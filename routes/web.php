@@ -1,0 +1,55 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\DashboardController;
+
+// Public routes
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Authentication routes
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [RegisterController::class, 'register']);
+
+Route::get('/login', function () {
+    return view('auth.login');
+})->name('login');
+
+Route::post('/login', function () {
+    // Login logic will be implemented
+})->name('login.post');
+
+Route::post('/logout', function () {
+    auth()->logout();
+    return redirect('/');
+})->name('logout');
+
+// Protected routes
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // Emissions routes
+    Route::prefix('emissions')->name('emissions.')->group(function () {
+        Route::get('/', function () {
+            return view('emissions.index');
+        })->name('index');
+        Route::get('/create', function () {
+            return view('emissions.create');
+        })->name('create');
+    });
+    
+    // Reports routes
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', function () {
+            return view('reports.index');
+        })->name('index');
+    });
+    
+    // Admin routes
+    Route::prefix('admin')->name('admin.')->middleware('can:admin')->group(function () {
+        Route::get('/', function () {
+            return view('admin.dashboard');
+        })->name('dashboard');
+    });
+});
