@@ -174,9 +174,9 @@ class CarbonCalculationService
                                 'total_emissions' => $subcategoryEmissions->sum('total_emissions'),
                                 'count' => $subcategoryEmissions->count(),
                             ];
-                        }),
+                        })->toArray(),
                 ];
-            });
+            })->toArray();
     }
 
     /**

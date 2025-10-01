@@ -16,8 +16,18 @@ Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
 
-Route::post('/login', function () {
-    // Login logic will be implemented
+Route::post('/login', function (\Illuminate\Http\Request $request) {
+    $credentials = $request->validate([
+        'email' => ['required', 'email'],
+        'password' => ['required'],
+    ]);
+
+    if (\Illuminate\Support\Facades\Auth::attempt($credentials, true)) {
+        $request->session()->regenerate();
+        return redirect()->intended(route('dashboard'));
+    }
+
+    return back()->withErrors(['email' => 'The provided credentials do not match our records.'])->onlyInput('email');
 })->name('login.post');
 
 Route::post('/logout', function () {
