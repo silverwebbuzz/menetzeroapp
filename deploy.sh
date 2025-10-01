@@ -47,6 +47,50 @@ fi
 mkdir -p storage/framework/{cache,sessions,views} bootstrap/cache
 chmod -R 775 storage bootstrap/cache || true
 
+# Ensure .htaccess files exist
+if [ ! -f public/.htaccess ]; then
+cat > public/.htaccess <<'HTACC'
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%1]
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Send Requests To Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+<IfModule !mod_rewrite.c>
+    ErrorDocument 404 /index.php
+</IfModule>
+HTACC
+fi
+
+if [ ! -f .htaccess ]; then
+cat > .htaccess <<'ROOTACC'
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ public/index.php [L]
+</IfModule>
+ROOTACC
+fi
+
 # Install production dependencies only (non-interactive)
 $COMPOSER_CMD install --no-dev --prefer-dist --no-interaction --no-ansi --optimize-autoloader
 
