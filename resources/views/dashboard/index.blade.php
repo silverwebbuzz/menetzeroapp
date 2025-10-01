@@ -33,13 +33,13 @@
 
     <!-- Charts Section -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="chart-container">
+        <div class="chart-container h-80">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">Emissions by Scope</h3>
-            <canvas id="scopeChart" width="400" height="200"></canvas>
+            <canvas id="scopeChart" class="w-full h-full"></canvas>
         </div>
-        <div class="chart-container">
+        <div class="chart-container h-80">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">Monthly Trends</h3>
-            <canvas id="trendsChart" width="400" height="200"></canvas>
+            <canvas id="trendsChart" class="w-full h-full"></canvas>
         </div>
     </div>
 
@@ -111,6 +111,7 @@
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            resizeDelay: 200,
             plugins: {
                 legend: {
                     position: 'bottom'
@@ -137,6 +138,7 @@
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            resizeDelay: 200,
             scales: {
                 y: {
                     beginAtZero: true
