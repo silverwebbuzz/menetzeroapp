@@ -43,6 +43,23 @@ else
 echo "APP_URL=https://app.menetzero.com" >> .env
 fi
 
+# Optionally set DB credentials from environment variables if provided
+if [ -n "${DB_HOST:-}" ]; then
+  if grep -q "^DB_HOST=" .env; then sed -i "s#^DB_HOST=.*#DB_HOST=${DB_HOST}#" .env; else echo "DB_HOST=${DB_HOST}" >> .env; fi
+fi
+if [ -n "${DB_PORT:-}" ]; then
+  if grep -q "^DB_PORT=" .env; then sed -i "s#^DB_PORT=.*#DB_PORT=${DB_PORT}#" .env; else echo "DB_PORT=${DB_PORT}" >> .env; fi
+fi
+if [ -n "${DB_DATABASE:-}" ]; then
+  if grep -q "^DB_DATABASE=" .env; then sed -i "s#^DB_DATABASE=.*#DB_DATABASE=${DB_DATABASE}#" .env; else echo "DB_DATABASE=${DB_DATABASE}" >> .env; fi
+fi
+if [ -n "${DB_USERNAME:-}" ]; then
+  if grep -q "^DB_USERNAME=" .env; then sed -i "s#^DB_USERNAME=.*#DB_USERNAME=${DB_USERNAME}#" .env; else echo "DB_USERNAME=${DB_USERNAME}" >> .env; fi
+fi
+if [ -n "${DB_PASSWORD:-}" ]; then
+  if grep -q "^DB_PASSWORD=" .env; then sed -i "s#^DB_PASSWORD=.*#DB_PASSWORD=${DB_PASSWORD}#" .env; else echo "DB_PASSWORD=${DB_PASSWORD}" >> .env; fi
+fi
+
 # Ensure storage and cache directories exist and are writable
 mkdir -p storage/framework/{cache,sessions,views} bootstrap/cache
 chmod -R 775 storage bootstrap/cache || true
@@ -104,6 +121,9 @@ $PHP_BIN artisan storage:link || true
 
 # Clear caches before rebuilding
 $PHP_BIN artisan optimize:clear --no-ansi || true
+
+# Re-read environment after changes
+if [ -f bootstrap/cache/config.php ]; then rm -f bootstrap/cache/config.php; fi
 
 # Cache configuration, routes, and views
 $PHP_BIN artisan config:cache --no-ansi
