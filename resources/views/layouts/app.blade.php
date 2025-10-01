@@ -11,8 +11,20 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700" rel="stylesheet" />
 
-    <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- Styles/Scripts (CDN, no Vite needed) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+        .text-eco-green { color: #28a745; }
+        .bg-eco-green { background-color: #28a745; }
+        .bg-eco-green-dark { background-color: #15803d; }
+        .sidebar-link { display:flex; align-items:center; padding:0.5rem 0.75rem; font-size:0.875rem; font-weight:500; border-radius:0.5rem; transition:background-color .2s,color .2s; }
+        .sidebar-link-active { background:#28a745; color:#fff; }
+        .sidebar-link-inactive { color:#4b5563; }
+        .sidebar-link-inactive:hover { background:#f3f4f6; color:#111827; }
+    </style>
     
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
