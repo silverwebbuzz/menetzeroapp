@@ -116,5 +116,12 @@ $PHP_BIN artisan migrate --force --no-ansi || true
 # Final optimize
 $PHP_BIN artisan optimize --no-ansi
 
+# Normalize permissions so Apache can read .htaccess and files
+echo "Fixing file and directory permissions..."
+find . -type d -exec chmod 755 {} \; || true
+find . -type f -exec chmod 644 {} \; || true
+chmod -R 775 storage bootstrap/cache || true
+chmod 644 .htaccess public/.htaccess 2>/dev/null || true
+
 echo "Deployment completed successfully!"
 echo "Your application is ready at: https://app.menetzero.com"
