@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CarbonTracker - Professional Carbon Emissions Tracking</title>
-    @vite([\"resources/css/app.css\", \"resources/js/app.js\"])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-50">
     <section class="bg-gradient-to-br from-eco-green to-eco-green-dark text-white py-24">
@@ -18,7 +18,7 @@
                     Comprehensive carbon emissions tracking for businesses.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href=\"{{ route(\"register\") }}\" class="bg-white text-eco-green hover:bg-gray-100 font-medium py-3 px-8 rounded-lg">
+                    <a href="{{ route('register') }}" class="bg-white text-eco-green hover:bg-gray-100 font-medium py-3 px-8 rounded-lg">
                         Start Free Trial
                     </a>
                 </div>
