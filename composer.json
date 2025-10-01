@@ -34,8 +34,8 @@
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi",
             "@php artisan migrate --graceful --ansi"
-        ],
-    }
+        ]
+    },
     "extra": {
         "laravel": {
             "dont-discover": []
