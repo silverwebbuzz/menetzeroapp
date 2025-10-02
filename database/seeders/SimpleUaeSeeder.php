@@ -204,7 +204,7 @@ class SimpleUaeSeeder extends Seeder
                 'company_id' => $company1->id,
                 'plan_type' => 'Standard',
                 'status' => 'active',
-                'stripe_customer_id' => 'cus_' . str_random(14),
+                'stripe_customer_id' => 'cus_' . \Illuminate\Support\Str::random(14),
                 'started_at' => now()->subMonths(6),
                 'expires_at' => now()->addMonths(6),
             ]);
