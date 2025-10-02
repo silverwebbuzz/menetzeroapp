@@ -23,87 +23,133 @@ class SimpleUaeSeeder extends Seeder
         try {
             // Create companies
             $this->command->info('Creating companies...');
-            $company1 = Company::create([
-                'name' => 'GreenTech UAE',
-                'slug' => 'greentech-uae',
-                'emirate' => 'Dubai',
-                'sector' => 'Manufacturing',
-                'license_no' => 'DED-12345',
-                'contact_person' => 'Ahmed Al-Rashid',
-                'email' => 'ahmed@greentech.ae',
-                'phone' => '+971500000001',
-                'address' => 'Dubai Industrial City, Building 15',
-                'city' => 'Dubai',
-                'state' => 'Dubai',
-                'country' => 'UAE',
-                'website' => 'https://greentech.ae',
-                'industry' => 'Manufacturing',
-                'employee_count' => 250,
-                'annual_revenue' => 15000000,
-                'is_active' => true,
-            ]);
+            
+            // Check if companies already exist
+            $company1 = Company::where('slug', 'greentech-uae')->first();
+            if (!$company1) {
+                $company1 = Company::create([
+                    'name' => 'GreenTech UAE',
+                    'slug' => 'greentech-uae',
+                    'emirate' => 'Dubai',
+                    'sector' => 'Manufacturing',
+                    'license_no' => 'DED-12345',
+                    'contact_person' => 'Ahmed Al-Rashid',
+                    'email' => 'ahmed@greentech.ae',
+                    'phone' => '+971500000001',
+                    'address' => 'Dubai Industrial City, Building 15',
+                    'city' => 'Dubai',
+                    'state' => 'Dubai',
+                    'country' => 'UAE',
+                    'website' => 'https://greentech.ae',
+                    'industry' => 'Manufacturing',
+                    'employee_count' => 250,
+                    'annual_revenue' => 15000000,
+                    'is_active' => true,
+                ]);
+                $this->command->info('✅ GreenTech UAE created');
+            } else {
+                $this->command->info('✅ GreenTech UAE already exists');
+            }
 
-            $company2 = Company::create([
-                'name' => 'Desert Transport LLC',
-                'slug' => 'desert-transport-llc',
-                'emirate' => 'Abu Dhabi',
-                'sector' => 'Logistics',
-                'license_no' => 'AD-98765',
-                'contact_person' => 'Fatima Al-Zahra',
-                'email' => 'fatima@deserttrans.ae',
-                'phone' => '+971500000002',
-                'address' => 'Mussafah Industrial Area, Plot 123',
-                'city' => 'Abu Dhabi',
-                'state' => 'Abu Dhabi',
-                'country' => 'UAE',
-                'website' => 'https://deserttrans.ae',
-                'industry' => 'Logistics',
-                'employee_count' => 180,
-                'annual_revenue' => 8500000,
-                'is_active' => true,
-            ]);
+            $company2 = Company::where('slug', 'desert-transport-llc')->first();
+            if (!$company2) {
+                $company2 = Company::create([
+                    'name' => 'Desert Transport LLC',
+                    'slug' => 'desert-transport-llc',
+                    'emirate' => 'Abu Dhabi',
+                    'sector' => 'Logistics',
+                    'license_no' => 'AD-98765',
+                    'contact_person' => 'Fatima Al-Zahra',
+                    'email' => 'fatima@deserttrans.ae',
+                    'phone' => '+971500000002',
+                    'address' => 'Mussafah Industrial Area, Plot 123',
+                    'city' => 'Abu Dhabi',
+                    'state' => 'Abu Dhabi',
+                    'country' => 'UAE',
+                    'website' => 'https://deserttrans.ae',
+                    'industry' => 'Logistics',
+                    'employee_count' => 180,
+                    'annual_revenue' => 8500000,
+                    'is_active' => true,
+                ]);
+                $this->command->info('✅ Desert Transport LLC created');
+            } else {
+                $this->command->info('✅ Desert Transport LLC already exists');
+            }
 
             $this->command->info('✅ Companies created');
 
             // Create facilities
             $this->command->info('Creating facilities...');
-            $facility1 = Facility::create([
-                'company_id' => $company1->id,
-                'name' => 'Factory Plant A',
-                'location' => 'Dubai Industrial City',
-                'type' => 'Factory',
-            ]);
+            
+            $facility1 = Facility::where('company_id', $company1->id)->where('name', 'Factory Plant A')->first();
+            if (!$facility1) {
+                $facility1 = Facility::create([
+                    'company_id' => $company1->id,
+                    'name' => 'Factory Plant A',
+                    'location' => 'Dubai Industrial City',
+                    'type' => 'Factory',
+                ]);
+                $this->command->info('✅ Factory Plant A created');
+            } else {
+                $this->command->info('✅ Factory Plant A already exists');
+            }
 
-            $facility2 = Facility::create([
-                'company_id' => $company2->id,
-                'name' => 'Truck Depot',
-                'location' => 'Mussafah Industrial Area',
-                'type' => 'Warehouse',
-            ]);
+            $facility2 = Facility::where('company_id', $company2->id)->where('name', 'Truck Depot')->first();
+            if (!$facility2) {
+                $facility2 = Facility::create([
+                    'company_id' => $company2->id,
+                    'name' => 'Truck Depot',
+                    'location' => 'Mussafah Industrial Area',
+                    'type' => 'Warehouse',
+                ]);
+                $this->command->info('✅ Truck Depot created');
+            } else {
+                $this->command->info('✅ Truck Depot already exists');
+            }
 
             $this->command->info('✅ Facilities created');
 
             // Create emission factors
             $this->command->info('Creating emission factors...');
-            EmissionFactor::create([
-                'category' => 'Energy',
-                'subcategory' => 'Grid Electricity',
-                'factor_value' => 0.424,
-                'unit' => 'kgCO₂e/kWh',
-                'source' => 'MOCCAE',
-                'year' => 2023,
-                'region' => 'UAE',
-            ]);
+            
+            $electricityFactor = EmissionFactor::where('category', 'Energy')
+                ->where('subcategory', 'Grid Electricity')
+                ->where('source', 'MOCCAE')
+                ->first();
+            if (!$electricityFactor) {
+                EmissionFactor::create([
+                    'category' => 'Energy',
+                    'subcategory' => 'Grid Electricity',
+                    'factor_value' => 0.424,
+                    'unit' => 'kgCO₂e/kWh',
+                    'source' => 'MOCCAE',
+                    'year' => 2023,
+                    'region' => 'UAE',
+                ]);
+                $this->command->info('✅ Grid Electricity factor created');
+            } else {
+                $this->command->info('✅ Grid Electricity factor already exists');
+            }
 
-            EmissionFactor::create([
-                'category' => 'Transport',
-                'subcategory' => 'Diesel Fuel',
-                'factor_value' => 2.680,
-                'unit' => 'kgCO₂e/litre',
-                'source' => 'IPCC',
-                'year' => 2023,
-                'region' => 'UAE',
-            ]);
+            $dieselFactor = EmissionFactor::where('category', 'Transport')
+                ->where('subcategory', 'Diesel Fuel')
+                ->where('source', 'IPCC')
+                ->first();
+            if (!$dieselFactor) {
+                EmissionFactor::create([
+                    'category' => 'Transport',
+                    'subcategory' => 'Diesel Fuel',
+                    'factor_value' => 2.680,
+                    'unit' => 'kgCO₂e/litre',
+                    'source' => 'IPCC',
+                    'year' => 2023,
+                    'region' => 'UAE',
+                ]);
+                $this->command->info('✅ Diesel Fuel factor created');
+            } else {
+                $this->command->info('✅ Diesel Fuel factor already exists');
+            }
 
             $this->command->info('✅ Emission factors created');
 
