@@ -20,5 +20,3 @@ class EnergyData extends Model
         return $this->belongsTo(Facility::class);
     }
 }
-
-

@@ -20,5 +20,3 @@ class AgricultureData extends Model
         return $this->belongsTo(Facility::class);
     }
 }
-
-

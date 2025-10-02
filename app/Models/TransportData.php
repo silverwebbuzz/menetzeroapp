@@ -20,5 +20,3 @@ class TransportData extends Model
         return $this->belongsTo(Facility::class);
     }
 }
-
-

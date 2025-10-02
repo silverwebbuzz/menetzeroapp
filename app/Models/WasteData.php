@@ -20,5 +20,3 @@ class WasteData extends Model
         return $this->belongsTo(Facility::class);
     }
 }
-
-

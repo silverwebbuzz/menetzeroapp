@@ -20,5 +20,3 @@ class IndustrialData extends Model
         return $this->belongsTo(Facility::class);
     }
 }
-
-
