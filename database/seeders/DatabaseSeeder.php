@@ -23,11 +23,11 @@ class DatabaseSeeder extends Seeder
         $this->command->info('✅ Basic demo data created');
         
         // Ask if user wants more data
-        if ($this->command->confirm('Do you want to create additional data using factories? (50+ companies with activity data)', false)) {
+        if ($this->command->confirm('Do you want to create additional data? (20+ companies with activity data)', false)) {
             $this->call([
-                FactorySeeder::class,
+                BasicDataSeeder::class,
             ]);
-            $this->command->info('✅ Additional factory data created');
+            $this->command->info('✅ Additional data created');
         }
         
         $this->command->info('🎉 Database seeding completed!');

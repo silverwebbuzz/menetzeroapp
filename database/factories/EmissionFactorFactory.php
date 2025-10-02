@@ -32,8 +32,8 @@ class EmissionFactorFactory extends Factory
             ]
         ];
 
-        $category = $this->faker->randomElement(array_keys($categories));
-        $subcategory = $this->faker->randomElement($categories[$category]);
+        $category = fake()->randomElement(array_keys($categories));
+        $subcategory = fake()->randomElement($categories[$category]);
 
         $factorValues = [
             'Grid Electricity' => 0.424,
@@ -93,11 +93,11 @@ class EmissionFactorFactory extends Factory
         return [
             'category' => $category,
             'subcategory' => $subcategory,
-            'factor_value' => $factorValues[$subcategory] ?? $this->faker->randomFloat(4, 0.01, 50.0),
+            'factor_value' => $factorValues[$subcategory] ?? fake()->randomFloat(4, 0.01, 50.0),
             'unit' => $units[$subcategory] ?? 'kgCO₂e/kg',
-            'source' => $this->faker->randomElement($sources),
-            'year' => $this->faker->numberBetween(2020, 2024),
-            'region' => $this->faker->randomElement($regions),
+            'source' => fake()->randomElement($sources),
+            'year' => fake()->numberBetween(2020, 2024),
+            'region' => fake()->randomElement($regions),
         ];
     }
 }

@@ -33,7 +33,7 @@ class CompanyFactory extends Factory
             'Government', 'NGO', 'Agriculture', 'Mining'
         ];
 
-        $name = $this->faker->company() . ' ' . $this->faker->randomElement(['UAE', 'Dubai', 'Abu Dhabi', 'Gulf', 'Middle East', 'Emirates']);
+        $name = fake()->company() . ' ' . fake()->randomElement(['UAE', 'Dubai', 'Abu Dhabi', 'Gulf', 'Middle East', 'Emirates']);
         
         return [
             'name' => $name,
