@@ -23,6 +23,37 @@
         </a>
     </div>
 
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Total -->
+        <div class="p-6 rounded-2xl text-white shadow-sm" style="background:linear-gradient(90deg, #26A69A 0%, #1f8e86 100%); border:1px solid rgba(38,166,154,.25)">
+            <div class="flex items-start justify-between">
+                <p class="text-sm/5 opacity-90">Total Emissions</p>
+                <span class="text-white/80">🌿</span>
+            </div>
+            <div class="mt-2 text-3xl font-semibold"><span id="kpiTotal">—</span> tCO₂e</div>
+            <p class="mt-1 text-xs/5 opacity-90"><span id="kpiTotalDelta">—</span> from last month</p>
+        </div>
+        <!-- Scope 1 -->
+        <div class="p-6 rounded-2xl bg-white shadow-sm border border-gray-100">
+            <div class="flex items-start justify-between"><p class="text-sm/5 text-gray-600">Scope 1 Emissions</p><span class="text-rose-500">📈</span></div>
+            <div class="mt-2 text-2xl font-semibold text-gray-900"><span id="kpiS1">—</span> tCO₂e</div>
+            <p class="mt-1 text-xs/5 text-rose-600"><span id="kpiS1Delta">—</span> from last month</p>
+        </div>
+        <!-- Scope 2 -->
+        <div class="p-6 rounded-2xl bg-white shadow-sm border border-gray-100">
+            <div class="flex items-start justify-between"><p class="text-sm/5 text-gray-600">Scope 2 Emissions</p><span class="text-amber-500">⚡</span></div>
+            <div class="mt-2 text-2xl font-semibold text-gray-900"><span id="kpiS2">—</span> tCO₂e</div>
+            <p class="mt-1 text-xs/5 text-emerald-600"><span id="kpiS2Delta">—</span> from last month</p>
+        </div>
+        <!-- Scope 3 -->
+        <div class="p-6 rounded-2xl bg-white shadow-sm border border-gray-100">
+            <div class="flex items-start justify-between"><p class="text-sm/5 text-gray-600">Scope 3 Emissions</p><span class="text-indigo-500">🔗</span></div>
+            <div class="mt-2 text-2xl font-semibold text-gray-900"><span id="kpiS3">—</span> tCO₂e</div>
+            <p class="mt-1 text-xs/5 text-emerald-600"><span id="kpiS3Delta">—</span> from last month</p>
+        </div>
+    </div>
+
     <!-- 1) Monthly CO2 Trend -->
     <div class="card p-6">
         <div class="flex items-center justify-between mb-4">
@@ -106,6 +137,16 @@
     const brand = getComputedStyle(document.documentElement).getPropertyValue('--brand') || '#004D40';
     const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent') || '#26A69A';
 
+    // Populate KPI values (using the same demo arrays below)
+    const lastIdx = months.length - 1;
+    const fmtDelta = (curr, prev) => {
+        if (prev === 0) return '0%';
+        const pct = ((curr - prev) / prev) * 100;
+        const sign = pct >= 0 ? '+' : '';
+        return `${sign}${pct.toFixed(1)}%`;
+    };
+    const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
     // 1) Monthly CO2 Trend
     const tctx = document.getElementById('trendChart').getContext('2d');
     new Chart(tctx, { type: 'line', data: { labels: months, datasets: [
@@ -122,6 +163,16 @@
     document.getElementById('sumS1').textContent = sum(s1).toFixed(1); document.getElementById('avgS1').textContent = avg(s1);
     document.getElementById('sumS2').textContent = sum(s2).toFixed(1); document.getElementById('avgS2').textContent = avg(s2);
     document.getElementById('sumS3').textContent = sum(s3).toFixed(1); document.getElementById('avgS3').textContent = avg(s3);
+
+    // Set KPI boxes
+    setText('kpiTotal', total[lastIdx].toLocaleString());
+    setText('kpiS1', s1[lastIdx].toLocaleString());
+    setText('kpiS2', s2[lastIdx].toLocaleString());
+    setText('kpiS3', s3[lastIdx].toLocaleString());
+    setText('kpiTotalDelta', fmtDelta(total[lastIdx], total[lastIdx-1]));
+    setText('kpiS1Delta', fmtDelta(s1[lastIdx], s1[lastIdx-1]));
+    setText('kpiS2Delta', fmtDelta(s2[lastIdx], s2[lastIdx-1]));
+    setText('kpiS3Delta', fmtDelta(s3[lastIdx], s3[lastIdx-1]));
 
     // 2) Energy & Water Usage (combo)
     const electricity = [4200,4300,4400,4550,4620,4680,4700,4720,4750,4780,4800,4850];
