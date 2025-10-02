@@ -8,6 +8,9 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Drop the existing emission_factors table and recreate with new schema
+        Schema::dropIfExists('emission_factors');
+        
         Schema::create('emission_factors', function (Blueprint $table) {
             $table->id();
             $table->string('category');
@@ -26,5 +29,3 @@ return new class extends Migration
         Schema::dropIfExists('emission_factors');
     }
 };
-
-
