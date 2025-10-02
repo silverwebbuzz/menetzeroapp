@@ -15,7 +15,12 @@ class DatabaseSeeder extends Seeder
     {
         $this->command->info('🌱 Starting database seeding...');
         
-        // Always run simple demo data first
+        // Always run emission factors first
+        $this->call([
+            UaeEmissionFactorsSeeder::class,
+        ]);
+        
+        // Then run simple demo data
         $this->call([
             SimpleUaeSeeder::class,
         ]);

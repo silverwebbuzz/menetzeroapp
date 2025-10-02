@@ -3,11 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\EmissionSource;
+use App\Services\CarbonCalculatorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class EmissionManagementController extends Controller
 {
+    protected $carbonCalculator;
+
+    public function __construct(CarbonCalculatorService $carbonCalculator)
+    {
+        $this->carbonCalculator = $carbonCalculator;
+    }
+
     public function index(Request $request)
     {
         $query = EmissionSource::query();
@@ -40,7 +48,7 @@ class EmissionManagementController extends Controller
     
     public function show(EmissionSource $emission)
     {
-        $emission->updateCalculatedTotals();
+        $this->carbonCalculator->calculateEmissions($emission);
         return view('emissions.detail', compact('emission'));
     }
     
@@ -94,5 +102,30 @@ class EmissionManagementController extends Controller
         
         return redirect()->route('emissions.management')
             ->with('success', 'Emission report status updated successfully!');
+    }
+
+    public function recalculate(EmissionSource $emission)
+    {
+        $results = $this->carbonCalculator->calculateEmissions($emission);
+        
+        return redirect()->route('emissions.show', $emission)
+            ->with('success', 'Emissions recalculated successfully!')
+            ->with('calculation_results', $results);
+    }
+
+    public function getBreakdown(EmissionSource $emission)
+    {
+        $breakdown = $this->carbonCalculator->getEmissionBreakdown($emission);
+        
+        return response()->json([
+            'success' => true,
+            'breakdown' => $breakdown,
+            'totals' => [
+                'scope1' => $emission->scope1_total,
+                'scope2' => $emission->scope2_total,
+                'scope3' => $emission->scope3_total,
+                'grand_total' => $emission->grand_total
+            ]
+        ]);
     }
 }

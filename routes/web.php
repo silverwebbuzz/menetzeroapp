@@ -77,6 +77,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/{emission}/duplicate', [EmissionManagementController::class, 'duplicate'])->name('duplicate');
         Route::delete('/{emission}/delete', [EmissionManagementController::class, 'delete'])->name('delete');
         Route::patch('/{emission}/status', [EmissionManagementController::class, 'updateStatus'])->name('update-status');
+        Route::post('/{emission}/recalculate', [EmissionManagementController::class, 'recalculate'])->name('recalculate');
+        Route::get('/{emission}/breakdown', [EmissionManagementController::class, 'getBreakdown'])->name('breakdown');
     });
     
     // Admin routes

@@ -20,6 +20,26 @@
                         </svg>
                         Back to Reports
                     </a>
+                    
+                    <form method="POST" action="{{ route('emissions.recalculate', $emission) }}" class="inline">
+                        @csrf
+                        <button type="submit" 
+                                class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                            Recalculate
+                        </button>
+                    </form>
+                    
+                    <button onclick="showBreakdown()" 
+                            class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        Breakdown
+                    </button>
+                    
                     @if($emission->status === 'draft')
                         <a href="{{ route('emissions.edit', $emission) }}" 
                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700">
@@ -218,4 +238,101 @@
         @endif
     </div>
 </div>
+
+<!-- Breakdown Modal -->
+<div id="breakdownModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Emission Breakdown</h3>
+                <button onclick="hideBreakdown()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="breakdownContent" class="text-sm text-gray-500">
+                Loading breakdown...
+            </div>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+function showBreakdown() {
+    document.getElementById('breakdownModal').classList.remove('hidden');
+    
+    // Fetch breakdown data
+    fetch('{{ route("emissions.breakdown", $emission) }}')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayBreakdown(data.breakdown, data.totals);
+            } else {
+                document.getElementById('breakdownContent').innerHTML = '<p class="text-red-500">Error loading breakdown</p>';
+            }
+        })
+        .catch(error => {
+            document.getElementById('breakdownContent').innerHTML = '<p class="text-red-500">Error loading breakdown</p>';
+        });
+}
+
+function hideBreakdown() {
+    document.getElementById('breakdownModal').classList.add('hidden');
+}
+
+function displayBreakdown(breakdown, totals) {
+    let html = '<div class="space-y-4">';
+    
+    // Group by scope
+    const scopeGroups = {
+        'Scope 1': [],
+        'Scope 2': [],
+        'Scope 3': []
+    };
+    
+    Object.keys(breakdown).forEach(key => {
+        const item = breakdown[key];
+        scopeGroups[item.scope].push({...item, key});
+    });
+    
+    // Display each scope
+    Object.keys(scopeGroups).forEach(scope => {
+        if (scopeGroups[scope].length > 0) {
+            html += `<div class="border rounded-lg p-4">`;
+            html += `<h4 class="font-semibold text-gray-900 mb-3">${scope}</h4>`;
+            html += `<div class="space-y-2">`;
+            
+            scopeGroups[scope].forEach(item => {
+                html += `<div class="flex justify-between items-center py-2 border-b border-gray-100">`;
+                html += `<div>`;
+                html += `<span class="font-medium text-gray-700">${item.key.replace('_', ' ').toUpperCase()}</span><br>`;
+                html += `<span class="text-sm text-gray-500">${item.quantity} ${item.unit} × ${item.factor} = ${item.co2e.toFixed(2)} kg CO₂e</span>`;
+                html += `</div>`;
+                html += `</div>`;
+            });
+            
+            html += `</div>`;
+            html += `</div>`;
+        }
+    });
+    
+    // Totals
+    html += '<div class="bg-gray-50 rounded-lg p-4 mt-4">';
+    html += '<h4 class="font-semibold text-gray-900 mb-3">Totals</h4>';
+    html += '<div class="grid grid-cols-2 gap-4">';
+    html += `<div><span class="text-sm text-gray-600">Scope 1:</span> <span class="font-medium">${totals.scope1.toFixed(2)} kg CO₂e</span></div>`;
+    html += `<div><span class="text-sm text-gray-600">Scope 2:</span> <span class="font-medium">${totals.scope2.toFixed(2)} kg CO₂e</span></div>`;
+    html += `<div><span class="text-sm text-gray-600">Scope 3:</span> <span class="font-medium">${totals.scope3.toFixed(2)} kg CO₂e</span></div>`;
+    html += `<div><span class="text-sm text-gray-600">Total:</span> <span class="font-bold text-lg">${totals.grand_total.toFixed(2)} kg CO₂e</span></div>`;
+    html += '</div>';
+    html += '</div>';
+    
+    html += '</div>';
+    
+    document.getElementById('breakdownContent').innerHTML = html;
+}
+</script>
+@endpush
 @endsection

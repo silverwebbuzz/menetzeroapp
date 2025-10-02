@@ -3,12 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\EmissionSource;
+use App\Services\CarbonCalculatorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class EmissionFormController extends Controller
 {
+    protected $carbonCalculator;
+
+    public function __construct(CarbonCalculatorService $carbonCalculator)
+    {
+        $this->carbonCalculator = $carbonCalculator;
+    }
+
     const STEPS = [
         'company' => 'A',
         'scope1' => 'B', 
@@ -58,7 +66,7 @@ class EmissionFormController extends Controller
 
         // Calculate totals if we have enough data
         if ($step === 'scope1' || $step === 'scope2' || $step === 'scope3') {
-            $emissionSource->updateCalculatedTotals();
+            $this->carbonCalculator->calculateEmissions($emissionSource);
         }
 
         $nextStep = $this->getNextStep($step);
@@ -75,7 +83,7 @@ class EmissionFormController extends Controller
     public function review()
     {
         $emissionSource = $this->getOrCreateEmissionSource(request());
-        $emissionSource->updateCalculatedTotals();
+        $this->carbonCalculator->calculateEmissions($emissionSource);
         $progress = $this->calculateProgress($emissionSource);
         $step = 'review';
         
@@ -85,7 +93,10 @@ class EmissionFormController extends Controller
     public function submit(Request $request)
     {
         $emissionSource = $this->getOrCreateEmissionSource($request);
-        $emissionSource->updateCalculatedTotals();
+        
+        // Calculate final emissions before submission
+        $this->carbonCalculator->calculateEmissions($emissionSource);
+        
         $emissionSource->status = 'submitted';
         $emissionSource->save();
 
@@ -315,10 +326,22 @@ class EmissionFormController extends Controller
             ];
         }
 
+        // If we have an emission source in session, calculate emissions from OCR data
+        $emissionSource = $this->getOrCreateEmissionSource($request);
+        if ($emissionSource) {
+            $this->carbonCalculator->calculateFromOcrData($mockData, $emissionSource);
+        }
+
         return response()->json([
             'success' => true,
             'extracted_data' => $mockData,
-            'message' => 'Data extracted successfully from ' . $file->getClientOriginalName()
+            'message' => 'Data extracted successfully from ' . $file->getClientOriginalName(),
+            'calculated_emissions' => $emissionSource ? [
+                'scope1_total' => $emissionSource->scope1_total,
+                'scope2_total' => $emissionSource->scope2_total,
+                'scope3_total' => $emissionSource->scope3_total,
+                'grand_total' => $emissionSource->grand_total
+            ] : null
         ]);
     }
 }

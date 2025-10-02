@@ -185,6 +185,14 @@
                                                         Edit
                                                     </a>
                                                 @endif
+                                                <form method="POST" action="{{ route('emissions.recalculate', $emission) }}" class="inline">
+                                                    @csrf
+                                                    <button type="submit" 
+                                                            class="text-purple-600 hover:text-purple-900"
+                                                            title="Recalculate emissions">
+                                                        Recalculate
+                                                    </button>
+                                                </form>
                                                 <a href="{{ route('emissions.duplicate', $emission) }}" 
                                                    class="text-gray-600 hover:text-gray-900">
                                                     Duplicate
