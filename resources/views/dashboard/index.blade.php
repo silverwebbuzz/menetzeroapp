@@ -17,10 +17,16 @@
             <h2 class="text-2xl font-semibold text-gray-900">Dashboard</h2>
             <p class="text-sm text-gray-500">Welcome back, {{ auth()->user()->name }}</p>
         </div>
-        <a href="#" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-[color:var(--brand)] border-[color:var(--accent)]/30 bg-[color:var(--accent)]/10 hover:bg-[color:var(--accent)]/20 transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m4-4H8"/></svg>
-            Export Report
-        </a>
+        <div class="flex gap-3">
+            <a href="{{ route('emission-form.index') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-white bg-[color:var(--brand)] hover:bg-[color:var(--brand)]/90 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                New Emission Report
+            </a>
+            <a href="#" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-[color:var(--brand)] border-[color:var(--accent)]/30 bg-[color:var(--accent)]/10 hover:bg-[color:var(--accent)]/20 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m4-4H8"/></svg>
+                Export Report
+            </a>
+        </div>
     </div>
 
     <!-- KPI Cards -->

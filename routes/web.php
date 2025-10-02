@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EmissionFormController;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -54,6 +55,17 @@ Route::middleware('auth')->group(function () {
         Route::get('/', function () {
             return view('reports.index');
         })->name('index');
+    });
+    
+    // Emission Form routes
+    Route::prefix('emission-form')->name('emission-form.')->group(function () {
+        Route::get('/', [EmissionFormController::class, 'index'])->name('index');
+        Route::get('/step/{step}', [EmissionFormController::class, 'showStep'])->name('step');
+        Route::post('/step/{step}', [EmissionFormController::class, 'storeStep'])->name('store');
+        Route::get('/review', [EmissionFormController::class, 'review'])->name('review');
+        Route::post('/submit', [EmissionFormController::class, 'submit'])->name('submit');
+        Route::get('/success', [EmissionFormController::class, 'success'])->name('success');
+        Route::post('/ocr', [EmissionFormController::class, 'extractOCRData'])->name('ocr');
     });
     
     // Admin routes
