@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmissionFormController;
+use App\Http\Controllers\EmissionManagementController;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -66,6 +67,16 @@ Route::middleware('auth')->group(function () {
         Route::post('/submit', [EmissionFormController::class, 'submit'])->name('submit');
         Route::get('/success', [EmissionFormController::class, 'success'])->name('success');
         Route::post('/ocr', [EmissionFormController::class, 'extractOCRData'])->name('ocr');
+    });
+    
+    // Emission Management routes
+    Route::prefix('emissions')->name('emissions.')->group(function () {
+        Route::get('/management', [EmissionManagementController::class, 'index'])->name('management');
+        Route::get('/{emission}', [EmissionManagementController::class, 'show'])->name('show');
+        Route::get('/{emission}/edit', [EmissionManagementController::class, 'edit'])->name('edit');
+        Route::post('/{emission}/duplicate', [EmissionManagementController::class, 'duplicate'])->name('duplicate');
+        Route::delete('/{emission}/delete', [EmissionManagementController::class, 'delete'])->name('delete');
+        Route::patch('/{emission}/status', [EmissionManagementController::class, 'updateStatus'])->name('update-status');
     });
     
     // Admin routes
