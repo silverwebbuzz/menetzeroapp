@@ -88,7 +88,11 @@
                 @endif
 
                 <!-- Form Content -->
-                <form method="POST" action="{{ route('emission-form.store', $step) }}" enctype="multipart/form-data" id="emission-form">
+                @if($step === 'review')
+                    <form method="POST" action="{{ route('emission-form.submit') }}" id="emission-form">
+                @else
+                    <form method="POST" action="{{ route('emission-form.store', $step) }}" enctype="multipart/form-data" id="emission-form">
+                @endif
                     @csrf
                     
                     @include('emission-form.sections.' . $step, ['emissionSource' => $emissionSource])

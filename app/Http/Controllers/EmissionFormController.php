@@ -76,8 +76,10 @@ class EmissionFormController extends Controller
     {
         $emissionSource = $this->getOrCreateEmissionSource(request());
         $emissionSource->updateCalculatedTotals();
+        $progress = $this->calculateProgress($emissionSource);
+        $step = 'review';
         
-        return view('emission-form.review', compact('emissionSource'));
+        return view('emission-form.step', compact('step', 'emissionSource', 'progress'));
     }
 
     public function submit(Request $request)
@@ -86,6 +88,9 @@ class EmissionFormController extends Controller
         $emissionSource->updateCalculatedTotals();
         $emissionSource->status = 'submitted';
         $emissionSource->save();
+
+        // Clear the session
+        $request->session()->forget('emission_form_id');
 
         return redirect()->route('emission-form.success')
             ->with('success', 'Emission data submitted successfully!');
