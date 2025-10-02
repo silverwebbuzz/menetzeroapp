@@ -15,19 +15,19 @@ class DatabaseSeeder extends Seeder
     {
         $this->command->info('🌱 Starting database seeding...');
         
-        // Run basic demo data seeder
+        // Always run simple demo data first
         $this->call([
-            UaeSchemaSeeder::class,
+            SimpleUaeSeeder::class,
         ]);
         
         $this->command->info('✅ Basic demo data created');
         
-        // Ask if user wants comprehensive data
-        if ($this->command->confirm('Do you want to create comprehensive dataset (100+ companies)? This will take longer.', false)) {
+        // Ask if user wants more data
+        if ($this->command->confirm('Do you want to create additional data using factories? (50+ companies with activity data)', false)) {
             $this->call([
-                ComprehensiveUaeSeeder::class,
+                FactorySeeder::class,
             ]);
-            $this->command->info('✅ Comprehensive dataset created');
+            $this->command->info('✅ Additional factory data created');
         }
         
         $this->command->info('🎉 Database seeding completed!');
