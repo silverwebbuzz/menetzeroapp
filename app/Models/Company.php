@@ -11,22 +11,11 @@ class Company extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'slug',
-        'email',
-        'phone',
-        'address',
-        'city',
-        'state',
-        'country',
-        'postal_code',
-        'website',
-        'description',
-        'industry',
-        'employee_count',
-        'annual_revenue',
-        'is_active',
-        'settings',
+        'name', 'slug', 'email', 'phone',
+        'address', 'city', 'state', 'country', 'postal_code', 'website',
+        'description', 'industry', 'employee_count', 'annual_revenue', 'is_active', 'settings',
+        // UAE additions
+        'emirate', 'sector', 'license_no', 'contact_person',
     ];
 
     protected $casts = [
@@ -71,6 +60,21 @@ class Company extends Model
     public function carbonCalculations()
     {
         return $this->hasMany(CarbonCalculation::class);
+    }
+
+    public function facilities()
+    {
+        return $this->hasMany(Facility::class);
+    }
+
+    public function reports()
+    {
+        return $this->hasMany(Report::class);
+    }
+
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
     }
 
     /**
