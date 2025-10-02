@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard - CarbonTracker')
+@section('title', 'Dashboard - MenetZero')
 @section('page-title', 'Dashboard')
 
 @section('content')
@@ -12,6 +12,7 @@
 </style>
 
 <div class="space-y-8">
+    <!-- Header with Quick Actions -->
     <div class="flex items-center justify-between">
         <div>
             <h2 class="text-2xl font-semibold text-gray-900">Dashboard</h2>
@@ -26,199 +27,307 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 Manage Reports
             </a>
-            <a href="#" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-[color:var(--brand)] border-[color:var(--accent)]/30 bg-[color:var(--accent)]/10 hover:bg-[color:var(--accent)]/20 transition">
+            <button onclick="uploadBill()" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-[color:var(--brand)] border-[color:var(--accent)]/30 bg-[color:var(--accent)]/10 hover:bg-[color:var(--accent)]/20 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                Upload Bill
+            </button>
+            <button onclick="generateReport()" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-[color:var(--brand)] border-[color:var(--accent)]/30 bg-[color:var(--accent)]/10 hover:bg-[color:var(--accent)]/20 transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m4-4H8"/></svg>
-                Export Report
-            </a>
+                Generate Report
+            </button>
         </div>
     </div>
 
     <!-- KPI Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Total -->
+        <!-- Total Emissions -->
         <div class="p-6 rounded-2xl text-white shadow-sm" style="background:linear-gradient(90deg, #26A69A 0%, #1f8e86 100%); border:1px solid rgba(38,166,154,.25)">
             <div class="flex items-start justify-between">
                 <p class="text-sm/5 opacity-90">Total Emissions</p>
                 <span class="text-white/80">🌿</span>
             </div>
-            <div class="mt-2 text-3xl font-semibold"><span id="kpiTotal">—</span> tCO₂e</div>
-            <p class="mt-1 text-xs/5 opacity-90"><span id="kpiTotalDelta">—</span> from last month</p>
+            <div class="mt-2 text-3xl font-semibold">{{ number_format($kpis['total_emissions'], 2) }} kg CO₂e</div>
+            <p class="mt-1 text-xs/5 opacity-90">
+                @if($kpis['monthly_change'] > 0)
+                    <span class="text-red-200">↗ {{ $kpis['monthly_change'] }}%</span> from last month
+                @elseif($kpis['monthly_change'] < 0)
+                    <span class="text-green-200">↘ {{ abs($kpis['monthly_change']) }}%</span> from last month
+                @else
+                    <span class="text-white/70">No change</span> from last month
+                @endif
+            </p>
         </div>
+
         <!-- Scope 1 -->
         <div class="p-6 rounded-2xl bg-white shadow-sm border border-gray-100">
             <div class="flex items-start justify-between"><p class="text-sm/5 text-gray-600">Scope 1 Emissions</p><span class="text-rose-500">📈</span></div>
-            <div class="mt-2 text-2xl font-semibold text-gray-900"><span id="kpiS1">—</span> tCO₂e</div>
-            <p class="mt-1 text-xs/5 text-rose-600"><span id="kpiS1Delta">—</span> from last month</p>
+            <div class="mt-2 text-2xl font-semibold text-gray-900">{{ number_format($kpis['scope1_total'], 2) }} kg CO₂e</div>
+            <p class="mt-1 text-xs/5 text-rose-600">Direct emissions</p>
         </div>
+
         <!-- Scope 2 -->
         <div class="p-6 rounded-2xl bg-white shadow-sm border border-gray-100">
             <div class="flex items-start justify-between"><p class="text-sm/5 text-gray-600">Scope 2 Emissions</p><span class="text-amber-500">⚡</span></div>
-            <div class="mt-2 text-2xl font-semibold text-gray-900"><span id="kpiS2">—</span> tCO₂e</div>
-            <p class="mt-1 text-xs/5 text-emerald-600"><span id="kpiS2Delta">—</span> from last month</p>
+            <div class="mt-2 text-2xl font-semibold text-gray-900">{{ number_format($kpis['scope2_total'], 2) }} kg CO₂e</div>
+            <p class="mt-1 text-xs/5 text-emerald-600">Purchased energy</p>
         </div>
+
         <!-- Scope 3 -->
         <div class="p-6 rounded-2xl bg-white shadow-sm border border-gray-100">
-            <div class="flex items-start justify-between"><p class="text-sm/5 text-gray-600">Scope 3 Emissions</p><span class="text-indigo-500">🔗</span></div>
-            <div class="mt-2 text-2xl font-semibold text-gray-900"><span id="kpiS3">—</span> tCO₂e</div>
-            <p class="mt-1 text-xs/5 text-emerald-600"><span id="kpiS3Delta">—</span> from last month</p>
+            <div class="flex items-start justify-between"><p class="text-sm/5 text-gray-600">Scope 3 Emissions</p><span class="text-purple-500">🌐</span></div>
+            <div class="mt-2 text-2xl font-semibold text-gray-900">{{ number_format($kpis['scope3_total'], 2) }} kg CO₂e</div>
+            <p class="mt-1 text-xs/5 text-purple-600">Other indirect</p>
         </div>
     </div>
 
-    <!-- 1) Monthly CO2 Trend -->
-    <div class="card p-6">
+    <!-- UAE Net Zero Progress -->
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
         <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">Monthly CO₂ Trend</h3>
-            <span class="chip"><span class="w-2 h-2 rounded-full" style="background:var(--accent)"></span> Updated</span>
+            <div>
+                <h3 class="text-lg font-semibold text-blue-900">UAE Net Zero 2050 Progress</h3>
+                <p class="text-sm text-blue-700">Track your progress towards carbon neutrality</p>
+            </div>
+            <div class="text-right">
+                <div class="text-2xl font-bold text-blue-900">{{ $netZeroProgress['progress'] }}%</div>
+                <div class="text-sm text-blue-600">{{ $netZeroProgress['years_remaining'] }} years remaining</div>
+            </div>
         </div>
-        <div class="h-80"><canvas id="trendChart" class="w-full h-full"></canvas></div>
-        <div class="mt-5 overflow-x-auto">
-            <table class="min-w-full text-sm">
-                <thead class="text-gray-500"><tr><th class="py-2 pr-6 text-left">Metric</th><th class="py-2 pr-6 text-left">YTD Total (tCO₂e)</th><th class="py-2 pr-6 text-left">Monthly Avg</th></tr></thead>
-                <tbody class="text-gray-900">
-                    <tr><td class="py-2 pr-6">Total</td><td class="py-2 pr-6" id="sumTotal">—</td><td class="py-2 pr-6" id="avgTotal">—</td></tr>
-                    <tr><td class="py-2 pr-6">Scope 1</td><td class="py-2 pr-6" id="sumS1">—</td><td class="py-2 pr-6" id="avgS1">—</td></tr>
-                    <tr><td class="py-2 pr-6">Scope 2</td><td class="py-2 pr-6" id="sumS2">—</td><td class="py-2 pr-6" id="avgS2">—</td></tr>
-                    <tr><td class="py-2 pr-6">Scope 3</td><td class="py-2 pr-6" id="sumS3">—</td><td class="py-2 pr-6" id="avgS3">—</td></tr>
-                </tbody>
-            </table>
+        
+        <div class="w-full bg-blue-200 rounded-full h-3 mb-4">
+            <div class="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full transition-all duration-500" 
+                 style="width: {{ $netZeroProgress['progress'] }}%"></div>
+        </div>
+        
+        <div class="grid grid-cols-3 gap-4 text-sm">
+            <div class="text-center">
+                <div class="font-semibold text-blue-900">{{ $netZeroProgress['current'] }} tCO₂e</div>
+                <div class="text-blue-600">Current</div>
+            </div>
+            <div class="text-center">
+                <div class="font-semibold text-blue-900">{{ $netZeroProgress['baseline'] }} tCO₂e</div>
+                <div class="text-blue-600">Baseline</div>
+            </div>
+            <div class="text-center">
+                <div class="font-semibold text-blue-900">{{ $netZeroProgress['target'] }} tCO₂e</div>
+                <div class="text-blue-600">Target 2050</div>
+            </div>
         </div>
     </div>
 
+    <!-- Charts Section -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- 2) Energy & Water Usage -->
+        <!-- Monthly Emissions Trend -->
         <div class="card p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Energy & Water Usage</h3>
-            <div class="h-80"><canvas id="energyChart" class="w-full h-full"></canvas></div>
-            <div class="mt-5 overflow-x-auto">
-                <table class="min-w-full text-sm">
-                    <thead class="text-gray-500"><tr><th class="py-2 pr-6 text-left">Resource</th><th class="py-2 pr-6 text-left">YTD Total</th><th class="py-2 pr-6 text-left">Monthly Avg</th></tr></thead>
-                    <tbody class="text-gray-900">
-                        <tr><td class="py-2 pr-6">Electricity (kWh)</td><td class="py-2 pr-6" id="sumElec">—</td><td class="py-2 pr-6" id="avgElec">—</td></tr>
-                        <tr><td class="py-2 pr-6">Fuel (L)</td><td class="py-2 pr-6" id="sumFuel">—</td><td class="py-2 pr-6" id="avgFuel">—</td></tr>
-                        <tr><td class="py-2 pr-6">Water (m³)</td><td class="py-2 pr-6" id="sumWater">—</td><td class="py-2 pr-6" id="avgWater">—</td></tr>
-                    </tbody>
-                </table>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Monthly Emissions Trend</h3>
+            <div class="h-64">
+                <canvas id="monthlyTrendChart"></canvas>
             </div>
         </div>
 
-        <!-- 3) Waste Generation -->
+        <!-- Emissions by Scope -->
         <div class="card p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Waste Generation</h3>
-            <div class="h-80"><canvas id="wasteChart" class="w-full h-full"></canvas></div>
-            <div class="mt-5 overflow-x-auto">
-                <table class="min-w-full text-sm">
-                    <thead class="text-gray-500"><tr><th class="py-2 pr-6 text-left">Type</th><th class="py-2 pr-6 text-left">YTD Total (kg)</th><th class="py-2 pr-6 text-left">Monthly Avg</th></tr></thead>
-                    <tbody class="text-gray-900">
-                        <tr><td class="py-2 pr-6">Hazardous</td><td class="py-2 pr-6" id="sumHaz">—</td><td class="py-2 pr-6" id="avgHaz">—</td></tr>
-                        <tr><td class="py-2 pr-6">Non‑Hazardous</td><td class="py-2 pr-6" id="sumNon">—</td><td class="py-2 pr-6" id="avgNon">—</td></tr>
-                        <tr><td class="py-2 pr-6">Recycled</td><td class="py-2 pr-6" id="sumRec">—</td><td class="py-2 pr-6" id="avgRec">—</td></tr>
-                    </tbody>
-                </table>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Emissions by Scope</h3>
+            <div class="h-64">
+                <canvas id="scopeBreakdownChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Emission Sources & Recent Activity -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Top Emission Sources -->
+        <div class="card p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Top Emission Sources</h3>
+            <div class="space-y-3">
+                @forelse($topSources as $source)
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div>
+                            <div class="font-medium text-gray-900">{{ $source['company'] }}</div>
+                            <div class="text-sm text-gray-500">{{ $source['year'] }} • {{ ucfirst($source['status']) }}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-semibold text-gray-900">{{ number_format($source['emissions'], 2) }} kg CO₂e</div>
+                            <div class="text-xs text-gray-500">
+                                S1: {{ number_format($source['scope1'], 0) }} | 
+                                S2: {{ number_format($source['scope2'], 0) }} | 
+                                S3: {{ number_format($source['scope3'], 0) }}
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="text-center py-8 text-gray-500">
+                        <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <p>No emission reports yet</p>
+                        <p class="text-sm">Create your first report to see data here</p>
+                    </div>
+                @endforelse
             </div>
         </div>
 
-        <!-- 4) Scope Contribution Share -->
-        <div class="card p-6 lg:col-span-2">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Scope Contribution Share</h3>
-            <div class="h-80"><canvas id="shareChart" class="w-full h-full"></canvas></div>
-            <div class="mt-5 overflow-x-auto">
-                <table class="min-w-full text-sm">
-                    <thead class="text-gray-500"><tr><th class="py-2 pr-6 text-left">Scope</th><th class="py-2 pr-6 text-left">Share</th></tr></thead>
-                    <tbody class="text-gray-900">
-                        <tr><td class="py-2 pr-6">Scope 1</td><td class="py-2 pr-6" id="shareS1">—</td></tr>
-                        <tr><td class="py-2 pr-6">Scope 2</td><td class="py-2 pr-6" id="shareS2">—</td></tr>
-                        <tr><td class="py-2 pr-6">Scope 3</td><td class="py-2 pr-6" id="shareS3">—</td></tr>
-                    </tbody>
-                </table>
+        <!-- Recent Activity -->
+        <div class="card p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+            <div class="space-y-3">
+                @forelse($recentActivity as $activity)
+                    <div class="flex items-center space-x-3">
+                        <div class="flex-shrink-0">
+                            @switch($activity->status)
+                                @case('draft')
+                                    <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    </div>
+                                    @break
+                                @case('submitted')
+                                    <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    </div>
+                                    @break
+                                @case('reviewed')
+                                    <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    </div>
+                                    @break
+                            @endswitch
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900">{{ $activity->company_name }}</p>
+                            <p class="text-sm text-gray-500">{{ $activity->created_at->format('M d, Y') }} • {{ number_format($activity->grand_total ?? 0, 2) }} kg CO₂e</p>
+                        </div>
+                        <div class="flex-shrink-0">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                @if($activity->status === 'draft') bg-amber-100 text-amber-800
+                                @elseif($activity->status === 'submitted') bg-green-100 text-green-800
+                                @else bg-purple-100 text-purple-800
+                                @endif">
+                                {{ ucfirst($activity->status) }}
+                            </span>
+                        </div>
+                    </div>
+                @empty
+                    <div class="text-center py-8 text-gray-500">
+                        <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <p>No recent activity</p>
+                        <p class="text-sm">Start creating emission reports</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+    </div>
+
+    <!-- Reports Summary -->
+    <div class="card p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Reports Summary</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="text-center p-4 bg-blue-50 rounded-lg">
+                <div class="text-2xl font-bold text-blue-900">{{ $kpis['reports_count'] }}</div>
+                <div class="text-sm text-blue-600">Total Reports</div>
+            </div>
+            <div class="text-center p-4 bg-amber-50 rounded-lg">
+                <div class="text-2xl font-bold text-amber-900">{{ $kpis['draft_reports'] }}</div>
+                <div class="text-sm text-amber-600">Draft Reports</div>
+            </div>
+            <div class="text-center p-4 bg-green-50 rounded-lg">
+                <div class="text-2xl font-bold text-green-900">{{ $kpis['submitted_reports'] }}</div>
+                <div class="text-sm text-green-600">Submitted Reports</div>
             </div>
         </div>
     </div>
 </div>
-@endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const s1 = [110, 120, 115, 118, 122, 125, 128, 130, 129, 131, 133, 136];
-    const s2 = [90, 88, 92, 94, 96, 95, 93, 92, 94, 95, 96, 97];
-    const s3 = [220, 230, 240, 245, 250, 255, 260, 262, 265, 268, 270, 275];
-    const total = months.map((_, i) => s1[i] + s2[i] + s3[i]);
+// Monthly Trend Chart
+const monthlyTrendCtx = document.getElementById('monthlyTrendChart').getContext('2d');
+const monthlyTrendData = @json($chartData['monthly_trend']);
 
-    const brand = getComputedStyle(document.documentElement).getPropertyValue('--brand') || '#004D40';
-    const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent') || '#26A69A';
+new Chart(monthlyTrendCtx, {
+    type: 'line',
+    data: {
+        labels: Object.keys(monthlyTrendData),
+        datasets: [{
+            label: 'Emissions (kg CO₂e)',
+            data: Object.values(monthlyTrendData),
+            borderColor: '#26A69A',
+            backgroundColor: 'rgba(38, 166, 154, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: 'rgba(0,0,0,0.1)'
+                }
+            },
+            x: {
+                grid: {
+                    display: false
+                }
+            }
+        }
+    }
+});
 
-    // Populate KPI values (using the same demo arrays below)
-    const lastIdx = months.length - 1;
-    const fmtDelta = (curr, prev) => {
-        if (prev === 0) return '0%';
-        const pct = ((curr - prev) / prev) * 100;
-        const sign = pct >= 0 ? '+' : '';
-        return `${sign}${pct.toFixed(1)}%`;
-    };
-    const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+// Scope Breakdown Chart
+const scopeBreakdownCtx = document.getElementById('scopeBreakdownChart').getContext('2d');
+const scopeBreakdownData = @json($chartData['scope_breakdown']);
 
-    // 1) Monthly CO2 Trend
-    const tctx = document.getElementById('trendChart').getContext('2d');
-    new Chart(tctx, { type: 'line', data: { labels: months, datasets: [
-        { label:'Total', data: total, borderColor: accent.trim(), backgroundColor: 'rgba(38,166,154,.12)', fill:true, tension:.35 },
-        { label:'Scope 1', data: s1, borderColor:'#ef4444', backgroundColor:'transparent', tension:.35 },
-        { label:'Scope 2', data: s2, borderColor:'#f59e0b', backgroundColor:'transparent', tension:.35 },
-        { label:'Scope 3', data: s3, borderColor:'#3b82f6', backgroundColor:'transparent', tension:.35 }
-    ]}, options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'index', intersect:false}, plugins:{ legend:{ position:'bottom' } }, scales:{ y:{ beginAtZero:false, grid:{ color:'#eef2ff'}}, x:{ grid:{ display:false }}} });
+new Chart(scopeBreakdownCtx, {
+    type: 'doughnut',
+    data: {
+        labels: Object.keys(scopeBreakdownData),
+        datasets: [{
+            data: Object.values(scopeBreakdownData),
+            backgroundColor: [
+                '#EF4444', // Scope 1 - Red
+                '#F59E0B', // Scope 2 - Amber
+                '#8B5CF6'  // Scope 3 - Purple
+            ],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
 
-    const sum = arr => arr.reduce((a,b)=>a+b,0);
-    const avg = arr => (sum(arr)/arr.length).toFixed(1);
-    document.getElementById('sumTotal').textContent = sum(total).toFixed(1);
-    document.getElementById('avgTotal').textContent = avg(total);
-    document.getElementById('sumS1').textContent = sum(s1).toFixed(1); document.getElementById('avgS1').textContent = avg(s1);
-    document.getElementById('sumS2').textContent = sum(s2).toFixed(1); document.getElementById('avgS2').textContent = avg(s2);
-    document.getElementById('sumS3').textContent = sum(s3).toFixed(1); document.getElementById('avgS3').textContent = avg(s3);
+// Quick Actions
+function uploadBill() {
+    // Redirect to emission form with file upload focus
+    window.location.href = '{{ route("emission-form.step", "evidence") }}';
+}
 
-    // Set KPI boxes
-    setText('kpiTotal', total[lastIdx].toLocaleString());
-    setText('kpiS1', s1[lastIdx].toLocaleString());
-    setText('kpiS2', s2[lastIdx].toLocaleString());
-    setText('kpiS3', s3[lastIdx].toLocaleString());
-    setText('kpiTotalDelta', fmtDelta(total[lastIdx], total[lastIdx-1]));
-    setText('kpiS1Delta', fmtDelta(s1[lastIdx], s1[lastIdx-1]));
-    setText('kpiS2Delta', fmtDelta(s2[lastIdx], s2[lastIdx-1]));
-    setText('kpiS3Delta', fmtDelta(s3[lastIdx], s3[lastIdx-1]));
-
-    // 2) Energy & Water Usage (combo)
-    const electricity = [4200,4300,4400,4550,4620,4680,4700,4720,4750,4780,4800,4850];
-    const fuel = [1200,1210,1225,1230,1240,1250,1260,1270,1280,1290,1300,1310];
-    const water = [900,910,905,920,930,940,950,960,965,970,980,990];
-    const ectx = document.getElementById('energyChart').getContext('2d');
-    new Chart(ectx, { type:'bar', data:{ labels:months, datasets:[
-        { type:'bar', label:'Electricity (kWh)', data:electricity, backgroundColor: brand.trim(), borderRadius:6 },
-        { type:'bar', label:'Fuel (L)', data:fuel, backgroundColor:'#64748b', borderRadius:6 },
-        { type:'line', label:'Water (m³)', data:water, borderColor: accent.trim(), backgroundColor:'transparent', tension:.35, yAxisID:'y1' }
-    ]}, options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'index', intersect:false}, plugins:{ legend:{ position:'bottom' }}, scales:{ y:{ beginAtZero:true, grid:{ color:'#eef2ff'}}, y1:{ beginAtZero:true, position:'right', grid:{ drawOnChartArea:false }} } });
-    document.getElementById('sumElec').textContent = sum(electricity).toFixed(0); document.getElementById('avgElec').textContent = avg(electricity);
-    document.getElementById('sumFuel').textContent = sum(fuel).toFixed(0); document.getElementById('avgFuel').textContent = avg(fuel);
-    document.getElementById('sumWater').textContent = sum(water).toFixed(0); document.getElementById('avgWater').textContent = avg(water);
-
-    // 3) Waste Generation
-    const wh = [120,130,110,150,140,160,170,165,155,150,148,160];
-    const wn = [800,820,810,830,840,845,855,860,870,880,890,900];
-    const wr = [300,320,330,340,350,360,370,380,390,400,410,420];
-    const wctx = document.getElementById('wasteChart').getContext('2d');
-    new Chart(wctx, { type:'bar', data:{ labels:months, datasets:[
-        { label:'Hazardous', data:wh, backgroundColor:'#ef4444', borderRadius:6 },
-        { label:'Non‑Hazardous', data:wn, backgroundColor:'#f59e0b', borderRadius:6 },
-        { label:'Recycled', data:wr, backgroundColor:'#22c55e', borderRadius:6 }
-    ]}, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' }}, scales:{ y:{ beginAtZero:true, grid:{ color:'#eef2ff'} } } });
-    document.getElementById('sumHaz').textContent = sum(wh).toFixed(0); document.getElementById('avgHaz').textContent = avg(wh);
-    document.getElementById('sumNon').textContent = sum(wn).toFixed(0); document.getElementById('avgNon').textContent = avg(wn);
-    document.getElementById('sumRec').textContent = sum(wr).toFixed(0); document.getElementById('avgRec').textContent = avg(wr);
-
-    // 4) Scope Contribution Share
-    const scTotals = [sum(s1), sum(s2), sum(s3)];
-    const scShare = scTotals.map(v => (v / sum(scTotals) * 100));
-    const sctx = document.getElementById('shareChart').getContext('2d');
-    new Chart(sctx, { type:'doughnut', data:{ labels:['Scope 1','Scope 2','Scope 3'], datasets:[{ data: scTotals, backgroundColor:['#ef4444','#f59e0b','#3b82f6'], borderWidth:0 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } } });
-    document.getElementById('shareS1').textContent = scShare[0].toFixed(1) + '%';
-    document.getElementById('shareS2').textContent = scShare[1].toFixed(1) + '%';
-    document.getElementById('shareS3').textContent = scShare[2].toFixed(1) + '%';
+function generateReport() {
+    // Generate and download report
+    alert('Report generation feature coming soon!');
+}
 </script>
 @endpush
+@endsection
