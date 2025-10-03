@@ -253,10 +253,18 @@ class LocationController extends Controller
             $location->company->locations()->where('id', '!=', $location->id)->update(['is_head_office' => false]);
         }
 
+        // Debug: Log what we're receiving
+        \Log::info('Location update request data:', [
+            'city' => $request->city,
+            'country' => $request->country,
+            'name' => $request->name,
+            'all_data' => $request->all()
+        ]);
+
         $updateData = [
             'name' => $request->name,
             'address' => $request->address,
-            'city' => $request->city,
+            'city' => $request->city ?: null, // Convert empty string to null
             'country' => $request->country,
             'location_type' => $request->location_type,
             'staff_count' => $request->staff_count,
@@ -269,6 +277,8 @@ class LocationController extends Controller
             'reporting_period' => $request->reporting_period,
             'measurement_frequency' => $request->measurement_frequency ?? 'Annually',
         ];
+
+        \Log::info('Location update data being saved:', $updateData);
 
         $location->update($updateData);
 

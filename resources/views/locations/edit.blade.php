@@ -50,7 +50,7 @@
     <div class="bg-white rounded-lg border border-gray-200 p-6">
         <h2 class="text-2xl font-bold text-gray-900 mb-6">Edit Location</h2>
         
-        <form method="POST" action="{{ route('locations.update', $location) }}">
+        <form method="POST" action="{{ route('locations.update', $location) }}" id="location-edit-form">
             @csrf
             @method('PUT')
             
@@ -395,6 +395,19 @@ document.querySelector('input[name="receives_utility_bills"]').addEventListener(
         // If company doesn't receive utility bills, show the other questions
         buildingDetails.style.display = 'block';
     }
+});
+
+// Debug form submission
+document.getElementById('location-edit-form').addEventListener('submit', function(e) {
+    const cityValue = document.getElementById('city').value;
+    const countryValue = document.getElementById('country').value;
+    
+    console.log('Form submitting with:');
+    console.log('City:', cityValue);
+    console.log('Country:', countryValue);
+    console.log('All form data:', new FormData(this));
+    
+    // Don't prevent submission, just log for debugging
 });
 </script>
 @endsection
