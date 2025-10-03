@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmissionFormController;
 use App\Http\Controllers\EmissionManagementController;
 use App\Http\Controllers\CompanySetupController;
+use App\Http\Controllers\ProfileController;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -43,6 +44,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/company/setup', [CompanySetupController::class, 'index'])->name('company.setup');
     Route::post('/company/setup', [CompanySetupController::class, 'store'])->name('company.setup.store');
     Route::get('/company/setup/skip', [CompanySetupController::class, 'skip'])->name('company.setup.skip');
+    
+    // Profile routes
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::post('/profile/personal', [ProfileController::class, 'updatePersonal'])->name('profile.update.personal');
+    Route::post('/profile/company', [ProfileController::class, 'updateCompany'])->name('profile.update.company');
 });
 
 // Protected routes
