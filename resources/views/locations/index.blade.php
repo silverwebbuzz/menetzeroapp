@@ -133,7 +133,7 @@
                                    class="px-4 py-2 border border-orange-500 text-orange-600 bg-white rounded-lg hover:bg-orange-50 transition">
                                     Edit
                                 </a>
-                                <a href="#" 
+                                <a href="{{ route('emission-boundaries.index', $location) }}" 
                                    class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">
                                     New Measurement
                                 </a>

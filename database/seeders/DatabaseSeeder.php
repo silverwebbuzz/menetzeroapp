@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
         // Always run emission factors first
         $this->call([
             UaeEmissionFactorsSeeder::class,
+            EmissionSourcesSeeder::class,
         ]);
         
         // Then run simple demo data

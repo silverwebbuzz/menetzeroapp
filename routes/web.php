@@ -9,6 +9,7 @@ use App\Http\Controllers\EmissionManagementController;
 use App\Http\Controllers\CompanySetupController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\EmissionBoundaryController;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -56,6 +57,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/locations/{location}/toggle-status', [LocationController::class, 'toggleStatus'])->name('locations.toggle-status');
     Route::post('/locations/{location}/toggle-head-office', [LocationController::class, 'toggleHeadOffice'])->name('locations.toggle-head-office');
     Route::post('/locations/step/{step}', [LocationController::class, 'storeStep'])->name('locations.store-step');
+    
+    // Emission boundaries routes
+    Route::get('/locations/{location}/emission-boundaries', [EmissionBoundaryController::class, 'index'])->name('emission-boundaries.index');
+    Route::post('/locations/{location}/emission-boundaries', [EmissionBoundaryController::class, 'store'])->name('emission-boundaries.store');
 });
 
 // Protected routes

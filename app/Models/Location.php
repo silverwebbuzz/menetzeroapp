@@ -46,6 +46,14 @@ class Location extends Model
     }
 
     /**
+     * Get the emission boundaries for this location
+     */
+    public function emissionBoundaries()
+    {
+        return $this->hasMany(LocationEmissionBoundary::class);
+    }
+
+    /**
      * Get the full address string.
      */
     public function getFullAddressAttribute()
