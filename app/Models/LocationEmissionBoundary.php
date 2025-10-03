@@ -11,12 +11,12 @@ class LocationEmissionBoundary extends Model
 
     protected $fillable = [
         'location_id',
-        'emission_source_id',
-        'is_selected',
+        'scope',
+        'selected_sources',
     ];
 
     protected $casts = [
-        'is_selected' => 'boolean',
+        'selected_sources' => 'array',
     ];
 
     /**
@@ -28,10 +28,44 @@ class LocationEmissionBoundary extends Model
     }
 
     /**
-     * Get the emission source master data
+     * Get the emission sources for this scope
      */
-    public function emissionSource()
+    public function emissionSources()
     {
-        return $this->belongsTo(EmissionSourceMaster::class, 'emission_source_id');
+        return EmissionSourceMaster::whereIn('id', $this->selected_sources ?? [])
+            ->where('scope', $this->scope)
+            ->get();
+    }
+
+    /**
+     * Check if a specific emission source is selected
+     */
+    public function hasSource($sourceId)
+    {
+        return in_array($sourceId, $this->selected_sources ?? []);
+    }
+
+    /**
+     * Add a source to the selection
+     */
+    public function addSource($sourceId)
+    {
+        $sources = $this->selected_sources ?? [];
+        if (!in_array($sourceId, $sources)) {
+            $sources[] = $sourceId;
+            $this->selected_sources = $sources;
+        }
+    }
+
+    /**
+     * Remove a source from the selection
+     */
+    public function removeSource($sourceId)
+    {
+        $sources = $this->selected_sources ?? [];
+        $sources = array_filter($sources, function($id) use ($sourceId) {
+            return $id != $sourceId;
+        });
+        $this->selected_sources = array_values($sources);
     }
 }

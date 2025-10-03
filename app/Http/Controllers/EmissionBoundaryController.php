@@ -28,10 +28,12 @@ class EmissionBoundaryController extends Controller
         $scope3Sources = EmissionSourceMaster::byScope('Scope 3')->where('is_active', true)->get();
 
         // Get selected boundaries for this location
-        $selectedBoundaries = $location->emissionBoundaries()
-            ->where('is_selected', true)
-            ->pluck('emission_source_id')
-            ->toArray();
+        $selectedBoundaries = [];
+        $boundaries = $location->emissionBoundaries;
+        
+        foreach ($boundaries as $boundary) {
+            $selectedBoundaries = array_merge($selectedBoundaries, $boundary->selected_sources ?? []);
+        }
 
         return view('emission-boundaries.index', compact(
             'location',
@@ -62,16 +64,45 @@ class EmissionBoundaryController extends Controller
         // Get the selected emission source IDs
         $selectedSources = $request->input('emission_sources', []);
 
-        // Delete all existing boundaries for this location
-        $location->emissionBoundaries()->delete();
+        // Group selected sources by scope
+        $scope1Sources = [];
+        $scope2Sources = [];
+        $scope3Sources = [];
 
-        // Create new boundaries for selected sources
         foreach ($selectedSources as $sourceId) {
-            LocationEmissionBoundary::create([
-                'location_id' => $location->id,
-                'emission_source_id' => $sourceId,
-                'is_selected' => true,
-            ]);
+            $source = EmissionSourceMaster::find($sourceId);
+            if ($source) {
+                switch ($source->scope) {
+                    case 'Scope 1':
+                        $scope1Sources[] = $sourceId;
+                        break;
+                    case 'Scope 2':
+                        $scope2Sources[] = $sourceId;
+                        break;
+                    case 'Scope 3':
+                        $scope3Sources[] = $sourceId;
+                        break;
+                }
+            }
+        }
+
+        // Update or create boundaries for each scope
+        $scopes = [
+            'Scope 1' => $scope1Sources,
+            'Scope 2' => $scope2Sources,
+            'Scope 3' => $scope3Sources,
+        ];
+
+        foreach ($scopes as $scope => $sources) {
+            LocationEmissionBoundary::updateOrCreate(
+                [
+                    'location_id' => $location->id,
+                    'scope' => $scope,
+                ],
+                [
+                    'selected_sources' => $sources,
+                ]
+            );
         }
 
         // Handle different actions
