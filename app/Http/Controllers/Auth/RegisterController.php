@@ -22,32 +22,19 @@ class RegisterController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'company_name' => 'required|string|max:255',
         ]);
 
-        // Check if company already exists, if not create it
-        $company = Company::where('name', $request->company_name)->first();
-        
-        if (!$company) {
-            $company = Company::create([
-                'name' => $request->company_name,
-                'email' => $request->email,
-                'is_active' => true,
-            ]);
-        }
-
-        // Create user
+        // Create user without company
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'company_id' => $company->id,
-            'role' => 'company_admin',
+            'role' => 'user',
             'is_active' => true,
         ]);
 
         Auth::login($user);
 
-        return redirect()->route('dashboard')->with('success', 'Account created successfully!');
+        return redirect()->route('company.setup')->with('success', 'Account created successfully! Please complete your business profile.');
     }
 }

@@ -56,11 +56,6 @@
                         <input class="input" id="email" name="email" type="email" value="{{ old('email') }}" required placeholder="Enter your email">
                         @error('email')<p class="text-sm text-rose-600 mt-1">{{ $message }}</p>@enderror
                     </div>
-                    <div>
-                        <label class="block text-sm text-gray-600 mb-1">Company Name</label>
-                        <input class="input" id="company_name" name="company_name" type="text" value="{{ old('company_name') }}" required placeholder="Your company">
-                        @error('company_name')<p class="text-sm text-rose-600 mt-1">{{ $message }}</p>@enderror
-                    </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm text-gray-600 mb-1">Password</label>

@@ -22,6 +22,18 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
         
+        // Check if user has a company
+        if (!$user->company_id) {
+            return view('dashboard.index', [
+                'needsCompanySetup' => true,
+                'kpis' => [],
+                'chartData' => [],
+                'netZeroProgress' => [],
+                'topSources' => collect([]),
+                'recentActivity' => collect([])
+            ]);
+        }
+        
         // Get all emission sources for the user's company
         $emissionSources = EmissionSource::where('company_name', $user->company->name ?? 'Unknown')
             ->orderBy('created_at', 'desc')
