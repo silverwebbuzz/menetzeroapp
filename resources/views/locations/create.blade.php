@@ -3,6 +3,10 @@
 @section('title', 'Add New Location - MenetZero')
 @section('page-title', 'Add New Location')
 
+@push('head')
+<meta name="csrf-token" content="{{ csrf_token() }}">
+@endpush
+
 @section('content')
 <style>
     .step-indicator { 
@@ -196,7 +200,7 @@
                                 </label>
                             </div>
                             
-                            <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="bg-gray-50 rounded-lg p-4" id="building-details" style="display: none;">
                                 <h5 class="text-sm font-semibold text-gray-900 mb-3">Office Building Details</h5>
                                 
                                 <div class="space-y-4">
@@ -326,7 +330,7 @@
                     <button type="button" onclick="prevStep()" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
                         Back
                     </button>
-                    <button type="submit" class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">
+                    <button type="button" onclick="saveAndFinish()" class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">
                         Save and Close
                     </button>
                 </div>
@@ -371,10 +375,65 @@ function showStep(step) {
 }
 
 function nextStep() {
+    // Save current step data
+    saveStepData();
+    
     if (currentStep < totalSteps) {
         currentStep++;
         showStep(currentStep);
     }
+}
+
+function saveStepData() {
+    const formData = new FormData();
+    const step = currentStep;
+    
+    // Add CSRF token
+    formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+    
+    // Collect data based on current step
+    if (step === 1) {
+        formData.append('name', document.querySelector('input[name="name"]').value);
+        formData.append('address', document.querySelector('textarea[name="address"]').value);
+        formData.append('city', document.querySelector('select[name="city"]').value);
+        formData.append('country', document.querySelector('select[name="country"]').value);
+        formData.append('location_type', document.querySelector('select[name="location_type"]').value);
+        formData.append('fiscal_year_start', document.querySelector('select[name="fiscal_year_start"]').value);
+        formData.append('receives_utility_bills', document.querySelector('input[name="receives_utility_bills"]').checked ? '1' : '0');
+        formData.append('pays_electricity_proportion', document.querySelector('input[name="pays_electricity_proportion"]').checked ? '1' : '0');
+        formData.append('shared_building_services', document.querySelector('input[name="shared_building_services"]').checked ? '1' : '0');
+    } else if (step === 2) {
+        formData.append('staff_count', document.querySelector('input[name="staff_count"]').value);
+        formData.append('staff_work_from_home', document.querySelector('input[name="staff_work_from_home"]').checked ? '1' : '0');
+    } else if (step === 3) {
+        formData.append('reporting_period', document.querySelector('select[name="reporting_period"]').value);
+        formData.append('measurement_frequency', document.querySelector('input[name="measurement_frequency"]:checked')?.value || 'Annually');
+    }
+    
+    // Send AJAX request to save step
+    fetch(`/locations/step/step${step}`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (response.redirected) {
+            // If redirected (final step), follow the redirect
+            window.location.href = response.url;
+        } else {
+            return response.json();
+        }
+    })
+    .then(data => {
+        if (data && data.success) {
+            console.log('Step data saved successfully');
+        }
+    })
+    .catch(error => {
+        console.error('Error saving step data:', error);
+    });
 }
 
 function prevStep() {
@@ -382,6 +441,11 @@ function prevStep() {
         currentStep--;
         showStep(currentStep);
     }
+}
+
+function saveAndFinish() {
+    // Save final step data - this will redirect automatically for step 3
+    saveStepData();
 }
 
 // City options based on country
@@ -410,6 +474,21 @@ document.getElementById('country').addEventListener('change', function() {
             option.textContent = city;
             citySelect.appendChild(option);
         });
+    }
+});
+
+// Handle utility bills logic
+document.querySelector('input[name="receives_utility_bills"]').addEventListener('change', function() {
+    const buildingDetails = document.getElementById('building-details');
+    if (this.checked) {
+        // If company receives utility bills for entire building, hide the other questions
+        buildingDetails.style.display = 'none';
+        // Uncheck the other options since they don't apply
+        document.querySelector('input[name="pays_electricity_proportion"]').checked = false;
+        document.querySelector('input[name="shared_building_services"]').checked = false;
+    } else {
+        // If company doesn't receive utility bills, show the other questions
+        buildingDetails.style.display = 'block';
     }
 });
 

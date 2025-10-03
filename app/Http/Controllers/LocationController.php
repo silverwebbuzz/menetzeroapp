@@ -112,6 +112,91 @@ class LocationController extends Controller
         return redirect()->route('locations.index')->with('success', 'Location created successfully!');
     }
 
+    public function storeStep(Request $request, $step)
+    {
+        $user = Auth::user();
+        $company = $user->company;
+        
+        if (!$company) {
+            return redirect()->route('company.setup')->with('error', 'Please complete your business profile first.');
+        }
+
+        // Get or create location from session
+        $locationId = session('location_id');
+        $location = null;
+        
+        if ($locationId) {
+            $location = Location::find($locationId);
+        }
+        
+        if (!$location) {
+            // Create new location with basic info
+            $location = $company->locations()->create([
+                'name' => $request->name ?? 'New Location',
+                'is_active' => true,
+            ]);
+            session(['location_id' => $location->id]);
+        }
+
+        // Update location based on step
+        switch ($step) {
+            case 'step1':
+                $request->validate([
+                    'name' => 'required|string|max:255',
+                    'address' => 'nullable|string|max:500',
+                    'city' => 'nullable|string|max:100',
+                    'country' => 'nullable|string|max:100',
+                    'location_type' => 'nullable|string|max:100',
+                    'fiscal_year_start' => 'nullable|string|max:20',
+                    'receives_utility_bills' => 'boolean',
+                    'pays_electricity_proportion' => 'boolean',
+                    'shared_building_services' => 'boolean',
+                ]);
+                
+                $location->update([
+                    'name' => $request->name,
+                    'address' => $request->address,
+                    'city' => $request->city,
+                    'country' => $request->country,
+                    'location_type' => $request->location_type,
+                    'fiscal_year_start' => $request->fiscal_year_start ?? 'January',
+                    'receives_utility_bills' => $request->boolean('receives_utility_bills'),
+                    'pays_electricity_proportion' => $request->boolean('pays_electricity_proportion'),
+                    'shared_building_services' => $request->boolean('shared_building_services'),
+                ]);
+                break;
+                
+            case 'step2':
+                $request->validate([
+                    'staff_count' => 'nullable|integer|min:0',
+                    'staff_work_from_home' => 'boolean',
+                ]);
+                
+                $location->update([
+                    'staff_count' => $request->staff_count,
+                    'staff_work_from_home' => $request->boolean('staff_work_from_home'),
+                ]);
+                break;
+                
+            case 'step3':
+                $request->validate([
+                    'reporting_period' => 'nullable|integer|min:2020|max:2030',
+                    'measurement_frequency' => 'nullable|string|max:20',
+                ]);
+                
+                $location->update([
+                    'reporting_period' => $request->reporting_period,
+                    'measurement_frequency' => $request->measurement_frequency ?? 'Annually',
+                ]);
+                
+                // Clear session after final step
+                session()->forget('location_id');
+                return redirect()->route('locations.index')->with('success', 'Location created successfully!');
+        }
+
+        return response()->json(['success' => true, 'location_id' => $location->id]);
+    }
+
     public function show(Location $location)
     {
         $this->authorize('view', $location);

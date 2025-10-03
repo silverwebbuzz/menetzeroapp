@@ -133,7 +133,7 @@
                             </label>
                         </div>
                         
-                        <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="bg-gray-50 rounded-lg p-4" id="building-details">
                             <h4 class="text-sm font-semibold text-gray-900 mb-3">Office Building Details</h4>
                             
                             <div class="space-y-4">
@@ -319,11 +319,32 @@ document.getElementById('country').addEventListener('change', function() {
     }
 });
 
+// Handle utility bills logic
+document.querySelector('input[name="receives_utility_bills"]').addEventListener('change', function() {
+    const buildingDetails = document.getElementById('building-details');
+    if (this.checked) {
+        // If company receives utility bills for entire building, hide the other questions
+        buildingDetails.style.display = 'none';
+        // Uncheck the other options since they don't apply
+        document.querySelector('input[name="pays_electricity_proportion"]').checked = false;
+        document.querySelector('input[name="shared_building_services"]').checked = false;
+    } else {
+        // If company doesn't receive utility bills, show the other questions
+        buildingDetails.style.display = 'block';
+    }
+});
+
 // Initialize city options on page load
 document.addEventListener('DOMContentLoaded', function() {
     const countrySelect = document.getElementById('country');
     if (countrySelect.value) {
         countrySelect.dispatchEvent(new Event('change'));
+    }
+    
+    // Initialize utility bills logic
+    const receivesUtilityBills = document.querySelector('input[name="receives_utility_bills"]');
+    if (receivesUtilityBills.checked) {
+        document.getElementById('building-details').style.display = 'none';
     }
 });
 </script>
