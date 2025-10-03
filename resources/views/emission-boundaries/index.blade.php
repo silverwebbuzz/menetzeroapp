@@ -88,6 +88,7 @@
         <form method="POST" action="{{ route('emission-boundaries.store', $location) }}" id="emission-boundaries-form">
             @csrf
             <input type="hidden" name="action" id="form-action" value="save">
+            <input type="hidden" name="current_tab" id="current-tab" value="{{ session('active_tab', 'scope1') }}">
             
             <!-- Scope 1 Tab -->
             <div id="scope1" class="tab-content {{ session('active_tab', 'scope1') === 'scope1' ? 'active' : '' }}">
@@ -247,6 +248,9 @@ function showTab(tabName) {
     
     // Update current tab
     currentTab = tabName;
+    
+    // Update hidden field
+    document.getElementById('current-tab').value = tabName;
     
     // Update button visibility
     updateButtonVisibility();

@@ -78,30 +78,23 @@ class EmissionBoundaryController extends Controller
         $action = $request->input('action', 'save');
         
         if ($action === 'next') {
-            // Determine next tab based on current selections
-            $scope1Count = count(array_filter($selectedSources, function($id) {
-                $source = \App\Models\EmissionSourceMaster::find($id);
-                return $source && $source->scope === 'Scope 1';
-            }));
+            // Get the current tab from the form
+            $currentTab = $request->input('current_tab', 'scope1');
             
-            $scope2Count = count(array_filter($selectedSources, function($id) {
-                $source = \App\Models\EmissionSourceMaster::find($id);
-                return $source && $source->scope === 'Scope 2';
-            }));
-            
-            // Redirect to next scope or back to form
-            if ($scope1Count > 0 && $scope2Count === 0) {
+            // Determine next tab based on current tab
+            if ($currentTab === 'scope1') {
                 return redirect()->route('emission-boundaries.index', $location)
                     ->with('success', 'Scope 1 selections saved! Please continue with Scope 2.')
                     ->with('active_tab', 'scope2');
-            } elseif ($scope2Count > 0) {
+            } elseif ($currentTab === 'scope2') {
                 return redirect()->route('emission-boundaries.index', $location)
                     ->with('success', 'Scope 2 selections saved! Please continue with Scope 3.')
                     ->with('active_tab', 'scope3');
             } else {
+                // If somehow on scope3, just redirect back to scope3
                 return redirect()->route('emission-boundaries.index', $location)
-                    ->with('success', 'Selections saved! Please continue with the next scope.')
-                    ->with('active_tab', 'scope2');
+                    ->with('success', 'Selections saved!')
+                    ->with('active_tab', 'scope3');
             }
         } else {
             // Save and close - redirect to locations listing
