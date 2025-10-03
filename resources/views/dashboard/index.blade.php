@@ -15,21 +15,15 @@
             </div>
             <h2 class="text-2xl font-semibold text-gray-900 mb-2">Complete Your Business Profile</h2>
             <p class="text-gray-600 mb-6">To get started with carbon tracking, please complete your business profile. This helps us provide accurate emissions data and industry-specific insights.</p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{{ route('company.setup') }}" class="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-white bg-[color:var(--brand)] hover:bg-[color:var(--brand)]/90 transition">
+            <div class="flex justify-center">
+                <a href="{{ route('company.setup') }}" class="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-white font-semibold bg-emerald-600 hover:bg-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                     Complete Business Profile
                 </a>
-                <a href="{{ route('company.setup.skip') }}" class="inline-flex items-center gap-2 px-6 py-3 rounded-lg border text-gray-700 border-gray-300 hover:bg-gray-50 transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                    Skip for Now
-                </a>
             </div>
-            <p class="text-sm text-gray-500 mt-4">You can complete this later from your profile settings.</p>
+            <p class="text-sm text-gray-500 mt-4">Complete your business profile to unlock full carbon tracking features.</p>
         </div>
     </div>
 @else

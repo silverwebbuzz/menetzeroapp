@@ -65,6 +65,13 @@
                             Reports
                         </a>
                         
+                        <a href="{{ route('company.setup') }}" class="sidebar-link {{ request()->routeIs('company.*') ? 'sidebar-link-active' : 'sidebar-link-inactive' }}">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                            My Profile
+                        </a>
+                        
                         @if(auth()->user()->isAdmin())
                         <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.*') ? 'sidebar-link-active' : 'sidebar-link-inactive' }}">
                             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
