@@ -87,8 +87,12 @@ class LocationController extends Controller
             'measurement_frequency' => 'nullable|string|max:20',
         ]);
 
+        // Check if this is the first location for the company
+        $isFirstLocation = $company->locations()->count() === 0;
+        $shouldBeHeadOffice = $request->boolean('is_head_office') || $isFirstLocation;
+        
         // If this is set as head office, unset any existing head office
-        if ($request->is_head_office) {
+        if ($shouldBeHeadOffice) {
             $company->locations()->update(['is_head_office' => false]);
         }
 
@@ -101,12 +105,13 @@ class LocationController extends Controller
             'staff_count' => $request->staff_count,
             'staff_work_from_home' => $request->boolean('staff_work_from_home'),
             'fiscal_year_start' => $request->fiscal_year_start ?? 'January',
-            'is_head_office' => $request->boolean('is_head_office'),
+            'is_head_office' => $shouldBeHeadOffice,
             'receives_utility_bills' => $request->boolean('receives_utility_bills'),
             'pays_electricity_proportion' => $request->boolean('pays_electricity_proportion'),
             'shared_building_services' => $request->boolean('shared_building_services'),
             'reporting_period' => $request->reporting_period,
             'measurement_frequency' => $request->measurement_frequency ?? 'Annually',
+            'is_active' => true,
         ]);
 
         return redirect()->route('locations.index')->with('success', 'Location created successfully!');
@@ -130,10 +135,14 @@ class LocationController extends Controller
         }
         
         if (!$location) {
+            // Check if this is the first location for the company
+            $isFirstLocation = $company->locations()->count() === 0;
+            
             // Create new location with basic info
             $location = $company->locations()->create([
                 'name' => $request->name ?? 'New Location',
                 'is_active' => true,
+                'is_head_office' => $isFirstLocation, // First location is automatically head office
             ]);
             session(['location_id' => $location->id]);
         }
@@ -199,19 +208,28 @@ class LocationController extends Controller
 
     public function show(Location $location)
     {
-        $this->authorize('view', $location);
+        $user = Auth::user();
+        if ($location->company_id !== $user->company_id) {
+            abort(403, 'Unauthorized access to this location.');
+        }
         return view('locations.show', compact('location'));
     }
 
     public function edit(Location $location)
     {
-        $this->authorize('update', $location);
+        $user = Auth::user();
+        if ($location->company_id !== $user->company_id) {
+            abort(403, 'Unauthorized access to this location.');
+        }
         return view('locations.edit', compact('location'));
     }
 
     public function update(Request $request, Location $location)
     {
-        $this->authorize('update', $location);
+        $user = Auth::user();
+        if ($location->company_id !== $user->company_id) {
+            abort(403, 'Unauthorized access to this location.');
+        }
 
         $request->validate([
             'name' => 'required|string|max:255',
@@ -257,14 +275,21 @@ class LocationController extends Controller
 
     public function destroy(Location $location)
     {
-        $this->authorize('delete', $location);
+        $user = Auth::user();
+        if ($location->company_id !== $user->company_id) {
+            abort(403, 'Unauthorized access to this location.');
+        }
         $location->delete();
         return redirect()->route('locations.index')->with('success', 'Location deleted successfully!');
     }
 
     public function toggleStatus(Location $location)
     {
-        $this->authorize('update', $location);
+        $user = Auth::user();
+        if ($location->company_id !== $user->company_id) {
+            abort(403, 'Unauthorized access to this location.');
+        }
+        
         $location->update(['is_active' => !$location->is_active]);
         
         $status = $location->is_active ? 'activated' : 'deactivated';
@@ -273,7 +298,10 @@ class LocationController extends Controller
 
     public function toggleHeadOffice(Location $location)
     {
-        $this->authorize('update', $location);
+        $user = Auth::user();
+        if ($location->company_id !== $user->company_id) {
+            abort(403, 'Unauthorized access to this location.');
+        }
         
         if (!$location->is_head_office) {
             // Unset any existing head office
