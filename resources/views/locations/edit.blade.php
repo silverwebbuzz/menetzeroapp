@@ -40,13 +40,18 @@
                         @error('country')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                     </div>
                     
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
-                        <select name="city" id="city" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
-                            <option value="">Select city</option>
-                        </select>
-                        @error('city')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
-                    </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
+                            <select name="city" id="city" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                <option value="">Select city</option>
+                                @if($location->city)
+                                    <option value="{{ $location->city }}" selected>{{ $location->city }}</option>
+                                @endif
+                            </select>
+                            @error('city')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
+                            <!-- Debug info -->
+                            <p class="text-xs text-gray-500 mt-1">Current city: {{ $location->city ?? 'None' }}</p>
+                        </div>
                 </div>
                 
                 <div>

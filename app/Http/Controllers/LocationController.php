@@ -253,7 +253,7 @@ class LocationController extends Controller
             $location->company->locations()->where('id', '!=', $location->id)->update(['is_head_office' => false]);
         }
 
-        $location->update([
+        $updateData = [
             'name' => $request->name,
             'address' => $request->address,
             'city' => $request->city,
@@ -268,7 +268,13 @@ class LocationController extends Controller
             'shared_building_services' => $request->boolean('shared_building_services'),
             'reporting_period' => $request->reporting_period,
             'measurement_frequency' => $request->measurement_frequency ?? 'Annually',
-        ]);
+        ];
+
+        // Debug: Log the update data
+        \Log::info('Location update data:', $updateData);
+        \Log::info('Request data:', $request->all());
+
+        $location->update($updateData);
 
         return redirect()->route('locations.index')->with('success', 'Location updated successfully!');
     }

@@ -67,6 +67,7 @@
             @foreach($locations as $location)
                 <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition">
                     <div class="flex items-center justify-between">
+                        <!-- Left Section: Icon + Location Details -->
                         <div class="flex items-center space-x-4 flex-1">
                             <!-- Location Flag/Icon -->
                             <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -82,13 +83,16 @@
                             
                             <!-- Location Details -->
                             <div class="flex-1 min-w-0">
-                                <h3 class="text-lg font-semibold text-gray-900 truncate">{{ $location->name }}</h3>
-                                <p class="text-gray-600 text-sm truncate">{{ $location->full_address }}</p>
+                                <h3 class="text-lg font-semibold text-gray-900">{{ $location->name }}</h3>
+                                <p class="text-gray-600 text-sm">{{ $location->full_address }}</p>
                                 <p class="text-sm text-gray-500">{{ $location->location_type }}</p>
                             </div>
-                            
+                        </div>
+                        
+                        <!-- Right Section: Stats + Toggles + Actions -->
+                        <div class="flex items-center space-x-8">
                             <!-- Stats -->
-                            <div class="flex items-center space-x-8 text-sm flex-shrink-0">
+                            <div class="flex items-center space-x-6 text-sm">
                                 <div class="text-center">
                                     <div class="font-semibold text-gray-900">Staff</div>
                                     <div class="text-gray-600">{{ $location->staff_count ?? 'N/A' }}</div>
@@ -98,33 +102,33 @@
                                     <div class="font-semibold text-gray-900">Fiscal Year</div>
                                     <div class="text-gray-600">{{ $location->fiscal_year_start }}</div>
                                 </div>
+                            </div>
+                            
+                            <!-- Toggles -->
+                            <div class="flex items-center space-x-6">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-sm font-medium text-gray-700">Head Office</span>
+                                    <form method="POST" action="{{ route('locations.toggle-head-office', $location) }}" class="inline">
+                                        @csrf
+                                        <button type="submit" class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 {{ $location->is_head_office ? 'bg-orange-600' : 'bg-gray-200' }}">
+                                            <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform {{ $location->is_head_office ? 'translate-x-6' : 'translate-x-1' }}"></span>
+                                        </button>
+                                    </form>
+                                </div>
                                 
-                                <!-- Toggles -->
-                                <div class="flex items-center space-x-6">
-                                    <div class="flex items-center space-x-2">
-                                        <span class="text-sm font-medium text-gray-700">Head Office</span>
-                                        <form method="POST" action="{{ route('locations.toggle-head-office', $location) }}" class="inline">
-                                            @csrf
-                                            <button type="submit" class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 {{ $location->is_head_office ? 'bg-orange-600' : 'bg-gray-200' }}">
-                                                <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform {{ $location->is_head_office ? 'translate-x-6' : 'translate-x-1' }}"></span>
-                                            </button>
-                                        </form>
-                                    </div>
-                                    
-                                    <div class="flex items-center space-x-2">
-                                        <span class="text-sm font-medium text-gray-700">Deactivate</span>
-                                        <form method="POST" action="{{ route('locations.toggle-status', $location) }}" class="inline">
-                                            @csrf
-                                            <button type="submit" class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 {{ !$location->is_active ? 'bg-orange-600' : 'bg-gray-200' }}">
-                                                <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform {{ !$location->is_active ? 'translate-x-6' : 'translate-x-1' }}"></span>
-                                            </button>
-                                        </form>
-                                    </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-sm font-medium text-gray-700">Deactivate</span>
+                                    <form method="POST" action="{{ route('locations.toggle-status', $location) }}" class="inline">
+                                        @csrf
+                                        <button type="submit" class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 {{ !$location->is_active ? 'bg-orange-600' : 'bg-gray-200' }}">
+                                            <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform {{ !$location->is_active ? 'translate-x-6' : 'translate-x-1' }}"></span>
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                             
                             <!-- Action Buttons -->
-                            <div class="flex items-center space-x-2 flex-shrink-0">
+                            <div class="flex items-center space-x-2">
                                 <a href="{{ route('locations.edit', $location) }}" 
                                    class="px-4 py-2 border border-orange-500 text-orange-600 bg-white rounded-lg hover:bg-orange-50 transition">
                                     Edit
