@@ -27,18 +27,12 @@
     .tab-button:hover:not(.active) {
         background: #f3f4f6;
     }
-    .tooltip-icon {
-        display: inline-block;
-        width: 16px;
-        height: 16px;
-        background: #3b82f6;
-        color: white;
-        border-radius: 50%;
-        text-align: center;
-        line-height: 16px;
-        font-size: 10px;
-        cursor: help;
-        margin-left: 8px;
+    .emission-description {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-top: 4px;
+        margin-left: 24px;
+        line-height: 1.4;
     }
     .category-group {
         margin-bottom: 24px;
@@ -80,22 +74,23 @@
 
         <!-- Tab Navigation -->
         <div class="flex space-x-1 mb-6">
-            <button class="tab-button active" onclick="showTab('scope1')">
+            <button class="tab-button {{ session('active_tab', 'scope1') === 'scope1' ? 'active' : '' }}" onclick="showTab('scope1')">
                 Scope 1
             </button>
-            <button class="tab-button" onclick="showTab('scope2')">
+            <button class="tab-button {{ session('active_tab', 'scope1') === 'scope2' ? 'active' : '' }}" onclick="showTab('scope2')">
                 Scope 2
             </button>
-            <button class="tab-button" onclick="showTab('scope3')">
+            <button class="tab-button {{ session('active_tab', 'scope1') === 'scope3' ? 'active' : '' }}" onclick="showTab('scope3')">
                 Scope 3
             </button>
         </div>
 
         <form method="POST" action="{{ route('emission-boundaries.store', $location) }}" id="emission-boundaries-form">
             @csrf
+            <input type="hidden" name="action" id="form-action" value="save">
             
             <!-- Scope 1 Tab -->
-            <div id="scope1" class="tab-content active">
+            <div id="scope1" class="tab-content {{ session('active_tab', 'scope1') === 'scope1' ? 'active' : '' }}">
                 <div class="mb-6">
                     <h3 class="text-lg font-semibold text-gray-900 mb-2">Stationary energy and fuels emissions</h3>
                     <p class="text-gray-600 mb-4">All stationary energy and fuels used in buildings, machinery or vehicles in the organisation's control (e.g. natural gas, fuels used in generators or vehicles) need to be included in your emission boundary.</p>
@@ -103,7 +98,7 @@
                     <p class="text-sm text-gray-600 mb-4">Select all applicable emission sources.</p>
                 </div>
 
-                <div class="space-y-3">
+                <div class="space-y-4">
                     @foreach($scope1Sources as $source)
                     <div class="form-check">
                         <div class="checkbox-container">
@@ -114,14 +109,14 @@
                                 {{ $source->name }}
                             </label>
                         </div>
-                        <span class="tooltip-icon" data-title="{{ $source->description }}">i</span>
+                        <div class="emission-description">{{ $source->description }}</div>
                     </div>
                     @endforeach
                 </div>
             </div>
 
             <!-- Scope 2 Tab -->
-            <div id="scope2" class="tab-content">
+            <div id="scope2" class="tab-content {{ session('active_tab', 'scope1') === 'scope2' ? 'active' : '' }}">
                 <div class="mb-6">
                     <h3 class="text-lg font-semibold text-gray-900 mb-2">Stationary energy and fuels emissions</h3>
                     <p class="text-gray-600 mb-4">All stationary energy and fuels used in buildings, machinery or vehicles in the organisation's control (e.g. natural gas, fuels used in generators or vehicles) need to be included in your emission boundary.</p>
@@ -129,7 +124,7 @@
                     <p class="text-sm text-gray-600 mb-4">Select all applicable emission sources.</p>
                 </div>
 
-                <div class="space-y-3">
+                <div class="space-y-4">
                     @foreach($scope2Sources as $source)
                     <div class="form-check">
                         <div class="checkbox-container">
@@ -140,14 +135,14 @@
                                 {{ $source->name }}
                             </label>
                         </div>
-                        <span class="tooltip-icon" data-title="{{ $source->description }}">i</span>
+                        <div class="emission-description">{{ $source->description }}</div>
                     </div>
                     @endforeach
                 </div>
             </div>
 
             <!-- Scope 3 Tab -->
-            <div id="scope3" class="tab-content">
+            <div id="scope3" class="tab-content {{ session('active_tab', 'scope1') === 'scope3' ? 'active' : '' }}">
                 <div class="mb-6">
                     <h3 class="text-lg font-semibold text-gray-900 mb-2">Indirect emissions as a result of your operations</h3>
                     <p class="text-gray-600 mb-4">All other emissions identified as a direct result of the organisation's operating must be assessed for relevance. This includes emissions outside the operational control (as defined) of the organisation.</p>
@@ -165,7 +160,7 @@
                 @foreach($upstreamCategories as $category => $sources)
                 <div class="category-group">
                     <h5 class="category-title">{{ $category }}</h5>
-                    <div class="space-y-3">
+                    <div class="space-y-4">
                         @foreach($sources as $source)
                         <div class="form-check">
                             <div class="checkbox-container">
@@ -176,7 +171,7 @@
                                     {{ $source->name }}
                                 </label>
                             </div>
-                            <span class="tooltip-icon" data-title="{{ $source->description }}">i</span>
+                            <div class="emission-description">{{ $source->description }}</div>
                         </div>
                         @endforeach
                     </div>
@@ -193,7 +188,7 @@
                 @foreach($downstreamCategories as $category => $sources)
                 <div class="category-group">
                     <h5 class="category-title">{{ $category }}</h5>
-                    <div class="space-y-3">
+                    <div class="space-y-4">
                         @foreach($sources as $source)
                         <div class="form-check">
                             <div class="checkbox-container">
@@ -204,7 +199,7 @@
                                     {{ $source->name }}
                                 </label>
                             </div>
-                            <span class="tooltip-icon" data-title="{{ $source->description }}">i</span>
+                            <div class="emission-description">{{ $source->description }}</div>
                         </div>
                         @endforeach
                     </div>
@@ -213,19 +208,26 @@
             </div>
 
             <!-- Form Actions -->
-            <div class="flex justify-end space-x-4 mt-8 pt-6 border-t">
+            <div class="flex justify-between mt-8 pt-6 border-t">
                 <a href="{{ route('locations.index') }}" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
                     Cancel
                 </a>
-                <button type="submit" class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">
-                    Save Emission Boundaries
-                </button>
+                <div class="flex space-x-3">
+                    <button type="button" id="next-btn" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition" style="display: none;">
+                        Next
+                    </button>
+                    <button type="submit" id="save-close-btn" class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">
+                        Save and Close
+                    </button>
+                </div>
             </div>
         </form>
     </div>
 </div>
 
 <script>
+let currentTab = 'scope1';
+
 function showTab(tabName) {
     // Hide all tab contents
     document.querySelectorAll('.tab-content').forEach(content => {
@@ -242,19 +244,83 @@ function showTab(tabName) {
     
     // Add active class to clicked button
     event.target.classList.add('active');
+    
+    // Update current tab
+    currentTab = tabName;
+    
+    // Update button visibility
+    updateButtonVisibility();
 }
 
-// Tooltip functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const tooltips = document.querySelectorAll('.tooltip-icon');
+function updateButtonVisibility() {
+    const nextBtn = document.getElementById('next-btn');
+    const saveCloseBtn = document.getElementById('save-close-btn');
     
-    tooltips.forEach(tooltip => {
-        tooltip.addEventListener('mouseenter', function() {
-            const title = this.getAttribute('data-title');
-            if (title) {
-                this.setAttribute('title', title);
-            }
-        });
+    if (currentTab === 'scope3') {
+        // On Scope 3, only show "Save and Close"
+        nextBtn.style.display = 'none';
+        saveCloseBtn.style.display = 'inline-block';
+    } else {
+        // On Scope 1 and 2, show both buttons
+        nextBtn.style.display = 'inline-block';
+        saveCloseBtn.style.display = 'inline-block';
+    }
+}
+
+function validateCurrentScope() {
+    const currentTabElement = document.getElementById(currentTab);
+    const checkboxes = currentTabElement.querySelectorAll('input[type="checkbox"]');
+    let checkedCount = 0;
+    
+    checkboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+            checkedCount++;
+        }
+    });
+    
+    if (checkedCount === 0) {
+        alert(`Please select at least one emission source in ${currentTab.toUpperCase()}.`);
+        return false;
+    }
+    
+    return true;
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Set initial tab based on session
+    const activeTab = '{{ session("active_tab", "scope1") }}';
+    currentTab = activeTab;
+    updateButtonVisibility();
+    
+    // Handle Next button click
+    document.getElementById('next-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        if (!validateCurrentScope()) {
+            return;
+        }
+        
+        // Set form action to next
+        document.getElementById('form-action').value = 'next';
+        
+        // Submit form
+        document.getElementById('emission-boundaries-form').submit();
+    });
+    
+    // Handle Save and Close button click
+    document.getElementById('save-close-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        if (!validateCurrentScope()) {
+            return;
+        }
+        
+        // Set form action to save
+        document.getElementById('form-action').value = 'save';
+        
+        // Submit form
+        document.getElementById('emission-boundaries-form').submit();
     });
 });
 </script>
