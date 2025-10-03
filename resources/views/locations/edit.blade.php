@@ -93,8 +93,6 @@
                                 @endif
                             </select>
                             @error('city')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
-                            <!-- Debug info -->
-                            <p class="text-xs text-gray-500 mt-1">Current city: {{ $location->city ?? 'None' }} | Current country: {{ $location->country ?? 'None' }}</p>
                         </div>
                 </div>
                 
@@ -287,8 +285,6 @@ document.getElementById('country').addEventListener('change', function() {
     const citySelect = document.getElementById('city');
     const country = this.value;
     
-    console.log('Country changed to:', country);
-    
     // Clear existing options
     citySelect.innerHTML = '<option value="">Select city</option>';
     
@@ -314,38 +310,28 @@ document.getElementById('country').addEventListener('change', function() {
         
         // Set the current city if it exists and matches the country
         const currentCity = '{{ $location->city }}';
-        console.log('Current city:', currentCity);
-        console.log('Available cities for', country, ':', cities[country]);
-        
         if (currentCity && cities[country].includes(currentCity)) {
             citySelect.value = currentCity;
-            console.log('Set city to:', currentCity);
         } else {
-            console.log('Current city not found in country cities - clearing city selection');
             // Don't try to preserve the old city if it doesn't match the new country
             citySelect.value = '';
         }
     }
 });
 
-// Also handle the case where country is already selected on page load
+// Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     const countrySelect = document.getElementById('country');
     const citySelect = document.getElementById('city');
     
-    console.log('Page loaded - Country:', countrySelect.value, 'City:', citySelect.value);
-    
     // If country is already selected, populate cities
     if (countrySelect.value) {
-        console.log('Country already selected, populating cities');
         countrySelect.dispatchEvent(new Event('change'));
     }
     
     // If no country is selected but we have a city, try to find the country
     if (!countrySelect.value && citySelect.value) {
         const currentCity = citySelect.value;
-        console.log('No country selected but city exists:', currentCity);
-        
         const cities = {
             'UAE': ['Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Umm Al Quwain'],
             'SA': ['Riyadh', 'Jeddah', 'Mecca', 'Medina', 'Dammam'],
@@ -361,7 +347,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Find which country has this city
         for (const [country, cityList] of Object.entries(cities)) {
             if (cityList.includes(currentCity)) {
-                console.log('Found country for city:', country);
                 countrySelect.value = country;
                 countrySelect.dispatchEvent(new Event('change'));
                 break;
@@ -397,17 +382,5 @@ document.querySelector('input[name="receives_utility_bills"]').addEventListener(
     }
 });
 
-// Debug form submission
-document.getElementById('location-edit-form').addEventListener('submit', function(e) {
-    const cityValue = document.getElementById('city').value;
-    const countryValue = document.getElementById('country').value;
-    
-    console.log('Form submitting with:');
-    console.log('City:', cityValue);
-    console.log('Country:', countryValue);
-    console.log('All form data:', new FormData(this));
-    
-    // Don't prevent submission, just log for debugging
-});
 </script>
 @endsection
