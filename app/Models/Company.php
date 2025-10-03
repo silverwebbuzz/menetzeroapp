@@ -33,9 +33,26 @@ class Company extends Model
 
         static::creating(function ($company) {
             if (empty($company->slug)) {
-                $company->slug = Str::slug($company->name);
+                $company->slug = static::generateUniqueSlug($company->name);
             }
         });
+    }
+
+    /**
+     * Generate a unique slug for the company.
+     */
+    public static function generateUniqueSlug($name)
+    {
+        $slug = Str::slug($name);
+        $originalSlug = $slug;
+        $counter = 1;
+
+        while (static::where('slug', $slug)->exists()) {
+            $slug = $originalSlug . '-' . $counter;
+            $counter++;
+        }
+
+        return $slug;
     }
 
     /**

@@ -25,12 +25,16 @@ class RegisterController extends Controller
             'company_name' => 'required|string|max:255',
         ]);
 
-        // Create company first
-        $company = Company::create([
-            'name' => $request->company_name,
-            'email' => $request->email,
-            'is_active' => true,
-        ]);
+        // Check if company already exists, if not create it
+        $company = Company::where('name', $request->company_name)->first();
+        
+        if (!$company) {
+            $company = Company::create([
+                'name' => $request->company_name,
+                'email' => $request->email,
+                'is_active' => true,
+            ]);
+        }
 
         // Create user
         $user = User::create([
