@@ -67,9 +67,9 @@
             @foreach($locations as $location)
                 <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition">
                     <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-4">
+                        <div class="flex items-center space-x-4 flex-1">
                             <!-- Location Flag/Icon -->
-                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                                 @if($location->country === 'UAE' || $location->country === 'United Arab Emirates')
                                     <span class="text-2xl">🇦🇪</span>
                                 @else
@@ -81,14 +81,14 @@
                             </div>
                             
                             <!-- Location Details -->
-                            <div class="flex-1">
-                                <h3 class="text-lg font-semibold text-gray-900">{{ $location->name }}</h3>
-                                <p class="text-gray-600">{{ $location->full_address }}</p>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-lg font-semibold text-gray-900 truncate">{{ $location->name }}</h3>
+                                <p class="text-gray-600 text-sm truncate">{{ $location->full_address }}</p>
                                 <p class="text-sm text-gray-500">{{ $location->location_type }}</p>
                             </div>
                             
                             <!-- Stats -->
-                            <div class="flex items-center space-x-6 text-sm">
+                            <div class="flex items-center space-x-8 text-sm flex-shrink-0">
                                 <div class="text-center">
                                     <div class="font-semibold text-gray-900">Staff</div>
                                     <div class="text-gray-600">{{ $location->staff_count ?? 'N/A' }}</div>
@@ -100,7 +100,7 @@
                                 </div>
                                 
                                 <!-- Toggles -->
-                                <div class="flex items-center space-x-4">
+                                <div class="flex items-center space-x-6">
                                     <div class="flex items-center space-x-2">
                                         <span class="text-sm font-medium text-gray-700">Head Office</span>
                                         <form method="POST" action="{{ route('locations.toggle-head-office', $location) }}" class="inline">
@@ -124,7 +124,7 @@
                             </div>
                             
                             <!-- Action Buttons -->
-                            <div class="flex items-center space-x-2">
+                            <div class="flex items-center space-x-2 flex-shrink-0">
                                 <a href="{{ route('locations.edit', $location) }}" 
                                    class="px-4 py-2 border border-orange-500 text-orange-600 bg-white rounded-lg hover:bg-orange-50 transition">
                                     Edit

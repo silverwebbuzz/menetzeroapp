@@ -100,7 +100,7 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Total number of staff (FTE)</label>
-                            <input type="number" name="staff_count" value="{{ old('staff_count', $location->staff_count) }}" min="0" 
+                            <input type="number" name="staff_count" value="{{ old('staff_count', $location->staff_count) }}" min="1" required
                                    placeholder="10" 
                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
                             @error('staff_count')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
@@ -343,8 +343,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize utility bills logic
     const receivesUtilityBills = document.querySelector('input[name="receives_utility_bills"]');
+    const buildingDetails = document.getElementById('building-details');
+    
     if (receivesUtilityBills.checked) {
-        document.getElementById('building-details').style.display = 'none';
+        buildingDetails.style.display = 'none';
+    } else {
+        buildingDetails.style.display = 'block';
     }
 });
 </script>

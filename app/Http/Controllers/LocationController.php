@@ -76,7 +76,7 @@ class LocationController extends Controller
             'city' => 'nullable|string|max:100',
             'country' => 'nullable|string|max:100',
             'location_type' => 'nullable|string|max:100',
-            'staff_count' => 'nullable|integer|min:0',
+            'staff_count' => 'required|integer|min:1',
             'staff_work_from_home' => 'boolean',
             'fiscal_year_start' => 'nullable|string|max:20',
             'is_head_office' => 'boolean',
@@ -177,7 +177,7 @@ class LocationController extends Controller
                 
             case 'step2':
                 $request->validate([
-                    'staff_count' => 'nullable|integer|min:0',
+                    'staff_count' => 'required|integer|min:1',
                     'staff_work_from_home' => 'boolean',
                 ]);
                 
@@ -237,7 +237,7 @@ class LocationController extends Controller
             'city' => 'nullable|string|max:100',
             'country' => 'nullable|string|max:100',
             'location_type' => 'nullable|string|max:100',
-            'staff_count' => 'nullable|integer|min:0',
+            'staff_count' => 'required|integer|min:1',
             'staff_work_from_home' => 'boolean',
             'fiscal_year_start' => 'nullable|string|max:20',
             'is_head_office' => 'boolean',

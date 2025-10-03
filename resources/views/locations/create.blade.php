@@ -200,7 +200,7 @@
                                 </label>
                             </div>
                             
-                            <div class="bg-gray-50 rounded-lg p-4" id="building-details" style="display: none;">
+                            <div class="bg-gray-50 rounded-lg p-4" id="building-details">
                                 <h5 class="text-sm font-semibold text-gray-900 mb-3">Office Building Details</h5>
                                 
                                 <div class="space-y-4">
@@ -247,7 +247,7 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Input the average number for the period you are measuring: Total number of staff(FTE)</label>
                         <p class="text-xs text-gray-500 mb-3">Staff are a source of indirect emissions. Include full-time, flexible, and remote employees. Do not include independent contractors not on your payroll.</p>
-                        <input type="number" name="staff_count" value="{{ old('staff_count') }}" min="0" 
+                        <input type="number" name="staff_count" value="{{ old('staff_count') }}" min="1" required
                                placeholder="10" 
                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
                         @error('staff_count')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
@@ -488,6 +488,18 @@ document.querySelector('input[name="receives_utility_bills"]').addEventListener(
         document.querySelector('input[name="shared_building_services"]').checked = false;
     } else {
         // If company doesn't receive utility bills, show the other questions
+        buildingDetails.style.display = 'block';
+    }
+});
+
+// Initialize utility bills logic on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const receivesUtilityBills = document.querySelector('input[name="receives_utility_bills"]');
+    const buildingDetails = document.getElementById('building-details');
+    
+    if (receivesUtilityBills.checked) {
+        buildingDetails.style.display = 'none';
+    } else {
         buildingDetails.style.display = 'block';
     }
 });
