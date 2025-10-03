@@ -270,10 +270,6 @@ class LocationController extends Controller
             'measurement_frequency' => $request->measurement_frequency ?? 'Annually',
         ];
 
-        // Debug: Log the update data
-        \Log::info('Location update data:', $updateData);
-        \Log::info('Request data:', $request->all());
-
         $location->update($updateData);
 
         return redirect()->route('locations.index')->with('success', 'Location updated successfully!');
