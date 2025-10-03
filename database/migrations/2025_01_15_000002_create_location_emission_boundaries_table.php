@@ -19,7 +19,7 @@ return new class extends Migration
             $table->timestamps();
             
             // Ensure unique combination of location and emission source
-            $table->unique(['location_id', 'emission_source_id']);
+            $table->unique(['location_id', 'emission_source_id'], 'loc_emission_unique');
         });
     }
 
@@ -28,6 +28,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('location_emission_boundaries', function (Blueprint $table) {
+            $table->dropUnique('loc_emission_unique');
+        });
         Schema::dropIfExists('location_emission_boundaries');
     }
 };
