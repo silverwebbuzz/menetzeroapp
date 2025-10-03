@@ -321,7 +321,9 @@ document.getElementById('country').addEventListener('change', function() {
             citySelect.value = currentCity;
             console.log('Set city to:', currentCity);
         } else {
-            console.log('Current city not found in country cities');
+            console.log('Current city not found in country cities - clearing city selection');
+            // Don't try to preserve the old city if it doesn't match the new country
+            citySelect.value = '';
         }
     }
 });
@@ -366,6 +368,18 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
+    
+    // Handle utility bills logic
+    const receivesUtilityBills = document.querySelector('input[name="receives_utility_bills"]');
+    const buildingDetails = document.getElementById('building-details');
+    
+    if (receivesUtilityBills && buildingDetails) {
+        if (receivesUtilityBills.checked) {
+            buildingDetails.style.display = 'none';
+        } else {
+            buildingDetails.style.display = 'block';
+        }
+    }
 });
 
 // Handle utility bills logic
@@ -380,25 +394,6 @@ document.querySelector('input[name="receives_utility_bills"]').addEventListener(
     } else {
         // If company doesn't receive utility bills, show the other questions
         buildingDetails.style.display = 'block';
-    }
-});
-
-// Initialize utility bills logic on page load
-document.addEventListener('DOMContentLoaded', function() {
-    const receivesUtilityBills = document.querySelector('input[name="receives_utility_bills"]');
-    const buildingDetails = document.getElementById('building-details');
-    
-    if (receivesUtilityBills.checked) {
-        buildingDetails.style.display = 'none';
-    } else {
-        buildingDetails.style.display = 'block';
-    }
-    
-    // Initialize city options
-    const countrySelect = document.getElementById('country');
-    if (countrySelect.value) {
-        // Trigger city population
-        countrySelect.dispatchEvent(new Event('change'));
     }
 });
 </script>
