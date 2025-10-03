@@ -84,16 +84,18 @@
                         @error('country')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                     </div>
                     
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
-                        <select name="city" id="city" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
-                            <option value="">Select city</option>
-                            @if($location->city)
-                                <option value="{{ $location->city }}" selected>{{ $location->city }}</option>
-                            @endif
-                        </select>
-                        @error('city')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
-                    </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
+                            <select name="city" id="city" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                <option value="">Select city</option>
+                                @if($location->city)
+                                    <option value="{{ $location->city }}" selected>{{ $location->city }}</option>
+                                @endif
+                            </select>
+                            @error('city')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
+                            <!-- Debug info -->
+                            <p class="text-xs text-gray-500 mt-1">Current city: {{ $location->city ?? 'None' }} | Current country: {{ $location->country ?? 'None' }}</p>
+                        </div>
                 </div>
                 
                 <!-- Location Type and Fiscal Year -->
@@ -285,6 +287,9 @@ document.getElementById('country').addEventListener('change', function() {
     const citySelect = document.getElementById('city');
     const country = this.value;
     
+    console.log('Country changed to:', country);
+    
+    // Clear existing options
     citySelect.innerHTML = '<option value="">Select city</option>';
     
     const cities = {
@@ -309,8 +314,56 @@ document.getElementById('country').addEventListener('change', function() {
         
         // Set the current city if it exists and matches the country
         const currentCity = '{{ $location->city }}';
+        console.log('Current city:', currentCity);
+        console.log('Available cities for', country, ':', cities[country]);
+        
         if (currentCity && cities[country].includes(currentCity)) {
             citySelect.value = currentCity;
+            console.log('Set city to:', currentCity);
+        } else {
+            console.log('Current city not found in country cities');
+        }
+    }
+});
+
+// Also handle the case where country is already selected on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const countrySelect = document.getElementById('country');
+    const citySelect = document.getElementById('city');
+    
+    console.log('Page loaded - Country:', countrySelect.value, 'City:', citySelect.value);
+    
+    // If country is already selected, populate cities
+    if (countrySelect.value) {
+        console.log('Country already selected, populating cities');
+        countrySelect.dispatchEvent(new Event('change'));
+    }
+    
+    // If no country is selected but we have a city, try to find the country
+    if (!countrySelect.value && citySelect.value) {
+        const currentCity = citySelect.value;
+        console.log('No country selected but city exists:', currentCity);
+        
+        const cities = {
+            'UAE': ['Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Umm Al Quwain'],
+            'SA': ['Riyadh', 'Jeddah', 'Mecca', 'Medina', 'Dammam'],
+            'KW': ['Kuwait City', 'Hawalli', 'Ahmadi'],
+            'QA': ['Doha', 'Al Rayyan', 'Al Wakrah'],
+            'BH': ['Manama', 'Riffa', 'Muharraq'],
+            'OM': ['Muscat', 'Salalah', 'Nizwa'],
+            'US': ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix'],
+            'UK': ['London', 'Birmingham', 'Manchester', 'Glasgow', 'Liverpool'],
+            'IN': ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Kolkata']
+        };
+        
+        // Find which country has this city
+        for (const [country, cityList] of Object.entries(cities)) {
+            if (cityList.includes(currentCity)) {
+                console.log('Found country for city:', country);
+                countrySelect.value = country;
+                countrySelect.dispatchEvent(new Event('change'));
+                break;
+            }
         }
     }
 });
