@@ -94,6 +94,11 @@ class Company extends Model
         return $this->hasMany(Subscription::class);
     }
 
+    public function locations()
+    {
+        return $this->hasMany(Location::class);
+    }
+
     /**
      * Get the route key for the model.
      */

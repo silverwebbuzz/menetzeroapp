@@ -1,0 +1,203 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Location;
+use App\Models\Company;
+use Illuminate\Support\Facades\Auth;
+
+class LocationController extends Controller
+{
+    public function index()
+    {
+        $user = Auth::user();
+        $company = $user->company;
+        
+        if (!$company) {
+            return redirect()->route('company.setup')->with('error', 'Please complete your business profile first.');
+        }
+
+        $locations = $company->locations()
+            ->when(request('search'), function($query, $search) {
+                $query->where('name', 'like', "%{$search}%")
+                      ->orWhere('city', 'like', "%{$search}%")
+                      ->orWhere('country', 'like', "%{$search}%");
+            })
+            ->when(request('filter'), function($query, $filter) {
+                if ($filter === 'active') {
+                    $query->where('is_active', true);
+                } elseif ($filter === 'inactive') {
+                    $query->where('is_active', false);
+                } elseif ($filter === 'head_office') {
+                    $query->where('is_head_office', true);
+                }
+            })
+            ->when(request('sort'), function($query, $sort) {
+                if ($sort === 'name') {
+                    $query->orderBy('name');
+                } elseif ($sort === 'created') {
+                    $query->orderBy('created_at', 'desc');
+                } elseif ($sort === 'staff') {
+                    $query->orderBy('staff_count', 'desc');
+                }
+            })
+            ->orderBy('is_head_office', 'desc')
+            ->orderBy('name')
+            ->paginate(10);
+
+        return view('locations.index', compact('locations', 'company'));
+    }
+
+    public function create()
+    {
+        $user = Auth::user();
+        $company = $user->company;
+        
+        if (!$company) {
+            return redirect()->route('company.setup')->with('error', 'Please complete your business profile first.');
+        }
+
+        return view('locations.create', compact('company'));
+    }
+
+    public function store(Request $request)
+    {
+        $user = Auth::user();
+        $company = $user->company;
+        
+        if (!$company) {
+            return redirect()->route('company.setup')->with('error', 'Please complete your business profile first.');
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'nullable|string|max:500',
+            'city' => 'nullable|string|max:100',
+            'country' => 'nullable|string|max:100',
+            'location_type' => 'nullable|string|max:100',
+            'staff_count' => 'nullable|integer|min:0',
+            'staff_work_from_home' => 'boolean',
+            'fiscal_year_start' => 'nullable|string|max:20',
+            'is_head_office' => 'boolean',
+            'receives_utility_bills' => 'boolean',
+            'pays_electricity_proportion' => 'boolean',
+            'shared_building_services' => 'boolean',
+            'reporting_period' => 'nullable|integer|min:2020|max:2030',
+            'measurement_frequency' => 'nullable|string|max:20',
+        ]);
+
+        // If this is set as head office, unset any existing head office
+        if ($request->is_head_office) {
+            $company->locations()->update(['is_head_office' => false]);
+        }
+
+        $location = $company->locations()->create([
+            'name' => $request->name,
+            'address' => $request->address,
+            'city' => $request->city,
+            'country' => $request->country,
+            'location_type' => $request->location_type,
+            'staff_count' => $request->staff_count,
+            'staff_work_from_home' => $request->boolean('staff_work_from_home'),
+            'fiscal_year_start' => $request->fiscal_year_start ?? 'January',
+            'is_head_office' => $request->boolean('is_head_office'),
+            'receives_utility_bills' => $request->boolean('receives_utility_bills'),
+            'pays_electricity_proportion' => $request->boolean('pays_electricity_proportion'),
+            'shared_building_services' => $request->boolean('shared_building_services'),
+            'reporting_period' => $request->reporting_period,
+            'measurement_frequency' => $request->measurement_frequency ?? 'Annually',
+        ]);
+
+        return redirect()->route('locations.index')->with('success', 'Location created successfully!');
+    }
+
+    public function show(Location $location)
+    {
+        $this->authorize('view', $location);
+        return view('locations.show', compact('location'));
+    }
+
+    public function edit(Location $location)
+    {
+        $this->authorize('update', $location);
+        return view('locations.edit', compact('location'));
+    }
+
+    public function update(Request $request, Location $location)
+    {
+        $this->authorize('update', $location);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'nullable|string|max:500',
+            'city' => 'nullable|string|max:100',
+            'country' => 'nullable|string|max:100',
+            'location_type' => 'nullable|string|max:100',
+            'staff_count' => 'nullable|integer|min:0',
+            'staff_work_from_home' => 'boolean',
+            'fiscal_year_start' => 'nullable|string|max:20',
+            'is_head_office' => 'boolean',
+            'receives_utility_bills' => 'boolean',
+            'pays_electricity_proportion' => 'boolean',
+            'shared_building_services' => 'boolean',
+            'reporting_period' => 'nullable|integer|min:2020|max:2030',
+            'measurement_frequency' => 'nullable|string|max:20',
+        ]);
+
+        // If this is set as head office, unset any existing head office
+        if ($request->is_head_office) {
+            $location->company->locations()->where('id', '!=', $location->id)->update(['is_head_office' => false]);
+        }
+
+        $location->update([
+            'name' => $request->name,
+            'address' => $request->address,
+            'city' => $request->city,
+            'country' => $request->country,
+            'location_type' => $request->location_type,
+            'staff_count' => $request->staff_count,
+            'staff_work_from_home' => $request->boolean('staff_work_from_home'),
+            'fiscal_year_start' => $request->fiscal_year_start ?? 'January',
+            'is_head_office' => $request->boolean('is_head_office'),
+            'receives_utility_bills' => $request->boolean('receives_utility_bills'),
+            'pays_electricity_proportion' => $request->boolean('pays_electricity_proportion'),
+            'shared_building_services' => $request->boolean('shared_building_services'),
+            'reporting_period' => $request->reporting_period,
+            'measurement_frequency' => $request->measurement_frequency ?? 'Annually',
+        ]);
+
+        return redirect()->route('locations.index')->with('success', 'Location updated successfully!');
+    }
+
+    public function destroy(Location $location)
+    {
+        $this->authorize('delete', $location);
+        $location->delete();
+        return redirect()->route('locations.index')->with('success', 'Location deleted successfully!');
+    }
+
+    public function toggleStatus(Location $location)
+    {
+        $this->authorize('update', $location);
+        $location->update(['is_active' => !$location->is_active]);
+        
+        $status = $location->is_active ? 'activated' : 'deactivated';
+        return back()->with('success', "Location {$status} successfully!");
+    }
+
+    public function toggleHeadOffice(Location $location)
+    {
+        $this->authorize('update', $location);
+        
+        if (!$location->is_head_office) {
+            // Unset any existing head office
+            $location->company->locations()->update(['is_head_office' => false]);
+            $location->update(['is_head_office' => true]);
+        } else {
+            $location->update(['is_head_office' => false]);
+        }
+        
+        return back()->with('success', 'Head office status updated successfully!');
+    }
+}

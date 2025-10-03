@@ -8,6 +8,7 @@ use App\Http\Controllers\EmissionFormController;
 use App\Http\Controllers\EmissionManagementController;
 use App\Http\Controllers\CompanySetupController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\LocationController;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -49,6 +50,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::post('/profile/personal', [ProfileController::class, 'updatePersonal'])->name('profile.update.personal');
     Route::post('/profile/company', [ProfileController::class, 'updateCompany'])->name('profile.update.company');
+    
+    // Location routes
+    Route::resource('locations', LocationController::class);
+    Route::post('/locations/{location}/toggle-status', [LocationController::class, 'toggleStatus'])->name('locations.toggle-status');
+    Route::post('/locations/{location}/toggle-head-office', [LocationController::class, 'toggleHeadOffice'])->name('locations.toggle-head-office');
 });
 
 // Protected routes
