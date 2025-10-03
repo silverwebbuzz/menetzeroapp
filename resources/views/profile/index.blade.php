@@ -256,7 +256,7 @@
                             
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Business Subcategory</label>
-                                <input type="text" name="business_subcategory" value="{{ old('business_subcategory') }}" 
+                                <input type="text" name="business_subcategory" value="{{ old('business_subcategory', $company->business_subcategory) }}" 
                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                                 @error('business_subcategory')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                             </div>

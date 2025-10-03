@@ -81,6 +81,7 @@ class ProfileController extends Controller
             'address' => $request->business_address,
             'country' => $request->country,
             'industry' => $request->business_category,
+            'business_subcategory' => $request->business_subcategory,
             'description' => $request->business_description,
             'contact_person' => $request->contact_person,
             'license_no' => $request->license_no,

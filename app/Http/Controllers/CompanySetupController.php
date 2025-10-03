@@ -44,6 +44,7 @@ class CompanySetupController extends Controller
             'address' => $request->business_address,
             'country' => $request->country,
             'industry' => $request->business_category,
+            'business_subcategory' => $request->business_subcategory,
             'description' => $request->business_description,
             'is_active' => true,
         ]);

@@ -13,7 +13,7 @@ class Company extends Model
     protected $fillable = [
         'name', 'slug', 'email', 'phone',
         'address', 'city', 'state', 'country', 'postal_code', 'website',
-        'description', 'industry', 'employee_count', 'annual_revenue', 'is_active', 'settings',
+        'description', 'industry', 'business_subcategory', 'employee_count', 'annual_revenue', 'is_active', 'settings',
         // UAE additions
         'emirate', 'sector', 'license_no', 'contact_person',
     ];
