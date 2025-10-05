@@ -383,7 +383,7 @@ class MeasurementController extends Controller
     private function calculateAvailablePeriods(Location $location)
     {
         $periods = [];
-        $currentYear = date('Y');
+        $currentYear = $location->reporting_period ?? date('Y'); // Use location's reporting period
         $fiscalYearStart = $location->fiscal_year_start ?? 'JAN'; // Default to January
         $measurementFrequency = $location->measurement_frequency ?? 'monthly'; // Default to monthly for testing
         
@@ -397,12 +397,15 @@ class MeasurementController extends Controller
         $monthMap = [
             'JAN' => 1, 'FEB' => 2, 'MAR' => 3, 'APR' => 4,
             'MAY' => 5, 'JUN' => 6, 'JUL' => 7, 'AUG' => 8,
-            'SEP' => 9, 'OCT' => 10, 'NOV' => 11, 'DEC' => 12
+            'SEP' => 9, 'OCT' => 10, 'NOV' => 11, 'DEC' => 12,
+            'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4,
+            'May' => 5, 'June' => 6, 'July' => 7, 'August' => 8,
+            'September' => 9, 'October' => 10, 'November' => 11, 'December' => 12
         ];
         $startMonth = $monthMap[$fiscalYearStart] ?? 1; // Default to January if not found
 
         // Generate periods based on frequency
-        switch ($measurementFrequency) {
+        switch (strtolower($measurementFrequency)) {
             case 'annually':
                 $periods[] = [
                     'start' => Carbon::create($currentYear, $startMonth, 1)->format('Y-m-d'),
@@ -445,6 +448,28 @@ class MeasurementController extends Controller
                 break;
 
             case 'monthly':
+                \Log::info('Generating monthly periods', [
+                    'currentYear' => $currentYear,
+                    'startMonth' => $startMonth
+                ]);
+                for ($i = 0; $i < 12; $i++) {
+                    $periodStart = Carbon::create($currentYear, $startMonth, 1)->addMonths($i);
+                    $periodEnd = $periodStart->copy()->addMonth()->subDay();
+                    $periods[] = [
+                        'start' => $periodStart->format('Y-m-d'),
+                        'end' => $periodEnd->format('Y-m-d'),
+                        'label' => $periodStart->format('M Y'),
+                        'frequency' => 'monthly',
+                        'fiscal_year' => $currentYear,
+                        'fiscal_start' => $fiscalYearStart
+                    ];
+                }
+                \Log::info('Generated monthly periods', ['count' => count($periods)]);
+                break;
+                
+            default:
+                \Log::warning('Unknown frequency: ' . $measurementFrequency);
+                // Fallback to monthly if unknown frequency
                 for ($i = 0; $i < 12; $i++) {
                     $periodStart = Carbon::create($currentYear, $startMonth, 1)->addMonths($i);
                     $periodEnd = $periodStart->copy()->addMonth()->subDay();
