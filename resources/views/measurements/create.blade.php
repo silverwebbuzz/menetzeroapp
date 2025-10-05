@@ -49,7 +49,17 @@
         <!-- Measurement Period -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">Measurement Period</h3>
+            <p class="text-sm text-gray-600 mb-4">Select a measurement period from the available options below, or choose a custom period.</p>
             
+            <!-- Available Periods Selection -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Available Periods</label>
+                <div id="available-periods" class="text-sm text-gray-600">
+                    Select a location to see available measurement periods.
+                </div>
+            </div>
+            
+            <!-- Custom Period Input -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label for="period_start" class="block text-sm font-medium text-gray-700 mb-2">
@@ -187,15 +197,28 @@ document.addEventListener('DOMContentLoaded', function() {
             availablePeriodsDiv.innerHTML = '<div class="text-blue-600">Loading available periods...</div>';
             
             // Fetch available periods for this location
-            fetch(`/measurements/available-periods/${locationId}`)
-                .then(response => response.json())
+            fetch(`/measurements/available-periods/${locationId}`, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
+                    console.log('Received periods data:', data);
                     if (data.periods && data.periods.length > 0) {
                         let html = '<div class="space-y-2">';
                         data.periods.forEach(period => {
-                            html += `<div class="p-2 bg-gray-50 rounded border cursor-pointer hover:bg-gray-100" 
+                            html += `<div class="p-2 bg-gray-50 rounded border cursor-pointer hover:bg-gray-100 transition" 
                                      onclick="selectPeriod('${period.start}', '${period.end}')">
-                                        <div class="font-medium">${period.label}</div>
+                                        <div class="font-medium text-gray-900">${period.label}</div>
                                         <div class="text-sm text-gray-600">${period.start} to ${period.end}</div>
                                      </div>`;
                         });
@@ -206,7 +229,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 })
                 .catch(error => {
-                    availablePeriodsDiv.innerHTML = '<div class="text-red-600">Error loading periods.</div>';
+                    console.error('Error loading periods:', error);
+                    availablePeriodsDiv.innerHTML = '<div class="text-red-600">Error loading periods. Please try again or enter dates manually.</div>';
                 });
         } else {
             availablePeriodsDiv.innerHTML = 'Select a location to see available measurement periods.';

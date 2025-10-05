@@ -342,16 +342,28 @@ class MeasurementController extends Controller
      */
     public function getAvailablePeriods(Location $location)
     {
-        $user = Auth::user();
-        
-        // Check if user has access to this location
-        if ($location->company_id !== $user->company_id) {
-            return response()->json(['error' => 'Unauthorized access'], 403);
-        }
+        try {
+            $user = Auth::user();
+            
+            // Check if user has access to this location
+            if ($location->company_id !== $user->company_id) {
+                return response()->json(['error' => 'Unauthorized access'], 403);
+            }
 
-        $periods = $this->calculateAvailablePeriods($location);
-        
-        return response()->json(['periods' => $periods]);
+            $periods = $this->calculateAvailablePeriods($location);
+            
+            return response()->json([
+                'periods' => $periods,
+                'location' => [
+                    'name' => $location->name,
+                    'fiscal_year_start' => $location->fiscal_year_start,
+                    'measurement_frequency' => $location->measurement_frequency
+                ]
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error getting available periods: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to load periods'], 500);
+        }
     }
 
     /**
@@ -361,8 +373,8 @@ class MeasurementController extends Controller
     {
         $periods = [];
         $currentYear = date('Y');
-        $fiscalYearStart = $location->fiscal_year_start_month;
-        $measurementFrequency = $location->measurement_frequency;
+        $fiscalYearStart = $location->fiscal_year_start ?? 'JAN'; // Default to January
+        $measurementFrequency = $location->measurement_frequency ?? 'annually'; // Default to annually
 
         // Get fiscal year start month number
         $monthMap = [
@@ -370,7 +382,7 @@ class MeasurementController extends Controller
             'MAY' => 5, 'JUN' => 6, 'JUL' => 7, 'AUG' => 8,
             'SEP' => 9, 'OCT' => 10, 'NOV' => 11, 'DEC' => 12
         ];
-        $startMonth = $monthMap[$fiscalYearStart];
+        $startMonth = $monthMap[$fiscalYearStart] ?? 1; // Default to January if not found
 
         // Generate periods based on frequency
         switch ($measurementFrequency) {
@@ -417,6 +429,15 @@ class MeasurementController extends Controller
                     ];
                 }
                 break;
+        }
+
+        // If no periods were generated, create a simple default period
+        if (empty($periods)) {
+            $periods[] = [
+                'start' => Carbon::create($currentYear, 1, 1),
+                'end' => Carbon::create($currentYear, 12, 31),
+                'label' => "FY {$currentYear} (Default)"
+            ];
         }
 
         // Filter out periods that already have measurements
