@@ -86,16 +86,18 @@ Route::middleware('auth')->group(function () {
             return 'No location found for company: ' . $user->company_id;
         }
         
+        // Use a unique period to avoid duplicates
+        $uniqueId = time();
         $measurement = \App\Models\Measurement::create([
             'location_id' => $location->id,
-            'period_start' => '2024-01-01',
-            'period_end' => '2024-01-31',
+            'period_start' => '2024-12-01',
+            'period_end' => '2024-12-31',
             'frequency' => 'monthly',
             'status' => 'draft',
             'fiscal_year' => 2024,
             'fiscal_year_start_month' => 'JAN',
             'created_by' => $user->id,
-            'notes' => 'Debug test measurement',
+            'notes' => 'Debug test measurement - ' . $uniqueId,
         ]);
         
         return redirect()->route('measurements.show', $measurement);
