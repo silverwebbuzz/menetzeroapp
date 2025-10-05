@@ -103,6 +103,37 @@ Route::middleware('auth')->group(function () {
         return redirect()->route('measurements.show', $measurement);
     })->name('debug.measurement');
     
+    // Debug route to test show method directly
+    Route::get('/debug/show/{measurement}', function($measurementId) {
+        $measurement = \App\Models\Measurement::find($measurementId);
+        if (!$measurement) {
+            return 'Measurement not found';
+        }
+        
+        $controller = new \App\Http\Controllers\MeasurementController();
+        return $controller->show($measurement);
+    })->name('debug.show');
+    
+    // Debug route to check emission boundaries
+    Route::get('/debug/boundaries/{measurement}', function($measurementId) {
+        $measurement = \App\Models\Measurement::find($measurementId);
+        if (!$measurement) {
+            return 'Measurement not found';
+        }
+        
+        $location = $measurement->location;
+        $boundaries = $location->emissionBoundaries()->get();
+        
+        return response()->json([
+            'location_id' => $location->id,
+            'location_name' => $location->name,
+            'boundaries_count' => $boundaries->count(),
+            'boundaries' => $boundaries->toArray(),
+            'emission_sources_master_count' => \App\Models\EmissionSourceMaster::count(),
+            'emission_sources_master' => \App\Models\EmissionSourceMaster::take(5)->get()->toArray()
+        ]);
+    })->name('debug.boundaries');
+    
     // Emission source calculation routes
     Route::get('/measurements/{measurement}/sources/{source}/calculate', [MeasurementController::class, 'calculateSource'])->name('measurements.calculate-source');
     Route::post('/measurements/{measurement}/sources/{source}/calculate', [MeasurementController::class, 'storeSourceData'])->name('measurements.store-source-data');
