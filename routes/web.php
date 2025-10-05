@@ -114,6 +114,30 @@ Route::middleware('auth')->group(function () {
         return $controller->show($measurement);
     })->name('debug.show');
     
+    // Simple debug route to test show method with minimal logic
+    Route::get('/debug/simple-show/{measurement}', function($measurementId) {
+        $measurement = \App\Models\Measurement::find($measurementId);
+        if (!$measurement) {
+            return 'Measurement not found';
+        }
+        
+        $user = \Auth::user();
+        
+        // Check if user has access to this measurement
+        if ($measurement->location->company_id !== $user->company_id) {
+            return 'Unauthorized access to this measurement.';
+        }
+
+        $measurement->load(['location']);
+
+        // Get emission boundaries for this location
+        $emissionBoundaries = $measurement->location->emissionBoundaries()
+            ->get()
+            ->groupBy('scope');
+
+        return view('measurements.show', compact('measurement', 'emissionBoundaries'));
+    })->name('debug.simple-show');
+    
     // Debug route to check emission boundaries
     Route::get('/debug/boundaries/{measurement}', function($measurementId) {
         $measurement = \App\Models\Measurement::find($measurementId);
