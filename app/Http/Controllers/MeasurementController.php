@@ -94,6 +94,8 @@ class MeasurementController extends Controller
      */
     public function store(Request $request)
     {
+        \Log::info('Measurement store called with data:', $request->all());
+        
         $request->validate([
             'location_id' => 'required|exists:locations,id',
             'period_start' => 'required|date',
@@ -103,6 +105,8 @@ class MeasurementController extends Controller
             'fiscal_year_start_month' => 'required|in:JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC',
             'notes' => 'nullable|string|max:1000',
         ]);
+        
+        \Log::info('Validation passed');
 
         $user = Auth::user();
         
@@ -150,6 +154,9 @@ class MeasurementController extends Controller
             DB::commit();
 
             \Log::info('Measurement created successfully. ID: ' . $measurement->id . ', Location: ' . $measurement->location_id);
+            
+            $redirectUrl = route('measurements.show', $measurement);
+            \Log::info('Redirecting to: ' . $redirectUrl);
             
             return redirect()->route('measurements.show', $measurement)
                 ->with('success', 'Measurement created successfully. You can now add emission data.');

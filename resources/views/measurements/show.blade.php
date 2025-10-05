@@ -73,28 +73,6 @@
         </div>
     </div>
 
-    <!-- Debug: Let's see what we have -->
-    <div class="bg-blue-100 p-4 mb-4 rounded">
-        <h3 class="font-bold">Debug Info:</h3>
-        <p>Emission Boundaries Count: {{ $emissionBoundaries->count() }}</p>
-        @if($emissionBoundaries->count() > 0)
-            @foreach($emissionBoundaries as $scope => $boundaries)
-                <p><strong>{{ $scope }}:</strong> {{ $boundaries->count() }} boundaries</p>
-                @if($boundaries->count() > 0)
-                    @php $boundary = $boundaries->first(); @endphp
-                    <p>Selected Sources: {{ json_encode($boundary->selected_sources) }}</p>
-                    @php $sources = $boundary->emissionSources(); @endphp
-                    <p>Emission Sources Found: {{ $sources->count() }}</p>
-                    @if($sources->count() > 0)
-                        @foreach($sources as $source)
-                            <p>- {{ $source->name }} (ID: {{ $source->id }})</p>
-                        @endforeach
-                    @endif
-                @endif
-            @endforeach
-        @endif
-    </div>
-
     <!-- Emission Sources by Scope -->
     @if($emissionBoundaries->count() > 0)
         @foreach(['Scope 1', 'Scope 2', 'Scope 3'] as $scope)
