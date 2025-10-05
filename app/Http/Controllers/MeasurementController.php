@@ -405,7 +405,17 @@ class MeasurementController extends Controller
         $startMonth = $monthMap[$fiscalYearStart] ?? 1; // Default to January if not found
 
         // Generate periods based on frequency
-        switch (strtolower($measurementFrequency)) {
+        // Handle both database enum values and normalized values
+        $normalizedFrequency = strtolower(str_replace(' ', '_', $measurementFrequency));
+        
+        \Log::info('Processing frequency', [
+            'original' => $measurementFrequency,
+            'normalized' => $normalizedFrequency,
+            'currentYear' => $currentYear,
+            'startMonth' => $startMonth
+        ]);
+        
+        switch ($normalizedFrequency) {
             case 'annually':
                 $periods[] = [
                     'start' => Carbon::create($currentYear, $startMonth, 1)->format('Y-m-d'),
@@ -418,6 +428,10 @@ class MeasurementController extends Controller
                 break;
 
             case 'half_yearly':
+                \Log::info('Generating half-yearly periods', [
+                    'currentYear' => $currentYear,
+                    'startMonth' => $startMonth
+                ]);
                 for ($i = 0; $i < 2; $i++) {
                     $periodStart = Carbon::create($currentYear, $startMonth, 1)->addMonths($i * 6);
                     $periodEnd = $periodStart->copy()->addMonths(6)->subDay();
@@ -430,9 +444,14 @@ class MeasurementController extends Controller
                         'fiscal_start' => $fiscalYearStart
                     ];
                 }
+                \Log::info('Generated half-yearly periods', ['count' => count($periods)]);
                 break;
 
             case 'quarterly':
+                \Log::info('Generating quarterly periods', [
+                    'currentYear' => $currentYear,
+                    'startMonth' => $startMonth
+                ]);
                 for ($i = 0; $i < 4; $i++) {
                     $periodStart = Carbon::create($currentYear, $startMonth, 1)->addMonths($i * 3);
                     $periodEnd = $periodStart->copy()->addMonths(3)->subDay();
@@ -445,6 +464,7 @@ class MeasurementController extends Controller
                         'fiscal_start' => $fiscalYearStart
                     ];
                 }
+                \Log::info('Generated quarterly periods', ['count' => count($periods)]);
                 break;
 
             case 'monthly':
@@ -468,7 +488,7 @@ class MeasurementController extends Controller
                 break;
                 
             default:
-                \Log::warning('Unknown frequency: ' . $measurementFrequency);
+                \Log::warning('Unknown frequency: ' . $measurementFrequency . ' (normalized: ' . $normalizedFrequency . ')');
                 // Fallback to monthly if unknown frequency
                 for ($i = 0; $i < 12; $i++) {
                     $periodStart = Carbon::create($currentYear, $startMonth, 1)->addMonths($i);
