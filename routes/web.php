@@ -77,6 +77,30 @@ Route::middleware('auth')->group(function () {
         return 'Measurement found: ID=' . $measurement->id . ', Location=' . $measurement->location_id;
     })->name('measurements.debug');
     
+    // Debug route to test measurement creation
+    Route::get('/debug/measurement', function() {
+        $user = \Auth::user();
+        $location = \App\Models\Location::where('company_id', $user->company_id)->first();
+        
+        if (!$location) {
+            return 'No location found for company: ' . $user->company_id;
+        }
+        
+        $measurement = \App\Models\Measurement::create([
+            'location_id' => $location->id,
+            'period_start' => '2024-01-01',
+            'period_end' => '2024-01-31',
+            'frequency' => 'monthly',
+            'status' => 'draft',
+            'fiscal_year' => 2024,
+            'fiscal_year_start_month' => 'JAN',
+            'created_by' => $user->id,
+            'notes' => 'Debug test measurement',
+        ]);
+        
+        return redirect()->route('measurements.show', $measurement);
+    })->name('debug.measurement');
+    
     // Emission source calculation routes
     Route::get('/measurements/{measurement}/sources/{source}/calculate', [MeasurementController::class, 'calculateSource'])->name('measurements.calculate-source');
     Route::post('/measurements/{measurement}/sources/{source}/calculate', [MeasurementController::class, 'storeSourceData'])->name('measurements.store-source-data');

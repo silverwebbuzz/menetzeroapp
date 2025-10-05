@@ -188,10 +188,17 @@ class MeasurementController extends Controller
                 'auditTrail.changedBy'
             ]);
 
-            // Get emission boundaries for this location
-            $emissionBoundaries = $measurement->location->emissionBoundaries()
-                ->get()
-                ->groupBy('scope');
+            // Get emission boundaries for this location - simplified
+            $emissionBoundaries = collect(); // Start with empty collection
+            
+            try {
+                $emissionBoundaries = $measurement->location->emissionBoundaries()
+                    ->get()
+                    ->groupBy('scope');
+            } catch (\Exception $e) {
+                \Log::warning('Could not load emission boundaries: ' . $e->getMessage());
+                // Continue with empty collection
+            }
 
             return view('measurements.show', compact('measurement', 'emissionBoundaries'));
         } catch (\Exception $e) {
