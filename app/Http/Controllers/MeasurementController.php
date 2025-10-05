@@ -83,7 +83,7 @@ class MeasurementController extends Controller
         $availablePeriods = [];
         if ($request->filled('location_id')) {
             $location = Location::findOrFail($request->location_id);
-            $availablePeriods = $this->getAvailablePeriods($location);
+            $availablePeriods = $this->calculateAvailablePeriods($location);
         }
 
         return view('measurements.create', compact('locations', 'availablePeriods'));
@@ -349,15 +349,15 @@ class MeasurementController extends Controller
             return response()->json(['error' => 'Unauthorized access'], 403);
         }
 
-        $periods = $this->getAvailablePeriods($location);
+        $periods = $this->calculateAvailablePeriods($location);
         
         return response()->json(['periods' => $periods]);
     }
 
     /**
-     * Get available measurement periods for a location
+     * Calculate available measurement periods for a location
      */
-    private function getAvailablePeriods(Location $location)
+    private function calculateAvailablePeriods(Location $location)
     {
         $periods = [];
         $currentYear = date('Y');
