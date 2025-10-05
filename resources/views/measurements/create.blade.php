@@ -11,7 +11,7 @@
         <p class="mt-2 text-gray-600">Set up a new carbon footprint measurement period for your location.</p>
     </div>
 
-    <form method="POST" action="{{ route('measurements.store') }}" class="space-y-6">
+    <form method="POST" action="{{ route('measurements.store') }}" class="space-y-6" onsubmit="console.log('Form submitting...', this); return true;">
         @csrf
         
         <!-- Location Selection -->
@@ -83,7 +83,8 @@
             </a>
             <button type="submit" id="create-measurement-btn"
                     class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    disabled>
+                    disabled
+                    onclick="console.log('Button clicked, disabled:', this.disabled);">
                 Create Measurement
             </button>
         </div>
@@ -156,6 +157,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to select a period
     window.selectPeriod = function(startDate, endDate, frequency, fiscalYear, fiscalStart) {
+        console.log('selectPeriod called with:', { startDate, endDate, frequency, fiscalYear, fiscalStart });
+        
         document.getElementById('period_start').value = startDate;
         document.getElementById('period_end').value = endDate;
         document.getElementById('frequency').value = frequency;
@@ -163,11 +166,19 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('fiscal_year_start_month').value = fiscalStart;
         
         // Enable the create button
-        document.getElementById('create-measurement-btn').disabled = false;
-        document.getElementById('create-measurement-btn').classList.remove('disabled:bg-gray-400', 'disabled:cursor-not-allowed');
-        document.getElementById('create-measurement-btn').classList.add('bg-orange-600', 'hover:bg-orange-700');
+        const button = document.getElementById('create-measurement-btn');
+        button.disabled = false;
+        button.classList.remove('disabled:bg-gray-400', 'disabled:cursor-not-allowed');
+        button.classList.add('bg-orange-600', 'hover:bg-orange-700');
         
-        console.log('Selected period:', { startDate, endDate, frequency, fiscalYear, fiscalStart });
+        console.log('Button enabled, disabled:', button.disabled);
+        console.log('Form values:', {
+            period_start: document.getElementById('period_start').value,
+            period_end: document.getElementById('period_end').value,
+            frequency: document.getElementById('frequency').value,
+            fiscal_year: document.getElementById('fiscal_year').value,
+            fiscal_year_start_month: document.getElementById('fiscal_year_start_month').value
+        });
     };
 });
 </script>
