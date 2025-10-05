@@ -385,11 +385,12 @@ class MeasurementController extends Controller
         $periods = [];
         $currentYear = date('Y');
         $fiscalYearStart = $location->fiscal_year_start ?? 'JAN'; // Default to January
-        $measurementFrequency = $location->measurement_frequency ?? 'annually'; // Default to annually
+        $measurementFrequency = $location->measurement_frequency ?? 'monthly'; // Default to monthly for testing
         
         \Log::info('Using settings:', [
             'fiscalYearStart' => $fiscalYearStart,
-            'measurementFrequency' => $measurementFrequency
+            'measurementFrequency' => $measurementFrequency,
+            'location_name' => $location->name
         ]);
 
         // Get fiscal year start month number
@@ -461,6 +462,7 @@ class MeasurementController extends Controller
 
         // If no periods were generated, create a simple default period
         if (empty($periods)) {
+            \Log::warning('No periods generated, creating default period');
             $periods[] = [
                 'start' => Carbon::create($currentYear, 1, 1)->format('Y-m-d'),
                 'end' => Carbon::create($currentYear, 12, 31)->format('Y-m-d'),
@@ -470,6 +472,11 @@ class MeasurementController extends Controller
                 'fiscal_start' => 'JAN'
             ];
         }
+        
+        \Log::info('Final periods generated:', [
+            'count' => count($periods),
+            'periods' => $periods
+        ]);
 
         // Filter out periods that already have measurements
         $existingPeriods = Measurement::where('location_id', $location->id)

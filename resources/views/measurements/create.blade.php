@@ -38,7 +38,7 @@
         </div>
 
         <!-- Measurement Period Selection -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6" id="measurement-period-section" style="display: none;">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">Select Measurement Period</h3>
             <p class="text-sm text-gray-600 mb-4">Choose a measurement period based on your location's settings.</p>
             
@@ -46,18 +46,7 @@
             <div class="mb-6">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Available Periods</label>
                 <div id="available-periods" class="text-sm text-gray-600">
-                    Select a location to see available measurement periods.
-                </div>
-                <div id="selected-period" class="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg hidden">
-                    <div class="flex items-center">
-                        <svg class="w-5 h-5 text-orange-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <div>
-                            <div class="font-medium text-orange-900" id="selected-period-label">Period Selected</div>
-                            <div class="text-sm text-orange-700" id="selected-period-dates"></div>
-                        </div>
-                    </div>
+                    Loading periods...
                 </div>
             </div>
             
@@ -108,12 +97,17 @@ document.addEventListener('DOMContentLoaded', function() {
     
     locationSelect.addEventListener('change', function() {
         const locationId = this.value;
+        const measurementSection = document.getElementById('measurement-period-section');
         
         if (locationId) {
+            // Show the measurement period section
+            measurementSection.style.display = 'block';
+            
             // Show loading state
             availablePeriodsDiv.innerHTML = '<div class="text-blue-600">Loading available periods...</div>';
             
             // Fetch available periods for this location
+            console.log('Fetching periods for location ID:', locationId);
             fetch(`/measurements/available-periods/${locationId}`, {
                 method: 'GET',
                 headers: {
@@ -133,11 +127,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (data.periods && data.periods.length > 0) {
                         let html = '<div class="space-y-2">';
                         data.periods.forEach((period, index) => {
-                            html += `<div class="p-3 bg-gray-50 rounded border cursor-pointer hover:bg-orange-50 hover:border-orange-300 transition" 
-                                     onclick="selectPeriod('${period.start}', '${period.end}', '${period.frequency || 'annually'}', '${period.fiscal_year || new Date().getFullYear()}', '${period.fiscal_start || 'JAN'}')">
-                                        <div class="font-medium text-gray-900">${period.label}</div>
-                                        <div class="text-sm text-gray-600">${period.start} to ${period.end}</div>
-                                     </div>`;
+                            html += `<label class="flex items-center p-3 bg-gray-50 rounded border cursor-pointer hover:bg-orange-50 hover:border-orange-300 transition">
+                                        <input type="radio" name="selected_period" value="${index}" 
+                                               class="mr-3 text-orange-600 focus:ring-orange-500" 
+                                               onchange="selectPeriod('${period.start}', '${period.end}', '${period.frequency || 'annually'}', '${period.fiscal_year || new Date().getFullYear()}', '${period.fiscal_start || 'JAN'}')">
+                                        <div class="flex-1">
+                                            <div class="font-medium text-gray-900">${period.label}</div>
+                                            <div class="text-sm text-gray-600">${period.start} to ${period.end}</div>
+                                        </div>
+                                     </label>`;
                         });
                         html += '</div>';
                         availablePeriodsDiv.innerHTML = html;
@@ -150,6 +148,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     availablePeriodsDiv.innerHTML = '<div class="text-red-600">Error loading periods. Please try again.</div>';
                 });
         } else {
+            // Hide the measurement period section
+            measurementSection.style.display = 'none';
             availablePeriodsDiv.innerHTML = 'Select a location to see available measurement periods.';
         }
     });
@@ -161,25 +161,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('frequency').value = frequency;
         document.getElementById('fiscal_year').value = fiscalYear;
         document.getElementById('fiscal_year_start_month').value = fiscalStart;
-        
-        // Visual feedback
-        document.querySelectorAll('#available-periods .p-3').forEach(div => {
-            div.classList.remove('bg-orange-100', 'border-orange-400');
-            div.classList.add('bg-gray-50', 'border-gray-200');
-        });
-        
-        // Highlight selected period
-        event.target.closest('.p-3').classList.remove('bg-gray-50', 'border-gray-200');
-        event.target.closest('.p-3').classList.add('bg-orange-100', 'border-orange-400');
-        
-        // Show selected period indicator
-        const selectedPeriodDiv = document.getElementById('selected-period');
-        const selectedPeriodLabel = document.getElementById('selected-period-label');
-        const selectedPeriodDates = document.getElementById('selected-period-dates');
-        
-        selectedPeriodLabel.textContent = event.target.closest('.p-3').querySelector('.font-medium').textContent;
-        selectedPeriodDates.textContent = `${startDate} to ${endDate}`;
-        selectedPeriodDiv.classList.remove('hidden');
         
         // Enable the create button
         document.getElementById('create-measurement-btn').disabled = false;
