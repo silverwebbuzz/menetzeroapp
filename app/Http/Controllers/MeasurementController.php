@@ -350,7 +350,15 @@ class MeasurementController extends Controller
                 return response()->json(['error' => 'Unauthorized access'], 403);
             }
 
+            \Log::info('Getting periods for location: ' . $location->name, [
+                'fiscal_year_start' => $location->fiscal_year_start,
+                'measurement_frequency' => $location->measurement_frequency,
+                'all_attributes' => $location->getAttributes()
+            ]);
+
             $periods = $this->calculateAvailablePeriods($location);
+            
+            \Log::info('Generated periods:', $periods->toArray());
             
             return response()->json([
                 'periods' => $periods,
@@ -361,8 +369,11 @@ class MeasurementController extends Controller
                 ]
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error getting available periods: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to load periods'], 500);
+            \Log::error('Error getting available periods: ' . $e->getMessage(), [
+                'location_id' => $location->id,
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['error' => 'Failed to load periods: ' . $e->getMessage()], 500);
         }
     }
 
@@ -375,6 +386,11 @@ class MeasurementController extends Controller
         $currentYear = date('Y');
         $fiscalYearStart = $location->fiscal_year_start ?? 'JAN'; // Default to January
         $measurementFrequency = $location->measurement_frequency ?? 'annually'; // Default to annually
+        
+        \Log::info('Using settings:', [
+            'fiscalYearStart' => $fiscalYearStart,
+            'measurementFrequency' => $measurementFrequency
+        ]);
 
         // Get fiscal year start month number
         $monthMap = [

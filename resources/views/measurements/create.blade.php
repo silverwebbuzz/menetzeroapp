@@ -18,31 +18,22 @@
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">Location Selection</h3>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="location_id" class="block text-sm font-medium text-gray-700 mb-2">
-                        Select Location <span class="text-red-500">*</span>
-                    </label>
-                    <select name="location_id" id="location_id" required
-                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error('location_id') border-red-500 @enderror">
-                        <option value="">Choose a location...</option>
-                        @foreach($locations as $location)
-                            <option value="{{ $location->id }}" {{ old('location_id') == $location->id ? 'selected' : '' }}>
-                                {{ $location->name }} ({{ $location->city }}, {{ $location->country }})
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('location_id')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Available Periods</label>
-                    <div id="available-periods" class="text-sm text-gray-600">
-                        Select a location to see available measurement periods.
-                    </div>
-                </div>
+            <div>
+                <label for="location_id" class="block text-sm font-medium text-gray-700 mb-2">
+                    Select Location <span class="text-red-500">*</span>
+                </label>
+                <select name="location_id" id="location_id" required
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error('location_id') border-red-500 @enderror">
+                    <option value="">Choose a location...</option>
+                    @foreach($locations as $location)
+                        <option value="{{ $location->id }}" {{ old('location_id') == $location->id ? 'selected' : '' }}>
+                            {{ $location->name }} ({{ $location->city }}, {{ $location->country }})
+                        </option>
+                    @endforeach
+                </select>
+                @error('location_id')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
             </div>
         </div>
 
@@ -156,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .catch(error => {
                     console.error('Error loading periods:', error);
-                    availablePeriodsDiv.innerHTML = '<div class="text-red-600">Error loading periods. Please try again or enter dates manually.</div>';
+                    availablePeriodsDiv.innerHTML = '<div class="text-red-600">Error loading periods. Please try again.</div>';
                 });
         } else {
             availablePeriodsDiv.innerHTML = 'Select a location to see available measurement periods.';
