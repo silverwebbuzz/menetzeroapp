@@ -723,24 +723,4 @@ class MeasurementController extends Controller
         return response()->json(['success' => false, 'message' => 'No data found to delete.']);
     }
 
-    /**
-     * Submit measurement for review
-     */
-    public function submit(Measurement $measurement)
-    {
-        $user = Auth::user();
-        
-        // Check if user has access to this measurement
-        if ($measurement->location->company_id !== $user->company_id) {
-            abort(403, 'Unauthorized access to this measurement.');
-        }
-
-        if ($measurement->status !== 'draft') {
-            return response()->json(['success' => false, 'message' => 'Measurement cannot be submitted in its current status.']);
-        }
-
-        $measurement->update(['status' => 'submitted']);
-
-        return response()->json(['success' => true]);
-    }
 }
