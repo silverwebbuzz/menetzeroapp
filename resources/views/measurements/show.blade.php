@@ -82,7 +82,7 @@
                     $emissionSources = $boundary->emissionSources();
                 @endphp
                 
-                @if($emissionSources->count() > 0)
+                @if($emissionSources && $emissionSources->count() > 0)
                 <div class="mb-8">
                     <!-- Scope Header -->
                     <div class="flex items-center justify-between mb-6">
@@ -113,67 +113,30 @@
                             @endphp
                             
                             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-                                <div class="flex items-start justify-between mb-4">
-                                    <div class="flex-1">
-                                        <h3 class="font-semibold text-gray-900 text-lg mb-2">{{ $source->name }}</h3>
-                                        @if($source->description)
-                                            <p class="text-sm text-gray-600 mb-3">{{ Str::limit($source->description, 100) }}</p>
-                                        @endif
-                                    </div>
-                                </div>
+                                <!-- Source Title -->
+                                <h3 class="font-semibold text-gray-900 text-lg mb-4">{{ $source->name }}</h3>
                                 
                                 <!-- Current Value -->
                                 <div class="mb-4">
-                                    <div class="text-2xl font-bold text-gray-900">
+                                    <div class="text-lg font-medium text-gray-700">
                                         {{ $existingData ? number_format($existingData->calculated_co2e, 2) : '0.00' }}t CO2e
                                     </div>
-                                    @if($existingData)
-                                        <div class="text-sm text-gray-600">
-                                            {{ number_format($existingData->quantity, 2) }} {{ $existingData->unit }}
-                                        </div>
-                                    @endif
                                 </div>
 
-                                <!-- Action Buttons -->
-                                <div class="flex gap-2">
+                                <!-- Action Button -->
+                                <div class="mt-4">
                                     @if($existingData)
                                         <a href="{{ route('measurements.edit-source', ['measurement' => $measurement->id, 'source' => $source->id]) }}" 
-                                           class="flex-1 bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition text-center">
+                                           class="w-full bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition text-center inline-block">
                                             Edit
                                         </a>
                                     @else
                                         <a href="{{ route('measurements.calculate-source', ['measurement' => $measurement->id, 'source' => $source->id]) }}" 
-                                           class="flex-1 bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition text-center">
+                                           class="w-full bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition text-center inline-block">
                                             Calculate
                                         </a>
                                     @endif
-                                    
-                                    @if($existingData)
-                                        <button onclick="deleteSourceData({{ $measurement->id }}, {{ $source->id }})" 
-                                                class="px-3 py-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                            </svg>
-                                        </button>
-                                    @endif
                                 </div>
-
-                                <!-- Status Indicator -->
-                                @if($existingData)
-                                    <div class="mt-3 flex items-center text-green-600">
-                                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                                        </svg>
-                                        <span class="text-sm font-medium">Completed</span>
-                                    </div>
-                                @else
-                                    <div class="mt-3 flex items-center text-gray-400">
-                                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
-                                        </svg>
-                                        <span class="text-sm">Pending</span>
-                                    </div>
-                                @endif
                             </div>
                         @endforeach
                     </div>
