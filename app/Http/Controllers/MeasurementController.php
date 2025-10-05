@@ -388,9 +388,12 @@ class MeasurementController extends Controller
         switch ($measurementFrequency) {
             case 'annually':
                 $periods[] = [
-                    'start' => Carbon::create($currentYear, $startMonth, 1),
-                    'end' => Carbon::create($currentYear, $startMonth, 1)->addYear()->subDay(),
-                    'label' => "FY {$currentYear} (Annual)"
+                    'start' => Carbon::create($currentYear, $startMonth, 1)->format('Y-m-d'),
+                    'end' => Carbon::create($currentYear, $startMonth, 1)->addYear()->subDay()->format('Y-m-d'),
+                    'label' => "FY {$currentYear} (Annual)",
+                    'frequency' => 'annually',
+                    'fiscal_year' => $currentYear,
+                    'fiscal_start' => $fiscalYearStart
                 ];
                 break;
 
@@ -399,9 +402,12 @@ class MeasurementController extends Controller
                     $periodStart = Carbon::create($currentYear, $startMonth, 1)->addMonths($i * 6);
                     $periodEnd = $periodStart->copy()->addMonths(6)->subDay();
                     $periods[] = [
-                        'start' => $periodStart,
-                        'end' => $periodEnd,
-                        'label' => $periodStart->format('M Y') . ' - ' . $periodEnd->format('M Y')
+                        'start' => $periodStart->format('Y-m-d'),
+                        'end' => $periodEnd->format('Y-m-d'),
+                        'label' => $periodStart->format('M Y') . ' - ' . $periodEnd->format('M Y'),
+                        'frequency' => 'half_yearly',
+                        'fiscal_year' => $currentYear,
+                        'fiscal_start' => $fiscalYearStart
                     ];
                 }
                 break;
@@ -411,9 +417,12 @@ class MeasurementController extends Controller
                     $periodStart = Carbon::create($currentYear, $startMonth, 1)->addMonths($i * 3);
                     $periodEnd = $periodStart->copy()->addMonths(3)->subDay();
                     $periods[] = [
-                        'start' => $periodStart,
-                        'end' => $periodEnd,
-                        'label' => $periodStart->format('M Y') . ' - ' . $periodEnd->format('M Y')
+                        'start' => $periodStart->format('Y-m-d'),
+                        'end' => $periodEnd->format('Y-m-d'),
+                        'label' => $periodStart->format('M Y') . ' - ' . $periodEnd->format('M Y'),
+                        'frequency' => 'quarterly',
+                        'fiscal_year' => $currentYear,
+                        'fiscal_start' => $fiscalYearStart
                     ];
                 }
                 break;
@@ -423,9 +432,12 @@ class MeasurementController extends Controller
                     $periodStart = Carbon::create($currentYear, $startMonth, 1)->addMonths($i);
                     $periodEnd = $periodStart->copy()->addMonth()->subDay();
                     $periods[] = [
-                        'start' => $periodStart,
-                        'end' => $periodEnd,
-                        'label' => $periodStart->format('M Y')
+                        'start' => $periodStart->format('Y-m-d'),
+                        'end' => $periodEnd->format('Y-m-d'),
+                        'label' => $periodStart->format('M Y'),
+                        'frequency' => 'monthly',
+                        'fiscal_year' => $currentYear,
+                        'fiscal_start' => $fiscalYearStart
                     ];
                 }
                 break;
@@ -434,9 +446,12 @@ class MeasurementController extends Controller
         // If no periods were generated, create a simple default period
         if (empty($periods)) {
             $periods[] = [
-                'start' => Carbon::create($currentYear, 1, 1),
-                'end' => Carbon::create($currentYear, 12, 31),
-                'label' => "FY {$currentYear} (Default)"
+                'start' => Carbon::create($currentYear, 1, 1)->format('Y-m-d'),
+                'end' => Carbon::create($currentYear, 12, 31)->format('Y-m-d'),
+                'label' => "FY {$currentYear} (Default)",
+                'frequency' => 'annually',
+                'fiscal_year' => $currentYear,
+                'fiscal_start' => 'JAN'
             ];
         }
 

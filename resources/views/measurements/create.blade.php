@@ -46,111 +46,36 @@
             </div>
         </div>
 
-        <!-- Measurement Period -->
+        <!-- Measurement Period Selection -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Measurement Period</h3>
-            <p class="text-sm text-gray-600 mb-4">Select a measurement period from the available options below, or choose a custom period.</p>
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Select Measurement Period</h3>
+            <p class="text-sm text-gray-600 mb-4">Choose a measurement period based on your location's settings.</p>
             
-            <!-- Available Periods Selection -->
+            <!-- Available Periods -->
             <div class="mb-6">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Available Periods</label>
                 <div id="available-periods" class="text-sm text-gray-600">
                     Select a location to see available measurement periods.
                 </div>
+                <div id="selected-period" class="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg hidden">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-orange-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <div>
+                            <div class="font-medium text-orange-900" id="selected-period-label">Period Selected</div>
+                            <div class="text-sm text-orange-700" id="selected-period-dates"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
             
-            <!-- Custom Period Input -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="period_start" class="block text-sm font-medium text-gray-700 mb-2">
-                        Period Start <span class="text-red-500">*</span>
-                    </label>
-                    <input type="date" name="period_start" id="period_start" required
-                           value="{{ old('period_start') }}"
-                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error('period_start') border-red-500 @enderror">
-                    @error('period_start')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label for="period_end" class="block text-sm font-medium text-gray-700 mb-2">
-                        Period End <span class="text-red-500">*</span>
-                    </label>
-                    <input type="date" name="period_end" id="period_end" required
-                           value="{{ old('period_end') }}"
-                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error('period_end') border-red-500 @enderror">
-                    @error('period_end')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-            </div>
-        </div>
-
-        <!-- Measurement Settings -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Measurement Settings</h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                    <label for="frequency" class="block text-sm font-medium text-gray-700 mb-2">
-                        Frequency <span class="text-red-500">*</span>
-                    </label>
-                    <select name="frequency" id="frequency" required
-                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error('frequency') border-red-500 @enderror">
-                        <option value="">Select frequency...</option>
-                        <option value="monthly" {{ old('frequency') == 'monthly' ? 'selected' : '' }}>Monthly</option>
-                        <option value="quarterly" {{ old('frequency') == 'quarterly' ? 'selected' : '' }}>Quarterly</option>
-                        <option value="half_yearly" {{ old('frequency') == 'half_yearly' ? 'selected' : '' }}>Half Yearly</option>
-                        <option value="annually" {{ old('frequency') == 'annually' ? 'selected' : '' }}>Annually</option>
-                    </select>
-                    @error('frequency')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label for="fiscal_year" class="block text-sm font-medium text-gray-700 mb-2">
-                        Fiscal Year <span class="text-red-500">*</span>
-                    </label>
-                    <select name="fiscal_year" id="fiscal_year" required
-                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error('fiscal_year') border-red-500 @enderror">
-                        @for($year = date('Y'); $year >= 2020; $year--)
-                            <option value="{{ $year }}" {{ old('fiscal_year', date('Y')) == $year ? 'selected' : '' }}>
-                                {{ $year }}
-                            </option>
-                        @endfor
-                    </select>
-                    @error('fiscal_year')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label for="fiscal_year_start_month" class="block text-sm font-medium text-gray-700 mb-2">
-                        Fiscal Year Start <span class="text-red-500">*</span>
-                    </label>
-                    <select name="fiscal_year_start_month" id="fiscal_year_start_month" required
-                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error('fiscal_year_start_month') border-red-500 @enderror">
-                        <option value="">Select month...</option>
-                        <option value="JAN" {{ old('fiscal_year_start_month') == 'JAN' ? 'selected' : '' }}>January</option>
-                        <option value="FEB" {{ old('fiscal_year_start_month') == 'FEB' ? 'selected' : '' }}>February</option>
-                        <option value="MAR" {{ old('fiscal_year_start_month') == 'MAR' ? 'selected' : '' }}>March</option>
-                        <option value="APR" {{ old('fiscal_year_start_month') == 'APR' ? 'selected' : '' }}>April</option>
-                        <option value="MAY" {{ old('fiscal_year_start_month') == 'MAY' ? 'selected' : '' }}>May</option>
-                        <option value="JUN" {{ old('fiscal_year_start_month') == 'JUN' ? 'selected' : '' }}>June</option>
-                        <option value="JUL" {{ old('fiscal_year_start_month') == 'JUL' ? 'selected' : '' }}>July</option>
-                        <option value="AUG" {{ old('fiscal_year_start_month') == 'AUG' ? 'selected' : '' }}>August</option>
-                        <option value="SEP" {{ old('fiscal_year_start_month') == 'SEP' ? 'selected' : '' }}>September</option>
-                        <option value="OCT" {{ old('fiscal_year_start_month') == 'OCT' ? 'selected' : '' }}>October</option>
-                        <option value="NOV" {{ old('fiscal_year_start_month') == 'NOV' ? 'selected' : '' }}>November</option>
-                        <option value="DEC" {{ old('fiscal_year_start_month') == 'DEC' ? 'selected' : '' }}>December</option>
-                    </select>
-                    @error('fiscal_year_start_month')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-            </div>
+            <!-- Hidden inputs for selected period -->
+            <input type="hidden" name="period_start" id="period_start" value="{{ old('period_start') }}">
+            <input type="hidden" name="period_end" id="period_end" value="{{ old('period_end') }}">
+            <input type="hidden" name="frequency" id="frequency" value="{{ old('frequency') }}">
+            <input type="hidden" name="fiscal_year" id="fiscal_year" value="{{ old('fiscal_year', date('Y')) }}">
+            <input type="hidden" name="fiscal_year_start_month" id="fiscal_year_start_month" value="{{ old('fiscal_year_start_month') }}">
         </div>
 
         <!-- Additional Notes -->
@@ -176,8 +101,9 @@
                class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
                 Cancel
             </a>
-            <button type="submit" 
-                    class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">
+            <button type="submit" id="create-measurement-btn"
+                    class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    disabled>
                 Create Measurement
             </button>
         </div>
@@ -215,9 +141,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.log('Received periods data:', data);
                     if (data.periods && data.periods.length > 0) {
                         let html = '<div class="space-y-2">';
-                        data.periods.forEach(period => {
-                            html += `<div class="p-2 bg-gray-50 rounded border cursor-pointer hover:bg-gray-100 transition" 
-                                     onclick="selectPeriod('${period.start}', '${period.end}')">
+                        data.periods.forEach((period, index) => {
+                            html += `<div class="p-3 bg-gray-50 rounded border cursor-pointer hover:bg-orange-50 hover:border-orange-300 transition" 
+                                     onclick="selectPeriod('${period.start}', '${period.end}', '${period.frequency || 'annually'}', '${period.fiscal_year || new Date().getFullYear()}', '${period.fiscal_start || 'JAN'}')">
                                         <div class="font-medium text-gray-900">${period.label}</div>
                                         <div class="text-sm text-gray-600">${period.start} to ${period.end}</div>
                                      </div>`;
@@ -238,9 +164,38 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Function to select a period
-    window.selectPeriod = function(startDate, endDate) {
+    window.selectPeriod = function(startDate, endDate, frequency, fiscalYear, fiscalStart) {
         document.getElementById('period_start').value = startDate;
         document.getElementById('period_end').value = endDate;
+        document.getElementById('frequency').value = frequency;
+        document.getElementById('fiscal_year').value = fiscalYear;
+        document.getElementById('fiscal_year_start_month').value = fiscalStart;
+        
+        // Visual feedback
+        document.querySelectorAll('#available-periods .p-3').forEach(div => {
+            div.classList.remove('bg-orange-100', 'border-orange-400');
+            div.classList.add('bg-gray-50', 'border-gray-200');
+        });
+        
+        // Highlight selected period
+        event.target.closest('.p-3').classList.remove('bg-gray-50', 'border-gray-200');
+        event.target.closest('.p-3').classList.add('bg-orange-100', 'border-orange-400');
+        
+        // Show selected period indicator
+        const selectedPeriodDiv = document.getElementById('selected-period');
+        const selectedPeriodLabel = document.getElementById('selected-period-label');
+        const selectedPeriodDates = document.getElementById('selected-period-dates');
+        
+        selectedPeriodLabel.textContent = event.target.closest('.p-3').querySelector('.font-medium').textContent;
+        selectedPeriodDates.textContent = `${startDate} to ${endDate}`;
+        selectedPeriodDiv.classList.remove('hidden');
+        
+        // Enable the create button
+        document.getElementById('create-measurement-btn').disabled = false;
+        document.getElementById('create-measurement-btn').classList.remove('disabled:bg-gray-400', 'disabled:cursor-not-allowed');
+        document.getElementById('create-measurement-btn').classList.add('bg-orange-600', 'hover:bg-orange-700');
+        
+        console.log('Selected period:', { startDate, endDate, frequency, fiscalYear, fiscalStart });
     };
 });
 </script>
