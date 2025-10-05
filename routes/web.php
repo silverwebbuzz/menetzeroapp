@@ -10,6 +10,7 @@ use App\Http\Controllers\CompanySetupController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\EmissionBoundaryController;
+use App\Http\Controllers\MeasurementController;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -61,6 +62,10 @@ Route::middleware('auth')->group(function () {
     // Emission boundaries routes
     Route::get('/locations/{location}/emission-boundaries', [EmissionBoundaryController::class, 'index'])->name('emission-boundaries.index');
     Route::post('/locations/{location}/emission-boundaries', [EmissionBoundaryController::class, 'store'])->name('emission-boundaries.store');
+    
+    // Measurements routes (replacing old emission form)
+    Route::resource('measurements', MeasurementController::class);
+    Route::post('/measurements/{measurement}/submit', [MeasurementController::class, 'submit'])->name('measurements.submit');
 });
 
 // Protected routes
@@ -84,28 +89,28 @@ Route::middleware('auth')->group(function () {
         })->name('index');
     });
     
-    // Emission Form routes
-    Route::prefix('emission-form')->name('emission-form.')->group(function () {
-        Route::get('/', [EmissionFormController::class, 'index'])->name('index');
-        Route::get('/step/{step}', [EmissionFormController::class, 'showStep'])->name('step');
-        Route::post('/step/{step}', [EmissionFormController::class, 'storeStep'])->name('store');
-        Route::get('/review', [EmissionFormController::class, 'review'])->name('review');
-        Route::post('/submit', [EmissionFormController::class, 'submit'])->name('submit');
-        Route::get('/success', [EmissionFormController::class, 'success'])->name('success');
-        Route::post('/ocr', [EmissionFormController::class, 'extractOCRData'])->name('ocr');
-    });
+    // OLD EMISSION FORM ROUTES - REPLACED BY MEASUREMENTS SYSTEM
+    // Route::prefix('emission-form')->name('emission-form.')->group(function () {
+    //     Route::get('/', [EmissionFormController::class, 'index'])->name('index');
+    //     Route::get('/step/{step}', [EmissionFormController::class, 'showStep'])->name('step');
+    //     Route::post('/step/{step}', [EmissionFormController::class, 'storeStep'])->name('store');
+    //     Route::get('/review', [EmissionFormController::class, 'review'])->name('review');
+    //     Route::post('/submit', [EmissionFormController::class, 'submit'])->name('submit');
+    //     Route::get('/success', [EmissionFormController::class, 'success'])->name('success');
+    //     Route::post('/ocr', [EmissionFormController::class, 'extractOCRData'])->name('ocr');
+    // });
     
-    // Emission Management routes
-    Route::prefix('emissions')->name('emissions.')->group(function () {
-        Route::get('/management', [EmissionManagementController::class, 'index'])->name('management');
-        Route::get('/{emission}', [EmissionManagementController::class, 'show'])->name('show');
-        Route::get('/{emission}/edit', [EmissionManagementController::class, 'edit'])->name('edit');
-        Route::post('/{emission}/duplicate', [EmissionManagementController::class, 'duplicate'])->name('duplicate');
-        Route::delete('/{emission}/delete', [EmissionManagementController::class, 'delete'])->name('delete');
-        Route::patch('/{emission}/status', [EmissionManagementController::class, 'updateStatus'])->name('update-status');
-        Route::post('/{emission}/recalculate', [EmissionManagementController::class, 'recalculate'])->name('recalculate');
-        Route::get('/{emission}/breakdown', [EmissionManagementController::class, 'getBreakdown'])->name('breakdown');
-    });
+    // OLD EMISSION MANAGEMENT ROUTES - REPLACED BY MEASUREMENTS SYSTEM
+    // Route::prefix('emissions')->name('emissions.')->group(function () {
+    //     Route::get('/management', [EmissionManagementController::class, 'index'])->name('management');
+    //     Route::get('/{emission}', [EmissionManagementController::class, 'show'])->name('show');
+    //     Route::get('/{emission}/edit', [EmissionManagementController::class, 'edit'])->name('edit');
+    //     Route::post('/{emission}/duplicate', [EmissionManagementController::class, 'duplicate'])->name('duplicate');
+    //     Route::delete('/{emission}/delete', [EmissionManagementController::class, 'delete'])->name('delete');
+    //     Route::patch('/{emission}/status', [EmissionManagementController::class, 'updateStatus'])->name('update-status');
+    //     Route::post('/{emission}/recalculate', [EmissionManagementController::class, 'recalculate'])->name('recalculate');
+    //     Route::get('/{emission}/breakdown', [EmissionManagementController::class, 'getBreakdown'])->name('breakdown');
+    // });
     
     // Admin routes
     Route::prefix('admin')->name('admin.')->middleware('can:admin')->group(function () {
