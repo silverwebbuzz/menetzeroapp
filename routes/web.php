@@ -66,6 +66,7 @@ Route::middleware('auth')->group(function () {
     // Measurements routes (replacing old emission form)
     Route::resource('measurements', MeasurementController::class);
     Route::post('/measurements/{measurement}/submit', [MeasurementController::class, 'submit'])->name('measurements.submit');
+    Route::get('/measurements/available-periods/{location}', [MeasurementController::class, 'getAvailablePeriods'])->name('measurements.available-periods');
 });
 
 // Protected routes

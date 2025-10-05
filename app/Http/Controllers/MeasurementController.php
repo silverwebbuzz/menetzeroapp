@@ -338,6 +338,23 @@ class MeasurementController extends Controller
     }
 
     /**
+     * Get available periods for a location (AJAX)
+     */
+    public function getAvailablePeriods(Location $location)
+    {
+        $user = Auth::user();
+        
+        // Check if user has access to this location
+        if ($location->company_id !== $user->company_id) {
+            return response()->json(['error' => 'Unauthorized access'], 403);
+        }
+
+        $periods = $this->getAvailablePeriods($location);
+        
+        return response()->json(['periods' => $periods]);
+    }
+
+    /**
      * Get available measurement periods for a location
      */
     private function getAvailablePeriods(Location $location)
