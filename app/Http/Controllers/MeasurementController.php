@@ -180,7 +180,6 @@ class MeasurementController extends Controller
 
         // Get emission boundaries for this location
         $emissionBoundaries = $measurement->location->emissionBoundaries()
-            ->with('emissionSource')
             ->get()
             ->groupBy('scope');
 
@@ -722,5 +721,6 @@ class MeasurementController extends Controller
 
         return response()->json(['success' => false, 'message' => 'No data found to delete.']);
     }
+
 
 }
