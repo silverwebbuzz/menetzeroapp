@@ -68,6 +68,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/measurements/{measurement}/submit', [MeasurementController::class, 'submit'])->name('measurements.submit');
     Route::get('/measurements/available-periods/{location}', [MeasurementController::class, 'getAvailablePeriods'])->name('measurements.available-periods');
     
+    // Debug route to test measurement show
+    Route::get('/measurements/{measurement}/debug', function($measurementId) {
+        $measurement = \App\Models\Measurement::find($measurementId);
+        if (!$measurement) {
+            return 'Measurement not found';
+        }
+        return 'Measurement found: ID=' . $measurement->id . ', Location=' . $measurement->location_id;
+    })->name('measurements.debug');
+    
     // Emission source calculation routes
     Route::get('/measurements/{measurement}/sources/{source}/calculate', [MeasurementController::class, 'calculateSource'])->name('measurements.calculate-source');
     Route::post('/measurements/{measurement}/sources/{source}/calculate', [MeasurementController::class, 'storeSourceData'])->name('measurements.store-source-data');

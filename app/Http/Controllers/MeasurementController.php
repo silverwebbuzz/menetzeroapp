@@ -149,6 +149,8 @@ class MeasurementController extends Controller
 
             DB::commit();
 
+            \Log::info('Measurement created successfully. ID: ' . $measurement->id . ', Location: ' . $measurement->location_id);
+            
             return redirect()->route('measurements.show', $measurement)
                 ->with('success', 'Measurement created successfully. You can now add emission data.');
 
@@ -164,26 +166,31 @@ class MeasurementController extends Controller
      */
     public function show(Measurement $measurement)
     {
-        $user = Auth::user();
-        
-        // Check if user has access to this measurement
-        if ($measurement->location->company_id !== $user->company_id) {
-            abort(403, 'Unauthorized access to this measurement.');
+        try {
+            $user = Auth::user();
+            
+            // Check if user has access to this measurement
+            if ($measurement->location->company_id !== $user->company_id) {
+                abort(403, 'Unauthorized access to this measurement.');
+            }
+
+            $measurement->load([
+                'location',
+                'creator',
+                'measurementData.emissionSource',
+                'auditTrail.changedBy'
+            ]);
+
+            // Get emission boundaries for this location
+            $emissionBoundaries = $measurement->location->emissionBoundaries()
+                ->get()
+                ->groupBy('scope');
+
+            return view('measurements.show', compact('measurement', 'emissionBoundaries'));
+        } catch (\Exception $e) {
+            \Log::error('Error in MeasurementController@show: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Failed to load measurement details: ' . $e->getMessage()]);
         }
-
-        $measurement->load([
-            'location',
-            'creator',
-            'measurementData.emissionSource',
-            'auditTrail.changedBy'
-        ]);
-
-        // Get emission boundaries for this location
-        $emissionBoundaries = $measurement->location->emissionBoundaries()
-            ->get()
-            ->groupBy('scope');
-
-        return view('measurements.show', compact('measurement', 'emissionBoundaries'));
     }
 
     /**
