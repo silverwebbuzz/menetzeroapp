@@ -540,4 +540,207 @@ class MeasurementController extends Controller
             });
         })->values();
     }
+
+    /**
+     * Show form to calculate emissions for a specific source
+     */
+    public function calculateSource(Measurement $measurement, $sourceId)
+    {
+        $user = Auth::user();
+        
+        // Check if user has access to this measurement
+        if ($measurement->location->company_id !== $user->company_id) {
+            abort(403, 'Unauthorized access to this measurement.');
+        }
+
+        $emissionSource = \App\Models\EmissionSource::findOrFail($sourceId);
+        $existingData = $measurement->measurementData()
+            ->where('emission_source_id', $sourceId)
+            ->first();
+
+        return view('measurements.calculate-source', compact('measurement', 'emissionSource', 'existingData'));
+    }
+
+    /**
+     * Store emission data for a specific source
+     */
+    public function storeSourceData(Request $request, Measurement $measurement, $sourceId)
+    {
+        $user = Auth::user();
+        
+        // Check if user has access to this measurement
+        if ($measurement->location->company_id !== $user->company_id) {
+            abort(403, 'Unauthorized access to this measurement.');
+        }
+
+        $emissionSource = \App\Models\EmissionSource::findOrFail($sourceId);
+        
+        $request->validate([
+            'quantity' => 'required|numeric|min:0',
+            'unit' => 'required|string|max:50',
+            'calculation_method' => 'nullable|string|max:100',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        // Get emission factor for this source
+        $emissionFactor = \App\Models\EmissionFactor::where('emission_source_id', $sourceId)
+            ->where('scope', $emissionSource->scope)
+            ->where('is_active', true)
+            ->first();
+
+        if (!$emissionFactor) {
+            return back()->withErrors(['error' => 'No emission factor found for this source.']);
+        }
+
+        // Calculate CO2e
+        $calculatedCo2e = $request->quantity * $emissionFactor->factor_value;
+
+        DB::beginTransaction();
+        try {
+            \App\Models\MeasurementData::create([
+                'measurement_id' => $measurement->id,
+                'emission_source_id' => $sourceId,
+                'quantity' => $request->quantity,
+                'unit' => $request->unit,
+                'calculated_co2e' => $calculatedCo2e,
+                'scope' => $emissionSource->scope,
+                'calculation_method' => $request->calculation_method,
+                'notes' => $request->notes,
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('measurements.show', $measurement)
+                ->with('success', 'Emission data saved successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors(['error' => 'Failed to save emission data. Please try again.'])
+                ->withInput();
+        }
+    }
+
+    /**
+     * Show form to edit emission data for a specific source
+     */
+    public function editSource(Measurement $measurement, $sourceId)
+    {
+        $user = Auth::user();
+        
+        // Check if user has access to this measurement
+        if ($measurement->location->company_id !== $user->company_id) {
+            abort(403, 'Unauthorized access to this measurement.');
+        }
+
+        $emissionSource = \App\Models\EmissionSource::findOrFail($sourceId);
+        $existingData = $measurement->measurementData()
+            ->where('emission_source_id', $sourceId)
+            ->firstOrFail();
+
+        return view('measurements.edit-source', compact('measurement', 'emissionSource', 'existingData'));
+    }
+
+    /**
+     * Update emission data for a specific source
+     */
+    public function updateSourceData(Request $request, Measurement $measurement, $sourceId)
+    {
+        $user = Auth::user();
+        
+        // Check if user has access to this measurement
+        if ($measurement->location->company_id !== $user->company_id) {
+            abort(403, 'Unauthorized access to this measurement.');
+        }
+
+        $emissionSource = \App\Models\EmissionSource::findOrFail($sourceId);
+        $existingData = $measurement->measurementData()
+            ->where('emission_source_id', $sourceId)
+            ->firstOrFail();
+        
+        $request->validate([
+            'quantity' => 'required|numeric|min:0',
+            'unit' => 'required|string|max:50',
+            'calculation_method' => 'nullable|string|max:100',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        // Get emission factor for this source
+        $emissionFactor = \App\Models\EmissionFactor::where('emission_source_id', $sourceId)
+            ->where('scope', $emissionSource->scope)
+            ->where('is_active', true)
+            ->first();
+
+        if (!$emissionFactor) {
+            return back()->withErrors(['error' => 'No emission factor found for this source.']);
+        }
+
+        // Calculate CO2e
+        $calculatedCo2e = $request->quantity * $emissionFactor->factor_value;
+
+        DB::beginTransaction();
+        try {
+            $existingData->update([
+                'quantity' => $request->quantity,
+                'unit' => $request->unit,
+                'calculated_co2e' => $calculatedCo2e,
+                'calculation_method' => $request->calculation_method,
+                'notes' => $request->notes,
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('measurements.show', $measurement)
+                ->with('success', 'Emission data updated successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors(['error' => 'Failed to update emission data. Please try again.'])
+                ->withInput();
+        }
+    }
+
+    /**
+     * Delete emission data for a specific source
+     */
+    public function deleteSourceData(Measurement $measurement, $sourceId)
+    {
+        $user = Auth::user();
+        
+        // Check if user has access to this measurement
+        if ($measurement->location->company_id !== $user->company_id) {
+            abort(403, 'Unauthorized access to this measurement.');
+        }
+
+        $existingData = $measurement->measurementData()
+            ->where('emission_source_id', $sourceId)
+            ->first();
+
+        if ($existingData) {
+            $existingData->delete();
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'No data found to delete.']);
+    }
+
+    /**
+     * Submit measurement for review
+     */
+    public function submit(Measurement $measurement)
+    {
+        $user = Auth::user();
+        
+        // Check if user has access to this measurement
+        if ($measurement->location->company_id !== $user->company_id) {
+            abort(403, 'Unauthorized access to this measurement.');
+        }
+
+        if ($measurement->status !== 'draft') {
+            return response()->json(['success' => false, 'message' => 'Measurement cannot be submitted in its current status.']);
+        }
+
+        $measurement->update(['status' => 'submitted']);
+
+        return response()->json(['success' => true]);
+    }
 }

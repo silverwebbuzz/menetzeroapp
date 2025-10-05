@@ -5,234 +5,270 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto">
-    <!-- Header -->
-    <div class="mb-8 flex justify-between items-center">
-        <div>
-            <h1 class="text-3xl font-bold text-gray-900">{{ $measurement->location->name }}</h1>
-            <p class="mt-2 text-gray-600">{{ $measurement->period_start->format('M d, Y') }} - {{ $measurement->period_end->format('M d, Y') }}</p>
-        </div>
-        <div class="flex space-x-3">
-            <span class="px-4 py-2 text-sm font-medium rounded-full 
-                @if($measurement->status === 'draft') bg-gray-100 text-gray-800
-                @elseif($measurement->status === 'submitted') bg-blue-100 text-blue-800
-                @elseif($measurement->status === 'under_review') bg-yellow-100 text-yellow-800
-                @elseif($measurement->status === 'not_verified') bg-red-100 text-red-800
-                @elseif($measurement->status === 'verified') bg-green-100 text-green-800
-                @endif">
-                {{ $measurement->status_display }}
-            </span>
+    <!-- Header with Measurement Info -->
+    <div class="mb-8">
+        <div class="flex justify-between items-start">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Measure Emissions</h1>
+                <p class="mt-2 text-gray-600">Measure each source of emissions by entering your data for the period.</p>
+            </div>
             
-            @if($measurement->canBeEdited())
-                <a href="{{ route('measurements.edit', $measurement) }}" 
-                   class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
-                    Edit
-                </a>
-            @endif
-            
-            @if($measurement->canBeSubmitted())
-                <form method="POST" action="{{ route('measurements.submit', $measurement) }}" class="inline">
-                    @csrf
-                    <button type="submit" class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">
-                        Submit for Review
-                    </button>
-                </form>
-            @endif
-        </div>
-    </div>
-
-    <!-- Measurement Overview -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <!-- Basic Info -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Measurement Details</h3>
-            <div class="space-y-3">
-                <div class="flex justify-between">
-                    <span class="text-gray-600">Frequency:</span>
-                    <span class="font-medium">{{ ucfirst(str_replace('_', ' ', $measurement->frequency)) }}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-600">Fiscal Year:</span>
-                    <span class="font-medium">{{ $measurement->fiscal_year }}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-600">Created:</span>
-                    <span class="font-medium">{{ $measurement->created_at->format('M d, Y') }}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-600">Created By:</span>
-                    <span class="font-medium">{{ $measurement->creator->name }}</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- CO2e Summary -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">CO2e Summary</h3>
-            <div class="space-y-3">
-                <div class="flex justify-between">
-                    <span class="text-gray-600">Total CO2e:</span>
-                    <span class="font-medium text-orange-600">{{ number_format($measurement->total_co2e, 2) }} kg</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-600">Scope 1:</span>
-                    <span class="font-medium">{{ number_format($measurement->getCo2eByScope('Scope 1'), 2) }} kg</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-600">Scope 2:</span>
-                    <span class="font-medium">{{ number_format($measurement->getCo2eByScope('Scope 2'), 2) }} kg</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-600">Scope 3:</span>
-                    <span class="font-medium">{{ number_format($measurement->getCo2eByScope('Scope 3'), 2) }} kg</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Data Points -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Data Points</h3>
-            <div class="space-y-3">
-                <div class="flex justify-between">
-                    <span class="text-gray-600">Total Entries:</span>
-                    <span class="font-medium">{{ $measurement->measurementData->count() }}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-600">With Documents:</span>
-                    <span class="font-medium">{{ $measurement->measurementData->where('supporting_docs', '!=', null)->count() }}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-600">Offset Items:</span>
-                    <span class="font-medium">{{ $measurement->measurementData->where('is_offset', true)->count() }}</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Emission Data by Scope -->
-    @if($measurement->measurementData->count() > 0)
-        <div class="space-y-8">
-            @foreach(['Scope 1', 'Scope 2', 'Scope 3'] as $scope)
-                @php
-                    $scopeData = $measurement->measurementData->where('scope', $scope);
-                @endphp
-                
-                @if($scopeData->count() > 0)
-                    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-                        <div class="px-6 py-4 border-b border-gray-200">
-                            <h3 class="text-lg font-semibold text-gray-900">{{ $scope }} Emissions</h3>
-                            <p class="text-sm text-gray-600">Total: {{ number_format($scopeData->sum('calculated_co2e'), 2) }} kg CO2e</p>
-                        </div>
-                        
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Emission Source</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CO2e</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    @foreach($scopeData as $data)
-                                        <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm font-medium text-gray-900">{{ $data->emissionSource->name }}</div>
-                                                @if($data->notes)
-                                                    <div class="text-sm text-gray-500">{{ Str::limit($data->notes, 50) }}</div>
-                                                @endif
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                {{ number_format($data->quantity, 2) }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {{ $data->unit }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-orange-600">
-                                                {{ number_format($data->calculated_co2e, 2) }} kg
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {{ $data->calculation_method ?? 'Standard' }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="flex items-center space-x-2">
-                                                    @if($data->is_offset)
-                                                        <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
-                                                            Offset
-                                                        </span>
-                                                    @endif
-                                                    @if($data->hasSupportingDocs())
-                                                        <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
-                                                            {{ $data->supporting_docs_count }} docs
-                                                        </span>
-                                                    @endif
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+            <!-- Help Section -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 max-w-sm">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Need Help?</h3>
+                <p class="text-sm text-gray-600 mb-4">Talk to one of our consultants to assist you with calculations.</p>
+                <div class="flex items-center mb-4">
+                    <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face" 
+                         alt="Consultant" class="w-10 h-10 rounded-full mr-3">
+                    <div>
+                        <div class="font-medium text-gray-900">Sarah Johnson</div>
+                        <div class="text-sm text-gray-600">Sustainability Consultant</div>
                     </div>
-                @endif
-            @endforeach
-        </div>
-    @else
-        <!-- Empty State -->
-        <div class="text-center py-12">
-            <div class="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                </svg>
+                </div>
+                <button class="w-full bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition flex items-center justify-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                    </svg>
+                    Call now
+                </button>
             </div>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">No emission data added yet</h3>
-            <p class="text-gray-600 mb-6">Start adding emission data for this measurement period.</p>
-            @if($measurement->canBeEdited())
-                <a href="{{ route('measurements.edit', $measurement) }}" class="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">
-                    Add Emission Data
-                </a>
-            @endif
         </div>
-    @endif
+    </div>
 
-    <!-- Notes Section -->
-    @if($measurement->notes)
-        <div class="mt-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Notes</h3>
-            <p class="text-gray-700">{{ $measurement->notes }}</p>
-        </div>
-    @endif
-
-    <!-- Audit Trail -->
-    @if($measurement->auditTrail->count() > 0)
-        <div class="mt-8 bg-white rounded-lg shadow-sm border border-gray-200">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-900">Activity History</h3>
+    <!-- Measurement Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Location Card -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-medium text-gray-500">Location</h3>
+                <a href="{{ route('locations.edit', $measurement->location) }}" 
+                   class="text-sm text-gray-600 hover:text-gray-900">Edit</a>
             </div>
-            <div class="divide-y divide-gray-200">
-                @foreach($measurement->auditTrail->sortByDesc('changed_at') as $audit)
-                    <div class="px-6 py-4">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-3">
-                                <div class="flex-shrink-0">
-                                    <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                                        <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                    </div>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-medium text-gray-900">{{ $audit->change_description }}</p>
-                                    <p class="text-sm text-gray-500">by {{ $audit->changedBy->name }} on {{ $audit->changed_at->format('M d, Y H:i') }}</p>
+            <div class="flex items-center">
+                <span class="text-2xl mr-3">🇦🇪</span>
+                <div>
+                    <div class="font-semibold text-gray-900">{{ $measurement->location->name }}</div>
+                    <div class="text-sm text-gray-600">{{ $measurement->location->staff_count }} staff members</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Measure Period Card -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 class="text-sm font-medium text-gray-500 mb-4">Measure Period</h3>
+            <div>
+                <div class="font-semibold text-gray-900">
+                    {{ \Carbon\Carbon::parse($measurement->period_start)->format('M Y') }} - 
+                    {{ \Carbon\Carbon::parse($measurement->period_end)->format('M Y') }}
+                </div>
+                <div class="text-sm text-gray-600 capitalize">{{ $measurement->frequency }} Period</div>
+            </div>
+        </div>
+
+        <!-- Emissions Summary Card -->
+        <div class="bg-gradient-to-r from-teal-500 to-teal-600 rounded-lg shadow-sm p-6 text-white">
+            <h3 class="text-sm font-medium text-teal-100 mb-2">Emissions Calculations</h3>
+            <div class="text-3xl font-bold">0.00t</div>
+            <div class="text-sm text-teal-100">CO2e</div>
+        </div>
+    </div>
+
+    <!-- Emission Sources by Scope -->
+    @foreach(['Scope 1', 'Scope 2', 'Scope 3'] as $scope)
+        @if(isset($emissionBoundaries[$scope]) && $emissionBoundaries[$scope]->count() > 0)
+            <div class="mb-8">
+                <!-- Scope Header -->
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        <h2 class="text-xl font-semibold text-gray-900 mr-2">{{ $scope }}</h2>
+                        <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-sm text-gray-600 mr-2">Total Scope Emissions</span>
+                        <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium">0.00 CO₂e</span>
+                        <button class="ml-2 text-orange-500 hover:text-orange-600">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Emission Source Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach($emissionBoundaries[$scope] as $boundary)
+                        @php
+                            $source = $boundary->emissionSource;
+                            $existingData = $measurement->measurementData()
+                                ->where('emission_source_id', $source->id)
+                                ->first();
+                        @endphp
+                        
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-gray-900 text-lg mb-2">{{ $source->name }}</h3>
+                                    @if($source->description)
+                                        <p class="text-sm text-gray-600 mb-3">{{ Str::limit($source->description, 100) }}</p>
+                                    @endif
                                 </div>
                             </div>
+                            
+                            <!-- Current Value -->
+                            <div class="mb-4">
+                                <div class="text-2xl font-bold text-gray-900">
+                                    {{ $existingData ? number_format($existingData->calculated_co2e, 2) : '0.00' }}t CO2e
+                                </div>
+                                @if($existingData)
+                                    <div class="text-sm text-gray-600">
+                                        {{ number_format($existingData->quantity, 2) }} {{ $existingData->unit }}
+                                    </div>
+                                @endif
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex gap-2">
+                                @if($existingData)
+                                    <a href="{{ route('measurements.edit-source', ['measurement' => $measurement->id, 'source' => $source->id]) }}" 
+                                       class="flex-1 bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition text-center">
+                                        Edit
+                                    </a>
+                                @else
+                                    <a href="{{ route('measurements.calculate-source', ['measurement' => $measurement->id, 'source' => $source->id]) }}" 
+                                       class="flex-1 bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition text-center">
+                                        Calculate
+                                    </a>
+                                @endif
+                                
+                                @if($existingData)
+                                    <button onclick="deleteSourceData({{ $measurement->id }}, {{ $source->id }})" 
+                                            class="px-3 py-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </button>
+                                @endif
+                            </div>
+
+                            <!-- Status Indicator -->
+                            @if($existingData)
+                                <div class="mt-3 flex items-center text-green-600">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span class="text-sm font-medium">Completed</span>
+                                </div>
+                            @else
+                                <div class="mt-3 flex items-center text-gray-400">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span class="text-sm">Pending</span>
+                                </div>
+                            @endif
                         </div>
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
+            </div>
+        @endif
+    @endforeach
+
+    <!-- Progress Summary -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mt-8">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Measurement Progress</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="text-center">
+                <div class="text-2xl font-bold text-gray-900">{{ $measurement->measurementData->count() }}</div>
+                <div class="text-sm text-gray-600">Sources Completed</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-gray-900">
+                    {{ $emissionBoundaries->flatten()->count() }}
+                </div>
+                <div class="text-sm text-gray-600">Total Sources</div>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-gray-900">
+                    {{ number_format($measurement->measurementData->sum('calculated_co2e'), 2) }}t
+                </div>
+                <div class="text-sm text-gray-600">Total CO2e</div>
             </div>
         </div>
-    @endif
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-between items-center mt-8">
+        <div class="flex gap-4">
+            <a href="{{ route('measurements.index') }}" 
+               class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                Back to Measurements
+            </a>
+            <a href="{{ route('measurements.edit', $measurement) }}" 
+               class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                Edit Measurement
+            </a>
+        </div>
+        
+        @if($measurement->measurementData->count() > 0)
+            <div class="flex gap-4">
+                <button onclick="submitMeasurement({{ $measurement->id }})" 
+                        class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                    Submit for Review
+                </button>
+            </div>
+        @endif
+    </div>
 </div>
+
+<script>
+function deleteSourceData(measurementId, sourceId) {
+    if (confirm('Are you sure you want to delete this emission data?')) {
+        fetch(`/measurements/${measurementId}/sources/${sourceId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Failed to delete emission data');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the data');
+        });
+    }
+}
+
+function submitMeasurement(measurementId) {
+    if (confirm('Are you sure you want to submit this measurement for review?')) {
+        fetch(`/measurements/${measurementId}/submit`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Failed to submit measurement');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while submitting the measurement');
+        });
+    }
+}
+</script>
 @endsection
