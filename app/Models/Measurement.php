@@ -171,6 +171,9 @@ class Measurement extends Model
                 if ($emissionFactor) {
                     $co2e = $quantity * $emissionFactor->factor_value;
                     
+                    // Round to 6 decimal places to match database precision
+                    $co2e = round($co2e, 6);
+                    
                     // Store individual source CO2e
                     $sourceCo2e[$emissionSourceId] = $co2e;
                     
@@ -195,6 +198,12 @@ class Measurement extends Model
         }
         
         $totalCo2e = $scope1Co2e + $scope2Co2e + $scope3Co2e;
+        
+        // Round all totals to 6 decimal places to match database precision
+        $scope1Co2e = round($scope1Co2e, 6);
+        $scope2Co2e = round($scope2Co2e, 6);
+        $scope3Co2e = round($scope3Co2e, 6);
+        $totalCo2e = round($totalCo2e, 6);
         
         \Log::info("Final scope totals - Scope 1: {$scope1Co2e}, Scope 2: {$scope2Co2e}, Scope 3: {$scope3Co2e}, Total: {$totalCo2e}");
         
