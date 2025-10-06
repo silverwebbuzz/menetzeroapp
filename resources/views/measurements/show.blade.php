@@ -305,14 +305,7 @@
                                             <td class="px-6 py-4">
                                                 <div class="text-sm font-medium text-gray-900">
                                                     @php
-                                                        $co2e = 0;
-                                                        if ($existingData && $existingData->has('quantity')) {
-                                                            $quantity = (float) $existingData['quantity']->field_value;
-                                                            $emissionFactor = \App\Models\EmissionFactor::getBestFactor($source->id, 'UAE', $measurement->fiscal_year);
-                                                            if ($emissionFactor) {
-                                                                $co2e = $quantity * $emissionFactor->factor_value;
-                                                            }
-                                                        }
+                                                        $co2e = $measurement->getSourceCo2e($source->id);
                                                     @endphp
                                                     {{ number_format($co2e, 2) }}t CO2e
                                                 </div>

@@ -434,6 +434,9 @@ class MeasurementController extends Controller
             
             MeasurementData::saveDataForSource($measurement->id, $sourceId, $formData, $user->id);
 
+            // Recalculate and cache CO2e values
+            $measurement->calculateAndCacheCo2e();
+
             DB::commit();
 
             return redirect()->route('measurements.show', $measurement)
@@ -537,6 +540,9 @@ class MeasurementController extends Controller
             }
             
             MeasurementData::saveDataForSource($measurement->id, $sourceId, $formData, $user->id);
+
+            // Recalculate and cache CO2e values
+            $measurement->calculateAndCacheCo2e();
 
             DB::commit();
 

@@ -26,6 +26,12 @@ class Measurement extends Model
         'staff_count',
         'staff_work_from_home',
         'work_from_home_percentage',
+        'total_co2e',
+        'scope_1_co2e',
+        'scope_2_co2e',
+        'scope_3_co2e',
+        'co2e_calculated_at',
+        'emission_source_co2e',
     ];
 
     protected $casts = [
@@ -34,6 +40,12 @@ class Measurement extends Model
         'metadata' => 'array',
         'staff_work_from_home' => 'boolean',
         'work_from_home_percentage' => 'decimal:2',
+        'total_co2e' => 'decimal:6',
+        'scope_1_co2e' => 'decimal:6',
+        'scope_2_co2e' => 'decimal:6',
+        'scope_3_co2e' => 'decimal:6',
+        'co2e_calculated_at' => 'datetime',
+        'emission_source_co2e' => 'array',
     ];
 
     /**
@@ -108,11 +120,35 @@ class Measurement extends Model
     }
 
     /**
-     * Get total CO2e for this measurement
+     * Get total CO2e for this measurement (cached)
      */
     public function getTotalCo2eAttribute()
     {
-        $totalCo2e = 0;
+        return $this->total_co2e ?? 0;
+    }
+
+    /**
+     * Get CO2e by scope (cached)
+     */
+    public function getCo2eByScope($scope)
+    {
+        return match($scope) {
+            'Scope 1' => $this->scope_1_co2e ?? 0,
+            'Scope 2' => $this->scope_2_co2e ?? 0,
+            'Scope 3' => $this->scope_3_co2e ?? 0,
+            default => 0
+        };
+    }
+
+    /**
+     * Calculate and cache CO2e values
+     */
+    public function calculateAndCacheCo2e()
+    {
+        $scope1Co2e = 0;
+        $scope2Co2e = 0;
+        $scope3Co2e = 0;
+        $sourceCo2e = []; // Store individual source CO2e values
         
         // Get all measurement data grouped by emission source
         $measurementData = $this->measurementData()
@@ -129,46 +165,58 @@ class Measurement extends Model
                 // Get emission factor for this source
                 $emissionFactor = \App\Models\EmissionFactor::getBestFactor($emissionSourceId, 'UAE', $this->fiscal_year);
                 if ($emissionFactor) {
-                    $totalCo2e += $quantity * $emissionFactor->factor_value;
-                }
-            }
-        }
-        
-        return $totalCo2e;
-    }
-
-    /**
-     * Get CO2e by scope
-     */
-    public function getCo2eByScope($scope)
-    {
-        $totalCo2e = 0;
-        
-        // Get all measurement data grouped by emission source
-        $measurementData = $this->measurementData()
-            ->with('emissionSource')
-            ->get()
-            ->groupBy('emission_source_id');
-        
-        foreach ($measurementData as $emissionSourceId => $data) {
-            // Check if this emission source belongs to the requested scope
-            $emissionSource = $data->first()->emissionSource;
-            if ($emissionSource && $emissionSource->scope === $scope) {
-                // Get quantity from the data
-                $quantityData = $data->where('field_name', 'quantity')->first();
-                if ($quantityData) {
-                    $quantity = (float) $quantityData->field_value;
+                    $co2e = $quantity * $emissionFactor->factor_value;
                     
-                    // Get emission factor for this source
-                    $emissionFactor = \App\Models\EmissionFactor::getBestFactor($emissionSourceId, 'UAE', $this->fiscal_year);
-                    if ($emissionFactor) {
-                        $totalCo2e += $quantity * $emissionFactor->factor_value;
+                    // Store individual source CO2e
+                    $sourceCo2e[$emissionSourceId] = $co2e;
+                    
+                    // Get emission source scope
+                    $emissionSource = $data->first()->emissionSource;
+                    if ($emissionSource) {
+                        switch ($emissionSource->scope) {
+                            case 'Scope 1':
+                                $scope1Co2e += $co2e;
+                                break;
+                            case 'Scope 2':
+                                $scope2Co2e += $co2e;
+                                break;
+                            case 'Scope 3':
+                                $scope3Co2e += $co2e;
+                                break;
+                        }
                     }
                 }
             }
         }
         
-        return $totalCo2e;
+        $totalCo2e = $scope1Co2e + $scope2Co2e + $scope3Co2e;
+        
+        // Update cached values
+        $this->update([
+            'total_co2e' => $totalCo2e,
+            'scope_1_co2e' => $scope1Co2e,
+            'scope_2_co2e' => $scope2Co2e,
+            'scope_3_co2e' => $scope3Co2e,
+            'emission_source_co2e' => $sourceCo2e,
+            'co2e_calculated_at' => now(),
+        ]);
+        
+        return [
+            'total' => $totalCo2e,
+            'scope_1' => $scope1Co2e,
+            'scope_2' => $scope2Co2e,
+            'scope_3' => $scope3Co2e,
+            'sources' => $sourceCo2e,
+        ];
+    }
+
+    /**
+     * Get CO2e for a specific emission source (cached)
+     */
+    public function getSourceCo2e($emissionSourceId)
+    {
+        $sourceCo2e = $this->emission_source_co2e ?? [];
+        return $sourceCo2e[$emissionSourceId] ?? 0;
     }
 
     /**
