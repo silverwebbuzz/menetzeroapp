@@ -112,7 +112,29 @@ class Measurement extends Model
      */
     public function getTotalCo2eAttribute()
     {
-        return $this->measurementData()->sum('calculated_co2e');
+        $totalCo2e = 0;
+        
+        // Get all measurement data grouped by emission source
+        $measurementData = $this->measurementData()
+            ->with('emissionSource')
+            ->get()
+            ->groupBy('emission_source_id');
+        
+        foreach ($measurementData as $emissionSourceId => $data) {
+            // Get quantity from the data
+            $quantityData = $data->where('field_name', 'quantity')->first();
+            if ($quantityData) {
+                $quantity = (float) $quantityData->field_value;
+                
+                // Get emission factor for this source
+                $emissionFactor = \App\Models\EmissionFactor::getBestFactor($emissionSourceId, 'UAE', $this->fiscal_year);
+                if ($emissionFactor) {
+                    $totalCo2e += $quantity * $emissionFactor->factor_value;
+                }
+            }
+        }
+        
+        return $totalCo2e;
     }
 
     /**
@@ -120,9 +142,33 @@ class Measurement extends Model
      */
     public function getCo2eByScope($scope)
     {
-        return $this->measurementData()
-            ->where('scope', $scope)
-            ->sum('calculated_co2e');
+        $totalCo2e = 0;
+        
+        // Get all measurement data grouped by emission source
+        $measurementData = $this->measurementData()
+            ->with('emissionSource')
+            ->get()
+            ->groupBy('emission_source_id');
+        
+        foreach ($measurementData as $emissionSourceId => $data) {
+            // Check if this emission source belongs to the requested scope
+            $emissionSource = $data->first()->emissionSource;
+            if ($emissionSource && $emissionSource->scope === $scope) {
+                // Get quantity from the data
+                $quantityData = $data->where('field_name', 'quantity')->first();
+                if ($quantityData) {
+                    $quantity = (float) $quantityData->field_value;
+                    
+                    // Get emission factor for this source
+                    $emissionFactor = \App\Models\EmissionFactor::getBestFactor($emissionSourceId, 'UAE', $this->fiscal_year);
+                    if ($emissionFactor) {
+                        $totalCo2e += $quantity * $emissionFactor->factor_value;
+                    }
+                }
+            }
+        }
+        
+        return $totalCo2e;
     }
 
     /**

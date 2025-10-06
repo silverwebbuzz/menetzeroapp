@@ -303,11 +303,21 @@
                                             </td>
                                             <td class="px-6 py-4">
                                                 <div class="text-sm font-medium text-gray-900">
-                                                    {{ $existingData ? number_format($existingData->calculated_co2e, 2) : '0.00' }}t CO2e
+                                                    @php
+                                                        $co2e = 0;
+                                                        if ($existingData && $existingData->has('quantity')) {
+                                                            $quantity = (float) $existingData['quantity']->field_value;
+                                                            $emissionFactor = \App\Models\EmissionFactor::getBestFactor($source->id, 'UAE', $measurement->fiscal_year);
+                                                            if ($emissionFactor) {
+                                                                $co2e = $quantity * $emissionFactor->factor_value;
+                                                            }
+                                                        }
+                                                    @endphp
+                                                    {{ number_format($co2e, 2) }}t CO2e
                                                 </div>
-                                                @if($existingData)
+                                                @if($existingData && $existingData->count() > 0)
                                                     <div class="text-sm text-gray-500 mt-1">
-                                                        Last updated: {{ $existingData->updated_at->format('M d, Y') }}
+                                                        Last updated: {{ $existingData->first()->updated_at->format('M d, Y') }}
                                                     </div>
                                                 @endif
                                             </td>
@@ -400,7 +410,7 @@
             </div>
             <div class="text-center">
                 <div class="text-2xl font-bold text-gray-900">
-                    {{ number_format($measurement->measurementData->sum('calculated_co2e'), 2) }}t
+                    {{ number_format($measurement->total_co2e, 2) }}t
                 </div>
                 <div class="text-sm text-gray-600">Total CO2e</div>
             </div>
