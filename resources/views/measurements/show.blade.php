@@ -280,13 +280,13 @@
                     <!-- Emission Sources Listing -->
                     <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
+                            <table class="min-w-full divide-y divide-gray-200 table-fixed">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Emission Source</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Emissions</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                        <th class="w-2/5 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Emission Source</th>
+                                        <th class="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Emissions</th>
+                                        <th class="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
@@ -297,21 +297,21 @@
                                                 ->first();
                                         @endphp
                                         <tr class="hover:bg-gray-50">
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm font-medium text-gray-900">{{ $source->name }}</div>
-                                                <div class="text-sm text-gray-500">{{ $source->description ?? 'No description available' }}</div>
+                                            <td class="px-6 py-4">
+                                                <div class="text-sm font-medium text-gray-900 mb-1">{{ $source->name }}</div>
+                                                <div class="text-sm text-gray-500 leading-relaxed">{{ $source->description ?? 'No description available' }}</div>
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
+                                            <td class="px-6 py-4">
                                                 <div class="text-sm font-medium text-gray-900">
                                                     {{ $existingData ? number_format($existingData->calculated_co2e, 2) : '0.00' }}t CO2e
                                                 </div>
                                                 @if($existingData)
-                                                    <div class="text-sm text-gray-500">
+                                                    <div class="text-sm text-gray-500 mt-1">
                                                         Last updated: {{ $existingData->updated_at->format('M d, Y') }}
                                                     </div>
                                                 @endif
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
+                                            <td class="px-6 py-4">
                                                 @if($existingData)
                                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                                         <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -328,7 +328,7 @@
                                                     </span>
                                                 @endif
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <td class="px-6 py-4">
                                                 @if($existingData)
                                                     <a href="{{ route('measurements.edit-source', ['measurement' => $measurement->id, 'source' => $source->id]) }}" 
                                                        class="inline-flex items-center px-3 py-1 border border-orange-300 text-orange-700 rounded-md hover:bg-orange-50 transition-colors">

@@ -9,8 +9,8 @@
     <div class="mb-8">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">Calculate Emissions</h1>
-                <p class="mt-2 text-gray-600">Enter data for {{ $emissionSource->name }}</p>
+                <h1 class="text-3xl font-bold text-gray-900">Add Data to Calculate Emissions for {{ $emissionSource->name }}</h1>
+                <p class="mt-2 text-gray-600">{{ $emissionSource->description ?? 'Enter your data to calculate CO2 emissions for this source.' }}</p>
             </div>
             <a href="{{ route('measurements.show', $measurement) }}" 
                class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
@@ -49,10 +49,7 @@
         
         <!-- Emission Factor Info -->
         @php
-            $emissionFactor = \App\Models\EmissionFactor::where('emission_source_id', $emissionSource->id)
-                ->where('scope', $emissionSource->scope)
-                ->where('is_active', true)
-                ->first();
+            $emissionFactor = \App\Models\EmissionFactor::getBestFactor($emissionSource->id, $emissionSource->scope, 'UAE', $measurement->fiscal_year);
         @endphp
         
         @if($emissionFactor)

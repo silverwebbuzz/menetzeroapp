@@ -353,7 +353,7 @@ class MeasurementController extends Controller
             abort(403, 'Unauthorized access to this measurement.');
         }
 
-        $emissionSource = \App\Models\EmissionSource::findOrFail($sourceId);
+        $emissionSource = EmissionSourceMaster::findOrFail($sourceId);
         $existingData = $measurement->measurementData()
             ->where('emission_source_id', $sourceId)
             ->first();
@@ -373,7 +373,7 @@ class MeasurementController extends Controller
             abort(403, 'Unauthorized access to this measurement.');
         }
 
-        $emissionSource = \App\Models\EmissionSource::findOrFail($sourceId);
+        $emissionSource = EmissionSourceMaster::findOrFail($sourceId);
         
         $request->validate([
             'quantity' => 'required|numeric|min:0',
@@ -383,10 +383,7 @@ class MeasurementController extends Controller
         ]);
 
         // Get emission factor for this source
-        $emissionFactor = \App\Models\EmissionFactor::where('emission_source_id', $sourceId)
-            ->where('scope', $emissionSource->scope)
-            ->where('is_active', true)
-            ->first();
+        $emissionFactor = \App\Models\EmissionFactor::getBestFactor($sourceId, $emissionSource->scope, 'UAE', $measurement->fiscal_year);
 
         if (!$emissionFactor) {
             return back()->withErrors(['error' => 'No emission factor found for this source.']);
@@ -432,7 +429,7 @@ class MeasurementController extends Controller
             abort(403, 'Unauthorized access to this measurement.');
         }
 
-        $emissionSource = \App\Models\EmissionSource::findOrFail($sourceId);
+        $emissionSource = EmissionSourceMaster::findOrFail($sourceId);
         $existingData = $measurement->measurementData()
             ->where('emission_source_id', $sourceId)
             ->firstOrFail();
@@ -452,7 +449,7 @@ class MeasurementController extends Controller
             abort(403, 'Unauthorized access to this measurement.');
         }
 
-        $emissionSource = \App\Models\EmissionSource::findOrFail($sourceId);
+        $emissionSource = EmissionSourceMaster::findOrFail($sourceId);
         $existingData = $measurement->measurementData()
             ->where('emission_source_id', $sourceId)
             ->firstOrFail();
@@ -465,10 +462,7 @@ class MeasurementController extends Controller
         ]);
 
         // Get emission factor for this source
-        $emissionFactor = \App\Models\EmissionFactor::where('emission_source_id', $sourceId)
-            ->where('scope', $emissionSource->scope)
-            ->where('is_active', true)
-            ->first();
+        $emissionFactor = \App\Models\EmissionFactor::getBestFactor($sourceId, $emissionSource->scope, 'UAE', $measurement->fiscal_year);
 
         if (!$emissionFactor) {
             return back()->withErrors(['error' => 'No emission factor found for this source.']);
