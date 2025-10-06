@@ -224,6 +224,18 @@ Route::middleware('auth')->group(function () {
         }
     })->name('debug.location-update');
     
+    // Debug route to test form submission
+    Route::post('/debug/form-test', function(\Illuminate\Http\Request $request) {
+        return response()->json([
+            'success' => true,
+            'method' => $request->method(),
+            'data' => $request->all(),
+            'headers' => $request->headers->all(),
+            'csrf_token' => $request->header('X-CSRF-TOKEN'),
+            'session_token' => csrf_token()
+        ]);
+    })->name('debug.form-test');
+    
     // Emission source calculation routes
     Route::get('/measurements/{measurement}/sources/{source}/calculate', [MeasurementController::class, 'calculateSource'])->name('measurements.calculate-source');
     Route::post('/measurements/{measurement}/sources/{source}/calculate', [MeasurementController::class, 'storeSourceData'])->name('measurements.store-source-data');

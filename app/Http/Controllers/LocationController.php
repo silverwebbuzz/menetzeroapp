@@ -226,69 +226,59 @@ class LocationController extends Controller
 
     public function update(Request $request, Location $location)
     {
-        $user = Auth::user();
-        if ($location->company_id !== $user->company_id) {
-            abort(403, 'Unauthorized access to this location.');
-        }
-
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'address' => 'nullable|string|max:500',
-            'city' => 'nullable|string|max:100',
-            'country' => 'nullable|string|max:100',
-            'location_type' => 'nullable|string|max:100',
-            'staff_count' => 'required|integer|min:1',
-            'staff_work_from_home' => 'nullable',
-            'fiscal_year_start' => 'nullable|string|max:20',
-            'is_head_office' => 'nullable',
-            'receives_utility_bills' => 'nullable',
-            'pays_electricity_proportion' => 'nullable',
-            'shared_building_services' => 'nullable',
-            'reporting_period' => 'nullable|integer|min:2020|max:2030',
-            'measurement_frequency' => 'nullable|string|max:20',
-        ]);
-
-        // If this is set as head office, unset any existing head office
-        if ($request->has('is_head_office')) {
-            $location->company->locations()->where('id', '!=', $location->id)->update(['is_head_office' => false]);
-        }
-
-        $updateData = [
-            'name' => $request->name,
-            'address' => $request->address,
-            'city' => $request->city ?: null, // Convert empty string to null
-            'country' => $request->country,
-            'location_type' => $request->location_type,
-            'staff_count' => $request->staff_count,
-            'staff_work_from_home' => $request->has('staff_work_from_home'),
-            'fiscal_year_start' => $request->fiscal_year_start ?? 'January',
-            'is_head_office' => $request->has('is_head_office'),
-            'receives_utility_bills' => $request->has('receives_utility_bills'),
-            'pays_electricity_proportion' => $request->has('pays_electricity_proportion'),
-            'shared_building_services' => $request->has('shared_building_services'),
-            'reporting_period' => $request->reporting_period,
-            'measurement_frequency' => $request->measurement_frequency ?? 'Annually',
-        ];
-
-        \Log::info('LocationController update called', [
+        \Log::info('LocationController update method called', [
             'location_id' => $location->id,
-            'update_data' => $updateData,
-            'measurement_frequency' => $request->measurement_frequency,
-            'fiscal_year_start' => $request->fiscal_year_start,
-            'reporting_period' => $request->reporting_period
+            'request_data' => $request->all(),
+            'method' => $request->method(),
+            'url' => $request->url()
         ]);
 
-        // Simple update without complex logic first
-        $location->update($updateData);
+        try {
+            $user = Auth::user();
+            if ($location->company_id !== $user->company_id) {
+                abort(403, 'Unauthorized access to this location.');
+            }
 
-        \Log::info('Location updated successfully', [
-            'location_id' => $location->id,
-            'new_measurement_frequency' => $location->measurement_frequency,
-            'new_fiscal_year_start' => $location->fiscal_year_start,
-            'new_reporting_period' => $location->reporting_period
-        ]);
+            // Minimal validation - only required fields
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'staff_count' => 'required|integer|min:1',
+            ]);
 
-        return redirect()->route('locations.index')->with('success', 'Location updated successfully!');
+            \Log::info('Validation passed, proceeding with update');
+
+            // Minimal update - only essential fields
+            $location->update([
+                'name' => $request->name,
+                'staff_count' => $request->staff_count,
+                'measurement_frequency' => $request->measurement_frequency ?? 'Annually',
+                'reporting_period' => $request->reporting_period,
+                'fiscal_year_start' => $request->fiscal_year_start ?? 'January',
+            ]);
+
+            \Log::info('Location updated successfully', [
+                'location_id' => $location->id,
+                'new_measurement_frequency' => $location->measurement_frequency,
+                'new_fiscal_year_start' => $location->fiscal_year_start,
+                'new_reporting_period' => $location->reporting_period
+            ]);
+
+            return redirect()->route('locations.index')->with('success', 'Location updated successfully!');
+            
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation error in location update', [
+                'errors' => $e->errors(),
+                'request_data' => $request->all()
+            ]);
+            return back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            \Log::error('Error updating location: ' . $e->getMessage(), [
+                'location_id' => $location->id,
+                'request_data' => $request->all(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return back()->withErrors(['error' => 'Failed to update location: ' . $e->getMessage()])->withInput();
+        }
     }
 
     public function destroy(Location $location)

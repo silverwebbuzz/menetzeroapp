@@ -61,7 +61,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('locations.update', $location) }}" id="location-edit-form">
+        <form method="POST" action="{{ route('locations.update', $location) }}" id="location-edit-form" onsubmit="console.log('Form submitting...', this); return true;">
             @csrf
             @method('PUT')
             
