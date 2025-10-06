@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Services\MeasurementPeriodService;
 
 class Location extends Model
 {
@@ -106,5 +107,31 @@ class Location extends Model
             'Quarterly',
             'Monthly'
         ];
+    }
+
+    /**
+     * Boot method to handle model events
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // After creating a location, sync measurement periods
+        static::created(function ($location) {
+            if ($location->measurement_frequency && $location->fiscal_year_start) {
+                $service = app(MeasurementPeriodService::class);
+                $service->syncMeasurementPeriods($location, auth()->id());
+            }
+        });
+
+        // After updating a location, check if measurement settings changed
+        static::updated(function ($location) {
+            $measurementSettingsChanged = $location->isDirty(['measurement_frequency', 'fiscal_year_start', 'reporting_period']);
+            
+            if ($measurementSettingsChanged) {
+                $service = app(MeasurementPeriodService::class);
+                $service->syncMeasurementPeriods($location, auth()->id());
+            }
+        });
     }
 }

@@ -7,12 +7,15 @@
 <div class="max-w-4xl mx-auto">
     <!-- Header -->
     <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">Create New Measurement</h1>
-        <p class="mt-2 text-gray-600">Set up a new carbon footprint measurement period for your location.</p>
+        <h1 class="text-3xl font-bold text-gray-900">Select Measurement Period</h1>
+        <p class="mt-2 text-gray-600">Choose a measurement period to start entering emission data for your location.</p>
     </div>
 
     <form method="POST" action="{{ route('measurements.store') }}" class="space-y-6" onsubmit="console.log('Form submitting...', this); return true;">
         @csrf
+        
+        <!-- Hidden field for selected measurement ID -->
+        <input type="hidden" name="measurement_id" id="measurement_id" value="{{ old('measurement_id') }}">
         
         <!-- Location Selection -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -85,7 +88,7 @@
                     class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
                     disabled
                     onclick="console.log('Button clicked, disabled:', this.disabled);">
-                Create Measurement
+                Start Data Entry
             </button>
         </div>
     </form>
@@ -124,34 +127,43 @@ document.addEventListener('DOMContentLoaded', function() {
                     return response.json();
                 })
                 .then(data => {
-                    console.log('Received periods data:', data);
-                    if (data.periods && data.periods.length > 0) {
+                    console.log('Received measurements data:', data);
+                    if (data.measurements && data.measurements.length > 0) {
                         let html = '<div class="space-y-2">';
-                        data.periods.forEach((period, index) => {
-                            const isExisting = period.is_existing;
-                            const isAvailable = period.is_available;
+                        data.measurements.forEach((measurement, index) => {
+                            const hasData = measurement.has_data;
+                            const status = measurement.status;
                             
-                            // Different styling for existing vs available periods
-                            const labelClass = isExisting 
-                                ? 'flex items-center p-3 bg-gray-100 rounded border border-gray-300 cursor-not-allowed opacity-75'
-                                : 'flex items-center p-3 bg-gray-50 rounded border cursor-pointer hover:bg-orange-50 hover:border-orange-300 transition';
+                            // Different styling based on status and data
+                            let labelClass = 'flex items-center p-3 bg-gray-50 rounded border cursor-pointer hover:bg-orange-50 hover:border-orange-300 transition';
+                            let statusText = '';
+                            let radioInput = '';
                             
-                            const radioInput = isExisting
-                                ? `<input type="radio" name="selected_period" value="${index}" 
-                                         class="mr-3 text-gray-400" disabled>`
-                                : `<input type="radio" name="selected_period" value="${index}" 
-                                         class="mr-3 text-orange-600 focus:ring-orange-500" 
-                                         onchange="selectPeriod('${period.start}', '${period.end}', '${period.frequency || 'annually'}', '${period.fiscal_year || new Date().getFullYear()}', '${period.fiscal_start || 'JAN'}')">`;
-                            
-                            const statusText = isExisting 
-                                ? '<div class="text-xs text-gray-500 mt-1">✓ Already added</div>'
-                                : '<div class="text-xs text-green-600 mt-1">Available for selection</div>';
+                            if (hasData) {
+                                // Has emission data - show as completed
+                                labelClass = 'flex items-center p-3 bg-green-50 rounded border border-green-200 cursor-not-allowed opacity-75';
+                                statusText = '<div class="text-xs text-green-600 mt-1">✓ Has emission data</div>';
+                                radioInput = `<input type="radio" name="selected_period" value="${index}" 
+                                             class="mr-3 text-green-400" disabled>`;
+                            } else if (status === 'draft') {
+                                // Draft measurement - can be selected
+                                statusText = '<div class="text-xs text-blue-600 mt-1">Draft - Ready for data entry</div>';
+                                radioInput = `<input type="radio" name="selected_period" value="${index}" 
+                                             class="mr-3 text-orange-600 focus:ring-orange-500" 
+                                             onchange="selectMeasurement('${measurement.id}')">`;
+                            } else {
+                                // Other statuses
+                                labelClass = 'flex items-center p-3 bg-gray-100 rounded border border-gray-300 cursor-not-allowed opacity-75';
+                                statusText = `<div class="text-xs text-gray-500 mt-1">Status: ${status}</div>`;
+                                radioInput = `<input type="radio" name="selected_period" value="${index}" 
+                                             class="mr-3 text-gray-400" disabled>`;
+                            }
                             
                             html += `<label class="${labelClass}">
                                         ${radioInput}
                                         <div class="flex-1">
-                                            <div class="font-medium text-gray-900">${period.label}</div>
-                                            <div class="text-sm text-gray-600">${period.start} to ${period.end}</div>
+                                            <div class="font-medium text-gray-900">${measurement.label}</div>
+                                            <div class="text-sm text-gray-600">${measurement.start} to ${measurement.end}</div>
                                             ${statusText}
                                         </div>
                                      </label>`;
@@ -159,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         html += '</div>';
                         availablePeriodsDiv.innerHTML = html;
                     } else {
-                        availablePeriodsDiv.innerHTML = '<div class="text-gray-600">No available periods found for this location.</div>';
+                        availablePeriodsDiv.innerHTML = '<div class="text-gray-600">No measurements found for this location. Please check the location settings.</div>';
                     }
                 })
                 .catch(error => {
@@ -173,15 +185,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Function to select a period
-    window.selectPeriod = function(startDate, endDate, frequency, fiscalYear, fiscalStart) {
-        console.log('selectPeriod called with:', { startDate, endDate, frequency, fiscalYear, fiscalStart });
+    // Function to select a measurement
+    window.selectMeasurement = function(measurementId) {
+        console.log('selectMeasurement called with:', measurementId);
         
-        document.getElementById('period_start').value = startDate;
-        document.getElementById('period_end').value = endDate;
-        document.getElementById('frequency').value = frequency;
-        document.getElementById('fiscal_year').value = fiscalYear;
-        document.getElementById('fiscal_year_start_month').value = fiscalStart;
+        // Set the measurement ID in a hidden field
+        document.getElementById('measurement_id').value = measurementId;
         
         // Enable the create button
         const button = document.getElementById('create-measurement-btn');
@@ -190,13 +199,7 @@ document.addEventListener('DOMContentLoaded', function() {
         button.classList.add('bg-orange-600', 'hover:bg-orange-700');
         
         console.log('Button enabled, disabled:', button.disabled);
-        console.log('Form values:', {
-            period_start: document.getElementById('period_start').value,
-            period_end: document.getElementById('period_end').value,
-            frequency: document.getElementById('frequency').value,
-            fiscal_year: document.getElementById('fiscal_year').value,
-            fiscal_year_start_month: document.getElementById('fiscal_year_start_month').value
-        });
+        console.log('Selected measurement ID:', measurementId);
     };
 });
 </script>
