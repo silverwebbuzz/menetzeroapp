@@ -175,6 +175,7 @@ class Measurement extends Model
                     // Get emission source scope
                     $emissionSource = $data->first()->emissionSource;
                     if ($emissionSource) {
+                        \Log::info("Source ID {$emissionSourceId}: {$emissionSource->name} - Scope: {$emissionSource->scope} - CO2e: {$co2e}");
                         switch ($emissionSource->scope) {
                             case 'Scope 1':
                                 $scope1Co2e += $co2e;
@@ -194,13 +195,32 @@ class Measurement extends Model
         $totalCo2e = $scope1Co2e + $scope2Co2e + $scope3Co2e;
         
         // Update cached values directly
+        \Log::info("Before saving measurement ID: " . $this->id . 
+                  " - Total: " . $totalCo2e . 
+                  ", Scope 1: " . $scope1Co2e . 
+                  ", Scope 2: " . $scope2Co2e . 
+                  ", Scope 3: " . $scope3Co2e . 
+                  ", Sources: " . json_encode($sourceCo2e));
+        
         $this->total_co2e = $totalCo2e;
         $this->scope_1_co2e = $scope1Co2e;
         $this->scope_2_co2e = $scope2Co2e;
         $this->scope_3_co2e = $scope3Co2e;
         $this->emission_source_co2e = $sourceCo2e;
         $this->co2e_calculated_at = now();
-        $this->save();
+        
+        $saved = $this->save();
+        \Log::info("Save result: " . ($saved ? 'SUCCESS' : 'FAILED'));
+        
+        // Reload the model to ensure we're getting the fresh data from the database
+        $this->refresh();
+
+        \Log::info("After saving and refreshing measurement ID: " . $this->id . 
+                  " - Total: " . $this->total_co2e . 
+                  ", Scope 1: " . $this->scope_1_co2e . 
+                  ", Scope 2: " . $this->scope_2_co2e . 
+                  ", Scope 3: " . $this->scope_3_co2e . 
+                  ", Sources: " . json_encode($this->emission_source_co2e));
         
         \Log::info("CO2e calculation completed for measurement ID: " . $this->id . 
                   " - Total: " . $totalCo2e . 
