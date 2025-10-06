@@ -75,14 +75,6 @@
 
     <!-- Measurements List - Grouped by Location and Year -->
     @if($measurements->count() > 0)
-        @php
-            // Group measurements by location and then by year
-            $groupedMeasurements = $measurements->groupBy(function($measurement) {
-                return $measurement->location->name;
-            })->map(function($locationMeasurements) {
-                return $locationMeasurements->groupBy('fiscal_year');
-            });
-        @endphp
 
         <div class="space-y-8">
             @foreach($groupedMeasurements as $locationName => $yearGroups)
@@ -112,12 +104,12 @@
                         </div>
                     </div>
 
-                    <!-- Years Container -->
+                    <!-- Years Container - Horizontal Layout -->
                     <div class="p-6">
-                        <div class="space-y-6">
+                        <div class="flex flex-wrap gap-6">
                             @foreach($yearGroups as $year => $yearMeasurements)
-                                <!-- Year Section -->
-                                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                                <!-- Year Section - Horizontal Card -->
+                                <div class="flex-1 min-w-0 border border-gray-200 rounded-lg overflow-hidden" style="min-width: 400px;">
                                     <!-- Year Header -->
                                     <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
                                         <div class="flex items-center justify-between">
@@ -133,12 +125,12 @@
 
                                     <!-- Measurements Grid -->
                                     <div class="p-4">
-                                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                                             @foreach($yearMeasurements as $measurement)
-                                                <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                                <div class="bg-white border border-gray-200 rounded-lg p-3 hover:shadow-md transition-shadow">
                                                     <!-- Period -->
-                                                    <div class="mb-3">
-                                                        <div class="text-sm font-medium text-gray-900">
+                                                    <div class="mb-2">
+                                                        <div class="text-xs font-medium text-gray-900">
                                                             {{ $measurement->period_start->format('M d') }} - {{ $measurement->period_end->format('M d, Y') }}
                                                         </div>
                                                         <div class="text-xs text-gray-500">
@@ -147,8 +139,8 @@
                                                     </div>
 
                                                     <!-- Status -->
-                                                    <div class="mb-3">
-                                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                                    <div class="mb-2">
+                                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
                                                             @if($measurement->status === 'draft') bg-gray-100 text-gray-800
                                                             @elseif($measurement->status === 'submitted') bg-blue-100 text-blue-800
                                                             @elseif($measurement->status === 'under_review') bg-yellow-100 text-yellow-800
@@ -160,15 +152,15 @@
                                                     </div>
 
                                                     <!-- CO2e -->
-                                                    <div class="mb-3">
-                                                        <div class="text-sm text-gray-600">Total CO2e</div>
-                                                        <div class="text-lg font-bold text-orange-600">
+                                                    <div class="mb-2">
+                                                        <div class="text-xs text-gray-600">Total CO2e</div>
+                                                        <div class="text-sm font-bold text-orange-600">
                                                             {{ number_format($measurement->total_co2e, 2) }} kg
                                                         </div>
                                                     </div>
 
                                                     <!-- Data Points -->
-                                                    <div class="mb-4">
+                                                    <div class="mb-3">
                                                         <div class="text-xs text-gray-500">
                                                             {{ $measurement->measurementData->count() }} data point(s)
                                                         </div>
@@ -177,19 +169,19 @@
                                                     <!-- Actions -->
                                                     <div class="flex justify-between items-center">
                                                         <a href="{{ route('measurements.show', $measurement) }}" 
-                                                           class="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                                                           class="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition">
                                                             View
                                                         </a>
                                                         @if($measurement->canBeEdited())
                                                             <a href="{{ route('measurements.edit', $measurement) }}" 
-                                                               class="px-3 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700 transition">
+                                                               class="px-2 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700 transition">
                                                                 Edit
                                                             </a>
                                                         @endif
                                                         @if($measurement->canBeSubmitted())
                                                             <form method="POST" action="{{ route('measurements.submit', $measurement) }}" class="inline">
                                                                 @csrf
-                                                                <button type="submit" class="px-3 py-1 text-xs bg-orange-600 text-white rounded hover:bg-orange-700 transition">
+                                                                <button type="submit" class="px-2 py-1 text-xs bg-orange-600 text-white rounded hover:bg-orange-700 transition">
                                                                     Submit
                                                                 </button>
                                                             </form>

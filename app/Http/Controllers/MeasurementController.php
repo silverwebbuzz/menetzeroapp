@@ -50,7 +50,7 @@ class MeasurementController extends Controller
             });
         }
 
-        $measurements = $query->orderBy('created_at', 'desc')->paginate(15);
+        $measurements = $query->orderBy('created_at', 'desc')->paginate(50);
         
         // Get locations for filter dropdown
         $locations = Location::where('company_id', $user->company_id)
@@ -58,9 +58,53 @@ class MeasurementController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('measurements.index', compact('measurements', 'locations'));
+        // Group and sort measurements for display
+        $groupedMeasurements = $this->groupAndSortMeasurements($measurements, $user);
+
+        return view('measurements.index', compact('measurements', 'locations', 'groupedMeasurements'));
     }
 
+    /**
+     * Group and sort measurements for display
+     */
+    private function groupAndSortMeasurements($measurements, $user)
+    {
+        // Get current fiscal year (assuming calendar year for simplicity)
+        $currentYear = date('Y');
+        
+        // Group by location first
+        $groupedByLocation = $measurements->groupBy(function($measurement) {
+            return $measurement->location->name;
+        });
+        
+        // Sort locations: Head office first, then alphabetically
+        $sortedLocations = $groupedByLocation->sortBy(function($locationMeasurements, $locationName) use ($user) {
+            $location = $locationMeasurements->first()->location;
+            
+            // Head office gets priority (0), others get alphabetical order (1+)
+            if ($location->is_head_office) {
+                return 0; // Head office first
+            }
+            
+            // For non-head offices, use alphabetical order
+            return 1;
+        });
+        
+        // For each location, group by year and sort
+        $finalGrouped = $sortedLocations->map(function($locationMeasurements) use ($currentYear) {
+            $groupedByYear = $locationMeasurements->groupBy('fiscal_year');
+            
+            // Sort years: current year first, then descending
+            return $groupedByYear->sortByDesc(function($yearMeasurements, $year) use ($currentYear) {
+                if ($year == $currentYear) {
+                    return 0; // Current year first
+                }
+                return $year; // Then by year descending
+            });
+        });
+        
+        return $finalGrouped;
+    }
 
     /**
      * Display the specified measurement
