@@ -199,42 +199,75 @@
                         </div>
                     </div>
 
-                    <!-- Emission Source Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        @foreach($emissionSources as $source)
-                            @php
-                                $existingData = $measurement->measurementData()
-                                    ->where('emission_source_id', $source->id)
-                                    ->first();
-                            @endphp
-                            
-                            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-                                <!-- Source Title -->
-                                <h3 class="font-semibold text-gray-900 text-lg mb-4">{{ $source->name }}</h3>
-                                
-                                <!-- Current Value -->
-                                <div class="mb-4">
-                                    <div class="text-lg font-medium text-gray-700">
-                                        {{ $existingData ? number_format($existingData->calculated_co2e, 2) : '0.00' }}t CO2e
-                                    </div>
-                                </div>
-
-                                <!-- Action Button -->
-                                <div class="mt-4">
-                                    @if($existingData)
-                                        <a href="{{ route('measurements.edit-source', ['measurement' => $measurement->id, 'source' => $source->id]) }}" 
-                                           class="w-full bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition text-center inline-block">
-                                            Edit
-                                        </a>
-                                    @else
-                                        <a href="{{ route('measurements.calculate-source', ['measurement' => $measurement->id, 'source' => $source->id]) }}" 
-                                           class="w-full bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition text-center inline-block">
-                                            Calculate
-                                        </a>
-                                    @endif
-                                </div>
-                            </div>
-                        @endforeach
+                    <!-- Emission Sources Listing -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Emission Source</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Emissions</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    @foreach($emissionSources as $source)
+                                        @php
+                                            $existingData = $measurement->measurementData()
+                                                ->where('emission_source_id', $source->id)
+                                                ->first();
+                                        @endphp
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm font-medium text-gray-900">{{ $source->name }}</div>
+                                                <div class="text-sm text-gray-500">{{ $source->description ?? 'No description available' }}</div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm font-medium text-gray-900">
+                                                    {{ $existingData ? number_format($existingData->calculated_co2e, 2) : '0.00' }}t CO2e
+                                                </div>
+                                                @if($existingData)
+                                                    <div class="text-sm text-gray-500">
+                                                        Last updated: {{ $existingData->updated_at->format('M d, Y') }}
+                                                    </div>
+                                                @endif
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                @if($existingData)
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                                        </svg>
+                                                        Completed
+                                                    </span>
+                                                @else
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                                        </svg>
+                                                        Pending
+                                                    </span>
+                                                @endif
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                @if($existingData)
+                                                    <a href="{{ route('measurements.edit-source', ['measurement' => $measurement->id, 'source' => $source->id]) }}" 
+                                                       class="text-orange-600 hover:text-orange-900 mr-3">
+                                                        Edit
+                                                    </a>
+                                                @else
+                                                    <a href="{{ route('measurements.calculate-source', ['measurement' => $measurement->id, 'source' => $source->id]) }}" 
+                                                       class="text-orange-600 hover:text-orange-900 mr-3">
+                                                        Calculate
+                                                    </a>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
                 @endif
