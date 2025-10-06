@@ -253,8 +253,9 @@ class Measurement extends Model
             
             if ($emissionFactor) {
                 $co2e = $quantity * $emissionFactor->factor_value;
-                $co2eRounded = round($co2e, 6);
-                $totalCo2e += $co2eRounded;
+                // Store as string to avoid floating point precision issues
+                $co2eRounded = number_format($co2e, 6, '.', '');
+                $totalCo2e += (float) $co2eRounded;
                 $emissionSourceCo2e[$sourceId] = $co2eRounded;
 
                 \Log::info("Calculated CO2e for source {$sourceId}: {$co2e} -> rounded: {$co2eRounded}");
@@ -262,13 +263,13 @@ class Measurement extends Model
                 // Add to scope totals
                 switch ($source->scope) {
                     case 'Scope 1':
-                        $scope1Co2e += $co2eRounded;
+                        $scope1Co2e += (float) $co2eRounded;
                         break;
                     case 'Scope 2':
-                        $scope2Co2e += $co2eRounded;
+                        $scope2Co2e += (float) $co2eRounded;
                         break;
                     case 'Scope 3':
-                        $scope3Co2e += $co2eRounded;
+                        $scope3Co2e += (float) $co2eRounded;
                         break;
                 }
             } else {
@@ -276,17 +277,14 @@ class Measurement extends Model
             }
         }
 
-        // Ensure all values are properly rounded to 6 decimal places
-        $totalCo2e = round($totalCo2e, 6);
-        $scope1Co2e = round($scope1Co2e, 6);
-        $scope2Co2e = round($scope2Co2e, 6);
-        $scope3Co2e = round($scope3Co2e, 6);
+        // Ensure all values are properly formatted to 6 decimal places
+        $totalCo2e = (float) number_format($totalCo2e, 6, '.', '');
+        $scope1Co2e = (float) number_format($scope1Co2e, 6, '.', '');
+        $scope2Co2e = (float) number_format($scope2Co2e, 6, '.', '');
+        $scope3Co2e = (float) number_format($scope3Co2e, 6, '.', '');
         
-        // Ensure JSON values are also rounded
-        $emissionSourceCo2eRounded = [];
-        foreach ($emissionSourceCo2e as $sourceId => $co2e) {
-            $emissionSourceCo2eRounded[$sourceId] = round($co2e, 6);
-        }
+        // JSON values are already stored as strings with proper formatting
+        $emissionSourceCo2eRounded = $emissionSourceCo2e;
 
         \Log::info("Final totals - Total: {$totalCo2e}, Scope1: {$scope1Co2e}, Scope2: {$scope2Co2e}, Scope3: {$scope3Co2e}");
         \Log::info("Emission source CO2e: " . json_encode($emissionSourceCo2eRounded));
