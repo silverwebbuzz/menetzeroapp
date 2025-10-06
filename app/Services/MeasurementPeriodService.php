@@ -107,7 +107,7 @@ class MeasurementPeriodService
         $fiscalYearStart = $location->fiscal_year_start ?? 'JAN';
         $measurementFrequency = $location->measurement_frequency ?? 'monthly';
 
-        // Get fiscal year start month number
+        // Get fiscal year start month number and normalize to full month name
         $monthMap = [
             'JAN' => 1, 'FEB' => 2, 'MAR' => 3, 'APR' => 4,
             'MAY' => 5, 'JUN' => 6, 'JUL' => 7, 'AUG' => 8,
@@ -116,7 +116,18 @@ class MeasurementPeriodService
             'May' => 5, 'June' => 6, 'July' => 7, 'August' => 8,
             'September' => 9, 'October' => 10, 'November' => 11, 'December' => 12
         ];
+        
+        $monthNameMap = [
+            'JAN' => 'January', 'FEB' => 'February', 'MAR' => 'March', 'APR' => 'April',
+            'MAY' => 'May', 'JUN' => 'June', 'JUL' => 'July', 'AUG' => 'August',
+            'SEP' => 'September', 'OCT' => 'October', 'NOV' => 'November', 'DEC' => 'December',
+            'January' => 'January', 'February' => 'February', 'March' => 'March', 'April' => 'April',
+            'May' => 'May', 'June' => 'June', 'July' => 'July', 'August' => 'August',
+            'September' => 'September', 'October' => 'October', 'November' => 'November', 'December' => 'December'
+        ];
+        
         $startMonth = $monthMap[$fiscalYearStart] ?? 1;
+        $fiscalYearStartFull = $monthNameMap[$fiscalYearStart] ?? 'January';
 
         // Normalize frequency
         $normalizedFrequency = strtolower(str_replace(' ', '_', $measurementFrequency));
@@ -135,7 +146,7 @@ class MeasurementPeriodService
                     'label' => "FY {$currentYear} (Annual)",
                     'frequency' => 'annually',
                     'fiscal_year' => $currentYear,
-                    'fiscal_start' => $fiscalYearStart
+                    'fiscal_start' => $fiscalYearStartFull
                 ];
                 break;
 
@@ -149,7 +160,7 @@ class MeasurementPeriodService
                         'label' => $periodStart->format('M Y') . ' - ' . $periodEnd->format('M Y'),
                         'frequency' => 'half_yearly',
                         'fiscal_year' => $currentYear,
-                        'fiscal_start' => $fiscalYearStart
+                        'fiscal_start' => $fiscalYearStartFull
                     ];
                 }
                 break;
@@ -164,7 +175,7 @@ class MeasurementPeriodService
                         'label' => $periodStart->format('M Y') . ' - ' . $periodEnd->format('M Y'),
                         'frequency' => 'quarterly',
                         'fiscal_year' => $currentYear,
-                        'fiscal_start' => $fiscalYearStart
+                        'fiscal_start' => $fiscalYearStartFull
                     ];
                 }
                 break;
@@ -179,7 +190,7 @@ class MeasurementPeriodService
                         'label' => $periodStart->format('M Y'),
                         'frequency' => 'monthly',
                         'fiscal_year' => $currentYear,
-                        'fiscal_start' => $fiscalYearStart
+                        'fiscal_start' => $fiscalYearStartFull
                     ];
                 }
                 break;
@@ -199,7 +210,7 @@ class MeasurementPeriodService
                         'label' => $periodStart->format('M Y'),
                         'frequency' => 'monthly',
                         'fiscal_year' => $currentYear,
-                        'fiscal_start' => $fiscalYearStart
+                        'fiscal_start' => $fiscalYearStartFull
                     ];
                 }
                 break;
