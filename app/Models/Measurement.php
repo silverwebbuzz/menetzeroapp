@@ -215,12 +215,18 @@ class Measurement extends Model
                   ", Scope 3: " . $scope3Co2e . 
                   ", Sources: " . json_encode($sourceCo2e));
         
+        // Round all values in the sourceCo2e array to 6 decimal places
+        $roundedSourceCo2e = [];
+        foreach ($sourceCo2e as $sourceId => $co2e) {
+            $roundedSourceCo2e[$sourceId] = round($co2e, 6);
+        }
+        
         $updateData = [
             'total_co2e' => $totalCo2e,
             'scope_1_co2e' => $scope1Co2e,
             'scope_2_co2e' => $scope2Co2e,
             'scope_3_co2e' => $scope3Co2e,
-            'emission_source_co2e' => $sourceCo2e,
+            'emission_source_co2e' => $roundedSourceCo2e,
             'co2e_calculated_at' => now(),
         ];
         
@@ -228,6 +234,33 @@ class Measurement extends Model
         
         $saved = $this->update($updateData);
         \Log::info("Update result: " . ($saved ? 'SUCCESS' : 'FAILED'));
+        
+        // If the update failed, try direct SQL update
+        if (!$saved) {
+            \Log::info("Laravel update failed, trying direct SQL update...");
+            
+            $sqlResult = \DB::statement("
+                UPDATE measurements 
+                SET total_co2e = ?, 
+                    scope_1_co2e = ?, 
+                    scope_2_co2e = ?, 
+                    scope_3_co2e = ?, 
+                    emission_source_co2e = ?, 
+                    co2e_calculated_at = ?,
+                    updated_at = NOW()
+                WHERE id = ?
+            ", [
+                $totalCo2e,
+                $scope1Co2e, 
+                $scope2Co2e,
+                $scope3Co2e,
+                json_encode($roundedSourceCo2e),
+                now(),
+                $this->id
+            ]);
+            
+            \Log::info("Direct SQL update result: " . ($sqlResult ? 'SUCCESS' : 'FAILED'));
+        }
         
         // Reload the model to ensure we're getting the fresh data from the database
         $this->refresh();
