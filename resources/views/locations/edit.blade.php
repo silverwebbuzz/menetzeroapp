@@ -180,9 +180,20 @@
                                 <p class="text-sm font-medium text-gray-900">Have staff regularly worked from home?</p>
                             </div>
                             <label class="toggle-switch">
-                                <input type="checkbox" name="staff_work_from_home" value="1" {{ old('staff_work_from_home', $location->staff_work_from_home) ? 'checked' : '' }}>
+                                <input type="checkbox" name="staff_work_from_home" value="1" {{ old('staff_work_from_home', $location->staff_work_from_home) ? 'checked' : '' }} onchange="toggleWorkFromHomePercentage()">
                                 <span class="slider"></span>
                             </label>
+                        </div>
+                        
+                        <div id="wfh-percentage-section" class="{{ old('staff_work_from_home', $location->staff_work_from_home) ? '' : 'hidden' }}">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Work from Home Percentage</label>
+                            <p class="text-xs text-gray-500 mb-3">What percentage of your staff work from home on average?</p>
+                            <input type="number" name="work_from_home_percentage" 
+                                   value="{{ old('work_from_home_percentage', $location->work_from_home_percentage ?? 100) }}" 
+                                   min="0" max="100" step="0.01"
+                                   placeholder="100" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                            @error('work_from_home_percentage')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                         </div>
                     </div>
                 </div>
@@ -401,6 +412,18 @@ document.querySelector('input[name="receives_utility_bills"]').addEventListener(
         buildingDetails.style.display = 'block';
     }
 });
+
+// Toggle work from home percentage field
+function toggleWorkFromHomePercentage() {
+    const checkbox = document.querySelector('input[name="staff_work_from_home"]');
+    const percentageSection = document.getElementById('wfh-percentage-section');
+    
+    if (checkbox.checked) {
+        percentageSection.classList.remove('hidden');
+    } else {
+        percentageSection.classList.add('hidden');
+    }
+}
 
 </script>
 @endsection

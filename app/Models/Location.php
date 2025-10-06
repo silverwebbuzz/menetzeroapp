@@ -20,6 +20,7 @@ class Location extends Model
         'location_type',
         'staff_count',
         'staff_work_from_home',
+        'work_from_home_percentage',
         'fiscal_year_start',
         'is_head_office',
         'is_active',
@@ -32,6 +33,7 @@ class Location extends Model
 
     protected $casts = [
         'staff_work_from_home' => 'boolean',
+        'work_from_home_percentage' => 'decimal:2',
         'is_head_office' => 'boolean',
         'is_active' => 'boolean',
         'receives_utility_bills' => 'boolean',

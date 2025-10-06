@@ -23,12 +23,17 @@ class Measurement extends Model
         'created_by',
         'notes',
         'metadata',
+        'staff_count',
+        'staff_work_from_home',
+        'work_from_home_percentage',
     ];
 
     protected $casts = [
         'period_start' => 'date',
         'period_end' => 'date',
         'metadata' => 'array',
+        'staff_work_from_home' => 'boolean',
+        'work_from_home_percentage' => 'decimal:2',
     ];
 
     /**

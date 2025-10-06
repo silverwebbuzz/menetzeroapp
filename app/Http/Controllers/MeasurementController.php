@@ -198,13 +198,37 @@ class MeasurementController extends Controller
 
         $request->validate([
             'notes' => 'nullable|string|max:1000',
+            'staff_count' => 'nullable|integer|min:1|max:10000',
+            'staff_work_from_home' => 'nullable|boolean',
+            'work_from_home_percentage' => 'nullable|numeric|min:0|max:100',
         ]);
 
         $oldValues = $measurement->toArray();
 
-        $measurement->update([
-            'notes' => $request->notes,
-        ]);
+        // Prepare update data
+        $updateData = [];
+        
+        if ($request->has('notes')) {
+            $updateData['notes'] = $request->notes;
+        }
+        
+        if ($request->has('staff_count')) {
+            $updateData['staff_count'] = $request->staff_count;
+        }
+        
+        if ($request->has('staff_work_from_home')) {
+            $updateData['staff_work_from_home'] = $request->boolean('staff_work_from_home');
+            // If work from home is disabled, set percentage to 0
+            if (!$request->boolean('staff_work_from_home')) {
+                $updateData['work_from_home_percentage'] = 0.00;
+            }
+        }
+        
+        if ($request->has('work_from_home_percentage')) {
+            $updateData['work_from_home_percentage'] = $request->work_from_home_percentage;
+        }
+
+        $measurement->update($updateData);
 
         // Create audit trail entry
         MeasurementAuditTrail::create([
@@ -218,8 +242,18 @@ class MeasurementController extends Controller
             'user_agent' => $request->userAgent(),
         ]);
 
+        // Determine what was updated for the success message
+        $updatedFields = [];
+        if (isset($updateData['notes'])) $updatedFields[] = 'notes';
+        if (isset($updateData['staff_count'])) $updatedFields[] = 'staff information';
+        if (isset($updateData['staff_work_from_home'])) $updatedFields[] = 'work from home settings';
+        
+        $message = !empty($updatedFields) 
+            ? 'Measurement ' . implode(', ', $updatedFields) . ' updated successfully.'
+            : 'Measurement updated successfully.';
+
         return redirect()->route('measurements.show', $measurement)
-            ->with('success', 'Measurement updated successfully.');
+            ->with('success', $message);
     }
 
     /**

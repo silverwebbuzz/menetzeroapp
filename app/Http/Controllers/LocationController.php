@@ -78,6 +78,7 @@ class LocationController extends Controller
             'location_type' => 'nullable|string|max:100',
             'staff_count' => 'required|integer|min:1',
             'staff_work_from_home' => 'boolean',
+            'work_from_home_percentage' => 'nullable|numeric|min:0|max:100',
             'fiscal_year_start' => 'nullable|string|max:20',
             'is_head_office' => 'boolean',
             'receives_utility_bills' => 'boolean',
@@ -104,6 +105,7 @@ class LocationController extends Controller
             'location_type' => $request->location_type,
             'staff_count' => $request->staff_count,
             'staff_work_from_home' => $request->boolean('staff_work_from_home'),
+            'work_from_home_percentage' => $request->work_from_home_percentage,
             'fiscal_year_start' => $request->fiscal_year_start ?? 'January',
             'is_head_office' => $shouldBeHeadOffice,
             'receives_utility_bills' => $request->boolean('receives_utility_bills'),
@@ -179,11 +181,13 @@ class LocationController extends Controller
                 $request->validate([
                     'staff_count' => 'required|integer|min:1',
                     'staff_work_from_home' => 'boolean',
+                    'work_from_home_percentage' => 'nullable|numeric|min:0|max:100',
                 ]);
                 
                 $location->update([
                     'staff_count' => $request->staff_count,
                     'staff_work_from_home' => $request->boolean('staff_work_from_home'),
+                    'work_from_home_percentage' => $request->work_from_home_percentage,
                 ]);
                 break;
                 
@@ -243,6 +247,8 @@ class LocationController extends Controller
             $request->validate([
                 'name' => 'required|string|max:255',
                 'staff_count' => 'required|integer|min:1',
+                'staff_work_from_home' => 'nullable|boolean',
+                'work_from_home_percentage' => 'nullable|numeric|min:0|max:100',
                 'measurement_frequency' => 'nullable|string|max:20',
                 'reporting_period' => 'nullable|integer|min:2020|max:2030',
                 'fiscal_year_start' => 'nullable|string|max:20',
@@ -255,14 +261,16 @@ class LocationController extends Controller
             $oldReportingPeriod = $location->reporting_period;
             $oldFiscalYearStart = $location->fiscal_year_start;
 
-            // Update location
-            $location->update([
-                'name' => $request->name,
-                'staff_count' => $request->staff_count,
-                'measurement_frequency' => $request->measurement_frequency ?? 'Annually',
-                'reporting_period' => $request->reporting_period,
-                'fiscal_year_start' => $request->fiscal_year_start ?? 'January',
-            ]);
+                // Update location
+                $location->update([
+                    'name' => $request->name,
+                    'staff_count' => $request->staff_count,
+                    'staff_work_from_home' => $request->boolean('staff_work_from_home'),
+                    'work_from_home_percentage' => $request->work_from_home_percentage,
+                    'measurement_frequency' => $request->measurement_frequency ?? 'Annually',
+                    'reporting_period' => $request->reporting_period,
+                    'fiscal_year_start' => $request->fiscal_year_start ?? 'January',
+                ]);
 
             \Log::info('Location updated successfully', [
                 'location_id' => $location->id,

@@ -57,8 +57,8 @@
         </div>
     </div>
 
-    <!-- Measurement Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Measurement Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <!-- Location Card with Inline Edit -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-4">
@@ -107,17 +107,95 @@
             </div>
         </div>
 
-        <!-- Measure Period Card -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 class="text-sm font-medium text-gray-500 mb-4">Measure Period</h3>
-            <div>
-                <div class="font-semibold text-gray-900">
-                    {{ \Carbon\Carbon::parse($measurement->period_start)->format('M Y') }} - 
-                    {{ \Carbon\Carbon::parse($measurement->period_end)->format('M Y') }}
+            <!-- Measure Period Card -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 class="text-sm font-medium text-gray-500 mb-4">Measure Period</h3>
+                <div>
+                    <div class="font-semibold text-gray-900">
+                        {{ \Carbon\Carbon::parse($measurement->period_start)->format('M Y') }} - 
+                        {{ \Carbon\Carbon::parse($measurement->period_end)->format('M Y') }}
+                    </div>
+                    <div class="text-sm text-gray-600 capitalize">{{ $measurement->frequency }} Period</div>
                 </div>
-                <div class="text-sm text-gray-600 capitalize">{{ $measurement->frequency }} Period</div>
             </div>
-        </div>
+
+            <!-- Staff Information Card -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-medium text-gray-500">Staff Information</h3>
+                    <button onclick="toggleStaffEdit()" class="text-sm text-orange-600 hover:text-orange-700 font-medium">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        Edit
+                    </button>
+                </div>
+                
+                <!-- View Mode -->
+                <div id="staff-view">
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Total Staff:</span>
+                            <span class="font-semibold text-gray-900">{{ $measurement->staff_count ?? 'Not set' }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Work from Home:</span>
+                            <span class="font-semibold text-gray-900">
+                                @if($measurement->staff_work_from_home)
+                                    {{ $measurement->work_from_home_percentage ?? 100 }}%
+                                @else
+                                    No
+                                @endif
+                            </span>
+                        </div>
+                        @if($measurement->staff_work_from_home && $measurement->staff_count)
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-600">Office Staff:</span>
+                                <span class="font-semibold text-gray-900">
+                                    {{ $measurement->staff_count - round(($measurement->staff_count * ($measurement->work_from_home_percentage ?? 100)) / 100) }}
+                                </span>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                
+                <!-- Edit Mode -->
+                <div id="staff-edit" class="hidden">
+                    <form method="POST" action="{{ route('measurements.update', $measurement) }}" class="space-y-4">
+                        @csrf
+                        @method('PUT')
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Staff Count</label>
+                            <input type="number" name="staff_count" value="{{ $measurement->staff_count }}" 
+                                   min="1" max="10000"
+                                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                        </div>
+                        <div>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="staff_work_from_home" value="1" 
+                                       {{ $measurement->staff_work_from_home ? 'checked' : '' }}
+                                       class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                                <span class="ml-2 text-sm text-gray-700">Staff work from home</span>
+                            </label>
+                        </div>
+                        <div id="wfh-percentage" class="{{ $measurement->staff_work_from_home ? '' : 'hidden' }}">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Work from Home Percentage</label>
+                            <input type="number" name="work_from_home_percentage" 
+                                   value="{{ $measurement->work_from_home_percentage ?? 100 }}" 
+                                   min="0" max="100" step="0.01"
+                                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                        </div>
+                        <div class="flex space-x-2">
+                            <button type="submit" class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition text-sm">
+                                Save Staff Info
+                            </button>
+                            <button type="button" onclick="toggleStaffEdit()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition text-sm">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
         <!-- Emissions Summary Card -->
         <div class="bg-gradient-to-r from-teal-500 to-teal-600 rounded-lg shadow-sm p-6 text-white">
@@ -419,5 +497,34 @@ function submitMeasurement(measurementId) {
             editMode.classList.remove('hidden');
         }
     }
+
+    function toggleStaffEdit() {
+        const viewMode = document.getElementById('staff-view');
+        const editMode = document.getElementById('staff-edit');
+        
+        if (viewMode.classList.contains('hidden')) {
+            viewMode.classList.remove('hidden');
+            editMode.classList.add('hidden');
+        } else {
+            viewMode.classList.add('hidden');
+            editMode.classList.remove('hidden');
+        }
+    }
+
+    // Handle work from home checkbox
+    document.addEventListener('DOMContentLoaded', function() {
+        const wfhCheckbox = document.querySelector('input[name="staff_work_from_home"]');
+        const wfhPercentage = document.getElementById('wfh-percentage');
+        
+        if (wfhCheckbox) {
+            wfhCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    wfhPercentage.classList.remove('hidden');
+                } else {
+                    wfhPercentage.classList.add('hidden');
+                }
+            });
+        }
+    });
     </script>
     @endsection

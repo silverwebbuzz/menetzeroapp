@@ -60,7 +60,10 @@ class MeasurementPeriodService
                         'fiscal_year' => $period['fiscal_year'],
                         'fiscal_year_start_month' => $period['fiscal_start'],
                         'created_by' => $createdBy,
-                        'notes' => 'Auto-generated measurement period'
+                        'notes' => 'Auto-generated measurement period',
+                        'staff_count' => $location->staff_count,
+                        'staff_work_from_home' => $location->staff_work_from_home,
+                        'work_from_home_percentage' => $location->staff_work_from_home ? ($location->work_from_home_percentage ?? 100.00) : 0.00
                     ]);
                     $createdCount++;
                     
