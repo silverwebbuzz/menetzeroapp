@@ -238,12 +238,12 @@ class LocationController extends Controller
             'country' => 'nullable|string|max:100',
             'location_type' => 'nullable|string|max:100',
             'staff_count' => 'required|integer|min:1',
-            'staff_work_from_home' => 'boolean',
+            'staff_work_from_home' => 'nullable',
             'fiscal_year_start' => 'nullable|string|max:20',
-            'is_head_office' => 'boolean',
-            'receives_utility_bills' => 'boolean',
-            'pays_electricity_proportion' => 'boolean',
-            'shared_building_services' => 'boolean',
+            'is_head_office' => 'nullable',
+            'receives_utility_bills' => 'nullable',
+            'pays_electricity_proportion' => 'nullable',
+            'shared_building_services' => 'nullable',
             'reporting_period' => 'nullable|integer|min:2020|max:2030',
             'measurement_frequency' => 'nullable|string|max:20',
         ]);
@@ -278,44 +278,17 @@ class LocationController extends Controller
             'reporting_period' => $request->reporting_period
         ]);
 
-        try {
-            // Store original values to check if measurement settings changed
-            $originalFrequency = $location->measurement_frequency;
-            $originalFiscalStart = $location->fiscal_year_start;
-            $originalReportingPeriod = $location->reporting_period;
-            
-            $location->update($updateData);
+        // Simple update without complex logic first
+        $location->update($updateData);
 
-            \Log::info('Location updated successfully', [
-                'location_id' => $location->id,
-                'new_measurement_frequency' => $location->measurement_frequency,
-                'new_fiscal_year_start' => $location->fiscal_year_start,
-                'new_reporting_period' => $location->reporting_period
-            ]);
+        \Log::info('Location updated successfully', [
+            'location_id' => $location->id,
+            'new_measurement_frequency' => $location->measurement_frequency,
+            'new_fiscal_year_start' => $location->fiscal_year_start,
+            'new_reporting_period' => $location->reporting_period
+        ]);
 
-            // Check if measurement settings changed and manually sync if needed
-            $measurementSettingsChanged = (
-                $originalFrequency !== $location->measurement_frequency ||
-                $originalFiscalStart !== $location->fiscal_year_start ||
-                $originalReportingPeriod !== $location->reporting_period
-            );
-
-            if ($measurementSettingsChanged) {
-                \Log::info('Measurement settings changed in controller, manually syncing...');
-                try {
-                    $service = app(\App\Services\MeasurementPeriodService::class);
-                    $result = $service->syncMeasurementPeriods($location, $user->id);
-                    \Log::info('Manual measurement sync completed', $result);
-                } catch (\Exception $e) {
-                    \Log::error('Error in manual measurement sync: ' . $e->getMessage());
-                }
-            }
-
-            return redirect()->route('locations.index')->with('success', 'Location updated successfully! Measurements have been automatically created/updated based on your settings.');
-        } catch (\Exception $e) {
-            \Log::error('Error updating location: ' . $e->getMessage());
-            return back()->withErrors(['error' => 'Failed to update location. Please try again.'])->withInput();
-        }
+        return redirect()->route('locations.index')->with('success', 'Location updated successfully!');
     }
 
     public function destroy(Location $location)

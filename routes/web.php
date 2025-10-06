@@ -188,6 +188,42 @@ Route::middleware('auth')->group(function () {
         }
     })->name('debug.sync-measurements');
     
+    // Debug route to test location update
+    Route::post('/debug/location-update/{location}', function($locationId, \Illuminate\Http\Request $request) {
+        $location = \App\Models\Location::find($locationId);
+        if (!$location) {
+            return response()->json(['error' => 'Location not found'], 404);
+        }
+        
+        try {
+            $updateData = [
+                'name' => $request->name,
+                'measurement_frequency' => $request->measurement_frequency,
+                'reporting_period' => $request->reporting_period,
+                'fiscal_year_start' => $request->fiscal_year_start,
+            ];
+            
+            $location->update($updateData);
+            
+            return response()->json([
+                'success' => true,
+                'location_id' => $location->id,
+                'updated_data' => $updateData,
+                'current_values' => [
+                    'measurement_frequency' => $location->measurement_frequency,
+                    'reporting_period' => $location->reporting_period,
+                    'fiscal_year_start' => $location->fiscal_year_start,
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+    })->name('debug.location-update');
+    
     // Emission source calculation routes
     Route::get('/measurements/{measurement}/sources/{source}/calculate', [MeasurementController::class, 'calculateSource'])->name('measurements.calculate-source');
     Route::post('/measurements/{measurement}/sources/{source}/calculate', [MeasurementController::class, 'storeSourceData'])->name('measurements.store-source-data');

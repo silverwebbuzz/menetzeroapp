@@ -50,6 +50,17 @@
     <div class="bg-white rounded-lg border border-gray-200 p-6">
         <h2 class="text-2xl font-bold text-gray-900 mb-6">Edit Location</h2>
         
+        @if ($errors->any())
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                <h3 class="text-red-800 font-medium mb-2">Please fix the following errors:</h3>
+                <ul class="text-red-700 text-sm space-y-1">
+                    @foreach ($errors->all() as $error)
+                        <li>• {{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <form method="POST" action="{{ route('locations.update', $location) }}" id="location-edit-form">
             @csrf
             @method('PUT')

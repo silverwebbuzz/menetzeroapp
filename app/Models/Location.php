@@ -139,45 +139,9 @@ class Location extends Model
             }
         });
 
-        // After updating a location, check if measurement settings changed
-        static::updated(function ($location) {
-            $original = $location->getOriginal();
-            $current = $location->getAttributes();
-            
-            // Check if measurement-related fields changed
-            $measurementSettingsChanged = (
-                ($original['measurement_frequency'] ?? null) !== ($current['measurement_frequency'] ?? null) ||
-                ($original['fiscal_year_start'] ?? null) !== ($current['fiscal_year_start'] ?? null) ||
-                ($original['reporting_period'] ?? null) !== ($current['reporting_period'] ?? null)
-            );
-            
-            \Log::info('Location updated event triggered', [
-                'location_id' => $location->id,
-                'measurement_settings_changed' => $measurementSettingsChanged,
-                'original_values' => [
-                    'measurement_frequency' => $original['measurement_frequency'] ?? null,
-                    'fiscal_year_start' => $original['fiscal_year_start'] ?? null,
-                    'reporting_period' => $original['reporting_period'] ?? null
-                ],
-                'new_values' => [
-                    'measurement_frequency' => $current['measurement_frequency'] ?? null,
-                    'fiscal_year_start' => $current['fiscal_year_start'] ?? null,
-                    'reporting_period' => $current['reporting_period'] ?? null
-                ]
-            ]);
-            
-            if ($measurementSettingsChanged) {
-                \Log::info('Measurement settings changed, syncing periods...');
-                try {
-                    $service = app(MeasurementPeriodService::class);
-                    $result = $service->syncMeasurementPeriods($location, auth()->id());
-                    \Log::info('Measurement sync completed', $result);
-                } catch (\Exception $e) {
-                    \Log::error('Error syncing measurement periods: ' . $e->getMessage());
-                }
-            } else {
-                \Log::info('No measurement settings changed, skipping sync');
-            }
-        });
+        // Temporarily disabled to debug 302 error
+        // static::updated(function ($location) {
+        //     // Measurement sync logic temporarily disabled
+        // });
     }
 }
