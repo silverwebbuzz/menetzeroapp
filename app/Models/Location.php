@@ -147,14 +147,25 @@ class Location extends Model
                 'location_id' => $location->id,
                 'measurement_settings_changed' => $measurementSettingsChanged,
                 'dirty_fields' => $location->getDirty(),
-                'measurement_frequency' => $location->measurement_frequency,
-                'fiscal_year_start' => $location->fiscal_year_start,
-                'reporting_period' => $location->reporting_period
+                'original_values' => $location->getOriginal(),
+                'new_values' => [
+                    'measurement_frequency' => $location->measurement_frequency,
+                    'fiscal_year_start' => $location->fiscal_year_start,
+                    'reporting_period' => $location->reporting_period
+                ]
             ]);
             
             if ($measurementSettingsChanged) {
-                $service = app(MeasurementPeriodService::class);
-                $service->syncMeasurementPeriods($location, auth()->id());
+                \Log::info('Measurement settings changed, syncing periods...');
+                try {
+                    $service = app(MeasurementPeriodService::class);
+                    $result = $service->syncMeasurementPeriods($location, auth()->id());
+                    \Log::info('Measurement sync completed', $result);
+                } catch (\Exception $e) {
+                    \Log::error('Error syncing measurement periods: ' . $e->getMessage());
+                }
+            } else {
+                \Log::info('No measurement settings changed, skipping sync');
             }
         });
     }

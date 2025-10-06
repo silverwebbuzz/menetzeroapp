@@ -50,7 +50,7 @@
     <div class="bg-white rounded-lg border border-gray-200 p-6">
         <h2 class="text-2xl font-bold text-gray-900 mb-6">Edit Location</h2>
         
-        <form method="POST" action="{{ route('locations.update', $location) }}" id="location-edit-form">
+        <form method="POST" action="{{ route('locations.update', $location) }}" id="location-edit-form" onsubmit="console.log('Form submitting with data:', new FormData(this)); return true;">
             @csrf
             @method('PUT')
             
@@ -224,6 +224,10 @@
                                     <option value="{{ $year }}" {{ old('reporting_period', $location->reporting_period) == $year ? 'selected' : '' }}>{{ $year }}</option>
                                 @endfor
                             </select>
+                            <!-- Debug info -->
+                            <div class="text-xs text-gray-500 mt-1">
+                                Debug: Current value = "{{ $location->reporting_period }}"
+                            </div>
                             @error('reporting_period')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                         </div>
                         
@@ -246,6 +250,11 @@
                                     <input type="radio" name="measurement_frequency" value="Monthly" {{ old('measurement_frequency', $location->measurement_frequency) == 'Monthly' ? 'checked' : '' }} class="mr-2">
                                     <span class="text-sm">Monthly</span>
                                 </label>
+                                
+                                <!-- Debug info -->
+                                <div class="text-xs text-gray-500 mt-2">
+                                    Debug: Current value = "{{ $location->measurement_frequency }}"
+                                </div>
                             </div>
                             @error('measurement_frequency')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                         </div>
