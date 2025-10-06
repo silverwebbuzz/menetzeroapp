@@ -249,7 +249,7 @@ class LocationController extends Controller
         ]);
 
         // If this is set as head office, unset any existing head office
-        if ($request->is_head_office) {
+        if ($request->has('is_head_office')) {
             $location->company->locations()->where('id', '!=', $location->id)->update(['is_head_office' => false]);
         }
 
@@ -260,12 +260,12 @@ class LocationController extends Controller
             'country' => $request->country,
             'location_type' => $request->location_type,
             'staff_count' => $request->staff_count,
-            'staff_work_from_home' => $request->boolean('staff_work_from_home'),
+            'staff_work_from_home' => $request->has('staff_work_from_home'),
             'fiscal_year_start' => $request->fiscal_year_start ?? 'January',
-            'is_head_office' => $request->boolean('is_head_office'),
-            'receives_utility_bills' => $request->boolean('receives_utility_bills'),
-            'pays_electricity_proportion' => $request->boolean('pays_electricity_proportion'),
-            'shared_building_services' => $request->boolean('shared_building_services'),
+            'is_head_office' => $request->has('is_head_office'),
+            'receives_utility_bills' => $request->has('receives_utility_bills'),
+            'pays_electricity_proportion' => $request->has('pays_electricity_proportion'),
+            'shared_building_services' => $request->has('shared_building_services'),
             'reporting_period' => $request->reporting_period,
             'measurement_frequency' => $request->measurement_frequency ?? 'Annually',
         ];
@@ -278,16 +278,21 @@ class LocationController extends Controller
             'reporting_period' => $request->reporting_period
         ]);
 
-        $location->update($updateData);
+        try {
+            $location->update($updateData);
 
-        \Log::info('Location updated successfully', [
-            'location_id' => $location->id,
-            'new_measurement_frequency' => $location->measurement_frequency,
-            'new_fiscal_year_start' => $location->fiscal_year_start,
-            'new_reporting_period' => $location->reporting_period
-        ]);
+            \Log::info('Location updated successfully', [
+                'location_id' => $location->id,
+                'new_measurement_frequency' => $location->measurement_frequency,
+                'new_fiscal_year_start' => $location->fiscal_year_start,
+                'new_reporting_period' => $location->reporting_period
+            ]);
 
-        return redirect()->route('locations.index')->with('success', 'Location updated successfully!');
+            return redirect()->route('locations.index')->with('success', 'Location updated successfully! Measurements have been automatically created/updated based on your settings.');
+        } catch (\Exception $e) {
+            \Log::error('Error updating location: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Failed to update location. Please try again.'])->withInput();
+        }
     }
 
     public function destroy(Location $location)

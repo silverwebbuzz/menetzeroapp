@@ -50,7 +50,7 @@
     <div class="bg-white rounded-lg border border-gray-200 p-6">
         <h2 class="text-2xl font-bold text-gray-900 mb-6">Edit Location</h2>
         
-        <form method="POST" action="{{ route('locations.update', $location) }}" id="location-edit-form" onsubmit="console.log('Form submitting with data:', new FormData(this)); return true;">
+        <form method="POST" action="{{ route('locations.update', $location) }}" id="location-edit-form">
             @csrf
             @method('PUT')
             
@@ -161,7 +161,7 @@
                                 <p class="text-sm font-medium text-gray-900">Have staff regularly worked from home?</p>
                             </div>
                             <label class="toggle-switch">
-                                <input type="checkbox" name="staff_work_from_home" {{ old('staff_work_from_home', $location->staff_work_from_home) ? 'checked' : '' }}>
+                                <input type="checkbox" name="staff_work_from_home" value="1" {{ old('staff_work_from_home', $location->staff_work_from_home) ? 'checked' : '' }}>
                                 <span class="slider"></span>
                             </label>
                         </div>
@@ -178,7 +178,7 @@
                                 <p class="text-sm font-medium text-gray-900">Do you receive the utility bills for the entire office building?</p>
                             </div>
                             <label class="toggle-switch">
-                                <input type="checkbox" name="receives_utility_bills" {{ old('receives_utility_bills', $location->receives_utility_bills) ? 'checked' : '' }}>
+                                <input type="checkbox" name="receives_utility_bills" value="1" {{ old('receives_utility_bills', $location->receives_utility_bills) ? 'checked' : '' }}>
                                 <span class="slider"></span>
                             </label>
                         </div>
@@ -192,7 +192,7 @@
                                         <p class="text-sm font-medium text-gray-900">Do you pay your proportion of the electricity bill for this location?</p>
                                     </div>
                                     <label class="toggle-switch">
-                                        <input type="checkbox" name="pays_electricity_proportion" {{ old('pays_electricity_proportion', $location->pays_electricity_proportion) ? 'checked' : '' }}>
+                                        <input type="checkbox" name="pays_electricity_proportion" value="1" {{ old('pays_electricity_proportion', $location->pays_electricity_proportion) ? 'checked' : '' }}>
                                         <span class="slider"></span>
                                     </label>
                                 </div>
@@ -202,7 +202,7 @@
                                         <p class="text-sm font-medium text-gray-900">Is your office space part of a larger building with shared services (lifts, lobbies, aircon)?</p>
                                     </div>
                                     <label class="toggle-switch">
-                                        <input type="checkbox" name="shared_building_services" {{ old('shared_building_services', $location->shared_building_services) ? 'checked' : '' }}>
+                                        <input type="checkbox" name="shared_building_services" value="1" {{ old('shared_building_services', $location->shared_building_services) ? 'checked' : '' }}>
                                         <span class="slider"></span>
                                     </label>
                                 </div>
@@ -224,10 +224,6 @@
                                     <option value="{{ $year }}" {{ old('reporting_period', $location->reporting_period) == $year ? 'selected' : '' }}>{{ $year }}</option>
                                 @endfor
                             </select>
-                            <!-- Debug info -->
-                            <div class="text-xs text-gray-500 mt-1">
-                                Debug: Current value = "{{ $location->reporting_period }}"
-                            </div>
                             @error('reporting_period')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                         </div>
                         
@@ -250,11 +246,6 @@
                                     <input type="radio" name="measurement_frequency" value="Monthly" {{ old('measurement_frequency', $location->measurement_frequency) == 'Monthly' ? 'checked' : '' }} class="mr-2">
                                     <span class="text-sm">Monthly</span>
                                 </label>
-                                
-                                <!-- Debug info -->
-                                <div class="text-xs text-gray-500 mt-2">
-                                    Debug: Current value = "{{ $location->measurement_frequency }}"
-                                </div>
                             </div>
                             @error('measurement_frequency')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                         </div>
@@ -268,10 +259,11 @@
                             <p class="text-sm font-medium text-gray-900">Is this your head office?</p>
                         </div>
                         <label class="toggle-switch">
-                            <input type="checkbox" name="is_head_office" {{ old('is_head_office', $location->is_head_office) ? 'checked' : '' }}>
+                            <input type="checkbox" name="is_head_office" value="1" {{ old('is_head_office', $location->is_head_office) ? 'checked' : '' }}>
                             <span class="slider"></span>
                         </label>
                     </div>
+                    @error('is_head_office')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                 </div>
             </div>
             
