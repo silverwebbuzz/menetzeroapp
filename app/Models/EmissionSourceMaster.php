@@ -34,6 +34,14 @@ class EmissionSourceMaster extends Model
     }
 
     /**
+     * Get all form fields for this emission source
+     */
+    public function formFields()
+    {
+        return $this->hasMany(EmissionSourceFormField::class, 'emission_source_id');
+    }
+
+    /**
      * Scope query to filter by scope
      */
     public function scopeByScope($query, $scope)

@@ -7,6 +7,7 @@ use App\Models\MeasurementData;
 use App\Models\Location;
 use App\Models\EmissionSourceMaster;
 use App\Models\EmissionFactor;
+use App\Models\EmissionSourceFormField;
 use App\Models\MeasurementAuditTrail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -354,11 +355,14 @@ class MeasurementController extends Controller
         }
 
         $emissionSource = EmissionSourceMaster::findOrFail($sourceId);
-        $existingData = $measurement->measurementData()
-            ->where('emission_source_id', $sourceId)
-            ->first();
+        
+        // Get dynamic form fields for this emission source
+        $formFields = EmissionSourceFormField::getFieldsForSource($sourceId);
+        
+        // Get existing data for this source
+        $existingData = MeasurementData::getDataForSource($measurement->id, $sourceId);
 
-        return view('measurements.calculate-source', compact('measurement', 'emissionSource', 'existingData'));
+        return view('measurements.calculate-source', compact('measurement', 'emissionSource', 'formFields', 'existingData'));
     }
 
     /**
@@ -375,12 +379,36 @@ class MeasurementController extends Controller
 
         $emissionSource = EmissionSourceMaster::findOrFail($sourceId);
         
-        $request->validate([
-            'quantity' => 'required|numeric|min:0',
-            'unit' => 'required|string|max:50',
-            'calculation_method' => 'nullable|string|max:100',
-            'notes' => 'nullable|string|max:1000',
-        ]);
+        // Get form fields for validation
+        $formFields = EmissionSourceFormField::getFieldsForSource($sourceId);
+        
+        // Build validation rules dynamically
+        $validationRules = [];
+        foreach ($formFields as $field) {
+            $rules = [];
+            if ($field->is_required) {
+                $rules[] = 'required';
+            } else {
+                $rules[] = 'nullable';
+            }
+            
+            if ($field->field_type === 'number') {
+                $rules[] = 'numeric';
+                $rules[] = 'min:0';
+            } else {
+                $rules[] = 'string';
+            }
+            
+            if ($field->validation_rules) {
+                if (isset($field->validation_rules['max'])) {
+                    $rules[] = 'max:' . $field->validation_rules['max'];
+                }
+            }
+            
+            $validationRules[$field->field_name] = $rules;
+        }
+        
+        $request->validate($validationRules);
 
         // Get emission factor for this source
         $emissionFactor = \App\Models\EmissionFactor::getBestFactor($sourceId, 'UAE', $measurement->fiscal_year);
@@ -389,21 +417,22 @@ class MeasurementController extends Controller
             return back()->withErrors(['error' => 'No emission factor found for this source.']);
         }
 
-        // Calculate CO2e
-        $calculatedCo2e = $request->quantity * $emissionFactor->factor_value;
+        // Get the quantity field value for CO2 calculation
+        $quantity = $request->input('quantity', 0);
+        $calculatedCo2e = $quantity * $emissionFactor->factor_value;
 
         DB::beginTransaction();
         try {
-            \App\Models\MeasurementData::create([
-                'measurement_id' => $measurement->id,
-                'emission_source_id' => $sourceId,
-                'quantity' => $request->quantity,
-                'unit' => $request->unit,
-                'calculated_co2e' => $calculatedCo2e,
-                'scope' => $emissionSource->scope,
-                'calculation_method' => $request->calculation_method,
-                'notes' => $request->notes,
-            ]);
+            // Save all form field data
+            $formData = [];
+            foreach ($formFields as $field) {
+                $value = $request->input($field->field_name);
+                if ($value !== null) {
+                    $formData[$field->field_name] = $value;
+                }
+            }
+            
+            MeasurementData::saveDataForSource($measurement->id, $sourceId, $formData, $user->id);
 
             DB::commit();
 

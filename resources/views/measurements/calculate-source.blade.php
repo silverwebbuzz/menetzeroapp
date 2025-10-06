@@ -106,31 +106,95 @@
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-6">Enter Your Data</h3>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Quantity -->
-                <div>
-                    <label for="quantity" class="block text-sm font-medium text-gray-700 mb-2">
-                        Quantity <span class="text-red-500">*</span>
+            @if($formFields && $formFields->count() > 0)
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    @foreach($formFields as $field)
+                        <div class="{{ $field->field_name === 'quantity' ? 'md:col-span-2' : '' }}">
+                            <label for="{{ $field->field_name }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ $field->field_label }}
+                                @if($field->is_required)
+                                    <span class="text-red-500">*</span>
+                                @endif
+                            </label>
+                            
+                            @if($field->field_type === 'number')
+                                <input type="number" 
+                                       name="{{ $field->field_name }}" 
+                                       id="{{ $field->field_name }}" 
+                                       step="{{ $field->validation_rules['step'] ?? '0.01' }}"
+                                       min="{{ $field->validation_rules['min'] ?? '0' }}"
+                                       value="{{ old($field->field_name, $existingData[$field->field_name]->field_value ?? '') }}"
+                                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error($field->field_name) border-red-500 @enderror"
+                                       placeholder="{{ $field->field_placeholder }}"
+                                       {{ $field->is_required ? 'required' : '' }}>
+                            @elseif($field->field_type === 'select')
+                                <select name="{{ $field->field_name }}" 
+                                        id="{{ $field->field_name }}"
+                                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error($field->field_name) border-red-500 @enderror"
+                                        {{ $field->is_required ? 'required' : '' }}>
+                                    <option value="">Select {{ $field->field_label }}</option>
+                                    @if($field->field_options)
+                                        @foreach($field->field_options as $option)
+                                            <option value="{{ $option['value'] }}" 
+                                                    {{ old($field->field_name, $existingData[$field->field_name]->field_value ?? '') == $option['value'] ? 'selected' : '' }}>
+                                                {{ $option['label'] }}
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            @elseif($field->field_type === 'textarea')
+                                <textarea name="{{ $field->field_name }}" 
+                                          id="{{ $field->field_name }}"
+                                          rows="3"
+                                          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error($field->field_name) border-red-500 @enderror"
+                                          placeholder="{{ $field->field_placeholder }}"
+                                          {{ $field->is_required ? 'required' : '' }}>{{ old($field->field_name, $existingData[$field->field_name]->field_value ?? '') }}</textarea>
+                            @else
+                                <input type="{{ $field->field_type }}" 
+                                       name="{{ $field->field_name }}" 
+                                       id="{{ $field->field_name }}"
+                                       value="{{ old($field->field_name, $existingData[$field->field_name]->field_value ?? '') }}"
+                                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error($field->field_name) border-red-500 @enderror"
+                                       placeholder="{{ $field->field_placeholder }}"
+                                       {{ $field->is_required ? 'required' : '' }}>
+                            @endif
+                            
+                            @if($field->help_text)
+                                <p class="mt-1 text-xs text-gray-600">{{ $field->help_text }}</p>
+                            @endif
+                            
+                            @error($field->field_name)
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <!-- Fallback static form if no dynamic fields are configured -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <label for="quantity" class="block text-sm font-medium text-gray-700 mb-2">
+                            Quantity <span class="text-red-500">*</span>
+                            @if($emissionFactor)
+                                <span class="text-xs text-gray-500 font-normal">
+                                    (Expected unit: {{ explode(' per ', $emissionFactor->unit)[0] ?? 'varies' }})
+                                </span>
+                            @endif
+                        </label>
+                        <input type="number" 
+                               name="quantity" 
+                               id="quantity" 
+                               step="0.0001"
+                               min="0"
+                               value="{{ old('quantity', $existingData['quantity']->field_value ?? '') }}"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error('quantity') border-red-500 @enderror"
+                               placeholder="Enter your consumption quantity"
+                               required>
                         @if($emissionFactor)
-                            <span class="text-xs text-gray-500 font-normal">
-                                (Expected unit: {{ explode(' per ', $emissionFactor->unit)[0] ?? 'varies' }})
-                            </span>
+                            <p class="mt-1 text-xs text-gray-600">
+                                💡 Example: For {{ $emissionSource->name }}, enter your total consumption amount
+                            </p>
                         @endif
-                    </label>
-                    <input type="number" 
-                           name="quantity" 
-                           id="quantity" 
-                           step="0.0001"
-                           min="0"
-                           value="{{ old('quantity', $existingData->quantity ?? '') }}"
-                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error('quantity') border-red-500 @enderror"
-                           placeholder="Enter your consumption quantity"
-                           required>
-                    @if($emissionFactor)
-                        <p class="mt-1 text-xs text-gray-600">
-                            💡 Example: For {{ $emissionSource->name }}, enter your total consumption amount
-                        </p>
-                    @endif
                     @error('quantity')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -201,6 +265,7 @@
                     @enderror
                 </div>
             </div>
+            @endif
         </div>
 
         <!-- CO2e Calculation Preview -->
