@@ -29,7 +29,7 @@
             <!-- Measurement Context Card -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Measurement Context</h3>
-                <div class="grid grid-cols-1 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <div class="text-sm font-medium text-gray-500">Location</div>
                         <div class="text-lg font-semibold text-gray-900">{{ $measurement->location->name }}</div>
@@ -44,6 +44,16 @@
                     <div>
                         <div class="text-sm font-medium text-gray-500">Scope</div>
                         <div class="text-lg font-semibold text-gray-900">{{ $emissionSource->scope }}</div>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium text-gray-500">Last Updated</div>
+                        <div class="text-lg font-semibold text-gray-900">
+                            @if($existingData && $existingData->count() > 0)
+                                {{ $existingData->first()->updated_at->format('M d, Y') }}
+                            @else
+                                No data yet
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
@@ -127,37 +137,6 @@
 
         <!-- Right Column - Form -->
         <div class="space-y-6">
-
-            <!-- Current Data Summary -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Current Data</h3>
-                <div class="space-y-4">
-                    <div>
-                        <div class="text-sm text-gray-500">Scope</div>
-                        <div class="text-lg font-bold text-gray-900">{{ $emissionSource->scope }}</div>
-                    </div>
-                    <div>
-                        <div class="text-sm text-gray-500">Last Updated</div>
-                        <div class="text-lg font-bold text-gray-900">
-                            @if($existingData && $existingData->count() > 0)
-                                {{ $existingData->first()->updated_at->format('M d, Y') }}
-                            @else
-                                No data yet
-                            @endif
-                        </div>
-                    </div>
-                    <div>
-                        <div class="text-sm text-gray-500">Status</div>
-                        <div class="text-lg font-bold text-gray-900">
-                            @if($existingData && $existingData->count() > 0)
-                                <span class="text-green-600">Data Entered</span>
-                            @else
-                                <span class="text-gray-500">No Data</span>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <!-- Edit Form -->
             <form method="POST" action="{{ route('measurements.update-source-data', ['measurement' => $measurement->id, 'source' => $emissionSource->id]) }}" class="space-y-6">

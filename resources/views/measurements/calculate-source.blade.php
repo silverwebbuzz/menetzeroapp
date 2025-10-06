@@ -4,107 +4,139 @@
 @section('page-title', 'Calculate Emissions')
 
 @section('content')
-<div class="max-w-4xl mx-auto">
+<div class="max-w-7xl mx-auto">
     <!-- Header -->
-    <div class="mb-8">
+    <div class="mb-6">
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-3xl font-bold text-gray-900">Add Data to Calculate Emissions for {{ $emissionSource->name }}</h1>
-                <p class="mt-2 text-gray-600">{{ $emissionSource->description ?? 'Enter your data to calculate CO2 emissions for this source.' }}</p>
+                <p class="mt-1 text-gray-600">{{ $emissionSource->description ?? 'Enter your data to calculate CO2 emissions for this source.' }}</p>
             </div>
             <a href="{{ route('measurements.show', $measurement) }}" 
-               class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+               class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-lg hover:from-gray-700 hover:to-gray-800 transition-all duration-200 shadow-md hover:shadow-lg">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
                 Back to Measurement
             </a>
         </div>
     </div>
 
-    <!-- Measurement Info -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-                <h3 class="text-sm font-medium text-gray-500 mb-2">Location</h3>
-                <div class="font-semibold text-gray-900">{{ $measurement->location->name }}</div>
-            </div>
-            <div>
-                <h3 class="text-sm font-medium text-gray-500 mb-2">Period</h3>
-                <div class="font-semibold text-gray-900">
-                    {{ \Carbon\Carbon::parse($measurement->period_start)->format('M Y') }} - 
-                    {{ \Carbon\Carbon::parse($measurement->period_end)->format('M Y') }}
+    <!-- Two Column Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Left Column - Information -->
+        <div class="space-y-6">
+            <!-- Measurement Context Card -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Measurement Context</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <div class="text-sm font-medium text-gray-500">Location</div>
+                        <div class="text-lg font-semibold text-gray-900">{{ $measurement->location->name }}</div>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium text-gray-500">Period</div>
+                        <div class="text-lg font-semibold text-gray-900">
+                            {{ \Carbon\Carbon::parse($measurement->period_start)->format('M Y') }} - 
+                            {{ \Carbon\Carbon::parse($measurement->period_end)->format('M Y') }}
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium text-gray-500">Scope</div>
+                        <div class="text-lg font-semibold text-gray-900">{{ $emissionSource->scope }}</div>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium text-gray-500">Last Updated</div>
+                        <div class="text-lg font-semibold text-gray-900">No data yet</div>
+                    </div>
                 </div>
             </div>
-            <div>
-                <h3 class="text-sm font-medium text-gray-500 mb-2">Scope</h3>
-                <div class="font-semibold text-gray-900">{{ $emissionSource->scope }}</div>
+
+            <!-- Emission Factor Information -->
+            @php
+                $emissionFactor = \App\Models\EmissionFactor::getBestFactor($emissionSource->id, 'UAE', $measurement->fiscal_year);
+            @endphp
+            
+            @if($emissionFactor)
+            <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border border-blue-200 p-6">
+                <div class="flex items-center mb-4">
+                    <div class="flex-shrink-0">
+                        <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-900">📊 Emission Factor Information</h3>
+                        <p class="text-sm text-gray-600">Current emission factor for calculations</p>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <div class="text-sm font-medium text-gray-500">Emission Factor</div>
+                        <div class="text-lg font-semibold text-gray-900">{{ number_format($emissionFactor->factor_value, 6) }} {{ $emissionFactor->unit }}</div>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium text-gray-500">Calculation Method</div>
+                        <div class="text-lg font-semibold text-gray-900">{{ $emissionFactor->calculation_method ?? 'Standard Method' }}</div>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium text-gray-500">Region</div>
+                        <div class="text-lg font-semibold text-gray-900">{{ $emissionFactor->region ?? 'UAE' }}</div>
+                    </div>
+                </div>
+                <div class="mt-4 p-3 bg-blue-50 rounded-lg">
+                    <p class="text-sm text-blue-800">
+                        <strong>Note:</strong> CO2e emission factor for {{ strtolower($emissionSource->name) }}.
+                    </p>
+                </div>
+            </div>
+            @endif
+
+            <!-- How It Works -->
+            <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200 p-6">
+                <div class="flex items-center mb-4">
+                    <div class="flex-shrink-0">
+                        <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-900">🧮 How It Works</h3>
+                        <p class="text-sm text-gray-600">Understanding the calculation process</p>
+                    </div>
+                </div>
+                @if($emissionFactor)
+                <div class="bg-white rounded-lg p-4 border border-green-200">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-900 mb-2">CO2e = Your Quantity × {{ number_format($emissionFactor->factor_value, 6) }} {{ $emissionFactor->unit }}</div>
+                        <p class="text-sm text-gray-600">Enter your consumption data below, and we'll automatically calculate your CO2e emissions.</p>
+                    </div>
+                </div>
+                @else
+                <div class="bg-white rounded-lg p-4 border border-green-200">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-900 mb-2">CO2e = Your Quantity × Emission Factor</div>
+                        <p class="text-sm text-gray-600">Enter your consumption data below, and we'll automatically calculate your CO2e emissions.</p>
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
-    </div>
 
-    <!-- Emission Source Details -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ $emissionSource->name }}</h3>
-        @if($emissionSource->description)
-            <p class="text-gray-600 mb-4">{{ $emissionSource->description }}</p>
-        @endif
-        
-        <!-- Emission Factor Info -->
-        @php
-            $emissionFactor = \App\Models\EmissionFactor::getBestFactor($emissionSource->id, 'UAE', $measurement->fiscal_year);
-        @endphp
-        
-        @if($emissionFactor)
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h4 class="font-medium text-blue-900 mb-3">📊 Emission Factor Information</h4>
-                <div class="text-sm text-blue-800 space-y-2">
-                    <div class="flex justify-between">
-                        <span><strong>Emission Factor:</strong></span>
-                        <span class="font-mono">{{ number_format($emissionFactor->factor_value, 6) }} {{ $emissionFactor->unit }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span><strong>Calculation Method:</strong></span>
-                        <span>{{ $emissionFactor->calculation_method ?? 'Standard' }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span><strong>Region:</strong></span>
-                        <span>{{ $emissionFactor->region }}</span>
-                    </div>
-                    @if($emissionFactor->description)
-                        <div class="mt-3 pt-3 border-t border-blue-200">
-                            <div class="text-xs text-blue-700">
-                                <strong>Note:</strong> {{ $emissionFactor->description }}
-                            </div>
-                        </div>
-                    @endif
-                </div>
-            </div>
-            
-            <!-- Calculation Preview -->
-            <div class="bg-green-50 border border-green-200 rounded-lg p-4 mt-4">
-                <h4 class="font-medium text-green-900 mb-2">🧮 How It Works</h4>
-                <div class="text-sm text-green-800">
-                    <div class="font-mono text-xs bg-white p-2 rounded border">
-                        CO2e = Your Quantity × {{ number_format($emissionFactor->factor_value, 6) }} {{ $emissionFactor->unit }}
-                    </div>
-                    <div class="mt-2 text-xs">
-                        Enter your consumption data below, and we'll automatically calculate your CO2e emissions.
-                    </div>
-                </div>
-            </div>
-        @else
-            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-                <div class="text-red-800">
-                    <strong>⚠️ Warning:</strong> No emission factor found for this source. Please contact support.
-                </div>
-            </div>
-        @endif
-    </div>
+        <!-- Right Column - Form -->
+        <div class="space-y-6">
 
-    <!-- Calculation Form -->
-    <form method="POST" action="{{ route('measurements.store-source-data', ['measurement' => $measurement->id, 'source' => $emissionSource->id]) }}" class="space-y-6">
-        @csrf
-        
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-6">Enter Your Data</h3>
+            <!-- Calculation Form -->
+            <form method="POST" action="{{ route('measurements.store-source-data', ['measurement' => $measurement->id, 'source' => $emissionSource->id]) }}" class="space-y-6">
+                @csrf
+                
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-6">Enter Your Data</h3>
             
             @if($formFields && $formFields->count() > 0)
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -299,8 +331,10 @@
                     class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">
                 {{ $existingData ? 'Update Calculation' : 'Save Calculation' }}
             </button>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
 
 <script>
