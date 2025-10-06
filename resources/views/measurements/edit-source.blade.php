@@ -157,7 +157,13 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <div class="text-sm text-teal-100">Quantity</div>
-                        <div class="text-2xl font-bold" id="preview-quantity">{{ number_format($existingData->quantity, 2) }}</div>
+                        <div class="text-2xl font-bold" id="preview-quantity">
+                            @if($existingData && $existingData->has('quantity'))
+                                {{ number_format($existingData['quantity']->field_value, 2) }}
+                            @else
+                                0.00
+                            @endif
+                        </div>
                     </div>
                     <div>
                         <div class="text-sm text-teal-100">Emission Factor</div>
@@ -165,7 +171,17 @@
                     </div>
                     <div>
                         <div class="text-sm text-teal-100">New CO2e</div>
-                        <div class="text-3xl font-bold" id="preview-co2e">{{ number_format($existingData->calculated_co2e, 2) }}t</div>
+                        <div class="text-3xl font-bold" id="preview-co2e">
+                            @if($existingData && $existingData->has('quantity'))
+                                @php
+                                    $quantity = $existingData['quantity']->field_value ?? 0;
+                                    $co2e = $quantity * $emissionFactor->factor_value;
+                                @endphp
+                                {{ number_format($co2e, 2) }}t
+                            @else
+                                0.00t
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
