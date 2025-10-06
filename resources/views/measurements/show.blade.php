@@ -297,10 +297,6 @@
                class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
                 Back to Measurements
             </a>
-            <a href="{{ route('measurements.edit', $measurement) }}" 
-               class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
-                Edit Measurement
-            </a>
         </div>
         
         @if($measurement->measurementData->count() > 0)
