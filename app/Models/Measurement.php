@@ -26,6 +26,12 @@ class Measurement extends Model
         'staff_count',
         'staff_work_from_home',
         'work_from_home_percentage',
+        'total_co2e',
+        'scope_1_co2e',
+        'scope_2_co2e',
+        'scope_3_co2e',
+        'co2e_calculated_at',
+        'emission_source_co2e',
     ];
 
     protected $casts = [
@@ -34,6 +40,12 @@ class Measurement extends Model
         'metadata' => 'array',
         'staff_work_from_home' => 'boolean',
         'work_from_home_percentage' => 'decimal:2',
+        'total_co2e' => 'decimal:6',
+        'scope_1_co2e' => 'decimal:6',
+        'scope_2_co2e' => 'decimal:6',
+        'scope_3_co2e' => 'decimal:6',
+        'co2e_calculated_at' => 'datetime',
+        'emission_source_co2e' => 'array',
     ];
 
     /**
@@ -199,6 +211,65 @@ class Measurement extends Model
         }
         
         return 0;
+    }
+
+    /**
+     * Calculate and save CO2e totals to database fields
+     */
+    public function calculateAndSaveCo2e()
+    {
+        $totalCo2e = 0;
+        $scope1Co2e = 0;
+        $scope2Co2e = 0;
+        $scope3Co2e = 0;
+        $emissionSourceCo2e = [];
+
+        // Get all measurement data for this measurement
+        $measurementData = $this->measurementData()
+            ->with('emissionSource')
+            ->get()
+            ->groupBy('emission_source_id');
+
+        foreach ($measurementData as $sourceId => $sourceData) {
+            $source = $sourceData->first()->emissionSource;
+            if (!$source) continue;
+
+            // Get quantity and emission factor
+            $quantityData = $sourceData->where('field_name', 'quantity')->first();
+            if (!$quantityData) continue;
+
+            $quantity = (float) $quantityData->field_value;
+            $emissionFactor = \App\Models\EmissionFactor::getBestFactor($sourceId, 'UAE', $this->fiscal_year);
+            
+            if ($emissionFactor) {
+                $co2e = $quantity * $emissionFactor->emission_factor;
+                $totalCo2e += $co2e;
+                $emissionSourceCo2e[$sourceId] = round($co2e, 6);
+
+                // Add to scope totals
+                switch ($source->scope) {
+                    case 'Scope 1':
+                        $scope1Co2e += $co2e;
+                        break;
+                    case 'Scope 2':
+                        $scope2Co2e += $co2e;
+                        break;
+                    case 'Scope 3':
+                        $scope3Co2e += $co2e;
+                        break;
+                }
+            }
+        }
+
+        // Update the measurement with calculated values
+        $this->update([
+            'total_co2e' => round($totalCo2e, 6),
+            'scope_1_co2e' => round($scope1Co2e, 6),
+            'scope_2_co2e' => round($scope2Co2e, 6),
+            'scope_3_co2e' => round($scope3Co2e, 6),
+            'emission_source_co2e' => $emissionSourceCo2e,
+            'co2e_calculated_at' => now(),
+        ]);
     }
 
     /**
