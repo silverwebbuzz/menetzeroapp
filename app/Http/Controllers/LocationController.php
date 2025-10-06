@@ -270,7 +270,22 @@ class LocationController extends Controller
             'measurement_frequency' => $request->measurement_frequency ?? 'Annually',
         ];
 
+        \Log::info('LocationController update called', [
+            'location_id' => $location->id,
+            'update_data' => $updateData,
+            'measurement_frequency' => $request->measurement_frequency,
+            'fiscal_year_start' => $request->fiscal_year_start,
+            'reporting_period' => $request->reporting_period
+        ]);
+
         $location->update($updateData);
+
+        \Log::info('Location updated successfully', [
+            'location_id' => $location->id,
+            'new_measurement_frequency' => $location->measurement_frequency,
+            'new_fiscal_year_start' => $location->fiscal_year_start,
+            'new_reporting_period' => $location->reporting_period
+        ]);
 
         return redirect()->route('locations.index')->with('success', 'Location updated successfully!');
     }

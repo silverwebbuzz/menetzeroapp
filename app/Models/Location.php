@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Services\MeasurementPeriodService;
+use Illuminate\Support\Facades\Log;
 
 class Location extends Model
 {
@@ -52,6 +53,14 @@ class Location extends Model
     public function emissionBoundaries()
     {
         return $this->hasMany(LocationEmissionBoundary::class);
+    }
+
+    /**
+     * Get the measurements for this location
+     */
+    public function measurements()
+    {
+        return $this->hasMany(Measurement::class);
     }
 
     /**
@@ -118,6 +127,12 @@ class Location extends Model
 
         // After creating a location, sync measurement periods
         static::created(function ($location) {
+            \Log::info('Location created event triggered', [
+                'location_id' => $location->id,
+                'measurement_frequency' => $location->measurement_frequency,
+                'fiscal_year_start' => $location->fiscal_year_start
+            ]);
+            
             if ($location->measurement_frequency && $location->fiscal_year_start) {
                 $service = app(MeasurementPeriodService::class);
                 $service->syncMeasurementPeriods($location, auth()->id());
@@ -127,6 +142,15 @@ class Location extends Model
         // After updating a location, check if measurement settings changed
         static::updated(function ($location) {
             $measurementSettingsChanged = $location->isDirty(['measurement_frequency', 'fiscal_year_start', 'reporting_period']);
+            
+            \Log::info('Location updated event triggered', [
+                'location_id' => $location->id,
+                'measurement_settings_changed' => $measurementSettingsChanged,
+                'dirty_fields' => $location->getDirty(),
+                'measurement_frequency' => $location->measurement_frequency,
+                'fiscal_year_start' => $location->fiscal_year_start,
+                'reporting_period' => $location->reporting_period
+            ]);
             
             if ($measurementSettingsChanged) {
                 $service = app(MeasurementPeriodService::class);

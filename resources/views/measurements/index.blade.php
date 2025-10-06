@@ -11,8 +11,8 @@
             <h1 class="text-3xl font-bold text-gray-900">Measurements</h1>
             <p class="mt-2 text-gray-600">Manage your carbon footprint measurements and data collection.</p>
         </div>
-        <a href="{{ route('measurements.create') }}" class="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">
-            Add New Measurement
+        <a href="{{ route('locations.index') }}" class="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">
+            Manage Locations
         </a>
     </div>
 
@@ -157,8 +157,8 @@
             </div>
             <h3 class="text-lg font-medium text-gray-900 mb-2">No measurements found</h3>
             <p class="text-gray-600 mb-6">Get started by creating your first measurement.</p>
-            <a href="{{ route('measurements.create') }}" class="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">
-                Add New Measurement
+            <a href="{{ route('locations.index') }}" class="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">
+                Manage Locations
             </a>
         </div>
     @endif

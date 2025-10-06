@@ -64,9 +64,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/locations/{location}/emission-boundaries', [EmissionBoundaryController::class, 'store'])->name('emission-boundaries.store');
     
     // Measurements routes (replacing old emission form)
-    Route::resource('measurements', MeasurementController::class);
+    Route::resource('measurements', MeasurementController::class)->except(['create', 'store']);
     Route::post('/measurements/{measurement}/submit', [MeasurementController::class, 'submit'])->name('measurements.submit');
-    Route::get('/measurements/available-periods/{location}', [MeasurementController::class, 'getAvailablePeriods'])->name('measurements.available-periods');
     
     // Debug route to test measurement show
     Route::get('/measurements/{measurement}/debug', function($measurementId) {

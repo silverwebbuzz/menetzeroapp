@@ -61,68 +61,6 @@ class MeasurementController extends Controller
         return view('measurements.index', compact('measurements', 'locations'));
     }
 
-    /**
-     * Show the form for creating a new measurement
-     */
-    public function create(Request $request)
-    {
-        $user = Auth::user();
-        
-        // Get locations for the user's company
-        $locations = Location::where('company_id', $user->company_id)
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get();
-
-        if ($locations->isEmpty()) {
-            return redirect()->route('locations.index')
-                ->with('error', 'Please add a location first before creating measurements.');
-        }
-
-        // If location is specified, get available periods
-        $availablePeriods = [];
-        if ($request->filled('location_id')) {
-            $location = Location::findOrFail($request->location_id);
-            $availablePeriods = $this->calculateAvailablePeriods($location);
-        }
-
-        return view('measurements.create', compact('locations', 'availablePeriods'));
-    }
-
-    /**
-     * Store a newly created measurement
-     */
-    public function store(Request $request)
-    {
-        \Log::info('Measurement store called with data:', $request->all());
-        
-        $request->validate([
-            'location_id' => 'required|exists:locations,id',
-            'measurement_id' => 'required|exists:measurements,id',
-        ]);
-        
-        \Log::info('Validation passed');
-
-        $user = Auth::user();
-        
-        // Check if user has access to this location
-        $location = Location::where('id', $request->location_id)
-            ->where('company_id', $user->company_id)
-            ->firstOrFail();
-
-        // Get the selected measurement
-        $measurement = Measurement::where('id', $request->measurement_id)
-            ->where('location_id', $request->location_id)
-            ->firstOrFail();
-
-        \Log::info('Redirecting to existing measurement. ID: ' . $measurement->id . ', Location: ' . $measurement->location_id);
-        
-        $redirectUrl = route('measurements.show', $measurement);
-        \Log::info('Redirecting to: ' . $redirectUrl);
-        
-        return redirect()->route('measurements.show', $measurement)
-            ->with('success', 'Measurement selected. You can now add emission data.');
-    }
 
     /**
      * Display the specified measurement
@@ -323,43 +261,6 @@ class MeasurementController extends Controller
             ->with('success', 'Measurement submitted successfully.');
     }
 
-    /**
-     * Get available periods for a location (AJAX)
-     */
-    public function getAvailablePeriods(Location $location)
-    {
-        try {
-            $user = Auth::user();
-            
-            // Check if user has access to this location
-            if ($location->company_id !== $user->company_id) {
-                return response()->json(['error' => 'Unauthorized access'], 403);
-            }
-
-            // Use the new service to get measurements
-            $service = app(\App\Services\MeasurementPeriodService::class);
-            $measurements = $service->getMeasurementsForLocation($location);
-            
-            \Log::info('Getting measurements for location: ' . $location->name, [
-                'count' => $measurements->count()
-            ]);
-            
-            return response()->json([
-                'measurements' => $measurements,
-                'location' => [
-                    'name' => $location->name,
-                    'fiscal_year_start' => $location->fiscal_year_start,
-                    'measurement_frequency' => $location->measurement_frequency
-                ]
-            ]);
-        } catch (\Exception $e) {
-            \Log::error('Error getting measurements: ' . $e->getMessage(), [
-                'location_id' => $location->id,
-                'trace' => $e->getTraceAsString()
-            ]);
-            return response()->json(['error' => 'Failed to load measurements: ' . $e->getMessage()], 500);
-        }
-    }
 
 
     /**
