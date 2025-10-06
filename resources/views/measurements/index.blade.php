@@ -73,71 +73,135 @@
         </form>
     </div>
 
-    <!-- Measurements List -->
+    <!-- Measurements List - Grouped by Location and Year -->
     @if($measurements->count() > 0)
-        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            @foreach($measurements as $measurement)
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
-                    <!-- Header -->
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-900">{{ $measurement->location->name }}</h3>
-                            <p class="text-sm text-gray-600">{{ $measurement->period_start->format('M d, Y') }} - {{ $measurement->period_end->format('M d, Y') }}</p>
-                        </div>
-                        <span class="px-3 py-1 text-xs font-medium rounded-full 
-                            @if($measurement->status === 'draft') bg-gray-100 text-gray-800
-                            @elseif($measurement->status === 'submitted') bg-blue-100 text-blue-800
-                            @elseif($measurement->status === 'under_review') bg-yellow-100 text-yellow-800
-                            @elseif($measurement->status === 'not_verified') bg-red-100 text-red-800
-                            @elseif($measurement->status === 'verified') bg-green-100 text-green-800
-                            @endif">
-                            {{ $measurement->status_display }}
-                        </span>
-                    </div>
+        @php
+            // Group measurements by location and then by year
+            $groupedMeasurements = $measurements->groupBy(function($measurement) {
+                return $measurement->location->name;
+            })->map(function($locationMeasurements) {
+                return $locationMeasurements->groupBy('fiscal_year');
+            });
+        @endphp
 
-                    <!-- Details -->
-                    <div class="space-y-2 mb-4">
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Frequency:</span>
-                            <span class="font-medium">{{ ucfirst(str_replace('_', ' ', $measurement->frequency)) }}</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Fiscal Year:</span>
-                            <span class="font-medium">{{ $measurement->fiscal_year }}</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Total CO2e:</span>
-                            <span class="font-medium text-orange-600">{{ number_format($measurement->total_co2e, 2) }} kg</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Data Points:</span>
-                            <span class="font-medium">{{ $measurement->measurementData->count() }}</span>
+        <div class="space-y-8">
+            @foreach($groupedMeasurements as $locationName => $yearGroups)
+                <!-- Location Section -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <!-- Location Header -->
+                    <div class="bg-gradient-to-r from-orange-50 to-orange-100 px-6 py-4 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-orange-600 rounded-lg flex items-center justify-center mr-3">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h2 class="text-xl font-bold text-gray-900">{{ $locationName }}</h2>
+                                    <p class="text-sm text-gray-600">{{ $yearGroups->flatten()->count() }} measurement(s) across {{ $yearGroups->count() }} year(s)</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm text-gray-600">Total CO2e</div>
+                                <div class="text-lg font-bold text-orange-600">
+                                    {{ number_format($yearGroups->flatten()->sum('total_co2e'), 2) }} kg
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Actions -->
-                    <div class="flex justify-between items-center pt-4 border-t border-gray-200">
-                        <div class="flex space-x-2">
-                            <a href="{{ route('measurements.show', $measurement) }}" 
-                               class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-                                View
-                            </a>
-                            @if($measurement->canBeEdited())
-                                <a href="{{ route('measurements.edit', $measurement) }}" 
-                                   class="px-3 py-1 text-sm bg-gray-600 text-white rounded hover:bg-gray-700 transition">
-                                    Edit
-                                </a>
-                            @endif
+                    <!-- Years Container -->
+                    <div class="p-6">
+                        <div class="space-y-6">
+                            @foreach($yearGroups as $year => $yearMeasurements)
+                                <!-- Year Section -->
+                                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                                    <!-- Year Header -->
+                                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
+                                        <div class="flex items-center justify-between">
+                                            <h3 class="text-lg font-semibold text-gray-900">Fiscal Year {{ $year }}</h3>
+                                            <div class="flex items-center space-x-4 text-sm text-gray-600">
+                                                <span>{{ $yearMeasurements->count() }} measurement(s)</span>
+                                                <span class="text-orange-600 font-medium">
+                                                    {{ number_format($yearMeasurements->sum('total_co2e'), 2) }} kg CO2e
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Measurements Grid -->
+                                    <div class="p-4">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                            @foreach($yearMeasurements as $measurement)
+                                                <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                                    <!-- Period -->
+                                                    <div class="mb-3">
+                                                        <div class="text-sm font-medium text-gray-900">
+                                                            {{ $measurement->period_start->format('M d') }} - {{ $measurement->period_end->format('M d, Y') }}
+                                                        </div>
+                                                        <div class="text-xs text-gray-500">
+                                                            {{ ucfirst(str_replace('_', ' ', $measurement->frequency)) }}
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Status -->
+                                                    <div class="mb-3">
+                                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                                            @if($measurement->status === 'draft') bg-gray-100 text-gray-800
+                                                            @elseif($measurement->status === 'submitted') bg-blue-100 text-blue-800
+                                                            @elseif($measurement->status === 'under_review') bg-yellow-100 text-yellow-800
+                                                            @elseif($measurement->status === 'not_verified') bg-red-100 text-red-800
+                                                            @elseif($measurement->status === 'verified') bg-green-100 text-green-800
+                                                            @endif">
+                                                            {{ ucfirst(str_replace('_', ' ', $measurement->status)) }}
+                                                        </span>
+                                                    </div>
+
+                                                    <!-- CO2e -->
+                                                    <div class="mb-3">
+                                                        <div class="text-sm text-gray-600">Total CO2e</div>
+                                                        <div class="text-lg font-bold text-orange-600">
+                                                            {{ number_format($measurement->total_co2e, 2) }} kg
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Data Points -->
+                                                    <div class="mb-4">
+                                                        <div class="text-xs text-gray-500">
+                                                            {{ $measurement->measurementData->count() }} data point(s)
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Actions -->
+                                                    <div class="flex justify-between items-center">
+                                                        <a href="{{ route('measurements.show', $measurement) }}" 
+                                                           class="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                                                            View
+                                                        </a>
+                                                        @if($measurement->canBeEdited())
+                                                            <a href="{{ route('measurements.edit', $measurement) }}" 
+                                                               class="px-3 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700 transition">
+                                                                Edit
+                                                            </a>
+                                                        @endif
+                                                        @if($measurement->canBeSubmitted())
+                                                            <form method="POST" action="{{ route('measurements.submit', $measurement) }}" class="inline">
+                                                                @csrf
+                                                                <button type="submit" class="px-3 py-1 text-xs bg-orange-600 text-white rounded hover:bg-orange-700 transition">
+                                                                    Submit
+                                                                </button>
+                                                            </form>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
-                        
-                        @if($measurement->canBeSubmitted())
-                            <form method="POST" action="{{ route('measurements.submit', $measurement) }}" class="inline">
-                                @csrf
-                                <button type="submit" class="px-3 py-1 text-sm bg-orange-600 text-white rounded hover:bg-orange-700 transition">
-                                    Submit
-                                </button>
-                            </form>
-                        @endif
                     </div>
                 </div>
             @endforeach

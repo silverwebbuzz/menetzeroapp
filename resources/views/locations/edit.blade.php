@@ -50,18 +50,6 @@
     <div class="bg-white rounded-lg border border-gray-200 p-6">
         <h2 class="text-2xl font-bold text-gray-900 mb-6">Edit Location</h2>
         
-        <!-- Debug Info -->
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <h3 class="text-blue-800 font-medium mb-2">Debug Info:</h3>
-            <div class="text-blue-700 text-sm space-y-1">
-                <p><strong>Location ID:</strong> {{ $location->id }}</p>
-                <p><strong>Current Name:</strong> {{ $location->name }}</p>
-                <p><strong>Current Staff Count:</strong> {{ $location->staff_count }}</p>
-                <p><strong>Current Measurement Frequency:</strong> {{ $location->measurement_frequency }}</p>
-                <p><strong>Current Reporting Period:</strong> {{ $location->reporting_period }}</p>
-                <p><strong>Current Fiscal Year Start:</strong> {{ $location->fiscal_year_start }}</p>
-            </div>
-        </div>
         
         @if (session('success'))
             <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
@@ -81,7 +69,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('locations.update', $location) }}" id="location-edit-form" onsubmit="console.log('Form submitting...', this); return true;">
+        <form method="POST" action="{{ route('locations.update', $location) }}" id="location-edit-form">
             @csrf
             @method('PUT')
             
