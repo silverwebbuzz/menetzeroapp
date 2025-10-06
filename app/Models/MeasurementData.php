@@ -54,7 +54,6 @@ class MeasurementData extends Model
     public function emissionFactor(): BelongsTo
     {
         return $this->belongsTo(EmissionFactor::class, 'emission_source_id', 'emission_source_id')
-            ->where('scope', $this->scope)
             ->where('is_active', true);
     }
 

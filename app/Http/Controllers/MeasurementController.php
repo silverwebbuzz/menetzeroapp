@@ -383,7 +383,7 @@ class MeasurementController extends Controller
         ]);
 
         // Get emission factor for this source
-        $emissionFactor = \App\Models\EmissionFactor::getBestFactor($sourceId, $emissionSource->scope, 'UAE', $measurement->fiscal_year);
+        $emissionFactor = \App\Models\EmissionFactor::getBestFactor($sourceId, 'UAE', $measurement->fiscal_year);
 
         if (!$emissionFactor) {
             return back()->withErrors(['error' => 'No emission factor found for this source.']);
@@ -462,7 +462,7 @@ class MeasurementController extends Controller
         ]);
 
         // Get emission factor for this source
-        $emissionFactor = \App\Models\EmissionFactor::getBestFactor($sourceId, $emissionSource->scope, 'UAE', $measurement->fiscal_year);
+        $emissionFactor = \App\Models\EmissionFactor::getBestFactor($sourceId, 'UAE', $measurement->fiscal_year);
 
         if (!$emissionFactor) {
             return back()->withErrors(['error' => 'No emission factor found for this source.']);

@@ -14,7 +14,6 @@ class EmissionFactor extends Model
         'emission_source_id',
         'factor_value',
         'unit',
-        'scope',
         'calculation_method',
         'region',
         'valid_from',
@@ -48,10 +47,13 @@ class EmissionFactor extends Model
 
     /**
      * Scope a query to only include factors for a given scope
+     * Note: Scope is now retrieved via the emission source relationship
      */
     public function scopeByScope($query, $scope)
     {
-        return $query->where('scope', $scope);
+        return $query->whereHas('emissionSource', function ($q) use ($scope) {
+            $q->where('scope', $scope);
+        });
     }
 
     /**
@@ -105,16 +107,16 @@ class EmissionFactor extends Model
     }
 
     /**
-     * Get the best factor for a given emission source, scope, and region
+     * Get the best factor for a given emission source and region
+     * Note: Scope is now retrieved via the emission source relationship
      */
-    public static function getBestFactor($emissionSourceId, $scope, $region = 'UAE', $year = null)
+    public static function getBestFactor($emissionSourceId, $region = 'UAE', $year = null)
     {
         if ($year === null) {
             $year = date('Y');
         }
 
         return self::where('emission_source_id', $emissionSourceId)
-            ->where('scope', $scope)
             ->where('region', $region)
             ->where('is_active', true)
             ->validForYear($year)
