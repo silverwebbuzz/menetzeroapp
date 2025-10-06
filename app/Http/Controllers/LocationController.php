@@ -226,11 +226,22 @@ class LocationController extends Controller
 
     public function update(Request $request, Location $location)
     {
-        \Log::info('LocationController update method called', [
+        // This should NEVER be reached if 302 is happening
+        \Log::info('=== LOCATION CONTROLLER UPDATE METHOD CALLED ===', [
             'location_id' => $location->id,
             'request_data' => $request->all(),
             'method' => $request->method(),
-            'url' => $request->url()
+            'url' => $request->url(),
+            'headers' => $request->headers->all()
+        ]);
+        
+        // Return immediately with debug info
+        return response()->json([
+            'success' => true,
+            'message' => 'Controller method reached successfully!',
+            'location_id' => $location->id,
+            'request_data' => $request->all(),
+            'method' => $request->method()
         ]);
 
         try {

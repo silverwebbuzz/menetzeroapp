@@ -236,6 +236,24 @@ Route::middleware('auth')->group(function () {
         ]);
     })->name('debug.form-test');
     
+    // Debug route to catch location update
+    Route::post('/debug/location-update-catch', function(\Illuminate\Http\Request $request) {
+        \Log::info('=== DEBUG ROUTE CAUGHT REQUEST ===', [
+            'url' => $request->url(),
+            'method' => $request->method(),
+            'data' => $request->all(),
+            'headers' => $request->headers->all(),
+            'csrf_token' => $request->header('X-CSRF-TOKEN'),
+            'session_token' => csrf_token()
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Debug route caught the request!',
+            'data' => $request->all()
+        ]);
+    })->name('debug.location-update-catch');
+    
     // Emission source calculation routes
     Route::get('/measurements/{measurement}/sources/{source}/calculate', [MeasurementController::class, 'calculateSource'])->name('measurements.calculate-source');
     Route::post('/measurements/{measurement}/sources/{source}/calculate', [MeasurementController::class, 'storeSourceData'])->name('measurements.store-source-data');
