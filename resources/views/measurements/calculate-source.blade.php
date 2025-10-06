@@ -49,22 +49,51 @@
         
         <!-- Emission Factor Info -->
         @php
-            $emissionFactor = \App\Models\EmissionFactor::getBestFactor($emissionSource->id, $emissionSource->scope, 'UAE', $measurement->fiscal_year);
+            $emissionFactor = \App\Models\EmissionFactor::getBestFactor($emissionSource->id, 'UAE', $measurement->fiscal_year);
         @endphp
         
         @if($emissionFactor)
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h4 class="font-medium text-blue-900 mb-2">Emission Factor</h4>
-                <div class="text-sm text-blue-800">
-                    <div><strong>Factor:</strong> {{ number_format($emissionFactor->factor_value, 6) }} {{ $emissionFactor->unit }}</div>
-                    <div><strong>Method:</strong> {{ $emissionFactor->calculation_method ?? 'Standard' }}</div>
-                    <div><strong>Region:</strong> {{ $emissionFactor->region }}</div>
+                <h4 class="font-medium text-blue-900 mb-3">📊 Emission Factor Information</h4>
+                <div class="text-sm text-blue-800 space-y-2">
+                    <div class="flex justify-between">
+                        <span><strong>Emission Factor:</strong></span>
+                        <span class="font-mono">{{ number_format($emissionFactor->factor_value, 6) }} {{ $emissionFactor->unit }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span><strong>Calculation Method:</strong></span>
+                        <span>{{ $emissionFactor->calculation_method ?? 'Standard' }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span><strong>Region:</strong></span>
+                        <span>{{ $emissionFactor->region }}</span>
+                    </div>
+                    @if($emissionFactor->description)
+                        <div class="mt-3 pt-3 border-t border-blue-200">
+                            <div class="text-xs text-blue-700">
+                                <strong>Note:</strong> {{ $emissionFactor->description }}
+                            </div>
+                        </div>
+                    @endif
+                </div>
+            </div>
+            
+            <!-- Calculation Preview -->
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4 mt-4">
+                <h4 class="font-medium text-green-900 mb-2">🧮 How It Works</h4>
+                <div class="text-sm text-green-800">
+                    <div class="font-mono text-xs bg-white p-2 rounded border">
+                        CO2e = Your Quantity × {{ number_format($emissionFactor->factor_value, 6) }} {{ $emissionFactor->unit }}
+                    </div>
+                    <div class="mt-2 text-xs">
+                        Enter your consumption data below, and we'll automatically calculate your CO2e emissions.
+                    </div>
                 </div>
             </div>
         @else
             <div class="bg-red-50 border border-red-200 rounded-lg p-4">
                 <div class="text-red-800">
-                    <strong>Warning:</strong> No emission factor found for this source. Please contact support.
+                    <strong>⚠️ Warning:</strong> No emission factor found for this source. Please contact support.
                 </div>
             </div>
         @endif
@@ -82,6 +111,11 @@
                 <div>
                     <label for="quantity" class="block text-sm font-medium text-gray-700 mb-2">
                         Quantity <span class="text-red-500">*</span>
+                        @if($emissionFactor)
+                            <span class="text-xs text-gray-500 font-normal">
+                                (Expected unit: {{ explode(' per ', $emissionFactor->unit)[0] ?? 'varies' }})
+                            </span>
+                        @endif
                     </label>
                     <input type="number" 
                            name="quantity" 
@@ -90,8 +124,13 @@
                            min="0"
                            value="{{ old('quantity', $existingData->quantity ?? '') }}"
                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error('quantity') border-red-500 @enderror"
-                           placeholder="Enter quantity"
+                           placeholder="Enter your consumption quantity"
                            required>
+                    @if($emissionFactor)
+                        <p class="mt-1 text-xs text-gray-600">
+                            💡 Example: For {{ $emissionSource->name }}, enter your total consumption amount
+                        </p>
+                    @endif
                     @error('quantity')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -101,6 +140,11 @@
                 <div>
                     <label for="unit" class="block text-sm font-medium text-gray-700 mb-2">
                         Unit <span class="text-red-500">*</span>
+                        @if($emissionFactor)
+                            <span class="text-xs text-gray-500 font-normal">
+                                (Recommended: {{ explode(' per ', $emissionFactor->unit)[0] ?? 'varies' }})
+                            </span>
+                        @endif
                     </label>
                     <select name="unit" 
                             id="unit"
@@ -116,6 +160,11 @@
                         <option value="hours" {{ old('unit', $existingData->unit ?? '') == 'hours' ? 'selected' : '' }}>Hours</option>
                         <option value="days" {{ old('unit', $existingData->unit ?? '') == 'days' ? 'selected' : '' }}>Days</option>
                     </select>
+                    @if($emissionFactor)
+                        <p class="mt-1 text-xs text-gray-600">
+                            💡 The emission factor is: {{ $emissionFactor->unit }}
+                        </p>
+                    @endif
                     @error('unit')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
