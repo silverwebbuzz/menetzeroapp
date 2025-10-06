@@ -12,10 +12,11 @@
                 <h1 class="text-3xl font-bold text-gray-900">Measure Emissions</h1>
                 <p class="mt-2 text-gray-600">Measure each source of emissions by entering your data for the period.</p>
             </div>
-            
+        </div>
+    </div>
 
-        <!-- Measurement Summary Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Measurement Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <!-- Location Card with Inline Edit -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-4">

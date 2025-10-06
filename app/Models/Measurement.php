@@ -152,6 +152,8 @@ class Measurement extends Model
         $scope3Co2e = 0;
         $sourceCo2e = []; // Store individual source CO2e values
         
+        \Log::info("Initial scope values - Scope 1: {$scope1Co2e}, Scope 2: {$scope2Co2e}, Scope 3: {$scope3Co2e}");
+        
         // Get all measurement data grouped by emission source
         $measurementData = $this->measurementData()
             ->with('emissionSource')
@@ -194,7 +196,9 @@ class Measurement extends Model
         
         $totalCo2e = $scope1Co2e + $scope2Co2e + $scope3Co2e;
         
-        // Update cached values directly
+        \Log::info("Final scope totals - Scope 1: {$scope1Co2e}, Scope 2: {$scope2Co2e}, Scope 3: {$scope3Co2e}, Total: {$totalCo2e}");
+        
+        // Update cached values using mass assignment
         \Log::info("Before saving measurement ID: " . $this->id . 
                   " - Total: " . $totalCo2e . 
                   ", Scope 1: " . $scope1Co2e . 
@@ -202,15 +206,19 @@ class Measurement extends Model
                   ", Scope 3: " . $scope3Co2e . 
                   ", Sources: " . json_encode($sourceCo2e));
         
-        $this->total_co2e = $totalCo2e;
-        $this->scope_1_co2e = $scope1Co2e;
-        $this->scope_2_co2e = $scope2Co2e;
-        $this->scope_3_co2e = $scope3Co2e;
-        $this->emission_source_co2e = $sourceCo2e;
-        $this->co2e_calculated_at = now();
+        $updateData = [
+            'total_co2e' => $totalCo2e,
+            'scope_1_co2e' => $scope1Co2e,
+            'scope_2_co2e' => $scope2Co2e,
+            'scope_3_co2e' => $scope3Co2e,
+            'emission_source_co2e' => $sourceCo2e,
+            'co2e_calculated_at' => now(),
+        ];
         
-        $saved = $this->save();
-        \Log::info("Save result: " . ($saved ? 'SUCCESS' : 'FAILED'));
+        \Log::info("Update data: " . json_encode($updateData));
+        
+        $saved = $this->update($updateData);
+        \Log::info("Update result: " . ($saved ? 'SUCCESS' : 'FAILED'));
         
         // Reload the model to ensure we're getting the fresh data from the database
         $this->refresh();
