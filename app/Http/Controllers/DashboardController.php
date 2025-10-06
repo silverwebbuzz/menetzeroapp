@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\EmissionSourceMaster;
 use App\Models\Company;
 use App\Models\Facility;
+use App\Models\Measurement;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -27,25 +28,28 @@ class DashboardController extends Controller
             ]);
         }
         
-        // Get all emission sources for the user's company
-        $emissionSources = EmissionSourceMaster::where('is_active', true)
+        // Get all measurements for the user's company
+        $measurements = Measurement::whereHas('location', function($query) use ($user) {
+                $query->where('company_id', $user->company_id);
+            })
+            ->with('location')
             ->orderBy('created_at', 'desc')
             ->get();
 
         // Calculate KPIs
-        $kpis = $this->calculateKPIs($emissionSources);
+        $kpis = $this->calculateKPIs($measurements);
         
         // Get chart data
-        $chartData = $this->getChartData($emissionSources);
+        $chartData = $this->getChartData($measurements);
         
         // Get UAE Net Zero progress
         $netZeroProgress = $this->calculateNetZeroProgress($kpis['total_emissions']);
         
         // Get top emission sources
-        $topSources = $this->getTopEmissionSources($emissionSources);
+        $topSources = $this->getTopEmissionSources($measurements);
         
         // Get recent activity
-        $recentActivity = $emissionSources->take(5);
+        $recentActivity = $measurements->take(5);
 
         return view('dashboard.index', compact(
             'kpis', 
@@ -56,27 +60,24 @@ class DashboardController extends Controller
         ));
     }
 
-    private function calculateKPIs($emissionSources)
+    private function calculateKPIs($measurements)
     {
-        $totalEmissions = $emissionSources->sum('grand_total') ?? 0;
-        $scope1Total = $emissionSources->sum('scope1_total') ?? 0;
-        $scope2Total = $emissionSources->sum('scope2_total') ?? 0;
-        $scope3Total = $emissionSources->sum('scope3_total') ?? 0;
+        $totalEmissions = $measurements->sum('total_co2e') ?? 0;
+        $scope1Total = $measurements->sum('scope_1_co2e') ?? 0;
+        $scope2Total = $measurements->sum('scope_2_co2e') ?? 0;
+        $scope3Total = $measurements->sum('scope_3_co2e') ?? 0;
         
         // Calculate month-over-month change
-        $currentMonth = now()->month;
-        $lastMonth = $currentMonth - 1;
-        
-        $currentMonthEmissions = $emissionSources
+        $currentMonthEmissions = $measurements
             ->where('created_at', '>=', now()->startOfMonth())
-            ->sum('grand_total') ?? 0;
+            ->sum('total_co2e') ?? 0;
             
-        $lastMonthEmissions = $emissionSources
+        $lastMonthEmissions = $measurements
             ->whereBetween('created_at', [
                 now()->subMonth()->startOfMonth(),
                 now()->subMonth()->endOfMonth()
             ])
-            ->sum('grand_total') ?? 0;
+            ->sum('total_co2e') ?? 0;
 
         $monthlyChange = $lastMonthEmissions > 0 
             ? (($currentMonthEmissions - $lastMonthEmissions) / $lastMonthEmissions) * 100 
@@ -88,36 +89,36 @@ class DashboardController extends Controller
             'scope2_total' => round($scope2Total, 2),
             'scope3_total' => round($scope3Total, 2),
             'monthly_change' => round($monthlyChange, 1),
-            'reports_count' => $emissionSources->count(),
-            'draft_reports' => $emissionSources->where('status', 'draft')->count(),
-            'submitted_reports' => $emissionSources->where('status', 'submitted')->count(),
+            'reports_count' => $measurements->count(),
+            'draft_reports' => $measurements->where('status', 'draft')->count(),
+            'submitted_reports' => $measurements->where('status', 'submitted')->count(),
         ];
     }
 
-    private function getChartData($emissionSources)
+    private function getChartData($measurements)
     {
         // Monthly emissions trend
-        $monthlyTrend = $emissionSources
+        $monthlyTrend = $measurements
             ->groupBy(function($item) {
                 return $item->created_at->format('Y-m');
             })
             ->map(function($group) {
-                return $group->sum('grand_total');
+                return $group->sum('total_co2e');
             })
             ->sortKeys();
 
         // Emissions by scope
         $scopeBreakdown = [
-            'Scope 1' => $emissionSources->sum('scope1_total') ?? 0,
-            'Scope 2' => $emissionSources->sum('scope2_total') ?? 0,
-            'Scope 3' => $emissionSources->sum('scope3_total') ?? 0,
+            'Scope 1' => $measurements->sum('scope_1_co2e') ?? 0,
+            'Scope 2' => $measurements->sum('scope_2_co2e') ?? 0,
+            'Scope 3' => $measurements->sum('scope_3_co2e') ?? 0,
         ];
 
-        // Top facilities/companies
-        $facilityBreakdown = $emissionSources
-            ->groupBy('company_name')
+        // Top locations
+        $locationBreakdown = $measurements
+            ->groupBy('location.name')
             ->map(function($group) {
-                return $group->sum('grand_total');
+                return $group->sum('total_co2e');
             })
             ->sortDesc()
             ->take(5);
@@ -125,7 +126,7 @@ class DashboardController extends Controller
         return [
             'monthly_trend' => $monthlyTrend,
             'scope_breakdown' => $scopeBreakdown,
-            'facility_breakdown' => $facilityBreakdown,
+            'location_breakdown' => $locationBreakdown,
         ];
     }
 
@@ -147,20 +148,20 @@ class DashboardController extends Controller
         ];
     }
 
-    private function getTopEmissionSources($emissionSources)
+    private function getTopEmissionSources($measurements)
     {
-        return $emissionSources
-            ->sortByDesc('grand_total')
+        return $measurements
+            ->sortByDesc('total_co2e')
             ->take(5)
-            ->map(function($source) {
+            ->map(function($measurement) {
                 return [
-                    'company' => $source->company_name,
-                    'year' => $source->reporting_year,
-                    'emissions' => round($source->grand_total ?? 0, 2),
-                    'scope1' => round($source->scope1_total ?? 0, 2),
-                    'scope2' => round($source->scope2_total ?? 0, 2),
-                    'scope3' => round($source->scope3_total ?? 0, 2),
-                    'status' => $source->status,
+                    'location' => $measurement->location->name ?? 'Unknown Location',
+                    'period' => $measurement->period_start->format('M Y') . ' - ' . $measurement->period_end->format('M Y'),
+                    'emissions' => round($measurement->total_co2e ?? 0, 2),
+                    'scope1' => round($measurement->scope_1_co2e ?? 0, 2),
+                    'scope2' => round($measurement->scope_2_co2e ?? 0, 2),
+                    'scope3' => round($measurement->scope_3_co2e ?? 0, 2),
+                    'status' => $measurement->status,
                 ];
             });
     }
