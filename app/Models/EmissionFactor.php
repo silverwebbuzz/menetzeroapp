@@ -107,7 +107,7 @@ class EmissionFactor extends Model
     }
 
     /**
-     * Get the best factor for a given emission source and region
+     * Get the best factor for a given emission source
      * Note: Scope is now retrieved via the emission source relationship
      */
     public static function getBestFactor($emissionSourceId, $region = 'UAE', $year = null)
@@ -116,12 +116,23 @@ class EmissionFactor extends Model
             $year = date('Y');
         }
 
-        return self::where('emission_source_id', $emissionSourceId)
+        // First try to find a factor for the specific region
+        $factor = self::where('emission_source_id', $emissionSourceId)
             ->where('region', $region)
             ->where('is_active', true)
             ->validForYear($year)
             ->orderBy('valid_from', 'desc')
             ->first();
+
+        // If no factor found for specific region, try any active factor for this source
+        if (!$factor) {
+            $factor = self::where('emission_source_id', $emissionSourceId)
+                ->where('is_active', true)
+                ->orderBy('valid_from', 'desc')
+                ->first();
+        }
+
+        return $factor;
     }
 
     /**
