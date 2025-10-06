@@ -230,21 +230,33 @@ class Measurement extends Model
             ->get()
             ->groupBy('emission_source_id');
 
+        \Log::info("Calculating CO2e for measurement {$this->id}. Found " . $measurementData->count() . " source groups.");
+
         foreach ($measurementData as $sourceId => $sourceData) {
             $source = $sourceData->first()->emissionSource;
-            if (!$source) continue;
+            if (!$source) {
+                \Log::warning("No emission source found for source ID: {$sourceId}");
+                continue;
+            }
 
             // Get quantity and emission factor
             $quantityData = $sourceData->where('field_name', 'quantity')->first();
-            if (!$quantityData) continue;
+            if (!$quantityData) {
+                \Log::warning("No quantity field found for source ID: {$sourceId}");
+                continue;
+            }
 
             $quantity = (float) $quantityData->field_value;
             $emissionFactor = \App\Models\EmissionFactor::getBestFactor($sourceId, 'UAE', $this->fiscal_year);
             
+            \Log::info("Source {$sourceId}: quantity={$quantity}, factor=" . ($emissionFactor ? $emissionFactor->factor_value : 'null'));
+            
             if ($emissionFactor) {
-                $co2e = $quantity * $emissionFactor->emission_factor;
+                $co2e = $quantity * $emissionFactor->factor_value;
                 $totalCo2e += $co2e;
                 $emissionSourceCo2e[$sourceId] = round($co2e, 6);
+
+                \Log::info("Calculated CO2e for source {$sourceId}: {$co2e}");
 
                 // Add to scope totals
                 switch ($source->scope) {
@@ -258,8 +270,13 @@ class Measurement extends Model
                         $scope3Co2e += $co2e;
                         break;
                 }
+            } else {
+                \Log::warning("No emission factor found for source ID: {$sourceId}");
             }
         }
+
+        \Log::info("Final totals - Total: {$totalCo2e}, Scope1: {$scope1Co2e}, Scope2: {$scope2Co2e}, Scope3: {$scope3Co2e}");
+        \Log::info("Emission source CO2e: " . json_encode($emissionSourceCo2e));
 
         // Update the measurement with calculated values
         $this->update([
@@ -270,6 +287,8 @@ class Measurement extends Model
             'emission_source_co2e' => $emissionSourceCo2e,
             'co2e_calculated_at' => now(),
         ]);
+
+        \Log::info("Updated measurement {$this->id} with CO2e values");
     }
 
     /**
