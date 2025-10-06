@@ -145,14 +145,10 @@ class Measurement extends Model
      */
     public function calculateAndCacheCo2e()
     {
-        \Log::info("Starting CO2e calculation for measurement ID: " . $this->id);
-        
         $scope1Co2e = 0;
         $scope2Co2e = 0;
         $scope3Co2e = 0;
         $sourceCo2e = []; // Store individual source CO2e values
-        
-        \Log::info("Initial scope values - Scope 1: {$scope1Co2e}, Scope 2: {$scope2Co2e}, Scope 3: {$scope3Co2e}");
         
         // Get all measurement data grouped by emission source
         $measurementData = $this->measurementData()
@@ -180,7 +176,6 @@ class Measurement extends Model
                     // Get emission source scope
                     $emissionSource = $data->first()->emissionSource;
                     if ($emissionSource) {
-                        \Log::info("Source ID {$emissionSourceId}: {$emissionSource->name} - Scope: {$emissionSource->scope} - CO2e: {$co2e}");
                         switch ($emissionSource->scope) {
                             case 'Scope 1':
                                 $scope1Co2e += $co2e;
@@ -205,8 +200,6 @@ class Measurement extends Model
         $scope3Co2e = round($scope3Co2e, 6);
         $totalCo2e = round($totalCo2e, 6);
         
-        \Log::info("Final scope totals - Scope 1: {$scope1Co2e}, Scope 2: {$scope2Co2e}, Scope 3: {$scope3Co2e}, Total: {$totalCo2e}");
-        
         // Update cached values using mass assignment
         // Round all values in the sourceCo2e array to 6 decimal places
         $roundedSourceCo2e = [];
@@ -214,14 +207,6 @@ class Measurement extends Model
             $roundedSourceCo2e[$sourceId] = round($co2e, 6);
         }
         
-        \Log::info("Before saving measurement ID: " . $this->id . 
-                  " - Total: " . $totalCo2e . 
-                  ", Scope 1: " . $scope1Co2e . 
-                  ", Scope 2: " . $scope2Co2e . 
-                  ", Scope 3: " . $scope3Co2e . 
-                  ", Sources: " . json_encode($sourceCo2e));
-        
-        \Log::info("Rounded sources: " . json_encode($roundedSourceCo2e));
         
         $updateData = [
             'total_co2e' => $totalCo2e,
@@ -232,52 +217,7 @@ class Measurement extends Model
             'co2e_calculated_at' => now(),
         ];
         
-        \Log::info("Update data: " . json_encode($updateData));
-        
-        $saved = $this->update($updateData);
-        \Log::info("Update result: " . ($saved ? 'SUCCESS' : 'FAILED'));
-        
-        // If the update failed, try direct SQL update
-        if (!$saved) {
-            \Log::info("Laravel update failed, trying direct SQL update...");
-            
-            $sqlResult = \DB::statement("
-                UPDATE measurements 
-                SET total_co2e = ?, 
-                    scope_1_co2e = ?, 
-                    scope_2_co2e = ?, 
-                    scope_3_co2e = ?, 
-                    emission_source_co2e = ?, 
-                    co2e_calculated_at = ?,
-                    updated_at = NOW()
-                WHERE id = ?
-            ", [
-                $totalCo2e,
-                $scope1Co2e, 
-                $scope2Co2e,
-                $scope3Co2e,
-                json_encode($roundedSourceCo2e),
-                now(),
-                $this->id
-            ]);
-            
-            \Log::info("Direct SQL update result: " . ($sqlResult ? 'SUCCESS' : 'FAILED'));
-        }
-        
-        // Reload the model to ensure we're getting the fresh data from the database
-        $this->refresh();
-
-        \Log::info("After saving and refreshing measurement ID: " . $this->id . 
-                  " - Total: " . $this->total_co2e . 
-                  ", Scope 1: " . $this->scope_1_co2e . 
-                  ", Scope 2: " . $this->scope_2_co2e . 
-                  ", Scope 3: " . $this->scope_3_co2e . 
-                  ", Sources: " . json_encode($this->emission_source_co2e));
-        
-        \Log::info("CO2e calculation completed for measurement ID: " . $this->id . 
-                  " - Total: " . $totalCo2e . 
-                  ", Scope 1: " . $scope1Co2e . 
-                  ", Sources: " . json_encode($sourceCo2e));
+        $this->update($updateData);
         
         return [
             'total' => $totalCo2e,

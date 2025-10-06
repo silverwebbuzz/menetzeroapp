@@ -23,8 +23,16 @@ class MeasurementController extends Controller
     {
         $user = Auth::user();
         
-        // Get measurements for user's company locations
-        $query = Measurement::with(['location', 'creator'])
+        // Get measurements for user's company locations with cached CO2e fields
+        $query = Measurement::select([
+            '*',
+            'total_co2e',
+            'scope_1_co2e', 
+            'scope_2_co2e',
+            'scope_3_co2e',
+            'emission_source_co2e',
+            'co2e_calculated_at'
+        ])->with(['location', 'creator'])
             ->whereHas('location', function($q) use ($user) {
                 $q->where('company_id', $user->company_id);
             });
@@ -120,6 +128,17 @@ class MeasurementController extends Controller
                 abort(403, 'Unauthorized access to this measurement.');
             }
 
+            // Ensure cached CO2e fields are loaded
+            $measurement = Measurement::select([
+                '*',
+                'total_co2e',
+                'scope_1_co2e', 
+                'scope_2_co2e',
+                'scope_3_co2e',
+                'emission_source_co2e',
+                'co2e_calculated_at'
+            ])->find($measurement->id);
+            
             $measurement->load([
                 'location',
                 'creator',
