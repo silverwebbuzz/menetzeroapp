@@ -253,21 +253,22 @@ class Measurement extends Model
             
             if ($emissionFactor) {
                 $co2e = $quantity * $emissionFactor->factor_value;
-                $totalCo2e += $co2e;
-                $emissionSourceCo2e[$sourceId] = round($co2e, 6);
+                $co2eRounded = round($co2e, 6);
+                $totalCo2e += $co2eRounded;
+                $emissionSourceCo2e[$sourceId] = $co2eRounded;
 
-                \Log::info("Calculated CO2e for source {$sourceId}: {$co2e}");
+                \Log::info("Calculated CO2e for source {$sourceId}: {$co2e} -> rounded: {$co2eRounded}");
 
                 // Add to scope totals
                 switch ($source->scope) {
                     case 'Scope 1':
-                        $scope1Co2e += $co2e;
+                        $scope1Co2e += $co2eRounded;
                         break;
                     case 'Scope 2':
-                        $scope2Co2e += $co2e;
+                        $scope2Co2e += $co2eRounded;
                         break;
                     case 'Scope 3':
-                        $scope3Co2e += $co2e;
+                        $scope3Co2e += $co2eRounded;
                         break;
                 }
             } else {
@@ -275,16 +276,28 @@ class Measurement extends Model
             }
         }
 
+        // Ensure all values are properly rounded to 6 decimal places
+        $totalCo2e = round($totalCo2e, 6);
+        $scope1Co2e = round($scope1Co2e, 6);
+        $scope2Co2e = round($scope2Co2e, 6);
+        $scope3Co2e = round($scope3Co2e, 6);
+        
+        // Ensure JSON values are also rounded
+        $emissionSourceCo2eRounded = [];
+        foreach ($emissionSourceCo2e as $sourceId => $co2e) {
+            $emissionSourceCo2eRounded[$sourceId] = round($co2e, 6);
+        }
+
         \Log::info("Final totals - Total: {$totalCo2e}, Scope1: {$scope1Co2e}, Scope2: {$scope2Co2e}, Scope3: {$scope3Co2e}");
-        \Log::info("Emission source CO2e: " . json_encode($emissionSourceCo2e));
+        \Log::info("Emission source CO2e: " . json_encode($emissionSourceCo2eRounded));
 
         // Update the measurement with calculated values
         $this->update([
-            'total_co2e' => round($totalCo2e, 6),
-            'scope_1_co2e' => round($scope1Co2e, 6),
-            'scope_2_co2e' => round($scope2Co2e, 6),
-            'scope_3_co2e' => round($scope3Co2e, 6),
-            'emission_source_co2e' => $emissionSourceCo2e,
+            'total_co2e' => $totalCo2e,
+            'scope_1_co2e' => $scope1Co2e,
+            'scope_2_co2e' => $scope2Co2e,
+            'scope_3_co2e' => $scope3Co2e,
+            'emission_source_co2e' => $emissionSourceCo2eRounded,
             'co2e_calculated_at' => now(),
         ]);
 
