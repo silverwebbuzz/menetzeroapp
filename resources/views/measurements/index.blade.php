@@ -16,6 +16,37 @@
         </a>
     </div>
 
+    <!-- Success/Error Messages -->
+    @if (session('success'))
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-green-800">{{ session('success') }}</p>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-red-800">{{ session('error') }}</p>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <!-- Filters -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
         <form method="GET" action="{{ route('measurements.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -193,6 +224,14 @@
                                                                         </button>
                                                                     </form>
                                                                 @endif
+                                                                <!-- Delete Button -->
+                                                                <form method="POST" action="{{ route('measurements.destroy', $measurement) }}" class="inline" onsubmit="return confirmDelete('{{ $measurement->period_start->format('M d, Y') }} - {{ $measurement->period_end->format('M d, Y') }}')">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button type="submit" class="px-3 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 transition">
+                                                                        Delete
+                                                                    </button>
+                                                                </form>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -228,4 +267,10 @@
         </div>
     @endif
 </div>
+
+<script>
+function confirmDelete(period) {
+    return confirm(`Are you sure you want to delete the measurement for ${period}?\n\nThis action cannot be undone and will also delete all associated emission data.`);
+}
+</script>
 @endsection
