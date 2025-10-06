@@ -22,22 +22,30 @@
     <!-- Current Data Summary -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">Current Data</h3>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div>
-                <div class="text-sm text-gray-500">Quantity</div>
-                <div class="text-xl font-bold text-gray-900">{{ number_format($existingData->quantity, 2) }} {{ $existingData->unit }}</div>
-            </div>
-            <div>
-                <div class="text-sm text-gray-500">Current CO2e</div>
-                <div class="text-xl font-bold text-gray-900">{{ number_format($existingData->calculated_co2e, 2) }}t</div>
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
                 <div class="text-sm text-gray-500">Scope</div>
                 <div class="text-xl font-bold text-gray-900">{{ $emissionSource->scope }}</div>
             </div>
             <div>
                 <div class="text-sm text-gray-500">Last Updated</div>
-                <div class="text-xl font-bold text-gray-900">{{ $existingData->updated_at->format('M d, Y') }}</div>
+                <div class="text-xl font-bold text-gray-900">
+                    @if($existingData && $existingData->count() > 0)
+                        {{ $existingData->first()->updated_at->format('M d, Y') }}
+                    @else
+                        No data yet
+                    @endif
+                </div>
+            </div>
+            <div>
+                <div class="text-sm text-gray-500">Status</div>
+                <div class="text-xl font-bold text-gray-900">
+                    @if($existingData && $existingData->count() > 0)
+                        <span class="text-green-600">Data Entered</span>
+                    @else
+                        <span class="text-gray-500">No Data</span>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
@@ -50,89 +58,97 @@
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-6">Update Your Data</h3>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Quantity -->
-                <div>
-                    <label for="quantity" class="block text-sm font-medium text-gray-700 mb-2">
-                        Quantity <span class="text-red-500">*</span>
-                    </label>
-                    <input type="number" 
-                           name="quantity" 
-                           id="quantity" 
-                           step="0.0001"
-                           min="0"
-                           value="{{ old('quantity', $existingData->quantity) }}"
-                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error('quantity') border-red-500 @enderror"
-                           placeholder="Enter quantity"
-                           required>
-                    @error('quantity')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+            @if($formFields && $formFields->count() > 0)
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    @foreach($formFields as $field)
+                        <div class="{{ $field->field_name === 'quantity' ? 'md:col-span-2' : '' }}">
+                            <label for="{{ $field->field_name }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                {{ $field->field_label }}
+                                @if($field->is_required)
+                                    <span class="text-red-500">*</span>
+                                @endif
+                            </label>
+                            
+                            @if($field->field_type === 'number')
+                                <input type="number" 
+                                       name="{{ $field->field_name }}" 
+                                       id="{{ $field->field_name }}" 
+                                       step="{{ $field->validation_rules['step'] ?? '0.01' }}"
+                                       min="{{ $field->validation_rules['min'] ?? '0' }}"
+                                       value="{{ old($field->field_name, $existingData[$field->field_name]->field_value ?? '') }}"
+                                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error($field->field_name) border-red-500 @enderror"
+                                       placeholder="{{ $field->field_placeholder }}"
+                                       {{ $field->is_required ? 'required' : '' }}>
+                            @elseif($field->field_type === 'select')
+                                <select name="{{ $field->field_name }}" 
+                                        id="{{ $field->field_name }}"
+                                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error($field->field_name) border-red-500 @enderror"
+                                        {{ $field->is_required ? 'required' : '' }}>
+                                    <option value="">Select {{ $field->field_label }}</option>
+                                    @if($field->field_options)
+                                        @foreach($field->field_options as $option)
+                                            <option value="{{ $option['value'] }}" 
+                                                    {{ old($field->field_name, $existingData[$field->field_name]->field_value ?? '') == $option['value'] ? 'selected' : '' }}>
+                                                {{ $option['label'] }}
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            @elseif($field->field_type === 'textarea')
+                                <textarea name="{{ $field->field_name }}" 
+                                          id="{{ $field->field_name }}"
+                                          rows="3"
+                                          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error($field->field_name) border-red-500 @enderror"
+                                          placeholder="{{ $field->field_placeholder }}"
+                                          {{ $field->is_required ? 'required' : '' }}>{{ old($field->field_name, $existingData[$field->field_name]->field_value ?? '') }}</textarea>
+                            @else
+                                <input type="{{ $field->field_type }}" 
+                                       name="{{ $field->field_name }}" 
+                                       id="{{ $field->field_name }}"
+                                       value="{{ old($field->field_name, $existingData[$field->field_name]->field_value ?? '') }}"
+                                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error($field->field_name) border-red-500 @enderror"
+                                       placeholder="{{ $field->field_placeholder }}"
+                                       {{ $field->is_required ? 'required' : '' }}>
+                            @endif
+                            
+                            @if($field->help_text)
+                                <p class="mt-1 text-xs text-gray-600">{{ $field->help_text }}</p>
+                            @endif
+                            
+                            @error($field->field_name)
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    @endforeach
                 </div>
+            @else
+                <!-- Fallback static form if no dynamic fields are configured -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <label for="quantity" class="block text-sm font-medium text-gray-700 mb-2">
+                            Quantity <span class="text-red-500">*</span>
+                        </label>
+                        <input type="number" 
+                               name="quantity" 
+                               id="quantity" 
+                               step="0.0001"
+                               min="0"
+                               value="{{ old('quantity', $existingData['quantity']->field_value ?? '') }}"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error('quantity') border-red-500 @enderror"
+                               placeholder="Enter quantity"
+                               required>
+                        @error('quantity')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                <!-- Unit -->
-                <div>
-                    <label for="unit" class="block text-sm font-medium text-gray-700 mb-2">
-                        Unit <span class="text-red-500">*</span>
-                    </label>
-                    <select name="unit" 
-                            id="unit"
-                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error('unit') border-red-500 @enderror"
-                            required>
-                        <option value="">Select unit</option>
-                        <option value="kWh" {{ old('unit', $existingData->unit) == 'kWh' ? 'selected' : '' }}>kWh</option>
-                        <option value="litres" {{ old('unit', $existingData->unit) == 'litres' ? 'selected' : '' }}>Litres</option>
-                        <option value="kg" {{ old('unit', $existingData->unit) == 'kg' ? 'selected' : '' }}>Kilograms (kg)</option>
-                        <option value="tonnes" {{ old('unit', $existingData->unit) == 'tonnes' ? 'selected' : '' }}>Tonnes</option>
-                        <option value="m³" {{ old('unit', $existingData->unit) == 'm³' ? 'selected' : '' }}>Cubic meters (m³)</option>
-                        <option value="km" {{ old('unit', $existingData->unit) == 'km' ? 'selected' : '' }}>Kilometers</option>
-                        <option value="hours" {{ old('unit', $existingData->unit) == 'hours' ? 'selected' : '' }}>Hours</option>
-                        <option value="days" {{ old('unit', $existingData->unit) == 'days' ? 'selected' : '' }}>Days</option>
-                    </select>
-                    @error('unit')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
                 </div>
-
-                <!-- Calculation Method -->
-                <div>
-                    <label for="calculation_method" class="block text-sm font-medium text-gray-700 mb-2">
-                        Calculation Method
-                    </label>
-                    <input type="text" 
-                           name="calculation_method" 
-                           id="calculation_method"
-                           value="{{ old('calculation_method', $existingData->calculation_method) }}"
-                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error('calculation_method') border-red-500 @enderror"
-                           placeholder="e.g., Direct measurement, Estimation">
-                    @error('calculation_method')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- Notes -->
-                <div>
-                    <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">
-                        Notes
-                    </label>
-                    <textarea name="notes" 
-                              id="notes" 
-                              rows="3"
-                              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error('notes') border-red-500 @enderror"
-                              placeholder="Add any additional notes...">{{ old('notes', $existingData->notes) }}</textarea>
-                    @error('notes')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-            </div>
+            @endif
         </div>
 
         <!-- CO2e Calculation Preview -->
         @php
-            $emissionFactor = \App\Models\EmissionFactor::where('emission_source_id', $emissionSource->id)
-                ->where('scope', $emissionSource->scope)
-                ->where('is_active', true)
-                ->first();
+            $emissionFactor = \App\Models\EmissionFactor::getBestFactor($emissionSource->id, 'UAE', $measurement->fiscal_year);
         @endphp
         
         @if($emissionFactor)
@@ -186,17 +202,20 @@ document.addEventListener('DOMContentLoaded', function() {
         const emissionFactor = {{ $emissionFactor->factor_value }};
         
         function updatePreview() {
-            const quantity = parseFloat(quantityInput.value) || 0;
-            const co2e = quantity * emissionFactor;
-            
-            previewQuantity.textContent = quantity.toFixed(2);
-            previewCo2e.textContent = co2e.toFixed(2) + 't';
+            if (quantityInput && previewQuantity && previewCo2e) {
+                const quantity = parseFloat(quantityInput.value) || 0;
+                const co2e = quantity * emissionFactor;
+                
+                previewQuantity.textContent = quantity.toFixed(2);
+                previewCo2e.textContent = co2e.toFixed(2) + 't';
+            }
         }
         
-        quantityInput.addEventListener('input', updatePreview);
-        
-        // Initial update
-        updatePreview();
+        if (quantityInput) {
+            quantityInput.addEventListener('input', updatePreview);
+            // Initial update
+            updatePreview();
+        }
     @endif
 });
 
