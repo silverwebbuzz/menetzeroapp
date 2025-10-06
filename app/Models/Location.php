@@ -141,17 +141,28 @@ class Location extends Model
 
         // After updating a location, check if measurement settings changed
         static::updated(function ($location) {
-            $measurementSettingsChanged = $location->isDirty(['measurement_frequency', 'fiscal_year_start', 'reporting_period']);
+            $original = $location->getOriginal();
+            $current = $location->getAttributes();
+            
+            // Check if measurement-related fields changed
+            $measurementSettingsChanged = (
+                ($original['measurement_frequency'] ?? null) !== ($current['measurement_frequency'] ?? null) ||
+                ($original['fiscal_year_start'] ?? null) !== ($current['fiscal_year_start'] ?? null) ||
+                ($original['reporting_period'] ?? null) !== ($current['reporting_period'] ?? null)
+            );
             
             \Log::info('Location updated event triggered', [
                 'location_id' => $location->id,
                 'measurement_settings_changed' => $measurementSettingsChanged,
-                'dirty_fields' => $location->getDirty(),
-                'original_values' => $location->getOriginal(),
+                'original_values' => [
+                    'measurement_frequency' => $original['measurement_frequency'] ?? null,
+                    'fiscal_year_start' => $original['fiscal_year_start'] ?? null,
+                    'reporting_period' => $original['reporting_period'] ?? null
+                ],
                 'new_values' => [
-                    'measurement_frequency' => $location->measurement_frequency,
-                    'fiscal_year_start' => $location->fiscal_year_start,
-                    'reporting_period' => $location->reporting_period
+                    'measurement_frequency' => $current['measurement_frequency'] ?? null,
+                    'fiscal_year_start' => $current['fiscal_year_start'] ?? null,
+                    'reporting_period' => $current['reporting_period'] ?? null
                 ]
             ]);
             

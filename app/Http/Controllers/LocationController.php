@@ -279,6 +279,11 @@ class LocationController extends Controller
         ]);
 
         try {
+            // Store original values to check if measurement settings changed
+            $originalFrequency = $location->measurement_frequency;
+            $originalFiscalStart = $location->fiscal_year_start;
+            $originalReportingPeriod = $location->reporting_period;
+            
             $location->update($updateData);
 
             \Log::info('Location updated successfully', [
@@ -287,6 +292,24 @@ class LocationController extends Controller
                 'new_fiscal_year_start' => $location->fiscal_year_start,
                 'new_reporting_period' => $location->reporting_period
             ]);
+
+            // Check if measurement settings changed and manually sync if needed
+            $measurementSettingsChanged = (
+                $originalFrequency !== $location->measurement_frequency ||
+                $originalFiscalStart !== $location->fiscal_year_start ||
+                $originalReportingPeriod !== $location->reporting_period
+            );
+
+            if ($measurementSettingsChanged) {
+                \Log::info('Measurement settings changed in controller, manually syncing...');
+                try {
+                    $service = app(\App\Services\MeasurementPeriodService::class);
+                    $result = $service->syncMeasurementPeriods($location, $user->id);
+                    \Log::info('Manual measurement sync completed', $result);
+                } catch (\Exception $e) {
+                    \Log::error('Error in manual measurement sync: ' . $e->getMessage());
+                }
+            }
 
             return redirect()->route('locations.index')->with('success', 'Location updated successfully! Measurements have been automatically created/updated based on your settings.');
         } catch (\Exception $e) {
