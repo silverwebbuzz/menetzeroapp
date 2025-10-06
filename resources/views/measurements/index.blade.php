@@ -208,14 +208,8 @@
                                                             <div class="flex items-center space-x-2">
                                                                 <a href="{{ route('measurements.show', $measurement) }}" 
                                                                    class="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-                                                                    View
+                                                                    View & Edit
                                                                 </a>
-                                                                @if($measurement->canBeEdited())
-                                                                    <a href="{{ route('measurements.edit', $measurement) }}" 
-                                                                       class="px-3 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700 transition">
-                                                                        Edit
-                                                                    </a>
-                                                                @endif
                                                                 @if($measurement->canBeSubmitted())
                                                                     <form method="POST" action="{{ route('measurements.submit', $measurement) }}" class="inline">
                                                                         @csrf

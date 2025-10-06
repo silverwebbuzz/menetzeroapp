@@ -13,43 +13,97 @@
                 <p class="mt-2 text-gray-600">Measure each source of emissions by entering your data for the period.</p>
             </div>
             
-            <!-- Help Section -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 max-w-sm">
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">Need Help?</h3>
-                <p class="text-sm text-gray-600 mb-4">Talk to one of our consultants to assist you with calculations.</p>
+            <!-- Enhanced Help Section -->
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl shadow-lg border border-blue-200 p-6 max-w-sm">
                 <div class="flex items-center mb-4">
-                    <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face" 
-                         alt="Consultant" class="w-10 h-10 rounded-full mr-3">
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
                     <div>
-                        <div class="font-medium text-gray-900">Sarah Johnson</div>
-                        <div class="text-sm text-gray-600">Sustainability Consultant</div>
+                        <h3 class="text-lg font-semibold text-gray-900">Need Support?</h3>
+                        <p class="text-sm text-gray-600">Expert guidance available</p>
                     </div>
                 </div>
-                <button class="w-full bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition flex items-center justify-center">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                    </svg>
-                    Call now
-                </button>
+                
+                <div class="bg-white rounded-lg p-4 mb-4 border border-blue-200">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center mr-3">
+                            <span class="text-white font-semibold text-sm">SJ</span>
+                        </div>
+                        <div>
+                            <div class="font-medium text-gray-900">Sarah Johnson</div>
+                            <div class="text-sm text-gray-600">Sustainability Expert</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-2">
+                    <button class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 flex items-center justify-center text-sm font-medium">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                        </svg>
+                        Call
+                    </button>
+                    <button class="flex-1 bg-white border border-blue-300 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-50 transition-all duration-200 flex items-center justify-center text-sm font-medium">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                        </svg>
+                        Chat
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Measurement Summary Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <!-- Location Card -->
+        <!-- Location Card with Inline Edit -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-sm font-medium text-gray-500">Location</h3>
-                <a href="{{ route('locations.edit', $measurement->location) }}" 
-                   class="text-sm text-gray-600 hover:text-gray-900">Edit</a>
+                <button onclick="toggleLocationEdit()" class="text-sm text-orange-600 hover:text-orange-700 font-medium">
+                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                    Edit
+                </button>
             </div>
-            <div class="flex items-center">
+            
+            <!-- View Mode -->
+            <div id="location-view" class="flex items-center">
                 <span class="text-2xl mr-3">🇦🇪</span>
                 <div>
                     <div class="font-semibold text-gray-900">{{ $measurement->location->name }}</div>
                     <div class="text-sm text-gray-600">{{ $measurement->location->staff_count }} staff members</div>
                 </div>
+            </div>
+            
+            <!-- Edit Mode -->
+            <div id="location-edit" class="hidden">
+                <form method="POST" action="{{ route('locations.update', $measurement->location) }}" class="space-y-4">
+                    @csrf
+                    @method('PUT')
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Location Name</label>
+                        <input type="text" name="name" value="{{ $measurement->location->name }}" 
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Staff Count</label>
+                        <input type="number" name="staff_count" value="{{ $measurement->location->staff_count }}" 
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                    </div>
+                    <div class="flex space-x-2">
+                        <button type="submit" class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition text-sm">
+                            Save
+                        </button>
+                        <button type="button" onclick="toggleLocationEdit()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition text-sm">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -266,5 +320,20 @@ function submitMeasurement(measurementId) {
         });
     }
 }
-</script>
-@endsection
+    </script>
+
+    <script>
+    function toggleLocationEdit() {
+        const viewMode = document.getElementById('location-view');
+        const editMode = document.getElementById('location-edit');
+        
+        if (viewMode.classList.contains('hidden')) {
+            viewMode.classList.remove('hidden');
+            editMode.classList.add('hidden');
+        } else {
+            viewMode.classList.add('hidden');
+            editMode.classList.remove('hidden');
+        }
+    }
+    </script>
+    @endsection
