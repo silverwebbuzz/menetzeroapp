@@ -6,11 +6,11 @@
 @section('content')
 <div class="max-w-4xl mx-auto">
     <!-- Header -->
-    <div class="mb-8">
+    <div class="mb-6">
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-3xl font-bold text-gray-900">Edit Data for {{ $emissionSource->name ?? 'Unknown Source' }}</h1>
-                <p class="mt-2 text-gray-600">{{ $emissionSource->description ?? 'Update your data to recalculate CO2 emissions for this source.' }}</p>
+                <p class="mt-1 text-gray-600">{{ $emissionSource->description ?? 'Update your data to recalculate CO2 emissions for this source.' }}</p>
             </div>
             <a href="{{ route('measurements.show', $measurement) }}" 
                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-lg hover:from-gray-700 hover:to-gray-800 transition-all duration-200 shadow-md hover:shadow-lg">
@@ -23,20 +23,7 @@
     </div>
 
     <!-- Measurement Context Card -->
-    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-6 mb-8">
-        <div class="flex items-center mb-4">
-            <div class="flex-shrink-0">
-                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                    </svg>
-                </div>
-            </div>
-            <div class="ml-4">
-                <h3 class="text-lg font-semibold text-gray-900">Measurement Context</h3>
-                <p class="text-sm text-gray-600">Current measurement period details</p>
-            </div>
-        </div>
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
                 <div class="text-sm font-medium text-gray-500">Location</div>
