@@ -165,8 +165,8 @@
                 @forelse($topSources as $source)
                     <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div>
-                            <div class="font-medium text-gray-900">{{ $source['company'] }}</div>
-                            <div class="text-sm text-gray-500">{{ $source['year'] }} • {{ ucfirst($source['status']) }}</div>
+                            <div class="font-medium text-gray-900">{{ $source['location'] }}</div>
+                            <div class="text-sm text-gray-500">{{ $source['period'] }} • {{ ucfirst($source['status']) }}</div>
                         </div>
                         <div class="text-right">
                             <div class="font-semibold text-gray-900">{{ number_format($source['emissions'], 2) }} kg CO₂e</div>
@@ -221,8 +221,8 @@
                             @endswitch
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-gray-900">{{ $activity->company_name }}</p>
-                            <p class="text-sm text-gray-500">{{ $activity->created_at->format('M d, Y') }} • {{ number_format($activity->grand_total ?? 0, 2) }} kg CO₂e</p>
+                            <p class="text-sm font-medium text-gray-900">{{ $activity->location->name ?? 'Unknown Location' }}</p>
+                            <p class="text-sm text-gray-500">{{ $activity->created_at->format('M d, Y') }} • {{ number_format($activity->total_co2e ?? 0, 2) }} kg CO₂e</p>
                         </div>
                         <div class="flex-shrink-0">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
