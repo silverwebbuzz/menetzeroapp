@@ -10,6 +10,8 @@ class MeasurementAuditTrail extends Model
 {
     use HasFactory;
 
+    protected $table = 'measurement_audit_trail';
+
     protected $fillable = [
         'measurement_id',
         'action',
