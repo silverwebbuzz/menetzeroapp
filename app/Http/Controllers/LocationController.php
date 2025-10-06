@@ -226,22 +226,11 @@ class LocationController extends Controller
 
     public function update(Request $request, Location $location)
     {
-        // This should NEVER be reached if 302 is happening
         \Log::info('=== LOCATION CONTROLLER UPDATE METHOD CALLED ===', [
             'location_id' => $location->id,
             'request_data' => $request->all(),
             'method' => $request->method(),
-            'url' => $request->url(),
-            'headers' => $request->headers->all()
-        ]);
-        
-        // Return immediately with debug info
-        return response()->json([
-            'success' => true,
-            'message' => 'Controller method reached successfully!',
-            'location_id' => $location->id,
-            'request_data' => $request->all(),
-            'method' => $request->method()
+            'url' => $request->url()
         ]);
 
         try {
@@ -250,15 +239,23 @@ class LocationController extends Controller
                 abort(403, 'Unauthorized access to this location.');
             }
 
-            // Minimal validation - only required fields
+            // Validation
             $request->validate([
                 'name' => 'required|string|max:255',
                 'staff_count' => 'required|integer|min:1',
+                'measurement_frequency' => 'nullable|string|max:20',
+                'reporting_period' => 'nullable|integer|min:2020|max:2030',
+                'fiscal_year_start' => 'nullable|string|max:20',
             ]);
 
             \Log::info('Validation passed, proceeding with update');
 
-            // Minimal update - only essential fields
+            // Store old values for comparison
+            $oldFrequency = $location->measurement_frequency;
+            $oldReportingPeriod = $location->reporting_period;
+            $oldFiscalYearStart = $location->fiscal_year_start;
+
+            // Update location
             $location->update([
                 'name' => $request->name,
                 'staff_count' => $request->staff_count,
@@ -269,12 +266,27 @@ class LocationController extends Controller
 
             \Log::info('Location updated successfully', [
                 'location_id' => $location->id,
-                'new_measurement_frequency' => $location->measurement_frequency,
-                'new_fiscal_year_start' => $location->fiscal_year_start,
-                'new_reporting_period' => $location->reporting_period
+                'old_frequency' => $oldFrequency,
+                'new_frequency' => $location->measurement_frequency,
+                'old_reporting_period' => $oldReportingPeriod,
+                'new_reporting_period' => $location->reporting_period,
+                'old_fiscal_year_start' => $oldFiscalYearStart,
+                'new_fiscal_year_start' => $location->fiscal_year_start
             ]);
 
-            // DON'T REDIRECT - Show success on same page
+            // Check if measurement settings changed and sync measurements
+            if ($oldFrequency !== $location->measurement_frequency || 
+                $oldReportingPeriod !== $location->reporting_period || 
+                $oldFiscalYearStart !== $location->fiscal_year_start) {
+                
+                \Log::info('Measurement settings changed, syncing measurements');
+                
+                $service = app(\App\Services\MeasurementPeriodService::class);
+                $service->syncMeasurementPeriods($location, $user->id);
+                
+                \Log::info('Measurement sync completed');
+            }
+
             return back()->with('success', 'Location updated successfully!');
             
         } catch (\Illuminate\Validation\ValidationException $e) {

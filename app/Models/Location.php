@@ -139,9 +139,16 @@ class Location extends Model
             }
         });
 
-        // Temporarily disabled to debug 302 error
-        // static::updated(function ($location) {
-        //     // Measurement sync logic temporarily disabled
-        // });
+            // Re-enabled - now handled manually in controller
+            static::updated(function ($location) {
+                \Log::info('Location updated event triggered', [
+                    'location_id' => $location->id,
+                    'measurement_frequency' => $location->measurement_frequency,
+                    'fiscal_year_start' => $location->fiscal_year_start
+                ]);
+                
+                // Note: Measurement sync is now handled manually in LocationController
+                // to have better control over when it happens
+            });
     }
 }
