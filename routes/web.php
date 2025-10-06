@@ -237,7 +237,7 @@ Route::middleware('auth')->group(function () {
     })->name('debug.form-test');
     
     // Debug route to catch location update
-    Route::post('/debug/location-update-catch', function(\Illuminate\Http\Request $request) {
+    Route::match(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], '/debug/location-update-catch', function(\Illuminate\Http\Request $request) {
         \Log::info('=== DEBUG ROUTE CAUGHT REQUEST ===', [
             'url' => $request->url(),
             'method' => $request->method(),
