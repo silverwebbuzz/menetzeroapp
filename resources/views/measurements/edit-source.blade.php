@@ -10,7 +10,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-3xl font-bold text-gray-900">Edit Emission Data</h1>
-                <p class="mt-2 text-gray-600">Update data for {{ $emissionSource->name }}</p>
+                <p class="mt-2 text-gray-600">Update data for {{ $emissionSource->name ?? 'Unknown Source' }}</p>
             </div>
             <a href="{{ route('measurements.show', $measurement) }}" 
                class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
@@ -18,6 +18,16 @@
             </a>
         </div>
     </div>
+
+    <!-- Debug Info -->
+    @if(config('app.debug'))
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+        <h4 class="font-semibold text-yellow-800 mb-2">Debug Info:</h4>
+        <p class="text-sm text-yellow-700">Emission Source ID: {{ $sourceId ?? 'Not set' }}</p>
+        <p class="text-sm text-yellow-700">Emission Source Name: {{ $emissionSource->name ?? 'Not found' }}</p>
+        <p class="text-sm text-yellow-700">Emission Source Description: {{ $emissionSource->description ?? 'Not found' }}</p>
+    </div>
+    @endif
 
     <!-- Current Data Summary -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">

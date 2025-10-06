@@ -466,7 +466,7 @@ class MeasurementController extends Controller
         // Get existing data for this source
         $existingData = MeasurementData::getDataForSource($measurement->id, $sourceId);
 
-        return view('measurements.edit-source', compact('measurement', 'emissionSource', 'formFields', 'existingData'));
+        return view('measurements.edit-source', compact('measurement', 'emissionSource', 'formFields', 'existingData', 'sourceId'));
     }
 
     /**
