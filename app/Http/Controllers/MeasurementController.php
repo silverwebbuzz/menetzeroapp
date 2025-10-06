@@ -386,12 +386,40 @@ class MeasurementController extends Controller
                 'all_attributes' => $location->getAttributes()
             ]);
 
-            $periods = $this->calculateAvailablePeriods($location);
+            // Get all possible periods (without filtering)
+            $allPeriods = $this->calculateAllPossiblePeriods($location);
             
-            \Log::info('Generated periods:', $periods->toArray());
+            // Get existing measurements for this location
+            $existingMeasurements = Measurement::where('location_id', $location->id)
+                ->get(['id', 'period_start', 'period_end', 'frequency', 'status'])
+                ->map(function($measurement) {
+                    return [
+                        'id' => $measurement->id,
+                        'start' => $measurement->period_start->format('Y-m-d'),
+                        'end' => $measurement->period_end->format('Y-m-d'),
+                        'frequency' => $measurement->frequency,
+                        'status' => $measurement->status
+                    ];
+                });
+            
+            // Mark periods as existing or available
+            $periodsWithStatus = $allPeriods->map(function($period) use ($existingMeasurements) {
+                $isExisting = $existingMeasurements->contains(function($existing) use ($period) {
+                    return $existing['start'] === $period['start'] && 
+                           $existing['end'] === $period['end'];
+                });
+                
+                $period['is_existing'] = $isExisting;
+                $period['is_available'] = !$isExisting;
+                
+                return $period;
+            });
+            
+            \Log::info('Generated periods with status:', $periodsWithStatus->toArray());
             
             return response()->json([
-                'periods' => $periods,
+                'periods' => $periodsWithStatus,
+                'existing_measurements' => $existingMeasurements,
                 'location' => [
                     'name' => $location->name,
                     'fiscal_year_start' => $location->fiscal_year_start,
@@ -569,6 +597,155 @@ class MeasurementController extends Controller
                        $existing['end']->format('Y-m-d') === $period['end'];
             });
         })->values();
+    }
+
+    /**
+     * Calculate all possible measurement periods for a location (without filtering existing ones)
+     */
+    private function calculateAllPossiblePeriods(Location $location)
+    {
+        $periods = [];
+        $currentYear = $location->reporting_period ?? date('Y'); // Use location's reporting period
+        $fiscalYearStart = $location->fiscal_year_start ?? 'JAN'; // Default to January
+        $measurementFrequency = $location->measurement_frequency ?? 'monthly'; // Default to monthly for testing
+        
+        \Log::info('Using settings for all periods:', [
+            'fiscalYearStart' => $fiscalYearStart,
+            'measurementFrequency' => $measurementFrequency,
+            'location_name' => $location->name
+        ]);
+
+        // Get fiscal year start month number
+        $monthMap = [
+            'JAN' => 1, 'FEB' => 2, 'MAR' => 3, 'APR' => 4,
+            'MAY' => 5, 'JUN' => 6, 'JUL' => 7, 'AUG' => 8,
+            'SEP' => 9, 'OCT' => 10, 'NOV' => 11, 'DEC' => 12,
+            'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4,
+            'May' => 5, 'June' => 6, 'July' => 7, 'August' => 8,
+            'September' => 9, 'October' => 10, 'November' => 11, 'December' => 12
+        ];
+        $startMonth = $monthMap[$fiscalYearStart] ?? 1; // Default to January if not found
+
+        // Generate periods based on frequency
+        // Handle both database enum values and normalized values
+        $normalizedFrequency = strtolower(str_replace(' ', '_', $measurementFrequency));
+        
+        \Log::info('Processing frequency for all periods', [
+            'original' => $measurementFrequency,
+            'normalized' => $normalizedFrequency,
+            'currentYear' => $currentYear,
+            'startMonth' => $startMonth
+        ]);
+        
+        switch ($normalizedFrequency) {
+            case 'annually':
+                $periods[] = [
+                    'start' => Carbon::create($currentYear, $startMonth, 1)->format('Y-m-d'),
+                    'end' => Carbon::create($currentYear, $startMonth, 1)->addYear()->subDay()->format('Y-m-d'),
+                    'label' => "FY {$currentYear} (Annual)",
+                    'frequency' => 'annually',
+                    'fiscal_year' => $currentYear,
+                    'fiscal_start' => $fiscalYearStart
+                ];
+                break;
+
+            case 'half_yearly':
+                \Log::info('Generating all half-yearly periods', [
+                    'currentYear' => $currentYear,
+                    'startMonth' => $startMonth
+                ]);
+                for ($i = 0; $i < 2; $i++) {
+                    $periodStart = Carbon::create($currentYear, $startMonth, 1)->addMonths($i * 6);
+                    $periodEnd = $periodStart->copy()->addMonths(6)->subDay();
+                    $periods[] = [
+                        'start' => $periodStart->format('Y-m-d'),
+                        'end' => $periodEnd->format('Y-m-d'),
+                        'label' => $periodStart->format('M Y') . ' - ' . $periodEnd->format('M Y'),
+                        'frequency' => 'half_yearly',
+                        'fiscal_year' => $currentYear,
+                        'fiscal_start' => $fiscalYearStart
+                    ];
+                }
+                \Log::info('Generated all half-yearly periods', ['count' => count($periods)]);
+                break;
+
+            case 'quarterly':
+                \Log::info('Generating all quarterly periods', [
+                    'currentYear' => $currentYear,
+                    'startMonth' => $startMonth
+                ]);
+                for ($i = 0; $i < 4; $i++) {
+                    $periodStart = Carbon::create($currentYear, $startMonth, 1)->addMonths($i * 3);
+                    $periodEnd = $periodStart->copy()->addMonths(3)->subDay();
+                    $periods[] = [
+                        'start' => $periodStart->format('Y-m-d'),
+                        'end' => $periodEnd->format('Y-m-d'),
+                        'label' => $periodStart->format('M Y') . ' - ' . $periodEnd->format('M Y'),
+                        'frequency' => 'quarterly',
+                        'fiscal_year' => $currentYear,
+                        'fiscal_start' => $fiscalYearStart
+                    ];
+                }
+                \Log::info('Generated all quarterly periods', ['count' => count($periods)]);
+                break;
+
+            case 'monthly':
+                \Log::info('Generating all monthly periods', [
+                    'currentYear' => $currentYear,
+                    'startMonth' => $startMonth
+                ]);
+                for ($i = 0; $i < 12; $i++) {
+                    $periodStart = Carbon::create($currentYear, $startMonth, 1)->addMonths($i);
+                    $periodEnd = $periodStart->copy()->addMonth()->subDay();
+                    $periods[] = [
+                        'start' => $periodStart->format('Y-m-d'),
+                        'end' => $periodEnd->format('Y-m-d'),
+                        'label' => $periodStart->format('M Y'),
+                        'frequency' => 'monthly',
+                        'fiscal_year' => $currentYear,
+                        'fiscal_start' => $fiscalYearStart
+                    ];
+                }
+                \Log::info('Generated all monthly periods', ['count' => count($periods)]);
+                break;
+                
+            default:
+                \Log::warning('Unknown frequency: ' . $measurementFrequency . ' (normalized: ' . $normalizedFrequency . ')');
+                // Fallback to monthly if unknown frequency
+                for ($i = 0; $i < 12; $i++) {
+                    $periodStart = Carbon::create($currentYear, $startMonth, 1)->addMonths($i);
+                    $periodEnd = $periodStart->copy()->addMonth()->subDay();
+                    $periods[] = [
+                        'start' => $periodStart->format('Y-m-d'),
+                        'end' => $periodEnd->format('Y-m-d'),
+                        'label' => $periodStart->format('M Y'),
+                        'frequency' => 'monthly',
+                        'fiscal_year' => $currentYear,
+                        'fiscal_start' => $fiscalYearStart
+                    ];
+                }
+                break;
+        }
+
+        // If no periods were generated, create a simple default period
+        if (empty($periods)) {
+            \Log::warning('No periods generated, creating default period');
+            $periods[] = [
+                'start' => Carbon::create($currentYear, 1, 1)->format('Y-m-d'),
+                'end' => Carbon::create($currentYear, 12, 31)->format('Y-m-d'),
+                'label' => "FY {$currentYear} (Default)",
+                'frequency' => 'annually',
+                'fiscal_year' => $currentYear,
+                'fiscal_start' => 'JAN'
+            ];
+        }
+        
+        \Log::info('Final all periods generated:', [
+            'count' => count($periods),
+            'periods' => $periods
+        ]);
+
+        return collect($periods);
     }
 
     /**

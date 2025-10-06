@@ -128,13 +128,31 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (data.periods && data.periods.length > 0) {
                         let html = '<div class="space-y-2">';
                         data.periods.forEach((period, index) => {
-                            html += `<label class="flex items-center p-3 bg-gray-50 rounded border cursor-pointer hover:bg-orange-50 hover:border-orange-300 transition">
-                                        <input type="radio" name="selected_period" value="${index}" 
-                                               class="mr-3 text-orange-600 focus:ring-orange-500" 
-                                               onchange="selectPeriod('${period.start}', '${period.end}', '${period.frequency || 'annually'}', '${period.fiscal_year || new Date().getFullYear()}', '${period.fiscal_start || 'JAN'}')">
+                            const isExisting = period.is_existing;
+                            const isAvailable = period.is_available;
+                            
+                            // Different styling for existing vs available periods
+                            const labelClass = isExisting 
+                                ? 'flex items-center p-3 bg-gray-100 rounded border border-gray-300 cursor-not-allowed opacity-75'
+                                : 'flex items-center p-3 bg-gray-50 rounded border cursor-pointer hover:bg-orange-50 hover:border-orange-300 transition';
+                            
+                            const radioInput = isExisting
+                                ? `<input type="radio" name="selected_period" value="${index}" 
+                                         class="mr-3 text-gray-400" disabled>`
+                                : `<input type="radio" name="selected_period" value="${index}" 
+                                         class="mr-3 text-orange-600 focus:ring-orange-500" 
+                                         onchange="selectPeriod('${period.start}', '${period.end}', '${period.frequency || 'annually'}', '${period.fiscal_year || new Date().getFullYear()}', '${period.fiscal_start || 'JAN'}')">`;
+                            
+                            const statusText = isExisting 
+                                ? '<div class="text-xs text-gray-500 mt-1">✓ Already added</div>'
+                                : '<div class="text-xs text-green-600 mt-1">Available for selection</div>';
+                            
+                            html += `<label class="${labelClass}">
+                                        ${radioInput}
                                         <div class="flex-1">
                                             <div class="font-medium text-gray-900">${period.label}</div>
                                             <div class="text-sm text-gray-600">${period.start} to ${period.end}</div>
+                                            ${statusText}
                                         </div>
                                      </label>`;
                         });
