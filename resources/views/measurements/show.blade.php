@@ -294,7 +294,8 @@
                                         @php
                                             $existingData = $measurement->measurementData()
                                                 ->where('emission_source_id', $source->id)
-                                                ->first();
+                                                ->get()
+                                                ->keyBy('field_name');
                                         @endphp
                                         <tr class="hover:bg-gray-50">
                                             <td class="px-6 py-4">
