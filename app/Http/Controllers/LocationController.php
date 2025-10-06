@@ -263,7 +263,8 @@ class LocationController extends Controller
                 'new_reporting_period' => $location->reporting_period
             ]);
 
-            return redirect()->route('locations.index')->with('success', 'Location updated successfully!');
+            // DON'T REDIRECT - Show success on same page
+            return back()->with('success', 'Location updated successfully!');
             
         } catch (\Illuminate\Validation\ValidationException $e) {
             \Log::error('Validation error in location update', [
