@@ -208,6 +208,12 @@ class Measurement extends Model
         \Log::info("Final scope totals - Scope 1: {$scope1Co2e}, Scope 2: {$scope2Co2e}, Scope 3: {$scope3Co2e}, Total: {$totalCo2e}");
         
         // Update cached values using mass assignment
+        // Round all values in the sourceCo2e array to 6 decimal places
+        $roundedSourceCo2e = [];
+        foreach ($sourceCo2e as $sourceId => $co2e) {
+            $roundedSourceCo2e[$sourceId] = round($co2e, 6);
+        }
+        
         \Log::info("Before saving measurement ID: " . $this->id . 
                   " - Total: " . $totalCo2e . 
                   ", Scope 1: " . $scope1Co2e . 
@@ -215,11 +221,7 @@ class Measurement extends Model
                   ", Scope 3: " . $scope3Co2e . 
                   ", Sources: " . json_encode($sourceCo2e));
         
-        // Round all values in the sourceCo2e array to 6 decimal places
-        $roundedSourceCo2e = [];
-        foreach ($sourceCo2e as $sourceId => $co2e) {
-            $roundedSourceCo2e[$sourceId] = round($co2e, 6);
-        }
+        \Log::info("Rounded sources: " . json_encode($roundedSourceCo2e));
         
         $updateData = [
             'total_co2e' => $totalCo2e,
