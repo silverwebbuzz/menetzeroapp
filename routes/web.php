@@ -158,6 +158,27 @@ Route::middleware('auth')->group(function () {
         ]);
     })->name('debug.boundaries');
     
+    // Debug route to test available periods
+    Route::get('/debug/periods/{location}', function($locationId) {
+        $location = \App\Models\Location::find($locationId);
+        if (!$location) {
+            return 'Location not found';
+        }
+        
+        $controller = new \App\Http\Controllers\MeasurementController();
+        $periods = $controller->calculateAvailablePeriods($location);
+        
+        return response()->json([
+            'location_id' => $location->id,
+            'location_name' => $location->name,
+            'fiscal_year_start' => $location->fiscal_year_start,
+            'measurement_frequency' => $location->measurement_frequency,
+            'reporting_period' => $location->reporting_period,
+            'periods' => $periods->toArray(),
+            'existing_measurements' => \App\Models\Measurement::where('location_id', $location->id)->get(['id', 'period_start', 'period_end', 'frequency'])
+        ]);
+    })->name('debug.periods');
+    
     // Emission source calculation routes
     Route::get('/measurements/{measurement}/sources/{source}/calculate', [MeasurementController::class, 'calculateSource'])->name('measurements.calculate-source');
     Route::post('/measurements/{measurement}/sources/{source}/calculate', [MeasurementController::class, 'storeSourceData'])->name('measurements.store-source-data');

@@ -565,8 +565,8 @@ class MeasurementController extends Controller
 
         return collect($periods)->filter(function($period) use ($existingPeriods) {
             return !$existingPeriods->contains(function($existing) use ($period) {
-                return $existing['start']->format('Y-m-d') === $period['start']->format('Y-m-d') &&
-                       $existing['end']->format('Y-m-d') === $period['end']->format('Y-m-d');
+                return $existing['start']->format('Y-m-d') === $period['start'] &&
+                       $existing['end']->format('Y-m-d') === $period['end'];
             });
         })->values();
     }
