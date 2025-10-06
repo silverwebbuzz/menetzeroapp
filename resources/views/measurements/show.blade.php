@@ -200,7 +200,7 @@
         <!-- Emissions Summary Card -->
         <div class="bg-gradient-to-r from-teal-500 to-teal-600 rounded-lg shadow-sm p-6 text-white">
             <h3 class="text-sm font-medium text-teal-100 mb-2">Emissions Calculations</h3>
-            <div class="text-3xl font-bold">0.00t</div>
+            <div class="text-3xl font-bold">{{ number_format($measurement->total_co2e ?? 0, 2) }}t</div>
             <div class="text-sm text-teal-100">CO2e</div>
         </div>
     </div>
@@ -268,7 +268,7 @@
                         </div>
                         <div class="flex items-center">
                             <span class="text-sm text-gray-600 mr-2">Total Scope Emissions</span>
-                            <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium">0.00 CO₂e</span>
+                            <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium">{{ number_format($measurement->getCo2eByScope('Scope 1'), 2) }} CO₂e</span>
                             <button class="ml-2 text-orange-500 hover:text-orange-600">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>

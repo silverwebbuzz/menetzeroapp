@@ -145,6 +145,8 @@ class Measurement extends Model
      */
     public function calculateAndCacheCo2e()
     {
+        \Log::info("Starting CO2e calculation for measurement ID: " . $this->id);
+        
         $scope1Co2e = 0;
         $scope2Co2e = 0;
         $scope3Co2e = 0;
@@ -191,15 +193,19 @@ class Measurement extends Model
         
         $totalCo2e = $scope1Co2e + $scope2Co2e + $scope3Co2e;
         
-        // Update cached values
-        $this->update([
-            'total_co2e' => $totalCo2e,
-            'scope_1_co2e' => $scope1Co2e,
-            'scope_2_co2e' => $scope2Co2e,
-            'scope_3_co2e' => $scope3Co2e,
-            'emission_source_co2e' => $sourceCo2e,
-            'co2e_calculated_at' => now(),
-        ]);
+        // Update cached values directly
+        $this->total_co2e = $totalCo2e;
+        $this->scope_1_co2e = $scope1Co2e;
+        $this->scope_2_co2e = $scope2Co2e;
+        $this->scope_3_co2e = $scope3Co2e;
+        $this->emission_source_co2e = $sourceCo2e;
+        $this->co2e_calculated_at = now();
+        $this->save();
+        
+        \Log::info("CO2e calculation completed for measurement ID: " . $this->id . 
+                  " - Total: " . $totalCo2e . 
+                  ", Scope 1: " . $scope1Co2e . 
+                  ", Sources: " . json_encode($sourceCo2e));
         
         return [
             'total' => $totalCo2e,
