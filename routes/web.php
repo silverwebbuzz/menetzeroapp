@@ -4,8 +4,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\EmissionFormController;
-use App\Http\Controllers\EmissionManagementController;
 use App\Http\Controllers\CompanySetupController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LocationController;

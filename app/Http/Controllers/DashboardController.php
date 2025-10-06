@@ -3,20 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\EmissionSource;
+use App\Models\EmissionSourceMaster;
 use App\Models\Company;
 use App\Models\Facility;
-use App\Services\CarbonCalculatorService;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    protected $carbonCalculator;
-
-    public function __construct(CarbonCalculatorService $carbonCalculator)
-    {
-        $this->carbonCalculator = $carbonCalculator;
-    }
 
     public function index()
     {
@@ -35,7 +28,7 @@ class DashboardController extends Controller
         }
         
         // Get all emission sources for the user's company
-        $emissionSources = EmissionSource::where('company_name', $user->company->name ?? 'Unknown')
+        $emissionSources = EmissionSourceMaster::where('is_active', true)
             ->orderBy('created_at', 'desc')
             ->get();
 
