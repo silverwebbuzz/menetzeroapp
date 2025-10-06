@@ -26,12 +26,6 @@ class Measurement extends Model
         'staff_count',
         'staff_work_from_home',
         'work_from_home_percentage',
-        'total_co2e',
-        'scope_1_co2e',
-        'scope_2_co2e',
-        'scope_3_co2e',
-        'co2e_calculated_at',
-        'emission_source_co2e',
     ];
 
     protected $casts = [
@@ -40,12 +34,6 @@ class Measurement extends Model
         'metadata' => 'array',
         'staff_work_from_home' => 'boolean',
         'work_from_home_percentage' => 'decimal:2',
-        'total_co2e' => 'decimal:6',
-        'scope_1_co2e' => 'decimal:6',
-        'scope_2_co2e' => 'decimal:6',
-        'scope_3_co2e' => 'decimal:6',
-        'co2e_calculated_at' => 'datetime',
-        'emission_source_co2e' => 'array',
     ];
 
     /**
@@ -120,35 +108,42 @@ class Measurement extends Model
     }
 
     /**
-     * Get total CO2e for this measurement (cached)
+     * Get total CO2e for this measurement (calculated directly)
      */
     public function getTotalCo2eAttribute()
     {
-        return $this->total_co2e ?? 0;
+        $totalCo2e = 0;
+        
+        // Get all measurement data grouped by emission source
+        $measurementData = $this->measurementData()
+            ->with('emissionSource')
+            ->get()
+            ->groupBy('emission_source_id');
+        
+        foreach ($measurementData as $emissionSourceId => $data) {
+            // Get quantity from the data
+            $quantityData = $data->where('field_name', 'quantity')->first();
+            if ($quantityData) {
+                $quantity = (float) $quantityData->field_value;
+                
+                // Get emission factor for this source
+                $emissionFactor = \App\Models\EmissionFactor::getBestFactor($emissionSourceId, 'UAE', $this->fiscal_year);
+                if ($emissionFactor) {
+                    $co2e = $quantity * $emissionFactor->factor_value;
+                    $totalCo2e += round($co2e, 6);
+                }
+            }
+        }
+        
+        return round($totalCo2e, 6);
     }
 
     /**
-     * Get CO2e by scope (cached)
+     * Get CO2e by scope (calculated directly)
      */
     public function getCo2eByScope($scope)
     {
-        return match($scope) {
-            'Scope 1' => $this->scope_1_co2e ?? 0,
-            'Scope 2' => $this->scope_2_co2e ?? 0,
-            'Scope 3' => $this->scope_3_co2e ?? 0,
-            default => 0
-        };
-    }
-
-    /**
-     * Calculate and cache CO2e values
-     */
-    public function calculateAndCacheCo2e()
-    {
-        $scope1Co2e = 0;
-        $scope2Co2e = 0;
-        $scope3Co2e = 0;
-        $sourceCo2e = []; // Store individual source CO2e values
+        $scopeCo2e = 0;
         
         // Get all measurement data grouped by emission source
         $measurementData = $this->measurementData()
@@ -167,74 +162,43 @@ class Measurement extends Model
                 if ($emissionFactor) {
                     $co2e = $quantity * $emissionFactor->factor_value;
                     
-                    // Round to 6 decimal places to match database precision
-                    $co2e = round($co2e, 6);
-                    
-                    // Store individual source CO2e
-                    $sourceCo2e[$emissionSourceId] = $co2e;
-                    
                     // Get emission source scope
                     $emissionSource = $data->first()->emissionSource;
-                    if ($emissionSource) {
-                        switch ($emissionSource->scope) {
-                            case 'Scope 1':
-                                $scope1Co2e += $co2e;
-                                break;
-                            case 'Scope 2':
-                                $scope2Co2e += $co2e;
-                                break;
-                            case 'Scope 3':
-                                $scope3Co2e += $co2e;
-                                break;
-                        }
+                    if ($emissionSource && $emissionSource->scope === $scope) {
+                        $scopeCo2e += round($co2e, 6);
                     }
                 }
             }
         }
         
-        $totalCo2e = $scope1Co2e + $scope2Co2e + $scope3Co2e;
-        
-        // Round all totals to 6 decimal places to match database precision
-        $scope1Co2e = round($scope1Co2e, 6);
-        $scope2Co2e = round($scope2Co2e, 6);
-        $scope3Co2e = round($scope3Co2e, 6);
-        $totalCo2e = round($totalCo2e, 6);
-        
-        // Update cached values using mass assignment
-        // Round all values in the sourceCo2e array to 6 decimal places
-        $roundedSourceCo2e = [];
-        foreach ($sourceCo2e as $sourceId => $co2e) {
-            $roundedSourceCo2e[$sourceId] = round($co2e, 6);
-        }
-        
-        
-        $updateData = [
-            'total_co2e' => $totalCo2e,
-            'scope_1_co2e' => $scope1Co2e,
-            'scope_2_co2e' => $scope2Co2e,
-            'scope_3_co2e' => $scope3Co2e,
-            'emission_source_co2e' => $roundedSourceCo2e,
-            'co2e_calculated_at' => now(),
-        ];
-        
-        $this->update($updateData);
-        
-        return [
-            'total' => $totalCo2e,
-            'scope_1' => $scope1Co2e,
-            'scope_2' => $scope2Co2e,
-            'scope_3' => $scope3Co2e,
-            'sources' => $sourceCo2e,
-        ];
+        return round($scopeCo2e, 6);
     }
 
     /**
-     * Get CO2e for a specific emission source (cached)
+     * Get CO2e for a specific emission source (calculated directly)
      */
     public function getSourceCo2e($emissionSourceId)
     {
-        $sourceCo2e = $this->emission_source_co2e ?? [];
-        return $sourceCo2e[$emissionSourceId] ?? 0;
+        // Get measurement data for this specific source
+        $data = $this->measurementData()
+            ->where('emission_source_id', $emissionSourceId)
+            ->get()
+            ->keyBy('field_name');
+        
+        // Get quantity from the data
+        $quantityData = $data->where('field_name', 'quantity')->first();
+        if ($quantityData) {
+            $quantity = (float) $quantityData->field_value;
+            
+            // Get emission factor for this source
+            $emissionFactor = \App\Models\EmissionFactor::getBestFactor($emissionSourceId, 'UAE', $this->fiscal_year);
+            if ($emissionFactor) {
+                $co2e = $quantity * $emissionFactor->factor_value;
+                return round($co2e, 6);
+            }
+        }
+        
+        return 0;
     }
 
     /**
