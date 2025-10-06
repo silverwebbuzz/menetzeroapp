@@ -104,12 +104,12 @@
                         </div>
                     </div>
 
-                    <!-- Years Container - Horizontal Layout -->
+                    <!-- Years Container - Vertical Listing -->
                     <div class="p-6">
-                        <div class="flex flex-wrap gap-6">
+                        <div class="space-y-6">
                             @foreach($yearGroups as $year => $yearMeasurements)
-                                <!-- Year Section - Horizontal Card -->
-                                <div class="flex-1 min-w-0 border border-gray-200 rounded-lg overflow-hidden" style="min-width: 400px;">
+                                <!-- Year Section -->
+                                <div class="border border-gray-200 rounded-lg overflow-hidden">
                                     <!-- Year Header -->
                                     <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
                                         <div class="flex items-center justify-between">
@@ -123,75 +123,82 @@
                                         </div>
                                     </div>
 
-                                    <!-- Measurements List - Horizontal -->
-                                    <div class="p-4">
-                                        <div class="overflow-x-auto">
-                                            <div class="flex space-x-4 pb-4" style="min-width: max-content;">
-                                                @foreach($yearMeasurements as $measurement)
-                                                    <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow flex-shrink-0" style="min-width: 280px;">
-                                                        <!-- Period -->
-                                                        <div class="mb-3">
-                                                            <div class="text-sm font-medium text-gray-900">
-                                                                {{ $measurement->period_start->format('M d') }} - {{ $measurement->period_end->format('M d, Y') }}
-                                                            </div>
-                                                            <div class="text-xs text-gray-500">
-                                                                {{ ucfirst(str_replace('_', ' ', $measurement->frequency)) }}
+                                    <!-- Measurements List - Full Width Listing -->
+                                    <div class="bg-white">
+                                        @foreach($yearMeasurements as $index => $measurement)
+                                            <div class="border-b border-gray-100 last:border-b-0">
+                                                <div class="px-4 py-4 hover:bg-gray-50 transition-colors">
+                                                    <div class="flex items-center justify-between">
+                                                        <!-- Left Side - Period Info -->
+                                                        <div class="flex-1">
+                                                            <div class="flex items-center space-x-6">
+                                                                <!-- Period -->
+                                                                <div class="min-w-0 flex-1">
+                                                                    <div class="text-sm font-medium text-gray-900">
+                                                                        {{ $measurement->period_start->format('M d') }} - {{ $measurement->period_end->format('M d, Y') }}
+                                                                    </div>
+                                                                    <div class="text-xs text-gray-500">
+                                                                        {{ ucfirst(str_replace('_', ' ', $measurement->frequency)) }}
+                                                                    </div>
+                                                                </div>
+
+                                                                <!-- Status -->
+                                                                <div class="flex-shrink-0">
+                                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                                                        @if($measurement->status === 'draft') bg-gray-100 text-gray-800
+                                                                        @elseif($measurement->status === 'submitted') bg-blue-100 text-blue-800
+                                                                        @elseif($measurement->status === 'under_review') bg-yellow-100 text-yellow-800
+                                                                        @elseif($measurement->status === 'not_verified') bg-red-100 text-red-800
+                                                                        @elseif($measurement->status === 'verified') bg-green-100 text-green-800
+                                                                        @endif">
+                                                                        {{ ucfirst(str_replace('_', ' ', $measurement->status)) }}
+                                                                    </span>
+                                                                </div>
+
+                                                                <!-- CO2e -->
+                                                                <div class="flex-shrink-0 text-right">
+                                                                    <div class="text-sm text-gray-600">Total CO2e</div>
+                                                                    <div class="text-sm font-bold text-orange-600">
+                                                                        {{ number_format($measurement->total_co2e, 2) }} kg
+                                                                    </div>
+                                                                </div>
+
+                                                                <!-- Data Points -->
+                                                                <div class="flex-shrink-0 text-right">
+                                                                    <div class="text-xs text-gray-500">
+                                                                        {{ $measurement->measurementData->count() }} data point(s)
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
 
-                                                        <!-- Status -->
-                                                        <div class="mb-3">
-                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                                @if($measurement->status === 'draft') bg-gray-100 text-gray-800
-                                                                @elseif($measurement->status === 'submitted') bg-blue-100 text-blue-800
-                                                                @elseif($measurement->status === 'under_review') bg-yellow-100 text-yellow-800
-                                                                @elseif($measurement->status === 'not_verified') bg-red-100 text-red-800
-                                                                @elseif($measurement->status === 'verified') bg-green-100 text-green-800
-                                                                @endif">
-                                                                {{ ucfirst(str_replace('_', ' ', $measurement->status)) }}
-                                                            </span>
-                                                        </div>
-
-                                                        <!-- CO2e -->
-                                                        <div class="mb-3">
-                                                            <div class="text-sm text-gray-600">Total CO2e</div>
-                                                            <div class="text-lg font-bold text-orange-600">
-                                                                {{ number_format($measurement->total_co2e, 2) }} kg
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Data Points -->
-                                                        <div class="mb-4">
-                                                            <div class="text-xs text-gray-500">
-                                                                {{ $measurement->measurementData->count() }} data point(s)
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Actions -->
-                                                        <div class="flex justify-between items-center">
-                                                            <a href="{{ route('measurements.show', $measurement) }}" 
-                                                               class="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-                                                                View
-                                                            </a>
-                                                            @if($measurement->canBeEdited())
-                                                                <a href="{{ route('measurements.edit', $measurement) }}" 
-                                                                   class="px-3 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700 transition">
-                                                                    Edit
+                                                        <!-- Right Side - Actions -->
+                                                        <div class="flex-shrink-0 ml-4">
+                                                            <div class="flex items-center space-x-2">
+                                                                <a href="{{ route('measurements.show', $measurement) }}" 
+                                                                   class="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                                                                    View
                                                                 </a>
-                                                            @endif
-                                                            @if($measurement->canBeSubmitted())
-                                                                <form method="POST" action="{{ route('measurements.submit', $measurement) }}" class="inline">
-                                                                    @csrf
-                                                                    <button type="submit" class="px-3 py-1 text-xs bg-orange-600 text-white rounded hover:bg-orange-700 transition">
-                                                                        Submit
-                                                                    </button>
-                                                                </form>
-                                                            @endif
+                                                                @if($measurement->canBeEdited())
+                                                                    <a href="{{ route('measurements.edit', $measurement) }}" 
+                                                                       class="px-3 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700 transition">
+                                                                        Edit
+                                                                    </a>
+                                                                @endif
+                                                                @if($measurement->canBeSubmitted())
+                                                                    <form method="POST" action="{{ route('measurements.submit', $measurement) }}" class="inline">
+                                                                        @csrf
+                                                                        <button type="submit" class="px-3 py-1 text-xs bg-orange-600 text-white rounded hover:bg-orange-700 transition">
+                                                                            Submit
+                                                                        </button>
+                                                                    </form>
+                                                                @endif
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                @endforeach
+                                                </div>
                                             </div>
-                                        </div>
+                                        @endforeach
                                     </div>
                                 </div>
                             @endforeach
