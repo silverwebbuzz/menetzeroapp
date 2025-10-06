@@ -64,7 +64,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/locations/{location}/emission-boundaries', [EmissionBoundaryController::class, 'store'])->name('emission-boundaries.store');
     
     // Measurements routes (replacing old emission form)
-    Route::resource('measurements', MeasurementController::class)->except(['create', 'store']);
+    Route::resource('measurements', MeasurementController::class)->except(['create', 'store', 'edit']);
     Route::post('/measurements/{measurement}/submit', [MeasurementController::class, 'submit'])->name('measurements.submit');
     
     // Debug route to test measurement show
