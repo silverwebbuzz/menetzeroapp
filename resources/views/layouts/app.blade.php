@@ -38,7 +38,15 @@
             <!-- Sidebar -->
             <div class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out" id="sidebar">
                 <div class="flex items-center justify-center h-16 px-4 bg-eco-green">
-                    <h1 class="text-xl font-bold text-white">CarbonTracker</h1>
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+                            <span class="text-teal-600 font-bold text-sm">ME</span>
+                        </div>
+                        <div class="text-white">
+                            <div class="text-xs font-medium leading-tight">MIDDLE EAST</div>
+                            <div class="text-sm font-bold leading-tight">NET Zero</div>
+                        </div>
+                    </div>
                 </div>
                 
                 <nav class="mt-8 px-4">

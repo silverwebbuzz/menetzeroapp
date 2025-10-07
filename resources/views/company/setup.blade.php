@@ -25,7 +25,12 @@
         <div class="flex items-center justify-center p-8">
             <div class="w-full max-w-2xl">
                 <div class="mb-8">
-                    <div class="h-9 w-28 rounded bg-emerald-600/10 text-emerald-700 flex items-center justify-center font-semibold mb-4">MenetZero</div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">ME</span>
+                        </div>
+                        <div class="text-lg font-semibold text-gray-900">MIDDLE EAST NET Zero</div>
+                    </div>
                     <h1 class="text-3xl font-semibold text-gray-900">Welcome {{ auth()->user()->name }}!</h1>
                     <p class="mt-2 text-sm text-gray-600">Please complete your business profile to get started with carbon tracking.</p>
                 </div>

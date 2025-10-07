@@ -24,7 +24,12 @@
         <div class="flex items-center justify-center p-8">
             <div class="w-full max-w-md">
                 <div class="mb-10">
-                    <div class="h-9 w-28 rounded bg-emerald-600/10 text-emerald-700 flex items-center justify-center font-semibold">MenetZero</div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">ME</span>
+                        </div>
+                        <div class="text-lg font-semibold text-gray-900">MIDDLE EAST NET Zero</div>
+                    </div>
                 </div>
                 <h1 class="text-3xl font-semibold text-gray-900">Sign up for MenetZero</h1>
                 <p class="mt-2 text-sm text-gray-600">Measure your organization’s carbon footprint with ease.</p>

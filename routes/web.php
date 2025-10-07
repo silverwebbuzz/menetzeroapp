@@ -10,6 +10,7 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\EmissionBoundaryController;
 use App\Http\Controllers\MeasurementController;
 use App\Http\Controllers\Auth\OAuthController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -38,12 +39,20 @@ Route::post('/login', function (\Illuminate\Http\Request $request) {
 
 Route::post('/logout', function () {
     auth()->logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
     return redirect('/');
 })->name('logout');
 
 // OAuth routes
 Route::get('/auth/google', [OAuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/auth/google/callback', [OAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+
+// Password reset routes
+Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgotPasswordForm'])->name('password.request');
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [ForgotPasswordController::class, 'reset'])->name('password.update');
 
 // Company setup routes (accessible after registration)
 Route::middleware('auth')->group(function () {

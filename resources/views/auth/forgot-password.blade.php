@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - MenetZero</title>
+    <title>Forgot Password - MenetZero</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -31,55 +31,43 @@
                         <div class="text-lg font-semibold text-gray-900">MIDDLE EAST NET Zero</div>
                     </div>
                 </div>
-                <h1 class="text-3xl font-semibold text-gray-900">Welcome back!</h1>
-                <p class="mt-2 text-sm text-gray-600">Sign in to MenetZero’s platform.</p>
+                <h1 class="text-3xl font-semibold text-gray-900">Forgot Password?</h1>
+                <p class="mt-2 text-sm text-gray-600">No worries, we'll send you reset instructions.</p>
 
-                <div class="mt-8">
-                    <a class="btn-neutral rounded-xl px-6 py-3 flex items-center justify-center gap-3 text-gray-700 hover:bg-gray-50 transition-colors w-full" href="{{ route('auth.google') }}">
-                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="" class="w-5 h-5"> 
-                        <span class="font-medium">Continue with Google</span>
-                    </a>
-                </div>
+                @if (session('status'))
+                    <div class="mt-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+                        {{ session('status') }}
+                    </div>
+                @endif
 
-                <div class="my-6 flex items-center gap-4 text-xs text-gray-400">
-                    <div class="h-px flex-1 bg-gray-200"></div>
-                    or
-                    <div class="h-px flex-1 bg-gray-200"></div>
-                </div>
-
-                <form class="space-y-4" method="POST" action="{{ route('login.post') }}">
+                <form class="mt-8 space-y-4" method="POST" action="{{ route('password.email') }}">
                     @csrf
                     <div>
                         <label class="block text-sm text-gray-600 mb-1">Business Email</label>
                         <input class="input" type="email" name="email" value="{{ old('email') }}" required placeholder="Enter your email...">
+                        @error('email')
+                            <p class="text-sm text-rose-600 mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
-                    <div>
-                        <div class="flex items-center justify-between mb-1">
-                            <label class="block text-sm text-gray-600">Password</label>
-                            <a href="{{ route('password.request') }}" class="text-xs text-emerald-700 hover:underline">Forgot Password?</a>
-                        </div>
-                        <input class="input" type="password" name="password" required placeholder="Enter your password...">
-                    </div>
-                    @if($errors->any())
-                        <p class="text-sm text-rose-600">{{ $errors->first() }}</p>
-                    @endif
-                    <button type="submit" class="btn-primary w-full rounded-xl py-3 font-medium">Login</button>
+
+                    <button type="submit" class="btn-primary w-full rounded-xl py-3 font-medium">Send Reset Link</button>
                 </form>
 
-                <p class="mt-6 text-sm text-gray-600">Don't have an account? <a href="{{ route('register') }}" class="text-emerald-700 font-medium">Sign up</a></p>
+                <div class="mt-6 text-center">
+                    <a href="{{ route('login') }}" class="text-sm text-emerald-700 hover:underline">Back to Login</a>
+                </div>
             </div>
         </div>
 
         <div class="relative brand-gradient text-white">
-            <div class="absolute inset-0" aria-hidden="true"></div>
             <div class="relative h-full w-full flex items-center justify-center p-8">
                 <div class="glass rounded-3xl p-8 w-full max-w-2xl">
-                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-sm">Meet MenetZero’s platform</span>
+                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-sm">Secure Password Reset</span>
                     <ul class="mt-6 space-y-4 text-white/90">
-                        <li class="flex gap-3"><span>✓</span> Understand your emissions</li>
-                        <li class="flex gap-3"><span>✓</span> Identify carbon hotspots</li>
-                        <li class="flex gap-3"><span>✓</span> Simulate and compare reductions</li>
-                        <li class="flex gap-3"><span>✓</span> Make confident low-carbon decisions</li>
+                        <li class="flex gap-3"><span>✓</span> Secure password reset process</li>
+                        <li class="flex gap-3"><span>✓</span> Email verification required</li>
+                        <li class="flex gap-3"><span>✓</span> Quick and easy recovery</li>
+                        <li class="flex gap-3"><span>✓</span> Your account stays protected</li>
                     </ul>
                 </div>
             </div>
@@ -87,5 +75,3 @@
     </div>
 </body>
 </html>
-
-
