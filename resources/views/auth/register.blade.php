@@ -30,10 +30,10 @@
                 <p class="mt-2 text-sm text-gray-600">Measure your organization’s carbon footprint with ease.</p>
 
                 <div class="mt-8 grid grid-cols-2 gap-3">
-                    <a class="btn-neutral rounded-xl px-4 py-2.5 flex items-center justify-center gap-2 text-gray-700" href="#">
+                    <a class="btn-neutral rounded-xl px-4 py-2.5 flex items-center justify-center gap-2 text-gray-700 hover:bg-gray-50 transition-colors" href="{{ route('auth.google') }}">
                         <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="" class="w-5 h-5"> Google
                     </a>
-                    <a class="btn-neutral rounded-xl px-4 py-2.5 flex items-center justify-center gap-2 text-gray-700" href="#">
+                    <a class="btn-neutral rounded-xl px-4 py-2.5 flex items-center justify-center gap-2 text-gray-700 hover:bg-gray-50 transition-colors" href="#" onclick="alert('Microsoft login coming soon!')">
                         <img src="https://www.svgrepo.com/show/452093/microsoft.svg" alt="" class="w-5 h-5"> Microsoft
                     </a>
                 </div>

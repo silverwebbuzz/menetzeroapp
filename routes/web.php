@@ -9,6 +9,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\EmissionBoundaryController;
 use App\Http\Controllers\MeasurementController;
+use App\Http\Controllers\Auth\OAuthController;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -39,6 +40,10 @@ Route::post('/logout', function () {
     auth()->logout();
     return redirect('/');
 })->name('logout');
+
+// OAuth routes
+Route::get('/auth/google', [OAuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [OAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
 // Company setup routes (accessible after registration)
 Route::middleware('auth')->group(function () {
