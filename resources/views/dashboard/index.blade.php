@@ -1,38 +1,30 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard - MenetZero')
+@section('title', 'Dashboard - MIDDLE EAST NET Zero')
 @section('page-title', 'Dashboard')
 
 @section('content')
 @if(isset($needsCompanySetup) && $needsCompanySetup)
     <!-- Profile Completion Message -->
-    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-8 text-center">
-        <div class="max-w-2xl mx-auto">
-            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+    <x-card title="Complete Your Business Profile" subtitle="To get started with carbon tracking, please complete your business profile. This helps us provide accurate emissions data and industry-specific insights.">
+        <div class="text-center">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
             </div>
-            <h2 class="text-2xl font-semibold text-gray-900 mb-2">Complete Your Business Profile</h2>
-            <p class="text-gray-600 mb-6">To get started with carbon tracking, please complete your business profile. This helps us provide accurate emissions data and industry-specific insights.</p>
-            <div class="flex justify-center">
-                <a href="{{ route('company.setup') }}" class="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-white font-semibold bg-emerald-600 hover:bg-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl">
+            <div class="flex justify-center mb-4">
+                <a href="{{ route('company.setup') }}" class="btn btn-primary btn-lg">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                     Complete Business Profile
                 </a>
             </div>
-            <p class="text-sm text-gray-500 mt-4">Complete your business profile to unlock full carbon tracking features.</p>
+            <p class="text-sm text-gray-500">Complete your business profile to unlock full carbon tracking features.</p>
         </div>
-    </div>
+    </x-card>
 @else
-<style>
-    :root { --brand:#004D40; --accent:#26A69A; --bg:#F9FAFB; }
-    .card { border:1px solid #e5e7eb; border-radius:1rem; background:#fff; box-shadow:0 10px 20px -10px rgba(0,0,0,.08); transition: box-shadow .25s ease, transform .25s ease; }
-    .card:hover { box-shadow:0 16px 28px -12px rgba(0,0,0,.12); transform: translateY(-1px); }
-    .chip { display:inline-flex; align-items:center; gap:.5rem; padding:.25rem .5rem; border-radius:9999px; font-size:.75rem; border:1px solid #e5e7eb; }
-</style>
 
 <div class="space-y-8">
     <!-- Header with Quick Actions -->
@@ -42,7 +34,7 @@
             <p class="text-sm text-gray-500">Welcome back, {{ auth()->user()->name }}</p>
         </div>
         <div class="flex gap-3">
-            <a href="{{ route('locations.index') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-white bg-[color:var(--brand)] hover:bg-[color:var(--brand)]/90 transition">
+            <a href="{{ route('locations.index') }}" class="btn btn-primary">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
                 Manage Locations
             </a>

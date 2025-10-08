@@ -7,17 +7,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('css/design-system.css') }}">
     <style>
-        body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
-        .brand-gradient { background-image: radial-gradient(1200px 600px at 80% 20%, rgba(16,185,129,.25), rgba(16,185,129,0)), linear-gradient(135deg, #0ea5a3 0%, #10b981 100%); }
-        .glass { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); backdrop-filter: blur(10px); }
-        .btn-primary { background-color:#10b981; color:#fff; }
-        .btn-primary:hover { background-color:#0ea5a3; }
-        .btn-neutral { background:#f8fafc; border:1px solid #e5e7eb; }
-        .btn-neutral:hover { background:#f1f5f9; }
-        .input { width:100%; padding:.75rem 1rem; border:1px solid #e5e7eb; border-radius:.75rem; outline:none; }
-        .input:focus { border-color:#10b981; box-shadow:0 0 0 4px rgba(16,185,129,.15); }
-        .step-indicator { background: linear-gradient(90deg, #10b981 0%, #0ea5a3 100%); }
+        .step-indicator { background: linear-gradient(90deg, var(--brand-secondary) 0%, var(--brand-primary) 100%); }
     </style>
 </head>
 <body class="min-h-screen">
@@ -25,12 +17,7 @@
         <div class="flex items-center justify-center p-8">
             <div class="w-full max-w-2xl">
                 <div class="mb-8">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center">
-                            <span class="text-white font-bold text-sm">ME</span>
-                        </div>
-                        <div class="text-lg font-semibold text-gray-900">MIDDLE EAST NET Zero</div>
-                    </div>
+                    @include('components.brand-logo')
                     <h1 class="text-3xl font-semibold text-gray-900">Welcome {{ auth()->user()->name }}!</h1>
                     <p class="mt-2 text-sm text-gray-600">Please complete your business profile to get started with carbon tracking.</p>
                 </div>
@@ -52,7 +39,7 @@
                 </div>
 
                 @if(session('success'))
-                    <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
+                    <div class="alert alert-success mb-6">
                         {{ session('success') }}
                     </div>
                 @endif
@@ -61,97 +48,101 @@
                     @csrf
                     
                     <!-- Business Information -->
-                    <div class="bg-gray-50 rounded-xl p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Business Information</h3>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Business Name *</label>
-                                <input class="input" name="company_name" type="text" value="{{ old('company_name') }}" required placeholder="Enter your business name">
-                                @error('company_name')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
-                            </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-6">Business Information</h3>
                             
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Business Email</label>
-                                <input class="input" name="business_email" type="email" value="{{ old('business_email', auth()->user()->email) }}" placeholder="business@company.com">
-                                @error('business_email')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="form-group">
+                                    <label class="form-label">Business Name *</label>
+                                    <input class="form-input" name="company_name" type="text" value="{{ old('company_name') }}" required placeholder="Enter your business name">
+                                    @error('company_name')<p class="form-error">{{ $message }}</p>@enderror
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Business Email</label>
+                                    <input class="form-input" name="business_email" type="email" value="{{ old('business_email', auth()->user()->email) }}" placeholder="business@company.com">
+                                    @error('business_email')<p class="form-error">{{ $message }}</p>@enderror
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Business Website</label>
-                                <input class="input" name="business_website" type="url" value="{{ old('business_website') }}" placeholder="https://www.company.com">
-                                @error('business_website')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                                <div class="form-group">
+                                    <label class="form-label">Business Website</label>
+                                    <input class="form-input" name="business_website" type="url" value="{{ old('business_website') }}" placeholder="https://www.company.com">
+                                    @error('business_website')<p class="form-error">{{ $message }}</p>@enderror
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Country</label>
+                                    <select class="form-input form-select" name="country">
+                                        <option value="">Select Country</option>
+                                        <option value="UAE" {{ old('country') == 'UAE' ? 'selected' : '' }}>United Arab Emirates</option>
+                                        <option value="SA" {{ old('country') == 'SA' ? 'selected' : '' }}>Saudi Arabia</option>
+                                        <option value="KW" {{ old('country') == 'KW' ? 'selected' : '' }}>Kuwait</option>
+                                        <option value="QA" {{ old('country') == 'QA' ? 'selected' : '' }}>Qatar</option>
+                                        <option value="BH" {{ old('country') == 'BH' ? 'selected' : '' }}>Bahrain</option>
+                                        <option value="OM" {{ old('country') == 'OM' ? 'selected' : '' }}>Oman</option>
+                                        <option value="US" {{ old('country') == 'US' ? 'selected' : '' }}>United States</option>
+                                        <option value="UK" {{ old('country') == 'UK' ? 'selected' : '' }}>United Kingdom</option>
+                                        <option value="IN" {{ old('country') == 'IN' ? 'selected' : '' }}>India</option>
+                                        <option value="Other" {{ old('country') == 'Other' ? 'selected' : '' }}>Other</option>
+                                    </select>
+                                    @error('country')<p class="form-error">{{ $message }}</p>@enderror
+                                </div>
                             </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Country</label>
-                                <select class="input" name="country">
-                                    <option value="">Select Country</option>
-                                    <option value="UAE" {{ old('country') == 'UAE' ? 'selected' : '' }}>United Arab Emirates</option>
-                                    <option value="SA" {{ old('country') == 'SA' ? 'selected' : '' }}>Saudi Arabia</option>
-                                    <option value="KW" {{ old('country') == 'KW' ? 'selected' : '' }}>Kuwait</option>
-                                    <option value="QA" {{ old('country') == 'QA' ? 'selected' : '' }}>Qatar</option>
-                                    <option value="BH" {{ old('country') == 'BH' ? 'selected' : '' }}>Bahrain</option>
-                                    <option value="OM" {{ old('country') == 'OM' ? 'selected' : '' }}>Oman</option>
-                                    <option value="US" {{ old('country') == 'US' ? 'selected' : '' }}>United States</option>
-                                    <option value="UK" {{ old('country') == 'UK' ? 'selected' : '' }}>United Kingdom</option>
-                                    <option value="IN" {{ old('country') == 'IN' ? 'selected' : '' }}>India</option>
-                                    <option value="Other" {{ old('country') == 'Other' ? 'selected' : '' }}>Other</option>
-                                </select>
-                                @error('country')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
-                            </div>
-                        </div>
 
-                        <div class="mt-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Business Address</label>
-                            <textarea class="input" name="business_address" rows="3" placeholder="Enter your registered business address">{{ old('business_address') }}</textarea>
-                            @error('business_address')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
+                            <div class="form-group mt-6">
+                                <label class="form-label">Business Address</label>
+                                <textarea class="form-input form-textarea" name="business_address" rows="3" placeholder="Enter your registered business address">{{ old('business_address') }}</textarea>
+                                @error('business_address')<p class="form-error">{{ $message }}</p>@enderror
+                            </div>
                         </div>
                     </div>
 
                     <!-- Business Details -->
-                    <div class="bg-gray-50 rounded-xl p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Business Details</h3>
-                        <p class="text-sm text-gray-600 mb-4">Describe briefly what your business does.</p>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Business Category</label>
-                                <select class="input" name="business_category">
-                                    <option value="">Select Category</option>
-                                    <option value="Technology" {{ old('business_category') == 'Technology' ? 'selected' : '' }}>Technology</option>
-                                    <option value="Manufacturing" {{ old('business_category') == 'Manufacturing' ? 'selected' : '' }}>Manufacturing</option>
-                                    <option value="Construction" {{ old('business_category') == 'Construction' ? 'selected' : '' }}>Construction</option>
-                                    <option value="Healthcare" {{ old('business_category') == 'Healthcare' ? 'selected' : '' }}>Healthcare</option>
-                                    <option value="Finance" {{ old('business_category') == 'Finance' ? 'selected' : '' }}>Finance</option>
-                                    <option value="Retail" {{ old('business_category') == 'Retail' ? 'selected' : '' }}>Retail</option>
-                                    <option value="Energy" {{ old('business_category') == 'Energy' ? 'selected' : '' }}>Energy</option>
-                                    <option value="Transportation" {{ old('business_category') == 'Transportation' ? 'selected' : '' }}>Transportation</option>
-                                    <option value="Other" {{ old('business_category') == 'Other' ? 'selected' : '' }}>Other</option>
-                                </select>
-                                @error('business_category')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
-                            </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">Business Details</h3>
+                            <p class="text-sm text-gray-600 mb-6">Describe briefly what your business does.</p>
                             
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Business Subcategory</label>
-                                <input class="input" name="business_subcategory" type="text" value="{{ old('business_subcategory') }}" placeholder="e.g., Software Development">
-                                @error('business_subcategory')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="form-group">
+                                    <label class="form-label">Business Category</label>
+                                    <select class="form-input form-select" name="business_category">
+                                        <option value="">Select Category</option>
+                                        <option value="Technology" {{ old('business_category') == 'Technology' ? 'selected' : '' }}>Technology</option>
+                                        <option value="Manufacturing" {{ old('business_category') == 'Manufacturing' ? 'selected' : '' }}>Manufacturing</option>
+                                        <option value="Construction" {{ old('business_category') == 'Construction' ? 'selected' : '' }}>Construction</option>
+                                        <option value="Healthcare" {{ old('business_category') == 'Healthcare' ? 'selected' : '' }}>Healthcare</option>
+                                        <option value="Finance" {{ old('business_category') == 'Finance' ? 'selected' : '' }}>Finance</option>
+                                        <option value="Retail" {{ old('business_category') == 'Retail' ? 'selected' : '' }}>Retail</option>
+                                        <option value="Energy" {{ old('business_category') == 'Energy' ? 'selected' : '' }}>Energy</option>
+                                        <option value="Transportation" {{ old('business_category') == 'Transportation' ? 'selected' : '' }}>Transportation</option>
+                                        <option value="Other" {{ old('business_category') == 'Other' ? 'selected' : '' }}>Other</option>
+                                    </select>
+                                    @error('business_category')<p class="form-error">{{ $message }}</p>@enderror
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Business Subcategory</label>
+                                    <input class="form-input" name="business_subcategory" type="text" value="{{ old('business_subcategory') }}" placeholder="e.g., Software Development">
+                                    @error('business_subcategory')<p class="form-error">{{ $message }}</p>@enderror
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="mt-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Business Description</label>
-                            <textarea class="input" name="business_description" rows="4" placeholder="Tell us a bit about what you do...">{{ old('business_description') }}</textarea>
-                            @error('business_description')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
+                            <div class="form-group mt-6">
+                                <label class="form-label">Business Description</label>
+                                <textarea class="form-input form-textarea" name="business_description" rows="4" placeholder="Tell us a bit about what you do...">{{ old('business_description') }}</textarea>
+                                @error('business_description')<p class="form-error">{{ $message }}</p>@enderror
+                            </div>
                         </div>
                     </div>
 
                     <!-- Action Buttons -->
                     <div class="flex items-center justify-between pt-6">
                         <a href="{{ route('company.setup.skip') }}" class="text-gray-600 hover:text-gray-800 font-medium">Skip for now</a>
-                        <button type="submit" class="btn-primary px-8 py-3 rounded-xl font-medium">Continue</button>
+                        <button type="submit" class="btn btn-primary">Continue</button>
                     </div>
                 </form>
             </div>
