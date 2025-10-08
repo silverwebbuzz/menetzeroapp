@@ -130,7 +130,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="brand-logo">
-                    <img src="{{ asset('images/menetzero.svg') }}" alt="MIDDLE EAST NET Zero" class="h-8 w-auto">
+                    <img src="https://app.menetzero.com/public/images/menetzero.svg" alt="MIDDLE EAST NET Zero" class="h-8 w-auto">
                 </div>
                 <div class="flex items-center space-x-4">
                     <a href="{{ route('login') }}" class="btn btn-outline">Login</a>
@@ -495,7 +495,7 @@
     <footer class="bg-gray-900 text-white py-12 px-4">
         <div class="max-w-6xl mx-auto text-center">
             <div class="brand-logo justify-center mb-6">
-                <img src="{{ asset('images/menetzero.svg') }}" alt="MIDDLE EAST NET Zero" class="h-8 w-auto">
+                <img src="https://app.menetzero.com/public/images/menetzero.svg" alt="MIDDLE EAST NET Zero" class="h-8 w-auto">
             </div>
             <p class="text-gray-400 mb-6">Comprehensive carbon emissions tracking for businesses in the Middle East</p>
             <div class="flex justify-center space-x-6">

@@ -62,6 +62,7 @@ fi
 
 # Ensure storage and cache directories exist and are writable
 mkdir -p storage/framework/{cache,sessions,views} bootstrap/cache
+mkdir -p public/images
 chmod -R 775 storage bootstrap/cache || true
 
 # Ensure .htaccess files exist
