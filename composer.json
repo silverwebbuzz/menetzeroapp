@@ -12,6 +12,7 @@
         "laravel/socialite": "^5.15",
         "laravel/tinker": "^2.10.1",
         "maatwebsite/excel": "^3.1",
+        "phiki/phiki": "^1.0",
         "spatie/laravel-permission": "^6.21"
     },
     "autoload": {

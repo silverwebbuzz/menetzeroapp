@@ -112,6 +112,9 @@ fi
 # Install production dependencies only (non-interactive)
 $COMPOSER_CMD install --no-dev --prefer-dist --no-interaction --no-ansi --optimize-autoloader
 
+# Ensure phiki package is installed (required for Laravel 12 error pages)
+$COMPOSER_CMD require phiki/phiki --no-interaction --no-ansi || true
+
 # Generate application key if not set
 if ! grep -q "^APP_KEY=base64:" .env; then
 $PHP_BIN artisan key:generate --force --no-ansi
