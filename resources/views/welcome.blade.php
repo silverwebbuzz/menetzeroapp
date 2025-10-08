@@ -14,13 +14,19 @@
         <div class="container">
             <div class="text-center">
                 <div class="mb-8">
-                    @include('components.brand-logo')
+                    <div class="brand-logo">
+                        <div class="brand-logo-icon" style="background-color: white; color: var(--brand-primary);">ME</div>
+                        <div style="color: white;">
+                            <div class="brand-logo-text-small" style="color: white;">MIDDLE EAST</div>
+                            <div class="brand-logo-text-large" style="color: white;">NET Zero</div>
+                        </div>
+                    </div>
                 </div>
-                <h1 class="text-4xl md:text-6xl font-bold mb-6">
+                <h1 class="text-4xl md:text-6xl font-bold mb-6 text-white">
                     Track Your Carbon Footprint
-                    <span class="block text-white/80">Like a Pro</span>
+                    <span class="block text-white/90">Like a Pro</span>
                 </h1>
-                <p class="text-xl md:text-2xl text-white/90 mb-8 max-w-3xl mx-auto">
+                <p class="text-xl md:text-2xl text-white/95 mb-8 max-w-3xl mx-auto">
                     Comprehensive carbon emissions tracking for businesses in the Middle East.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">

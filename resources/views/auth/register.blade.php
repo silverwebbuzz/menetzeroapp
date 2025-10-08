@@ -3,8 +3,8 @@
 @section('title', 'Sign up - MIDDLE EAST NET Zero')
 
 @section('content')
-    <h1 class="text-3xl font-semibold text-gray-900 mb-2">Sign up for MIDDLE EAST NET Zero</h1>
-    <p class="text-sm text-gray-600 mb-8">Measure your organization's carbon footprint with ease.</p>
+    <h1 class="text-3xl font-semibold mb-2" style="color: #111827;">Sign up for MIDDLE EAST NET Zero</h1>
+    <p class="text-sm mb-8" style="color: #4b5563;">Measure your organization's carbon footprint with ease.</p>
 
     <div class="mb-6">
         <a class="btn btn-ghost btn-full" href="{{ route('auth.google') }}">

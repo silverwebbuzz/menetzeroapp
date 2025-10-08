@@ -3,8 +3,8 @@
 @section('title', 'Login - MIDDLE EAST NET Zero')
 
 @section('content')
-    <h1 class="text-3xl font-semibold text-gray-900 mb-2">Welcome back!</h1>
-    <p class="text-sm text-gray-600 mb-8">Sign in to MIDDLE EAST NET Zero's platform.</p>
+    <h1 class="text-3xl font-semibold mb-2" style="color: #111827;">Welcome back!</h1>
+    <p class="text-sm mb-8" style="color: #4b5563;">Sign in to MIDDLE EAST NET Zero's platform.</p>
 
     <div class="mb-6">
         <a class="btn btn-ghost btn-full" href="{{ route('auth.google') }}">

@@ -25,6 +25,13 @@
   --gray-800: #1f2937;
   --gray-900: #111827;
   
+  /* Fallback colors for better compatibility */
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  
   /* Semantic Colors */
   --success: #10b981;
   --success-light: #d1fae5;
@@ -98,8 +105,8 @@ body {
   font-family: var(--font-family);
   font-size: var(--font-size-base);
   line-height: 1.6;
-  color: var(--gray-900);
-  background-color: var(--gray-50);
+  color: #111827 !important;
+  background-color: #f9fafb !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -146,7 +153,7 @@ body {
 }
 
 .brand-logo-text {
-  color: var(--gray-900);
+  color: #111827 !important;
   font-weight: var(--font-weight-semibold);
   font-size: var(--font-size-lg);
 }
@@ -262,18 +269,18 @@ body {
   display: block;
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  color: var(--gray-700);
+  color: #374151 !important;
   margin-bottom: var(--space-2);
 }
 
 .form-input {
   width: 100%;
   padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--gray-300);
+  border: 1px solid #d1d5db;
   border-radius: var(--radius-xl);
   font-size: var(--font-size-base);
-  color: var(--gray-900);
-  background-color: white;
+  color: #111827 !important;
+  background-color: white !important;
   transition: all var(--transition-fast);
 }
 

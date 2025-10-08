@@ -115,12 +115,12 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                                 </svg>
                             </button>
-                            <h1 class="text-2xl font-semibold text-gray-900">@yield('page-title', 'Dashboard')</h1>
+                            <h1 class="text-2xl font-semibold" style="color: #111827;">@yield('page-title', 'Dashboard')</h1>
                         </div>
                         
                         <div class="flex items-center space-x-4">
                             <div class="relative">
-                                <button class="flex items-center text-sm text-gray-700 hover:text-gray-900">
+                                <button class="flex items-center text-sm" style="color: #374151;">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5-5-5h5v-5a7.5 7.5 0 00-15 0v5h5l-5 5-5-5h5v-5a7.5 7.5 0 0115 0v5z"></path>
                                     </svg>
@@ -131,7 +131,7 @@
                             <div class="relative">
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
-                                    <button type="submit" class="flex items-center text-sm text-gray-700 hover:text-gray-900">
+                                    <button type="submit" class="flex items-center text-sm" style="color: #374151;">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                                         </svg>
