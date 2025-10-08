@@ -92,17 +92,9 @@
             align-items: center; 
             gap: 0.75rem; 
         }
-        .brand-logo-icon { 
-            width: 2rem; 
-            height: 2rem; 
-            background-color: #0ea5a3; 
-            border-radius: 0.5rem; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: white; 
-            font-weight: 700; 
-            font-size: 0.875rem; 
+        .brand-logo img {
+            height: 2rem;
+            width: auto;
         }
         .brand-logo-text { 
             color: #111827 !important; 
@@ -116,10 +108,9 @@
         <div class="flex items-center justify-center p-8">
             <div class="w-full max-w-md">
                 <div class="mb-10">
-                    <div class="brand-logo">
-                        <div class="brand-logo-icon">ME</div>
-                        <div class="brand-logo-text">MIDDLE EAST NET Zero</div>
-                    </div>
+                        <div class="brand-logo">
+                            <img src="{{ asset('images/menetzero.svg') }}" alt="MIDDLE EAST NET Zero" class="h-8 w-auto">
+                        </div>
                 </div>
                 
                 <h1 class="text-3xl font-semibold mb-2" style="color: #111827;">Welcome back!</h1>

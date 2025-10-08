@@ -58,17 +58,9 @@
             align-items: center;
             gap: 0.75rem;
         }
-        .brand-logo-icon {
-            width: 2rem;
+        .brand-logo img {
             height: 2rem;
-            background-color: #0ea5a3;
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 0.875rem;
+            width: auto;
         }
         .brand-logo-text {
             color: white !important;
@@ -138,11 +130,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="brand-logo">
-                    <div class="brand-logo-icon">ME</div>
-                    <div>
-                        <div class="brand-logo-text-small" style="color: #111827;">MIDDLE EAST</div>
-                        <div class="brand-logo-text-large" style="color: #111827;">NET Zero</div>
-                    </div>
+                    <img src="{{ asset('images/menetzero.svg') }}" alt="MIDDLE EAST NET Zero" class="h-8 w-auto">
                 </div>
                 <div class="flex items-center space-x-4">
                     <a href="{{ route('login') }}" class="btn btn-outline">Login</a>
@@ -507,11 +495,7 @@
     <footer class="bg-gray-900 text-white py-12 px-4">
         <div class="max-w-6xl mx-auto text-center">
             <div class="brand-logo justify-center mb-6">
-                <div class="brand-logo-icon">ME</div>
-                <div>
-                    <div class="brand-logo-text-small">MIDDLE EAST</div>
-                    <div class="brand-logo-text-large">NET Zero</div>
-                </div>
+                <img src="{{ asset('images/menetzero.svg') }}" alt="MIDDLE EAST NET Zero" class="h-8 w-auto">
             </div>
             <p class="text-gray-400 mb-6">Comprehensive carbon emissions tracking for businesses in the Middle East</p>
             <div class="flex justify-center space-x-6">

@@ -47,18 +47,9 @@
             align-items: center; 
             gap: 0.75rem; 
         }
-        .brand-logo-icon { 
-            width: 2.5rem; 
-            height: 2.5rem; 
-            background-color: white; 
-            border-radius: 0.5rem; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: #0ea5a3; 
-            font-weight: 700; 
-            font-size: 1rem; 
-            flex-shrink: 0;
+        .brand-logo img {
+            height: 2rem;
+            width: auto;
         }
         .brand-logo-text { 
             color: white !important; 
@@ -314,13 +305,9 @@
             <!-- Sidebar -->
             <div class="sidebar" id="sidebar" style="transform: translateX(-100%);">
                 <div class="sidebar-header">
-                    <div class="brand-logo">
-                        <div class="brand-logo-icon">ME</div>
-                        <div>
-                            <div class="brand-logo-text-small">MIDDLE EAST</div>
-                            <div class="brand-logo-text-large">NET Zero</div>
-                        </div>
-                    </div>
+                          <div class="brand-logo">
+                              <img src="{{ asset('images/menetzero.svg') }}" alt="MIDDLE EAST NET Zero" class="h-8 w-auto">
+                          </div>
                 </div>
                 
                 <nav class="mt-8 px-4">

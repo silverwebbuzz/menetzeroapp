@@ -15,10 +15,9 @@
         <div class="flex items-center justify-center p-8">
             <div class="w-full max-w-md">
                 <div class="mb-10">
-                    <div class="brand-logo">
-                        <div class="brand-logo-icon">ME</div>
-                        <div class="brand-logo-text">MIDDLE EAST NET Zero</div>
-                    </div>
+                        <div class="brand-logo">
+                            <img src="{{ asset('images/menetzero.svg') }}" alt="MIDDLE EAST NET Zero" class="h-8 w-auto">
+                        </div>
                 </div>
                 
                 @yield('content')
