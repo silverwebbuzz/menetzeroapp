@@ -15,7 +15,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="{{ asset('css/design-system.css') }}">
     <style>
         body { 
             font-family: 'Inter', system-ui, -apple-system, sans-serif; 
@@ -31,6 +30,7 @@
             top: 0; 
             bottom: 0;
             overflow-y: auto; 
+            transform: translateX(0);
         }
         .sidebar-header { 
             padding: 1.5rem; 
@@ -182,6 +182,12 @@
             }
         }
         
+        @media (min-width: 1025px) {
+            .sidebar { 
+                transform: translateX(0) !important; 
+            }
+        }
+        
         @media (max-width: 768px) {
             .sidebar { 
                 width: 100%; 
@@ -318,7 +324,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, mobile menu ready');
             
-            // Test sidebar visibility
+            // Initialize sidebar state
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('mobileOverlay');
             console.log('Sidebar found on load:', sidebar);
@@ -326,7 +332,16 @@
             
             if (sidebar) {
                 console.log('Sidebar current classes:', sidebar.className);
-                console.log('Sidebar computed style:', window.getComputedStyle(sidebar).transform);
+                console.log('Window width:', window.innerWidth);
+                
+                // Set initial state based on screen size
+                if (window.innerWidth <= 1024) {
+                    sidebar.style.transform = 'translateX(-100%)';
+                    console.log('Mobile: Sidebar hidden initially');
+                } else {
+                    sidebar.style.transform = 'translateX(0)';
+                    console.log('Desktop: Sidebar visible initially');
+                }
             }
             
             // Add multiple event listeners to ensure it works
@@ -334,9 +349,6 @@
             console.log('Mobile menu button found:', mobileMenuBtn);
             
             if (mobileMenuBtn) {
-                // Remove any existing listeners first
-                mobileMenuBtn.removeEventListener('click', window.toggleSidebar);
-                
                 // Add click listener
                 mobileMenuBtn.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -392,6 +404,23 @@
             } else {
                 console.log('Sidebar not found!');
             }
+        };
+        
+        /* Test CSS loading */
+        window.testCSS = function() {
+            console.log('Testing CSS...');
+            const testDiv = document.createElement('div');
+            testDiv.style.position = 'fixed';
+            testDiv.style.top = '10px';
+            testDiv.style.right = '10px';
+            testDiv.style.background = 'red';
+            testDiv.style.color = 'white';
+            testDiv.style.padding = '10px';
+            testDiv.style.zIndex = '9999';
+            testDiv.innerHTML = 'CSS Test - Click to remove';
+            testDiv.onclick = function() { this.remove(); };
+            document.body.appendChild(testDiv);
+            console.log('Red test div added to top-right corner');
         };
     </script>
 </head>
