@@ -25,22 +25,17 @@
         .sidebar { 
             background-color: #ffffff; 
             border-right: 1px solid #e5e7eb; 
-            height: 100vh; 
             width: 280px; 
             position: fixed; 
             left: 0; 
             top: 0; 
+            bottom: 0;
             overflow-y: auto; 
-            display: flex;
-            flex-direction: column;
         }
         .sidebar-header { 
-            padding: 2rem 1.5rem; 
+            padding: 1.5rem; 
             border-bottom: 1px solid #e5e7eb; 
             background-color: #0ea5a3; 
-            min-height: 80px;
-            display: flex;
-            align-items: center;
         }
         .brand-logo { 
             display: flex; 
@@ -108,12 +103,6 @@
         .nav-link:not(.active) svg { 
             color: #6b7280; 
         }
-        .sidebar-footer { 
-            padding: 1.5rem; 
-            border-top: 1px solid #e5e7eb; 
-            margin-top: auto; 
-            flex-shrink: 0;
-        }
         .user-info { 
             color: #111827 !important; 
         }
@@ -123,7 +112,6 @@
         }
         .main-content { 
             margin-left: 280px; 
-            min-height: 100vh; 
             background-color: #f9fafb;
         }
         .header { 
@@ -196,7 +184,7 @@
     @stack('head')
 </head>
 <body class="font-sans antialiased bg-gray-50">
-    <div class="min-h-screen">
+    <div>
         @auth
             <!-- Sidebar -->
             <div class="sidebar" id="sidebar">
@@ -210,7 +198,7 @@
                     </div>
                 </div>
                 
-                <nav class="flex-1 py-4">
+                <nav class="mt-8 px-4">
             <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
@@ -260,19 +248,6 @@
                     </div>
                 </nav>
                 
-                <div class="sidebar-footer">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background-color: #0ea5a3;">
-                                <span class="text-white text-sm font-medium">{{ substr(auth()->user()->name, 0, 1) }}</span>
-                            </div>
-                        </div>
-                        <div class="ml-3">
-                            <p class="user-info">{{ auth()->user()->name ?? 'User' }}</p>
-                            <p class="user-company">{{ auth()->user()->company?->name ?? 'No Company' }}</p>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Main content -->
