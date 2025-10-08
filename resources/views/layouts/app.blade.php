@@ -15,6 +15,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Suppress Tailwind CDN warning
+        window.tailwind = { config: { theme: { extend: {} } } };
+    </script>
     <style>
         body { 
             font-family: 'Inter', system-ui, -apple-system, sans-serif; 
@@ -277,7 +281,7 @@
     </style>
     
     <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
     
     <!-- Additional head content -->
     @stack('head')
