@@ -167,12 +167,90 @@
             .sidebar { 
                 transform: translateX(-100%); 
                 transition: transform 0.3s ease-in-out; 
+                z-index: 1000;
             }
             .sidebar.open { 
                 transform: translateX(0); 
             }
             .main-content { 
                 margin-left: 0; 
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar { 
+                width: 100%; 
+                max-width: 320px; 
+            }
+            .main-content { 
+                margin-left: 0; 
+            }
+            .header { 
+                padding: 1rem; 
+            }
+            .content-area { 
+                padding: 1rem; 
+            }
+            .page-title { 
+                font-size: 1.25rem; 
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .content-area { 
+                padding: 0.75rem; 
+            }
+            .header { 
+                padding: 0.75rem; 
+            }
+        }
+        
+        /* Mobile Overlay */
+        .mobile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+        
+        .mobile-overlay.active {
+            display: block;
+        }
+        
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+        }
+        
+        @media (max-width: 1024px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+        
+        /* Mobile Button Improvements */
+        @media (max-width: 640px) {
+            .btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.875rem;
+            }
+            .btn svg {
+                width: 1rem;
+                height: 1rem;
+            }
+        }
+        
+        /* Touch-friendly interactions */
+        @media (hover: none) and (pointer: coarse) {
+            .btn:hover {
+                transform: none;
+            }
+            .nav-link:hover {
+                background-color: transparent;
             }
         }
     </style>
@@ -182,10 +260,54 @@
     
     <!-- Additional head content -->
     @stack('head')
+    
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobileOverlay');
+            
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            } else {
+                sidebar.classList.add('open');
+                overlay.classList.add('active');
+            }
+        }
+        
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobileOverlay');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            
+            if (window.innerWidth <= 1024 && 
+                !sidebar.contains(event.target) && 
+                !menuBtn.contains(event.target) &&
+                sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            }
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobileOverlay');
+            
+            if (window.innerWidth > 1024) {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            }
+        });
+    </script>
 </head>
 <body class="font-sans antialiased bg-gray-50">
     <div>
         @auth
+            <!-- Mobile Overlay -->
+            <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
+            
             <!-- Sidebar -->
             <div class="sidebar" id="sidebar">
                 <div class="sidebar-header">
@@ -256,7 +378,7 @@
                 <header class="header">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
-                            <button class="lg:hidden mr-4" onclick="toggleSidebar()">
+                            <button class="mobile-menu-btn mr-4" onclick="toggleSidebar()">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                                 </svg>

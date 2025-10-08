@@ -28,33 +28,37 @@
 
 <div class="space-y-8">
     <!-- Header with Quick Actions -->
-    <div class="flex items-center justify-between mb-8">
-        <div>
+    <div class="mb-8">
+        <div class="mb-4">
             <h2 class="text-2xl font-semibold" style="color: #111827;">Dashboard</h2>
             <p class="text-sm" style="color: #6b7280;">Welcome back, {{ auth()->user()->name }}</p>
         </div>
-        <div class="flex gap-3">
+        <div class="flex flex-wrap gap-3">
             <a href="{{ route('locations.index') }}" class="btn btn-primary">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-                Manage Locations
+                <span class="hidden sm:inline">Manage Locations</span>
+                <span class="sm:hidden">Locations</span>
             </a>
             <a href="{{ route('measurements.index') }}" class="btn btn-outline">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                Manage Reports
+                <span class="hidden sm:inline">Manage Reports</span>
+                <span class="sm:hidden">Reports</span>
             </a>
-            <button onclick="uploadBill()" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-[color:var(--brand)] border-[color:var(--accent)]/30 bg-[color:var(--accent)]/10 hover:bg-[color:var(--accent)]/20 transition">
+            <button onclick="uploadBill()" class="btn btn-outline">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                Upload Bill
+                <span class="hidden sm:inline">Upload Bill</span>
+                <span class="sm:hidden">Upload</span>
             </button>
-            <button onclick="generateReport()" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-[color:var(--brand)] border-[color:var(--accent)]/30 bg-[color:var(--accent)]/10 hover:bg-[color:var(--accent)]/20 transition">
+            <button onclick="generateReport()" class="btn btn-outline">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m4-4H8"/></svg>
-                Generate Report
+                <span class="hidden sm:inline">Generate Report</span>
+                <span class="sm:hidden">Generate</span>
             </button>
         </div>
     </div>
 
     <!-- KPI Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <!-- Total Emissions -->
         <div class="p-6 rounded-2xl text-white shadow-sm" style="background:linear-gradient(90deg, #26A69A 0%, #1f8e86 100%); border:1px solid rgba(38,166,154,.25)">
             <div class="flex items-start justify-between">
@@ -130,7 +134,7 @@
     </div>
 
     <!-- Charts Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <!-- Monthly Emissions Trend -->
         <div class="card p-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">Monthly Emissions Trend</h3>
@@ -149,7 +153,7 @@
     </div>
 
     <!-- Top Emission Sources & Recent Activity -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <!-- Top Emission Sources -->
         <div class="card p-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">Top Emission Sources</h3>
@@ -320,7 +324,7 @@
     <!-- Reports Summary -->
     <div class="card p-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">Reports Summary</h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="text-center p-4 bg-blue-50 rounded-lg">
                 <div class="text-2xl font-bold text-blue-900">{{ $kpis['reports_count'] }}</div>
                 <div class="text-sm text-blue-600">Total Reports</div>
