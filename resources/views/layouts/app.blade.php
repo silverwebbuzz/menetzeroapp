@@ -273,17 +273,24 @@
     @stack('head')
     
     <script>
-        function toggleSidebar() {
-            console.log('Toggle sidebar clicked'); // Debug log
+        // Simple global function
+        window.toggleSidebar = function() {
+            console.log('toggleSidebar called');
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('mobileOverlay');
             
+            console.log('Sidebar element:', sidebar);
+            console.log('Overlay element:', overlay);
+            
             if (!sidebar || !overlay) {
-                console.error('Sidebar or overlay not found');
+                console.error('Elements not found');
                 return;
             }
             
-            if (sidebar.classList.contains('open')) {
+            const isOpen = sidebar.classList.contains('open');
+            console.log('Current state - isOpen:', isOpen);
+            
+            if (isOpen) {
                 sidebar.classList.remove('open');
                 overlay.classList.remove('active');
                 console.log('Sidebar closed');
@@ -292,9 +299,38 @@
                 overlay.classList.add('active');
                 console.log('Sidebar opened');
             }
-        }
+        };
         
-        // Close sidebar when clicking outside on mobile
+        // Ensure DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, mobile menu ready');
+            
+            // Add multiple event listeners to ensure it works
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            console.log('Mobile menu button found:', mobileMenuBtn);
+            
+            if (mobileMenuBtn) {
+                // Remove any existing listeners first
+                mobileMenuBtn.removeEventListener('click', window.toggleSidebar);
+                
+                // Add click listener
+                mobileMenuBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Button clicked via addEventListener');
+                    window.toggleSidebar();
+                });
+                
+                // Also add touchstart for mobile
+                mobileMenuBtn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    console.log('Button touched via touchstart');
+                    window.toggleSidebar();
+                });
+            }
+        });
+        
+        // Close sidebar when clicking outside
         document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('mobileOverlay');
@@ -318,22 +354,6 @@
             if (window.innerWidth > 1024 && sidebar && overlay) {
                 sidebar.classList.remove('open');
                 overlay.classList.remove('active');
-            }
-        });
-        
-        // Ensure DOM is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, mobile menu ready');
-            
-            // Add event listener to mobile menu button as backup
-            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-            if (mobileMenuBtn) {
-                mobileMenuBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('Mobile menu button clicked via event listener');
-                    toggleSidebar();
-                });
             }
         });
     </script>
@@ -414,7 +434,7 @@
                 <header class="header">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
-                            <button class="mobile-menu-btn mr-4" onclick="toggleSidebar()" type="button">
+                            <button class="mobile-menu-btn mr-4" onclick="window.toggleSidebar()" type="button" style="background: red; color: white; padding: 10px;">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                                 </svg>
