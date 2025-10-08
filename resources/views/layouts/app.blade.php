@@ -172,6 +172,7 @@
                 left: 0 !important;
                 top: 0 !important;
                 bottom: 0 !important;
+                width: 280px !important;
             }
             .sidebar.open { 
                 transform: translateX(0) !important; 
@@ -294,19 +295,23 @@
             const isOpen = sidebar.classList.contains('open');
             console.log('Current state - isOpen:', isOpen);
             console.log('Sidebar classes before:', sidebar.className);
+            console.log('Current transform before:', sidebar.style.transform);
             
             if (isOpen) {
                 sidebar.classList.remove('open');
                 overlay.classList.remove('active');
+                sidebar.style.transform = 'translateX(-100%)';
                 console.log('Sidebar closed');
             } else {
                 sidebar.classList.add('open');
                 overlay.classList.add('active');
+                sidebar.style.transform = 'translateX(0)';
                 console.log('Sidebar opened');
             }
             
             console.log('Sidebar classes after:', sidebar.className);
             console.log('Overlay classes after:', overlay.className);
+            console.log('Transform after:', sidebar.style.transform);
         };
         
         // Ensure DOM is loaded
@@ -466,7 +471,7 @@
                 <header class="header">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
-                            <button class="mobile-menu-btn mr-4" onclick="window.toggleSidebar()" type="button" style="background: red; color: white; padding: 10px;">
+                            <button class="mobile-menu-btn mr-4" onclick="window.toggleSidebar()" type="button">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                                 </svg>
