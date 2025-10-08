@@ -25,17 +25,22 @@
         .sidebar { 
             background-color: #ffffff; 
             border-right: 1px solid #e5e7eb; 
-            min-height: 100vh; 
+            height: 100vh; 
             width: 280px; 
             position: fixed; 
             left: 0; 
             top: 0; 
             overflow-y: auto; 
+            display: flex;
+            flex-direction: column;
         }
         .sidebar-header { 
-            padding: 1.5rem; 
+            padding: 2rem 1.5rem; 
             border-bottom: 1px solid #e5e7eb; 
             background-color: #0ea5a3; 
+            min-height: 80px;
+            display: flex;
+            align-items: center;
         }
         .brand-logo { 
             display: flex; 
@@ -43,8 +48,8 @@
             gap: 0.75rem; 
         }
         .brand-logo-icon { 
-            width: 2rem; 
-            height: 2rem; 
+            width: 2.5rem; 
+            height: 2.5rem; 
             background-color: white; 
             border-radius: 0.5rem; 
             display: flex; 
@@ -52,7 +57,8 @@
             justify-content: center; 
             color: #0ea5a3; 
             font-weight: 700; 
-            font-size: 0.875rem; 
+            font-size: 1rem; 
+            flex-shrink: 0;
         }
         .brand-logo-text { 
             color: white !important; 
@@ -106,6 +112,7 @@
             padding: 1.5rem; 
             border-top: 1px solid #e5e7eb; 
             margin-top: auto; 
+            flex-shrink: 0;
         }
         .user-info { 
             color: #111827 !important; 
@@ -117,6 +124,7 @@
         .main-content { 
             margin-left: 280px; 
             min-height: 100vh; 
+            background-color: #f9fafb;
         }
         .header { 
             background-color: white; 
@@ -168,7 +176,7 @@
                     </div>
                 </div>
                 
-                <nav class="flex-1 py-6">
+                <nav class="flex-1 py-4">
             <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
