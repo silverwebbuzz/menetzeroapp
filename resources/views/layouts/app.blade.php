@@ -168,13 +168,16 @@
                 transform: translateX(-100%); 
                 transition: transform 0.3s ease-in-out; 
                 z-index: 1000;
-                position: fixed;
+                position: fixed !important;
+                left: 0 !important;
+                top: 0 !important;
+                bottom: 0 !important;
             }
             .sidebar.open { 
-                transform: translateX(0); 
+                transform: translateX(0) !important; 
             }
             .main-content { 
-                margin-left: 0; 
+                margin-left: 0 !important; 
             }
         }
         
@@ -281,6 +284,7 @@
             
             console.log('Sidebar element:', sidebar);
             console.log('Overlay element:', overlay);
+            console.log('Window width:', window.innerWidth);
             
             if (!sidebar || !overlay) {
                 console.error('Elements not found');
@@ -289,6 +293,7 @@
             
             const isOpen = sidebar.classList.contains('open');
             console.log('Current state - isOpen:', isOpen);
+            console.log('Sidebar classes before:', sidebar.className);
             
             if (isOpen) {
                 sidebar.classList.remove('open');
@@ -299,11 +304,25 @@
                 overlay.classList.add('active');
                 console.log('Sidebar opened');
             }
+            
+            console.log('Sidebar classes after:', sidebar.className);
+            console.log('Overlay classes after:', overlay.className);
         };
         
         // Ensure DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, mobile menu ready');
+            
+            // Test sidebar visibility
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobileOverlay');
+            console.log('Sidebar found on load:', sidebar);
+            console.log('Overlay found on load:', overlay);
+            
+            if (sidebar) {
+                console.log('Sidebar current classes:', sidebar.className);
+                console.log('Sidebar computed style:', window.getComputedStyle(sidebar).transform);
+            }
             
             // Add multiple event listeners to ensure it works
             const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
@@ -356,6 +375,19 @@
                 overlay.classList.remove('active');
             }
         });
+        
+        // Test function - you can call this from console
+        window.testSidebar = function() {
+            console.log('Testing sidebar...');
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) {
+                sidebar.style.transform = 'translateX(0)';
+                sidebar.style.background = 'red';
+                console.log('Sidebar should now be visible and red');
+            } else {
+                console.log('Sidebar not found!');
+            }
+        };
     </script>
 </head>
 <body class="font-sans antialiased bg-gray-50">
