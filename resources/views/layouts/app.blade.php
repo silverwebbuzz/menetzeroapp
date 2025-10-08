@@ -428,10 +428,15 @@
     <div>
         @auth
             <!-- Mobile Overlay -->
-            <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
+            <div class="mobile-overlay" id="mobileOverlay" onclick="
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('mobileOverlay');
+                sidebar.style.transform = 'translateX(-100%)';
+                overlay.style.display = 'none';
+            "></div>
             
             <!-- Sidebar -->
-            <div class="sidebar" id="sidebar">
+            <div class="sidebar" id="sidebar" style="transform: translateX(-100%);">
                 <div class="sidebar-header">
                     <div class="brand-logo">
                         <div class="brand-logo-icon">ME</div>
@@ -500,7 +505,17 @@
                 <header class="header">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
-                            <button class="mobile-menu-btn mr-4" onclick="window.toggleSidebar()" type="button">
+                            <button class="mobile-menu-btn mr-4" onclick="
+                                const sidebar = document.getElementById('sidebar');
+                                const overlay = document.getElementById('mobileOverlay');
+                                if (sidebar.style.transform === 'translateX(0px)' || sidebar.style.transform === '') {
+                                    sidebar.style.transform = 'translateX(-100%)';
+                                    overlay.style.display = 'none';
+                                } else {
+                                    sidebar.style.transform = 'translateX(0px)';
+                                    overlay.style.display = 'block';
+                                }
+                            " type="button">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                                 </svg>
