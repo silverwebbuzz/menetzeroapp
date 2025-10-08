@@ -140,6 +140,40 @@
             padding: 2rem; 
         }
         
+        /* Button Styles */
+        .btn { 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 0.5rem; 
+            padding: 0.75rem 1.5rem; 
+            border-radius: 1rem; 
+            font-weight: 500; 
+            text-decoration: none; 
+            border: 1px solid transparent; 
+            cursor: pointer; 
+            transition: all 0.15s ease-in-out; 
+        }
+        .btn-primary { 
+            background-color: #0ea5a3; 
+            color: white; 
+            border-color: #0ea5a3; 
+        }
+        .btn-primary:hover { 
+            background-color: #0d9488; 
+            border-color: #0d9488; 
+            transform: translateY(-1px); 
+        }
+        .btn-outline { 
+            background-color: transparent; 
+            color: #0ea5a3; 
+            border-color: #0ea5a3; 
+        }
+        .btn-outline:hover { 
+            background-color: #0ea5a3; 
+            color: white; 
+        }
+        
         /* Responsive Design */
         @media (max-width: 1024px) {
             .sidebar { 
@@ -234,8 +268,8 @@
                             </div>
                         </div>
                         <div class="ml-3">
-                            <p class="user-info">{{ auth()->user()->name }}</p>
-                            <p class="user-company">{{ auth()->user()->company->name ?? 'No Company' }}</p>
+                            <p class="user-info">{{ auth()->user()->name ?? 'User' }}</p>
+                            <p class="user-company">{{ auth()->user()->company?->name ?? 'No Company' }}</p>
                         </div>
                     </div>
                 </div>
