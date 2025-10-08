@@ -168,6 +168,7 @@
                 transform: translateX(-100%); 
                 transition: transform 0.3s ease-in-out; 
                 z-index: 1000;
+                position: fixed;
             }
             .sidebar.open { 
                 transform: translateX(0); 
@@ -224,6 +225,16 @@
         /* Mobile Menu Button */
         .mobile-menu-btn {
             display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            transition: background-color 0.2s;
+        }
+        
+        .mobile-menu-btn:hover {
+            background-color: #f3f4f6;
         }
         
         @media (max-width: 1024px) {
@@ -263,15 +274,23 @@
     
     <script>
         function toggleSidebar() {
+            console.log('Toggle sidebar clicked'); // Debug log
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('mobileOverlay');
+            
+            if (!sidebar || !overlay) {
+                console.error('Sidebar or overlay not found');
+                return;
+            }
             
             if (sidebar.classList.contains('open')) {
                 sidebar.classList.remove('open');
                 overlay.classList.remove('active');
+                console.log('Sidebar closed');
             } else {
                 sidebar.classList.add('open');
                 overlay.classList.add('active');
+                console.log('Sidebar opened');
             }
         }
         
@@ -282,6 +301,7 @@
             const menuBtn = document.querySelector('.mobile-menu-btn');
             
             if (window.innerWidth <= 1024 && 
+                sidebar && overlay && menuBtn &&
                 !sidebar.contains(event.target) && 
                 !menuBtn.contains(event.target) &&
                 sidebar.classList.contains('open')) {
@@ -295,9 +315,25 @@
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('mobileOverlay');
             
-            if (window.innerWidth > 1024) {
+            if (window.innerWidth > 1024 && sidebar && overlay) {
                 sidebar.classList.remove('open');
                 overlay.classList.remove('active');
+            }
+        });
+        
+        // Ensure DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, mobile menu ready');
+            
+            // Add event listener to mobile menu button as backup
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Mobile menu button clicked via event listener');
+                    toggleSidebar();
+                });
             }
         });
     </script>
@@ -378,7 +414,7 @@
                 <header class="header">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
-                            <button class="mobile-menu-btn mr-4" onclick="toggleSidebar()">
+                            <button class="mobile-menu-btn mr-4" onclick="toggleSidebar()" type="button">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                                 </svg>
