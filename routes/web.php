@@ -11,6 +11,7 @@ use App\Http\Controllers\EmissionBoundaryController;
 use App\Http\Controllers\MeasurementController;
 use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\DocumentUploadController;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -85,6 +86,20 @@ Route::middleware('auth')->group(function () {
     Route::get('/measurements/{measurement}/sources/{source}/edit', [MeasurementController::class, 'editSource'])->name('measurements.edit-source');
     Route::put('/measurements/{measurement}/sources/{source}/edit', [MeasurementController::class, 'updateSourceData'])->name('measurements.update-source-data');
     Route::delete('/measurements/{measurement}/sources/{source}', [MeasurementController::class, 'deleteSourceData'])->name('measurements.delete-source-data');
+    
+    // Document Upload routes (AI Smart Uploads)
+    Route::prefix('document-uploads')->name('document-uploads.')->group(function () {
+        Route::get('/', [DocumentUploadController::class, 'index'])->name('index');
+        Route::get('/create', [DocumentUploadController::class, 'create'])->name('create');
+        Route::post('/', [DocumentUploadController::class, 'store'])->name('store');
+        Route::get('/{document}', [DocumentUploadController::class, 'show'])->name('show');
+        Route::get('/{document}/edit', [DocumentUploadController::class, 'edit'])->name('edit');
+        Route::put('/{document}', [DocumentUploadController::class, 'update'])->name('update');
+        Route::post('/{document}/approve', [DocumentUploadController::class, 'approve'])->name('approve');
+        Route::post('/{document}/reject', [DocumentUploadController::class, 'reject'])->name('reject');
+        Route::delete('/{document}', [DocumentUploadController::class, 'destroy'])->name('destroy');
+        Route::post('/{document}/retry-ocr', [DocumentUploadController::class, 'retryOcr'])->name('retry-ocr');
+    });
 });
 
 // Protected routes
