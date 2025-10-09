@@ -58,8 +58,4 @@ class CompanySetupController extends Controller
         return redirect()->route('dashboard')->with('success', 'Business profile completed successfully!');
     }
 
-    public function skip()
-    {
-        return redirect()->route('dashboard')->with('info', 'You can complete your business profile later from the dashboard.');
-    }
 }

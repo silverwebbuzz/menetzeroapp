@@ -59,7 +59,6 @@ Route::post('/reset-password', [ForgotPasswordController::class, 'reset'])->name
 Route::middleware('auth')->group(function () {
     Route::get('/company/setup', [CompanySetupController::class, 'index'])->name('company.setup');
     Route::post('/company/setup', [CompanySetupController::class, 'store'])->name('company.setup.store');
-    Route::get('/company/setup/skip', [CompanySetupController::class, 'skip'])->name('company.setup.skip');
     
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
