@@ -474,7 +474,6 @@ function generateReport() {
 }
 </script>
 @endpush
-@endif
 @endsection
 
 @if(isset($needsCompanySetup) && $needsCompanySetup)
