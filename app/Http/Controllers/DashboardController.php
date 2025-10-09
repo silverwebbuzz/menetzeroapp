@@ -121,16 +121,32 @@ class DashboardController extends Controller
 
     private function getChartData($measurements)
     {
-        // Monthly emissions trend - get last 6 months
+        // Monthly emissions trend - get last 6 months based on measurement periods
         $monthlyData = collect();
-        for ($i = 5; $i >= 0; $i--) {
-            $month = now()->subMonths($i);
-            $monthKey = $month->format('Y-m');
+        
+        // Get the range of months from the measurements
+        $measurementMonths = $measurements->map(function($measurement) {
+            return $measurement->period_start->format('Y-m');
+        })->unique()->sort()->values();
+        
+        // If we have measurements, use their months, otherwise use last 6 months
+        if ($measurementMonths->isNotEmpty()) {
+            $monthsToShow = $measurementMonths->take(6);
+        } else {
+            $monthsToShow = collect();
+            for ($i = 5; $i >= 0; $i--) {
+                $monthsToShow->push(now()->subMonths($i)->format('Y-m'));
+            }
+        }
+        
+        foreach ($monthsToShow as $monthKey) {
+            $month = \Carbon\Carbon::createFromFormat('Y-m', $monthKey);
             $monthLabel = $month->format('M');
             
             $monthlyEmissions = $measurements
-                ->where('created_at', '>=', $month->startOfMonth())
-                ->where('created_at', '<=', $month->endOfMonth())
+                ->filter(function($measurement) use ($month) {
+                    return $measurement->period_start->format('Y-m') === $month->format('Y-m');
+                })
                 ->sum('total_co2e') ?? 0;
                 
             $monthlyData->put($monthKey, [
