@@ -1,4 +1,8 @@
+@extends('layouts.app')
 
+
+
+@section('content')
 @if(isset($needsCompanySetup) && $needsCompanySetup)
     <!-- Company Setup Form - Show ONLY when company not added -->
     <div class="max-w-4xl mx-auto">
