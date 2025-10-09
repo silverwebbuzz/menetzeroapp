@@ -31,7 +31,8 @@ class DashboardController extends Controller
                     'submitted_reports' => 0,
                 ],
                 'chartData' => [
-                    'monthly_trend' => collect([]),
+                    'monthly_labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    'monthly_emissions' => [0, 0, 0, 0, 0, 0],
                     'scope_breakdown' => [
                         'Scope 1' => 0,
                         'Scope 2' => 0,
@@ -120,15 +121,27 @@ class DashboardController extends Controller
 
     private function getChartData($measurements)
     {
-        // Monthly emissions trend
-        $monthlyTrend = $measurements
-            ->groupBy(function($item) {
-                return $item->created_at->format('Y-m');
-            })
-            ->map(function($group) {
-                return $group->sum('total_co2e');
-            })
-            ->sortKeys();
+        // Monthly emissions trend - get last 6 months
+        $monthlyData = collect();
+        for ($i = 5; $i >= 0; $i--) {
+            $month = now()->subMonths($i);
+            $monthKey = $month->format('Y-m');
+            $monthLabel = $month->format('M');
+            
+            $monthlyEmissions = $measurements
+                ->where('created_at', '>=', $month->startOfMonth())
+                ->where('created_at', '<=', $month->endOfMonth())
+                ->sum('total_co2e') ?? 0;
+                
+            $monthlyData->put($monthKey, [
+                'label' => $monthLabel,
+                'emissions' => round($monthlyEmissions, 2)
+            ]);
+        }
+
+        // Prepare chart data
+        $monthlyLabels = $monthlyData->pluck('label')->toArray();
+        $monthlyEmissions = $monthlyData->pluck('emissions')->toArray();
 
         // Emissions by scope
         $scopeBreakdown = [
@@ -147,7 +160,8 @@ class DashboardController extends Controller
             ->take(5);
 
         return [
-            'monthly_trend' => $monthlyTrend,
+            'monthly_labels' => $monthlyLabels,
+            'monthly_emissions' => $monthlyEmissions,
             'scope_breakdown' => $scopeBreakdown,
             'location_breakdown' => $locationBreakdown,
         ];
