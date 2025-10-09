@@ -423,11 +423,6 @@
                         </div>
                         
                         <div class="flex items-center space-x-4">
-                            @if(isset($needsCompanySetup) && $needsCompanySetup)
-                                <button onclick="openCompanySetupModal()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">
-                                    Complete Setup
-                                </button>
-                            @endif
                             <div class="relative">
                                 <button class="flex items-center text-sm" style="color: #374151;">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -474,10 +469,6 @@
             @yield('content')
         @endauth
         
-        <!-- Company Setup Modal (only show if needed) -->
-        @if(isset($needsCompanySetup) && $needsCompanySetup)
-            @include('components.company-setup-modal')
-        @endif
     </div>
 
     <script>
@@ -486,37 +477,6 @@
             sidebar.classList.toggle('-translate-x-full');
         }
         
-        // Global function to open company setup modal
-        function openCompanySetupModal() {
-            const modal = document.getElementById('companySetupModal');
-            if (modal) {
-                modal.classList.remove('hidden');
-                document.body.style.overflow = 'hidden';
-            }
-        }
-        
-        // Global function to close company setup modal
-        function closeCompanySetupModal() {
-            const modal = document.getElementById('companySetupModal');
-            if (modal) {
-                modal.classList.add('hidden');
-                document.body.style.overflow = 'auto';
-            }
-        }
-        
-        // Auto-open modal if redirected from protected routes
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if there's an error message about completing business profile
-            const errorMessages = document.querySelectorAll('.alert-error, .text-red-600');
-            errorMessages.forEach(function(message) {
-                if (message.textContent.includes('business profile') || message.textContent.includes('complete')) {
-                    // Auto-open the modal after a short delay
-                    setTimeout(function() {
-                        openCompanySetupModal();
-                    }, 1000);
-                }
-            });
-        });
     </script>
 
     @stack('scripts')

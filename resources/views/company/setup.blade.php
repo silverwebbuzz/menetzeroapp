@@ -291,29 +291,29 @@
                         <li class="flex gap-3">
                             <span class="text-emerald-300">✓</span>
                             <div>
-                                <div class="font-medium">Accurate Carbon Tracking</div>
-                                <div class="text-sm text-white/70">Get precise emissions data for your specific industry</div>
+                                <div class="font-medium">Unlock Full Dashboard</div>
+                                <div class="text-sm text-white/70">Access all features including locations, measurements, and reports</div>
                             </div>
                         </li>
                         <li class="flex gap-3">
                             <span class="text-emerald-300">✓</span>
                             <div>
-                                <div class="font-medium">Industry Benchmarks</div>
-                                <div class="text-sm text-white/70">Compare your performance with similar businesses</div>
+                                <div class="font-medium">AI-Powered Insights</div>
+                                <div class="text-sm text-white/70">Get smart recommendations based on your industry and data</div>
                             </div>
                         </li>
                         <li class="flex gap-3">
                             <span class="text-emerald-300">✓</span>
                             <div>
-                                <div class="font-medium">Compliance Reporting</div>
-                                <div class="text-sm text-white/70">Meet UAE sustainability reporting requirements</div>
+                                <div class="font-medium">Compliance Ready</div>
+                                <div class="text-sm text-white/70">Meet UAE Net Zero 2050 and international standards</div>
                             </div>
                         </li>
                         <li class="flex gap-3">
                             <span class="text-emerald-300">✓</span>
                             <div>
-                                <div class="font-medium">Custom Recommendations</div>
-                                <div class="text-sm text-white/70">Receive tailored sustainability strategies</div>
+                                <div class="font-medium">Team Collaboration</div>
+                                <div class="text-sm text-white/70">Invite team members and assign roles for better management</div>
                             </div>
                         </li>
                     </ul>
