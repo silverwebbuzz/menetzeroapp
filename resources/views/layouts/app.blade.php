@@ -40,7 +40,6 @@
         .sidebar-header { 
             padding: 1.5rem; 
             border-bottom: 1px solid #e5e7eb; 
-            background-color: #0ea5a3; 
         }
         .brand-logo { 
             display: flex; 
