@@ -85,12 +85,12 @@
                 <p class="text-sm/5 opacity-90">Total Emissions</p>
                 <span class="text-white/80">🌿</span>
             </div>
-            <div class="mt-2 text-3xl font-semibold">{{ number_format($kpis['total_emissions'], 2) }} kg CO₂e</div>
+            <div class="mt-2 text-3xl font-semibold">{{ number_format($kpis['total_emissions'] ?? 0, 2) }} kg CO₂e</div>
             <p class="mt-1 text-xs/5 opacity-90">
-                @if($kpis['monthly_change'] > 0)
-                    <span class="text-red-200">↗ {{ $kpis['monthly_change'] }}%</span> from last month
-                @elseif($kpis['monthly_change'] < 0)
-                    <span class="text-green-200">↘ {{ abs($kpis['monthly_change']) }}%</span> from last month
+                @if(($kpis['monthly_change'] ?? 0) > 0)
+                    <span class="text-red-200">↗ {{ $kpis['monthly_change'] ?? 0 }}%</span> from last month
+                @elseif(($kpis['monthly_change'] ?? 0) < 0)
+                    <span class="text-green-200">↘ {{ abs($kpis['monthly_change'] ?? 0) }}%</span> from last month
                 @else
                     <span class="text-white/70">No change</span> from last month
                 @endif
@@ -100,21 +100,21 @@
         <!-- Scope 1 -->
         <div class="p-6 rounded-2xl bg-white shadow-sm border border-gray-100">
             <div class="flex items-start justify-between"><p class="text-sm/5 text-gray-600">Scope 1 Emissions</p><span class="text-rose-500">📈</span></div>
-            <div class="mt-2 text-2xl font-semibold text-gray-900">{{ number_format($kpis['scope1_total'], 2) }} kg CO₂e</div>
+            <div class="mt-2 text-2xl font-semibold text-gray-900">{{ number_format($kpis['scope1_total'] ?? 0, 2) }} kg CO₂e</div>
             <p class="mt-1 text-xs/5 text-rose-600">Direct emissions</p>
         </div>
 
         <!-- Scope 2 -->
         <div class="p-6 rounded-2xl bg-white shadow-sm border border-gray-100">
             <div class="flex items-start justify-between"><p class="text-sm/5 text-gray-600">Scope 2 Emissions</p><span class="text-amber-500">⚡</span></div>
-            <div class="mt-2 text-2xl font-semibold text-gray-900">{{ number_format($kpis['scope2_total'], 2) }} kg CO₂e</div>
+            <div class="mt-2 text-2xl font-semibold text-gray-900">{{ number_format($kpis['scope2_total'] ?? 0, 2) }} kg CO₂e</div>
             <p class="mt-1 text-xs/5 text-emerald-600">Purchased energy</p>
         </div>
 
         <!-- Scope 3 -->
         <div class="p-6 rounded-2xl bg-white shadow-sm border border-gray-100">
             <div class="flex items-start justify-between"><p class="text-sm/5 text-gray-600">Scope 3 Emissions</p><span class="text-purple-500">🌐</span></div>
-            <div class="mt-2 text-2xl font-semibold text-gray-900">{{ number_format($kpis['scope3_total'], 2) }} kg CO₂e</div>
+            <div class="mt-2 text-2xl font-semibold text-gray-900">{{ number_format($kpis['scope3_total'] ?? 0, 2) }} kg CO₂e</div>
             <p class="mt-1 text-xs/5 text-purple-600">Other indirect</p>
         </div>
     </div>
@@ -127,27 +127,27 @@
                 <p class="text-sm text-blue-700">Track your progress towards carbon neutrality</p>
             </div>
             <div class="text-right">
-                <div class="text-2xl font-bold text-blue-900">{{ $netZeroProgress['progress'] }}%</div>
-                <div class="text-sm text-blue-600">{{ $netZeroProgress['years_remaining'] }} years remaining</div>
+                <div class="text-2xl font-bold text-blue-900">{{ $netZeroProgress['progress'] ?? 0 }}%</div>
+                <div class="text-sm text-blue-600">{{ $netZeroProgress['years_remaining'] ?? 25 }} years remaining</div>
             </div>
         </div>
         
         <div class="w-full bg-blue-200 rounded-full h-3 mb-4">
             <div class="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full transition-all duration-500" 
-                 style="width: {{ $netZeroProgress['progress'] }}%"></div>
+                 style="width: {{ $netZeroProgress['progress'] ?? 0 }}%"></div>
         </div>
         
         <div class="grid grid-cols-3 gap-4 text-sm">
             <div class="text-center">
-                <div class="font-semibold text-blue-900">{{ $netZeroProgress['current'] }} tCO₂e</div>
+                <div class="font-semibold text-blue-900">{{ $netZeroProgress['current'] ?? 0 }} tCO₂e</div>
                 <div class="text-blue-600">Current</div>
             </div>
             <div class="text-center">
-                <div class="font-semibold text-blue-900">{{ $netZeroProgress['baseline'] }} tCO₂e</div>
+                <div class="font-semibold text-blue-900">{{ $netZeroProgress['baseline'] ?? 1000 }} tCO₂e</div>
                 <div class="text-blue-600">Baseline</div>
             </div>
             <div class="text-center">
-                <div class="font-semibold text-blue-900">{{ $netZeroProgress['target'] }} tCO₂e</div>
+                <div class="font-semibold text-blue-900">{{ $netZeroProgress['target'] ?? 0 }} tCO₂e</div>
                 <div class="text-blue-600">Target 2050</div>
             </div>
         </div>

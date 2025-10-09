@@ -20,9 +20,32 @@ class DashboardController extends Controller
         if (!$user->company_id) {
             return view('dashboard.index', [
                 'needsCompanySetup' => true,
-                'kpis' => [],
-                'chartData' => [],
-                'netZeroProgress' => [],
+                'kpis' => [
+                    'total_emissions' => 0,
+                    'scope1_total' => 0,
+                    'scope2_total' => 0,
+                    'scope3_total' => 0,
+                    'monthly_change' => 0,
+                    'reports_count' => 0,
+                    'draft_reports' => 0,
+                    'submitted_reports' => 0,
+                ],
+                'chartData' => [
+                    'monthly_trend' => collect([]),
+                    'scope_breakdown' => [
+                        'Scope 1' => 0,
+                        'Scope 2' => 0,
+                        'Scope 3' => 0,
+                    ],
+                    'location_breakdown' => collect([]),
+                ],
+                'netZeroProgress' => [
+                    'current' => 0,
+                    'baseline' => 1000,
+                    'target' => 0,
+                    'progress' => 0,
+                    'years_remaining' => 25,
+                ],
                 'topSources' => collect([]),
                 'recentActivity' => collect([])
             ]);
