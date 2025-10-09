@@ -6,12 +6,12 @@
 @section('content')
 @if(isset($needsCompanySetup) && $needsCompanySetup)
     <!-- Setup Notification Banner -->
-    <div class="bg-gradient-to-r from-emerald-50 to-blue-50 border border-emerald-200 rounded-lg p-4 mb-6">
+    <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-4 mb-6">
         <div class="flex items-center justify-between">
             <div class="flex items-center">
-                <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center mr-4">
-                    <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                <div class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center mr-4">
+                    <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
                     </svg>
                 </div>
                 <div>
@@ -19,7 +19,7 @@
                     <p class="text-xs text-gray-600">Get started with accurate carbon tracking and industry insights.</p>
                 </div>
             </div>
-            <button onclick="openCompanySetupModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+            <button onclick="openCompanySetupModal()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
                 Complete Setup
             </button>
         </div>

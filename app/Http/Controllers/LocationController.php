@@ -15,7 +15,7 @@ class LocationController extends Controller
         $company = $user->company;
         
         if (!$company) {
-            return redirect()->route('company.setup')->with('error', 'Please complete your business profile first.');
+            return redirect()->route('dashboard')->with('error', 'Please complete your business profile first to access this feature.');
         }
 
         $locations = $company->locations()
@@ -55,7 +55,7 @@ class LocationController extends Controller
         $company = $user->company;
         
         if (!$company) {
-            return redirect()->route('company.setup')->with('error', 'Please complete your business profile first.');
+            return redirect()->route('dashboard')->with('error', 'Please complete your business profile first to access this feature.');
         }
 
         return view('locations.create', compact('company'));
@@ -67,7 +67,7 @@ class LocationController extends Controller
         $company = $user->company;
         
         if (!$company) {
-            return redirect()->route('company.setup')->with('error', 'Please complete your business profile first.');
+            return redirect()->route('dashboard')->with('error', 'Please complete your business profile first to access this feature.');
         }
 
         $request->validate([
@@ -125,7 +125,7 @@ class LocationController extends Controller
         $company = $user->company;
         
         if (!$company) {
-            return redirect()->route('company.setup')->with('error', 'Please complete your business profile first.');
+            return redirect()->route('dashboard')->with('error', 'Please complete your business profile first to access this feature.');
         }
 
         // Get or create location from session

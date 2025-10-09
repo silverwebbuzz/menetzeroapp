@@ -424,7 +424,7 @@
                         
                         <div class="flex items-center space-x-4">
                             @if(isset($needsCompanySetup) && $needsCompanySetup)
-                                <button onclick="openCompanySetupModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">
+                                <button onclick="openCompanySetupModal()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">
                                     Complete Setup
                                 </button>
                             @endif
@@ -503,6 +503,20 @@
                 document.body.style.overflow = 'auto';
             }
         }
+        
+        // Auto-open modal if redirected from protected routes
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if there's an error message about completing business profile
+            const errorMessages = document.querySelectorAll('.alert-error, .text-red-600');
+            errorMessages.forEach(function(message) {
+                if (message.textContent.includes('business profile') || message.textContent.includes('complete')) {
+                    // Auto-open the modal after a short delay
+                    setTimeout(function() {
+                        openCompanySetupModal();
+                    }, 1000);
+                }
+            });
+        });
     </script>
 
     @stack('scripts')
