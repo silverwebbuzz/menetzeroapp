@@ -5,26 +5,26 @@
 
 @section('content')
 @if(isset($needsCompanySetup) && $needsCompanySetup)
-    <!-- Profile Completion Message -->
-    <x-card title="Complete Your Business Profile" subtitle="To get started with carbon tracking, please complete your business profile. This helps us provide accurate emissions data and industry-specific insights.">
-        <div class="text-center">
-            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-            </div>
-            <div class="flex justify-center mb-4">
-                <button onclick="openCompanySetupModal()" class="btn btn-primary btn-lg">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+    <!-- Setup Notification Banner -->
+    <div class="bg-gradient-to-r from-emerald-50 to-blue-50 border border-emerald-200 rounded-lg p-4 mb-6">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center mr-4">
+                    <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    Complete Business Profile
-                </button>
+                </div>
+                <div>
+                    <h3 class="text-sm font-medium text-gray-900">Complete your business profile</h3>
+                    <p class="text-xs text-gray-600">Get started with accurate carbon tracking and industry insights.</p>
+                </div>
             </div>
-            <p class="text-sm text-gray-500">Complete your business profile to unlock full carbon tracking features.</p>
+            <button onclick="openCompanySetupModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                Complete Setup
+            </button>
         </div>
-    </x-card>
-@else
+    </div>
+@endif
 
 <div class="space-y-8">
     <!-- Header with Quick Actions -->
@@ -32,6 +32,9 @@
         <div class="mb-4">
             <h2 class="text-2xl font-semibold" style="color: #111827;">Dashboard</h2>
             <p class="text-sm" style="color: #6b7280;">Welcome back, {{ auth()->user()->name }}</p>
+            @if(isset($needsCompanySetup) && $needsCompanySetup)
+                <p class="text-xs text-amber-600 mt-1">Complete your business profile to unlock full dashboard features</p>
+            @endif
         </div>
         <div class="flex flex-wrap gap-3">
             <a href="{{ route('locations.index') }}" class="btn btn-primary">
@@ -56,6 +59,23 @@
             </button>
         </div>
     </div>
+
+    @if(isset($needsCompanySetup) && $needsCompanySetup)
+        <!-- Setup Reminder -->
+        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 text-amber-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+                <div class="flex-1">
+                    <p class="text-sm text-amber-800">Complete your business profile to access detailed analytics and reporting features.</p>
+                </div>
+                <button onclick="openCompanySetupModal()" class="text-amber-700 hover:text-amber-900 font-medium text-sm">
+                    Complete Now →
+                </button>
+            </div>
+        </div>
+    @endif
 
     <!-- KPI Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
