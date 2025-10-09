@@ -86,21 +86,37 @@ class DashboardController extends Controller
 
     private function calculateKPIs($measurements)
     {
-        $totalEmissions = $measurements->sum('total_co2e') ?? 0;
-        $scope1Total = $measurements->sum('scope_1_co2e') ?? 0;
-        $scope2Total = $measurements->sum('scope_2_co2e') ?? 0;
-        $scope3Total = $measurements->sum('scope_3_co2e') ?? 0;
+        // Get current year data
+        $currentYear = now()->year;
+        $currentYearMeasurements = $measurements->filter(function($measurement) use ($currentYear) {
+            return $measurement->period_start->year == $currentYear;
+        });
+
+        $totalEmissions = $currentYearMeasurements->sum('total_co2e') ?? 0;
+        $scope1Total = $currentYearMeasurements->sum('scope_1_co2e') ?? 0;
+        $scope2Total = $currentYearMeasurements->sum('scope_2_co2e') ?? 0;
+        $scope3Total = $currentYearMeasurements->sum('scope_3_co2e') ?? 0;
         
-        // Calculate month-over-month change
+        // Verify calculation: total should equal scope1 + scope2 + scope3
+        $calculatedTotal = $scope1Total + $scope2Total + $scope3Total;
+        if (abs($totalEmissions - $calculatedTotal) > 0.01) {
+            // If there's a discrepancy, use the calculated total
+            $totalEmissions = $calculatedTotal;
+        }
+        
+        // Calculate month-over-month change based on measurement periods
+        $currentMonth = now()->format('Y-m');
         $currentMonthEmissions = $measurements
-            ->where('created_at', '>=', now()->startOfMonth())
+            ->filter(function($measurement) use ($currentMonth) {
+                return $measurement->period_start->format('Y-m') === $currentMonth;
+            })
             ->sum('total_co2e') ?? 0;
             
+        $lastMonth = now()->subMonth()->format('Y-m');
         $lastMonthEmissions = $measurements
-            ->whereBetween('created_at', [
-                now()->subMonth()->startOfMonth(),
-                now()->subMonth()->endOfMonth()
-            ])
+            ->filter(function($measurement) use ($lastMonth) {
+                return $measurement->period_start->format('Y-m') === $lastMonth;
+            })
             ->sum('total_co2e') ?? 0;
 
         $monthlyChange = $lastMonthEmissions > 0 
@@ -116,6 +132,7 @@ class DashboardController extends Controller
             'reports_count' => $measurements->count(),
             'draft_reports' => $measurements->where('status', 'draft')->count(),
             'submitted_reports' => $measurements->where('status', 'submitted')->count(),
+            'period' => $currentYear, // Add period context
         ];
     }
 
