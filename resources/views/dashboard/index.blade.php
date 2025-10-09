@@ -1,9 +1,4 @@
-@extends('layouts.app')
 
-@section('title', 'Dashboard - MIDDLE EAST NET Zero')
-@section('page-title', 'Dashboard')
-
-@section('content')
 @if(isset($needsCompanySetup) && $needsCompanySetup)
     <!-- Company Setup Form - Show ONLY when company not added -->
     <div class="max-w-4xl mx-auto">
