@@ -322,97 +322,189 @@ class DEWABillParser
     }
     
     /**
+     * Check if the extracted text is mostly binary content
+     */
+    private function isBinaryContent(string $text): bool
+    {
+        // If text is empty, it's not binary content
+        if (empty($text)) {
+            return false;
+        }
+        
+        // Count printable ASCII characters
+        $printableCount = preg_match_all('/[\x20-\x7E]/', $text);
+        $totalLength = strlen($text);
+        
+        // If less than 30% of characters are printable ASCII, consider it binary
+        $printableRatio = $printableCount / $totalLength;
+        
+        // Check for common binary content patterns
+        $binaryPatterns = [
+            '/\?[^\s]*\?/',  // Question marks with non-space characters
+            '/[^\x20-\x7E]{3,}/',  // 3+ consecutive non-printable characters
+            '/endstream\s+endobj/',  // PDF stream markers
+            '/obj\s+<<\/Type/',  // PDF object markers
+        ];
+        
+        $binaryMatchCount = 0;
+        foreach ($binaryPatterns as $pattern) {
+            if (preg_match($pattern, $text)) {
+                $binaryMatchCount++;
+            }
+        }
+        
+        // If we have a low printable ratio OR multiple binary patterns, it's binary content
+        return $printableRatio < 0.3 || $binaryMatchCount >= 2;
+    }
+    
+    /**
      * Parse extracted text to find ALL bill data and organize into generic boxes
      */
     private function parseBillText(string $text): array
     {
-        // If no text was extracted, create a fallback structure for manual processing
-        if (empty($text) || strpos($text, 'PDF text extraction failed') !== false) {
-            Log::info('No text extracted, creating fallback structure for manual processing');
+        // If no text was extracted or only binary content, create a fallback structure for manual processing
+        if (empty($text) || strpos($text, 'PDF text extraction failed') !== false || $this->isBinaryContent($text)) {
+            Log::info('No readable text extracted (binary content detected), creating fallback structure for manual processing');
             
             $billData = [
                 'bill_information' => [
                     [
                         'type' => 'bill_number',
                         'label' => 'Bill Number',
-                        'value' => 'Manual Entry Required',
-                        'confidence' => 0
+                        'value' => 'Please enter bill number from your DEWA bill',
+                        'confidence' => 0,
+                        'help_text' => 'Look for "Bill No" or "Invoice No" on your bill'
                     ],
                     [
                         'type' => 'account_number', 
                         'label' => 'Account Number',
-                        'value' => 'Manual Entry Required',
-                        'confidence' => 0
+                        'value' => 'Please enter your DEWA account number',
+                        'confidence' => 0,
+                        'help_text' => 'Usually a 10-12 digit number on your bill'
                     ],
                     [
                         'type' => 'customer_name',
                         'label' => 'Customer Name', 
-                        'value' => 'Manual Entry Required',
-                        'confidence' => 0
+                        'value' => 'Please enter customer name from bill',
+                        'confidence' => 0,
+                        'help_text' => 'Name of the account holder'
+                    ],
+                    [
+                        'type' => 'bill_date',
+                        'label' => 'Bill Date',
+                        'value' => 'Please enter bill date',
+                        'confidence' => 0,
+                        'help_text' => 'Date when the bill was issued'
+                    ],
+                    [
+                        'type' => 'due_date',
+                        'label' => 'Due Date',
+                        'value' => 'Please enter due date',
+                        'confidence' => 0,
+                        'help_text' => 'Date when payment is due'
                     ]
                 ],
                 'extracted_services' => [
                     [
                         'type' => 'electricity',
-                        'description' => 'Electricity Service - Manual Entry Required',
+                        'description' => 'Electricity Consumption - Please enter from your bill',
                         'unit' => 'kWh',
                         'value' => '0',
-                        'confidence' => 0
+                        'confidence' => 0,
+                        'help_text' => 'Look for electricity consumption in kWh on your bill'
                     ],
                     [
                         'type' => 'water',
-                        'description' => 'Water Service - Manual Entry Required', 
+                        'description' => 'Water Consumption - Please enter from your bill', 
                         'unit' => 'Cubic Meters',
                         'value' => '0',
-                        'confidence' => 0
+                        'confidence' => 0,
+                        'help_text' => 'Look for water consumption in cubic meters on your bill'
+                    ],
+                    [
+                        'type' => 'sewerage',
+                        'description' => 'Sewerage Charges - Please enter from your bill',
+                        'unit' => 'AED',
+                        'value' => '0.00',
+                        'confidence' => 0,
+                        'help_text' => 'Look for sewerage or drainage charges on your bill'
                     ]
                 ],
                 'extracted_charges' => [
                     [
                         'type' => 'electricity_charge',
-                        'description' => 'Electricity Charges - Manual Entry Required',
+                        'description' => 'Electricity Charges - Please enter from your bill',
                         'amount' => '0.00',
                         'currency' => 'AED',
-                        'confidence' => 0
+                        'confidence' => 0,
+                        'help_text' => 'Look for electricity charges in AED on your bill'
                     ],
                     [
                         'type' => 'water_charge',
-                        'description' => 'Water Charges - Manual Entry Required',
+                        'description' => 'Water Charges - Please enter from your bill',
                         'amount' => '0.00', 
                         'currency' => 'AED',
-                        'confidence' => 0
+                        'confidence' => 0,
+                        'help_text' => 'Look for water charges in AED on your bill'
+                    ],
+                    [
+                        'type' => 'sewerage_charge',
+                        'description' => 'Sewerage Charges - Please enter from your bill',
+                        'amount' => '0.00',
+                        'currency' => 'AED',
+                        'confidence' => 0,
+                        'help_text' => 'Look for sewerage or drainage charges in AED on your bill'
+                    ],
+                    [
+                        'type' => 'municipal_fee',
+                        'description' => 'Municipal Fee - Please enter from your bill',
+                        'amount' => '0.00',
+                        'currency' => 'AED',
+                        'confidence' => 0,
+                        'help_text' => 'Look for municipal fee (5% of annual rent / 12) on your bill'
                     ]
                 ],
                 'extracted_consumption' => [
                     [
                         'type' => 'electricity_consumption',
-                        'description' => 'Electricity Consumption - Manual Entry Required',
+                        'description' => 'Electricity Consumption - Please enter from your bill',
                         'unit' => 'kWh',
                         'value' => '0',
                         'period' => 'Current Month',
-                        'confidence' => 0
+                        'confidence' => 0,
+                        'help_text' => 'Look for electricity consumption in kWh on your bill'
                     ],
                     [
                         'type' => 'water_consumption',
-                        'description' => 'Water Consumption - Manual Entry Required',
+                        'description' => 'Water Consumption - Please enter from your bill',
                         'unit' => 'Cubic Meters', 
                         'value' => '0',
                         'period' => 'Current Month',
-                        'confidence' => 0
+                        'confidence' => 0,
+                        'help_text' => 'Look for water consumption in cubic meters on your bill'
                     ]
                 ],
                 'extracted_dates' => [
                     [
                         'type' => 'bill_date',
                         'label' => 'Bill Date',
-                        'value' => 'Manual Entry Required',
-                        'confidence' => 0
+                        'value' => 'Please enter bill date from your bill',
+                        'confidence' => 0,
+                        'help_text' => 'Look for the date when the bill was issued'
                     ],
                     [
                         'type' => 'due_date',
                         'label' => 'Due Date', 
-                        'value' => 'Manual Entry Required',
-                        'confidence' => 0
+                        'value' => 'Please enter due date from your bill',
+                        'confidence' => 0,
+                        'help_text' => 'Look for the payment due date on your bill'
+                    ],
+                    [
+                        'type' => 'billing_period',
+                        'label' => 'Billing Period',
+                        'value' => 'Please enter billing period from your bill',
+                        'confidence' => 0,
+                        'help_text' => 'Look for the period covered by this bill (e.g., Jan 1 - Jan 31)'
                     ]
                 ],
                 'extracted_amounts' => [
@@ -421,7 +513,24 @@ class DEWABillParser
                         'label' => 'Total Amount',
                         'value' => '0.00',
                         'currency' => 'AED',
-                        'confidence' => 0
+                        'confidence' => 0,
+                        'help_text' => 'Look for the total amount due in AED on your bill'
+                    ],
+                    [
+                        'type' => 'previous_balance',
+                        'label' => 'Previous Balance',
+                        'value' => '0.00',
+                        'currency' => 'AED',
+                        'confidence' => 0,
+                        'help_text' => 'Look for any previous balance or outstanding amount'
+                    ],
+                    [
+                        'type' => 'current_charges',
+                        'label' => 'Current Charges',
+                        'value' => '0.00',
+                        'currency' => 'AED',
+                        'confidence' => 0,
+                        'help_text' => 'Look for current period charges'
                     ]
                 ],
                 'raw_text' => $text,
@@ -431,7 +540,15 @@ class DEWABillParser
                 'processing_info' => [
                     'extraction_failed' => true,
                     'requires_manual_entry' => true,
-                    'message' => 'PDF text extraction failed - please enter data manually'
+                    'message' => 'PDF text extraction failed - this appears to be an image-based or heavily compressed PDF. Please enter the data manually from your DEWA bill.',
+                    'extraction_method' => 'manual_entry_required',
+                    'pdf_type' => 'image_based_or_compressed',
+                    'suggestions' => [
+                        'This PDF appears to be scanned or heavily compressed',
+                        'Please manually enter the data from your physical bill',
+                        'Look for bill number, account number, and consumption data',
+                        'Enter electricity and water consumption in the appropriate fields'
+                    ]
                 ]
             ];
             
