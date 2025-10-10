@@ -1252,7 +1252,12 @@ class DEWABillParser
             '/(water|sewerage|drainage)[^0-9]*(\d+\.?\d*)\s*(cubic\s*meters?|m³|gallons?)/i',
             '/(\d+\.?\d*)\s*(cubic\s*meters?|m³|gallons?)\s*(water|sewerage|drainage)/i',
             '/water[^0-9]*(\d+\.?\d*)\s*(cubic\s*meters?|m³)/i',
-            '/sewerage[^0-9]*(\d+\.?\d*)\s*(cubic\s*meters?|m³)/i'
+            '/sewerage[^0-9]*(\d+\.?\d*)\s*(cubic\s*meters?|m³)/i',
+            // Additional patterns for DEWA bills
+            '/(\d+\.?\d*)\s*(cubic\s*meters?|m³)/i',
+            '/water[^0-9]*(\d+\.?\d*)/i',
+            '/sewerage[^0-9]*(\d+\.?\d*)/i',
+            '/drainage[^0-9]*(\d+\.?\d*)/i'
         ];
         
         foreach ($waterPatterns as $pattern) {
@@ -1305,6 +1310,12 @@ class DEWABillParser
                     ];
                 }
             }
+        }
+        
+        // Method: Try to categorize extracted amounts as services based on context
+        if (empty($services)) {
+            Log::info('No services found with direct patterns, trying context-based categorization');
+            $services = $this->categorizeAmountsAsServices($cleanText);
         }
         
         Log::info('Found ' . count($services) . ' services');
