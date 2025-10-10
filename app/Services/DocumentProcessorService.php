@@ -50,8 +50,10 @@ class DocumentProcessorService
             // Extract data using appropriate service
             if ($document->source_type === 'dewa' || $document->source_type === 'electricity') {
                 // Use DEWA bill parser for DEWA bills and electricity bills
+                \Log::info('Using DEWA parser for source_type: ' . $document->source_type);
                 $dewaParser = new DEWABillParser();
                 $extractedData = $dewaParser->parseBill($filePath);
+                \Log::info('DEWA parser result: ' . json_encode($extractedData));
             } else {
                 // Use OCR service for other document types
                 $extractedData = $this->getOCRService()->extractData(

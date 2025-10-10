@@ -97,6 +97,12 @@
                     </div>
                     <div class="px-6 py-4">
                         @if($document->processed_data)
+                            <!-- Debug: Show raw processed data -->
+                            <div class="mb-4 p-3 bg-gray-100 rounded text-xs">
+                                <strong>Debug - Processed Data:</strong><br>
+                                <pre>{{ json_encode($document->processed_data, JSON_PRETTY_PRINT) }}</pre>
+                            </div>
+                            
                             @if($document->source_type === 'dewa' || $document->source_type === 'electricity')
                                 <!-- DEWA Bill Data Structure -->
                                 <div class="space-y-6">

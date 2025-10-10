@@ -113,7 +113,9 @@ class DocumentUploadController extends Controller
             );
 
             // Queue OCR processing
+            \Log::info('Starting OCR processing for document: ' . $document->id . ' with source_type: ' . $document->source_type);
             $this->documentProcessor->processDocument($document);
+            \Log::info('OCR processing completed for document: ' . $document->id);
 
             return redirect()->route('document-uploads.show', $document)
                 ->with('success', 'Document uploaded successfully. OCR processing has started.');
