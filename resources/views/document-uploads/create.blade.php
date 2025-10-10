@@ -65,11 +65,12 @@
                 <select name="source_type" id="source_type" required 
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="">Select document type</option>
-                    <option value="electricity" {{ old('source_type') === 'electricity' ? 'selected' : '' }}>⚡ Electricity Bill</option>
-                    <option value="fuel" {{ old('source_type') === 'fuel' ? 'selected' : '' }}>⛽ Fuel Receipt</option>
-                    <option value="waste" {{ old('source_type') === 'waste' ? 'selected' : '' }}>🗑️ Waste Disposal</option>
+                    <option value="dewa" {{ old('source_type') === 'dewa' ? 'selected' : '' }}>🏢 DEWA Bill (Dubai Electricity & Water Authority)</option>
+                    <option value="electricity" {{ old('source_type') === 'electricity' ? 'selected' : '' }}>⚡ Other Electricity Bill</option>
                     <option value="water" {{ old('source_type') === 'water' ? 'selected' : '' }}>💧 Water Bill</option>
+                    <option value="fuel" {{ old('source_type') === 'fuel' ? 'selected' : '' }}>⛽ Fuel Receipt</option>
                     <option value="transport" {{ old('source_type') === 'transport' ? 'selected' : '' }}>🚛 Transport/Logistics</option>
+                    <option value="waste" {{ old('source_type') === 'waste' ? 'selected' : '' }}>🗑️ Waste Disposal</option>
                     <option value="other" {{ old('source_type') === 'other' ? 'selected' : '' }}>📄 Other Document</option>
                 </select>
                 @error('source_type')

@@ -40,8 +40,8 @@ class DocumentProcessorService
             $filePath = Storage::disk('private')->path($document->file_path);
 
             // Extract data using appropriate service
-            if ($document->source_type === 'electricity') {
-                // Use DEWA bill parser for electricity bills
+            if ($document->source_type === 'dewa' || $document->source_type === 'electricity') {
+                // Use DEWA bill parser for DEWA bills and electricity bills
                 $dewaParser = new DEWABillParser();
                 $extractedData = $dewaParser->parseBill($filePath);
             } else {
@@ -56,7 +56,7 @@ class DocumentProcessorService
             }
 
             // Validate extracted data
-            if ($document->source_type === 'electricity') {
+            if ($document->source_type === 'dewa' || $document->source_type === 'electricity') {
                 $dewaParser = new DEWABillParser();
                 $validation = $dewaParser->validateExtractedData($extractedData);
             } else {
@@ -64,7 +64,7 @@ class DocumentProcessorService
             }
 
             // Calculate confidence score
-            if ($document->source_type === 'electricity') {
+            if ($document->source_type === 'dewa' || $document->source_type === 'electricity') {
                 $confidence = $extractedData['confidence'] ?? 90; // DEWA parser provides confidence
             } else {
                 $confidence = $this->ocrService->getConfidenceScore($extractedData);

@@ -97,7 +97,7 @@
                     </div>
                     <div class="px-6 py-4">
                         @if($document->processed_data)
-                            @if($document->source_type === 'electricity')
+                            @if($document->source_type === 'dewa' || $document->source_type === 'electricity')
                                 <!-- DEWA Bill Data Structure -->
                                 <div class="space-y-6">
                                     @if(isset($document->processed_data['extracted_services']) || isset($document->processed_data['extracted_charges']) || isset($document->processed_data['extracted_consumption']))
