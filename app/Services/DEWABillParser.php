@@ -48,10 +48,26 @@ class DEWABillParser
     private function extractTextFromPDF(string $filePath): string
     {
         try {
+            Log::info('Starting PDF text extraction for: ' . $filePath);
+            
+            // Check if file exists
+            if (!file_exists($filePath)) {
+                Log::error('PDF file does not exist: ' . $filePath);
+                return '';
+            }
+            
             // Use pdftotext command if available
             if (function_exists('shell_exec') && $this->commandExists('pdftotext')) {
+                Log::info('Using pdftotext command for extraction');
                 $output = shell_exec("pdftotext -layout \"$filePath\" -");
-                return $output ?: '';
+                if ($output) {
+                    Log::info('pdftotext extracted ' . strlen($output) . ' characters');
+                    return $output;
+                } else {
+                    Log::warning('pdftotext returned empty output');
+                }
+            } else {
+                Log::info('pdftotext not available, using fallback method');
             }
             
             // Fallback: try to read PDF as text (basic approach)
@@ -60,8 +76,15 @@ class DEWABillParser
                 throw new \Exception('Could not read PDF file');
             }
             
+            Log::info('PDF file size: ' . strlen($content) . ' bytes');
+            
             // Simple text extraction (this is basic and may not work for all PDFs)
             $text = $this->basicPDFTextExtraction($content);
+            
+            Log::info('Basic extraction result: ' . strlen($text) . ' characters');
+            if (strlen($text) > 0) {
+                Log::info('First 200 characters: ' . substr($text, 0, 200));
+            }
             
             return $text;
             
@@ -157,9 +180,12 @@ class DEWABillParser
         $text = preg_replace('/\s+/', ' ', $text);
         $text = trim($text);
         
-        // If still empty, add a fallback message
+        // If still empty, add a fallback message and create mock data for DEWA bills
         if (empty($text)) {
             $text = 'PDF text extraction failed - document may be image-based or encrypted';
+            
+            // For DEWA bills, create some mock data structure to help with manual processing
+            Log::info('Creating fallback mock data for DEWA bill');
         }
         
         return $text;
@@ -170,6 +196,119 @@ class DEWABillParser
      */
     private function parseBillText(string $text): array
     {
+        // If no text was extracted, create a fallback structure for manual processing
+        if (empty($text) || strpos($text, 'PDF text extraction failed') !== false) {
+            Log::info('No text extracted, creating fallback structure for manual processing');
+            
+            $billData = [
+                'bill_information' => [
+                    [
+                        'type' => 'bill_number',
+                        'label' => 'Bill Number',
+                        'value' => 'Manual Entry Required',
+                        'confidence' => 0
+                    ],
+                    [
+                        'type' => 'account_number', 
+                        'label' => 'Account Number',
+                        'value' => 'Manual Entry Required',
+                        'confidence' => 0
+                    ],
+                    [
+                        'type' => 'customer_name',
+                        'label' => 'Customer Name', 
+                        'value' => 'Manual Entry Required',
+                        'confidence' => 0
+                    ]
+                ],
+                'extracted_services' => [
+                    [
+                        'type' => 'electricity',
+                        'description' => 'Electricity Service - Manual Entry Required',
+                        'unit' => 'kWh',
+                        'value' => '0',
+                        'confidence' => 0
+                    ],
+                    [
+                        'type' => 'water',
+                        'description' => 'Water Service - Manual Entry Required', 
+                        'unit' => 'Cubic Meters',
+                        'value' => '0',
+                        'confidence' => 0
+                    ]
+                ],
+                'extracted_charges' => [
+                    [
+                        'type' => 'electricity_charge',
+                        'description' => 'Electricity Charges - Manual Entry Required',
+                        'amount' => '0.00',
+                        'currency' => 'AED',
+                        'confidence' => 0
+                    ],
+                    [
+                        'type' => 'water_charge',
+                        'description' => 'Water Charges - Manual Entry Required',
+                        'amount' => '0.00', 
+                        'currency' => 'AED',
+                        'confidence' => 0
+                    ]
+                ],
+                'extracted_consumption' => [
+                    [
+                        'type' => 'electricity_consumption',
+                        'description' => 'Electricity Consumption - Manual Entry Required',
+                        'unit' => 'kWh',
+                        'value' => '0',
+                        'period' => 'Current Month',
+                        'confidence' => 0
+                    ],
+                    [
+                        'type' => 'water_consumption',
+                        'description' => 'Water Consumption - Manual Entry Required',
+                        'unit' => 'Cubic Meters', 
+                        'value' => '0',
+                        'period' => 'Current Month',
+                        'confidence' => 0
+                    ]
+                ],
+                'extracted_dates' => [
+                    [
+                        'type' => 'bill_date',
+                        'label' => 'Bill Date',
+                        'value' => 'Manual Entry Required',
+                        'confidence' => 0
+                    ],
+                    [
+                        'type' => 'due_date',
+                        'label' => 'Due Date', 
+                        'value' => 'Manual Entry Required',
+                        'confidence' => 0
+                    ]
+                ],
+                'extracted_amounts' => [
+                    [
+                        'type' => 'total_amount',
+                        'label' => 'Total Amount',
+                        'value' => '0.00',
+                        'currency' => 'AED',
+                        'confidence' => 0
+                    ]
+                ],
+                'raw_text' => $text,
+                'confidence' => 30,
+                'extraction_method' => 'fallback_manual_entry',
+                'bill_type' => 'DEWA_UTILITY_BILL',
+                'processing_info' => [
+                    'extraction_failed' => true,
+                    'requires_manual_entry' => true,
+                    'message' => 'PDF text extraction failed - please enter data manually'
+                ]
+            ];
+            
+            return $billData;
+        }
+        
+        // Normal extraction process
         $billData = [
             'bill_information' => $this->extractBillInformation($text),
             'extracted_services' => $this->extractAllServices($text),
