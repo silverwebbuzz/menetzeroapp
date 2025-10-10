@@ -118,13 +118,16 @@ class DocumentUploadController extends Controller
                 ->with('success', 'Document uploaded successfully. OCR processing has started.');
 
         } catch (\Exception $e) {
-            DocumentProcessingLog::log(
-                $document->id ?? null,
-                'error',
-                'Failed to upload document: ' . $e->getMessage(),
-                ['error' => $e->getTraceAsString()],
-                'upload'
-            );
+            // Only log if document was created successfully
+            if (isset($document) && $document->id) {
+                DocumentProcessingLog::log(
+                    $document->id,
+                    'error',
+                    'Failed to upload document: ' . $e->getMessage(),
+                    ['error' => $e->getTraceAsString()],
+                    'upload'
+                );
+            }
 
             return back()->withErrors(['file' => 'Failed to upload document. Please try again.']);
         }
