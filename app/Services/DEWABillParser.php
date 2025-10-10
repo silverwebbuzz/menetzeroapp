@@ -193,7 +193,7 @@ class DEWABillParser
             }
         }
         
-        // Method 3: Look for text streams
+        // Method 3: Look for text streams and try to decode them
         if (empty($text)) {
             preg_match_all('/stream\s*(.*?)\s*endstream/s', $content, $streamMatches);
             if (!empty($streamMatches[1])) {
@@ -208,7 +208,22 @@ class DEWABillParser
             }
         }
         
-        // Method 4: Look for common DEWA bill patterns
+        // Method 4: Look for compressed streams and try to extract text
+        if (empty($text)) {
+            // Look for FlateDecode streams (compressed text)
+            preg_match_all('/\/FlateDecode.*?stream\s*(.*?)\s*endstream/s', $content, $flateMatches);
+            if (!empty($flateMatches[1])) {
+                foreach ($flateMatches[1] as $flateStream) {
+                    // Try to find readable text in compressed streams
+                    $readableText = $this->extractReadableTextFromStream($flateStream);
+                    if (!empty($readableText)) {
+                        $text .= $readableText . ' ';
+                    }
+                }
+            }
+        }
+        
+        // Method 5: Look for common DEWA bill patterns in binary content
         if (empty($text)) {
             // Look for specific patterns that might be in the PDF
             $patterns = [
@@ -231,6 +246,15 @@ class DEWABillParser
             }
         }
         
+        // Method 6: Look for readable text in the raw content
+        if (empty($text)) {
+            // Extract any readable text from the PDF content
+            $readableText = $this->extractReadableTextFromContent($content);
+            if (!empty($readableText)) {
+                $text .= $readableText . ' ';
+            }
+        }
+        
         // Clean up the text
         $text = preg_replace('/\s+/', ' ', $text);
         $text = trim($text);
@@ -244,6 +268,57 @@ class DEWABillParser
         }
         
         return $text;
+    }
+    
+    /**
+     * Extract readable text from compressed streams
+     */
+    private function extractReadableTextFromStream(string $stream): string
+    {
+        $text = '';
+        
+        // Look for readable text patterns in the stream
+        $patterns = [
+            '/[A-Za-z0-9\s\.\,\:\-\/]+/',  // Basic alphanumeric patterns
+            '/\b[A-Z]{2,}\b/',              // Uppercase words (like DEWA, AED)
+            '/\b\d+\.\d+\b/',              // Decimal numbers
+            '/\b\d{4,}\b/',                // Long numbers (like account numbers)
+        ];
+        
+        foreach ($patterns as $pattern) {
+            preg_match_all($pattern, $stream, $matches);
+            if (!empty($matches[0])) {
+                $text .= implode(' ', $matches[0]) . ' ';
+            }
+        }
+        
+        return trim($text);
+    }
+    
+    /**
+     * Extract readable text from PDF content
+     */
+    private function extractReadableTextFromContent(string $content): string
+    {
+        $text = '';
+        
+        // Look for readable text patterns in the entire content
+        $patterns = [
+            '/[A-Za-z0-9\s\.\,\:\-\/]+/',  // Basic alphanumeric patterns
+            '/\b[A-Z]{2,}\b/',              // Uppercase words
+            '/\b\d+\.\d+\b/',              // Decimal numbers
+            '/\b\d{4,}\b/',                // Long numbers
+            '/\b[A-Za-z]+\s+\d+\b/',       // Word followed by number
+        ];
+        
+        foreach ($patterns as $pattern) {
+            preg_match_all($pattern, $content, $matches);
+            if (!empty($matches[0])) {
+                $text .= implode(' ', $matches[0]) . ' ';
+            }
+        }
+        
+        return trim($text);
     }
     
     /**
@@ -393,22 +468,79 @@ class DEWABillParser
     {
         $info = [];
         
-        // Extract bill number
-        if (preg_match('/\b(\d{9,12})\b/', $text, $matches)) {
-            $info['bill_number'] = $matches[1];
+        // Clean the text first to remove PDF artifacts
+        $cleanText = $this->cleanExtractedText($text);
+        
+        // Extract bill number - look for various patterns
+        $billPatterns = [
+            '/Bill\s*No[\.:]?\s*(\d+)/i',
+            '/Bill\s*Number[\.:]?\s*(\d+)/i',
+            '/Invoice\s*No[\.:]?\s*(\d+)/i',
+            '/\b(\d{8,12})\b/',  // Long numbers that might be bill numbers
+        ];
+        
+        foreach ($billPatterns as $pattern) {
+            if (preg_match($pattern, $cleanText, $matches)) {
+                $info['bill_number'] = $matches[1];
+                break;
+            }
         }
         
         // Extract account number
-        if (preg_match('/Account[:\s]*(\d{8,12})/', $text, $matches)) {
-            $info['account_number'] = $matches[1];
+        $accountPatterns = [
+            '/Account\s*No[\.:]?\s*(\d+)/i',
+            '/Account\s*Number[\.:]?\s*(\d+)/i',
+            '/Account[\.:]?\s*(\d+)/i',
+        ];
+        
+        foreach ($accountPatterns as $pattern) {
+            if (preg_match($pattern, $cleanText, $matches)) {
+                $info['account_number'] = $matches[1];
+                break;
+            }
         }
         
         // Extract customer name
-        if (preg_match('/Customer[:\s]*([A-Z\s]+)/', $text, $matches)) {
+        if (preg_match('/Customer\s*Name[\.:]?\s*([A-Za-z\s]+)/i', $cleanText, $matches)) {
             $info['customer_name'] = trim($matches[1]);
         }
         
         return $info;
+    }
+    
+    /**
+     * Clean extracted text to remove PDF artifacts and binary content
+     */
+    private function cleanExtractedText(string $text): string
+    {
+        // Remove PDF object references
+        $text = preg_replace('/\b\d+\s+\d+\s+obj\b/', '', $text);
+        $text = preg_replace('/\bendobj\b/', '', $text);
+        
+        // Remove stream markers
+        $text = preg_replace('/\bstream\b/', '', $text);
+        $text = preg_replace('/\bendstream\b/', '', $text);
+        
+        // Remove PDF operators
+        $text = preg_replace('/\b(BT|ET|Tj|TJ|Tm|Td|TD|Tf|Tc|Tw|Tz|TL|Tr|Ts|T\*|Tj|TJ)\b/', '', $text);
+        
+        // Remove PDF filters
+        $text = preg_replace('/\b(FlateDecode|ASCIIHexDecode|ASCII85Decode|LZWDecode|RunLengthDecode)\b/', '', $text);
+        
+        // Remove binary content markers
+        $text = preg_replace('/\b(Filter|Length|Type|ExtGState|BM|Normal|ca)\b/', '', $text);
+        
+        // Remove common PDF artifacts
+        $text = preg_replace('/\b(<<|>>|\/Type|\/Filter|\/Length|\/BM|\/Normal|\/ca)\b/', '', $text);
+        
+        // Remove binary content patterns
+        $text = preg_replace('/[^\x20-\x7E\s]/', ' ', $text);
+        
+        // Clean up extra whitespace
+        $text = preg_replace('/\s+/', ' ', $text);
+        $text = trim($text);
+        
+        return $text;
     }
     
     /**
@@ -418,8 +550,11 @@ class DEWABillParser
     {
         $services = [];
         
+        // Clean the text first
+        $cleanText = $this->cleanExtractedText($text);
+        
         // Look for electricity-related services
-        if (preg_match_all('/(electricity|power|energy)[^0-9]*(\d+\.?\d*)\s*(kWh|units?)/i', $text, $matches, PREG_SET_ORDER)) {
+        if (preg_match_all('/(electricity|power|energy)[^0-9]*(\d+\.?\d*)\s*(kWh|units?)/i', $cleanText, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
                 $services[] = [
                     'type' => 'Electricity',
@@ -432,7 +567,7 @@ class DEWABillParser
         }
         
         // Look for water-related services
-        if (preg_match_all('/(water|sewerage|drainage)[^0-9]*(\d+\.?\d*)\s*(cubic\s*meters?|m³|gallons?)/i', $text, $matches, PREG_SET_ORDER)) {
+        if (preg_match_all('/(water|sewerage|drainage)[^0-9]*(\d+\.?\d*)\s*(cubic\s*meters?|m³|gallons?)/i', $cleanText, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
                 $services[] = [
                     'type' => 'Water',
