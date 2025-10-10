@@ -25,6 +25,38 @@ class DocumentProcessorService
         }
         return $this->ocrService;
     }
+    
+    /**
+     * Clean data to ensure it can be safely encoded to JSON
+     */
+    private function cleanDataForJSON($data)
+    {
+        if (is_array($data)) {
+            $cleaned = [];
+            foreach ($data as $key => $value) {
+                $cleaned[$key] = $this->cleanDataForJSON($value);
+            }
+            return $cleaned;
+        } elseif (is_string($data)) {
+            // Remove null bytes and control characters
+            $data = str_replace(["\0", "\x00"], '', $data);
+            
+            // Remove other control characters except newlines and tabs
+            $data = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $data);
+            
+            // Ensure UTF-8 encoding
+            if (!mb_check_encoding($data, 'UTF-8')) {
+                $data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
+            }
+            
+            // Remove any remaining invalid UTF-8 sequences
+            $data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
+            
+            return $data;
+        } else {
+            return $data;
+        }
+    }
 
     /**
      * Process document with OCR extraction
@@ -80,6 +112,9 @@ class DocumentProcessorService
                 $confidence = $this->getOCRService()->getConfidenceScore($extractedData);
             }
 
+            // Clean extracted data to ensure UTF-8 encoding
+            $extractedData = $this->cleanDataForJSON($extractedData);
+            
             // Update document with extracted data
             $document->update([
                 'extracted_data' => $extractedData,

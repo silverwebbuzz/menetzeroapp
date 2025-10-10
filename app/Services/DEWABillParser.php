@@ -61,6 +61,8 @@ class DEWABillParser
                 Log::info('Using pdftotext command for extraction');
                 $output = shell_exec("pdftotext -layout \"$filePath\" -");
                 if ($output) {
+                    // Clean and encode the output to ensure UTF-8
+                    $output = $this->cleanTextForUTF8($output);
                     Log::info('pdftotext extracted ' . strlen($output) . ' characters');
                     return $output;
                 } else {
@@ -80,6 +82,9 @@ class DEWABillParser
             
             // Simple text extraction (this is basic and may not work for all PDFs)
             $text = $this->basicPDFTextExtraction($content);
+            
+            // Clean the extracted text for UTF-8 encoding
+            $text = $this->cleanTextForUTF8($text);
             
             Log::info('Basic extraction result: ' . strlen($text) . ' characters');
             if (strlen($text) > 0) {
@@ -101,6 +106,56 @@ class DEWABillParser
     {
         $return = shell_exec("which $command");
         return !empty($return);
+    }
+    
+    /**
+     * Clean text to ensure proper UTF-8 encoding
+     */
+    private function cleanTextForUTF8(string $text): string
+    {
+        // Remove null bytes and control characters
+        $text = str_replace(["\0", "\x00"], '', $text);
+        
+        // Remove other control characters except newlines and tabs
+        $text = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $text);
+        
+        // Convert to UTF-8 and remove invalid sequences
+        $text = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
+        
+        // Remove any remaining invalid UTF-8 sequences
+        $text = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
+        
+        // Clean up extra whitespace
+        $text = preg_replace('/\s+/', ' ', $text);
+        $text = trim($text);
+        
+        return $text;
+    }
+    
+    /**
+     * Clean extracted data to ensure all string values are UTF-8 safe
+     */
+    private function cleanExtractedDataForUTF8(array $data): array
+    {
+        return $this->recursiveCleanUTF8($data);
+    }
+    
+    /**
+     * Recursively clean UTF-8 encoding in arrays
+     */
+    private function recursiveCleanUTF8($data)
+    {
+        if (is_array($data)) {
+            $cleaned = [];
+            foreach ($data as $key => $value) {
+                $cleaned[$key] = $this->recursiveCleanUTF8($value);
+            }
+            return $cleaned;
+        } elseif (is_string($data)) {
+            return $this->cleanTextForUTF8($data);
+        } else {
+            return $data;
+        }
     }
     
     /**
@@ -305,6 +360,9 @@ class DEWABillParser
                 ]
             ];
             
+            // Clean the fallback data as well
+            $billData = $this->cleanExtractedDataForUTF8($billData);
+            
             return $billData;
         }
         
@@ -321,6 +379,9 @@ class DEWABillParser
             'extraction_method' => 'pdf_text_extraction',
             'bill_type' => 'DEWA_UTILITY_BILL'
         ];
+        
+        // Clean all string values in the extracted data to ensure UTF-8 encoding
+        $billData = $this->cleanExtractedDataForUTF8($billData);
         
         return $billData;
     }
