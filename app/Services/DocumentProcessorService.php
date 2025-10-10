@@ -6,6 +6,7 @@ use App\Models\DocumentUpload;
 use App\Models\DocumentProcessingLog;
 use App\Models\DocumentUsageTracking;
 use App\Services\DEWABillParser;
+use App\Services\OCRService;
 use Illuminate\Support\Facades\Storage;
 
 class DocumentProcessorService

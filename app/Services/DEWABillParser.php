@@ -444,41 +444,70 @@ class DEWABillParser
         $errors = [];
         $warnings = [];
         
-        // Check required fields - look in the structured data
-        $electricityConsumption = null;
-        if (isset($data['energy_consumption']['total_electricity_kwh'])) {
-            $electricityConsumption = $data['energy_consumption']['total_electricity_kwh'];
-        } elseif (isset($data['dewa_services']['electricity_consumption_kwh'])) {
-            $electricityConsumption = $data['dewa_services']['electricity_consumption_kwh'];
-        } elseif (isset($data['electricity_consumption_kwh'])) {
-            $electricityConsumption = $data['electricity_consumption_kwh'];
+        // Check if we have any extracted data at all
+        $hasServices = !empty($data['extracted_services'] ?? []);
+        $hasCharges = !empty($data['extracted_charges'] ?? []);
+        $hasConsumption = !empty($data['extracted_consumption'] ?? []);
+        
+        if (!$hasServices && !$hasCharges && !$hasConsumption) {
+            $errors[] = 'No data extracted from the document';
         }
         
-        if (empty($electricityConsumption)) {
-            $errors[] = 'Electricity consumption (kWh) is required for carbon calculation';
-        }
-        
-        // Validate electricity consumption
-        if ($electricityConsumption && $electricityConsumption > 0) {
-            if ($electricityConsumption > 10000) {
-                $warnings[] = 'Electricity consumption seems unusually high';
+        // Check for electricity consumption in services or consumption data
+        $hasElectricity = false;
+        if ($hasServices) {
+            foreach ($data['extracted_services'] as $service) {
+                if (strtolower($service['type']) === 'electricity' || 
+                    strpos(strtolower($service['description']), 'electricity') !== false ||
+                    strpos(strtolower($service['unit']), 'kwh') !== false) {
+                    $hasElectricity = true;
+                    break;
+                }
             }
         }
         
-        // Validate water consumption
-        $waterConsumption = null;
-        if (isset($data['energy_consumption']['total_water_cubic_meters'])) {
-            $waterConsumption = $data['energy_consumption']['total_water_cubic_meters'];
-        } elseif (isset($data['dewa_services']['water_consumption_cubic_meters'])) {
-            $waterConsumption = $data['dewa_services']['water_consumption_cubic_meters'];
-        } elseif (isset($data['water_consumption_cubic_meters'])) {
-            $waterConsumption = $data['water_consumption_cubic_meters'];
+        if ($hasConsumption) {
+            foreach ($data['extracted_consumption'] as $consumption) {
+                if (strpos(strtolower($consumption['unit']), 'kwh') !== false) {
+                    $hasElectricity = true;
+                    break;
+                }
+            }
         }
         
-        if ($waterConsumption && $waterConsumption > 0) {
-            if ($waterConsumption > 1000) {
-                $warnings[] = 'Water consumption seems unusually high';
+        if (!$hasElectricity) {
+            $warnings[] = 'No electricity consumption data found - may affect carbon calculations';
+        }
+        
+        // Check for water consumption
+        $hasWater = false;
+        if ($hasServices) {
+            foreach ($data['extracted_services'] as $service) {
+                if (strtolower($service['type']) === 'water' || 
+                    strpos(strtolower($service['description']), 'water') !== false ||
+                    strpos(strtolower($service['unit']), 'cubic') !== false) {
+                    $hasWater = true;
+                    break;
+                }
             }
+        }
+        
+        if ($hasConsumption) {
+            foreach ($data['extracted_consumption'] as $consumption) {
+                if (strpos(strtolower($consumption['unit']), 'cubic') !== false) {
+                    $hasWater = true;
+                    break;
+                }
+            }
+        }
+        
+        if (!$hasWater) {
+            $warnings[] = 'No water consumption data found';
+        }
+        
+        // Check for financial data
+        if (!$hasCharges) {
+            $warnings[] = 'No financial charges found in the document';
         }
         
         return [
