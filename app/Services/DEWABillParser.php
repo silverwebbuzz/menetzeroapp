@@ -601,7 +601,16 @@ class DEWABillParser
             '/(\d+\.?\d*)\s*(kWh|kwh|units?)/i',
             '/(\d+\.?\d*)\s*(cubic\s*meters?|m³)/i',
             '/(\d+\.?\d*)\s*AED/i',
-            '/(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/i'
+            '/(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/i',
+            // Additional DEWA-specific patterns
+            '/electricity[^0-9]*(\d+\.?\d*)/i',
+            '/water[^0-9]*(\d+\.?\d*)/i',
+            '/sewerage[^0-9]*(\d+\.?\d*)/i',
+            '/municipal[^0-9]*(\d+\.?\d*)/i',
+            '/housing[^0-9]*(\d+\.?\d*)/i',
+            '/chiller[^0-9]*(\d+\.?\d*)/i',
+            '/consumption[^0-9]*(\d+\.?\d*)/i',
+            '/usage[^0-9]*(\d+\.?\d*)/i'
         ];
         
         foreach ($dewaContentPatterns as $pattern) {
@@ -1215,7 +1224,12 @@ class DEWABillParser
             '/(electricity|power|energy)[^0-9]*(\d+\.?\d*)\s*(kWh|units?)/i',
             '/(\d+\.?\d*)\s*(kWh|units?)\s*(electricity|power|energy)/i',
             '/electricity[^0-9]*(\d+\.?\d*)\s*(kWh|units?)/i',
-            '/power[^0-9]*(\d+\.?\d*)\s*(kWh|units?)/i'
+            '/power[^0-9]*(\d+\.?\d*)\s*(kWh|units?)/i',
+            // Additional patterns for DEWA bills
+            '/(\d+\.?\d*)\s*(kWh|kwh)/i',
+            '/electricity[^0-9]*(\d+\.?\d*)/i',
+            '/power[^0-9]*(\d+\.?\d*)/i',
+            '/energy[^0-9]*(\d+\.?\d*)/i'
         ];
         
         foreach ($electricityPatterns as $pattern) {
