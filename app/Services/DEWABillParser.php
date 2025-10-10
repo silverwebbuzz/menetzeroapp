@@ -260,21 +260,39 @@ class DEWABillParser
         $errors = [];
         $warnings = [];
         
-        // Check required fields
-        if (empty($data['electricity_consumption_kwh'])) {
+        // Check required fields - look in the structured data
+        $electricityConsumption = null;
+        if (isset($data['energy_consumption']['total_electricity_kwh'])) {
+            $electricityConsumption = $data['energy_consumption']['total_electricity_kwh'];
+        } elseif (isset($data['dewa_services']['electricity_consumption_kwh'])) {
+            $electricityConsumption = $data['dewa_services']['electricity_consumption_kwh'];
+        } elseif (isset($data['electricity_consumption_kwh'])) {
+            $electricityConsumption = $data['electricity_consumption_kwh'];
+        }
+        
+        if (empty($electricityConsumption)) {
             $errors[] = 'Electricity consumption (kWh) is required for carbon calculation';
         }
         
         // Validate electricity consumption
-        if (isset($data['electricity_consumption_kwh']) && $data['electricity_consumption_kwh'] > 0) {
-            if ($data['electricity_consumption_kwh'] > 10000) {
+        if ($electricityConsumption && $electricityConsumption > 0) {
+            if ($electricityConsumption > 10000) {
                 $warnings[] = 'Electricity consumption seems unusually high';
             }
         }
         
         // Validate water consumption
-        if (isset($data['water_consumption_cubic_meters']) && $data['water_consumption_cubic_meters'] > 0) {
-            if ($data['water_consumption_cubic_meters'] > 1000) {
+        $waterConsumption = null;
+        if (isset($data['energy_consumption']['total_water_cubic_meters'])) {
+            $waterConsumption = $data['energy_consumption']['total_water_cubic_meters'];
+        } elseif (isset($data['dewa_services']['water_consumption_cubic_meters'])) {
+            $waterConsumption = $data['dewa_services']['water_consumption_cubic_meters'];
+        } elseif (isset($data['water_consumption_cubic_meters'])) {
+            $waterConsumption = $data['water_consumption_cubic_meters'];
+        }
+        
+        if ($waterConsumption && $waterConsumption > 0) {
+            if ($waterConsumption > 1000) {
                 $warnings[] = 'Water consumption seems unusually high';
             }
         }

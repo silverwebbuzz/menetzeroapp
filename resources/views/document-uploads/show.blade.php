@@ -97,14 +97,94 @@
                     </div>
                     <div class="px-6 py-4">
                         @if($document->processed_data)
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                @foreach($document->processed_data as $key => $value)
-                                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                                        <span class="text-sm font-medium text-gray-600 capitalize">{{ str_replace('_', ' ', $key) }}</span>
-                                        <span class="text-sm text-gray-900 font-medium">{{ $value }}</span>
-                                    </div>
-                                @endforeach
-                            </div>
+                            @if($document->source_type === 'electricity')
+                                <!-- DEWA Bill Data Structure -->
+                                <div class="space-y-6">
+                                    <!-- Bill Information -->
+                                    @if(isset($document->processed_data['bill_information']))
+                                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                            <h4 class="text-sm font-semibold text-blue-900 mb-3">📄 Bill Information</h4>
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                @foreach($document->processed_data['bill_information'] as $key => $value)
+                                                    <div class="flex justify-between items-center py-1">
+                                                        <span class="text-sm font-medium text-gray-600">{{ ucfirst(str_replace('_', ' ', $key)) }}</span>
+                                                        <span class="text-sm text-gray-900 font-medium">{{ $value }}</span>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    <!-- DEWA Services -->
+                                    @if(isset($document->processed_data['dewa_services']))
+                                        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                                            <h4 class="text-sm font-semibold text-green-900 mb-3">⚡ DEWA Services</h4>
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                @foreach($document->processed_data['dewa_services'] as $key => $value)
+                                                    <div class="flex justify-between items-center py-1">
+                                                        <span class="text-sm font-medium text-gray-600">{{ ucfirst(str_replace('_', ' ', $key)) }}</span>
+                                                        <span class="text-sm text-gray-900 font-medium">{{ is_numeric($value) ? number_format($value, 2) : $value }}</span>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    <!-- Energy Consumption -->
+                                    @if(isset($document->processed_data['energy_consumption']))
+                                        <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                                            <h4 class="text-sm font-semibold text-emerald-900 mb-3">🌱 Energy Consumption</h4>
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                @foreach($document->processed_data['energy_consumption'] as $key => $value)
+                                                    <div class="flex justify-between items-center py-1">
+                                                        <span class="text-sm font-medium text-gray-600">{{ ucfirst(str_replace('_', ' ', $key)) }}</span>
+                                                        <span class="text-sm text-gray-900 font-medium">{{ is_numeric($value) ? number_format($value, 2) : $value }}</span>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    <!-- Carbon Footprint -->
+                                    @if(isset($document->processed_data['carbon_footprint']))
+                                        <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                                            <h4 class="text-sm font-semibold text-purple-900 mb-3">🌍 Carbon Footprint</h4>
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                @foreach($document->processed_data['carbon_footprint'] as $key => $value)
+                                                    <div class="flex justify-between items-center py-1">
+                                                        <span class="text-sm font-medium text-gray-600">{{ ucfirst(str_replace('_', ' ', $key)) }}</span>
+                                                        <span class="text-sm text-gray-900 font-medium">
+                                                            @if(is_array($value))
+                                                                @foreach($value as $subKey => $subValue)
+                                                                    <div class="text-xs">{{ ucfirst(str_replace('_', ' ', $subKey)) }}: {{ is_numeric($subValue) ? number_format($subValue, 2) : $subValue }}</div>
+                                                                @endforeach
+                                                            @else
+                                                                {{ is_numeric($value) ? number_format($value, 2) : $value }}
+                                                            @endif
+                                                        </span>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+                            @else
+                                <!-- Generic Data Structure -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    @foreach($document->processed_data as $key => $value)
+                                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                                            <span class="text-sm font-medium text-gray-600 capitalize">{{ str_replace('_', ' ', $key) }}</span>
+                                            <span class="text-sm text-gray-900 font-medium">
+                                                @if(is_array($value))
+                                                    {{ json_encode($value) }}
+                                                @else
+                                                    {{ $value }}
+                                                @endif
+                                            </span>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
                         @else
                             <p class="text-sm text-gray-500">No data extracted yet.</p>
                         @endif
