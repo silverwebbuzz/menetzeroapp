@@ -1394,22 +1394,125 @@ class DEWABillParser
     }
     
     /**
+     * Categorize extracted amounts as services based on context
+     */
+    private function categorizeAmountsAsServices(string $text): array
+    {
+        $services = [];
+        
+        Log::info('Categorizing amounts as services');
+        
+        // Look for amounts with context that might indicate services
+        $amountPatterns = [
+            // Look for amounts that might be electricity consumption
+            '/(\d+\.?\d*)\s*(kWh|kwh|units?)/i',
+            '/(\d+\.?\d*)\s*(electricity|power|energy)/i',
+            '/electricity[^0-9]*(\d+\.?\d*)/i',
+            '/power[^0-9]*(\d+\.?\d*)/i',
+            
+            // Look for amounts that might be water consumption
+            '/(\d+\.?\d*)\s*(cubic\s*meters?|m³|gallons?)/i',
+            '/(\d+\.?\d*)\s*(water|sewerage|drainage)/i',
+            '/water[^0-9]*(\d+\.?\d*)/i',
+            '/sewerage[^0-9]*(\d+\.?\d*)/i',
+            
+            // Look for amounts that might be other services
+            '/(\d+\.?\d*)\s*(municipal|housing|chiller)/i',
+            '/municipal[^0-9]*(\d+\.?\d*)/i',
+            '/housing[^0-9]*(\d+\.?\d*)/i',
+            '/chiller[^0-9]*(\d+\.?\d*)/i'
+        ];
+        
+        foreach ($amountPatterns as $pattern) {
+            if (preg_match_all($pattern, $text, $matches, PREG_SET_ORDER)) {
+                foreach ($matches as $match) {
+                    $value = floatval($match[1] ?? $match[2]);
+                    $unit = $match[2] ?? 'units';
+                    $context = $match[0];
+                    
+                    // Determine service type based on context
+                    $serviceType = 'Other';
+                    if (preg_match('/(electricity|power|energy|kWh|kwh)/i', $context)) {
+                        $serviceType = 'Electricity';
+                        $unit = 'kWh';
+                    } elseif (preg_match('/(water|sewerage|drainage|cubic|m³)/i', $context)) {
+                        $serviceType = 'Water';
+                        $unit = 'Cubic Meters';
+                    } elseif (preg_match('/(municipal|housing|chiller)/i', $context)) {
+                        $serviceType = 'Other';
+                        $unit = 'AED';
+                    }
+                    
+                    $services[] = [
+                        'type' => $serviceType,
+                        'description' => $serviceType . ' Service',
+                        'value' => $value,
+                        'unit' => $unit,
+                        'raw_text' => $context,
+                        'confidence' => 0.6
+                    ];
+                }
+            }
+        }
+        
+        Log::info('Categorized ' . count($services) . ' amounts as services');
+        
+        return $services;
+    }
+    
+    /**
      * Extract ALL consumption data
      */
     private function extractAllConsumption(string $text): array
     {
         $consumption = [];
         
+        Log::info('Extracting consumption from text of length: ' . strlen($text));
+        
+        // Clean the text first
+        $cleanText = $this->cleanExtractedText($text);
+        
         // Extract consumption with various units
-        if (preg_match_all('/(\d+\.?\d*)\s*(kWh|kwh|units?|cubic\s*meters?|m³|liters?|gallons?|kg|tons?|m²|sq\s*ft)/i', $text, $matches, PREG_SET_ORDER)) {
-            foreach ($matches as $match) {
-                $consumption[] = [
-                    'value' => floatval($match[1]),
-                    'unit' => $match[2],
-                    'raw_text' => $match[0]
-                ];
+        $consumptionPatterns = [
+            '/(\d+\.?\d*)\s*(kWh|kwh|units?)/i',
+            '/(\d+\.?\d*)\s*(cubic\s*meters?|m³)/i',
+            '/(\d+\.?\d*)\s*(liters?|gallons?)/i',
+            '/(\d+\.?\d*)\s*(kg|tons?)/i',
+            '/(\d+\.?\d*)\s*(m²|sq\s*ft)/i',
+            // Additional patterns for DEWA bills
+            '/electricity[^0-9]*(\d+\.?\d*)\s*(kWh|kwh|units?)/i',
+            '/water[^0-9]*(\d+\.?\d*)\s*(cubic\s*meters?|m³)/i',
+            '/consumption[^0-9]*(\d+\.?\d*)/i',
+            '/usage[^0-9]*(\d+\.?\d*)/i'
+        ];
+        
+        foreach ($consumptionPatterns as $pattern) {
+            if (preg_match_all($pattern, $cleanText, $matches, PREG_SET_ORDER)) {
+                foreach ($matches as $match) {
+                    $value = floatval($match[1]);
+                    $unit = $match[2] ?? 'units';
+                    $context = $match[0];
+                    
+                    // Determine consumption type based on context
+                    $consumptionType = 'General';
+                    if (preg_match('/(electricity|power|energy|kWh|kwh)/i', $context)) {
+                        $consumptionType = 'Electricity';
+                    } elseif (preg_match('/(water|sewerage|drainage|cubic|m³)/i', $context)) {
+                        $consumptionType = 'Water';
+                    }
+                    
+                    $consumption[] = [
+                        'type' => $consumptionType,
+                        'value' => $value,
+                        'unit' => $unit,
+                        'raw_text' => $context,
+                        'confidence' => 0.7
+                    ];
+                }
             }
         }
+        
+        Log::info('Found ' . count($consumption) . ' consumption entries');
         
         return $consumption;
     }
@@ -1421,15 +1524,32 @@ class DEWABillParser
     {
         $dates = [];
         
+        Log::info('Extracting dates from text of length: ' . strlen($text));
+        
+        // Clean the text first
+        $cleanText = $this->cleanExtractedText($text);
+        
         // Extract various date formats
-        if (preg_match_all('/(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/', $text, $matches)) {
-            foreach ($matches[1] as $date) {
-                $dates[] = [
-                    'date' => $date,
-                    'raw_text' => $date
-                ];
+        $datePatterns = [
+            '/(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/',
+            '/(\d{4}[\/\-\.]\d{1,2}[\/\-\.]\d{1,2})/',
+            '/(\d{1,2}\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{4})/i',
+            '/((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2},?\s+\d{4})/i'
+        ];
+        
+        foreach ($datePatterns as $pattern) {
+            if (preg_match_all($pattern, $cleanText, $matches)) {
+                foreach ($matches[1] as $date) {
+                    $dates[] = [
+                        'date' => $date,
+                        'raw_text' => $date,
+                        'confidence' => 0.8
+                    ];
+                }
             }
         }
+        
+        Log::info('Found ' . count($dates) . ' dates');
         
         return $dates;
     }
