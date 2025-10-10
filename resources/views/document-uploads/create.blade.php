@@ -18,21 +18,40 @@
                 <label for="file" class="block text-sm font-medium text-gray-700 mb-2">
                     Document File <span class="text-red-500">*</span>
                 </label>
-                <div id="upload-area" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400 transition-colors">
+                
+                <!-- Hidden file input - always present -->
+                <input id="file" name="file" type="file" class="hidden" accept=".pdf,.jpg,.jpeg,.png" required>
+                
+                <!-- Upload area display -->
+                <div id="upload-area" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400 transition-colors cursor-pointer" onclick="document.getElementById('file').click()">
                     <div class="space-y-1 text-center">
                         <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                             <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
-                        <div class="flex text-sm text-gray-600">
-                            <label for="file" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
-                                <span>Upload a file</span>
-                                <input id="file" name="file" type="file" class="sr-only" accept=".pdf,.jpg,.jpeg,.png" required>
-                            </label>
-                            <p class="pl-1">or drag and drop</p>
+                        <div class="text-sm text-gray-600">
+                            <span class="font-medium text-blue-600">Click to upload</span>
+                            <span class="text-gray-500"> or drag and drop</span>
                         </div>
                         <p class="text-xs text-gray-500">PDF, JPG, PNG up to 10MB</p>
                     </div>
                 </div>
+                
+                <!-- File info display -->
+                <div id="file-info" class="hidden mt-2 p-3 bg-green-50 border border-green-200 rounded-md">
+                    <div class="flex items-center">
+                        <svg class="h-5 w-5 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-green-800" id="file-name"></p>
+                            <p class="text-xs text-green-600" id="file-size"></p>
+                        </div>
+                        <button type="button" onclick="clearFile()" class="text-sm text-green-600 hover:text-green-500">
+                            Remove
+                        </button>
+                    </div>
+                </div>
+                
                 @error('file')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
@@ -144,48 +163,29 @@ document.getElementById('file').addEventListener('change', function(e) {
         const fileName = file.name;
         const fileSize = (file.size / 1024 / 1024).toFixed(2) + ' MB';
         
-        // Update the upload area to show file info
+        // Show file info
+        document.getElementById('file-name').textContent = fileName;
+        document.getElementById('file-size').textContent = fileSize;
+        document.getElementById('file-info').classList.remove('hidden');
+        
+        // Update upload area to show selected state
         const uploadArea = document.getElementById('upload-area');
-        uploadArea.innerHTML = `
-            <div class="space-y-1 text-center">
-                <svg class="mx-auto h-12 w-12 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 48 48">
-                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-                <div class="text-sm text-gray-900 font-medium">${fileName}</div>
-                <div class="text-xs text-gray-500">${fileSize}</div>
-                <button type="button" onclick="resetFileUpload()" class="text-sm text-blue-600 hover:text-blue-500">
-                    Choose different file
-                </button>
-            </div>
-        `;
+        uploadArea.classList.add('border-green-400', 'bg-green-50');
+        uploadArea.classList.remove('border-gray-300');
     }
 });
 
-function resetFileUpload() {
-    // Reset the file input
-    const fileInput = document.getElementById('file');
-    fileInput.value = '';
+function clearFile() {
+    // Clear the file input
+    document.getElementById('file').value = '';
     
-    // Reset the upload area
+    // Hide file info
+    document.getElementById('file-info').classList.add('hidden');
+    
+    // Reset upload area
     const uploadArea = document.getElementById('upload-area');
-    uploadArea.innerHTML = `
-        <div class="space-y-1 text-center">
-            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            <div class="flex text-sm text-gray-600">
-                <label for="file" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
-                    <span>Upload a file</span>
-                    <input id="file" name="file" type="file" class="sr-only" accept=".pdf,.jpg,.jpeg,.png" required>
-                </label>
-                <p class="pl-1">or drag and drop</p>
-            </div>
-            <p class="text-xs text-gray-500">PDF, JPG, PNG up to 10MB</p>
-        </div>
-    `;
-    
-    // Re-attach the change event listener
-    document.getElementById('file').addEventListener('change', arguments.callee);
+    uploadArea.classList.remove('border-green-400', 'bg-green-50');
+    uploadArea.classList.add('border-gray-300');
 }
 </script>
 @endsection
