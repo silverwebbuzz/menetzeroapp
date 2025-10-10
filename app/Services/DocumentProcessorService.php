@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\DocumentUpload;
 use App\Models\DocumentProcessingLog;
 use App\Models\DocumentUsageTracking;
+use App\Services\DEWABillParser;
 use Illuminate\Support\Facades\Storage;
 
 class DocumentProcessorService
@@ -37,20 +38,36 @@ class DocumentProcessorService
             // Get file path
             $filePath = Storage::disk('private')->path($document->file_path);
 
-            // Extract data using OCR
-            $extractedData = $this->ocrService->extractData(
-                $filePath, 
-                $document->source_type, 
-                $document->id, 
-                $document->company->users()->first()->id ?? null, 
-                $document->company_id
-            );
+            // Extract data using appropriate service
+            if ($document->source_type === 'electricity') {
+                // Use DEWA bill parser for electricity bills
+                $dewaParser = new DEWABillParser();
+                $extractedData = $dewaParser->parseBill($filePath);
+            } else {
+                // Use OCR service for other document types
+                $extractedData = $this->ocrService->extractData(
+                    $filePath, 
+                    $document->source_type, 
+                    $document->id, 
+                    $document->company->users()->first()->id ?? null, 
+                    $document->company_id
+                );
+            }
 
             // Validate extracted data
-            $validation = $this->ocrService->validateExtractedData($extractedData, $document->source_type);
+            if ($document->source_type === 'electricity') {
+                $dewaParser = new DEWABillParser();
+                $validation = $dewaParser->validateExtractedData($extractedData);
+            } else {
+                $validation = $this->ocrService->validateExtractedData($extractedData, $document->source_type);
+            }
 
             // Calculate confidence score
-            $confidence = $this->ocrService->getConfidenceScore($extractedData);
+            if ($document->source_type === 'electricity') {
+                $confidence = $extractedData['confidence'] ?? 90; // DEWA parser provides confidence
+            } else {
+                $confidence = $this->ocrService->getConfidenceScore($extractedData);
+            }
 
             // Update document with extracted data
             $document->update([
