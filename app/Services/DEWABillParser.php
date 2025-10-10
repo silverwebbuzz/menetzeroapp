@@ -29,70 +29,169 @@ class DEWABillParser
     }
     
     /**
-     * Extract raw data from PDF (placeholder for actual OCR)
+     * Extract raw data from PDF using actual text extraction
      */
     private function extractBillData(string $filePath): array
     {
-        // This would use actual PDF text extraction in production
-        // For now, return a comprehensive structure based on typical DEWA bills
+        // Extract text from PDF using simple text extraction
+        $extractedText = $this->extractTextFromPDF($filePath);
         
-        // For now, return realistic DEWA bill data based on typical bills
-        // In production, this would use actual PDF text extraction
-        return [
-            // Bill header information
-            'bill_number' => '756595961',
-            'issue_date' => '2023-08-29',
-            'due_date' => '2023-08-30',
-            'period_start' => '2023-08-16',
-            'period_end' => '2023-08-26',
-            'account_number' => '2031203304',
-            'customer_name' => 'ABDULMAJEED SHAMEER MAJEED',
-            'premise_address' => 'JUMEIRA BEACH RESIDENCE, BLDG.2B-39.FLAT-204, AL GOZE INDL.2ND, (E&W-SUB METER)',
-            'premise_number' => '365039071',
-            'premise_type' => 'RESIDENTIAL - FLAT',
+        // Parse the extracted text to find bill data
+        $billData = $this->parseBillText($extractedText);
+        
+        return $billData;
+    }
+    
+    /**
+     * Extract text from PDF file
+     */
+    private function extractTextFromPDF(string $filePath): string
+    {
+        try {
+            // Use pdftotext command if available
+            if (function_exists('shell_exec') && $this->commandExists('pdftotext')) {
+                $output = shell_exec("pdftotext -layout \"$filePath\" -");
+                return $output ?: '';
+            }
             
-            // DEWA services breakdown (extracted from typical DEWA bills)
-            'electricity_consumption_kwh' => 1234.5, // Typical residential consumption
-            'electricity_charges_aed' => 479.49,
-            'water_consumption_cubic_meters' => 45.2, // Typical residential water usage
-            'water_charges_aed' => 33.66,
-            'other_services_aed' => 100.00,
-            'dewa_total_aed' => 613.15,
+            // Fallback: try to read PDF as text (basic approach)
+            $content = file_get_contents($filePath);
+            if ($content === false) {
+                throw new \Exception('Could not read PDF file');
+            }
             
-            // Municipality services
-            'municipality_housing_aed' => 0.00,
-            'municipality_sewerage_aed' => 6.60,
-            'municipality_total_aed' => 6.60,
+            // Simple text extraction (this is basic and may not work for all PDFs)
+            $text = $this->basicPDFTextExtraction($content);
             
-            // Financial summary
-            'additional_charges_aed' => 20.00,
-            'current_month_total_aed' => 639.75,
-            'previous_balance_aed' => 0.00,
-            'payments_received_aed' => 0.00,
-            'total_due_aed' => 639.75,
-            'vat_amount_aed' => 31.99,
+            return $text;
             
-            // Carbon footprint data (calculated from consumption)
-            'carbon_footprint_kg_co2e' => 456.2, // Calculated from electricity consumption
-            'carbon_footprint_breakdown' => [
-                'electricity_emissions' => 456.2,
-                'water_emissions' => 12.8
-            ],
-            
-            // Provider information
+        } catch (\Exception $e) {
+            Log::error('PDF text extraction failed: ' . $e->getMessage());
+            return '';
+        }
+    }
+    
+    /**
+     * Check if a command exists
+     */
+    private function commandExists(string $command): bool
+    {
+        $return = shell_exec("which $command");
+        return !empty($return);
+    }
+    
+    /**
+     * Basic PDF text extraction (fallback method)
+     */
+    private function basicPDFTextExtraction(string $content): string
+    {
+        // This is a very basic approach - in production you'd use a proper PDF library
+        // For now, we'll try to extract readable text patterns
+        
+        $text = '';
+        
+        // Look for text between BT and ET markers (PDF text objects)
+        preg_match_all('/BT\s*(.*?)\s*ET/s', $content, $matches);
+        
+        if (!empty($matches[1])) {
+            foreach ($matches[1] as $match) {
+                // Extract text from Tj and TJ operators
+                preg_match_all('/\((.*?)\)\s*Tj/', $match, $textMatches);
+                if (!empty($textMatches[1])) {
+                    $text .= implode(' ', $textMatches[1]) . ' ';
+                }
+            }
+        }
+        
+        // Clean up the text
+        $text = preg_replace('/\s+/', ' ', $text);
+        $text = trim($text);
+        
+        return $text;
+    }
+    
+    /**
+     * Parse extracted text to find bill data
+     */
+    private function parseBillText(string $text): array
+    {
+        $billData = [
+            // Initialize with null values
+            'bill_number' => null,
+            'issue_date' => null,
+            'due_date' => null,
+            'period_start' => null,
+            'period_end' => null,
+            'account_number' => null,
+            'customer_name' => null,
+            'premise_address' => null,
+            'premise_type' => null,
+            'electricity_consumption_kwh' => null,
+            'electricity_charges_aed' => null,
+            'water_consumption_cubic_meters' => null,
+            'water_charges_aed' => null,
+            'other_services_aed' => null,
+            'dewa_total_aed' => null,
+            'municipality_housing_aed' => null,
+            'municipality_sewerage_aed' => null,
+            'municipality_total_aed' => null,
+            'additional_charges_aed' => null,
+            'current_month_total_aed' => null,
+            'previous_balance_aed' => null,
+            'payments_received_aed' => null,
+            'total_due_aed' => null,
+            'vat_amount_aed' => null,
+            'carbon_footprint_kg_co2e' => null,
             'provider' => 'DEWA',
-            'provider_vat_number' => '100027620200003',
+            'provider_vat_number' => null,
             'service_areas' => ['Dubai'],
-            
-            // Billing period
-            'billing_period_days' => 11,
-            'consumption_slab' => 'Residential Tier 2', // Based on consumption level
-            
-            // Confidence and processing
-            'confidence' => 95,
-            'extraction_method' => 'dewa_official_parser',
-            'bill_type' => 'DEWA_UTILITY_BILL'
+            'billing_period_days' => null,
+            'consumption_slab' => null,
+            'confidence' => 60, // Lower confidence for text extraction
+            'extraction_method' => 'pdf_text_extraction',
+            'bill_type' => 'DEWA_UTILITY_BILL',
+            'raw_text' => $text // Store raw text for debugging
         ];
+        
+        // Extract bill number (look for patterns like 756595961)
+        if (preg_match('/\b(\d{9,12})\b/', $text, $matches)) {
+            $billData['bill_number'] = $matches[1];
+        }
+        
+        // Extract dates (look for date patterns)
+        if (preg_match('/(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/', $text, $matches)) {
+            $billData['issue_date'] = $matches[1];
+        }
+        
+        // Extract amounts (look for AED amounts)
+        if (preg_match_all('/(\d+\.?\d*)\s*AED/', $text, $matches)) {
+            $amounts = array_map('floatval', $matches[1]);
+            if (!empty($amounts)) {
+                $billData['total_due_aed'] = max($amounts); // Assume largest amount is total
+            }
+        }
+        
+        // Extract electricity consumption (look for kWh patterns)
+        if (preg_match('/(\d+\.?\d*)\s*kWh/', $text, $matches)) {
+            $billData['electricity_consumption_kwh'] = floatval($matches[1]);
+        }
+        
+        // Extract water consumption (look for cubic meters)
+        if (preg_match('/(\d+\.?\d*)\s*cubic\s*meters?/', $text, $matches)) {
+            $billData['water_consumption_cubic_meters'] = floatval($matches[1]);
+        }
+        
+        // Extract account number (look for long numbers)
+        if (preg_match('/Account[:\s]*(\d{8,12})/', $text, $matches)) {
+            $billData['account_number'] = $matches[1];
+        }
+        
+        // Extract customer name (look for name patterns)
+        if (preg_match('/Customer[:\s]*([A-Z\s]+)/', $text, $matches)) {
+            $billData['customer_name'] = trim($matches[1]);
+        }
+        
+        return $billData;
     }
     
     /**
@@ -103,71 +202,74 @@ class DEWABillParser
         return [
             // Bill Information
             'bill_information' => [
-                'bill_number' => $rawData['bill_number'],
-                'issue_date' => $rawData['issue_date'],
-                'due_date' => $rawData['due_date'],
-                'period_start' => $rawData['period_start'],
-                'period_end' => $rawData['period_end'],
-                'account_number' => $rawData['account_number'],
-                'customer_name' => $rawData['customer_name'],
-                'premise_address' => $rawData['premise_address'],
-                'premise_type' => $rawData['premise_type']
+                'bill_number' => $rawData['bill_number'] ?? null,
+                'issue_date' => $rawData['issue_date'] ?? null,
+                'due_date' => $rawData['due_date'] ?? null,
+                'period_start' => $rawData['period_start'] ?? null,
+                'period_end' => $rawData['period_end'] ?? null,
+                'account_number' => $rawData['account_number'] ?? null,
+                'customer_name' => $rawData['customer_name'] ?? null,
+                'premise_address' => $rawData['premise_address'] ?? null,
+                'premise_type' => $rawData['premise_type'] ?? null
             ],
             
             // DEWA Services
             'dewa_services' => [
-                'electricity_consumption_kwh' => $rawData['electricity_consumption_kwh'],
-                'electricity_charges_aed' => $rawData['electricity_charges_aed'],
-                'water_consumption_cubic_meters' => $rawData['water_consumption_cubic_meters'],
-                'water_charges_aed' => $rawData['water_charges_aed'],
-                'other_services_aed' => $rawData['other_services_aed'],
-                'dewa_total_aed' => $rawData['dewa_total_aed']
+                'electricity_consumption_kwh' => $rawData['electricity_consumption_kwh'] ?? null,
+                'electricity_charges_aed' => $rawData['electricity_charges_aed'] ?? null,
+                'water_consumption_cubic_meters' => $rawData['water_consumption_cubic_meters'] ?? null,
+                'water_charges_aed' => $rawData['water_charges_aed'] ?? null,
+                'other_services_aed' => $rawData['other_services_aed'] ?? null,
+                'dewa_total_aed' => $rawData['dewa_total_aed'] ?? null
             ],
             
             // Municipality Services
             'municipality_services' => [
-                'housing_aed' => $rawData['municipality_housing_aed'],
-                'sewerage_aed' => $rawData['municipality_sewerage_aed'],
-                'total_aed' => $rawData['municipality_total_aed']
+                'housing_aed' => $rawData['municipality_housing_aed'] ?? null,
+                'sewerage_aed' => $rawData['municipality_sewerage_aed'] ?? null,
+                'total_aed' => $rawData['municipality_total_aed'] ?? null
             ],
             
             // Financial Summary
             'financial_summary' => [
-                'additional_charges_aed' => $rawData['additional_charges_aed'],
-                'current_month_total_aed' => $rawData['current_month_total_aed'],
-                'previous_balance_aed' => $rawData['previous_balance_aed'],
-                'payments_received_aed' => $rawData['payments_received_aed'],
-                'total_due_aed' => $rawData['total_due_aed'],
-                'vat_amount_aed' => $rawData['vat_amount_aed']
+                'additional_charges_aed' => $rawData['additional_charges_aed'] ?? null,
+                'current_month_total_aed' => $rawData['current_month_total_aed'] ?? null,
+                'previous_balance_aed' => $rawData['previous_balance_aed'] ?? null,
+                'payments_received_aed' => $rawData['payments_received_aed'] ?? null,
+                'total_due_aed' => $rawData['total_due_aed'] ?? null,
+                'vat_amount_aed' => $rawData['vat_amount_aed'] ?? null
             ],
             
             // Energy Consumption (for carbon calculation)
             'energy_consumption' => [
-                'total_electricity_kwh' => $rawData['electricity_consumption_kwh'],
-                'total_water_cubic_meters' => $rawData['water_consumption_cubic_meters']
+                'total_electricity_kwh' => $rawData['electricity_consumption_kwh'] ?? null,
+                'total_water_cubic_meters' => $rawData['water_consumption_cubic_meters'] ?? null
             ],
             
             // Carbon Footprint (if available)
             'carbon_footprint' => [
-                'total_kg_co2e' => $rawData['carbon_footprint_kg_co2e'],
-                'breakdown' => $rawData['carbon_footprint_breakdown']
+                'total_kg_co2e' => $rawData['carbon_footprint_kg_co2e'] ?? null,
+                'breakdown' => $rawData['carbon_footprint_breakdown'] ?? null
             ],
             
             // Provider Information
             'provider_info' => [
-                'provider' => $rawData['provider'],
-                'vat_number' => $rawData['provider_vat_number'],
-                'service_areas' => $rawData['service_areas']
+                'provider' => $rawData['provider'] ?? 'DEWA',
+                'vat_number' => $rawData['provider_vat_number'] ?? null,
+                'service_areas' => $rawData['service_areas'] ?? ['Dubai']
             ],
             
             // Processing Information
             'processing_info' => [
-                'confidence' => $rawData['confidence'],
-                'extraction_method' => $rawData['extraction_method'],
-                'bill_type' => $rawData['bill_type'],
-                'billing_period_days' => $rawData['billing_period_days'],
-                'consumption_slab' => $rawData['consumption_slab']
-            ]
+                'confidence' => $rawData['confidence'] ?? 60,
+                'extraction_method' => $rawData['extraction_method'] ?? 'pdf_text_extraction',
+                'bill_type' => $rawData['bill_type'] ?? 'DEWA_UTILITY_BILL',
+                'billing_period_days' => $rawData['billing_period_days'] ?? null,
+                'consumption_slab' => $rawData['consumption_slab'] ?? null
+            ],
+            
+            // Raw extracted text for debugging
+            'raw_text' => $rawData['raw_text'] ?? null
         ];
     }
     
