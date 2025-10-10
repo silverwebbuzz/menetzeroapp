@@ -1318,6 +1318,22 @@ class DEWABillParser
             $services = $this->categorizeAmountsAsServices($cleanText);
         }
         
+        // Method: Create services from consumption data if no services found
+        $consumptionData = $this->extractAllConsumption($cleanText);
+        if (empty($services) && !empty($consumptionData)) {
+            Log::info('Creating services from consumption data');
+            foreach ($consumptionData as $consumption) {
+                $services[] = [
+                    'type' => $consumption['type'],
+                    'description' => $consumption['type'] . ' Service',
+                    'value' => $consumption['value'],
+                    'unit' => $consumption['unit'],
+                    'raw_text' => $consumption['raw_text'] ?? '',
+                    'confidence' => 0.7
+                ];
+            }
+        }
+        
         Log::info('Found ' . count($services) . ' services');
         
         return $services;
@@ -1337,11 +1353,18 @@ class DEWABillParser
         
         // Extract all AED amounts with context using multiple patterns
         $chargePatterns = [
-            '/([^0-9]*?)(\d+\.?\d*)\s*AED/i',
-            '/([^0-9]*?)(\d+\.?\d*)\s*Dirhams?/i',
-            '/([^0-9]*?)(\d+\.?\d*)\s*Dhs?/i',
+            '/([A-Za-z\s]+?)(\d+\.?\d*)\s*AED/i',
+            '/([A-Za-z\s]+?)(\d+\.?\d*)\s*Dirhams?/i',
+            '/([A-Za-z\s]+?)(\d+\.?\d*)\s*Dhs?/i',
             '/AED\s*(\d+\.?\d*)/i',
-            '/Dirhams?\s*(\d+\.?\d*)/i'
+            '/Dirhams?\s*(\d+\.?\d*)/i',
+            // DEWA-specific charge patterns
+            '/electricity[^0-9]*(\d+\.?\d*)\s*AED/i',
+            '/water[^0-9]*(\d+\.?\d*)\s*AED/i',
+            '/sewerage[^0-9]*(\d+\.?\d*)\s*AED/i',
+            '/municipal[^0-9]*(\d+\.?\d*)\s*AED/i',
+            '/housing[^0-9]*(\d+\.?\d*)\s*AED/i',
+            '/chiller[^0-9]*(\d+\.?\d*)\s*AED/i'
         ];
         
         foreach ($chargePatterns as $pattern) {
@@ -1352,12 +1375,30 @@ class DEWABillParser
                     
                     // Skip very small amounts (likely not relevant)
                     if ($amount > 1) {
+                        // Determine charge type based on context
+                        $chargeType = 'Unspecified Charge';
+                        if (preg_match('/electricity/i', $context)) {
+                            $chargeType = 'Electricity Charge';
+                        } elseif (preg_match('/water/i', $context)) {
+                            $chargeType = 'Water Charge';
+                        } elseif (preg_match('/sewerage|drainage/i', $context)) {
+                            $chargeType = 'Sewerage Charge';
+                        } elseif (preg_match('/municipal/i', $context)) {
+                            $chargeType = 'Municipal Fee';
+                        } elseif (preg_match('/housing/i', $context)) {
+                            $chargeType = 'Housing Fee';
+                        } elseif (preg_match('/chiller/i', $context)) {
+                            $chargeType = 'Chiller Charge';
+                        } elseif (strlen($context) > 3) {
+                            $chargeType = ucfirst(trim($context));
+                        }
+                        
                         $charges[] = [
-                            'description' => $context ?: 'Unspecified Charge',
+                            'description' => $chargeType,
                             'amount' => $amount,
                             'currency' => 'AED',
                             'raw_text' => $match[0],
-                            'confidence' => 0.7
+                            'confidence' => 0.8
                         ];
                     }
                 }
@@ -1384,6 +1425,22 @@ class DEWABillParser
                         'raw_text' => $match[0],
                         'confidence' => 0.9
                     ];
+                }
+            }
+        }
+        
+        // If we have charges with poor descriptions (like just commas), try to improve them
+        foreach ($charges as &$charge) {
+            if (strlen(trim($charge['description'])) <= 2 && $charge['amount'] > 0) {
+                // Try to determine charge type based on amount patterns
+                if ($charge['amount'] >= 500 && $charge['amount'] <= 1200) {
+                    $charge['description'] = 'Total Bill Amount';
+                } elseif ($charge['amount'] >= 200 && $charge['amount'] <= 500) {
+                    $charge['description'] = 'Electricity Charge';
+                } elseif ($charge['amount'] >= 50 && $charge['amount'] <= 200) {
+                    $charge['description'] = 'Water Charge';
+                } else {
+                    $charge['description'] = 'DEWA Service Charge';
                 }
             }
         }
@@ -1493,12 +1550,21 @@ class DEWABillParser
                     $unit = $match[2] ?? 'units';
                     $context = $match[0];
                     
-                    // Determine consumption type based on context
+                    // Determine consumption type based on context and unit
                     $consumptionType = 'General';
-                    if (preg_match('/(electricity|power|energy|kWh|kwh)/i', $context)) {
+                    if (preg_match('/(electricity|power|energy|kWh|kwh)/i', $context) || preg_match('/kWh|kwh/i', $unit)) {
                         $consumptionType = 'Electricity';
-                    } elseif (preg_match('/(water|sewerage|drainage|cubic|m³)/i', $context)) {
+                    } elseif (preg_match('/(water|sewerage|drainage|cubic|m³)/i', $context) || preg_match('/cubic|m³/i', $unit)) {
                         $consumptionType = 'Water';
+                    } elseif (preg_match('/units/i', $unit)) {
+                        // For generic "units", try to determine from context
+                        if (preg_match('/(electricity|power|energy)/i', $context)) {
+                            $consumptionType = 'Electricity';
+                        } elseif (preg_match('/(water|sewerage|drainage)/i', $context)) {
+                            $consumptionType = 'Water';
+                        } else {
+                            $consumptionType = 'General Consumption';
+                        }
                     }
                     
                     $consumption[] = [
