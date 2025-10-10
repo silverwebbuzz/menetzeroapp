@@ -76,6 +76,13 @@ class DocumentUploadController extends Controller
      */
     public function store(Request $request)
     {
+        // Debug: Log request data
+        \Log::info('Document upload request', [
+            'has_file' => $request->hasFile('file'),
+            'file_name' => $request->file('file') ? $request->file('file')->getClientOriginalName() : 'No file',
+            'all_input' => $request->all()
+        ]);
+
         $request->validate([
             'file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240', // 10MB max
             'source_type' => 'required|in:electricity,fuel,waste,water,transport,other',
