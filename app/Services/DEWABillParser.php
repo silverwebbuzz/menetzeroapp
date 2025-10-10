@@ -43,12 +43,12 @@ class DEWABillParser
     }
     
     /**
-     * Extract text from PDF file
+     * Extract text from PDF file with enhanced methods
      */
     private function extractTextFromPDF(string $filePath): string
     {
         try {
-            Log::info('Starting PDF text extraction for: ' . $filePath);
+            Log::info('Starting enhanced PDF text extraction for: ' . $filePath);
             
             // Check if file exists
             if (!file_exists($filePath)) {
@@ -56,46 +56,87 @@ class DEWABillParser
                 return '';
             }
             
-            // Use pdftotext command if available
+            $fileSize = filesize($filePath);
+            Log::info('PDF file size: ' . $fileSize . ' bytes');
+            
+            // Method 1: Try pdftotext command with multiple options
             if (function_exists('shell_exec') && $this->commandExists('pdftotext')) {
-                Log::info('Using pdftotext command for extraction');
-                $output = shell_exec("pdftotext -layout \"$filePath\" -");
-                if ($output) {
-                    // Clean and encode the output to ensure UTF-8
-                    $output = $this->cleanTextForUTF8($output);
-                    Log::info('pdftotext extracted ' . strlen($output) . ' characters');
-                    return $output;
-                } else {
-                    Log::warning('pdftotext returned empty output');
+                Log::info('Attempting pdftotext extraction with multiple options');
+                
+                // Try different pdftotext options
+                $pdftotextOptions = [
+                    'pdftotext -layout -nopgbrk "' . $filePath . '" -',
+                    'pdftotext -raw -nopgbrk "' . $filePath . '" -',
+                    'pdftotext -table -nopgbrk "' . $filePath . '" -',
+                    'pdftotext -lineprinter -nopgbrk "' . $filePath . '" -'
+                ];
+                
+                foreach ($pdftotextOptions as $option) {
+                    Log::info('Trying pdftotext option: ' . $option);
+                    $output = shell_exec($option);
+                    
+                    if ($output && strlen(trim($output)) > 50) {
+                        $output = $this->cleanTextForUTF8($output);
+                        
+                        // Check if output is readable (not binary)
+                        if (!$this->isBinaryContent($output)) {
+                            Log::info('pdftotext successful with ' . strlen($output) . ' characters');
+                            Log::info('Sample output: ' . substr($output, 0, 200));
+                            return $output;
+                        } else {
+                            Log::warning('pdftotext output appears to be binary content');
+                        }
+                    }
                 }
+                
+                Log::warning('All pdftotext options failed or returned binary content');
             } else {
-                Log::info('pdftotext not available, using fallback method');
+                Log::info('pdftotext not available, using fallback methods');
             }
             
-            // Fallback: try to read PDF as text (basic approach)
+            // Method 2: Try pdfinfo to get document info first
+            if (function_exists('shell_exec') && $this->commandExists('pdfinfo')) {
+                Log::info('Getting PDF info with pdfinfo');
+                $pdfInfo = shell_exec('pdfinfo "' . $filePath . '"');
+                if ($pdfInfo) {
+                    Log::info('PDF Info: ' . substr($pdfInfo, 0, 300));
+                    
+                    // Check if PDF is encrypted
+                    if (strpos($pdfInfo, 'Encrypted: yes') !== false) {
+                        Log::warning('PDF appears to be encrypted');
+                        return $this->createEncryptedPDFFallback();
+                    }
+                }
+            }
+            
+            // Method 3: Enhanced binary content extraction
             $content = file_get_contents($filePath);
             if ($content === false) {
                 throw new \Exception('Could not read PDF file');
             }
             
-            Log::info('PDF file size: ' . strlen($content) . ' bytes');
-            
-            // Simple text extraction (this is basic and may not work for all PDFs)
-            $text = $this->basicPDFTextExtraction($content);
+            Log::info('Attempting enhanced binary content extraction');
+            $text = $this->enhancedPDFTextExtraction($content);
             
             // Clean the extracted text for UTF-8 encoding
             $text = $this->cleanTextForUTF8($text);
             
-            Log::info('Basic extraction result: ' . strlen($text) . ' characters');
+            Log::info('Enhanced extraction result: ' . strlen($text) . ' characters');
             if (strlen($text) > 0) {
-                Log::info('First 200 characters: ' . substr($text, 0, 200));
+                Log::info('Sample output: ' . substr($text, 0, 200));
+                
+                // Check if the extracted text is readable
+                if ($this->isBinaryContent($text)) {
+                    Log::warning('Enhanced extraction still returned binary content');
+                    return $this->createImageBasedPDFFallback();
+                }
             }
             
             return $text;
             
         } catch (\Exception $e) {
             Log::error('PDF text extraction failed: ' . $e->getMessage());
-            return '';
+            return $this->createExtractionFailedFallback();
         }
     }
     
@@ -156,6 +197,144 @@ class DEWABillParser
         } else {
             return $data;
         }
+    }
+    
+    /**
+     * Enhanced PDF text extraction with better pattern matching
+     */
+    private function enhancedPDFTextExtraction(string $content): string
+    {
+        $text = '';
+        
+        Log::info('Starting enhanced PDF text extraction');
+        
+        // Method 1: Look for text between BT and ET markers (PDF text objects)
+        preg_match_all('/BT\s*(.*?)\s*ET/s', $content, $matches);
+        Log::info('Found ' . count($matches[1]) . ' text objects');
+        
+        if (!empty($matches[1])) {
+            foreach ($matches[1] as $match) {
+                // Extract text from Tj and TJ operators
+                preg_match_all('/\((.*?)\)\s*Tj/', $match, $textMatches);
+                if (!empty($textMatches[1])) {
+                    $text .= implode(' ', $textMatches[1]) . ' ';
+                }
+                
+                // Also try TJ operators (array format)
+                preg_match_all('/\[(.*?)\]\s*TJ/', $match, $tjMatches);
+                if (!empty($tjMatches[1])) {
+                    $text .= implode(' ', $tjMatches[1]) . ' ';
+                }
+            }
+        }
+        
+        // Method 2: Look for DEWA-specific patterns in the PDF
+        if (empty($text)) {
+            Log::info('Looking for DEWA-specific patterns');
+            $dewaPatterns = [
+                '/DEWA/i',
+                '/Dubai Electricity/i',
+                '/Electricity/i', 
+                '/Water/i',
+                '/Bill/i',
+                '/Account/i',
+                '/Customer/i',
+                '/AED/i',
+                '/kWh/i',
+                '/Cubic/i',
+                '/Municipality/i',
+                '/Sewerage/i',
+                '/Drainage/i'
+            ];
+            
+            foreach ($dewaPatterns as $pattern) {
+                if (preg_match($pattern, $content)) {
+                    $text .= 'DEWA Bill detected ';
+                    Log::info('Found DEWA pattern: ' . $pattern);
+                    break;
+                }
+            }
+        }
+        
+        // Method 3: Look for readable text patterns in the PDF
+        if (empty($text)) {
+            Log::info('Looking for readable text patterns');
+            // Extract text from parentheses (common in PDFs)
+            preg_match_all('/\(([^)]+)\)/', $content, $parenMatches);
+            if (!empty($parenMatches[1])) {
+                $text .= implode(' ', $parenMatches[1]) . ' ';
+                Log::info('Found ' . count($parenMatches[1]) . ' text patterns in parentheses');
+            }
+        }
+        
+        // Method 4: Look for text streams and try to decode them
+        if (empty($text)) {
+            Log::info('Looking for text streams');
+            preg_match_all('/stream\s*(.*?)\s*endstream/s', $content, $streamMatches);
+            Log::info('Found ' . count($streamMatches[1]) . ' streams');
+            
+            if (!empty($streamMatches[1])) {
+                foreach ($streamMatches[1] as $stream) {
+                    // Try to extract readable text from streams
+                    $streamText = preg_replace('/[^\x20-\x7E]/', ' ', $stream);
+                    $streamText = preg_replace('/\s+/', ' ', $streamText);
+                    if (strlen(trim($streamText)) > 10) {
+                        $text .= $streamText . ' ';
+                    }
+                }
+            }
+        }
+        
+        // Method 5: Look for compressed streams and try to extract text
+        if (empty($text)) {
+            Log::info('Looking for compressed streams');
+            // Look for FlateDecode streams (compressed text)
+            preg_match_all('/\/FlateDecode.*?stream\s*(.*?)\s*endstream/s', $content, $flateMatches);
+            Log::info('Found ' . count($flateMatches[1]) . ' FlateDecode streams');
+            
+            if (!empty($flateMatches[1])) {
+                foreach ($flateMatches[1] as $flateStream) {
+                    // Try to find readable text in compressed streams
+                    $readableText = $this->extractReadableTextFromStream($flateStream);
+                    if (!empty($readableText)) {
+                        $text .= $readableText . ' ';
+                    }
+                }
+            }
+        }
+        
+        // Method 6: Look for readable text in the raw content
+        if (empty($text)) {
+            Log::info('Looking for readable text in raw content');
+            // Extract any readable text from the PDF content
+            $readableText = $this->extractReadableTextFromContent($content);
+            if (!empty($readableText)) {
+                $text .= $readableText . ' ';
+            }
+        }
+        
+        // Method 7: Try to extract text from PDF objects
+        if (empty($text)) {
+            Log::info('Looking for PDF objects with text');
+            // Look for PDF objects that might contain text
+            preg_match_all('/\d+\s+\d+\s+obj\s*(.*?)\s*endobj/s', $content, $objMatches);
+            Log::info('Found ' . count($objMatches[1]) . ' PDF objects');
+            
+            foreach ($objMatches[1] as $obj) {
+                // Look for text content in objects
+                if (preg_match('/\((.*?)\)/', $obj, $textMatches)) {
+                    $text .= implode(' ', $textMatches[1]) . ' ';
+                }
+            }
+        }
+        
+        // Clean up the text
+        $text = preg_replace('/\s+/', ' ', $text);
+        $text = trim($text);
+        
+        Log::info('Enhanced extraction completed with ' . strlen($text) . ' characters');
+        
+        return $text;
     }
     
     /**
@@ -331,12 +510,14 @@ class DEWABillParser
             return false;
         }
         
+        $totalLength = strlen($text);
+        Log::info('Checking binary content for text of length: ' . $totalLength);
+        
         // Count printable ASCII characters
         $printableCount = preg_match_all('/[\x20-\x7E]/', $text);
-        $totalLength = strlen($text);
-        
-        // If less than 30% of characters are printable ASCII, consider it binary
         $printableRatio = $printableCount / $totalLength;
+        
+        Log::info('Printable ratio: ' . round($printableRatio, 3) . ' (' . $printableCount . '/' . $totalLength . ')');
         
         // Check for common binary content patterns
         $binaryPatterns = [
@@ -344,17 +525,46 @@ class DEWABillParser
             '/[^\x20-\x7E]{3,}/',  // 3+ consecutive non-printable characters
             '/endstream\s+endobj/',  // PDF stream markers
             '/obj\s+<<\/Type/',  // PDF object markers
+            '/\x00/',  // Null bytes
+            '/[\x80-\xFF]{3,}/',  // High ASCII characters (likely binary)
         ];
         
         $binaryMatchCount = 0;
         foreach ($binaryPatterns as $pattern) {
             if (preg_match($pattern, $text)) {
                 $binaryMatchCount++;
+                Log::info('Found binary pattern: ' . $pattern);
             }
         }
         
-        // If we have a low printable ratio OR multiple binary patterns, it's binary content
-        return $printableRatio < 0.3 || $binaryMatchCount >= 2;
+        Log::info('Binary pattern matches: ' . $binaryMatchCount);
+        
+        // Check for PDF-specific binary indicators
+        $pdfBinaryIndicators = [
+            'stream',
+            'endstream', 
+            'obj',
+            'endobj',
+            'FlateDecode',
+            'ASCIIHexDecode',
+            'ASCII85Decode'
+        ];
+        
+        $pdfIndicatorCount = 0;
+        foreach ($pdfBinaryIndicators as $indicator) {
+            if (strpos($text, $indicator) !== false) {
+                $pdfIndicatorCount++;
+            }
+        }
+        
+        Log::info('PDF binary indicators found: ' . $pdfIndicatorCount);
+        
+        // If we have a low printable ratio OR multiple binary patterns OR many PDF indicators, it's binary content
+        $isBinary = $printableRatio < 0.3 || $binaryMatchCount >= 2 || $pdfIndicatorCount >= 3;
+        
+        Log::info('Is binary content: ' . ($isBinary ? 'YES' : 'NO'));
+        
+        return $isBinary;
     }
     
     /**
@@ -630,6 +840,8 @@ class DEWABillParser
      */
     private function cleanExtractedText(string $text): string
     {
+        Log::info('Cleaning extracted text of length: ' . strlen($text));
+        
         // Remove PDF object references
         $text = preg_replace('/\b\d+\s+\d+\s+obj\b/', '', $text);
         $text = preg_replace('/\bendobj\b/', '', $text);
@@ -650,12 +862,21 @@ class DEWABillParser
         // Remove common PDF artifacts
         $text = preg_replace('/\b(<<|>>|\/Type|\/Filter|\/Length|\/BM|\/Normal|\/ca)\b/', '', $text);
         
+        // Remove PDF structure markers
+        $text = preg_replace('/\b(<<|>>|\/Type|\/Subtype|\/Filter|\/Length|\/Width|\/Height|\/ColorSpace|\/BitsPerComponent)\b/', '', $text);
+        
         // Remove binary content patterns
         $text = preg_replace('/[^\x20-\x7E\s]/', ' ', $text);
+        
+        // Remove excessive question marks and special characters
+        $text = preg_replace('/\?{2,}/', '?', $text);
+        $text = preg_replace('/[^\x20-\x7E\s\?\.\,\:\-\/]/', ' ', $text);
         
         // Clean up extra whitespace
         $text = preg_replace('/\s+/', ' ', $text);
         $text = trim($text);
+        
+        Log::info('Cleaned text length: ' . strlen($text));
         
         return $text;
     }
@@ -667,60 +888,95 @@ class DEWABillParser
     {
         $services = [];
         
+        Log::info('Extracting services from text of length: ' . strlen($text));
+        
         // Clean the text first
         $cleanText = $this->cleanExtractedText($text);
         
-        // Look for electricity-related services
-        if (preg_match_all('/(electricity|power|energy)[^0-9]*(\d+\.?\d*)\s*(kWh|units?)/i', $cleanText, $matches, PREG_SET_ORDER)) {
-            foreach ($matches as $match) {
-                $services[] = [
-                    'type' => 'Electricity',
-                    'description' => trim($match[1]),
-                    'value' => floatval($match[2]),
-                    'unit' => $match[3],
-                    'raw_text' => $match[0]
-                ];
+        // Look for electricity-related services with enhanced patterns
+        $electricityPatterns = [
+            '/(electricity|power|energy)[^0-9]*(\d+\.?\d*)\s*(kWh|units?)/i',
+            '/(\d+\.?\d*)\s*(kWh|units?)\s*(electricity|power|energy)/i',
+            '/electricity[^0-9]*(\d+\.?\d*)\s*(kWh|units?)/i',
+            '/power[^0-9]*(\d+\.?\d*)\s*(kWh|units?)/i'
+        ];
+        
+        foreach ($electricityPatterns as $pattern) {
+            if (preg_match_all($pattern, $cleanText, $matches, PREG_SET_ORDER)) {
+                foreach ($matches as $match) {
+                    $services[] = [
+                        'type' => 'Electricity',
+                        'description' => trim($match[1] ?? 'Electricity'),
+                        'value' => floatval($match[2] ?? $match[1]),
+                        'unit' => $match[3] ?? $match[2],
+                        'raw_text' => $match[0],
+                        'confidence' => 0.8
+                    ];
+                }
             }
         }
         
-        // Look for water-related services
-        if (preg_match_all('/(water|sewerage|drainage)[^0-9]*(\d+\.?\d*)\s*(cubic\s*meters?|m³|gallons?)/i', $cleanText, $matches, PREG_SET_ORDER)) {
-            foreach ($matches as $match) {
-                $services[] = [
-                    'type' => 'Water',
-                    'description' => trim($match[1]),
-                    'value' => floatval($match[2]),
-                    'unit' => $match[3],
-                    'raw_text' => $match[0]
-                ];
+        // Look for water-related services with enhanced patterns
+        $waterPatterns = [
+            '/(water|sewerage|drainage)[^0-9]*(\d+\.?\d*)\s*(cubic\s*meters?|m³|gallons?)/i',
+            '/(\d+\.?\d*)\s*(cubic\s*meters?|m³|gallons?)\s*(water|sewerage|drainage)/i',
+            '/water[^0-9]*(\d+\.?\d*)\s*(cubic\s*meters?|m³)/i',
+            '/sewerage[^0-9]*(\d+\.?\d*)\s*(cubic\s*meters?|m³)/i'
+        ];
+        
+        foreach ($waterPatterns as $pattern) {
+            if (preg_match_all($pattern, $cleanText, $matches, PREG_SET_ORDER)) {
+                foreach ($matches as $match) {
+                    $services[] = [
+                        'type' => 'Water',
+                        'description' => trim($match[1] ?? 'Water'),
+                        'value' => floatval($match[2] ?? $match[1]),
+                        'unit' => $match[3] ?? $match[2],
+                        'raw_text' => $match[0],
+                        'confidence' => 0.8
+                    ];
+                }
             }
         }
         
         // Look for fuel/gas services
-        if (preg_match_all('/(fuel|gas|petrol|diesel)[^0-9]*(\d+\.?\d*)\s*(liters?|gallons?|kg|tons?)/i', $text, $matches, PREG_SET_ORDER)) {
+        if (preg_match_all('/(fuel|gas|petrol|diesel)[^0-9]*(\d+\.?\d*)\s*(liters?|gallons?|kg|tons?)/i', $cleanText, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
                 $services[] = [
                     'type' => 'Fuel',
                     'description' => trim($match[1]),
                     'value' => floatval($match[2]),
                     'unit' => $match[3],
-                    'raw_text' => $match[0]
+                    'raw_text' => $match[0],
+                    'confidence' => 0.7
                 ];
             }
         }
         
-        // Look for other services
-        if (preg_match_all('/(municipality|housing|chiller|cooling|heating)[^0-9]*(\d+\.?\d*)\s*(AED|units?)/i', $text, $matches, PREG_SET_ORDER)) {
-            foreach ($matches as $match) {
-                $services[] = [
-                    'type' => 'Other',
-                    'description' => trim($match[1]),
-                    'value' => floatval($match[2]),
-                    'unit' => $match[3],
-                    'raw_text' => $match[0]
-                ];
+        // Look for DEWA-specific services
+        $dewaServicePatterns = [
+            '/(municipality|housing|chiller|cooling|heating)[^0-9]*(\d+\.?\d*)\s*(AED|units?)/i',
+            '/(municipal|housing|chiller)[^0-9]*(\d+\.?\d*)\s*(AED|units?)/i',
+            '/municipal[^0-9]*(\d+\.?\d*)\s*(AED|units?)/i',
+            '/housing[^0-9]*(\d+\.?\d*)\s*(AED|units?)/i'
+        ];
+        
+        foreach ($dewaServicePatterns as $pattern) {
+            if (preg_match_all($pattern, $cleanText, $matches, PREG_SET_ORDER)) {
+                foreach ($matches as $match) {
+                    $services[] = [
+                        'type' => 'Other',
+                        'description' => trim($match[1]),
+                        'value' => floatval($match[2]),
+                        'unit' => $match[3],
+                        'raw_text' => $match[0],
+                        'confidence' => 0.6
+                    ];
+                }
             }
         }
+        
+        Log::info('Found ' . count($services) . ' services');
         
         return $services;
     }
@@ -732,23 +988,65 @@ class DEWABillParser
     {
         $charges = [];
         
-        // Extract all AED amounts with context
-        if (preg_match_all('/([^0-9]*?)(\d+\.?\d*)\s*AED/i', $text, $matches, PREG_SET_ORDER)) {
-            foreach ($matches as $match) {
-                $context = trim($match[1]);
-                $amount = floatval($match[2]);
-                
-                // Skip very small amounts (likely not relevant)
-                if ($amount > 1) {
+        Log::info('Extracting charges from text of length: ' . strlen($text));
+        
+        // Clean the text first
+        $cleanText = $this->cleanExtractedText($text);
+        
+        // Extract all AED amounts with context using multiple patterns
+        $chargePatterns = [
+            '/([^0-9]*?)(\d+\.?\d*)\s*AED/i',
+            '/([^0-9]*?)(\d+\.?\d*)\s*Dirhams?/i',
+            '/([^0-9]*?)(\d+\.?\d*)\s*Dhs?/i',
+            '/AED\s*(\d+\.?\d*)/i',
+            '/Dirhams?\s*(\d+\.?\d*)/i'
+        ];
+        
+        foreach ($chargePatterns as $pattern) {
+            if (preg_match_all($pattern, $cleanText, $matches, PREG_SET_ORDER)) {
+                foreach ($matches as $match) {
+                    $context = trim($match[1] ?? '');
+                    $amount = floatval($match[2] ?? $match[1]);
+                    
+                    // Skip very small amounts (likely not relevant)
+                    if ($amount > 1) {
+                        $charges[] = [
+                            'description' => $context ?: 'Unspecified Charge',
+                            'amount' => $amount,
+                            'currency' => 'AED',
+                            'raw_text' => $match[0],
+                            'confidence' => 0.7
+                        ];
+                    }
+                }
+            }
+        }
+        
+        // Look for specific DEWA charge patterns
+        $dewaChargePatterns = [
+            '/electricity[^0-9]*(\d+\.?\d*)\s*AED/i',
+            '/water[^0-9]*(\d+\.?\d*)\s*AED/i',
+            '/sewerage[^0-9]*(\d+\.?\d*)\s*AED/i',
+            '/municipal[^0-9]*(\d+\.?\d*)\s*AED/i',
+            '/housing[^0-9]*(\d+\.?\d*)\s*AED/i',
+            '/chiller[^0-9]*(\d+\.?\d*)\s*AED/i'
+        ];
+        
+        foreach ($dewaChargePatterns as $pattern) {
+            if (preg_match_all($pattern, $cleanText, $matches, PREG_SET_ORDER)) {
+                foreach ($matches as $match) {
                     $charges[] = [
-                        'description' => $context ?: 'Unspecified Charge',
-                        'amount' => $amount,
+                        'description' => 'DEWA ' . ucfirst(trim($match[0])),
+                        'amount' => floatval($match[1]),
                         'currency' => 'AED',
-                        'raw_text' => $match[0]
+                        'raw_text' => $match[0],
+                        'confidence' => 0.9
                     ];
                 }
             }
         }
+        
+        Log::info('Found ' . count($charges) . ' charges');
         
         return $charges;
     }
@@ -821,6 +1119,33 @@ class DEWABillParser
         }
         
         return $amounts;
+    }
+    
+    /**
+     * Create fallback structure for encrypted PDFs
+     */
+    private function createEncryptedPDFFallback(): string
+    {
+        Log::info('Creating fallback structure for encrypted PDF');
+        return 'PDF appears to be encrypted - manual entry required';
+    }
+    
+    /**
+     * Create fallback structure for image-based PDFs
+     */
+    private function createImageBasedPDFFallback(): string
+    {
+        Log::info('Creating fallback structure for image-based PDF');
+        return 'PDF appears to be image-based (scanned document) - manual entry required';
+    }
+    
+    /**
+     * Create fallback structure when extraction completely fails
+     */
+    private function createExtractionFailedFallback(): string
+    {
+        Log::info('Creating fallback structure for failed extraction');
+        return 'PDF text extraction failed - manual entry required';
     }
     
     /**
