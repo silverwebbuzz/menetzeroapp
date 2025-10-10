@@ -55,10 +55,246 @@
             <!-- Extracted Data Fields -->
             <div>
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Extracted Data</h3>
-                <div class="space-y-4">
-                    @if($document->processed_data)
+                <p class="text-sm text-gray-600 mb-6">
+                    Review and correct the extracted data from your {{ ucfirst($document->source_type) }} bill. 
+                    Match the values with your actual bill to ensure accurate carbon calculations.
+                </p>
+                
+                @if($document->processed_data)
+                    <!-- DEWA Bill Structure -->
+                    @if($document->source_type === 'electricity')
+                        <!-- Bill Information Section -->
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                            <h4 class="text-sm font-semibold text-blue-900 mb-3">📋 Bill Information</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Bill Number</label>
+                                    <input type="text" name="extracted_data[bill_number]" value="{{ old('extracted_data.bill_number', $document->processed_data['bill_number'] ?? '') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                           placeholder="e.g., 10003068141">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Issue Date</label>
+                                    <input type="date" name="extracted_data[issue_date]" value="{{ old('extracted_data.issue_date', $document->processed_data['issue_date'] ?? '') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+                                    <input type="date" name="extracted_data[due_date]" value="{{ old('extracted_data.due_date', $document->processed_data['due_date'] ?? '') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
+                                    <input type="text" name="extracted_data[account_number]" value="{{ old('extracted_data.account_number', $document->processed_data['account_number'] ?? '') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                           placeholder="e.g., 2031203304">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Electricity and Water Consumption (Main DEWA Services) -->
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                            <h4 class="text-sm font-semibold text-green-900 mb-3">⚡ Electricity and Water Consumption</h4>
+                            <p class="text-xs text-green-700 mb-4">Charges for your usage, with different rates or slabs depending on consumption levels</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Electricity Consumption (kWh) *</label>
+                                    <input type="number" step="0.01" name="extracted_data[electricity_consumption_kwh]" value="{{ old('extracted_data.electricity_consumption_kwh', $document->processed_data['electricity_consumption_kwh'] ?? '') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                           placeholder="e.g., 1234.5" required>
+                                    <p class="text-xs text-gray-500 mt-1">Required for carbon emissions calculation</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Electricity Charges (AED)</label>
+                                    <input type="number" step="0.01" name="extracted_data[electricity_charges_aed]" value="{{ old('extracted_data.electricity_charges_aed', $document->processed_data['electricity_charges_aed'] ?? '') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                           placeholder="e.g., 85.60">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Water Consumption (Cubic Meters)</label>
+                                    <input type="number" step="0.01" name="extracted_data[water_consumption_cubic_meters]" value="{{ old('extracted_data.water_consumption_cubic_meters', $document->processed_data['water_consumption_cubic_meters'] ?? '') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                           placeholder="e.g., 45.2">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Water Charges (AED)</label>
+                                    <input type="number" step="0.01" name="extracted_data[water_charges_aed]" value="{{ old('extracted_data.water_charges_aed', $document->processed_data['water_charges_aed'] ?? '') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                           placeholder="e.g., 33.66">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Other DEWA Services (AED)</label>
+                                    <input type="number" step="0.01" name="extracted_data[dewa_other_services_aed]" value="{{ old('extracted_data.dewa_other_services_aed', $document->processed_data['dewa_other_services_aed'] ?? '') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                           placeholder="e.g., 100.00">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">DEWA Total (AED)</label>
+                                    <input type="number" step="0.01" name="extracted_data[dewa_total_aed]" value="{{ old('extracted_data.dewa_total_aed', $document->processed_data['dewa_total_aed'] ?? '') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                           placeholder="e.g., 219.26">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Municipal Fee Section -->
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                            <h4 class="text-sm font-semibold text-blue-900 mb-3">🏛️ Municipal Fee</h4>
+                            <p class="text-xs text-blue-700 mb-4">A fee equal to 5% of your annual rent, divided by 12 months</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Municipal Fee (AED)</label>
+                                    <input type="number" step="0.01" name="extracted_data[municipal_fee_aed]" value="{{ old('extracted_data.municipal_fee_aed', $document->processed_data['municipal_fee_aed'] ?? '') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                           placeholder="e.g., 150.00">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Municipal Fee Rate</label>
+                                    <input type="text" name="extracted_data[municipal_fee_percentage]" value="{{ old('extracted_data.municipal_fee_percentage', $document->processed_data['municipal_fee_percentage'] ?? '5%') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                           placeholder="5%" readonly>
+                                    <p class="text-xs text-gray-500 mt-1">Fixed rate by government</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chiller/Cold Water Charge Section -->
+                        <div class="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-6">
+                            <h4 class="text-sm font-semibold text-purple-900 mb-3">❄️ Chiller/Cold Water Charge</h4>
+                            <p class="text-xs text-purple-700 mb-4">For buildings with central air conditioning, varies based on apartment size</p>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Chiller Charge (AED)</label>
+                                    <input type="number" step="0.01" name="extracted_data[chiller_charge_aed]" value="{{ old('extracted_data.chiller_charge_aed', $document->processed_data['chiller_charge_aed'] ?? '') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                           placeholder="e.g., 200.00">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Cold Water Charge (AED)</label>
+                                    <input type="number" step="0.01" name="extracted_data[cold_water_charge_aed]" value="{{ old('extracted_data.cold_water_charge_aed', $document->processed_data['cold_water_charge_aed'] ?? '') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                           placeholder="e.g., 50.00">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Apartment Size (Sq Ft)</label>
+                                    <input type="number" step="0.01" name="extracted_data[apartment_size_sqft]" value="{{ old('extracted_data.apartment_size_sqft', $document->processed_data['apartment_size_sqft'] ?? '') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                           placeholder="e.g., 1200">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Housing Fee Section -->
+                        <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
+                            <h4 class="text-sm font-semibold text-orange-900 mb-3">🏠 Housing Fee</h4>
+                            <p class="text-xs text-orange-700 mb-4">A fee paid by all residents, whether they own or rent. Owner is technically responsible but often included in tenant's bill</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Housing Fee (AED)</label>
+                                    <input type="number" step="0.01" name="extracted_data[housing_fee_aed]" value="{{ old('extracted_data.housing_fee_aed', $document->processed_data['housing_fee_aed'] ?? '') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                           placeholder="e.g., 0.00">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Responsible Party</label>
+                                    <select name="extracted_data[housing_fee_responsible]" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Select responsible party</option>
+                                        <option value="Owner" {{ old('extracted_data.housing_fee_responsible', $document->processed_data['housing_fee_responsible'] ?? '') == 'Owner' ? 'selected' : '' }}>Owner</option>
+                                        <option value="Tenant" {{ old('extracted_data.housing_fee_responsible', $document->processed_data['housing_fee_responsible'] ?? '') == 'Tenant' ? 'selected' : '' }}>Tenant</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Moving-in Charges Section -->
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                            <h4 class="text-sm font-semibold text-yellow-900 mb-3">🚚 Moving-in Charges</h4>
+                            <p class="text-xs text-yellow-700 mb-4">When setting up a new connection, initial moving-in fees will be included on your first bill</p>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Moving-in Charges (AED)</label>
+                                    <input type="number" step="0.01" name="extracted_data[moving_in_charges_aed]" value="{{ old('extracted_data.moving_in_charges_aed', $document->processed_data['moving_in_charges_aed'] ?? '') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                           placeholder="e.g., 0.00">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Connection Fee (AED)</label>
+                                    <input type="number" step="0.01" name="extracted_data[connection_fee_aed]" value="{{ old('extracted_data.connection_fee_aed', $document->processed_data['connection_fee_aed'] ?? '') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                           placeholder="e.g., 0.00">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Deposit Amount (AED)</label>
+                                    <input type="number" step="0.01" name="extracted_data[deposit_amount_aed]" value="{{ old('extracted_data.deposit_amount_aed', $document->processed_data['deposit_amount_aed'] ?? '') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                           placeholder="e.g., 0.00">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dubai Municipality Section -->
+                        <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
+                            <h4 class="text-sm font-semibold text-orange-900 mb-3">🏛️ Dubai Municipality Services</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Housing (AED)</label>
+                                    <input type="number" step="0.01" name="extracted_data[municipality_housing]" value="{{ old('extracted_data.municipality_housing', $document->processed_data['municipality_housing'] ?? '') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                           placeholder="e.g., 0.00">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Sewerage (AED)</label>
+                                    <input type="number" step="0.01" name="extracted_data[municipality_sewerage]" value="{{ old('extracted_data.municipality_sewerage', $document->processed_data['municipality_sewerage'] ?? '') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                           placeholder="e.g., 6.60">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Energy Consumption Summary (for Carbon Calculation) -->
+                        <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-6">
+                            <h4 class="text-sm font-semibold text-emerald-900 mb-3">🌱 Energy Consumption Summary (for Carbon Calculation)</h4>
+                            <p class="text-xs text-emerald-700 mb-4">Total consumption values used for carbon emissions calculation</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Total Electricity (kWh) *</label>
+                                    <input type="number" step="0.01" name="extracted_data[total_electricity_kwh]" value="{{ old('extracted_data.total_electricity_kwh', $document->processed_data['total_electricity_kwh'] ?? '') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                           placeholder="e.g., 1234.5" required>
+                                    <p class="text-xs text-gray-500 mt-1">Primary for Scope 2 emissions calculation</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Total Water (Cubic Meters)</label>
+                                    <input type="number" step="0.01" name="extracted_data[total_water_cubic_meters]" value="{{ old('extracted_data.total_water_cubic_meters', $document->processed_data['total_water_cubic_meters'] ?? '') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                           placeholder="e.g., 45.2">
+                                    <p class="text-xs text-gray-500 mt-1">For water-related emissions calculation</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Financial Summary Section -->
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
+                            <h4 class="text-sm font-semibold text-gray-900 mb-3">💰 Financial Summary</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Total Due (AED)</label>
+                                    <input type="number" step="0.01" name="extracted_data[total_due]" value="{{ old('extracted_data.total_due', $document->processed_data['total_due'] ?? '') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                           placeholder="e.g., 245.86">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">VAT Amount (AED)</label>
+                                    <input type="number" step="0.01" name="extracted_data[vat_amount]" value="{{ old('extracted_data.vat_amount', $document->processed_data['vat_amount'] ?? '') }}" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                           placeholder="e.g., 5.68">
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <!-- Generic fields for other document types -->
                         @foreach($document->processed_data as $key => $value)
-                            <div class="flex items-center space-x-4">
+                            <div class="flex items-center space-x-4 mb-4">
                                 <div class="flex-1">
                                     <label for="extracted_data_{{ $key }}" class="block text-sm font-medium text-gray-700 mb-1">
                                         {{ ucfirst(str_replace('_', ' ', $key)) }}
@@ -78,6 +314,7 @@
                                 </div>
                             </div>
                         @endforeach
+                    @endif
                     @else
                         <div class="text-center py-8">
                             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
