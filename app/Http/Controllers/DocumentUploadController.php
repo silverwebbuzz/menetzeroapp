@@ -119,6 +119,14 @@ class DocumentUploadController extends Controller
                 ->with('success', 'Document uploaded successfully. OCR processing has started.');
 
         } catch (\Exception $e) {
+            // Log the error for debugging
+            \Log::error('Document upload failed: ' . $e->getMessage(), [
+                'error' => $e->getTraceAsString(),
+                'user_id' => Auth::id(),
+                'company_id' => Auth::user()->company_id ?? 'null',
+                'source_type' => $request->source_type ?? 'null'
+            ]);
+
             // Only log if document was created successfully
             if (isset($document) && $document->id) {
                 DocumentProcessingLog::log(
@@ -130,7 +138,7 @@ class DocumentUploadController extends Controller
                 );
             }
 
-            return back()->withErrors(['file' => 'Failed to upload document. Please try again.']);
+            return back()->withErrors(['file' => 'Failed to upload document: ' . $e->getMessage()]);
         }
     }
 

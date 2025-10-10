@@ -13,9 +13,17 @@ class DocumentProcessorService
 {
     protected $ocrService;
 
-    public function __construct(OCRService $ocrService)
+    public function __construct()
     {
-        $this->ocrService = $ocrService;
+        // OCRService will be created when needed to avoid circular dependency issues
+    }
+    
+    protected function getOCRService()
+    {
+        if (!$this->ocrService) {
+            $this->ocrService = app(OCRService::class);
+        }
+        return $this->ocrService;
     }
 
     /**
@@ -46,7 +54,7 @@ class DocumentProcessorService
                 $extractedData = $dewaParser->parseBill($filePath);
             } else {
                 // Use OCR service for other document types
-                $extractedData = $this->ocrService->extractData(
+                $extractedData = $this->getOCRService()->extractData(
                     $filePath, 
                     $document->source_type, 
                     $document->id, 
@@ -60,14 +68,14 @@ class DocumentProcessorService
                 $dewaParser = new DEWABillParser();
                 $validation = $dewaParser->validateExtractedData($extractedData);
             } else {
-                $validation = $this->ocrService->validateExtractedData($extractedData, $document->source_type);
+                $validation = $this->getOCRService()->validateExtractedData($extractedData, $document->source_type);
             }
 
             // Calculate confidence score
             if ($document->source_type === 'dewa' || $document->source_type === 'electricity') {
                 $confidence = $extractedData['confidence'] ?? 90; // DEWA parser provides confidence
             } else {
-                $confidence = $this->ocrService->getConfidenceScore($extractedData);
+                $confidence = $this->getOCRService()->getConfidenceScore($extractedData);
             }
 
             // Update document with extracted data
