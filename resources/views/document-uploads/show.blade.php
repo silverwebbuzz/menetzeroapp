@@ -97,105 +97,146 @@
                     </div>
                     <div class="px-6 py-4">
                         @if($document->processed_data)
-                            <!-- Debug: Show raw processed data -->
-                            <div class="mb-4 p-3 bg-gray-100 rounded text-xs">
-                                <strong>Debug - Processed Data:</strong><br>
-                                <pre>{{ json_encode($document->processed_data, JSON_PRETTY_PRINT) }}</pre>
-                            </div>
-                            
                             @if($document->source_type === 'dewa' || $document->source_type === 'electricity')
                                 <!-- DEWA Bill Data Structure -->
                                 <div class="space-y-6">
-                                    @if(isset($document->processed_data['extracted_services']) || isset($document->processed_data['extracted_charges']) || isset($document->processed_data['extracted_consumption']))
-                                        <!-- Extracted Data Summary -->
-                                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                            <h4 class="text-sm font-semibold text-blue-900 mb-3">🏢 DEWA Bill Data Extracted</h4>
-                                            <p class="text-xs text-blue-700 mb-4">Data extracted from your DEWA bill - ready for scope assignment</p>
-                                            
-                                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                                                <div class="text-center">
-                                                    <div class="text-2xl font-bold text-blue-900">{{ count($document->processed_data['extracted_services'] ?? []) }}</div>
-                                                    <div class="text-sm text-blue-700">Services Found</div>
-                                                </div>
-                                                <div class="text-center">
-                                                    <div class="text-2xl font-bold text-blue-900">{{ count($document->processed_data['extracted_charges'] ?? []) }}</div>
-                                                    <div class="text-sm text-blue-700">Charges Found</div>
-                                                </div>
-                                                <div class="text-center">
-                                                    <div class="text-2xl font-bold text-blue-900">{{ count($document->processed_data['extracted_consumption'] ?? []) }}</div>
-                                                    <div class="text-sm text-blue-700">Consumption Data</div>
-                                                </div>
+                                    <!-- Extracted Data Summary -->
+                                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                        <h4 class="text-sm font-semibold text-blue-900 mb-3">🏢 DEWA Bill Data Extracted</h4>
+                                        <p class="text-xs text-blue-700 mb-4">Data extracted from your DEWA bill - ready for scope assignment</p>
+                                        
+                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                            <div class="text-center">
+                                                <div class="text-2xl font-bold text-blue-900">{{ count($document->processed_data['extracted_services'] ?? []) }}</div>
+                                                <div class="text-sm text-blue-700">Services Found</div>
                                             </div>
-                                            
-                                            <div class="flex items-center justify-between">
-                                                <div class="text-sm text-blue-700">
-                                                    Ready to assign to Scope 1, 2, or 3 categories
-                                                </div>
-                                                <a href="{{ route('document-uploads.assign-scope', $document) }}" class="btn btn-primary">
-                                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                    </svg>
-                                                    Assign to Scopes
-                                                </a>
+                                            <div class="text-center">
+                                                <div class="text-2xl font-bold text-blue-900">{{ count($document->processed_data['extracted_charges'] ?? []) }}</div>
+                                                <div class="text-sm text-blue-700">Charges Found</div>
+                                            </div>
+                                            <div class="text-center">
+                                                <div class="text-2xl font-bold text-blue-900">{{ count($document->processed_data['extracted_consumption'] ?? []) }}</div>
+                                                <div class="text-sm text-blue-700">Consumption Data</div>
                                             </div>
                                         </div>
-                                    @endif
+                                        
+                                        <div class="flex items-center justify-between">
+                                            <div class="text-sm text-blue-700">
+                                                Ready to assign to Scope 1, 2, or 3 categories
+                                            </div>
+                                            <a href="{{ route('document-uploads.assign-scope', $document) }}" class="btn btn-primary">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                </svg>
+                                                Assign to Scopes
+                                            </a>
+                                        </div>
+                                    </div>
 
-                                    <!-- DEWA Services -->
-                                    @if(isset($document->processed_data['dewa_services']))
+                                    <!-- Services Box -->
+                                    @if(!empty($document->processed_data['extracted_services']))
                                         <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                                            <h4 class="text-sm font-semibold text-green-900 mb-3">⚡ DEWA Services</h4>
-                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                @foreach($document->processed_data['dewa_services'] as $key => $value)
-                                                    <div class="flex justify-between items-center py-1">
-                                                        <span class="text-sm font-medium text-gray-600">{{ ucfirst(str_replace('_', ' ', $key)) }}</span>
-                                                        <span class="text-sm text-gray-900 font-medium">{{ is_numeric($value) ? number_format($value, 2) : $value }}</span>
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                    @endif
-
-                                    <!-- Energy Consumption -->
-                                    @if(isset($document->processed_data['energy_consumption']))
-                                        <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
-                                            <h4 class="text-sm font-semibold text-emerald-900 mb-3">🌱 Energy Consumption</h4>
-                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                @foreach($document->processed_data['energy_consumption'] as $key => $value)
-                                                    <div class="flex justify-between items-center py-1">
-                                                        <span class="text-sm font-medium text-gray-600">{{ ucfirst(str_replace('_', ' ', $key)) }}</span>
-                                                        <span class="text-sm text-gray-900 font-medium">{{ is_numeric($value) ? number_format($value, 2) : $value }}</span>
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                    @endif
-
-                                    <!-- Carbon Footprint -->
-                                    @if(isset($document->processed_data['carbon_footprint']))
-                                        <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                                            <h4 class="text-sm font-semibold text-purple-900 mb-3">🌍 Carbon Footprint</h4>
-                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                @foreach($document->processed_data['carbon_footprint'] as $key => $value)
-                                                    <div class="flex justify-between items-center py-1">
-                                                        <span class="text-sm font-medium text-gray-600">{{ ucfirst(str_replace('_', ' ', $key)) }}</span>
-                                                        <span class="text-sm text-gray-900 font-medium">
-                                                            @if(is_array($value))
-                                                                @foreach($value as $subKey => $subValue)
-                                                                    <div class="text-xs">{{ ucfirst(str_replace('_', ' ', $subKey)) }}: {{ is_numeric($subValue) ? number_format($subValue, 2) : $subValue }}</div>
-                                                                @endforeach
-                                                            @else
-                                                                {{ is_numeric($value) ? number_format($value, 2) : $value }}
+                                            <h4 class="text-sm font-semibold text-green-900 mb-3">⚡ Services Found</h4>
+                                            <div class="space-y-2">
+                                                @foreach($document->processed_data['extracted_services'] as $service)
+                                                    <div class="flex justify-between items-center py-2 px-3 bg-white rounded border">
+                                                        <div>
+                                                            <span class="font-medium text-gray-900">{{ $service['type'] ?? 'Service' }}</span>
+                                                            @if(isset($service['description']))
+                                                                <span class="text-sm text-gray-600 ml-2">{{ $service['description'] }}</span>
                                                             @endif
-                                                        </span>
+                                                        </div>
+                                                        <div class="text-right">
+                                                            <span class="font-bold text-green-900">{{ $service['value'] ?? '0' }}</span>
+                                                            <span class="text-sm text-gray-600 ml-1">{{ $service['unit'] ?? 'units' }}</span>
+                                                        </div>
                                                     </div>
                                                 @endforeach
                                             </div>
                                         </div>
                                     @endif
+
+                                    <!-- Charges Box -->
+                                    @if(!empty($document->processed_data['extracted_charges']))
+                                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                                            <h4 class="text-sm font-semibold text-yellow-900 mb-3">💰 Charges Found</h4>
+                                            <div class="space-y-2">
+                                                @foreach($document->processed_data['extracted_charges'] as $charge)
+                                                    <div class="flex justify-between items-center py-2 px-3 bg-white rounded border">
+                                                        <div>
+                                                            <span class="font-medium text-gray-900">{{ $charge['description'] ?? 'Charge' }}</span>
+                                                        </div>
+                                                        <div class="text-right">
+                                                            <span class="font-bold text-yellow-900">{{ number_format($charge['amount'], 2) }}</span>
+                                                            <span class="text-sm text-gray-600 ml-1">{{ $charge['currency'] ?? 'AED' }}</span>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    <!-- Consumption Box -->
+                                    @if(!empty($document->processed_data['extracted_consumption']))
+                                        <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                                            <h4 class="text-sm font-semibold text-emerald-900 mb-3">🌱 Consumption Data</h4>
+                                            <div class="space-y-2">
+                                                @foreach($document->processed_data['extracted_consumption'] as $consumption)
+                                                    <div class="flex justify-between items-center py-2 px-3 bg-white rounded border">
+                                                        <div>
+                                                            <span class="font-medium text-gray-900">{{ $consumption['type'] ?? 'Consumption' }}</span>
+                                                        </div>
+                                                        <div class="text-right">
+                                                            <span class="font-bold text-emerald-900">{{ $consumption['value'] ?? '0' }}</span>
+                                                            <span class="text-sm text-gray-600 ml-1">{{ $consumption['unit'] ?? 'units' }}</span>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    <!-- Dates Box -->
+                                    @if(!empty($document->processed_data['extracted_dates']))
+                                        <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                                            <h4 class="text-sm font-semibold text-purple-900 mb-3">📅 Dates Found</h4>
+                                            <div class="space-y-2">
+                                                @foreach($document->processed_data['extracted_dates'] as $date)
+                                                    <div class="flex justify-between items-center py-2 px-3 bg-white rounded border">
+                                                        <div>
+                                                            <span class="font-medium text-gray-900">{{ $date['date'] ?? 'Date' }}</span>
+                                                        </div>
+                                                        <div class="text-right">
+                                                            <span class="text-sm text-purple-700">{{ $date['raw_text'] ?? '' }}</span>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    <!-- Bill Information Box -->
+                                    @if(!empty($document->processed_data['bill_information']))
+                                        <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+                                            <h4 class="text-sm font-semibold text-indigo-900 mb-3">📄 Bill Information</h4>
+                                            <div class="space-y-2">
+                                                @foreach($document->processed_data['bill_information'] as $info)
+                                                    <div class="flex justify-between items-center py-2 px-3 bg-white rounded border">
+                                                        <div>
+                                                            <span class="font-medium text-gray-900">{{ $info['label'] ?? $info['type'] ?? 'Information' }}</span>
+                                                        </div>
+                                                        <div class="text-right">
+                                                            <span class="text-sm text-indigo-700">{{ $info['value'] ?? '' }}</span>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
+
                                 </div>
                             @else
-                                <!-- Generic Data Structure -->
+                                <!-- Generic Data Structure for other document types -->
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     @foreach($document->processed_data as $key => $value)
                                         <div class="flex justify-between items-center py-2 border-b border-gray-100">
