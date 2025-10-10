@@ -79,7 +79,7 @@ class DocumentUploadController extends Controller
     {
         $request->validate([
             'file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240', // 10MB max
-            'source_type' => 'required|in:electricity,fuel,waste,water,transport,other',
+            'source_type' => 'required|in:dewa,electricity,fuel,waste,water,transport,other',
             'document_category' => 'required|in:bill,receipt,invoice,statement,contract,other',
             'location_id' => 'nullable|exists:locations,id',
         ]);
