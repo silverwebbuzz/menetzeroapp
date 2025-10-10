@@ -98,6 +98,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/{document}/reject', [DocumentUploadController::class, 'reject'])->name('reject');
         Route::delete('/{document}', [DocumentUploadController::class, 'destroy'])->name('destroy');
         Route::post('/{document}/retry-ocr', [DocumentUploadController::class, 'retryOcr'])->name('retry-ocr');
+        Route::get('/{document}/field-mapping', [DocumentUploadController::class, 'showFieldMapping'])->name('field-mapping');
+        Route::put('/{document}/field-mapping', [DocumentUploadController::class, 'updateFieldMapping'])->name('update-field-mapping');
     });
 });
 

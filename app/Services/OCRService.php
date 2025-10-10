@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\DocumentUpload;
 use App\Models\DocumentProcessingLog;
 use App\Models\DocumentUsageTracking;
+use App\Services\DEWABillParser;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 
@@ -82,9 +83,10 @@ class OCRService
             throw new \Exception('File not found: ' . $filePath);
         }
         
-        // For DEWA bills, extract specific government data structure
+        // For DEWA bills, use specialized parser
         if ($sourceType === 'electricity') {
-            return $this->extractDEWABillData($filePath);
+            $dewaParser = new DEWABillParser();
+            return $dewaParser->parseBill($filePath);
         }
         
         // For other types, return structured fields

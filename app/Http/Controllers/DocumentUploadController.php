@@ -9,6 +9,7 @@ use App\Models\Location;
 use App\Services\OCRService;
 use App\Services\DocumentProcessorService;
 use App\Services\EmissionIntegrationService;
+use App\Services\DEWABillParser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -380,6 +381,77 @@ class DocumentUploadController extends Controller
 
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Failed to restart OCR processing. Please try again.']);
+        }
+    }
+
+    /**
+     * Show field mapping page for DEWA bills
+     */
+    public function showFieldMapping(DocumentUpload $document)
+    {
+        // Check if user has access to this document
+        if ($document->company_id !== Auth::user()->company_id) {
+            abort(403, 'Unauthorized access to document.');
+        }
+
+        // Get field mapping options
+        $dewaParser = new DEWABillParser();
+        $fieldMappingOptions = $dewaParser->getFieldMappingOptions();
+
+        // Get extracted values from the document
+        $extractedValues = $document->processed_data ?? [];
+
+        // Get current field mapping
+        $currentMapping = $document->field_mapping ?? [];
+
+        // Get locations for assignment
+        $locations = Location::where('company_id', Auth::user()->company_id)->get();
+
+        // Check for carbon footprint data
+        $carbonFootprint = [];
+        if (isset($extractedValues['carbon_footprint'])) {
+            $carbonFootprint = $extractedValues['carbon_footprint'];
+        }
+
+        return view('document-uploads.field-mapping', compact(
+            'document',
+            'fieldMappingOptions',
+            'extractedValues',
+            'currentMapping',
+            'locations',
+            'carbonFootprint'
+        ));
+    }
+
+    /**
+     * Update field mapping for DEWA bills
+     */
+    public function updateFieldMapping(Request $request, DocumentUpload $document)
+    {
+        // Check if user has access to this document
+        if ($document->company_id !== Auth::user()->company_id) {
+            abort(403, 'Unauthorized access to document.');
+        }
+
+        $request->validate([
+            'field_mapping' => 'required|array',
+            'field_mapping.*' => 'required|string',
+            'location_id' => 'nullable|exists:locations,id'
+        ]);
+
+        try {
+            // Update field mapping
+            $document->update([
+                'field_mapping' => $request->field_mapping,
+                'location_id' => $request->location_id,
+                'status' => 'mapped'
+            ]);
+
+            return redirect()->route('document-uploads.show', $document)
+                ->with('success', 'Field mapping has been saved successfully.');
+
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Failed to save field mapping: ' . $e->getMessage()]);
         }
     }
 }
