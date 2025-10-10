@@ -111,87 +111,209 @@ class DEWABillParser
     }
     
     /**
-     * Parse extracted text to find bill data
+     * Parse extracted text to find ALL bill data and organize into generic boxes
      */
     private function parseBillText(string $text): array
     {
         $billData = [
-            // Initialize with null values
-            'bill_number' => null,
-            'issue_date' => null,
-            'due_date' => null,
-            'period_start' => null,
-            'period_end' => null,
-            'account_number' => null,
-            'customer_name' => null,
-            'premise_address' => null,
-            'premise_type' => null,
-            'electricity_consumption_kwh' => null,
-            'electricity_charges_aed' => null,
-            'water_consumption_cubic_meters' => null,
-            'water_charges_aed' => null,
-            'other_services_aed' => null,
-            'dewa_total_aed' => null,
-            'municipality_housing_aed' => null,
-            'municipality_sewerage_aed' => null,
-            'municipality_total_aed' => null,
-            'additional_charges_aed' => null,
-            'current_month_total_aed' => null,
-            'previous_balance_aed' => null,
-            'payments_received_aed' => null,
-            'total_due_aed' => null,
-            'vat_amount_aed' => null,
-            'carbon_footprint_kg_co2e' => null,
-            'provider' => 'DEWA',
-            'provider_vat_number' => null,
-            'service_areas' => ['Dubai'],
-            'billing_period_days' => null,
-            'consumption_slab' => null,
-            'confidence' => 60, // Lower confidence for text extraction
+            'bill_information' => $this->extractBillInformation($text),
+            'extracted_services' => $this->extractAllServices($text),
+            'extracted_charges' => $this->extractAllCharges($text),
+            'extracted_consumption' => $this->extractAllConsumption($text),
+            'extracted_dates' => $this->extractAllDates($text),
+            'extracted_amounts' => $this->extractAllAmounts($text),
+            'raw_text' => $text,
+            'confidence' => 60,
             'extraction_method' => 'pdf_text_extraction',
-            'bill_type' => 'DEWA_UTILITY_BILL',
-            'raw_text' => $text // Store raw text for debugging
+            'bill_type' => 'DEWA_UTILITY_BILL'
         ];
         
-        // Extract bill number (look for patterns like 756595961)
+        return $billData;
+    }
+    
+    /**
+     * Extract basic bill information
+     */
+    private function extractBillInformation(string $text): array
+    {
+        $info = [];
+        
+        // Extract bill number
         if (preg_match('/\b(\d{9,12})\b/', $text, $matches)) {
-            $billData['bill_number'] = $matches[1];
+            $info['bill_number'] = $matches[1];
         }
         
-        // Extract dates (look for date patterns)
-        if (preg_match('/(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/', $text, $matches)) {
-            $billData['issue_date'] = $matches[1];
+        // Extract account number
+        if (preg_match('/Account[:\s]*(\d{8,12})/', $text, $matches)) {
+            $info['account_number'] = $matches[1];
         }
         
-        // Extract amounts (look for AED amounts)
-        if (preg_match_all('/(\d+\.?\d*)\s*AED/', $text, $matches)) {
-            $amounts = array_map('floatval', $matches[1]);
-            if (!empty($amounts)) {
-                $billData['total_due_aed'] = max($amounts); // Assume largest amount is total
+        // Extract customer name
+        if (preg_match('/Customer[:\s]*([A-Z\s]+)/', $text, $matches)) {
+            $info['customer_name'] = trim($matches[1]);
+        }
+        
+        return $info;
+    }
+    
+    /**
+     * Extract ALL services mentioned in the bill
+     */
+    private function extractAllServices(string $text): array
+    {
+        $services = [];
+        
+        // Look for electricity-related services
+        if (preg_match_all('/(electricity|power|energy)[^0-9]*(\d+\.?\d*)\s*(kWh|units?)/i', $text, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $services[] = [
+                    'type' => 'Electricity',
+                    'description' => trim($match[1]),
+                    'value' => floatval($match[2]),
+                    'unit' => $match[3],
+                    'raw_text' => $match[0]
+                ];
             }
         }
         
-        // Extract electricity consumption (look for kWh patterns)
-        if (preg_match('/(\d+\.?\d*)\s*kWh/', $text, $matches)) {
-            $billData['electricity_consumption_kwh'] = floatval($matches[1]);
+        // Look for water-related services
+        if (preg_match_all('/(water|sewerage|drainage)[^0-9]*(\d+\.?\d*)\s*(cubic\s*meters?|m³|gallons?)/i', $text, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $services[] = [
+                    'type' => 'Water',
+                    'description' => trim($match[1]),
+                    'value' => floatval($match[2]),
+                    'unit' => $match[3],
+                    'raw_text' => $match[0]
+                ];
+            }
         }
         
-        // Extract water consumption (look for cubic meters)
-        if (preg_match('/(\d+\.?\d*)\s*cubic\s*meters?/', $text, $matches)) {
-            $billData['water_consumption_cubic_meters'] = floatval($matches[1]);
+        // Look for fuel/gas services
+        if (preg_match_all('/(fuel|gas|petrol|diesel)[^0-9]*(\d+\.?\d*)\s*(liters?|gallons?|kg|tons?)/i', $text, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $services[] = [
+                    'type' => 'Fuel',
+                    'description' => trim($match[1]),
+                    'value' => floatval($match[2]),
+                    'unit' => $match[3],
+                    'raw_text' => $match[0]
+                ];
+            }
         }
         
-        // Extract account number (look for long numbers)
-        if (preg_match('/Account[:\s]*(\d{8,12})/', $text, $matches)) {
-            $billData['account_number'] = $matches[1];
+        // Look for other services
+        if (preg_match_all('/(municipality|housing|chiller|cooling|heating)[^0-9]*(\d+\.?\d*)\s*(AED|units?)/i', $text, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $services[] = [
+                    'type' => 'Other',
+                    'description' => trim($match[1]),
+                    'value' => floatval($match[2]),
+                    'unit' => $match[3],
+                    'raw_text' => $match[0]
+                ];
+            }
         }
         
-        // Extract customer name (look for name patterns)
-        if (preg_match('/Customer[:\s]*([A-Z\s]+)/', $text, $matches)) {
-            $billData['customer_name'] = trim($matches[1]);
+        return $services;
+    }
+    
+    /**
+     * Extract ALL charges mentioned in the bill
+     */
+    private function extractAllCharges(string $text): array
+    {
+        $charges = [];
+        
+        // Extract all AED amounts with context
+        if (preg_match_all('/([^0-9]*?)(\d+\.?\d*)\s*AED/i', $text, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $context = trim($match[1]);
+                $amount = floatval($match[2]);
+                
+                // Skip very small amounts (likely not relevant)
+                if ($amount > 1) {
+                    $charges[] = [
+                        'description' => $context ?: 'Unspecified Charge',
+                        'amount' => $amount,
+                        'currency' => 'AED',
+                        'raw_text' => $match[0]
+                    ];
+                }
+            }
         }
         
-        return $billData;
+        return $charges;
+    }
+    
+    /**
+     * Extract ALL consumption data
+     */
+    private function extractAllConsumption(string $text): array
+    {
+        $consumption = [];
+        
+        // Extract consumption with various units
+        if (preg_match_all('/(\d+\.?\d*)\s*(kWh|kwh|units?|cubic\s*meters?|m³|liters?|gallons?|kg|tons?|m²|sq\s*ft)/i', $text, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $consumption[] = [
+                    'value' => floatval($match[1]),
+                    'unit' => $match[2],
+                    'raw_text' => $match[0]
+                ];
+            }
+        }
+        
+        return $consumption;
+    }
+    
+    /**
+     * Extract ALL dates mentioned in the bill
+     */
+    private function extractAllDates(string $text): array
+    {
+        $dates = [];
+        
+        // Extract various date formats
+        if (preg_match_all('/(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/', $text, $matches)) {
+            foreach ($matches[1] as $date) {
+                $dates[] = [
+                    'date' => $date,
+                    'raw_text' => $date
+                ];
+            }
+        }
+        
+        return $dates;
+    }
+    
+    /**
+     * Extract ALL amounts (numbers with context)
+     */
+    private function extractAllAmounts(string $text): array
+    {
+        $amounts = [];
+        
+        // Extract all numbers with context
+        if (preg_match_all('/([^0-9]*?)(\d+\.?\d*)([^0-9]*?)/', $text, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $before = trim($match[1]);
+                $number = floatval($match[2]);
+                $after = trim($match[3]);
+                
+                // Only include meaningful numbers
+                if ($number > 0 && (strlen($before) > 2 || strlen($after) > 2)) {
+                    $amounts[] = [
+                        'value' => $number,
+                        'context_before' => $before,
+                        'context_after' => $after,
+                        'raw_text' => $match[0]
+                    ];
+                }
+            }
+        }
+        
+        return $amounts;
     }
     
     /**
@@ -201,71 +323,31 @@ class DEWABillParser
     {
         return [
             // Bill Information
-            'bill_information' => [
-                'bill_number' => $rawData['bill_number'] ?? null,
-                'issue_date' => $rawData['issue_date'] ?? null,
-                'due_date' => $rawData['due_date'] ?? null,
-                'period_start' => $rawData['period_start'] ?? null,
-                'period_end' => $rawData['period_end'] ?? null,
-                'account_number' => $rawData['account_number'] ?? null,
-                'customer_name' => $rawData['customer_name'] ?? null,
-                'premise_address' => $rawData['premise_address'] ?? null,
-                'premise_type' => $rawData['premise_type'] ?? null
-            ],
+            'bill_information' => $rawData['bill_information'] ?? [],
             
-            // DEWA Services
-            'dewa_services' => [
-                'electricity_consumption_kwh' => $rawData['electricity_consumption_kwh'] ?? null,
-                'electricity_charges_aed' => $rawData['electricity_charges_aed'] ?? null,
-                'water_consumption_cubic_meters' => $rawData['water_consumption_cubic_meters'] ?? null,
-                'water_charges_aed' => $rawData['water_charges_aed'] ?? null,
-                'other_services_aed' => $rawData['other_services_aed'] ?? null,
-                'dewa_total_aed' => $rawData['dewa_total_aed'] ?? null
-            ],
+            // All extracted services (Electricity, Water, Fuel, etc.)
+            'extracted_services' => $rawData['extracted_services'] ?? [],
             
-            // Municipality Services
-            'municipality_services' => [
-                'housing_aed' => $rawData['municipality_housing_aed'] ?? null,
-                'sewerage_aed' => $rawData['municipality_sewerage_aed'] ?? null,
-                'total_aed' => $rawData['municipality_total_aed'] ?? null
-            ],
+            // All extracted charges with context
+            'extracted_charges' => $rawData['extracted_charges'] ?? [],
             
-            // Financial Summary
-            'financial_summary' => [
-                'additional_charges_aed' => $rawData['additional_charges_aed'] ?? null,
-                'current_month_total_aed' => $rawData['current_month_total_aed'] ?? null,
-                'previous_balance_aed' => $rawData['previous_balance_aed'] ?? null,
-                'payments_received_aed' => $rawData['payments_received_aed'] ?? null,
-                'total_due_aed' => $rawData['total_due_aed'] ?? null,
-                'vat_amount_aed' => $rawData['vat_amount_aed'] ?? null
-            ],
+            // All consumption data with units
+            'extracted_consumption' => $rawData['extracted_consumption'] ?? [],
             
-            // Energy Consumption (for carbon calculation)
-            'energy_consumption' => [
-                'total_electricity_kwh' => $rawData['electricity_consumption_kwh'] ?? null,
-                'total_water_cubic_meters' => $rawData['water_consumption_cubic_meters'] ?? null
-            ],
+            // All dates found in the bill
+            'extracted_dates' => $rawData['extracted_dates'] ?? [],
             
-            // Carbon Footprint (if available)
-            'carbon_footprint' => [
-                'total_kg_co2e' => $rawData['carbon_footprint_kg_co2e'] ?? null,
-                'breakdown' => $rawData['carbon_footprint_breakdown'] ?? null
-            ],
-            
-            // Provider Information
-            'provider_info' => [
-                'provider' => $rawData['provider'] ?? 'DEWA',
-                'vat_number' => $rawData['provider_vat_number'] ?? null,
-                'service_areas' => $rawData['service_areas'] ?? ['Dubai']
-            ],
+            // All amounts with context
+            'extracted_amounts' => $rawData['extracted_amounts'] ?? [],
             
             // Processing Information
             'processing_info' => [
                 'confidence' => $rawData['confidence'] ?? 60,
                 'extraction_method' => $rawData['extraction_method'] ?? 'pdf_text_extraction',
                 'bill_type' => $rawData['bill_type'] ?? 'DEWA_UTILITY_BILL',
-                'billing_period_days' => $rawData['billing_period_days'] ?? null,
-                'consumption_slab' => $rawData['consumption_slab'] ?? null
+                'total_services_found' => count($rawData['extracted_services'] ?? []),
+                'total_charges_found' => count($rawData['extracted_charges'] ?? []),
+                'total_consumption_found' => count($rawData['extracted_consumption'] ?? [])
             ],
             
             // Raw extracted text for debugging

@@ -100,17 +100,37 @@
                             @if($document->source_type === 'electricity')
                                 <!-- DEWA Bill Data Structure -->
                                 <div class="space-y-6">
-                                    <!-- Bill Information -->
-                                    @if(isset($document->processed_data['bill_information']))
+                                    @if(isset($document->processed_data['extracted_services']) || isset($document->processed_data['extracted_charges']) || isset($document->processed_data['extracted_consumption']))
+                                        <!-- Extracted Data Summary -->
                                         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                            <h4 class="text-sm font-semibold text-blue-900 mb-3">📄 Bill Information</h4>
-                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                @foreach($document->processed_data['bill_information'] as $key => $value)
-                                                    <div class="flex justify-between items-center py-1">
-                                                        <span class="text-sm font-medium text-gray-600">{{ ucfirst(str_replace('_', ' ', $key)) }}</span>
-                                                        <span class="text-sm text-gray-900 font-medium">{{ $value }}</span>
-                                                    </div>
-                                                @endforeach
+                                            <h4 class="text-sm font-semibold text-blue-900 mb-3">🏢 DEWA Bill Data Extracted</h4>
+                                            <p class="text-xs text-blue-700 mb-4">Data extracted from your DEWA bill - ready for scope assignment</p>
+                                            
+                                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                                <div class="text-center">
+                                                    <div class="text-2xl font-bold text-blue-900">{{ count($document->processed_data['extracted_services'] ?? []) }}</div>
+                                                    <div class="text-sm text-blue-700">Services Found</div>
+                                                </div>
+                                                <div class="text-center">
+                                                    <div class="text-2xl font-bold text-blue-900">{{ count($document->processed_data['extracted_charges'] ?? []) }}</div>
+                                                    <div class="text-sm text-blue-700">Charges Found</div>
+                                                </div>
+                                                <div class="text-center">
+                                                    <div class="text-2xl font-bold text-blue-900">{{ count($document->processed_data['extracted_consumption'] ?? []) }}</div>
+                                                    <div class="text-sm text-blue-700">Consumption Data</div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="flex items-center justify-between">
+                                                <div class="text-sm text-blue-700">
+                                                    Ready to assign to Scope 1, 2, or 3 categories
+                                                </div>
+                                                <a href="{{ route('document-uploads.assign-scope', $document) }}" class="btn btn-primary">
+                                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                    Assign to Scopes
+                                                </a>
                                             </div>
                                         </div>
                                     @endif

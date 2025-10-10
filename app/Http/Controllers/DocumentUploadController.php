@@ -454,4 +454,67 @@ class DocumentUploadController extends Controller
             return back()->withErrors(['error' => 'Failed to save field mapping: ' . $e->getMessage()]);
         }
     }
+
+    /**
+     * Show scope assignment page for DEWA bills
+     */
+    public function showScopeAssignment(DocumentUpload $document)
+    {
+        // Check if user has access to this document
+        if ($document->company_id !== Auth::user()->company_id) {
+            abort(403, 'Unauthorized access to document.');
+        }
+
+        // Get extracted data from the document
+        $extractedData = $document->processed_data ?? [];
+
+        // Get locations for assignment
+        $locations = Location::where('company_id', Auth::user()->company_id)->get();
+
+        return view('document-uploads.assign-scope', compact(
+            'document',
+            'extractedData',
+            'locations'
+        ));
+    }
+
+    /**
+     * Update scope assignments for DEWA bills
+     */
+    public function updateScopeAssignment(Request $request, DocumentUpload $document)
+    {
+        // Check if user has access to this document
+        if ($document->company_id !== Auth::user()->company_id) {
+            abort(403, 'Unauthorized access to document.');
+        }
+
+        $request->validate([
+            'service_assignments' => 'nullable|array',
+            'charge_assignments' => 'nullable|array',
+            'consumption_assignments' => 'nullable|array',
+            'location_id' => 'nullable|exists:locations,id'
+        ]);
+
+        try {
+            // Store scope assignments
+            $scopeAssignments = [
+                'services' => $request->service_assignments ?? [],
+                'charges' => $request->charge_assignments ?? [],
+                'consumption' => $request->consumption_assignments ?? []
+            ];
+
+            // Update document
+            $document->update([
+                'scope_assignments' => $scopeAssignments,
+                'location_id' => $request->location_id,
+                'status' => 'assigned'
+            ]);
+
+            return redirect()->route('document-uploads.show', $document)
+                ->with('success', 'Scope assignments have been saved successfully.');
+
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Failed to save scope assignments: ' . $e->getMessage()]);
+        }
+    }
 }

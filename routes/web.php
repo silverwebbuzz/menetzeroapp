@@ -100,6 +100,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/{document}/retry-ocr', [DocumentUploadController::class, 'retryOcr'])->name('retry-ocr');
         Route::get('/{document}/field-mapping', [DocumentUploadController::class, 'showFieldMapping'])->name('field-mapping');
         Route::put('/{document}/field-mapping', [DocumentUploadController::class, 'updateFieldMapping'])->name('update-field-mapping');
+        Route::get('/{document}/assign-scope', [DocumentUploadController::class, 'showScopeAssignment'])->name('assign-scope');
+        Route::put('/{document}/assign-scope', [DocumentUploadController::class, 'updateScopeAssignment'])->name('update-assign-scope');
     });
 });
 
