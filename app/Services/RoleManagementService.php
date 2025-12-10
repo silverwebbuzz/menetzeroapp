@@ -26,6 +26,11 @@ class RoleManagementService
      */
     public function createCustomRole($companyId, $roleName, $permissions, $data = [])
     {
+        // Ensure permissions is an array
+        if (!is_array($permissions)) {
+            $permissions = json_decode($permissions, true) ?? [];
+        }
+        
         return CompanyCustomRole::create([
             'company_id' => $companyId,
             'role_name' => $roleName,
@@ -43,10 +48,16 @@ class RoleManagementService
     {
         $role = CompanyCustomRole::findOrFail($roleId);
         
+        // Ensure permissions is an array if provided
+        $permissions = $data['permissions'] ?? $role->permissions;
+        if (isset($data['permissions']) && !is_array($permissions)) {
+            $permissions = json_decode($permissions, true) ?? [];
+        }
+        
         $role->update([
             'role_name' => $data['role_name'] ?? $role->role_name,
             'description' => $data['description'] ?? $role->description,
-            'permissions' => $data['permissions'] ?? $role->permissions,
+            'permissions' => $permissions,
             'is_active' => $data['is_active'] ?? $role->is_active,
         ]);
 

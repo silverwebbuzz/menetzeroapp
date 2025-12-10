@@ -103,9 +103,7 @@ class StaffManagementController extends Controller
 
         $request->validate([
             'email' => 'required|email|max:255',
-            'role_id' => 'nullable|exists:roles,id',
-            'custom_role_id' => 'nullable|exists:company_custom_roles,id',
-            'access_level' => 'required|in:view,edit,full',
+            'custom_role_id' => 'required|exists:company_custom_roles,id',
             'notes' => 'nullable|string',
         ]);
 
@@ -118,11 +116,10 @@ class StaffManagementController extends Controller
             $this->invitationService->inviteUser(
                 $company->id,
                 $request->email,
-                $request->role_id,
+                null, // role_id removed
                 Auth::id(),
                 [
                     'custom_role_id' => $request->custom_role_id,
-                    'access_level' => $request->access_level,
                     'notes' => $request->notes,
                 ]
             );
@@ -145,18 +142,14 @@ class StaffManagementController extends Controller
         }
 
         $request->validate([
-            'role_id' => 'nullable|exists:roles,id',
-            'custom_role_id' => 'nullable|exists:company_custom_roles,id',
-            'access_level' => 'required|in:view,edit,full',
+            'custom_role_id' => 'required|exists:company_custom_roles,id',
         ]);
 
         $this->invitationService->updateAccessRole(
             $access->id,
-            $request->role_id,
+            null, // role_id removed
             $request->custom_role_id
         );
-
-        $access->update(['access_level' => $request->access_level]);
 
         return redirect()->route('staff.index')
             ->with('success', 'Staff role updated successfully.');

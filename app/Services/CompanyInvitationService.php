@@ -31,13 +31,13 @@ class CompanyInvitationService
         }
 
         // Create invitation
+        // Access level is determined by the custom role's permissions, so we set a default
         $invitation = CompanyInvitation::create([
             'company_id' => $companyId,
-            'company_type' => $company->company_type,
             'email' => $email,
-            'role_id' => $roleId,
+            'role_id' => null, // System role removed - using custom roles only
             'custom_role_id' => $data['custom_role_id'] ?? null,
-            'access_level' => $data['access_level'] ?? 'view',
+            'access_level' => 'view', // Default, permissions come from custom role
             'token' => Str::random(64),
             'status' => 'pending',
             'invited_by' => $invitedBy,
@@ -72,7 +72,6 @@ class CompanyInvitationService
                 $user = User::create([
                     'email' => $invitation->email,
                     'name' => $invitation->email, // Will be updated later
-                    'user_type' => $invitation->company_type,
                     'password' => bcrypt(Str::random(16)), // Temporary password
                 ]);
             }
@@ -82,7 +81,6 @@ class CompanyInvitationService
         UserCompanyAccess::create([
             'user_id' => $user->id,
             'company_id' => $invitation->company_id,
-            'company_type' => $invitation->company_type,
             'role_id' => $invitation->role_id,
             'custom_role_id' => $invitation->custom_role_id,
             'access_level' => $invitation->access_level,

@@ -22,47 +22,31 @@
                 @enderror
             </div>
 
-            <!-- Role -->
-            <div class="mb-6">
-                <label for="role_id" class="block text-sm font-medium text-gray-700 mb-2">System Role (Optional)</label>
-                <select name="role_id" id="role_id"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
-                    <option value="">Select a system role</option>
-                    <!-- Add system roles here if using Spatie -->
-                </select>
-            </div>
-
             <!-- Custom Role -->
             @if($customRoles->count() > 0)
             <div class="mb-6">
-                <label for="custom_role_id" class="block text-sm font-medium text-gray-700 mb-2">Custom Role (Optional)</label>
-                <select name="custom_role_id" id="custom_role_id"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
-                    <option value="">Select a custom role</option>
+                <label for="custom_role_id" class="block text-sm font-medium text-gray-700 mb-2">Role & Responsibilities *</label>
+                <select name="custom_role_id" id="custom_role_id" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 @error('custom_role_id') border-red-500 @enderror">
+                    <option value="">Select a role</option>
                     @foreach($customRoles as $role)
                         <option value="{{ $role->id }}" {{ old('custom_role_id') == $role->id ? 'selected' : '' }}>
                             {{ $role->role_name }}
                         </option>
                     @endforeach
                 </select>
+                <p class="mt-1 text-sm text-gray-500">The selected role defines the staff member's permissions and access level.</p>
+                @error('custom_role_id')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+            @else
+            <div class="mb-6">
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <p class="text-sm text-yellow-800">No custom roles available. Please create roles first in <a href="{{ route('roles.index') }}" class="underline">Roles & Permissions</a>.</p>
+                </div>
             </div>
             @endif
-
-            <!-- Access Level -->
-            <div class="mb-6">
-                <label for="access_level" class="block text-sm font-medium text-gray-700 mb-2">Access Level *</label>
-                <select name="access_level" id="access_level" required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
-                    <option value="view" {{ old('access_level') == 'view' ? 'selected' : '' }}>View Only</option>
-                    <option value="edit" {{ old('access_level') == 'edit' ? 'selected' : '' }}>Edit</option>
-                    <option value="full" {{ old('access_level') == 'full' ? 'selected' : '' }}>Full Access</option>
-                </select>
-                <p class="mt-1 text-sm text-gray-500">
-                    <strong>View:</strong> Can view data only<br>
-                    <strong>Edit:</strong> Can view and edit data<br>
-                    <strong>Full:</strong> Can view, edit, and manage settings
-                </p>
-            </div>
 
             <!-- Notes -->
             <div class="mb-6">
