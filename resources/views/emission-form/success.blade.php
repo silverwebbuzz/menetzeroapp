@@ -139,7 +139,7 @@
                         Submit Another Report
                     </a>
                     
-                    <a href="{{ route('dashboard') }}" 
+                    <a href="{{ (auth()->user() && auth()->user()->company && auth()->user()->company->company_type === 'partner') ? route('partner.dashboard') : route('client.dashboard') }}" 
                        class="inline-flex items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>

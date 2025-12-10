@@ -35,6 +35,6 @@ class RegisterController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('dashboard')->with('success', 'Account created successfully! Please complete your business profile to get started.');
+        return redirect()->route('client.dashboard')->with('success', 'Account created successfully! Please complete your business profile to get started.');
     }
 }

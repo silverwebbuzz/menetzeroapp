@@ -45,7 +45,7 @@ Route::post('/login', function (\Illuminate\Http\Request $request) {
             return redirect()->route('account.selector');
         }
         
-        return redirect()->intended(route('dashboard'));
+        return redirect()->intended(route('client.dashboard'));
     }
 
     return back()->withErrors(['email' => 'The provided credentials do not match our records.'])->onlyInput('email');
