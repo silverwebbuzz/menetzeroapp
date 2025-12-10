@@ -313,22 +313,15 @@
                 
                 <nav class="mt-8 px-4 flex-1 flex flex-col">
             @php
-                $user = auth()->user();
+                // Determine company type based on which guard is active
+                // Partner guard = partner, Web guard = client
+                $isPartner = auth('partner')->check();
+                $user = $isPartner ? auth('partner')->user() : auth('web')->user();
                 $hasCompany = $user && $user->company_id;
-                
-                // Determine company type using Company model's helper methods
-                $companyType = 'client'; // Default to client
-                
-                if ($user && $user->company_id) {
-                    $userCompany = \App\Models\Company::find($user->company_id);
-                    if ($userCompany && $userCompany->isPartner()) {
-                        $companyType = 'partner';
-                    }
-                }
             @endphp
             
             <div class="flex-1">
-            @if($companyType === 'partner')
+            @if($isPartner)
                 @include('layouts.partials.nav-partner')
             @else
                 @include('layouts.partials.nav-client')

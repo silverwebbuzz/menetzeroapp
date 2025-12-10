@@ -14,7 +14,8 @@ class SetActiveCompanyContext
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $user = auth()->user();
+        // Get user from either guard
+        $user = auth('partner')->user() ?? auth('web')->user();
         
         if (!$user) {
             return $next($request);

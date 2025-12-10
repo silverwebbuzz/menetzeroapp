@@ -13,7 +13,8 @@ class AccountSelectorController extends Controller
      */
     public function index()
     {
-        $user = auth()->user();
+        // Get user from either guard
+        $user = auth('partner')->user() ?? auth('web')->user();
         
         if (!$user->hasMultipleCompanyAccess()) {
             // Single company access - redirect to dashboard
@@ -69,7 +70,8 @@ class AccountSelectorController extends Controller
             'company_id' => 'required|exists:companies,id'
         ]);
         
-        $user = auth()->user();
+        // Get user from either guard
+        $user = auth('partner')->user() ?? auth('web')->user();
         
         // Verify user has access
         if (!$user->hasAccessToCompany($request->company_id) && $user->company_id != $request->company_id) {

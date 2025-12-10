@@ -5,13 +5,19 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Company;
 use App\Models\User;
+use App\Models\PartnerUser;
 use Illuminate\Support\Facades\Auth;
 
 class CompanySetupController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
+        // Get user from either guard
+        $user = Auth::guard('partner')->user() ?? Auth::guard('web')->user();
+        
+        if (!$user) {
+            return redirect()->route('login');
+        }
         
         // If user already has a company, redirect to appropriate dashboard
         if ($user->company_id) {
@@ -22,8 +28,8 @@ class CompanySetupController extends Controller
             return redirect()->route('client.dashboard');
         }
 
-        // Check if user came from partner registration
-        $isPartner = session('registering_as_partner', false);
+        // Check if user came from partner registration or is using partner guard
+        $isPartner = session('registering_as_partner', false) || Auth::guard('partner')->check();
         
         return view('company.setup', compact('isPartner'));
     }
@@ -41,10 +47,16 @@ class CompanySetupController extends Controller
             'business_description' => 'nullable|string|max:1000',
         ]);
 
-        $user = Auth::user();
+        // Get user from either guard
+        $user = Auth::guard('partner')->user() ?? Auth::guard('web')->user();
+        
+        if (!$user) {
+            return redirect()->route('login');
+        }
 
-        // Determine company type from session or request
-        $companyType = session('registering_as_partner', false) ? 'partner' : ($request->company_type ?? 'client');
+        // Determine company type from session or guard
+        $isPartner = session('registering_as_partner', false) || Auth::guard('partner')->check();
+        $companyType = $isPartner ? 'partner' : 'client';
         
         // Create company
         $company = Company::create([

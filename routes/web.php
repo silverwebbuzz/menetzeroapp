@@ -36,23 +36,11 @@ Route::post('/login', function (\Illuminate\Http\Request $request) {
         'password' => ['required'],
     ]);
 
-    if (\Illuminate\Support\Facades\Auth::attempt($credentials, true)) {
+    // Use 'web' guard (users table - clients only)
+    if (\Illuminate\Support\Facades\Auth::guard('web')->attempt($credentials, true)) {
         $request->session()->regenerate();
         
-        $user = auth()->user();
-        
-        // Validate that user is a CLIENT (not partner)
-        if ($user->company_id) {
-            $company = $user->company;
-            if ($company && $company->company_type === 'partner') {
-                \Illuminate\Support\Facades\Auth::logout();
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
-                return back()->withErrors([
-                    'email' => 'This account is registered as a Partner. Please login from the Partner login page.',
-                ])->onlyInput('email');
-            }
-        }
+        $user = auth('web')->user();
         
         // Check if user has multiple company access
         if ($user && $user->hasMultipleCompanyAccess()) {
@@ -103,45 +91,34 @@ Route::prefix('partner')->group(function () {
             'password' => ['required'],
         ]);
 
-        if (\Illuminate\Support\Facades\Auth::attempt($credentials, $request->boolean('remember'))) {
+        // Use 'partner' guard (users_partner table - partners only)
+        if (\Illuminate\Support\Facades\Auth::guard('partner')->attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
             
-            $user = \Illuminate\Support\Facades\Auth::user();
+            $user = auth('partner')->user();
             
-            // Validate that user is a PARTNER (not client)
             if (!$user->company_id) {
                 // User has no company yet - allow but they need to complete setup
                 session(['registering_as_partner' => true]);
                 return redirect()->route('company.setup')->with('info', 'Please complete your partner profile to continue.');
             }
             
-            $company = $user->getActiveCompany();
-            
-            if ($company && $company->isPartner()) {
-                // Check if user has multiple company access
-                if ($user->hasMultipleCompanyAccess()) {
-                    return redirect()->route('account.selector');
-                }
-                return redirect()->route('partner.dashboard');
-            } else {
-                // User is a client, not a partner
-                \Illuminate\Support\Facades\Auth::logout();
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
-                return back()->withErrors([
-                    'email' => 'This account is registered as a Client. Please login from the Client login page.',
-                ])->onlyInput('email');
+            // Check if user has multiple company access
+            if ($user->hasMultipleCompanyAccess()) {
+                return redirect()->route('account.selector');
             }
+            
+            return redirect()->route('partner.dashboard');
         }
 
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',
         ])->onlyInput('email');
-    });
+    })->name('partner.login.post');
 });
 
-// Partner Routes (protected)
-Route::prefix('partner')->middleware(['auth', 'setActiveCompany', 'checkCompanyType:partner'])->group(function () {
+// Partner Routes (protected) - Use partner guard
+Route::prefix('partner')->middleware(['auth:partner', 'setActiveCompany', 'checkCompanyType:partner'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('partner.dashboard');
     
     // External Client Management
@@ -209,16 +186,16 @@ Route::prefix('partner')->middleware(['auth', 'setActiveCompany', 'checkCompanyT
     Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('partner.profile.update.password');
 });
 
-// Account Switcher (for multi-company staff)
-Route::middleware(['auth'])->group(function () {
+// Account Switcher (for multi-company staff) - Works with both guards
+Route::middleware(['auth:web,partner'])->group(function () {
     Route::get('/account/selector', [AccountSelectorController::class, 'index'])->name('account.selector');
     Route::post('/account/switch', [AccountSelectorController::class, 'switch'])->name('account.switch');
 });
 
 // Profile Routes - Separate for Client and Partner
 
-// Client Routes
-Route::middleware(['auth', 'setActiveCompany', 'checkCompanyType:client'])->group(function () {
+// Client Routes - Use web guard (default)
+Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('client.dashboard');
     
     // Profile routes

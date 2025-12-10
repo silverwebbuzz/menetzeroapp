@@ -2,20 +2,21 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class PartnerUser extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
+     * The table associated with the model.
+     */
+    protected $table = 'users_partner';
+
+    /**
      * The attributes that are mass assignable.
-     *
-     * @var list<string>
      */
     protected $fillable = [
         'name',
@@ -29,7 +30,6 @@ class User extends Authenticatable
         'google_id',
         'avatar',
         'provider',
-        // New fields for enhancements
         'custom_role_id',
         'external_company_name',
         'notes',
@@ -37,8 +37,6 @@ class User extends Authenticatable
 
     /**
      * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
      */
     protected $hidden = [
         'password',
@@ -47,8 +45,6 @@ class User extends Authenticatable
 
     /**
      * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
      */
     protected function casts(): array
     {
@@ -68,19 +64,12 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the carbon emissions created by the user.
-     */
-    public function carbonEmissions()
-    {
-        return $this->hasMany(CarbonEmission::class);
-    }
-
-    /**
      * Get all companies this user has access to (multi-account access).
      */
     public function accessibleCompanies()
     {
-        return $this->hasMany(UserCompanyAccess::class);
+        return $this->hasMany(UserCompanyAccess::class, 'user_id', 'id')
+            ->where('user_type', 'partner');
     }
 
     /**
@@ -88,7 +77,8 @@ class User extends Authenticatable
      */
     public function activeContext()
     {
-        return $this->hasOne(UserActiveContext::class);
+        return $this->hasOne(UserActiveContext::class, 'user_id', 'id')
+            ->where('user_type', 'partner');
     }
 
     /**
@@ -165,7 +155,6 @@ class User extends Authenticatable
             return $accessCount > 1;
         } catch (\Exception $e) {
             // If table doesn't exist yet, just check company_id
-            // This handles the case where migration hasn't been run
             return false;
         }
     }
@@ -180,10 +169,13 @@ class User extends Authenticatable
         }
         
         UserActiveContext::updateOrCreate(
-            ['user_id' => $this->id],
+            [
+                'user_id' => $this->id,
+                'user_type' => 'partner',
+            ],
             [
                 'active_company_id' => $companyId,
-                'active_company_type' => Company::find($companyId)->company_type ?? 'client',
+                'active_company_type' => Company::find($companyId)->company_type ?? 'partner',
                 'last_switched_at' => now(),
             ]
         );
@@ -213,3 +205,4 @@ class User extends Authenticatable
         return $this->role === 'company_user';
     }
 }
+

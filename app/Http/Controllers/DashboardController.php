@@ -14,7 +14,8 @@ class DashboardController extends Controller
 
     public function index()
     {
-        $user = auth()->user();
+        // Get user from either guard
+        $user = auth('partner')->user() ?? auth('web')->user();
         
         // Check if user has a company
         if (!$user->company_id) {

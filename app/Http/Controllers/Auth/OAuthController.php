@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\PartnerUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -39,109 +40,122 @@ class OAuthController extends Controller
             $registrationType = session('oauth_registration_type', 'client');
             $isPartner = ($registrationType === 'partner');
             
-            // Check if user already exists with this Google ID
-            $user = User::where('google_id', $googleUser->getId())->first();
-            
-            if ($user) {
-                // User exists, validate company type matches registration type BEFORE logging in
-                if ($user->company_id) {
-                    $company = $user->company;
-                    if ($company) {
-                        // Validate type match
-                        if ($isPartner && $company->company_type !== 'partner') {
-                            session()->forget('oauth_registration_type');
-                            return redirect()->route('partner.login')
-                                ->withErrors(['email' => 'This account is registered as a Client. Please login from the Client login page.']);
-                        }
-                        
-                        if (!$isPartner && $company->company_type === 'partner') {
-                            session()->forget('oauth_registration_type');
-                            return redirect()->route('login')
-                                ->withErrors(['email' => 'This account is registered as a Partner. Please login from the Partner login page.']);
-                        }
+            if ($isPartner) {
+                // Partner OAuth - use PartnerUser model
+                $user = PartnerUser::where('google_id', $googleUser->getId())->first();
+                
+                if ($user) {
+                    // User exists, log them in
+                    Auth::guard('partner')->login($user, true);
+                    session()->forget('oauth_registration_type');
+                    
+                    // Check if user has multiple company access
+                    if ($user->hasMultipleCompanyAccess()) {
+                        return redirect()->route('account.selector');
                     }
+                    
+                    return redirect()->route('partner.dashboard');
                 }
                 
-                // User exists and type matches (or no company yet), log them in
-                Auth::login($user, true);
-                session()->forget('oauth_registration_type');
+                // Check if user exists with this email
+                $existingUser = PartnerUser::where('email', $googleUser->getEmail())->first();
                 
-                // Check if user has multiple company access
-                if ($user->hasMultipleCompanyAccess()) {
-                    return redirect()->route('account.selector');
-                }
-                
-                // Redirect to appropriate dashboard based on company type
-                return $this->redirectToDashboard($user, $isPartner);
-            }
-            
-            // Check if user exists with this email
-            $existingUser = User::where('email', $googleUser->getEmail())->first();
-            
-            if ($existingUser) {
-                // Validate company type if user has a company
-                if ($existingUser->company_id) {
-                    $company = $existingUser->company;
-                    if ($company) {
-                        // Check type match
-                        if ($isPartner && $company->company_type !== 'partner') {
-                            session()->forget('oauth_registration_type');
-                            return redirect()->route('partner.login')
-                                ->withErrors(['email' => 'This email is registered as a Client. Please login from the Client login page.']);
-                        }
-                        
-                        if (!$isPartner && $company->company_type === 'partner') {
-                            session()->forget('oauth_registration_type');
-                            return redirect()->route('login')
-                                ->withErrors(['email' => 'This email is registered as a Partner. Please login from the Partner login page.']);
-                        }
+                if ($existingUser) {
+                    // User exists with email but no Google ID, update their record
+                    $existingUser->update([
+                        'google_id' => $googleUser->getId(),
+                        'avatar' => $googleUser->getAvatar(),
+                        'provider' => 'google',
+                    ]);
+                    
+                    Auth::guard('partner')->login($existingUser, true);
+                    session()->forget('oauth_registration_type');
+                    
+                    // Check if user has multiple company access
+                    if ($existingUser->hasMultipleCompanyAccess()) {
+                        return redirect()->route('account.selector');
                     }
+                    
+                    return redirect()->route('partner.dashboard');
                 }
                 
-                // User exists with email but no Google ID, update their record
-                $existingUser->update([
+                // Create new partner user
+                $newUser = PartnerUser::create([
+                    'name' => $googleUser->getName(),
+                    'email' => $googleUser->getEmail(),
                     'google_id' => $googleUser->getId(),
                     'avatar' => $googleUser->getAvatar(),
                     'provider' => 'google',
+                    'password' => Hash::make(Str::random(24)),
+                    'email_verified_at' => now(),
+                    'role' => 'company_user',
+                    'is_active' => true,
                 ]);
                 
-                Auth::login($existingUser, true);
+                Auth::guard('partner')->login($newUser, true);
+                session(['registering_as_partner' => true]);
                 session()->forget('oauth_registration_type');
                 
-                // Check if user has multiple company access
-                if ($existingUser->hasMultipleCompanyAccess()) {
-                    return redirect()->route('account.selector');
+                return redirect()->route('company.setup')
+                    ->with('success', 'Account created successfully! Please complete your partner profile to get started.');
+            } else {
+                // Client OAuth - use User model
+                $user = User::where('google_id', $googleUser->getId())->first();
+                
+                if ($user) {
+                    // User exists, log them in
+                    Auth::guard('web')->login($user, true);
+                    session()->forget('oauth_registration_type');
+                    
+                    // Check if user has multiple company access
+                    if ($user->hasMultipleCompanyAccess()) {
+                        return redirect()->route('account.selector');
+                    }
+                    
+                    return redirect()->route('client.dashboard');
                 }
                 
-                // Redirect to appropriate dashboard based on company type
-                return $this->redirectToDashboard($existingUser, $isPartner);
+                // Check if user exists with this email
+                $existingUser = User::where('email', $googleUser->getEmail())->first();
+                
+                if ($existingUser) {
+                    // User exists with email but no Google ID, update their record
+                    $existingUser->update([
+                        'google_id' => $googleUser->getId(),
+                        'avatar' => $googleUser->getAvatar(),
+                        'provider' => 'google',
+                    ]);
+                    
+                    Auth::guard('web')->login($existingUser, true);
+                    session()->forget('oauth_registration_type');
+                    
+                    // Check if user has multiple company access
+                    if ($existingUser->hasMultipleCompanyAccess()) {
+                        return redirect()->route('account.selector');
+                    }
+                    
+                    return redirect()->route('client.dashboard');
+                }
+                
+                // Create new client user
+                $newUser = User::create([
+                    'name' => $googleUser->getName(),
+                    'email' => $googleUser->getEmail(),
+                    'google_id' => $googleUser->getId(),
+                    'avatar' => $googleUser->getAvatar(),
+                    'provider' => 'google',
+                    'password' => Hash::make(Str::random(24)),
+                    'email_verified_at' => now(),
+                    'role' => 'company_user',
+                    'is_active' => true,
+                ]);
+                
+                Auth::guard('web')->login($newUser, true);
+                session()->forget('oauth_registration_type');
+                
+                return redirect()->route('company.setup')
+                    ->with('success', 'Account created successfully! Please complete your business profile to get started.');
             }
-            
-            // Create new user
-            $newUser = User::create([
-                'name' => $googleUser->getName(),
-                'email' => $googleUser->getEmail(),
-                'google_id' => $googleUser->getId(),
-                'avatar' => $googleUser->getAvatar(),
-                'provider' => 'google',
-                'password' => Hash::make(Str::random(24)), // Random password for OAuth users
-                'email_verified_at' => now(), // Google emails are pre-verified
-                'role' => 'company_user',
-                'is_active' => true,
-            ]);
-            
-            Auth::login($newUser, true);
-            
-            // Set session flag for company setup based on registration type
-            if ($isPartner) {
-                session(['registering_as_partner' => true]);
-            }
-            
-            session()->forget('oauth_registration_type');
-            
-            // Redirect to company setup (user doesn't have company yet)
-            return redirect()->route('company.setup')
-                ->with('success', 'Account created successfully! Please complete your business profile to get started.');
             
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
             // Network/connection error
