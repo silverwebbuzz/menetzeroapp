@@ -314,23 +314,25 @@
                 $user = auth()->user();
                 $hasCompany = $user && $user->company_id;
                 
-                // Get active company - try multiple methods
-                $activeCompany = null;
-                if ($hasCompany) {
-                    try {
-                        $activeCompany = $user->getActiveCompany();
-                    } catch (\Exception $e) {
-                        // Fallback to direct company relationship
-                        $activeCompany = $user->company;
-                    }
-                }
+                // ALWAYS use the direct company relationship - this is the user's primary company
+                // This ensures we get the correct company type for the user's own company
+                $companyType = 'client'; // Default to client
                 
-                // Determine company type - default to 'client' if not set
-                $companyType = 'client'; // Default
-                if ($activeCompany) {
-                    $companyType = $activeCompany->company_type ?? 'client';
-                } elseif ($user && $user->company) {
-                    $companyType = $user->company->company_type ?? 'client';
+                if ($user && $user->company_id) {
+                    // Load the company directly - ensure it's loaded
+                    $userCompany = \App\Models\Company::find($user->company_id);
+                    
+                    if ($userCompany && isset($userCompany->company_type)) {
+                        // Get the company_type value
+                        $type = $userCompany->company_type;
+                        
+                        // Only set to 'partner' if explicitly 'partner', otherwise default to 'client'
+                        if ($type === 'partner') {
+                            $companyType = 'partner';
+                        } else {
+                            $companyType = 'client';
+                        }
+                    }
                 }
             @endphp
             
