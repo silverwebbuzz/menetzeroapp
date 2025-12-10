@@ -43,7 +43,8 @@ class OAuthController extends Controller
                     return redirect()->route('account.selector');
                 }
                 
-                return redirect()->intended(route('dashboard'));
+                // Redirect to appropriate dashboard based on company type
+                return $this->redirectToDashboard($user);
             }
             
             // Check if user exists with this email
@@ -64,7 +65,8 @@ class OAuthController extends Controller
                     return redirect()->route('account.selector');
                 }
                 
-                return redirect()->intended(route('dashboard'));
+                // Redirect to appropriate dashboard based on company type
+                return $this->redirectToDashboard($existingUser);
             }
             
             // Create new user
@@ -81,7 +83,8 @@ class OAuthController extends Controller
             ]);
             
             Auth::login($newUser, true);
-            return redirect()->intended(route('dashboard'));
+            // Redirect to appropriate dashboard based on company type
+            return $this->redirectToDashboard($newUser);
             
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
             // Network/connection error
@@ -147,5 +150,23 @@ class OAuthController extends Controller
                 'email' => 'Google authentication failed. Please try again or use email/password login.'
             ]);
         }
+    }
+
+    /**
+     * Redirect to appropriate dashboard based on user's company type
+     */
+    protected function redirectToDashboard($user)
+    {
+        // If user has a company, check company type
+        if ($user->company_id && $user->company) {
+            $companyType = $user->company->company_type ?? 'client';
+            
+            if ($companyType === 'partner') {
+                return redirect()->route('partner.dashboard');
+            }
+        }
+        
+        // Default to client dashboard
+        return redirect()->route('client.dashboard');
     }
 }
