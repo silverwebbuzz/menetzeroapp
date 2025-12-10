@@ -105,10 +105,15 @@ class User extends Authenticatable
      */
     public function hasAccessToCompany($companyId)
     {
-        return $this->accessibleCompanies()
-            ->where('company_id', $companyId)
-            ->where('status', 'active')
-            ->exists();
+        try {
+            return $this->accessibleCompanies()
+                ->where('company_id', $companyId)
+                ->where('status', 'active')
+                ->exists();
+        } catch (\Exception $e) {
+            // If table doesn't exist, fall back to company_id check
+            return $this->company_id == $companyId;
+        }
     }
 
     /**
@@ -121,15 +126,19 @@ class User extends Authenticatable
             return null;
         }
 
-        $context = $this->activeContext;
-        if ($context && $context->active_company_id) {
-            return Company::find($context->active_company_id);
-        }
-        
-        // Fallback: If only one company access, use that
-        $access = $this->accessibleCompanies()->where('status', 'active')->first();
-        if ($access) {
-            return Company::find($access->company_id);
+        try {
+            $context = $this->activeContext;
+            if ($context && $context->active_company_id) {
+                return Company::find($context->active_company_id);
+            }
+            
+            // Fallback: If only one company access, use that
+            $access = $this->accessibleCompanies()->where('status', 'active')->first();
+            if ($access) {
+                return Company::find($access->company_id);
+            }
+        } catch (\Exception $e) {
+            // If tables don't exist yet, fall back to company_id
         }
         
         // Fallback: Internal user's company
@@ -146,14 +155,20 @@ class User extends Authenticatable
             return false;
         }
 
-        $accessCount = $this->accessibleCompanies()->where('status', 'active')->count();
-        
-        // If user has company_id set, count that too
-        if ($this->company_id) {
-            $accessCount++;
+        try {
+            $accessCount = $this->accessibleCompanies()->where('status', 'active')->count();
+            
+            // If user has company_id set, count that too
+            if ($this->company_id) {
+                $accessCount++;
+            }
+            
+            return $accessCount > 1;
+        } catch (\Exception $e) {
+            // If table doesn't exist yet, just check company_id
+            // This handles the case where migration hasn't been run
+            return false;
         }
-        
-        return $accessCount > 1;
     }
 
     /**
