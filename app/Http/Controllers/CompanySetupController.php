@@ -13,9 +13,13 @@ class CompanySetupController extends Controller
     {
         $user = Auth::user();
         
-        // If user already has a company, redirect to dashboard
+        // If user already has a company, redirect to appropriate dashboard
         if ($user->company_id) {
-            return redirect()->route('dashboard');
+            $company = $user->company;
+            if ($company && $company->company_type === 'partner') {
+                return redirect()->route('partner.dashboard');
+            }
+            return redirect()->route('client.dashboard');
         }
 
         return view('company.setup');
@@ -36,7 +40,7 @@ class CompanySetupController extends Controller
 
         $user = Auth::user();
 
-        // Create company
+        // Create company (default to client type)
         $company = Company::create([
             'name' => $request->company_name,
             'email' => $request->business_email ?? $user->email,
@@ -46,6 +50,8 @@ class CompanySetupController extends Controller
             'industry' => $request->business_category,
             'business_subcategory' => $request->business_subcategory,
             'description' => $request->business_description,
+            'company_type' => $request->company_type ?? 'client', // Default to client
+            'is_direct_client' => true,
             'is_active' => true,
         ]);
 
@@ -55,7 +61,11 @@ class CompanySetupController extends Controller
             'role' => 'company_admin',
         ]);
 
-        return redirect()->route('dashboard')->with('success', 'Business profile completed successfully!');
+        // Redirect to appropriate dashboard based on company type
+        if ($company->company_type === 'partner') {
+            return redirect()->route('partner.dashboard')->with('success', 'Business profile completed successfully!');
+        }
+        return redirect()->route('client.dashboard')->with('success', 'Business profile completed successfully!');
     }
 
 }
