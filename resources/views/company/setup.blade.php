@@ -274,9 +274,8 @@
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="flex flex-col sm:flex-row items-center justify-between pt-6 gap-4">
-                        <a href="{{ route('company.setup.skip') }}" class="text-gray-600 hover:text-gray-800 font-medium order-2 sm:order-1">Skip for now</a>
-                        <button type="submit" class="btn btn-primary w-full sm:w-auto order-1 sm:order-2">Continue</button>
+                    <div class="flex flex-col sm:flex-row items-center justify-end pt-6 gap-4">
+                        <button type="submit" class="btn btn-primary w-full sm:w-auto">Continue</button>
                     </div>
                 </form>
             </div>
