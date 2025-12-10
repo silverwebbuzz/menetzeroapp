@@ -122,7 +122,15 @@ Route::prefix('partner')->middleware(['auth:partner', 'setActiveCompany', 'check
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('partner.dashboard');
     
     // External Client Management
-    Route::resource('clients', ExternalClientController::class);
+    Route::resource('clients', ExternalClientController::class)->names([
+        'index' => 'partner.clients.index',
+        'create' => 'partner.clients.create',
+        'store' => 'partner.clients.store',
+        'show' => 'partner.clients.show',
+        'edit' => 'partner.clients.edit',
+        'update' => 'partner.clients.update',
+        'destroy' => 'partner.clients.destroy',
+    ]);
     
     // External Client Locations
     Route::get('/clients/{client}/locations', [ExternalClientLocationController::class, 'index'])->name('partner.clients.locations.index');
