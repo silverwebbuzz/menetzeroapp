@@ -317,12 +317,21 @@
                 // ALWAYS use the direct company relationship - this is the user's primary company
                 // This ensures we get the correct company type for the user's own company
                 $companyType = 'client'; // Default to client
+                $debugInfo = [];
                 
                 if ($user && $user->company_id) {
                     // Load the company directly - ensure it's loaded
                     $userCompany = \App\Models\Company::find($user->company_id);
                     
-                    if ($userCompany && isset($userCompany->company_type)) {
+                    $debugInfo['user_id'] = $user->id;
+                    $debugInfo['company_id'] = $user->company_id;
+                    $debugInfo['company_found'] = $userCompany ? 'yes' : 'no';
+                    
+                    if ($userCompany) {
+                        $debugInfo['company_name'] = $userCompany->name;
+                        $debugInfo['company_type_raw'] = $userCompany->company_type ?? 'NULL';
+                        $debugInfo['company_type_isset'] = isset($userCompany->company_type) ? 'yes' : 'no';
+                        
                         // Get the company_type value
                         $type = $userCompany->company_type;
                         
@@ -332,9 +341,33 @@
                         } else {
                             $companyType = 'client';
                         }
+                        
+                        $debugInfo['final_company_type'] = $companyType;
+                    } else {
+                        $debugInfo['error'] = 'Company not found';
                     }
+                } else {
+                    $debugInfo['error'] = 'No company_id on user';
                 }
             @endphp
+            
+            <!-- DEBUG: Company Type Detection -->
+            <div class="mb-4 p-3 bg-yellow-100 border border-yellow-400 rounded text-xs">
+                <strong>DEBUG INFO:</strong><br>
+                User ID: {{ $debugInfo['user_id'] ?? 'N/A' }}<br>
+                Company ID: {{ $debugInfo['company_id'] ?? 'N/A' }}<br>
+                Company Found: {{ $debugInfo['company_found'] ?? 'N/A' }}<br>
+                @if(isset($debugInfo['company_name']))
+                Company Name: {{ $debugInfo['company_name'] }}<br>
+                Company Type (Raw): <strong>{{ $debugInfo['company_type_raw'] }}</strong><br>
+                Company Type (isset): {{ $debugInfo['company_type_isset'] }}<br>
+                Final Company Type: <strong style="color: red; font-size: 14px;">{{ $debugInfo['final_company_type'] ?? 'N/A' }}</strong><br>
+                @endif
+                @if(isset($debugInfo['error']))
+                <span style="color: red;">Error: {{ $debugInfo['error'] }}</span><br>
+                @endif
+                Showing Navigation: <strong style="color: blue;">{{ $companyType === 'partner' ? 'PARTNER' : 'CLIENT' }}</strong>
+            </div>
             
             @if($companyType === 'partner')
                 @include('layouts.partials.nav-partner')
