@@ -36,6 +36,8 @@
             bottom: 0;
             overflow-y: auto; 
             transform: translateX(0);
+            display: flex;
+            flex-direction: column;
         }
         .sidebar-header { 
             padding: 1.5rem; 
@@ -309,7 +311,7 @@
                           </div>
                 </div>
                 
-                <nav class="mt-8 px-4">
+                <nav class="mt-8 px-4 flex-1 flex flex-col">
             @php
                 $user = auth()->user();
                 $hasCompany = $user && $user->company_id;
@@ -325,12 +327,13 @@
                 }
             @endphp
             
+            <div class="flex-1">
             @if($companyType === 'partner')
                 @include('layouts.partials.nav-partner')
             @else
                 @include('layouts.partials.nav-client')
             @endif
-                    </div>
+            </div>
                 </nav>
                 
             </div>
@@ -414,6 +417,38 @@
             sidebar.classList.toggle('-translate-x-full');
         }
         
+        // Settings menu toggle function
+        function toggleSettingsMenu(button) {
+            const menu = button.closest('.settings-menu');
+            const content = menu.querySelector('.settings-content');
+            const arrow = menu.querySelector('.settings-arrow');
+            
+            if (content.style.display === 'none' || !content.style.display) {
+                content.style.display = 'block';
+                content.classList.remove('hidden');
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                content.style.display = 'none';
+                content.classList.add('hidden');
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+        
+        // Auto-expand settings menu if current route matches
+        document.addEventListener('DOMContentLoaded', function() {
+            const settingsContent = document.querySelector('.settings-content');
+            if (settingsContent) {
+                const activeLink = settingsContent.querySelector('.nav-link.active');
+                if (activeLink) {
+                    const menu = settingsContent.closest('.settings-menu');
+                    const toggle = menu.querySelector('.settings-toggle');
+                    const arrow = menu.querySelector('.settings-arrow');
+                    settingsContent.style.display = 'block';
+                    settingsContent.classList.remove('hidden');
+                    arrow.style.transform = 'rotate(180deg)';
+                }
+            }
+        });
     </script>
 
     @stack('scripts')
