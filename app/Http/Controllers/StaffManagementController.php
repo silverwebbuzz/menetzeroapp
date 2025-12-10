@@ -10,6 +10,7 @@ use App\Models\CompanyInvitation;
 use App\Models\CompanyCustomRole;
 use App\Models\RoleTemplate;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class StaffManagementController extends Controller
 {
@@ -73,7 +74,12 @@ class StaffManagementController extends Controller
                 ->with('error', 'Please complete your company setup first.');
         }
 
-        $customRoles = $company->customRoles()->where('is_active', true)->get();
+        try {
+            $customRoles = $company->customRoles()->where('is_active', true)->get();
+        } catch (\Exception $e) {
+            $customRoles = collect([]);
+        }
+        
         $templates = RoleTemplate::where('is_active', true)
             ->where(function($query) use ($company) {
                 $query->where('category', $company->company_type)
