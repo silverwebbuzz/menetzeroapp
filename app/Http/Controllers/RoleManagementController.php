@@ -22,6 +22,8 @@ class RoleManagementController extends Controller
      */
     public function index()
     {
+        $this->requirePermission('manage_settings');
+        
         $company = Auth::user()->getActiveCompany();
         if (!$company) {
             return redirect()->route('client.dashboard')
@@ -39,6 +41,8 @@ class RoleManagementController extends Controller
      */
     public function create()
     {
+        $this->requirePermission('manage_settings');
+        
         $company = Auth::user()->getActiveCompany();
         if (!$company) {
             return redirect()->route('client.dashboard')
@@ -55,6 +59,8 @@ class RoleManagementController extends Controller
      */
     public function store(Request $request)
     {
+        $this->requirePermission('manage_settings');
+        
         $company = Auth::user()->getActiveCompany();
         if (!$company) {
             return redirect()->route('client.dashboard')
@@ -87,6 +93,8 @@ class RoleManagementController extends Controller
      */
     public function edit(CompanyCustomRole $role)
     {
+        $this->requirePermission('manage_settings');
+        
         $company = Auth::user()->getActiveCompany();
         if (!$company || $role->company_id !== $company->id) {
             abort(403, 'Unauthorized action.');
@@ -102,6 +110,8 @@ class RoleManagementController extends Controller
      */
     public function update(Request $request, CompanyCustomRole $role)
     {
+        $this->requirePermission('manage_settings');
+        
         $company = Auth::user()->getActiveCompany();
         if (!$company || $role->company_id !== $company->id) {
             abort(403, 'Unauthorized action.');
@@ -130,6 +140,8 @@ class RoleManagementController extends Controller
      */
     public function destroy(CompanyCustomRole $role)
     {
+        $this->requirePermission('manage_settings');
+        
         $company = Auth::user()->getActiveCompany();
         if (!$company || $role->company_id !== $company->id) {
             abort(403, 'Unauthorized action.');

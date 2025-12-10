@@ -5,10 +5,18 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Location;
 use App\Models\Company;
+use App\Services\SubscriptionService;
 use Illuminate\Support\Facades\Auth;
 
 class LocationController extends Controller
 {
+    protected $subscriptionService;
+
+    public function __construct(SubscriptionService $subscriptionService)
+    {
+        $this->subscriptionService = $subscriptionService;
+    }
+
     public function index()
     {
         $user = Auth::user();
@@ -51,6 +59,8 @@ class LocationController extends Controller
 
     public function create()
     {
+        $this->requirePermission('locations.*', ['manage_locations']);
+        
         $user = Auth::user();
         $company = $user->company;
         
@@ -63,6 +73,8 @@ class LocationController extends Controller
 
     public function store(Request $request)
     {
+        $this->requirePermission('locations.*', ['manage_locations']);
+        
         $user = Auth::user();
         $company = $user->company;
         
@@ -87,6 +99,12 @@ class LocationController extends Controller
             'reporting_period' => 'nullable|integer|min:2020|max:2030',
             'measurement_frequency' => 'nullable|string|max:20',
         ]);
+
+        // Check location limit before creating
+        $limitCheck = $this->subscriptionService->canPerformAction($company->id, 'locations', 1);
+        if (!$limitCheck['allowed']) {
+            return back()->withErrors(['name' => $limitCheck['message']])->withInput();
+        }
 
         // Check if this is the first location for the company
         $isFirstLocation = $company->locations()->count() === 0;
@@ -137,6 +155,12 @@ class LocationController extends Controller
         }
         
         if (!$location) {
+            // Check location limit before creating
+            $limitCheck = $this->subscriptionService->canPerformAction($company->id, 'locations', 1);
+            if (!$limitCheck['allowed']) {
+                return response()->json(['success' => false, 'error' => $limitCheck['message']], 422);
+            }
+
             // Check if this is the first location for the company
             $isFirstLocation = $company->locations()->count() === 0;
             

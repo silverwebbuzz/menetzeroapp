@@ -10,6 +10,7 @@ use App\Services\OCRService;
 use App\Services\DocumentProcessorService;
 use App\Services\EmissionIntegrationService;
 use App\Services\DEWABillParser;
+use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -20,15 +21,18 @@ class DocumentUploadController extends Controller
     protected $ocrService;
     protected $documentProcessor;
     protected $integrationService;
+    protected $subscriptionService;
 
     public function __construct(
         OCRService $ocrService,
         DocumentProcessorService $documentProcessor,
-        EmissionIntegrationService $integrationService
+        EmissionIntegrationService $integrationService,
+        SubscriptionService $subscriptionService
     ) {
         $this->ocrService = $ocrService;
         $this->documentProcessor = $documentProcessor;
         $this->integrationService = $integrationService;
+        $this->subscriptionService = $subscriptionService;
     }
 
     /**
@@ -65,6 +69,8 @@ class DocumentUploadController extends Controller
      */
     public function create()
     {
+        $this->requirePermission('documents.upload', ['upload_documents']);
+        
         $locations = Location::where('company_id', Auth::user()->company_id)
             ->where('is_active', true)
             ->get();
@@ -77,12 +83,23 @@ class DocumentUploadController extends Controller
      */
     public function store(Request $request)
     {
+        $this->requirePermission('documents.upload', ['upload_documents']);
+        
         $request->validate([
             'file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240', // 10MB max
             'source_type' => 'required|in:dewa,electricity,fuel,waste,water,transport,other',
             'document_category' => 'required|in:bill,receipt,invoice,statement,contract,other',
             'location_id' => 'nullable|exists:locations,id',
         ]);
+
+        // Check document limit before uploading
+        $company = Auth::user()->getActiveCompany();
+        if ($company) {
+            $limitCheck = $this->subscriptionService->canPerformAction($company->id, 'documents', 1);
+            if (!$limitCheck['allowed']) {
+                return back()->withErrors(['file' => $limitCheck['message']])->withInput();
+            }
+        }
 
         try {
             $file = $request->file('file');

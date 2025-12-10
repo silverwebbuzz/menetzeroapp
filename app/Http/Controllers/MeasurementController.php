@@ -21,12 +21,19 @@ class MeasurementController extends Controller
      */
     public function index(Request $request)
     {
+        $this->requirePermission('measurements.view', ['measurements.*', 'manage_measurements']);
+        
         $user = Auth::user();
+        $company = $user->getActiveCompany();
+        
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
         
         // Get measurements for user's company locations
         $query = Measurement::with(['location', 'creator'])
-            ->whereHas('location', function($q) use ($user) {
-                $q->where('company_id', $user->company_id);
+            ->whereHas('location', function($q) use ($company) {
+                $q->where('company_id', $company->id);
             });
 
         // Apply filters
@@ -54,7 +61,7 @@ class MeasurementController extends Controller
         $measurements = $query->orderBy('created_at', 'desc')->paginate(50);
         
         // Get locations for filter dropdown
-        $locations = Location::where('company_id', $user->company_id)
+        $locations = Location::where('company_id', $company->id)
             ->where('is_active', true)
             ->orderBy('name')
             ->get();
@@ -112,11 +119,14 @@ class MeasurementController extends Controller
      */
     public function show(Measurement $measurement)
     {
+        $this->requirePermission('measurements.view', ['measurements.*', 'manage_measurements']);
+        
         try {
             $user = Auth::user();
+            $company = $user->getActiveCompany();
             
             // Check if user has access to this measurement
-            if ($measurement->location->company_id !== $user->company_id) {
+            if ($measurement->location->company_id !== $company?->id) {
                 abort(403, 'Unauthorized access to this measurement.');
             }
 
@@ -161,10 +171,13 @@ class MeasurementController extends Controller
      */
     public function edit(Measurement $measurement)
     {
+        $this->requirePermission('measurements.edit', ['measurements.*', 'manage_measurements']);
+        
         $user = Auth::user();
+        $company = $user->getActiveCompany();
         
         // Check if user has access to this measurement
-        if ($measurement->location->company_id !== $user->company_id) {
+        if ($measurement->location->company_id !== $company?->id) {
             abort(403, 'Unauthorized access to this measurement.');
         }
 
@@ -184,10 +197,13 @@ class MeasurementController extends Controller
      */
     public function update(Request $request, Measurement $measurement)
     {
+        $this->requirePermission('measurements.edit', ['measurements.*', 'manage_measurements']);
+        
         $user = Auth::user();
+        $company = $user->getActiveCompany();
         
         // Check if user has access to this measurement
-        if ($measurement->location->company_id !== $user->company_id) {
+        if ($measurement->location->company_id !== $company?->id) {
             abort(403, 'Unauthorized access to this measurement.');
         }
 
@@ -262,10 +278,13 @@ class MeasurementController extends Controller
      */
     public function destroy(Measurement $measurement)
     {
+        $this->requirePermission('measurements.delete', ['measurements.*', 'manage_measurements']);
+        
         $user = Auth::user();
+        $company = $user->getActiveCompany();
         
         // Check if user has access to this measurement
-        if ($measurement->location->company_id !== $user->company_id) {
+        if ($measurement->location->company_id !== $company?->id) {
             abort(403, 'Unauthorized access to this measurement.');
         }
 
@@ -307,10 +326,13 @@ class MeasurementController extends Controller
      */
     public function submit(Measurement $measurement)
     {
+        $this->requirePermission('measurements.edit', ['measurements.*', 'manage_measurements']);
+        
         $user = Auth::user();
+        $company = $user->getActiveCompany();
         
         // Check if user has access to this measurement
-        if ($measurement->location->company_id !== $user->company_id) {
+        if ($measurement->location->company_id !== $company?->id) {
             abort(403, 'Unauthorized access to this measurement.');
         }
 
@@ -347,10 +369,13 @@ class MeasurementController extends Controller
      */
     public function calculateSource(Measurement $measurement, $sourceId)
     {
+        $this->requirePermission('measurements.create', ['measurements.edit', 'measurements.*', 'manage_measurements']);
+        
         $user = Auth::user();
+        $company = $user->getActiveCompany();
         
         // Check if user has access to this measurement
-        if ($measurement->location->company_id !== $user->company_id) {
+        if ($measurement->location->company_id !== $company?->id) {
             abort(403, 'Unauthorized access to this measurement.');
         }
 
@@ -370,10 +395,13 @@ class MeasurementController extends Controller
      */
     public function storeSourceData(Request $request, Measurement $measurement, $sourceId)
     {
+        $this->requirePermission('measurements.create', ['measurements.edit', 'measurements.*', 'manage_measurements']);
+        
         $user = Auth::user();
         
         // Check if user has access to this measurement
-        if ($measurement->location->company_id !== $user->company_id) {
+        $company = $user->getActiveCompany();
+        if ($measurement->location->company_id !== $company?->id) {
             abort(403, 'Unauthorized access to this measurement.');
         }
 
@@ -454,10 +482,13 @@ class MeasurementController extends Controller
      */
     public function editSource(Measurement $measurement, $sourceId)
     {
+        $this->requirePermission('measurements.edit', ['measurements.*', 'manage_measurements']);
+        
         $user = Auth::user();
         
         // Check if user has access to this measurement
-        if ($measurement->location->company_id !== $user->company_id) {
+        $company = $user->getActiveCompany();
+        if ($measurement->location->company_id !== $company?->id) {
             abort(403, 'Unauthorized access to this measurement.');
         }
 
@@ -477,10 +508,13 @@ class MeasurementController extends Controller
      */
     public function updateSourceData(Request $request, Measurement $measurement, $sourceId)
     {
+        $this->requirePermission('measurements.edit', ['measurements.*', 'manage_measurements']);
+        
         $user = Auth::user();
         
         // Check if user has access to this measurement
-        if ($measurement->location->company_id !== $user->company_id) {
+        $company = $user->getActiveCompany();
+        if ($measurement->location->company_id !== $company?->id) {
             abort(403, 'Unauthorized access to this measurement.');
         }
 
@@ -561,10 +595,13 @@ class MeasurementController extends Controller
      */
     public function deleteSourceData(Measurement $measurement, $sourceId)
     {
+        $this->requirePermission('measurements.delete', ['measurements.edit', 'measurements.*', 'manage_measurements']);
+        
         $user = Auth::user();
         
         // Check if user has access to this measurement
-        if ($measurement->location->company_id !== $user->company_id) {
+        $company = $user->getActiveCompany();
+        if ($measurement->location->company_id !== $company?->id) {
             abort(403, 'Unauthorized access to this measurement.');
         }
 

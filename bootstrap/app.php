@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'setActiveCompany' => \App\Http\Middleware\SetActiveCompanyContext::class,
             'checkCompanyType' => \App\Http\Middleware\CheckCompanyType::class,
             'ensureSuperAdmin' => \App\Http\Middleware\EnsureSuperAdmin::class,
+            'permission' => \App\Http\Middleware\CheckPermission::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

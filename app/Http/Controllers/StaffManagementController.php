@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\CompanyInvitationService;
+use App\Services\SubscriptionService;
 use App\Models\User;
 use App\Models\UserCompanyAccess;
 use App\Models\CompanyInvitation;
@@ -15,10 +16,12 @@ use Illuminate\Support\Facades\Schema;
 class StaffManagementController extends Controller
 {
     protected $invitationService;
+    protected $subscriptionService;
 
-    public function __construct(CompanyInvitationService $invitationService)
+    public function __construct(CompanyInvitationService $invitationService, SubscriptionService $subscriptionService)
     {
         $this->invitationService = $invitationService;
+        $this->subscriptionService = $subscriptionService;
     }
 
     /**
@@ -26,6 +29,8 @@ class StaffManagementController extends Controller
      */
     public function index()
     {
+        $this->requirePermission('manage_staff');
+        
         $company = Auth::user()->getActiveCompany();
         if (!$company) {
             return redirect()->route('client.dashboard')
@@ -68,6 +73,8 @@ class StaffManagementController extends Controller
      */
     public function create()
     {
+        $this->requirePermission('manage_staff');
+        
         $company = Auth::user()->getActiveCompany();
         if (!$company) {
             return redirect()->route('client.dashboard')
@@ -95,6 +102,8 @@ class StaffManagementController extends Controller
      */
     public function store(Request $request)
     {
+        $this->requirePermission('manage_staff');
+        
         $company = Auth::user()->getActiveCompany();
         if (!$company) {
             return redirect()->route('client.dashboard')
@@ -106,6 +115,12 @@ class StaffManagementController extends Controller
             'custom_role_id' => 'required|exists:company_custom_roles,id',
             'notes' => 'nullable|string',
         ]);
+
+        // Check user limit before inviting
+        $limitCheck = $this->subscriptionService->canPerformAction($company->id, 'users', 1);
+        if (!$limitCheck['allowed']) {
+            return back()->withErrors(['email' => $limitCheck['message']])->withInput();
+        }
 
         try {
             $invitation = $this->invitationService->inviteUser(
@@ -136,6 +151,8 @@ class StaffManagementController extends Controller
      */
     public function updateRole(Request $request, UserCompanyAccess $access)
     {
+        $this->requirePermission('manage_staff');
+        
         $company = Auth::user()->getActiveCompany();
         if (!$company || $access->company_id !== $company->id) {
             abort(403, 'Unauthorized action.');
@@ -160,6 +177,8 @@ class StaffManagementController extends Controller
      */
     public function destroy(UserCompanyAccess $access)
     {
+        $this->requirePermission('manage_staff');
+        
         $company = Auth::user()->getActiveCompany();
         if (!$company || $access->company_id !== $company->id) {
             abort(403, 'Unauthorized action.');

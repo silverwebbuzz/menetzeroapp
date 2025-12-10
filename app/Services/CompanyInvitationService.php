@@ -127,10 +127,21 @@ class CompanyInvitationService
                 'invited_by' => $invitation->invited_by,
                 'invited_at' => $invitation->invited_at,
             ]);
+
+            // If user doesn't have a company_id, set it and also set custom_role_id for direct access
+            if (!$user->company_id) {
+                $user->update([
+                    'company_id' => $invitation->company_id,
+                    'custom_role_id' => $invitation->custom_role_id,
+                ]);
+            }
         } catch (\Exception $e) {
-            // If table doesn't exist, just assign company_id to user
+            // If table doesn't exist, just assign company_id and custom_role_id to user
             if (strpos($e->getMessage(), "doesn't exist") !== false) {
-                $user->update(['company_id' => $invitation->company_id]);
+                $user->update([
+                    'company_id' => $invitation->company_id,
+                    'custom_role_id' => $invitation->custom_role_id,
+                ]);
             } else {
                 throw $e;
             }

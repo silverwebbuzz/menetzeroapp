@@ -87,5 +87,112 @@ class SubscriptionService
 
         return $subscription->plan->limits ?? [];
     }
+
+    /**
+     * Check if company can perform an action based on plan limits.
+     */
+    public function canPerformAction($companyId, $resourceType, $quantity = 1)
+    {
+        $limits = $this->getPlanLimits($companyId);
+        
+        if (empty($limits)) {
+            // No limits defined, allow action
+            return ['allowed' => true, 'message' => null];
+        }
+
+        $limit = $limits[$resourceType] ?? null;
+        
+        if ($limit === null) {
+            // No limit for this resource type, allow action
+            return ['allowed' => true, 'message' => null];
+        }
+
+        if ($limit === -1) {
+            // Unlimited
+            return ['allowed' => true, 'message' => null];
+        }
+
+        // Get current usage
+        $currentUsage = $this->getCurrentUsage($companyId, $resourceType);
+        
+        if (($currentUsage + $quantity) > $limit) {
+            $remaining = max(0, $limit - $currentUsage);
+            return [
+                'allowed' => false,
+                'message' => "You have reached your plan limit for {$resourceType}. Your plan allows {$limit} {$resourceType}, and you currently have {$currentUsage}. " . ($remaining > 0 ? "You can add {$remaining} more." : "Please upgrade your plan to add more.")
+            ];
+        }
+
+        return ['allowed' => true, 'message' => null];
+    }
+
+    /**
+     * Get current usage for a resource type.
+     */
+    public function getCurrentUsage($companyId, $resourceType)
+    {
+        switch ($resourceType) {
+            case 'users':
+                // Count all unique users for the company
+                // Get all user IDs (direct company users)
+                $directUserIds = \App\Models\User::where('company_id', $companyId)->pluck('id')->toArray();
+                
+                // Get all user IDs from user_company_access
+                $accessUserIds = [];
+                try {
+                    $accessUserIds = \App\Models\UserCompanyAccess::where('company_id', $companyId)
+                        ->where('status', 'active')
+                        ->pluck('user_id')
+                        ->unique()
+                        ->toArray();
+                } catch (\Exception $e) {
+                    // Table doesn't exist
+                }
+                
+                // Combine and get unique count
+                $allUserIds = array_unique(array_merge($directUserIds, $accessUserIds));
+                $userCount = count($allUserIds);
+                
+                // Count pending invitations as they will become users
+                try {
+                    $pendingInvitations = \App\Models\CompanyInvitation::where('company_id', $companyId)
+                        ->where('status', 'pending')
+                        ->where('expires_at', '>', now())
+                        ->count();
+                } catch (\Exception $e) {
+                    $pendingInvitations = 0;
+                }
+                
+                return $userCount + $pendingInvitations;
+                
+            case 'locations':
+                return \App\Models\Location::where('company_id', $companyId)
+                    ->where('is_active', true)
+                    ->count();
+                    
+            case 'documents':
+                return \App\Models\DocumentUpload::where('company_id', $companyId)
+                    ->count();
+                    
+            default:
+                return 0;
+        }
+    }
+
+    /**
+     * Get remaining quota for a resource type.
+     */
+    public function getRemainingQuota($companyId, $resourceType)
+    {
+        $limits = $this->getPlanLimits($companyId);
+        $limit = $limits[$resourceType] ?? null;
+        
+        if ($limit === null || $limit === -1) {
+            return -1; // Unlimited or no limit
+        }
+        
+        $currentUsage = $this->getCurrentUsage($companyId, $resourceType);
+        return max(0, $limit - $currentUsage);
+    }
 }
 

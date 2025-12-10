@@ -100,6 +100,116 @@ class User extends Authenticatable
     }
 
     /**
+     * Get custom role for a specific company (from UserCompanyAccess).
+     */
+    public function getCustomRoleForCompany($companyId = null)
+    {
+        if (!$companyId) {
+            $companyId = $this->getActiveCompany()?->id;
+        }
+
+        if (!$companyId) {
+            return null;
+        }
+
+        // First check UserCompanyAccess for this company (for invited users)
+        try {
+            $access = UserCompanyAccess::where('user_id', $this->id)
+                ->where('company_id', $companyId)
+                ->where('status', 'active')
+                ->with('customRole')
+                ->first();
+            
+            if ($access && $access->customRole) {
+                return $access->customRole;
+            }
+        } catch (\Exception $e) {
+            // Table doesn't exist, continue to check direct custom_role_id
+        }
+
+        // Fallback: Check if user has direct custom_role_id for this company
+        if ($this->custom_role_id && $this->company_id == $companyId) {
+            return $this->customRole;
+        }
+
+        return null;
+    }
+
+    /**
+     * Get user's permissions for the active company.
+     */
+    public function getPermissions($companyId = null)
+    {
+        // Super admin has all permissions
+        if ($this->isAdmin()) {
+            return ['*'];
+        }
+
+        // Company admin has all permissions
+        if ($this->isCompanyAdmin()) {
+            return ['*'];
+        }
+
+        $customRole = $this->getCustomRoleForCompany($companyId);
+        
+        if (!$customRole) {
+            return [];
+        }
+
+        $permissions = $customRole->permissions ?? [];
+        
+        // If permissions is ['*'], return it as is
+        if (in_array('*', $permissions)) {
+            return ['*'];
+        }
+
+        return $permissions;
+    }
+
+    /**
+     * Check if user has a specific permission.
+     */
+    public function hasPermission($permission, $companyId = null)
+    {
+        $permissions = $this->getPermissions($companyId);
+        
+        // If user has all permissions
+        if (in_array('*', $permissions)) {
+            return true;
+        }
+
+        // Check exact permission
+        if (in_array($permission, $permissions)) {
+            return true;
+        }
+
+        // Check wildcard permissions (e.g., 'measurements.*' matches 'measurements.create')
+        foreach ($permissions as $perm) {
+            if (str_ends_with($perm, '.*')) {
+                $prefix = str_replace('.*', '', $perm);
+                if (str_starts_with($permission, $prefix . '.')) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if user has any of the given permissions.
+     */
+    public function hasAnyPermission(array $permissions, $companyId = null)
+    {
+        foreach ($permissions as $permission) {
+            if ($this->hasPermission($permission, $companyId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Check if user has access to a company.
      */
     public function hasAccessToCompany($companyId)
