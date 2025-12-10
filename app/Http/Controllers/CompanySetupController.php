@@ -5,7 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Company;
 use App\Models\User;
+use App\Models\ClientSubscription;
+use App\Models\SubscriptionPlan;
+use App\Models\RoleTemplate;
+use App\Models\CompanyCustomRole;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class CompanySetupController extends Controller
 {
@@ -56,8 +61,6 @@ class CompanySetupController extends Controller
             'industry' => $request->business_category,
             'business_subcategory' => $request->business_subcategory,
             'description' => $request->business_description,
-            'company_type' => 'client',
-            'is_direct_client' => true,
             'is_active' => true,
         ]);
 
@@ -66,6 +69,52 @@ class CompanySetupController extends Controller
             'company_id' => $company->id,
             'role' => 'company_admin',
         ]);
+
+        // Create free subscription for the company
+        $freePlan = SubscriptionPlan::where('plan_category', 'client')
+            ->where(function($query) {
+                $query->where('plan_code', 'free')
+                      ->orWhere('plan_code', 'FREE')
+                      ->orWhere('price_annual', 0);
+            })
+            ->where('is_active', true)
+            ->first();
+
+        if ($freePlan) {
+            $startedAt = now();
+            $expiresAt = Carbon::parse($startedAt)->addYear();
+
+            ClientSubscription::create([
+                'company_id' => $company->id,
+                'subscription_plan_id' => $freePlan->id,
+                'status' => 'active',
+                'billing_cycle' => 'annual',
+                'started_at' => $startedAt,
+                'expires_at' => $expiresAt,
+                'auto_renew' => true,
+            ]);
+        }
+
+        // Create default custom roles from role templates
+        $roleTemplates = RoleTemplate::where('is_active', true)
+            ->where('is_system_template', true)
+            ->where(function($query) {
+                $query->where('category', 'client')
+                      ->orWhere('category', 'both');
+            })
+            ->orderBy('sort_order')
+            ->get();
+
+        foreach ($roleTemplates as $template) {
+            CompanyCustomRole::create([
+                'company_id' => $company->id,
+                'role_name' => $template->template_name,
+                'description' => $template->description,
+                'permissions' => $template->permissions ?? [],
+                'based_on_template' => $template->template_code,
+                'is_active' => true,
+            ]);
+        }
 
         return redirect()->route('client.dashboard')->with('success', 'Business profile completed successfully!');
     }

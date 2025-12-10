@@ -12,7 +12,8 @@ use App\Models\IndustrialData;
 use App\Models\WasteData;
 use App\Models\AgricultureData;
 use App\Models\Report;
-use App\Models\Subscription;
+use App\Models\ClientSubscription;
+use App\Models\SubscriptionPlan;
 
 class BasicDataSeeder extends Seeder
 {
@@ -143,14 +144,27 @@ class BasicDataSeeder extends Seeder
                     'file_path' => '/reports/quarterly_report_' . $company->slug . '.pdf',
                 ]);
 
-                Subscription::create([
-                    'company_id' => $company->id,
-                    'plan_type' => $this->getRandomPlanType(),
-                    'status' => 'active',
-                    'stripe_customer_id' => 'cus_' . \Illuminate\Support\Str::random(14),
-                    'started_at' => now()->subMonths(rand(1, 12)),
-                    'expires_at' => now()->addMonths(12),
-                ]);
+                // Create subscription using ClientSubscription
+                $freePlan = SubscriptionPlan::where('plan_category', 'client')
+                    ->where(function($query) {
+                        $query->where('plan_code', 'free')
+                              ->orWhere('plan_code', 'FREE')
+                              ->orWhere('price_annual', 0);
+                    })
+                    ->where('is_active', true)
+                    ->first();
+                
+                if ($freePlan) {
+                    ClientSubscription::create([
+                        'company_id' => $company->id,
+                        'subscription_plan_id' => $freePlan->id,
+                        'status' => 'active',
+                        'billing_cycle' => 'annual',
+                        'started_at' => now()->subMonths(rand(1, 12)),
+                        'expires_at' => now()->addMonths(12),
+                        'auto_renew' => true,
+                    ]);
+                }
             }
             $this->command->info('✅ Reports and subscriptions created');
 
@@ -207,9 +221,4 @@ class BasicDataSeeder extends Seeder
         return $prefixes[array_rand($prefixes)] . '-' . rand(10000, 99999);
     }
 
-    private function getRandomPlanType(): string
-    {
-        $plans = ['Free', 'Standard', 'Premium'];
-        return $plans[array_rand($plans)];
-    }
 }

@@ -89,11 +89,6 @@ class Company extends Model
         return $this->hasMany(Report::class);
     }
 
-    public function subscriptions()
-    {
-        return $this->hasMany(Subscription::class);
-    }
-
     public function locations()
     {
         return $this->hasMany(Location::class);

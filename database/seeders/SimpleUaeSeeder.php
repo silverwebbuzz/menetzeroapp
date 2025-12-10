@@ -12,7 +12,8 @@ use App\Models\IndustrialData;
 use App\Models\WasteData;
 use App\Models\AgricultureData;
 use App\Models\Report;
-use App\Models\Subscription;
+use App\Models\ClientSubscription;
+use App\Models\SubscriptionPlan;
 
 class SimpleUaeSeeder extends Seeder
 {
@@ -246,16 +247,29 @@ class SimpleUaeSeeder extends Seeder
 
             // Create subscriptions
             $this->command->info('Creating subscriptions...');
-            Subscription::create([
-                'company_id' => $company1->id,
-                'plan_type' => 'Standard',
-                'status' => 'active',
-                'stripe_customer_id' => 'cus_' . \Illuminate\Support\Str::random(14),
-                'started_at' => now()->subMonths(6),
-                'expires_at' => now()->addMonths(6),
-            ]);
-
-            $this->command->info('✅ Subscriptions created');
+            $freePlan = SubscriptionPlan::where('plan_category', 'client')
+                ->where(function($query) {
+                    $query->where('plan_code', 'free')
+                          ->orWhere('plan_code', 'FREE')
+                          ->orWhere('price_annual', 0);
+                })
+                ->where('is_active', true)
+                ->first();
+            
+            if ($freePlan) {
+                ClientSubscription::create([
+                    'company_id' => $company1->id,
+                    'subscription_plan_id' => $freePlan->id,
+                    'status' => 'active',
+                    'billing_cycle' => 'annual',
+                    'started_at' => now()->subMonths(6),
+                    'expires_at' => now()->addMonths(6),
+                    'auto_renew' => true,
+                ]);
+                $this->command->info('✅ Subscriptions created');
+            } else {
+                $this->command->warn('⚠️  Free subscription plan not found, skipping subscription creation');
+            }
 
             $this->command->info('🎉 Simple UAE demo data created successfully!');
             $this->command->info('📊 Created: 2 companies, 2 facilities, 2 emission factors, 2 energy records, 1 transport record, 1 industrial record, 1 waste record, 1 agriculture record, 1 report, 1 subscription');
