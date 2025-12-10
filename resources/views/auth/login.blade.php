@@ -128,7 +128,7 @@
                 </p>
 
                 <div class="mb-6">
-                    <a class="btn btn-ghost btn-full" href="{{ route('auth.google') }}">
+                    <a class="btn btn-ghost btn-full" href="{{ route('auth.google', ['type' => isset($isPartner) && $isPartner ? 'partner' : 'client']) }}">
                         <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="" class="w-5 h-5"> 
                         <span>Continue with Google</span>
                     </a>

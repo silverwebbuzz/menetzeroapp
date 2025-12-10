@@ -39,8 +39,22 @@ Route::post('/login', function (\Illuminate\Http\Request $request) {
     if (\Illuminate\Support\Facades\Auth::attempt($credentials, true)) {
         $request->session()->regenerate();
         
-        // Check if user has multiple company access
         $user = auth()->user();
+        
+        // Validate that user is a CLIENT (not partner)
+        if ($user->company_id) {
+            $company = $user->company;
+            if ($company && $company->company_type === 'partner') {
+                \Illuminate\Support\Facades\Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return back()->withErrors([
+                    'email' => 'This account is registered as a Partner. Please login from the Partner login page.',
+                ])->onlyInput('email');
+            }
+        }
+        
+        // Check if user has multiple company access
         if ($user && $user->hasMultipleCompanyAccess()) {
             return redirect()->route('account.selector');
         }
@@ -93,14 +107,29 @@ Route::prefix('partner')->group(function () {
             $request->session()->regenerate();
             
             $user = \Illuminate\Support\Facades\Auth::user();
+            
+            // Validate that user is a PARTNER (not client)
+            if (!$user->company_id) {
+                // User has no company yet - allow but they need to complete setup
+                session(['registering_as_partner' => true]);
+                return redirect()->route('company.setup')->with('info', 'Please complete your partner profile to continue.');
+            }
+            
             $company = $user->getActiveCompany();
             
             if ($company && $company->isPartner()) {
+                // Check if user has multiple company access
+                if ($user->hasMultipleCompanyAccess()) {
+                    return redirect()->route('account.selector');
+                }
                 return redirect()->route('partner.dashboard');
             } else {
+                // User is a client, not a partner
                 \Illuminate\Support\Facades\Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
                 return back()->withErrors([
-                    'email' => 'This account is not registered as a partner.',
+                    'email' => 'This account is registered as a Client. Please login from the Client login page.',
                 ])->onlyInput('email');
             }
         }
