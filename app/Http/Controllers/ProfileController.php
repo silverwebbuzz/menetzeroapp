@@ -26,8 +26,6 @@ class ProfileController extends Controller
             'name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',
             'designation' => 'nullable|string|max:100',
-            'current_password' => 'nullable|string',
-            'new_password' => 'nullable|string|min:8|confirmed',
         ]);
 
         // Update basic info
@@ -37,18 +35,34 @@ class ProfileController extends Controller
             'designation' => $request->designation,
         ]);
 
-        // Handle password change if provided
-        if ($request->filled('current_password') && $request->filled('new_password')) {
-            if (!Hash::check($request->current_password, $user->password)) {
-                return back()->withErrors(['current_password' => 'Current password is incorrect.']);
-            }
-            
-            $user->update([
-                'password' => Hash::make($request->new_password),
-            ]);
+        return back()->with('success', 'Personal information updated successfully!');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $user = Auth::user();
+        
+        $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        // Verify current password
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Current password is incorrect.'])->withInput();
         }
 
-        return back()->with('success', 'Personal information updated successfully!');
+        // Check if new password is different from current
+        if (Hash::check($request->new_password, $user->password)) {
+            return back()->withErrors(['new_password' => 'New password must be different from your current password.'])->withInput();
+        }
+
+        // Update password
+        $user->update([
+            'password' => Hash::make($request->new_password),
+        ]);
+
+        return back()->with('success', 'Password updated successfully!');
     }
 
     public function updateCompany(Request $request)

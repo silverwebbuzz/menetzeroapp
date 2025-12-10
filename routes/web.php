@@ -135,6 +135,12 @@ Route::prefix('partner')->middleware(['auth', 'setActiveCompany', 'checkCompanyT
         Route::get('/payment-history', [\App\Http\Controllers\Partner\SubscriptionController::class, 'paymentHistory'])->name('payment-history');
         Route::post('/cancel', [\App\Http\Controllers\Partner\SubscriptionController::class, 'cancel'])->name('cancel');
     });
+    
+    // Profile routes
+    Route::get('/profile', [ProfileController::class, 'index'])->name('partner.profile');
+    Route::post('/profile/personal', [ProfileController::class, 'updatePersonal'])->name('partner.profile.update.personal');
+    Route::post('/profile/company', [ProfileController::class, 'updateCompany'])->name('partner.profile.update.company');
+    Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('partner.profile.update.password');
 });
 
 // Account Switcher (for multi-company staff)
@@ -142,6 +148,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/account/selector', [AccountSelectorController::class, 'index'])->name('account.selector');
     Route::post('/account/switch', [AccountSelectorController::class, 'switch'])->name('account.switch');
 });
+
+// Profile Routes - Separate for Client and Partner
 
 // Client Routes
 Route::middleware(['auth', 'setActiveCompany', 'checkCompanyType:client'])->group(function () {
@@ -151,6 +159,7 @@ Route::middleware(['auth', 'setActiveCompany', 'checkCompanyType:client'])->grou
     Route::get('/profile', [ProfileController::class, 'index'])->name('client.profile');
     Route::post('/profile/personal', [ProfileController::class, 'updatePersonal'])->name('profile.update.personal');
     Route::post('/profile/company', [ProfileController::class, 'updateCompany'])->name('profile.update.company');
+    Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.update.password');
     
     // Location routes
     Route::resource('locations', LocationController::class);

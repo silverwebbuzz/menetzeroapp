@@ -64,6 +64,12 @@
             </svg>
             Company Information
         </button>
+        <button onclick="showTab('password')" id="password-tab" class="tab-button inactive">
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+            </svg>
+            Change Password
+        </button>
     </div>
 
     <!-- Personal Information Tab -->
@@ -71,7 +77,7 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-6">Personal Information</h3>
             
-            <form method="POST" action="{{ route('profile.update.personal') }}" class="space-y-6">
+            <form method="POST" action="{{ auth()->user()->getActiveCompany() && auth()->user()->getActiveCompany()->isPartner() ? route('partner.profile.update.personal') : route('profile.update.personal') }}" class="space-y-6">
                 @csrf
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -104,36 +110,74 @@
                     </div>
                 </div>
 
-                <!-- Password Change Section -->
-                <div class="border-t pt-6">
-                    <h4 class="text-md font-semibold text-gray-900 mb-4">Change Password</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
-                            <input type="password" name="current_password" 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                            @error('current_password')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
-                            <input type="password" name="new_password" 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                            @error('new_password')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
-                            <input type="password" name="new_password_confirmation" 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                <div class="flex justify-end">
+                    <button type="submit" class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
+                        Update Personal Information
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Change Password Tab -->
+    <div id="password-content" class="tab-content">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-6">Change Password</h3>
+            
+            <form method="POST" action="{{ auth()->user()->getActiveCompany() && auth()->user()->getActiveCompany()->isPartner() ? route('partner.profile.update.password') : route('profile.update.password') }}" class="space-y-6">
+                @csrf
+                
+                <div class="max-w-2xl">
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Current Password *</label>
+                        <input type="password" name="current_password" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" 
+                               required autocomplete="current-password">
+                        @error('current_password')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">New Password *</label>
+                        <input type="password" name="new_password" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" 
+                               required autocomplete="new-password" minlength="8">
+                        <p class="text-xs text-gray-500 mt-1">Password must be at least 8 characters long.</p>
+                        @error('new_password')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password *</label>
+                        <input type="password" name="new_password_confirmation" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" 
+                               required autocomplete="new-password" minlength="8">
+                        @error('new_password_confirmation')
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                        <div class="flex items-start">
+                            <svg class="w-5 h-5 text-blue-600 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <div class="text-sm text-blue-800">
+                                <p class="font-semibold mb-1">Password Requirements:</p>
+                                <ul class="list-disc list-inside space-y-1 text-blue-700">
+                                    <li>Minimum 8 characters</li>
+                                    <li>Use a combination of letters, numbers, and symbols for better security</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                    <p class="text-xs text-gray-500 mt-2">Leave password fields empty if you don't want to change your password.</p>
                 </div>
 
                 <div class="flex justify-end">
                     <button type="submit" class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
-                        Update Personal Information
+                        Update Password
                     </button>
                 </div>
             </form>
@@ -146,7 +190,7 @@
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h3 class="text-lg font-semibold text-gray-900 mb-6">Company Information</h3>
                 
-                <form method="POST" action="{{ route('profile.update.company') }}" class="space-y-6">
+                <form method="POST" action="{{ auth()->user()->getActiveCompany() && auth()->user()->getActiveCompany()->isPartner() ? route('partner.profile.update.company') : route('profile.update.company') }}" class="space-y-6">
                     @csrf
                     
                     <!-- Basic Company Info -->
