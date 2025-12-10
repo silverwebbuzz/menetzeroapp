@@ -26,14 +26,24 @@ class CheckCompanyType
 
         $company = $user->getActiveCompany();
         
-        // If no company, allow access to dashboard for company setup
+        // If no company, allow access to dashboard and company setup only
         // Dashboard controller will handle showing company setup prompt
         if (!$company) {
             // Only allow dashboard and company setup routes
-            $allowedRoutes = ['client.dashboard', 'partner.dashboard', 'company.setup', 'company.setup.store'];
+            $allowedRoutes = [
+                'client.dashboard', 
+                'partner.dashboard', 
+                'company.setup', 
+                'company.setup.store',
+                'logout', // Allow logout
+            ];
             $routeName = $request->route() ? $request->route()->getName() : null;
+            
+            // If route name exists and is not in allowed list, redirect to dashboard with message
             if ($routeName && !in_array($routeName, $allowedRoutes)) {
-                abort(403, 'No company access. Please complete company setup first.');
+                // Redirect to dashboard with a message instead of showing 403
+                return redirect()->route('client.dashboard')
+                    ->with('error', 'Please complete your company setup first to access this feature.');
             }
             return $next($request);
         }
