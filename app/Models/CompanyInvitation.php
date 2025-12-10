@@ -77,6 +77,14 @@ class CompanyInvitation extends Model
     }
 
     /**
+     * Get the custom role.
+     */
+    public function customRole()
+    {
+        return $this->belongsTo(CompanyCustomRole::class, 'custom_role_id');
+    }
+
+    /**
      * Check if invitation is expired.
      */
     public function isExpired()

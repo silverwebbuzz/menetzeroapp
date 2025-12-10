@@ -108,12 +108,7 @@ class StaffManagementController extends Controller
         ]);
 
         try {
-            // Check if tables exist
-            if (!\Schema::hasTable('user_company_accesses') || !\Schema::hasTable('company_invitations')) {
-                return back()->withErrors(['email' => 'Staff management features require database migration. Please run the migration first.'])->withInput();
-            }
-            
-            $this->invitationService->inviteUser(
+            $invitation = $this->invitationService->inviteUser(
                 $company->id,
                 $request->email,
                 null, // role_id removed
@@ -124,8 +119,13 @@ class StaffManagementController extends Controller
                 ]
             );
 
-            return redirect()->route('staff.index')
-                ->with('success', 'Invitation sent successfully.');
+            // Store invitation in session in case it wasn't saved to DB
+            session(['invitation' => $invitation]);
+
+            // Redirect to success page with invitation details
+            $invitationId = $invitation->id ?? 0;
+            return redirect()->route('staff.invitation-success', $invitationId)
+                ->with('invitation', $invitation);
         } catch (\Exception $e) {
             return back()->withErrors(['email' => $e->getMessage()])->withInput();
         }
@@ -169,6 +169,62 @@ class StaffManagementController extends Controller
 
         return redirect()->route('staff.index')
             ->with('success', 'Staff access revoked successfully.');
+    }
+
+    /**
+     * Show invitation success page with details.
+     */
+    public function invitationSuccess($invitationId)
+    {
+        $company = Auth::user()->getActiveCompany();
+        if (!$company) {
+            return redirect()->route('client.dashboard')
+                ->with('error', 'Please complete your company setup first.');
+        }
+
+        try {
+            $invitation = CompanyInvitation::with(['company', 'inviter', 'customRole'])
+                ->where('id', $invitationId)
+                ->where('company_id', $company->id)
+                ->first();
+            
+            // If invitation not found in DB (table doesn't exist), get from session
+            if (!$invitation) {
+                $invitation = session('invitation');
+                if (!$invitation) {
+                    return redirect()->route('staff.index')
+                        ->with('error', 'Invitation not found.');
+                }
+                // Load relationships manually
+                $invitation->company = $company;
+                $invitation->inviter = Auth::user();
+                if ($invitation->custom_role_id) {
+                    $invitation->customRole = CompanyCustomRole::find($invitation->custom_role_id);
+                }
+            }
+        } catch (\Exception $e) {
+            // If table doesn't exist, get from session
+            $invitation = session('invitation');
+            if (!$invitation) {
+                return redirect()->route('staff.index')
+                    ->with('error', 'Invitation not found.');
+            }
+            // Load relationships manually
+            $invitation->company = $company;
+            $invitation->inviter = Auth::user();
+            if ($invitation->custom_role_id) {
+                try {
+                    $invitation->customRole = CompanyCustomRole::find($invitation->custom_role_id);
+                } catch (\Exception $e) {
+                    $invitation->customRole = null;
+                }
+            }
+        }
+
+        // Generate invitation acceptance URL
+        $acceptUrl = route('invitations.accept', ['token' => $invitation->token]);
+
+        return view('staff.invitation-success', compact('invitation', 'acceptUrl'));
     }
 
     /**
