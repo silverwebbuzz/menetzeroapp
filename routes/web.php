@@ -104,6 +104,19 @@ Route::prefix('partner')->middleware(['auth', 'setActiveCompany', 'checkCompanyT
     // External Client Reports
     Route::get('/clients/{client}/reports', [ExternalClientReportController::class, 'index'])->name('partner.clients.reports.index');
     Route::post('/clients/{client}/reports', [ExternalClientReportController::class, 'generate'])->name('partner.clients.reports.generate');
+    
+    // Role Management routes
+    Route::resource('roles', \App\Http\Controllers\Partner\RoleManagementController::class)->except(['show']);
+    
+    // Staff Management routes
+    Route::prefix('staff')->name('staff.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Partner\StaffManagementController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Partner\StaffManagementController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Partner\StaffManagementController::class, 'store'])->name('store');
+        Route::put('/{access}/role', [\App\Http\Controllers\Partner\StaffManagementController::class, 'updateRole'])->name('update-role');
+        Route::delete('/{access}', [\App\Http\Controllers\Partner\StaffManagementController::class, 'destroy'])->name('destroy');
+        Route::delete('/invitations/{invitation}', [\App\Http\Controllers\Partner\StaffManagementController::class, 'cancelInvitation'])->name('cancel-invitation');
+    });
 });
 
 // Account Switcher (for multi-company staff)
@@ -165,6 +178,19 @@ Route::middleware(['auth', 'setActiveCompany', 'checkCompanyType:client'])->grou
         Route::get('/', function () {
             return view('reports.index');
         })->name('index');
+    });
+    
+    // Role Management routes
+    Route::resource('roles', \App\Http\Controllers\RoleManagementController::class)->except(['show']);
+    
+    // Staff Management routes
+    Route::prefix('staff')->name('staff.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\StaffManagementController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\StaffManagementController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\StaffManagementController::class, 'store'])->name('store');
+        Route::put('/{access}/role', [\App\Http\Controllers\StaffManagementController::class, 'updateRole'])->name('update-role');
+        Route::delete('/{access}', [\App\Http\Controllers\StaffManagementController::class, 'destroy'])->name('destroy');
+        Route::delete('/invitations/{invitation}', [\App\Http\Controllers\StaffManagementController::class, 'cancelInvitation'])->name('cancel-invitation');
     });
     
     // OLD EMISSION FORM ROUTES - REPLACED BY MEASUREMENTS SYSTEM
