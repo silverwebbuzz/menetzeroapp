@@ -12,7 +12,6 @@ class UserCompanyAccess extends Model
     protected $fillable = [
         'user_id',
         'company_id',
-        'company_type',
         'role_id',
         'custom_role_id',
         'access_level',

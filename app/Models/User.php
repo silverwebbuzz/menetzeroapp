@@ -183,7 +183,6 @@ class User extends Authenticatable
             ['user_id' => $this->id],
             [
                 'active_company_id' => $companyId,
-                'active_company_type' => Company::find($companyId)->company_type ?? 'client',
                 'last_switched_at' => now(),
             ]
         );

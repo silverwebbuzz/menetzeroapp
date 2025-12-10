@@ -12,7 +12,6 @@ class UserActiveContext extends Model
     protected $fillable = [
         'user_id',
         'active_company_id',
-        'active_company_type',
         'last_switched_at',
     ];
 

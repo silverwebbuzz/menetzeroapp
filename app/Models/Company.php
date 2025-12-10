@@ -16,14 +16,10 @@ class Company extends Model
         'description', 'industry', 'business_subcategory', 'employee_count', 'annual_revenue', 'is_active', 'settings',
         // UAE additions
         'emirate', 'sector', 'license_no', 'contact_person',
-        // New fields for enhancements
-        'company_type',
-        'is_direct_client',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
-        'is_direct_client' => 'boolean',
         'settings' => 'array',
         'annual_revenue' => 'decimal:2',
     ];

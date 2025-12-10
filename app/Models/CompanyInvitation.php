@@ -12,7 +12,6 @@ class CompanyInvitation extends Model
 
     protected $fillable = [
         'company_id',
-        'company_type',
         'email',
         'role_id',
         'custom_role_id',
