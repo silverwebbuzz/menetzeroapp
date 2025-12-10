@@ -115,20 +115,13 @@
                 
                 <h1 class="text-3xl font-semibold mb-2" style="color: #111827;">
                     Welcome back!
-                    @if(isset($isPartner) && $isPartner)
-                        <span class="text-sm font-normal text-emerald-600">(Partner)</span>
-                    @endif
                 </h1>
                 <p class="text-sm mb-8" style="color: #4b5563;">
-                    @if(isset($isPartner) && $isPartner)
-                        Sign in to your Partner account.
-                    @else
-                        Sign in to MIDDLE EAST NET Zero's platform.
-                    @endif
+                    Sign in to MIDDLE EAST NET Zero's platform.
                 </p>
 
                 <div class="mb-6">
-                    <a class="btn btn-ghost btn-full" href="{{ route('auth.google', ['type' => isset($isPartner) && $isPartner ? 'partner' : 'client']) }}">
+                    <a class="btn btn-ghost btn-full" href="{{ route('auth.google') }}">
                         <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="" class="w-5 h-5"> 
                         <span>Continue with Google</span>
                     </a>
@@ -140,7 +133,7 @@
                     <div class="h-px flex-1" style="background-color: #e5e7eb;"></div>
                 </div>
 
-                <form class="space-y-6" method="POST" action="{{ isset($isPartner) && $isPartner ? route('partner.login') : route('login.post') }}">
+                <form class="space-y-6" method="POST" action="{{ route('login.post') }}">
                     @csrf
                     <div class="form-group">
                         <label class="form-label">Business Email</label>

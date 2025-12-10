@@ -14,16 +14,8 @@ class DashboardController extends Controller
 
     public function index()
     {
-        // Get user from either guard
-        $partnerUser = auth('partner')->user();
-        $clientUser = auth('web')->user();
-        
-        // If partner user is accessing client dashboard, redirect them
-        if ($partnerUser && !$clientUser) {
-            return redirect()->route('partner.dashboard');
-        }
-        
-        $user = $clientUser ?? $partnerUser;
+        // Get user from web guard
+        $user = auth('web')->user();
         
         // Check if user has a company
         if (!$user || !$user->company_id) {

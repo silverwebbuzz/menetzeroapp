@@ -313,19 +313,12 @@
                 
                 <nav class="mt-8 px-4 flex-1 flex flex-col">
             @php
-                // Determine company type based on which guard is active
-                // Partner guard = partner, Web guard = client
-                $isPartner = auth('partner')->check();
-                $user = $isPartner ? auth('partner')->user() : auth('web')->user();
+                $user = auth('web')->user();
                 $hasCompany = $user && $user->company_id;
             @endphp
             
             <div class="flex-1">
-            @if($isPartner)
-                @include('layouts.partials.nav-partner')
-            @else
                 @include('layouts.partials.nav-client')
-            @endif
             </div>
                 </nav>
                 

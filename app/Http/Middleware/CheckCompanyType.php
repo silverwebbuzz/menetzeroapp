@@ -13,8 +13,8 @@ class CheckCompanyType
      */
     public function handle(Request $request, Closure $next, string $type): Response
     {
-        // Get user from either guard
-        $user = auth('partner')->user() ?? auth('web')->user();
+        // Get user from web guard
+        $user = auth('web')->user();
         
         if (!$user) {
             abort(401, 'Unauthenticated');
@@ -33,7 +33,6 @@ class CheckCompanyType
             // Only allow dashboard and company setup routes
             $allowedRoutes = [
                 'client.dashboard', 
-                'partner.dashboard', 
                 'company.setup', 
                 'company.setup.store',
                 'logout', // Allow logout
@@ -42,21 +41,15 @@ class CheckCompanyType
             
             // If route name exists and is not in allowed list, redirect to dashboard with message
             if ($routeName && !in_array($routeName, $allowedRoutes)) {
-                // Redirect to appropriate dashboard based on guard
-                $dashboardRoute = auth('partner')->check() ? 'partner.dashboard' : 'client.dashboard';
-                return redirect()->route($dashboardRoute)
+                return redirect()->route('client.dashboard')
                     ->with('error', 'Please complete your company setup first to access this feature.');
             }
             return $next($request);
         }
 
-        // Check company type
+        // Check company type - only clients allowed now
         if ($type === 'client' && !$company->isClient()) {
             abort(403, 'This route is for clients only');
-        }
-
-        if ($type === 'partner' && !$company->isPartner()) {
-            abort(403, 'This route is for partners only');
         }
 
         return $next($request);

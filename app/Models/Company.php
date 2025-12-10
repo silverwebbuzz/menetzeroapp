@@ -112,14 +112,6 @@ class Company extends Model
     }
 
     /**
-     * Get partner subscriptions.
-     */
-    public function partnerSubscriptions()
-    {
-        return $this->hasMany(PartnerSubscription::class);
-    }
-
-    /**
      * Get active client subscription.
      */
     public function activeClientSubscription()
@@ -128,25 +120,6 @@ class Company extends Model
             ->where('status', 'active')
             ->where('expires_at', '>', now())
             ->first();
-    }
-
-    /**
-     * Get active partner subscription.
-     */
-    public function activePartnerSubscription()
-    {
-        return $this->partnerSubscriptions()
-            ->where('status', 'active')
-            ->where('expires_at', '>', now())
-            ->first();
-    }
-
-    /**
-     * Get external clients (if partner).
-     */
-    public function externalClients()
-    {
-        return $this->hasMany(PartnerExternalClient::class, 'partner_company_id');
     }
 
     /**
@@ -186,15 +159,7 @@ class Company extends Model
      */
     public function isClient()
     {
-        return $this->company_type === 'client';
-    }
-
-    /**
-     * Check if company is a partner.
-     */
-    public function isPartner()
-    {
-        return $this->company_type === 'partner';
+        return $this->company_type === 'client' || $this->company_type === null;
     }
 
     /**

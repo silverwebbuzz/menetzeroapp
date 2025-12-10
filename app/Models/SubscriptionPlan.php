@@ -39,14 +39,6 @@ class SubscriptionPlan extends Model
     }
 
     /**
-     * Get partner subscriptions for this plan.
-     */
-    public function partnerSubscriptions()
-    {
-        return $this->hasMany(PartnerSubscription::class, 'subscription_plan_id');
-    }
-
-    /**
      * Scope for active plans.
      */
     public function scopeActive($query)
@@ -60,14 +52,6 @@ class SubscriptionPlan extends Model
     public function scopeForClients($query)
     {
         return $query->where('plan_category', 'client');
-    }
-
-    /**
-     * Scope for partner plans.
-     */
-    public function scopeForPartners($query)
-    {
-        return $query->where('plan_category', 'partner');
     }
 }
 

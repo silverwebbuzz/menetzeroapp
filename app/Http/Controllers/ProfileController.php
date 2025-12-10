@@ -12,8 +12,8 @@ class ProfileController extends Controller
 {
     public function index()
     {
-        // Get user from either guard
-        $user = Auth::guard('partner')->user() ?? Auth::guard('web')->user();
+        // Get user from web guard
+        $user = Auth::guard('web')->user();
         $company = $user->company;
         
         return view('profile.index', compact('user', 'company'));
@@ -21,8 +21,8 @@ class ProfileController extends Controller
 
     public function updatePersonal(Request $request)
     {
-        // Get user from either guard
-        $user = Auth::guard('partner')->user() ?? Auth::guard('web')->user();
+        // Get user from web guard
+        $user = Auth::guard('web')->user();
         
         $request->validate([
             'name' => 'required|string|max:255',
@@ -42,8 +42,8 @@ class ProfileController extends Controller
 
     public function updatePassword(Request $request)
     {
-        // Get user from either guard
-        $user = Auth::guard('partner')->user() ?? Auth::guard('web')->user();
+        // Get user from web guard
+        $user = Auth::guard('web')->user();
         
         $request->validate([
             'current_password' => 'required|string',
@@ -70,8 +70,8 @@ class ProfileController extends Controller
 
     public function updateCompany(Request $request)
     {
-        // Get user from either guard
-        $user = Auth::guard('partner')->user() ?? Auth::guard('web')->user();
+        // Get user from web guard
+        $user = Auth::guard('web')->user();
         
         if (!$user->company_id) {
             return back()->withErrors(['company' => 'No company associated with this account.']);

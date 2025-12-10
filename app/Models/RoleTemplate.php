@@ -45,15 +45,5 @@ class RoleTemplate extends Model
         });
     }
 
-    /**
-     * Scope for partner templates.
-     */
-    public function scopeForPartners($query)
-    {
-        return $query->where(function($q) {
-            $q->where('category', 'partner')
-              ->orWhere('category', 'both');
-        });
-    }
 }
 

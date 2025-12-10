@@ -13,11 +13,6 @@ use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\DocumentUploadController;
 use App\Http\Controllers\AccountSelectorController;
-use App\Http\Controllers\Partner\ExternalClientController;
-use App\Http\Controllers\Partner\ExternalClientLocationController;
-use App\Http\Controllers\Partner\ExternalClientMeasurementController;
-use App\Http\Controllers\Partner\ExternalClientDocumentController;
-use App\Http\Controllers\Partner\ExternalClientReportController;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -76,126 +71,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/company/setup', [CompanySetupController::class, 'store'])->name('company.setup.store');
 });
 
-// Partner Authentication routes (public, before login)
-Route::prefix('partner')->group(function () {
-    Route::get('/register', [RegisterController::class, 'showPartnerRegistrationForm'])->name('partner.register');
-    Route::post('/register', [RegisterController::class, 'registerPartner']);
-    
-    Route::get('/login', function () {
-        return view('auth.login', ['isPartner' => true]);
-    })->name('partner.login');
-    
-    Route::post('/login', function (\Illuminate\Http\Request $request) {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
-
-        // Use 'partner' guard (users_partner table - partners only)
-        if (\Illuminate\Support\Facades\Auth::guard('partner')->attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
-            
-            $user = auth('partner')->user();
-            
-            if (!$user->company_id) {
-                // User has no company yet - allow but they need to complete setup
-                session(['registering_as_partner' => true]);
-                return redirect()->route('company.setup')->with('info', 'Please complete your partner profile to continue.');
-            }
-            
-            // Check if user has multiple company access
-            if ($user->hasMultipleCompanyAccess()) {
-                return redirect()->route('account.selector');
-            }
-            
-            return redirect()->route('partner.dashboard');
-        }
-
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ])->onlyInput('email');
-    })->name('partner.login.post');
-});
-
-// Partner Routes (protected) - Use partner guard
-Route::prefix('partner')->middleware(['auth:partner', 'setActiveCompany', 'checkCompanyType:partner'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('partner.dashboard');
-    
-    // External Client Management
-    Route::resource('clients', ExternalClientController::class)->names([
-        'index' => 'partner.clients.index',
-        'create' => 'partner.clients.create',
-        'store' => 'partner.clients.store',
-        'show' => 'partner.clients.show',
-        'edit' => 'partner.clients.edit',
-        'update' => 'partner.clients.update',
-        'destroy' => 'partner.clients.destroy',
-    ]);
-    
-    // External Client Locations
-    Route::get('/clients/{client}/locations', [ExternalClientLocationController::class, 'index'])->name('partner.clients.locations.index');
-    Route::post('/clients/{client}/locations', [ExternalClientLocationController::class, 'store'])->name('partner.clients.locations.store');
-    Route::get('/clients/{client}/locations/{location}', [ExternalClientLocationController::class, 'show'])->name('partner.clients.locations.show');
-    Route::put('/clients/{client}/locations/{location}', [ExternalClientLocationController::class, 'update'])->name('partner.clients.locations.update');
-    Route::delete('/clients/{client}/locations/{location}', [ExternalClientLocationController::class, 'destroy'])->name('partner.clients.locations.destroy');
-    
-    // External Client Measurements
-    Route::get('/clients/{client}/locations/{location}/measurements', [ExternalClientMeasurementController::class, 'index'])->name('partner.clients.measurements.index');
-    Route::post('/clients/{client}/locations/{location}/measurements', [ExternalClientMeasurementController::class, 'store'])->name('partner.clients.measurements.store');
-    Route::get('/clients/{client}/measurements/{measurement}', [ExternalClientMeasurementController::class, 'show'])->name('partner.clients.measurements.show');
-    Route::put('/clients/{client}/measurements/{measurement}', [ExternalClientMeasurementController::class, 'update'])->name('partner.clients.measurements.update');
-    Route::delete('/clients/{client}/measurements/{measurement}', [ExternalClientMeasurementController::class, 'destroy'])->name('partner.clients.measurements.destroy');
-    
-    // External Client Documents
-    Route::get('/clients/{client}/documents', [ExternalClientDocumentController::class, 'index'])->name('partner.clients.documents.index');
-    Route::post('/clients/{client}/documents', [ExternalClientDocumentController::class, 'store'])->name('partner.clients.documents.store');
-    Route::get('/clients/{client}/documents/{document}', [ExternalClientDocumentController::class, 'show'])->name('partner.clients.documents.show');
-    Route::delete('/clients/{client}/documents/{document}', [ExternalClientDocumentController::class, 'destroy'])->name('partner.clients.documents.destroy');
-    
-    // External Client Reports
-    Route::get('/clients/{client}/reports', [ExternalClientReportController::class, 'index'])->name('partner.clients.reports.index');
-    Route::post('/clients/{client}/reports', [ExternalClientReportController::class, 'generate'])->name('partner.clients.reports.generate');
-    
-    // Role Management routes
-    Route::resource('roles', \App\Http\Controllers\Partner\RoleManagementController::class)->except(['show'])->names([
-        'index' => 'partner.roles.index',
-        'create' => 'partner.roles.create',
-        'store' => 'partner.roles.store',
-        'edit' => 'partner.roles.edit',
-        'update' => 'partner.roles.update',
-        'destroy' => 'partner.roles.destroy',
-    ]);
-    
-    // Staff Management routes - EXPLICIT NAMES to avoid conflicts
-    Route::prefix('staff')->name('partner.staff.')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Partner\StaffManagementController::class, 'index'])->name('index');
-        Route::get('/create', [\App\Http\Controllers\Partner\StaffManagementController::class, 'create'])->name('create');
-        Route::post('/', [\App\Http\Controllers\Partner\StaffManagementController::class, 'store'])->name('store');
-        Route::put('/{access}/role', [\App\Http\Controllers\Partner\StaffManagementController::class, 'updateRole'])->name('update-role');
-        Route::delete('/{access}', [\App\Http\Controllers\Partner\StaffManagementController::class, 'destroy'])->name('destroy');
-        Route::delete('/invitations/{invitation}', [\App\Http\Controllers\Partner\StaffManagementController::class, 'cancelInvitation'])->name('cancel-invitation');
-    });
-    
-    // Subscription & Billing routes
-    Route::prefix('subscriptions')->name('partner.subscriptions.')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Partner\SubscriptionController::class, 'index'])->name('index');
-        Route::get('/current-plan', [\App\Http\Controllers\Partner\SubscriptionController::class, 'currentPlan'])->name('current-plan');
-        Route::get('/upgrade', [\App\Http\Controllers\Partner\SubscriptionController::class, 'upgrade'])->name('upgrade');
-        Route::post('/upgrade', [\App\Http\Controllers\Partner\SubscriptionController::class, 'processUpgrade'])->name('process-upgrade');
-        Route::get('/billing', [\App\Http\Controllers\Partner\SubscriptionController::class, 'billing'])->name('billing');
-        Route::get('/payment-history', [\App\Http\Controllers\Partner\SubscriptionController::class, 'paymentHistory'])->name('payment-history');
-        Route::post('/cancel', [\App\Http\Controllers\Partner\SubscriptionController::class, 'cancel'])->name('cancel');
-    });
-    
-    // Profile routes
-    Route::get('/profile', [ProfileController::class, 'index'])->name('partner.profile');
-    Route::post('/profile/personal', [ProfileController::class, 'updatePersonal'])->name('partner.profile.update.personal');
-    Route::post('/profile/company', [ProfileController::class, 'updateCompany'])->name('partner.profile.update.company');
-    Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('partner.profile.update.password');
-});
-
-// Account Switcher (for multi-company staff) - Works with both guards
-Route::middleware(['auth:web,partner'])->group(function () {
+// Account Switcher (for multi-company staff)
+Route::middleware(['auth:web'])->group(function () {
     Route::get('/account/selector', [AccountSelectorController::class, 'index'])->name('account.selector');
     Route::post('/account/switch', [AccountSelectorController::class, 'switch'])->name('account.switch');
 });

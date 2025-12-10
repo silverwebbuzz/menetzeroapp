@@ -141,13 +141,6 @@
                                 <a href="{{ route('register') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-b-lg">Sign Up</a>
                             </div>
                         </div>
-                        <div class="relative group">
-                            <button class="btn btn-primary">Partner</button>
-                            <div class="absolute top-full right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                                <a href="{{ route('partner.login') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-t-lg">Login</a>
-                                <a href="{{ route('partner.register') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-b-lg">Sign Up</a>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

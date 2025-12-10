@@ -76,11 +76,7 @@ class FeatureFlagService
     {
         $company = Company::findOrFail($companyId);
         
-        if ($company->isClient()) {
-            $subscription = $this->subscriptionService->getActiveSubscription($companyId, 'client');
-        } else {
-            $subscription = $this->subscriptionService->getActiveSubscription($companyId, 'partner');
-        }
+        $subscription = $this->subscriptionService->getActiveSubscription($companyId, 'client');
 
         if (!$subscription || !$subscription->plan) {
             return [];

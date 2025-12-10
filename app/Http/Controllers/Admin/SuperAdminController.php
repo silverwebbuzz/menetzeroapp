@@ -9,7 +9,6 @@ use App\Models\User;
 use App\Models\SubscriptionPlan;
 use App\Models\RoleTemplate;
 use App\Models\ClientSubscription;
-use App\Models\PartnerSubscription;
 use App\Models\UsageTracking;
 use App\Services\SubscriptionService;
 
@@ -31,15 +30,12 @@ class SuperAdminController extends Controller
     {
         $stats = [
             'total_companies' => Company::count(),
-            'total_clients' => Company::where('company_type', 'client')->count(),
-            'total_partners' => Company::where('company_type', 'partner')->count(),
+            'total_clients' => Company::where('company_type', 'client')->orWhereNull('company_type')->count(),
             'total_users' => User::count(),
             'active_client_subscriptions' => ClientSubscription::where('status', 'active')->where('expires_at', '>', now())->count(),
-            'active_partner_subscriptions' => PartnerSubscription::where('status', 'active')->where('expires_at', '>', now())->count(),
-            'total_external_clients' => \App\Models\PartnerExternalClient::count(),
         ];
 
-        $recentCompanies = Company::with(['clientSubscriptions.plan', 'partnerSubscriptions.plan'])
+        $recentCompanies = Company::with(['clientSubscriptions.plan'])
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get();
@@ -66,7 +62,7 @@ class SuperAdminController extends Controller
             });
         }
 
-        $companies = $query->with(['clientSubscriptions.plan', 'partnerSubscriptions.plan'])
+        $companies = $query->with(['clientSubscriptions.plan'])
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
@@ -81,9 +77,7 @@ class SuperAdminController extends Controller
         $company = Company::with([
             'users',
             'clientSubscriptions.plan',
-            'partnerSubscriptions.plan',
             'locations',
-            'externalClients',
             'featureFlags',
         ])->findOrFail($id);
 
@@ -116,7 +110,7 @@ class SuperAdminController extends Controller
         $request->validate([
             'plan_code' => 'required|string|max:50|unique:subscription_plans,plan_code',
             'plan_name' => 'required|string|max:255',
-            'plan_category' => 'required|in:client,partner',
+            'plan_category' => 'required|in:client',
             'price_annual' => 'required|numeric|min:0',
             'currency' => 'required|string|max:3',
             'billing_cycle' => 'required|in:annual,monthly',
@@ -162,7 +156,7 @@ class SuperAdminController extends Controller
         $request->validate([
             'plan_code' => 'required|string|max:50|unique:subscription_plans,plan_code,' . $id,
             'plan_name' => 'required|string|max:255',
-            'plan_category' => 'required|in:client,partner',
+            'plan_category' => 'required|in:client',
             'price_annual' => 'required|numeric|min:0',
             'currency' => 'required|string|max:3',
             'billing_cycle' => 'required|in:annual,monthly',
@@ -216,7 +210,7 @@ class SuperAdminController extends Controller
             'template_name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'permissions' => 'nullable|array',
-            'category' => 'required|in:client,partner,both',
+            'category' => 'required|in:client,both',
             'sort_order' => 'nullable|integer',
         ]);
 
@@ -256,7 +250,7 @@ class SuperAdminController extends Controller
             'template_name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'permissions' => 'nullable|array',
-            'category' => 'required|in:client,partner,both',
+            'category' => 'required|in:client,both',
             'sort_order' => 'nullable|integer',
         ]);
 
@@ -332,12 +326,7 @@ class SuperAdminController extends Controller
             ],
             'subscriptions' => [
                 'client_active' => ClientSubscription::where('status', 'active')->where('expires_at', '>', now())->count(),
-                'partner_active' => PartnerSubscription::where('status', 'active')->where('expires_at', '>', now())->count(),
                 'total_revenue' => $this->calculateTotalRevenue(),
-            ],
-            'external_clients' => [
-                'total' => \App\Models\PartnerExternalClient::count(),
-                'active' => \App\Models\PartnerExternalClient::where('status', 'active')->count(),
             ],
         ];
 
@@ -349,23 +338,13 @@ class SuperAdminController extends Controller
      */
     private function calculateTotalRevenue()
     {
-        $clientRevenue = ClientSubscription::where('status', 'active')
+        return ClientSubscription::where('status', 'active')
             ->where('expires_at', '>', now())
             ->with('plan')
             ->get()
             ->sum(function($sub) {
                 return $sub->plan->price_annual ?? 0;
             });
-
-        $partnerRevenue = PartnerSubscription::where('status', 'active')
-            ->where('expires_at', '>', now())
-            ->with('plan')
-            ->get()
-            ->sum(function($sub) {
-                return $sub->plan->price_annual ?? 0;
-            });
-
-        return $clientRevenue + $partnerRevenue;
     }
 }
 

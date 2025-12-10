@@ -77,7 +77,7 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-6">Personal Information</h3>
             
-            <form method="POST" action="{{ auth()->user()->getActiveCompany() && auth()->user()->getActiveCompany()->isPartner() ? route('partner.profile.update.personal') : route('profile.update.personal') }}" class="space-y-6">
+            <form method="POST" action="{{ route('profile.update.personal') }}" class="space-y-6">
                 @csrf
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -124,7 +124,7 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-6">Change Password</h3>
             
-            <form method="POST" action="{{ auth()->user()->getActiveCompany() && auth()->user()->getActiveCompany()->isPartner() ? route('partner.profile.update.password') : route('profile.update.password') }}" class="space-y-6">
+            <form method="POST" action="{{ route('profile.update.password') }}" class="space-y-6">
                 @csrf
                 
                 <div class="max-w-2xl">
@@ -190,7 +190,7 @@
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h3 class="text-lg font-semibold text-gray-900 mb-6">Company Information</h3>
                 
-                <form method="POST" action="{{ auth()->user()->getActiveCompany() && auth()->user()->getActiveCompany()->isPartner() ? route('partner.profile.update.company') : route('profile.update.company') }}" class="space-y-6">
+                <form method="POST" action="{{ route('profile.update.company') }}" class="space-y-6">
                     @csrf
                     
                     <!-- Basic Company Info -->

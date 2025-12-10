@@ -13,16 +13,13 @@ class AccountSelectorController extends Controller
      */
     public function index()
     {
-        // Get user from either guard
-        $user = auth('partner')->user() ?? auth('web')->user();
+        // Get user from web guard
+        $user = auth('web')->user();
         
         if (!$user->hasMultipleCompanyAccess()) {
             // Single company access - redirect to dashboard
             $company = $user->getActiveCompany();
             if ($company) {
-                if ($company->isPartner()) {
-                    return redirect()->route('partner.dashboard');
-                }
                 return redirect()->route('client.dashboard');
             }
         }
@@ -70,8 +67,8 @@ class AccountSelectorController extends Controller
             'company_id' => 'required|exists:companies,id'
         ]);
         
-        // Get user from either guard
-        $user = auth('partner')->user() ?? auth('web')->user();
+        // Get user from web guard
+        $user = auth('web')->user();
         
         // Verify user has access
         if (!$user->hasAccessToCompany($request->company_id) && $user->company_id != $request->company_id) {
@@ -84,13 +81,6 @@ class AccountSelectorController extends Controller
         UserCompanyAccess::where('user_id', $user->id)
             ->where('company_id', $request->company_id)
             ->update(['last_accessed_at' => now()]);
-        
-        $company = Company::find($request->company_id);
-        
-        // Redirect based on company type
-        if ($company->isPartner()) {
-            return redirect()->route('partner.dashboard');
-        }
         
         return redirect()->route('client.dashboard');
     }
