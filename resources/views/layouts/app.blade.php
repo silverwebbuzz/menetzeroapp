@@ -319,7 +319,10 @@
             </a>
             
             @php
-                $hasCompany = auth()->user() && auth()->user()->company_id;
+                $user = auth()->user();
+                $hasCompany = $user && $user->company_id;
+                $activeCompany = $hasCompany ? $user->getActiveCompany() : null;
+                $companyType = $activeCompany ? $activeCompany->company_type : 'client';
             @endphp
             
             @if($hasCompany)
@@ -389,10 +392,6 @@
                                 Team Management
                             </div>
                         </div>
-                        
-                        @php
-                            $companyType = auth()->user()->company ? auth()->user()->company->company_type : 'client';
-                        @endphp
                         
                         @if($companyType === 'partner')
                         <a href="{{ route('partner.staff.index') }}" class="nav-link {{ request()->routeIs('partner.staff.*') ? 'active' : '' }}">
