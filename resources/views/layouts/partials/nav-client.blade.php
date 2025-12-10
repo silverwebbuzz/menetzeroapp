@@ -1,8 +1,14 @@
-{{-- Client Navigation Menu --}}
+{{-- ============================================ --}}
+{{-- CLIENT NAVIGATION MENU - DO NOT MODIFY --}}
+{{-- This file is for CLIENT users only --}}
+{{-- ============================================ --}}
 @php
     $user = auth()->user();
     $hasCompany = $user && $user->company_id;
 @endphp
+
+<!-- DEBUG: This is nav-client.blade.php -->
+<div style="display: none;" data-nav-type="CLIENT">CLIENT NAV LOADED</div>
 
 <a href="{{ route('client.dashboard') }}" class="nav-link {{ request()->routeIs('client.dashboard') ? 'active' : '' }}">
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">

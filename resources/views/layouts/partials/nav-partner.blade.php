@@ -1,8 +1,14 @@
-{{-- Partner Navigation Menu --}}
+{{-- ============================================ --}}
+{{-- PARTNER NAVIGATION MENU - DO NOT MODIFY --}}
+{{-- This file is for PARTNER users only --}}
+{{-- ============================================ --}}
 @php
     $user = auth()->user();
     $hasCompany = $user && $user->company_id;
 @endphp
+
+<!-- DEBUG: This is nav-partner.blade.php -->
+<div style="display: none;" data-nav-type="PARTNER">PARTNER NAV LOADED</div>
 
 <a href="{{ route('partner.dashboard') }}" class="nav-link {{ request()->routeIs('partner.dashboard') ? 'active' : '' }}">
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">

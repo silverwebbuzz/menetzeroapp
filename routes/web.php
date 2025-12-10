@@ -106,10 +106,17 @@ Route::prefix('partner')->middleware(['auth', 'setActiveCompany', 'checkCompanyT
     Route::post('/clients/{client}/reports', [ExternalClientReportController::class, 'generate'])->name('partner.clients.reports.generate');
     
     // Role Management routes
-    Route::resource('roles', \App\Http\Controllers\Partner\RoleManagementController::class)->except(['show']);
+    Route::resource('roles', \App\Http\Controllers\Partner\RoleManagementController::class)->except(['show'])->names([
+        'index' => 'partner.roles.index',
+        'create' => 'partner.roles.create',
+        'store' => 'partner.roles.store',
+        'edit' => 'partner.roles.edit',
+        'update' => 'partner.roles.update',
+        'destroy' => 'partner.roles.destroy',
+    ]);
     
-    // Staff Management routes
-    Route::prefix('staff')->name('staff.')->group(function () {
+    // Staff Management routes - EXPLICIT NAMES to avoid conflicts
+    Route::prefix('staff')->name('partner.staff.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Partner\StaffManagementController::class, 'index'])->name('index');
         Route::get('/create', [\App\Http\Controllers\Partner\StaffManagementController::class, 'create'])->name('create');
         Route::post('/', [\App\Http\Controllers\Partner\StaffManagementController::class, 'store'])->name('store');
@@ -180,10 +187,17 @@ Route::middleware(['auth', 'setActiveCompany', 'checkCompanyType:client'])->grou
         })->name('index');
     });
     
-    // Role Management routes
-    Route::resource('roles', \App\Http\Controllers\RoleManagementController::class)->except(['show']);
+    // Role Management routes - EXPLICIT NAMES for client
+    Route::resource('roles', \App\Http\Controllers\RoleManagementController::class)->except(['show'])->names([
+        'index' => 'roles.index',
+        'create' => 'roles.create',
+        'store' => 'roles.store',
+        'edit' => 'roles.edit',
+        'update' => 'roles.update',
+        'destroy' => 'roles.destroy',
+    ]);
     
-    // Staff Management routes
+    // Staff Management routes - EXPLICIT NAMES for client
     Route::prefix('staff')->name('staff.')->group(function () {
         Route::get('/', [\App\Http\Controllers\StaffManagementController::class, 'index'])->name('index');
         Route::get('/create', [\App\Http\Controllers\StaffManagementController::class, 'create'])->name('create');
