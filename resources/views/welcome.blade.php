@@ -133,8 +133,22 @@
                     <img src="https://app.menetzero.com/public/images/menetzero.svg" alt="MIDDLE EAST NET Zero" class="h-8 w-auto">
                 </div>
                 <div class="flex items-center space-x-4">
-                    <a href="{{ route('login') }}" class="btn btn-outline">Login</a>
-                    <a href="{{ route('register') }}" class="btn btn-primary">Signup</a>
+                    <div class="flex items-center gap-3">
+                        <div class="relative group">
+                            <button class="btn btn-outline">Client</button>
+                            <div class="absolute top-full left-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                <a href="{{ route('login') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-t-lg">Login</a>
+                                <a href="{{ route('register') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-b-lg">Sign Up</a>
+                            </div>
+                        </div>
+                        <div class="relative group">
+                            <button class="btn btn-primary">Partner</button>
+                            <div class="absolute top-full right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                <a href="{{ route('partner.login') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-t-lg">Login</a>
+                                <a href="{{ route('partner.register') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-b-lg">Sign Up</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

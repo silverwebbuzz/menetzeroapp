@@ -22,7 +22,10 @@ class CompanySetupController extends Controller
             return redirect()->route('client.dashboard');
         }
 
-        return view('company.setup');
+        // Check if user came from partner registration
+        $isPartner = session('registering_as_partner', false);
+        
+        return view('company.setup', compact('isPartner'));
     }
 
     public function store(Request $request)
@@ -40,7 +43,10 @@ class CompanySetupController extends Controller
 
         $user = Auth::user();
 
-        // Create company (default to client type)
+        // Determine company type from session or request
+        $companyType = session('registering_as_partner', false) ? 'partner' : ($request->company_type ?? 'client');
+        
+        // Create company
         $company = Company::create([
             'name' => $request->company_name,
             'email' => $request->business_email ?? $user->email,
@@ -50,10 +56,13 @@ class CompanySetupController extends Controller
             'industry' => $request->business_category,
             'business_subcategory' => $request->business_subcategory,
             'description' => $request->business_description,
-            'company_type' => $request->company_type ?? 'client', // Default to client
-            'is_direct_client' => true,
+            'company_type' => $companyType,
+            'is_direct_client' => $companyType === 'client',
             'is_active' => true,
         ]);
+        
+        // Clear the session flag
+        session()->forget('registering_as_partner');
 
         // Update user with company
         $user->update([

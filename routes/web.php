@@ -22,12 +22,12 @@ use App\Http\Controllers\Partner\ExternalClientReportController;
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// Authentication routes
+// Authentication routes - Client
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
 
 Route::get('/login', function () {
-    return view('auth.login');
+    return view('auth.login', ['isPartner' => false]);
 })->name('login');
 
 Route::post('/login', function (\Illuminate\Http\Request $request) {
@@ -74,7 +74,44 @@ Route::middleware('auth')->group(function () {
     Route::post('/company/setup', [CompanySetupController::class, 'store'])->name('company.setup.store');
 });
 
-// Partner Routes
+// Partner Authentication routes (public, before login)
+Route::prefix('partner')->group(function () {
+    Route::get('/register', [RegisterController::class, 'showPartnerRegistrationForm'])->name('partner.register');
+    Route::post('/register', [RegisterController::class, 'registerPartner']);
+    
+    Route::get('/login', function () {
+        return view('auth.login', ['isPartner' => true]);
+    })->name('partner.login');
+    
+    Route::post('/login', function (\Illuminate\Http\Request $request) {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        if (\Illuminate\Support\Facades\Auth::attempt($credentials, $request->boolean('remember'))) {
+            $request->session()->regenerate();
+            
+            $user = \Illuminate\Support\Facades\Auth::user();
+            $company = $user->getActiveCompany();
+            
+            if ($company && $company->isPartner()) {
+                return redirect()->route('partner.dashboard');
+            } else {
+                \Illuminate\Support\Facades\Auth::logout();
+                return back()->withErrors([
+                    'email' => 'This account is not registered as a partner.',
+                ])->onlyInput('email');
+            }
+        }
+
+        return back()->withErrors([
+            'email' => 'The provided credentials do not match our records.',
+        ])->onlyInput('email');
+    });
+});
+
+// Partner Routes (protected)
 Route::prefix('partner')->middleware(['auth', 'setActiveCompany', 'checkCompanyType:partner'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('partner.dashboard');
     
