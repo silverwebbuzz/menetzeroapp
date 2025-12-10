@@ -12,6 +12,12 @@ use App\Http\Controllers\MeasurementController;
 use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\DocumentUploadController;
+use App\Http\Controllers\AccountSelectorController;
+use App\Http\Controllers\Partner\ExternalClientController;
+use App\Http\Controllers\Partner\ExternalClientLocationController;
+use App\Http\Controllers\Partner\ExternalClientMeasurementController;
+use App\Http\Controllers\Partner\ExternalClientDocumentController;
+use App\Http\Controllers\Partner\ExternalClientReportController;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -32,6 +38,13 @@ Route::post('/login', function (\Illuminate\Http\Request $request) {
 
     if (\Illuminate\Support\Facades\Auth::attempt($credentials, true)) {
         $request->session()->regenerate();
+        
+        // Check if user has multiple company access
+        $user = auth()->user();
+        if ($user && $user->hasMultipleCompanyAccess()) {
+            return redirect()->route('account.selector');
+        }
+        
         return redirect()->intended(route('dashboard'));
     }
 
@@ -59,9 +72,52 @@ Route::post('/reset-password', [ForgotPasswordController::class, 'reset'])->name
 Route::middleware('auth')->group(function () {
     Route::get('/company/setup', [CompanySetupController::class, 'index'])->name('company.setup');
     Route::post('/company/setup', [CompanySetupController::class, 'store'])->name('company.setup.store');
+});
+
+// Partner Routes
+Route::prefix('partner')->middleware(['auth', 'setActiveCompany', 'checkCompanyType:partner'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('partner.dashboard');
+    
+    // External Client Management
+    Route::resource('clients', ExternalClientController::class);
+    
+    // External Client Locations
+    Route::get('/clients/{client}/locations', [ExternalClientLocationController::class, 'index'])->name('partner.clients.locations.index');
+    Route::post('/clients/{client}/locations', [ExternalClientLocationController::class, 'store'])->name('partner.clients.locations.store');
+    Route::get('/clients/{client}/locations/{location}', [ExternalClientLocationController::class, 'show'])->name('partner.clients.locations.show');
+    Route::put('/clients/{client}/locations/{location}', [ExternalClientLocationController::class, 'update'])->name('partner.clients.locations.update');
+    Route::delete('/clients/{client}/locations/{location}', [ExternalClientLocationController::class, 'destroy'])->name('partner.clients.locations.destroy');
+    
+    // External Client Measurements
+    Route::get('/clients/{client}/locations/{location}/measurements', [ExternalClientMeasurementController::class, 'index'])->name('partner.clients.measurements.index');
+    Route::post('/clients/{client}/locations/{location}/measurements', [ExternalClientMeasurementController::class, 'store'])->name('partner.clients.measurements.store');
+    Route::get('/clients/{client}/measurements/{measurement}', [ExternalClientMeasurementController::class, 'show'])->name('partner.clients.measurements.show');
+    Route::put('/clients/{client}/measurements/{measurement}', [ExternalClientMeasurementController::class, 'update'])->name('partner.clients.measurements.update');
+    Route::delete('/clients/{client}/measurements/{measurement}', [ExternalClientMeasurementController::class, 'destroy'])->name('partner.clients.measurements.destroy');
+    
+    // External Client Documents
+    Route::get('/clients/{client}/documents', [ExternalClientDocumentController::class, 'index'])->name('partner.clients.documents.index');
+    Route::post('/clients/{client}/documents', [ExternalClientDocumentController::class, 'store'])->name('partner.clients.documents.store');
+    Route::get('/clients/{client}/documents/{document}', [ExternalClientDocumentController::class, 'show'])->name('partner.clients.documents.show');
+    Route::delete('/clients/{client}/documents/{document}', [ExternalClientDocumentController::class, 'destroy'])->name('partner.clients.documents.destroy');
+    
+    // External Client Reports
+    Route::get('/clients/{client}/reports', [ExternalClientReportController::class, 'index'])->name('partner.clients.reports.index');
+    Route::post('/clients/{client}/reports', [ExternalClientReportController::class, 'generate'])->name('partner.clients.reports.generate');
+});
+
+// Account Switcher (for multi-company staff)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/account/selector', [AccountSelectorController::class, 'index'])->name('account.selector');
+    Route::post('/account/switch', [AccountSelectorController::class, 'switch'])->name('account.switch');
+});
+
+// Client Routes
+Route::middleware(['auth', 'setActiveCompany', 'checkCompanyType:client'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('client.dashboard');
     
     // Profile routes
-    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::get('/profile', [ProfileController::class, 'index'])->name('client.profile');
     Route::post('/profile/personal', [ProfileController::class, 'updatePersonal'])->name('profile.update.personal');
     Route::post('/profile/company', [ProfileController::class, 'updateCompany'])->name('profile.update.company');
     
@@ -75,7 +131,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/locations/{location}/emission-boundaries', [EmissionBoundaryController::class, 'index'])->name('emission-boundaries.index');
     Route::post('/locations/{location}/emission-boundaries', [EmissionBoundaryController::class, 'store'])->name('emission-boundaries.store');
     
-    // Measurements routes (replacing old emission form)
+    // Measurements routes
     Route::resource('measurements', MeasurementController::class)->except(['create', 'store', 'edit']);
     Route::post('/measurements/{measurement}/submit', [MeasurementController::class, 'submit'])->name('measurements.submit');
     
@@ -102,21 +158,6 @@ Route::middleware('auth')->group(function () {
         Route::put('/{document}/field-mapping', [DocumentUploadController::class, 'updateFieldMapping'])->name('update-field-mapping');
         Route::get('/{document}/assign-scope', [DocumentUploadController::class, 'showScopeAssignment'])->name('assign-scope');
         Route::put('/{document}/assign-scope', [DocumentUploadController::class, 'updateScopeAssignment'])->name('update-assign-scope');
-    });
-});
-
-// Protected routes
-Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
-    // Emissions routes
-    Route::prefix('emissions')->name('emissions.')->group(function () {
-        Route::get('/', function () {
-            return view('emissions.index');
-        })->name('index');
-        Route::get('/create', function () {
-            return view('emissions.create');
-        })->name('create');
     });
     
     // Reports routes
@@ -149,10 +190,40 @@ Route::middleware('auth')->group(function () {
     //     Route::get('/{emission}/breakdown', [EmissionManagementController::class, 'getBreakdown'])->name('breakdown');
     // });
     
-    // Admin routes
-    Route::prefix('admin')->name('admin.')->middleware('can:admin')->group(function () {
-        Route::get('/', function () {
-            return view('admin.dashboard');
-        })->name('dashboard');
+    // Admin Authentication Routes (Public)
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('/login', [\App\Http\Controllers\Admin\AdminLoginController::class, 'showLoginForm'])->name('login');
+        Route::post('/login', [\App\Http\Controllers\Admin\AdminLoginController::class, 'login'])->name('login.post');
+        Route::post('/logout', [\App\Http\Controllers\Admin\AdminLoginController::class, 'logout'])->name('logout');
+    });
+
+    // Super Admin routes (Protected)
+    Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\Admin\SuperAdminController::class, 'dashboard'])->name('dashboard');
+        
+        // Companies Management
+        Route::get('/companies', [\App\Http\Controllers\Admin\SuperAdminController::class, 'companies'])->name('companies.index');
+        Route::get('/companies/{id}', [\App\Http\Controllers\Admin\SuperAdminController::class, 'showCompany'])->name('companies.show');
+        
+        // Subscription Plans Management
+        Route::get('/subscription-plans', [\App\Http\Controllers\Admin\SuperAdminController::class, 'subscriptionPlans'])->name('subscription-plans');
+        Route::get('/subscription-plans/create', [\App\Http\Controllers\Admin\SuperAdminController::class, 'createSubscriptionPlan'])->name('subscription-plans.create');
+        Route::post('/subscription-plans', [\App\Http\Controllers\Admin\SuperAdminController::class, 'storeSubscriptionPlan'])->name('subscription-plans.store');
+        Route::get('/subscription-plans/{id}/edit', [\App\Http\Controllers\Admin\SuperAdminController::class, 'editSubscriptionPlan'])->name('subscription-plans.edit');
+        Route::put('/subscription-plans/{id}', [\App\Http\Controllers\Admin\SuperAdminController::class, 'updateSubscriptionPlan'])->name('subscription-plans.update');
+        
+        // Role Templates Management
+        Route::get('/role-templates', [\App\Http\Controllers\Admin\SuperAdminController::class, 'roleTemplates'])->name('role-templates');
+        Route::get('/role-templates/create', [\App\Http\Controllers\Admin\SuperAdminController::class, 'createRoleTemplate'])->name('role-templates.create');
+        Route::post('/role-templates', [\App\Http\Controllers\Admin\SuperAdminController::class, 'storeRoleTemplate'])->name('role-templates.store');
+        Route::get('/role-templates/{id}/edit', [\App\Http\Controllers\Admin\SuperAdminController::class, 'editRoleTemplate'])->name('role-templates.edit');
+        Route::put('/role-templates/{id}', [\App\Http\Controllers\Admin\SuperAdminController::class, 'updateRoleTemplate'])->name('role-templates.update');
+        
+        // Users Management
+        Route::get('/users', [\App\Http\Controllers\Admin\SuperAdminController::class, 'users'])->name('users.index');
+        Route::get('/users/{id}', [\App\Http\Controllers\Admin\SuperAdminController::class, 'showUser'])->name('users.show');
+        
+        // Statistics
+        Route::get('/statistics', [\App\Http\Controllers\Admin\SuperAdminController::class, 'statistics'])->name('statistics');
     });
 });

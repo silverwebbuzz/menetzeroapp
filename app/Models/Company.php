@@ -16,10 +16,14 @@ class Company extends Model
         'description', 'industry', 'business_subcategory', 'employee_count', 'annual_revenue', 'is_active', 'settings',
         // UAE additions
         'emirate', 'sector', 'license_no', 'contact_person',
+        // New fields for enhancements
+        'company_type',
+        'is_direct_client',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_direct_client' => 'boolean',
         'settings' => 'array',
         'annual_revenue' => 'decimal:2',
     ];
@@ -97,6 +101,100 @@ class Company extends Model
     public function locations()
     {
         return $this->hasMany(Location::class);
+    }
+
+    /**
+     * Get client subscriptions.
+     */
+    public function clientSubscriptions()
+    {
+        return $this->hasMany(ClientSubscription::class);
+    }
+
+    /**
+     * Get partner subscriptions.
+     */
+    public function partnerSubscriptions()
+    {
+        return $this->hasMany(PartnerSubscription::class);
+    }
+
+    /**
+     * Get active client subscription.
+     */
+    public function activeClientSubscription()
+    {
+        return $this->clientSubscriptions()
+            ->where('status', 'active')
+            ->where('expires_at', '>', now())
+            ->first();
+    }
+
+    /**
+     * Get active partner subscription.
+     */
+    public function activePartnerSubscription()
+    {
+        return $this->partnerSubscriptions()
+            ->where('status', 'active')
+            ->where('expires_at', '>', now())
+            ->first();
+    }
+
+    /**
+     * Get external clients (if partner).
+     */
+    public function externalClients()
+    {
+        return $this->hasMany(PartnerExternalClient::class, 'partner_company_id');
+    }
+
+    /**
+     * Get user company access records.
+     */
+    public function userAccesses()
+    {
+        return $this->hasMany(UserCompanyAccess::class);
+    }
+
+    /**
+     * Get custom roles.
+     */
+    public function customRoles()
+    {
+        return $this->hasMany(CompanyCustomRole::class);
+    }
+
+    /**
+     * Get feature flags.
+     */
+    public function featureFlags()
+    {
+        return $this->hasMany(FeatureFlag::class);
+    }
+
+    /**
+     * Get usage tracking records.
+     */
+    public function usageTracking()
+    {
+        return $this->hasMany(UsageTracking::class);
+    }
+
+    /**
+     * Check if company is a client.
+     */
+    public function isClient()
+    {
+        return $this->company_type === 'client';
+    }
+
+    /**
+     * Check if company is a partner.
+     */
+    public function isPartner()
+    {
+        return $this->company_type === 'partner';
     }
 
     /**

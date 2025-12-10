@@ -29,6 +29,11 @@ class User extends Authenticatable
         'google_id',
         'avatar',
         'provider',
+        // New fields for enhancements
+        'user_type',
+        'custom_role_id',
+        'external_company_name',
+        'notes',
     ];
 
     /**
@@ -69,6 +74,105 @@ class User extends Authenticatable
     public function carbonEmissions()
     {
         return $this->hasMany(CarbonEmission::class);
+    }
+
+    /**
+     * Get all companies this user has access to (multi-account access).
+     */
+    public function accessibleCompanies()
+    {
+        return $this->hasMany(UserCompanyAccess::class);
+    }
+
+    /**
+     * Get active company context.
+     */
+    public function activeContext()
+    {
+        return $this->hasOne(UserActiveContext::class);
+    }
+
+    /**
+     * Get custom role.
+     */
+    public function customRole()
+    {
+        return $this->belongsTo(CompanyCustomRole::class, 'custom_role_id');
+    }
+
+    /**
+     * Check if user has access to a company.
+     */
+    public function hasAccessToCompany($companyId)
+    {
+        return $this->accessibleCompanies()
+            ->where('company_id', $companyId)
+            ->where('status', 'active')
+            ->exists();
+    }
+
+    /**
+     * Get current active company.
+     */
+    public function getActiveCompany()
+    {
+        // Super admin doesn't have active company
+        if ($this->isAdmin()) {
+            return null;
+        }
+
+        $context = $this->activeContext;
+        if ($context && $context->active_company_id) {
+            return Company::find($context->active_company_id);
+        }
+        
+        // Fallback: If only one company access, use that
+        $access = $this->accessibleCompanies()->where('status', 'active')->first();
+        if ($access) {
+            return Company::find($access->company_id);
+        }
+        
+        // Fallback: Internal user's company
+        return $this->company;
+    }
+
+    /**
+     * Check if user has multiple company access.
+     */
+    public function hasMultipleCompanyAccess()
+    {
+        // Super admin doesn't need company access
+        if ($this->isAdmin()) {
+            return false;
+        }
+
+        $accessCount = $this->accessibleCompanies()->where('status', 'active')->count();
+        
+        // If user has company_id set, count that too
+        if ($this->company_id) {
+            $accessCount++;
+        }
+        
+        return $accessCount > 1;
+    }
+
+    /**
+     * Switch active company.
+     */
+    public function switchToCompany($companyId)
+    {
+        if (!$this->hasAccessToCompany($companyId) && $this->company_id != $companyId) {
+            throw new \Exception('User does not have access to this company');
+        }
+        
+        UserActiveContext::updateOrCreate(
+            ['user_id' => $this->id],
+            [
+                'active_company_id' => $companyId,
+                'active_company_type' => Company::find($companyId)->company_type ?? 'client',
+                'last_switched_at' => now(),
+            ]
+        );
     }
 
     /**
