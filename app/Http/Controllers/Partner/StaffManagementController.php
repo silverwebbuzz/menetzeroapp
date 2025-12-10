@@ -11,6 +11,7 @@ use App\Models\CompanyInvitation;
 use App\Models\CompanyCustomRole;
 use App\Models\RoleTemplate;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class StaffManagementController extends Controller
 {
@@ -32,10 +33,15 @@ class StaffManagementController extends Controller
         }
 
         // Get all users with access to this company
-        $staffMembers = UserCompanyAccess::where('company_id', $company->id)
-            ->where('status', 'active')
-            ->with(['user', 'customRole'])
-            ->get();
+        try {
+            $staffMembers = UserCompanyAccess::where('company_id', $company->id)
+                ->where('status', 'active')
+                ->with(['user', 'customRole'])
+                ->get();
+        } catch (\Exception $e) {
+            // Table doesn't exist yet, use empty collection
+            $staffMembers = collect([]);
+        }
 
         // Also include users directly assigned to company
         $directStaff = User::where('company_id', $company->id)
@@ -43,11 +49,16 @@ class StaffManagementController extends Controller
             ->get();
 
         // Get pending invitations
-        $pendingInvitations = CompanyInvitation::where('company_id', $company->id)
-            ->where('status', 'pending')
-            ->where('expires_at', '>', now())
-            ->with('inviter')
-            ->get();
+        try {
+            $pendingInvitations = CompanyInvitation::where('company_id', $company->id)
+                ->where('status', 'pending')
+                ->where('expires_at', '>', now())
+                ->with('inviter')
+                ->get();
+        } catch (\Exception $e) {
+            // Table doesn't exist yet, use empty collection
+            $pendingInvitations = collect([]);
+        }
 
         return view('partner.staff.index', compact('staffMembers', 'directStaff', 'pendingInvitations'));
     }
@@ -62,7 +73,12 @@ class StaffManagementController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        $customRoles = $company->customRoles()->where('is_active', true)->get();
+        try {
+            $customRoles = $company->customRoles()->where('is_active', true)->get();
+        } catch (\Exception $e) {
+            $customRoles = collect([]);
+        }
+        
         $templates = RoleTemplate::where('is_active', true)
             ->where(function($query) {
                 $query->where('category', 'partner')
@@ -92,6 +108,11 @@ class StaffManagementController extends Controller
         ]);
 
         try {
+            // Check if tables exist
+            if (!\Schema::hasTable('user_company_accesses') || !\Schema::hasTable('company_invitations')) {
+                return back()->withErrors(['email' => 'Staff management features require database migration. Please run the migration first.'])->withInput();
+            }
+            
             $this->invitationService->inviteUser(
                 $company->id,
                 $request->email,
