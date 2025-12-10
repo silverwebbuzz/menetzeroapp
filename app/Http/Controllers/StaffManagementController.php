@@ -237,7 +237,9 @@ class StaffManagementController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        $invitation->update(['status' => 'cancelled']);
+        // Use 'rejected' status as 'cancelled' is not a valid enum value
+        // Valid values are: 'pending', 'accepted', 'rejected', 'expired'
+        $invitation->update(['status' => 'rejected']);
 
         return redirect()->route('staff.index')
             ->with('success', 'Invitation cancelled successfully.');
