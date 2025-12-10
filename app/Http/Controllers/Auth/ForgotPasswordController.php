@@ -27,13 +27,61 @@ class ForgotPasswordController extends Controller
     {
         $request->validate(['email' => 'required|email']);
 
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
+        try {
+            $status = Password::sendResetLink(
+                $request->only('email')
+            );
 
-        return $status === Password::RESET_LINK_SENT
-            ? back()->with(['status' => __($status)])
-            : back()->withErrors(['email' => __($status)]);
+            if ($status === Password::RESET_LINK_SENT) {
+                return back()->with(['status' => __($status)]);
+            } else {
+                return back()->withErrors(['email' => __($status)]);
+            }
+        } catch (\Exception $e) {
+            // If SMTP is not configured, show the reset link directly
+            if (strpos($e->getMessage(), 'SMTP') !== false || 
+                strpos($e->getMessage(), 'smtp') !== false ||
+                strpos($e->getMessage(), 'getaddrinfo') !== false ||
+                strpos($e->getMessage(), 'Connection could not be established') !== false) {
+                
+                // Get the user
+                $user = User::where('email', $request->email)->first();
+                
+                if (!$user) {
+                    return back()->withErrors(['email' => 'We could not find a user with that email address.']);
+                }
+
+                // Create password reset token manually
+                $token = Password::createToken($user);
+                
+                // Generate reset URL
+                $resetUrl = route('password.reset', ['token' => $token, 'email' => $user->email]);
+                
+                // Redirect to success page with reset link
+                return redirect()->route('password.reset-success')
+                    ->with('resetUrl', $resetUrl)
+                    ->with('email', $user->email);
+            }
+            
+            // Other errors
+            return back()->withErrors(['email' => 'An error occurred. Please try again later.']);
+        }
+    }
+
+    /**
+     * Show password reset success page with link (when SMTP not configured)
+     */
+    public function resetSuccess()
+    {
+        $resetUrl = session('resetUrl');
+        $email = session('email');
+        
+        if (!$resetUrl || !$email) {
+            return redirect()->route('password.request')
+                ->with('error', 'Invalid reset request.');
+        }
+        
+        return view('auth.password-reset-success', compact('resetUrl', 'email'));
     }
 
     /**

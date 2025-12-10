@@ -62,12 +62,15 @@ Route::get('/auth/google/callback', [OAuthController::class, 'handleGoogleCallba
 // Password reset routes
 Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgotPasswordForm'])->name('password.request');
 Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/password/reset-success', [ForgotPasswordController::class, 'resetSuccess'])->name('password.reset-success');
 Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('/reset-password', [ForgotPasswordController::class, 'reset'])->name('password.update');
 
 // Invitation acceptance route (public)
 Route::get('/invitations/accept/{token}', [\App\Http\Controllers\InvitationController::class, 'accept'])->name('invitations.accept');
 Route::post('/invitations/accept/{token}', [\App\Http\Controllers\InvitationController::class, 'processAccept'])->name('invitations.accept.process');
+Route::get('/invitations/{token}/setup-password/{password_token}', [\App\Http\Controllers\InvitationController::class, 'setupPassword'])->name('invitations.setup-password');
+Route::post('/invitations/{token}/setup-password/{password_token}', [\App\Http\Controllers\InvitationController::class, 'processSetupPassword'])->name('invitations.setup-password.process');
 
 // Company setup routes (accessible after registration)
 Route::middleware('auth')->group(function () {
