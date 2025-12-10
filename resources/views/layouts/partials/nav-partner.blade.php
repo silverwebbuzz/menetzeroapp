@@ -1,14 +1,8 @@
-{{-- ============================================ --}}
-{{-- PARTNER NAVIGATION MENU - DO NOT MODIFY --}}
-{{-- This file is for PARTNER users only --}}
-{{-- ============================================ --}}
+{{-- Partner Navigation Menu --}}
 @php
     $user = auth()->user();
     $hasCompany = $user && $user->company_id;
 @endphp
-
-<!-- DEBUG: This is nav-partner.blade.php -->
-<div style="display: none;" data-nav-type="PARTNER">PARTNER NAV LOADED</div>
 
 <a href="{{ route('partner.dashboard') }}" class="nav-link {{ request()->routeIs('partner.dashboard') ? 'active' : '' }}">
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -59,6 +53,34 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
     </svg>
     Roles & Permissions
+</a>
+
+<!-- Subscription & Billing Section -->
+<div class="mt-6 mb-2">
+    <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3">
+        Subscription & Billing
+    </div>
+</div>
+
+<a href="{{ route('partner.subscriptions.index') }}" class="nav-link {{ request()->routeIs('partner.subscriptions.*') ? 'active' : '' }}">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+    </svg>
+    My Subscription
+</a>
+
+<a href="{{ route('partner.subscriptions.current-plan') }}" class="nav-link {{ request()->routeIs('partner.subscriptions.current-plan') ? 'active' : '' }}">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    Current Plan
+</a>
+
+<a href="{{ route('partner.subscriptions.payment-history') }}" class="nav-link {{ request()->routeIs('partner.subscriptions.payment-history') ? 'active' : '' }}">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+    </svg>
+    Payment History
 </a>
 
 <!-- Reports Section -->

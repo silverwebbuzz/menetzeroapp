@@ -124,6 +124,17 @@ Route::prefix('partner')->middleware(['auth', 'setActiveCompany', 'checkCompanyT
         Route::delete('/{access}', [\App\Http\Controllers\Partner\StaffManagementController::class, 'destroy'])->name('destroy');
         Route::delete('/invitations/{invitation}', [\App\Http\Controllers\Partner\StaffManagementController::class, 'cancelInvitation'])->name('cancel-invitation');
     });
+    
+    // Subscription & Billing routes
+    Route::prefix('subscriptions')->name('partner.subscriptions.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Partner\SubscriptionController::class, 'index'])->name('index');
+        Route::get('/current-plan', [\App\Http\Controllers\Partner\SubscriptionController::class, 'currentPlan'])->name('current-plan');
+        Route::get('/upgrade', [\App\Http\Controllers\Partner\SubscriptionController::class, 'upgrade'])->name('upgrade');
+        Route::post('/upgrade', [\App\Http\Controllers\Partner\SubscriptionController::class, 'processUpgrade'])->name('process-upgrade');
+        Route::get('/billing', [\App\Http\Controllers\Partner\SubscriptionController::class, 'billing'])->name('billing');
+        Route::get('/payment-history', [\App\Http\Controllers\Partner\SubscriptionController::class, 'paymentHistory'])->name('payment-history');
+        Route::post('/cancel', [\App\Http\Controllers\Partner\SubscriptionController::class, 'cancel'])->name('cancel');
+    });
 });
 
 // Account Switcher (for multi-company staff)
@@ -205,6 +216,17 @@ Route::middleware(['auth', 'setActiveCompany', 'checkCompanyType:client'])->grou
         Route::put('/{access}/role', [\App\Http\Controllers\StaffManagementController::class, 'updateRole'])->name('update-role');
         Route::delete('/{access}', [\App\Http\Controllers\StaffManagementController::class, 'destroy'])->name('destroy');
         Route::delete('/invitations/{invitation}', [\App\Http\Controllers\StaffManagementController::class, 'cancelInvitation'])->name('cancel-invitation');
+    });
+    
+    // Subscription & Billing routes
+    Route::prefix('subscriptions')->name('subscriptions.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Client\SubscriptionController::class, 'index'])->name('index');
+        Route::get('/current-plan', [\App\Http\Controllers\Client\SubscriptionController::class, 'currentPlan'])->name('current-plan');
+        Route::get('/upgrade', [\App\Http\Controllers\Client\SubscriptionController::class, 'upgrade'])->name('upgrade');
+        Route::post('/upgrade', [\App\Http\Controllers\Client\SubscriptionController::class, 'processUpgrade'])->name('process-upgrade');
+        Route::get('/billing', [\App\Http\Controllers\Client\SubscriptionController::class, 'billing'])->name('billing');
+        Route::get('/payment-history', [\App\Http\Controllers\Client\SubscriptionController::class, 'paymentHistory'])->name('payment-history');
+        Route::post('/cancel', [\App\Http\Controllers\Client\SubscriptionController::class, 'cancel'])->name('cancel');
     });
     
     // OLD EMISSION FORM ROUTES - REPLACED BY MEASUREMENTS SYSTEM

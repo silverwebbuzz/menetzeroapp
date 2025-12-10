@@ -314,76 +314,20 @@
                 $user = auth()->user();
                 $hasCompany = $user && $user->company_id;
                 
-                // ALWAYS use the direct company relationship - this is the user's primary company
-                // Use the Company model's helper methods which check against enum('client', 'partner')
+                // Determine company type using Company model's helper methods
                 $companyType = 'client'; // Default to client
-                $debugInfo = [];
                 
                 if ($user && $user->company_id) {
-                    // Load the company directly
                     $userCompany = \App\Models\Company::find($user->company_id);
-                    
-                    $debugInfo['user_id'] = $user->id;
-                    $debugInfo['company_id'] = $user->company_id;
-                    $debugInfo['company_found'] = $userCompany ? 'yes' : 'no';
-                    
-                    if ($userCompany) {
-                        $debugInfo['company_name'] = $userCompany->name;
-                        $debugInfo['company_type_raw'] = $userCompany->company_type ?? 'NULL';
-                        
-                        // Use Company model's helper methods - they check against enum('client', 'partner')
-                        if ($userCompany->isPartner()) {
-                            $companyType = 'partner';
-                        } else {
-                            // Default to client (either isClient() or null/empty)
-                            $companyType = 'client';
-                        }
-                        
-                        $debugInfo['isPartner()'] = $userCompany->isPartner() ? 'true' : 'false';
-                        $debugInfo['isClient()'] = $userCompany->isClient() ? 'true' : 'false';
-                        $debugInfo['final_company_type'] = $companyType;
-                    } else {
-                        $debugInfo['error'] = 'Company not found';
+                    if ($userCompany && $userCompany->isPartner()) {
+                        $companyType = 'partner';
                     }
-                } else {
-                    $debugInfo['error'] = 'No company_id on user';
                 }
             @endphp
             
-            <!-- DEBUG: Company Type Detection -->
-            <div class="mb-4 p-3 bg-yellow-100 border border-yellow-400 rounded text-xs">
-                <strong>DEBUG INFO:</strong><br>
-                User ID: {{ $debugInfo['user_id'] ?? 'N/A' }}<br>
-                Company ID: {{ $debugInfo['company_id'] ?? 'N/A' }}<br>
-                Company Found: {{ $debugInfo['company_found'] ?? 'N/A' }}<br>
-                @if(isset($debugInfo['company_name']))
-                Company Name: {{ $debugInfo['company_name'] }}<br>
-                Company Type (Raw from DB): <strong style="color: blue;">{{ $debugInfo['company_type_raw'] }}</strong><br>
-                isPartner(): {{ $debugInfo['isPartner()'] ?? 'N/A' }}<br>
-                isClient(): {{ $debugInfo['isClient()'] ?? 'N/A' }}<br>
-                Final Company Type: <strong style="color: red; font-size: 14px;">{{ $debugInfo['final_company_type'] ?? 'N/A' }}</strong><br>
-                @endif
-                @if(isset($debugInfo['error']))
-                <span style="color: red;">Error: {{ $debugInfo['error'] }}</span><br>
-                @endif
-                $companyType Variable: <strong style="color: green; font-size: 14px;">{{ $companyType }}</strong><br>
-                Condition Check: {{ $companyType === 'partner' ? 'TRUE (showing partner)' : 'FALSE (showing client)' }}<br>
-                Showing Navigation: <strong style="color: blue; font-size: 16px;">{{ $companyType === 'partner' ? 'PARTNER' : 'CLIENT' }}</strong>
-            </div>
-            
-            <!-- DEBUG: Which partial is being included -->
-            <div class="mb-2 p-2 bg-red-100 border border-red-400 rounded text-xs">
-                <strong>NAVIGATION DEBUG:</strong><br>
-                $companyType: "{{ $companyType }}"<br>
-                Comparison: {{ $companyType === 'partner' ? 'YES (partner)' : 'NO (client)' }}<br>
-                Including: <strong style="color: red; font-size: 14px;">{{ $companyType === 'partner' ? 'nav-partner.blade.php' : 'nav-client.blade.php' }}</strong>
-            </div>
-            
             @if($companyType === 'partner')
-                {{-- PARTNER NAVIGATION - enum('client', 'partner') check --}}
                 @include('layouts.partials.nav-partner')
             @else
-                {{-- CLIENT NAVIGATION - enum('client', 'partner') default --}}
                 @include('layouts.partials.nav-client')
             @endif
                     </div>
