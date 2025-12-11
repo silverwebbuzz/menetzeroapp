@@ -105,31 +105,21 @@
                 </div>
 
                 <div class="flex items-center gap-3">
-                    <!-- Export -->
-                    <div class="relative">
-                        <button class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 flex items-center gap-2">
-                            Export
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <!-- Add New User -->
+                    <!-- Invite New User -->
                     <div class="relative">
                         @if($canAddUser['allowed'])
                             <button onclick="openAddUserModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm flex items-center gap-2">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                 </svg>
-                                Add New User
+                                Invite New User
                             </button>
                         @else
                             <button onclick="showUpgradeMessage()" class="px-4 py-2 bg-gray-400 text-white rounded-lg cursor-not-allowed text-sm flex items-center gap-2" title="{{ $userLimitMessage }}">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                 </svg>
-                                Add New User
+                                Invite New User
                             </button>
                         @endif
                     </div>
@@ -183,20 +173,24 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="flex items-center justify-end gap-2">
-                                    <button onclick="deleteUser({{ $staff->id }})" class="text-red-600 hover:text-red-900" title="Delete">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                        </svg>
-                                    </button>
-                                    <button onclick="viewUser({{ $staff->id }})" class="text-blue-600 hover:text-blue-900" title="View">
+                                    <form action="{{ route('staff.destroy', $staff->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to remove this user from your company?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-600 hover:text-red-900" title="Delete">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                    <button onclick="viewUser({{ $staff->user->id ?? 0 }}, '{{ $staff->user->name ?? 'N/A' }}', '{{ $staff->user->email ?? 'N/A' }}', '{{ $staff->user->phone ?? 'N/A' }}', '{{ $staff->companyCustomRole->role_name ?? 'N/A' }}', '{{ $staff->is_active ? 'Active' : 'Inactive' }}')" class="text-blue-600 hover:text-blue-900" title="View">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                         </svg>
                                     </button>
-                                    <button onclick="editUser({{ $staff->id }})" class="text-gray-600 hover:text-gray-900" title="More">
+                                    <button onclick="editUserRole({{ $staff->id }}, {{ $staff->company_custom_role_id ?? 0 }})" class="text-gray-600 hover:text-gray-900" title="Edit Role">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                         </svg>
                                     </button>
                                 </div>
@@ -210,7 +204,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                                     </svg>
                                     <p class="mt-2 text-sm">No users found.</p>
-                                    <p class="text-xs text-gray-400 mt-1">Add new users to get started.</p>
+                                    <p class="text-xs text-gray-400 mt-1">Invite new users to get started.</p>
                                 </div>
                             </td>
                         </tr>
@@ -227,7 +221,7 @@
     <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div class="p-6">
             <div class="flex items-center justify-between mb-6">
-                <h2 class="text-2xl font-bold text-gray-900">Add New User</h2>
+                <h2 class="text-2xl font-bold text-gray-900">Invite New User</h2>
                 <button onclick="closeAddUserModal()" class="text-gray-400 hover:text-gray-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -266,14 +260,6 @@
                             @error('name')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
-                        </div>
-                        <div>
-                            <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                            <select name="status" id="status" 
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
                         </div>
                         <div>
                             <label for="custom_role_id" class="block text-sm font-medium text-gray-700 mb-2">Role</label>
@@ -364,21 +350,128 @@ function togglePassword(fieldId) {
     field.type = field.type === 'password' ? 'text' : 'password';
 }
 
-function deleteUser(userId) {
-    if (confirm('Are you sure you want to delete this user?')) {
-        // Implement delete functionality
-        console.log('Delete user:', userId);
+// View User Modal
+function viewUser(userId, userName, userEmail, userPhone, userRole, userStatus) {
+    // Create modal if it doesn't exist
+    if (!document.getElementById('viewUserModal')) {
+        const modalHTML = `
+            <div id="viewUserModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50 flex items-center justify-center">
+                <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-2xl font-bold text-gray-900">User Details</h2>
+                            <button onclick="closeViewUserModal()" class="text-gray-400 hover:text-gray-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-1">Name</label>
+                                <p class="text-lg font-semibold text-gray-900" id="viewUserName"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-1">Email</label>
+                                <p class="text-lg text-gray-900" id="viewUserEmail"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-1">Phone</label>
+                                <p class="text-lg text-gray-900" id="viewUserPhone"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-1">Role</label>
+                                <p class="text-lg text-gray-900" id="viewUserRole"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-1">Status</label>
+                                <span id="viewUserStatus"></span>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex justify-end">
+                            <button onclick="closeViewUserModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
     }
+    
+    document.getElementById('viewUserName').textContent = userName;
+    document.getElementById('viewUserEmail').textContent = userEmail;
+    document.getElementById('viewUserPhone').textContent = userPhone || 'N/A';
+    document.getElementById('viewUserRole').textContent = userRole;
+    document.getElementById('viewUserStatus').textContent = userStatus;
+    document.getElementById('viewUserStatus').className = userStatus === 'Active' 
+        ? 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800'
+        : 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800';
+    
+    document.getElementById('viewUserModal').classList.remove('hidden');
 }
 
-function viewUser(userId) {
-    // Implement view functionality
-    console.log('View user:', userId);
+function closeViewUserModal() {
+    document.getElementById('viewUserModal').classList.add('hidden');
 }
 
-function editUser(userId) {
-    // Implement edit functionality
-    console.log('Edit user:', userId);
+// Edit User Role Modal
+function editUserRole(userCompanyRoleId, currentRoleId) {
+    // Create modal if it doesn't exist
+    if (!document.getElementById('editUserRoleModal')) {
+        const modalHTML = `
+            <div id="editUserRoleModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50 flex items-center justify-center">
+                <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-2xl font-bold text-gray-900">Edit User Role</h2>
+                            <button onclick="closeEditUserRoleModal()" class="text-gray-400 hover:text-gray-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <form id="editUserRoleForm" method="POST" action="">
+                            @csrf
+                            @method('PUT')
+                            <div class="mb-4">
+                                <label for="editRoleSelect" class="block text-sm font-medium text-gray-700 mb-2">Select Role</label>
+                                <select name="company_custom_role_id" id="editRoleSelect" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">Select a role</option>
+                                    @foreach($customRoles as $role)
+                                        <option value="{{ $role->id }}">{{ $role->role_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="flex items-center justify-end gap-3 mt-6">
+                                <button type="button" onclick="closeEditUserRoleModal()" 
+                                        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                    Update Role
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+    }
+    
+    const form = document.getElementById('editUserRoleForm');
+    // Set form action to the correct route
+    form.action = '{{ url("/staff") }}/' + userCompanyRoleId + '/role';
+    document.getElementById('editRoleSelect').value = currentRoleId;
+    
+    document.getElementById('editUserRoleModal').classList.remove('hidden');
+}
+
+function closeEditUserRoleModal() {
+    document.getElementById('editUserRoleModal').classList.add('hidden');
 }
 
 function submitAddUserForm(event) {
@@ -416,6 +509,19 @@ function submitAddUserForm(event) {
 document.getElementById('addUserModal')?.addEventListener('click', function(e) {
     if (e.target === this) {
         closeAddUserModal();
+    }
+});
+
+// Close view user modal on outside click
+document.addEventListener('click', function(e) {
+    const viewModal = document.getElementById('viewUserModal');
+    if (viewModal && e.target === viewModal) {
+        closeViewUserModal();
+    }
+    
+    const editModal = document.getElementById('editUserRoleModal');
+    if (editModal && e.target === editModal) {
+        closeEditUserRoleModal();
     }
 });
 

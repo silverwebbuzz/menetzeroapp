@@ -37,11 +37,12 @@ Route::post('/login', function (\Illuminate\Http\Request $request) {
         
         $user = auth('web')->user();
         
-        // Check if user has multiple company access
+        // Check if user has multiple company access (Slack-style workspace selector)
         if ($user && $user->hasMultipleCompanyAccess()) {
             return redirect()->route('account.selector');
         }
         
+        // Single company access - go to dashboard
         return redirect()->intended(route('client.dashboard'));
     }
 

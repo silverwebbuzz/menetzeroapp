@@ -17,8 +17,15 @@ class DashboardController extends Controller
         // Get user from web guard
         $user = auth('web')->user();
         
+        if (!$user) {
+            return redirect()->route('login');
+        }
+        
+        // Get active company from user_company_roles
+        $company = $user->getActiveCompany();
+        
         // Check if user has a company
-        if (!$user || !$user->company_id) {
+        if (!$company) {
             return view('dashboard.index', [
                 'needsCompanySetup' => true,
                 'kpis' => [
@@ -55,7 +62,7 @@ class DashboardController extends Controller
         
         // Get all measurements for the user's company
         $measurements = Measurement::whereHas('location', function($query) use ($user) {
-                $query->where('company_id', $user->company_id);
+                $query->where('company_id', $company->id);
             })
             ->with('location')
             ->orderBy('created_at', 'desc')

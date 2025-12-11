@@ -38,14 +38,15 @@ class CompanyInvitationService
         }
 
         // Create invitation (will work even if table doesn't exist yet - Laravel will handle it)
-        // Access level is determined by the custom role's permissions, so we set a default
+        // Use company_custom_role_id as primary field
         try {
             $invitation = CompanyInvitation::create([
                 'company_id' => $companyId,
                 'email' => $email,
-                'role_id' => null, // System role removed - using custom roles only
-                'custom_role_id' => $data['custom_role_id'] ?? null,
-                'access_level' => 'view', // Default, permissions come from custom role
+                'role_id' => null, // Legacy - not used
+                'custom_role_id' => $data['custom_role_id'] ?? null, // Legacy - for backward compatibility
+                'company_custom_role_id' => $data['custom_role_id'] ?? $data['company_custom_role_id'] ?? null, // Primary field
+                'access_level' => 'view', // Legacy - not used
                 'token' => Str::random(64),
                 'status' => 'pending',
                 'invited_by' => $invitedBy,
@@ -61,6 +62,7 @@ class CompanyInvitationService
                     'email' => $email,
                     'role_id' => null,
                     'custom_role_id' => $data['custom_role_id'] ?? null,
+                    'company_custom_role_id' => $data['custom_role_id'] ?? $data['company_custom_role_id'] ?? null,
                     'access_level' => 'view',
                     'token' => Str::random(64),
                     'status' => 'pending',
@@ -116,30 +118,30 @@ class CompanyInvitationService
         }
 
         // Create user company role record
+        // Use company_custom_role_id (primary) or fallback to custom_role_id (backward compatibility)
+        $roleId = $invitation->company_custom_role_id ?? $invitation->custom_role_id;
+        
         try {
-            if ($invitation->custom_role_id) {
-                UserCompanyRole::create([
-                    'user_id' => $user->id,
-                    'company_id' => $invitation->company_id,
-                    'company_custom_role_id' => $invitation->custom_role_id,
-                    'assigned_by' => $invitation->invited_by,
-                    'is_active' => true,
-                ]);
-            }
-
-            // If user doesn't have a company_id, set it
-            if (!$user->company_id) {
-                $user->update([
-                    'company_id' => $invitation->company_id,
-                ]);
+            if ($roleId) {
+                // Check if user already has access to this company
+                $existingAccess = UserCompanyRole::where('user_id', $user->id)
+                    ->where('company_id', $invitation->company_id)
+                    ->where('is_active', true)
+                    ->first();
+                
+                if (!$existingAccess) {
+                    UserCompanyRole::create([
+                        'user_id' => $user->id,
+                        'company_id' => $invitation->company_id,
+                        'company_custom_role_id' => $roleId, // Staff role (not 0)
+                        'assigned_by' => $invitation->invited_by,
+                        'is_active' => true,
+                    ]);
+                }
             }
         } catch (\Exception $e) {
-            // If table doesn't exist, just assign company_id to user
-            if (strpos($e->getMessage(), "doesn't exist") !== false) {
-                $user->update([
-                    'company_id' => $invitation->company_id,
-                ]);
-            } else {
+            // If table doesn't exist, this is fine - will be created when migration runs
+            if (strpos($e->getMessage(), "doesn't exist") === false) {
                 throw $e;
             }
         }

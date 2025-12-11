@@ -114,7 +114,6 @@ class StaffManagementController extends Controller
                 'confirm_password' => 'required|same:password',
                 'phone' => 'nullable|string|max:20',
                 'custom_role_id' => 'required|exists:company_custom_roles,id',
-                'status' => 'nullable|in:active,inactive',
             ]);
 
             // Check user limit
@@ -128,14 +127,14 @@ class StaffManagementController extends Controller
             
             if (!$user) {
                 // Create new user (company_id is null, access is via UserCompanyRole)
+                // No role field - all roles managed in user_company_roles
                 $user = User::create([
                     'name' => $request->name,
                     'email' => $request->email,
                     'password' => \Illuminate\Support\Facades\Hash::make($request->password),
                     'phone' => $request->phone ?: null,
                     'company_id' => null, // Access is managed via UserCompanyRole
-                    'role' => 'company_user',
-                    'is_active' => ($request->status ?? 'active') === 'active',
+                    'is_active' => true, // New users are active by default
                 ]);
             } else {
                 // User exists, check if they already have access to this company
@@ -156,7 +155,7 @@ class StaffManagementController extends Controller
                     'company_id' => $company->id,
                     'company_custom_role_id' => $request->custom_role_id,
                     'assigned_by' => Auth::id(),
-                    'is_active' => ($request->status ?? 'active') === 'active',
+                    'is_active' => true, // New role assignments are active by default
                 ]);
 
                 return redirect()->route('roles.index')
@@ -226,8 +225,9 @@ class StaffManagementController extends Controller
             'assigned_by' => Auth::id(),
         ]);
 
-        return redirect()->route('staff.index')
-            ->with('success', 'Staff role updated successfully.');
+        return redirect()->route('roles.index')
+            ->with('success', 'Staff role updated successfully.')
+            ->with('active_tab', 'staff');
     }
 
     /**

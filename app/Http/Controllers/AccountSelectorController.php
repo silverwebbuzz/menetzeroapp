@@ -9,50 +9,30 @@ use App\Models\Company;
 class AccountSelectorController extends Controller
 {
     /**
-     * Show account selector page.
+     * Show account selector page (Slack-style workspace selector).
      */
     public function index()
     {
         // Get user from web guard
         $user = auth('web')->user();
         
-        if (!$user->hasMultipleCompanyAccess()) {
-            // Single company access - redirect to dashboard
-            $company = $user->getActiveCompany();
-            if ($company) {
-                return redirect()->route('client.dashboard');
-            }
-        }
-
-        $accessibleCompanies = collect();
-        
-        // Add companies from user_company_roles
-        $userCompanyRoles = $user->companyRoles()->where('is_active', true)->with('companyCustomRole')->get();
-        foreach ($userCompanyRoles as $userCompanyRole) {
-            $company = Company::find($userCompanyRole->company_id);
-            if ($company) {
-                $accessibleCompanies->push([
-                    'id' => $company->id,
-                    'name' => $company->name,
-                    'type' => $company->company_type ?? 'client',
-                    'role' => $userCompanyRole->companyCustomRole ? $userCompanyRole->companyCustomRole->role_name : 'N/A',
-                    'last_accessed' => null,
-                ]);
-            }
+        if (!$user) {
+            return redirect()->route('login');
         }
         
-        // Add own company if set (for standard staff)
-        if ($user->company_id) {
-            $company = Company::find($user->company_id);
-            if ($company) {
-                $accessibleCompanies->push([
-                    'id' => $company->id,
-                    'name' => $company->name,
-                    'type' => $company->company_type,
-                    'role' => $user->role ?? 'N/A',
-                    'last_accessed' => null,
-                ]);
-            }
+        // Get all accessible companies from user_company_roles
+        $accessibleCompanies = $user->getAccessibleCompanies();
+        
+        // If only one company, auto-select and redirect
+        if ($accessibleCompanies->count() === 1) {
+            $company = $accessibleCompanies->first();
+            $user->switchToCompany($company['id']);
+            return redirect()->route('client.dashboard');
+        }
+        
+        // If no companies, redirect to company setup
+        if ($accessibleCompanies->count() === 0) {
+            return redirect()->route('company.setup');
         }
 
         return view('account-selector', compact('accessibleCompanies'));
@@ -71,14 +51,17 @@ class AccountSelectorController extends Controller
         $user = auth('web')->user();
         
         // Verify user has access
-        if (!$user->hasAccessToCompany($request->company_id) && $user->company_id != $request->company_id) {
+        if (!$user->hasAccessToCompany($request->company_id)) {
             abort(403, 'You do not have access to this company');
         }
         
         $user->switchToCompany($request->company_id);
         
-        // Update last accessed (if needed in future)
-        // UserCompanyRole doesn't have last_accessed_at, but we can add it if needed
+        // Determine redirect based on company type
+        $company = Company::find($request->company_id);
+        if ($company && $company->company_type === 'partner') {
+            return redirect()->route('partner.dashboard');
+        }
         
         return redirect()->route('client.dashboard');
     }

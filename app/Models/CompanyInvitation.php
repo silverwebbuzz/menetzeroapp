@@ -13,9 +13,10 @@ class CompanyInvitation extends Model
     protected $fillable = [
         'company_id',
         'email',
-        'role_id',
-        'custom_role_id',
-        'access_level',
+        'role_id', // Legacy - not used
+        'custom_role_id', // Legacy - kept for backward compatibility
+        'company_custom_role_id', // NEW - primary field for role assignment
+        'access_level', // Legacy - not used
         'token',
         'status',
         'invited_by',
@@ -77,11 +78,28 @@ class CompanyInvitation extends Model
     }
 
     /**
-     * Get the custom role.
+     * Get the custom role (using company_custom_role_id).
      */
     public function customRole()
     {
-        return $this->belongsTo(CompanyCustomRole::class, 'custom_role_id');
+        // Use company_custom_role_id if available, fallback to custom_role_id for backward compatibility
+        $roleId = $this->company_custom_role_id ?? $this->custom_role_id;
+        if ($roleId) {
+            return CompanyCustomRole::find($roleId);
+        }
+        return null;
+    }
+
+    /**
+     * Get the company custom role (primary method).
+     */
+    public function companyCustomRole()
+    {
+        $roleId = $this->company_custom_role_id ?? $this->custom_role_id;
+        if ($roleId) {
+            return $this->belongsTo(CompanyCustomRole::class, 'company_custom_role_id');
+        }
+        return null;
     }
 
     /**

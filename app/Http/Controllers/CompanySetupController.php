@@ -23,8 +23,10 @@ class CompanySetupController extends Controller
             return redirect()->route('login');
         }
         
-        // If user already has a company, redirect to dashboard
-        if ($user->company_id) {
+        // Check if user already has company access (from user_company_roles)
+        $activeCompany = $user->getActiveCompany();
+        if ($activeCompany) {
+            // User already has a company - redirect to dashboard
             return redirect()->route('client.dashboard');
         }
         
@@ -64,11 +66,23 @@ class CompanySetupController extends Controller
             'is_active' => true,
         ]);
 
-        // Update user with company
-        $user->update([
-            'company_id' => $company->id,
-            'role' => 'company_admin',
-        ]);
+        // Create user_company_roles entry with company_custom_role_id = 0 (Owner)
+        // This makes the user the owner of this company
+        try {
+            \App\Models\UserCompanyRole::create([
+                'user_id' => $user->id,
+                'company_id' => $company->id,
+                'company_custom_role_id' => 0, // 0 = Owner
+                'assigned_by' => $user->id, // Self-assigned
+                'is_active' => true,
+            ]);
+        } catch (\Exception $e) {
+            // If table doesn't exist yet, fallback to old method
+            $user->update([
+                'company_id' => $company->id,
+                'role' => 'company_admin',
+            ]);
+        }
 
         // Create free subscription for the company
         $freePlan = SubscriptionPlan::where('plan_category', 'client')

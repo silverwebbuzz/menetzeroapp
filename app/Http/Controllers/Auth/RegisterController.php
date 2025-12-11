@@ -31,16 +31,31 @@ class RegisterController extends Controller
         ]);
 
         // Create new user in users table (clients only)
+        // No role field - all roles managed in user_company_roles
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'company_user',
             'is_active' => true,
         ]);
 
         Auth::guard('web')->login($user);
 
-        return redirect()->route('client.dashboard')->with('success', 'Account created successfully! Please complete your business profile to get started.');
+        // Check if user has any existing company access (from invitations they accepted before registering)
+        if ($user->hasMultipleCompanyAccess()) {
+            return redirect()->route('account.selector')
+                ->with('success', 'Account created successfully! Select a workspace to continue.');
+        }
+        
+        // Check if user has single company access
+        $activeCompany = $user->getActiveCompany();
+        if ($activeCompany) {
+            return redirect()->route('client.dashboard')
+                ->with('success', 'Account created successfully!');
+        }
+
+        // No company access - redirect to company setup
+        return redirect()->route('client.dashboard')
+            ->with('success', 'Account created successfully! Please complete your business profile to get started.');
     }
 }

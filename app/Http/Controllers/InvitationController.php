@@ -89,7 +89,7 @@ class InvitationController extends Controller
 
                 $newUser = $this->invitationService->acceptInvitation($token, $userId);
 
-                // If user didn't exist before accepting, redirect to password setup
+                // If user didn't exist before accepting, redirect to password setup (Slack-style)
                 if (!$userBeforeAccept) {
                     // New user - redirect to password setup
                     $passwordToken = \Illuminate\Support\Facades\Password::createToken($newUser);
@@ -100,6 +100,14 @@ class InvitationController extends Controller
                     if (!$loggedInUser) {
                         Auth::guard('web')->login($newUser);
                     }
+                    
+                    // Check if user has multiple company access - show workspace selector
+                    if ($newUser->hasMultipleCompanyAccess()) {
+                        return redirect()->route('account.selector')
+                            ->with('success', 'Invitation accepted successfully! Select a workspace to continue.');
+                    }
+                    
+                    // Single company access - go to dashboard
                     return redirect()->route('client.dashboard')
                         ->with('success', 'Invitation accepted successfully!');
                 }
