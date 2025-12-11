@@ -300,15 +300,35 @@ class StaffManagementController extends Controller
         $invitationModel = null;
         try {
             if ($invitationId > 0) {
-                $invitationModel = CompanyInvitation::with(['company', 'inviter', 'customRole'])
+                // Load invitation with proper relationships
+                // Note: customRole is an attribute accessor, not a relationship, so don't eager load it
+                $invitationModel = CompanyInvitation::with(['company', 'inviter', 'companyCustomRole'])
                     ->where('id', $invitationId)
                     ->where('company_id', $company->id)
                     ->first();
+                
+                // Set customRole for backward compatibility (use companyCustomRole if available)
+                if ($invitationModel) {
+                    if ($invitationModel->companyCustomRole) {
+                        $invitationModel->setRelation('customRole', $invitationModel->companyCustomRole);
+                    } else {
+                        // Fallback to custom_role_id if company_custom_role_id is null
+                        $roleId = $invitationModel->custom_role_id;
+                        if ($roleId) {
+                            try {
+                                $invitationModel->setRelation('customRole', CompanyCustomRole::find($roleId));
+                            } catch (\Exception $e) {
+                                // Ignore
+                            }
+                        }
+                    }
+                }
             }
         } catch (\Exception $e) {
             \Log::warning('Error fetching invitation from database', [
                 'error' => $e->getMessage(),
-                'invitation_id' => $invitationId
+                'invitation_id' => $invitationId,
+                'trace' => $e->getTraceAsString()
             ]);
         }
         

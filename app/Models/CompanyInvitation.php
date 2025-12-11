@@ -78,26 +78,25 @@ class CompanyInvitation extends Model
     }
 
     /**
-     * Get the custom role (using company_custom_role_id).
+     * Get the company custom role (primary method - proper relationship).
+     * Uses company_custom_role_id as the foreign key.
      */
-    public function customRole()
+    public function companyCustomRole()
+    {
+        return $this->belongsTo(CompanyCustomRole::class, 'company_custom_role_id');
+    }
+
+    /**
+     * Get the custom role (using company_custom_role_id or custom_role_id).
+     * This is a helper method, not a relationship (for backward compatibility).
+     * Use companyCustomRole() for eager loading.
+     */
+    public function getCustomRoleAttribute()
     {
         // Use company_custom_role_id if available, fallback to custom_role_id for backward compatibility
         $roleId = $this->company_custom_role_id ?? $this->custom_role_id;
         if ($roleId) {
             return CompanyCustomRole::find($roleId);
-        }
-        return null;
-    }
-
-    /**
-     * Get the company custom role (primary method).
-     */
-    public function companyCustomRole()
-    {
-        $roleId = $this->company_custom_role_id ?? $this->custom_role_id;
-        if ($roleId) {
-            return $this->belongsTo(CompanyCustomRole::class, 'company_custom_role_id');
         }
         return null;
     }
