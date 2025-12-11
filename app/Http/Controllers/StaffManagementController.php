@@ -240,8 +240,15 @@ class StaffManagementController extends Controller
     /**
      * Update staff member role.
      */
-    public function updateRole(Request $request, UserCompanyRole $userCompanyRole)
+    public function updateRole(Request $request, $access)
     {
+        // Handle route model binding - try to get UserCompanyRole by ID
+        try {
+            $userCompanyRole = UserCompanyRole::findOrFail($access);
+        } catch (\Exception $e) {
+            abort(404, 'Staff member not found.');
+        }
+
         $this->requirePermission('staff_management', 'edit');
         
         $company = Auth::user()->getActiveCompany();
@@ -266,17 +273,47 @@ class StaffManagementController extends Controller
     /**
      * Remove staff member access.
      */
-    public function destroy(UserCompanyRole $userCompanyRole)
+    public function destroy($access)
     {
+        // Handle route model binding - try to get UserCompanyRole by ID
+        try {
+            $userCompanyRole = UserCompanyRole::findOrFail($access);
+        } catch (\Exception $e) {
+            \Log::error('Failed to find UserCompanyRole', [
+                'id' => $access,
+                'error' => $e->getMessage()
+            ]);
+            abort(404, 'Staff member not found.');
+        }
+
         $company = Auth::user()->getActiveCompany();
-        if (!$company || $userCompanyRole->company_id !== $company->id) {
-            abort(403, 'Unauthorized action.');
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+
+        if ($userCompanyRole->company_id !== $company->id) {
+            \Log::warning('User attempted to delete staff from different company', [
+                'user_id' => Auth::id(),
+                'user_company_role_id' => $userCompanyRole->id,
+                'user_company_role_company_id' => $userCompanyRole->company_id,
+                'active_company_id' => $company->id
+            ]);
+            abort(403, 'Unauthorized action. You can only remove staff from your own company.');
         }
 
         // Check if user is owner/admin of the company OR has delete permission
         // Owners can always delete staff (they own the company)
         $isOwner = Auth::user()->isCompanyAdmin($company->id);
         $hasPermission = Auth::user()->hasModulePermission('staff_management', 'delete', $company->id);
+        
+        \Log::info('Staff deletion attempt', [
+            'user_id' => Auth::id(),
+            'is_owner' => $isOwner,
+            'has_permission' => $hasPermission,
+            'staff_user_company_role_id' => $userCompanyRole->id,
+            'staff_user_id' => $userCompanyRole->user_id,
+            'company_id' => $company->id
+        ]);
         
         if (!$isOwner && !$hasPermission) {
             abort(403, 'You do not have permission to remove staff members.');
