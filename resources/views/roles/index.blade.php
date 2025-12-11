@@ -117,12 +117,21 @@
 
                     <!-- Add New User -->
                     <div class="relative">
-                        <button onclick="openAddUserModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm flex items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                            Add New User
-                        </button>
+                        @if($canAddUser['allowed'])
+                            <button onclick="openAddUserModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                Add New User
+                            </button>
+                        @else
+                            <button onclick="showUpgradeMessage()" class="px-4 py-2 bg-gray-400 text-white rounded-lg cursor-not-allowed text-sm flex items-center gap-2" title="{{ $userLimitMessage }}">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                Add New User
+                            </button>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -360,5 +369,10 @@ document.getElementById('addUserModal')?.addEventListener('click', function(e) {
 @if(session('success'))
     closeAddUserModal();
 @endif
+
+function showUpgradeMessage() {
+    const message = @json($userLimitMessage ?? "You have reached your plan limit for users. Please upgrade your subscription to add more users.");
+    alert(message);
+}
 </script>
 @endsection

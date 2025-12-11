@@ -48,8 +48,33 @@ Route::post('/login', function (\Illuminate\Http\Request $request) {
     return back()->withErrors(['email' => 'The provided credentials do not match our records.'])->onlyInput('email');
 })->name('login.post');
 
+// Authentication routes - Partner
+Route::get('/partner/register', [RegisterController::class, 'showRegistrationForm'])->name('partner.register');
+Route::post('/partner/register', [RegisterController::class, 'register']);
+
+Route::get('/partner/login', function () {
+    return view('auth.login', ['isPartner' => true]);
+})->name('partner.login');
+
+Route::post('/partner/login', function (\Illuminate\Http\Request $request) {
+    $credentials = $request->validate([
+        'email' => ['required', 'email'],
+        'password' => ['required'],
+    ]);
+
+    // Use 'partner' guard (users_partner table - partners only)
+    if (\Illuminate\Support\Facades\Auth::guard('partner')->attempt($credentials, true)) {
+        $request->session()->regenerate();
+        return redirect()->intended(route('partner.dashboard'));
+    }
+
+    return back()->withErrors(['email' => 'The provided credentials do not match our records.'])->onlyInput('email');
+})->name('partner.login.post');
+
 Route::post('/logout', function () {
-    auth()->logout();
+    // Logout from all guards
+    \Illuminate\Support\Facades\Auth::guard('web')->logout();
+    \Illuminate\Support\Facades\Auth::guard('partner')->logout();
     request()->session()->invalidate();
     request()->session()->regenerateToken();
     return redirect('/');
@@ -174,38 +199,78 @@ Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client'])->
         Route::post('/cancel', [\App\Http\Controllers\Client\SubscriptionController::class, 'cancel'])->name('cancel');
     });
     
-    // OLD EMISSION FORM ROUTES - REPLACED BY MEASUREMENTS SYSTEM
-    // Route::prefix('emission-form')->name('emission-form.')->group(function () {
-    //     Route::get('/', [EmissionFormController::class, 'index'])->name('index');
-    //     Route::get('/step/{step}', [EmissionFormController::class, 'showStep'])->name('step');
-    //     Route::post('/step/{step}', [EmissionFormController::class, 'storeStep'])->name('store');
-    //     Route::get('/review', [EmissionFormController::class, 'review'])->name('review');
-    //     Route::post('/submit', [EmissionFormController::class, 'submit'])->name('submit');
-    //     Route::get('/success', [EmissionFormController::class, 'success'])->name('success');
-    //     Route::post('/ocr', [EmissionFormController::class, 'extractOCRData'])->name('ocr');
-    // });
-    
-    // OLD EMISSION MANAGEMENT ROUTES - REPLACED BY MEASUREMENTS SYSTEM
-    // Route::prefix('emissions')->name('emissions.')->group(function () {
-    //     Route::get('/management', [EmissionManagementController::class, 'index'])->name('management');
-    //     Route::get('/{emission}', [EmissionManagementController::class, 'show'])->name('show');
-    //     Route::get('/{emission}/edit', [EmissionManagementController::class, 'edit'])->name('edit');
-    //     Route::post('/{emission}/duplicate', [EmissionManagementController::class, 'duplicate'])->name('duplicate');
-    //     Route::delete('/{emission}/delete', [EmissionManagementController::class, 'delete'])->name('delete');
-    //     Route::patch('/{emission}/status', [EmissionManagementController::class, 'updateStatus'])->name('update-status');
-    //     Route::post('/{emission}/recalculate', [EmissionManagementController::class, 'recalculate'])->name('recalculate');
-    //     Route::get('/{emission}/breakdown', [EmissionManagementController::class, 'getBreakdown'])->name('breakdown');
-    // });
-    
-    // Admin Authentication Routes (Public)
-    Route::prefix('admin')->name('admin.')->group(function () {
-        Route::get('/login', [\App\Http\Controllers\Admin\AdminLoginController::class, 'showLoginForm'])->name('login');
-        Route::post('/login', [\App\Http\Controllers\Admin\AdminLoginController::class, 'login'])->name('login.post');
-        Route::post('/logout', [\App\Http\Controllers\Admin\AdminLoginController::class, 'logout'])->name('logout');
-    });
+});
 
-    // Super Admin routes (Protected)
-    Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(function () {
+// Partner Routes - Use partner guard
+Route::prefix('partner')->middleware(['auth:partner', 'setActiveCompany', 'checkCompanyType:partner'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('partner.dashboard');
+    
+    // Profile routes
+    Route::get('/profile', [ProfileController::class, 'index'])->name('partner.profile');
+    Route::post('/profile/personal', [ProfileController::class, 'updatePersonal'])->name('partner.profile.update.personal');
+    Route::post('/profile/company', [ProfileController::class, 'updateCompany'])->name('partner.profile.update.company');
+    Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('partner.profile.update.password');
+    
+    // External Client Management
+    Route::resource('clients', \App\Http\Controllers\Partner\ExternalClientController::class)->names([
+        'index' => 'partner.clients.index',
+        'create' => 'partner.clients.create',
+        'store' => 'partner.clients.store',
+        'show' => 'partner.clients.show',
+        'edit' => 'partner.clients.edit',
+        'update' => 'partner.clients.update',
+        'destroy' => 'partner.clients.destroy',
+    ]);
+    
+    // Reports routes
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', function () {
+            return view('reports.index');
+        })->name('index');
+    });
+    
+    // Role Management routes - EXPLICIT NAMES for partner
+    Route::resource('roles', \App\Http\Controllers\RoleManagementController::class)->except(['show'])->names([
+        'index' => 'partner.roles.index',
+        'create' => 'partner.roles.create',
+        'store' => 'partner.roles.store',
+        'edit' => 'partner.roles.edit',
+        'update' => 'partner.roles.update',
+        'destroy' => 'partner.roles.destroy',
+    ]);
+    
+    // Staff Management routes - Redirect to roles page (combined view)
+    Route::prefix('staff')->name('partner.staff.')->group(function () {
+        Route::get('/', function() { return redirect()->route('partner.roles.index'); })->name('index');
+        Route::get('/create', function() { return redirect()->route('partner.roles.index'); })->name('create');
+        Route::post('/', [\App\Http\Controllers\StaffManagementController::class, 'store'])->name('store');
+        Route::get('/invitations/{invitation}/success', [\App\Http\Controllers\StaffManagementController::class, 'invitationSuccess'])->name('invitation-success');
+        Route::put('/{access}/role', [\App\Http\Controllers\StaffManagementController::class, 'updateRole'])->name('update-role');
+        Route::delete('/{access}', [\App\Http\Controllers\StaffManagementController::class, 'destroy'])->name('destroy');
+        Route::delete('/invitations/{invitation}', [\App\Http\Controllers\StaffManagementController::class, 'cancelInvitation'])->name('cancel-invitation');
+    });
+    
+    // Subscription & Billing routes for partner
+    Route::prefix('subscriptions')->name('partner.subscriptions.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Partner\SubscriptionController::class, 'index'])->name('index');
+        Route::get('/current-plan', [\App\Http\Controllers\Partner\SubscriptionController::class, 'currentPlan'])->name('current-plan');
+        Route::get('/upgrade', [\App\Http\Controllers\Partner\SubscriptionController::class, 'upgrade'])->name('upgrade');
+        Route::post('/upgrade', [\App\Http\Controllers\Partner\SubscriptionController::class, 'processUpgrade'])->name('process-upgrade');
+        Route::get('/billing', [\App\Http\Controllers\Partner\SubscriptionController::class, 'billing'])->name('billing');
+        Route::get('/payment-history', [\App\Http\Controllers\Partner\SubscriptionController::class, 'paymentHistory'])->name('payment-history');
+        Route::post('/cancel', [\App\Http\Controllers\Partner\SubscriptionController::class, 'cancel'])->name('cancel');
+    });
+});
+
+// Admin Authentication Routes (Public - outside middleware)
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/login', [\App\Http\Controllers\Admin\AdminLoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [\App\Http\Controllers\Admin\AdminLoginController::class, 'login'])->name('login.post');
+    Route::post('/logout', [\App\Http\Controllers\Admin\AdminLoginController::class, 'logout'])->name('logout');
+});
+
+// Super Admin routes (Protected)
+Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Admin\SuperAdminController::class, 'dashboard'])->name('dashboard');
         
         // Companies Management

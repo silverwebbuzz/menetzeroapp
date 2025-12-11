@@ -51,7 +51,12 @@ class RoleManagementController extends Controller
             ->with('inviter')
             ->get();
 
-        return view('roles.index', compact('customRoles', 'staffMembers', 'pendingInvitations'));
+        // Check if can add more users
+        $subscriptionService = app(\App\Services\SubscriptionService::class);
+        $canAddUser = $subscriptionService->canPerformAction($company->id, 'users', 1);
+        $userLimitMessage = $canAddUser['allowed'] ? null : $canAddUser['message'];
+
+        return view('roles.index', compact('customRoles', 'staffMembers', 'pendingInvitations', 'canAddUser', 'userLimitMessage'));
     }
 
     /**

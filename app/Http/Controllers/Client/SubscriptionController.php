@@ -116,7 +116,7 @@ class SubscriptionController extends Controller
     }
 
     /**
-     * Show billing information.
+     * Show billing information with tabs.
      */
     public function billing()
     {
@@ -133,11 +133,31 @@ class SubscriptionController extends Controller
                 ->with('info', 'You do not have an active subscription.');
         }
 
-        return view('client.subscriptions.billing', compact('subscription', 'company'));
+        // Get payment history (if table exists)
+        $paymentHistory = collect([]);
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasTable('client_payment_transactions')) {
+                $paymentHistory = \App\Models\PaymentTransaction::where('company_id', $company->id)
+                    ->with('billingMethod')
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+            }
+        } catch (\Exception $e) {
+            // Table doesn't exist, use empty collection
+        }
+
+        // Get billing methods
+        $billingMethods = \App\Models\ClientBillingMethod::where('company_id', $company->id)
+            ->where('is_active', true)
+            ->orderBy('is_default', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('client.subscriptions.billing', compact('subscription', 'company', 'paymentHistory', 'billingMethods'));
     }
 
     /**
-     * Show payment history.
+     * Show payment history - Redirect to billing page with transactions tab.
      */
     public function paymentHistory()
     {
@@ -147,12 +167,8 @@ class SubscriptionController extends Controller
                 ->with('error', 'Access denied.');
         }
 
-        $subscriptions = ClientSubscription::where('company_id', $company->id)
-            ->with('plan')
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        return view('client.subscriptions.payment-history', compact('subscriptions', 'company'));
+        // Redirect to billing page with transactions tab active
+        return redirect()->route('subscriptions.billing')->with('active_tab', 'transactions');
     }
 
     /**
