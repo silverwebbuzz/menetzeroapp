@@ -126,9 +126,10 @@ class CompanySetupController extends Controller
             ]);
 
             // Copy permissions from template to company custom role
+            // Use syncWithoutDetaching to avoid duplicate entry errors
             $templatePermissions = $template->permissions()->pluck('permissions.id')->toArray();
             if (!empty($templatePermissions)) {
-                $customRole->permissions()->attach($templatePermissions);
+                $customRole->permissions()->syncWithoutDetaching($templatePermissions);
             }
         }
 
