@@ -101,7 +101,13 @@ class InvitationController extends Controller
                     Auth::guard('web')->login($newUser);
                 }
                 
-                // Go to dashboard (1 user = 1 company, no workspace selector needed)
+                // Check if user has multiple company access - show workspace selector
+                if ($newUser->hasMultipleCompanyAccess()) {
+                    return redirect()->route('account.selector')
+                        ->with('success', 'Invitation accepted successfully! Select a company to continue.');
+                }
+                
+                // Single company access - go to dashboard
                 return redirect()->route('client.dashboard')
                     ->with('success', 'Invitation accepted successfully!');
                 }

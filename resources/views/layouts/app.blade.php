@@ -352,6 +352,58 @@
                         </div>
                         
                         <div class="flex items-center space-x-4">
+                            @php
+                                $user = auth('web')->user();
+                                $accessibleCompanies = $user ? $user->getAccessibleCompanies() : collect([]);
+                                $activeCompany = $user ? $user->getActiveCompany() : null;
+                            @endphp
+                            
+                            @if($accessibleCompanies->count() > 1)
+                            <!-- Company Switcher Dropdown -->
+                            <div class="relative" x-data="{ open: false }">
+                                <button @click="open = !open" class="flex items-center text-sm px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors" style="color: #374151;">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                    </svg>
+                                    <span class="font-medium">{{ $activeCompany ? $activeCompany->name : 'Select Company' }}</span>
+                                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+                                
+                                <div x-show="open" @click.away="open = false" x-transition class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-y-auto">
+                                    <div class="p-2">
+                                        <div class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Companies</div>
+                                        @foreach($accessibleCompanies as $company)
+                                        <form action="{{ route('account.switch') }}" method="POST" class="block">
+                                            @csrf
+                                            <input type="hidden" name="company_id" value="{{ $company['id'] }}">
+                                            <button type="submit" class="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 transition-colors {{ $activeCompany && $activeCompany->id == $company['id'] ? 'bg-blue-50 border border-blue-200' : '' }}">
+                                                <div class="flex items-center justify-between">
+                                                    <div class="flex-1 min-w-0">
+                                                        <p class="text-sm font-medium text-gray-900 truncate">{{ $company['name'] }}</p>
+                                                        <p class="text-xs text-gray-500 mt-0.5">
+                                                            @if($company['is_owner'])
+                                                                <span class="text-green-600 font-medium">Owner</span>
+                                                            @else
+                                                                {{ $company['role_name'] }}
+                                                            @endif
+                                                        </p>
+                                                    </div>
+                                                    @if($activeCompany && $activeCompany->id == $company['id'])
+                                                    <svg class="w-4 h-4 text-blue-600 ml-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                    </svg>
+                                                    @endif
+                                                </div>
+                                            </button>
+                                        </form>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+                            
                             <div class="relative">
                                 <button class="flex items-center text-sm" style="color: #374151;">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -17,7 +17,11 @@ class CompanyInvitationService
     {
         $company = \App\Models\Company::findOrFail($companyId);
 
-        // Check if user already has a company (1 user = 1 company only)
+        // Check invitation rules:
+        // 1. User can own 1 company only (company_custom_role_id = NULL)
+        // 2. User can be staff in multiple companies (company_custom_role_id > 0)
+        // 3. If inviting as staff, allow even if user owns a company
+        // 4. If user already has access to this company, block
         try {
             $existingUser = User::where('email', $email)->first();
             if ($existingUser) {
@@ -31,13 +35,23 @@ class CompanyInvitationService
                     throw new \Exception('User already has access to this company');
                 }
                 
-                // Check if user already has ANY company (1 user = 1 company only)
-                $hasAnyCompany = UserCompanyRole::where('user_id', $existingUser->id)
-                    ->where('is_active', true)
-                    ->exists();
+                // Check if this is a staff invitation (has company_custom_role_id)
+                $isStaffInvitation = !empty($data['custom_role_id']) || !empty($data['company_custom_role_id']);
                 
-                if ($hasAnyCompany) {
-                    throw new \Exception('User already belongs to a company. Each user can only be associated with one company.');
+                if ($isStaffInvitation) {
+                    // Staff invitation: Allow even if user owns a company
+                    // User can be staff in multiple companies
+                    // No additional checks needed
+                } else {
+                    // Owner invitation: Check if user already owns a company
+                    $ownsCompany = UserCompanyRole::where('user_id', $existingUser->id)
+                        ->where('is_active', true)
+                        ->whereNull('company_custom_role_id')
+                        ->exists();
+                    
+                    if ($ownsCompany) {
+                        throw new \Exception('User already owns a company. Each user can only own one company.');
+                    }
                 }
             }
         } catch (\Exception $e) {

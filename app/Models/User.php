@@ -309,19 +309,22 @@ class User extends Authenticatable
     }
 
     /**
-     * Get current active company.
-     * Simplified: 1 user = 1 company only.
+     * Get owned company (where user is owner - company_custom_role_id = NULL).
+     * 1 user can own 1 company only.
      */
-    public function getActiveCompany()
+    public function getOwnedCompany()
     {
-        // Super admin doesn't have active company
+        // Super admin doesn't have owned company
         if ($this->isAdmin()) {
             return null;
         }
 
         try {
-            // Get the single company from user_company_roles
-            $userCompanyRole = $this->companyRoles()->where('is_active', true)->first();
+            $userCompanyRole = $this->companyRoles()
+                ->where('is_active', true)
+                ->whereNull('company_custom_role_id')
+                ->first();
+            
             if ($userCompanyRole) {
                 return Company::find($userCompanyRole->company_id);
             }
@@ -334,15 +337,189 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user already has a company (1 user = 1 company only).
+     * Get all companies where user is staff (company_custom_role_id > 0).
+     * Staff can be in multiple companies.
      */
-    public function hasCompany()
+    public function getStaffCompanies()
     {
         try {
-            return $this->companyRoles()->where('is_active', true)->exists();
+            return $this->companyRoles()
+                ->where('is_active', true)
+                ->whereNotNull('company_custom_role_id')
+                ->with('company', 'companyCustomRole')
+                ->get()
+                ->map(function($userCompanyRole) {
+                    return [
+                        'id' => $userCompanyRole->company_id,
+                        'company' => $userCompanyRole->company,
+                        'role' => $userCompanyRole->companyCustomRole,
+                        'role_name' => $userCompanyRole->companyCustomRole ? $userCompanyRole->companyCustomRole->role_name : 'Staff',
+                        'user_company_role_id' => $userCompanyRole->id,
+                    ];
+                })
+                ->filter(function($item) {
+                    return $item['company'] !== null;
+                });
         } catch (\Exception $e) {
-            // If table doesn't exist, check company_id
+            return collect([]);
+        }
+    }
+
+    /**
+     * Get current active company (from user_active_context or first available).
+     * Hybrid: Can be owned company OR staff company.
+     */
+    public function getActiveCompany()
+    {
+        // Super admin doesn't have active company
+        if ($this->isAdmin()) {
+            return null;
+        }
+
+        try {
+            // Check active context first
+            $context = $this->activeContext;
+            if ($context && $context->active_company_id) {
+                $company = Company::find($context->active_company_id);
+                if ($company && $this->hasAccessToCompany($company->id)) {
+                    return $company;
+                }
+            }
+            
+            // Fallback: Get owned company first (if exists)
+            $ownedCompany = $this->getOwnedCompany();
+            if ($ownedCompany) {
+                return $ownedCompany;
+            }
+            
+            // Fallback: Get first staff company
+            $staffCompanies = $this->getStaffCompanies();
+            if ($staffCompanies->isNotEmpty()) {
+                return $staffCompanies->first()['company'];
+            }
+        } catch (\Exception $e) {
+            // If tables don't exist yet, fall back to company_id
+        }
+        
+        // Fallback: Internal user's company (backward compatibility)
+        return $this->company;
+    }
+
+    /**
+     * Get all accessible companies (owned + staff companies).
+     * For company selector on login.
+     */
+    public function getAccessibleCompanies()
+    {
+        $companies = collect();
+        
+        // Add owned company
+        $ownedCompany = $this->getOwnedCompany();
+        if ($ownedCompany) {
+            $companies->push([
+                'id' => $ownedCompany->id,
+                'name' => $ownedCompany->name,
+                'type' => 'owner',
+                'role_name' => 'Owner',
+                'is_owner' => true,
+                'company' => $ownedCompany,
+            ]);
+        }
+        
+        // Add staff companies
+        $staffCompanies = $this->getStaffCompanies();
+        foreach ($staffCompanies as $staff) {
+            $companies->push([
+                'id' => $staff['id'],
+                'name' => $staff['company']->name,
+                'type' => 'staff',
+                'role_name' => $staff['role_name'],
+                'is_owner' => false,
+                'company' => $staff['company'],
+                'user_company_role_id' => $staff['user_company_role_id'],
+            ]);
+        }
+        
+        return $companies;
+    }
+
+    /**
+     * Check if user has multiple company access (owned + staff).
+     */
+    public function hasMultipleCompanyAccess()
+    {
+        if ($this->isAdmin()) {
+            return false;
+        }
+
+        try {
+            $ownedCount = $this->companyRoles()
+                ->where('is_active', true)
+                ->whereNull('company_custom_role_id')
+                ->count();
+            
+            $staffCount = $this->companyRoles()
+                ->where('is_active', true)
+                ->whereNotNull('company_custom_role_id')
+                ->count();
+            
+            return ($ownedCount + $staffCount) > 1;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Check if user owns a company (1 user = 1 owned company max).
+     */
+    public function ownsCompany()
+    {
+        try {
+            return $this->companyRoles()
+                ->where('is_active', true)
+                ->whereNull('company_custom_role_id')
+                ->exists();
+        } catch (\Exception $e) {
+            // Fallback: check company_id
             return !empty($this->company_id);
+        }
+    }
+
+    /**
+     * Check if user is staff in any company.
+     */
+    public function isStaffInAnyCompany()
+    {
+        try {
+            return $this->companyRoles()
+                ->where('is_active', true)
+                ->whereNotNull('company_custom_role_id')
+                ->exists();
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Switch active company context.
+     */
+    public function switchToCompany($companyId)
+    {
+        if (!$this->hasAccessToCompany($companyId)) {
+            throw new \Exception('User does not have access to this company');
+        }
+        
+        try {
+            UserActiveContext::updateOrCreate(
+                ['user_id' => $this->id],
+                [
+                    'active_company_id' => $companyId,
+                    'last_switched_at' => now(),
+                ]
+            );
+        } catch (\Exception $e) {
+            // If table doesn't exist, store in session
+            session(['active_company_id' => $companyId]);
         }
     }
 

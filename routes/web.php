@@ -30,11 +30,18 @@ Route::post('/login', function (\Illuminate\Http\Request $request) {
         'password' => ['required'],
     ]);
 
-    // Use 'web' guard (users table - clients only)
+    // Use 'web' guard (users table - clients and staff)
     if (\Illuminate\Support\Facades\Auth::guard('web')->attempt($credentials, true)) {
         $request->session()->regenerate();
         
-        // Go to dashboard (1 user = 1 company, no workspace selector needed)
+        $user = auth('web')->user();
+        
+        // Check if user has multiple company access (owned + staff)
+        if ($user && $user->hasMultipleCompanyAccess()) {
+            return redirect()->route('account.selector');
+        }
+        
+        // Single company or no company - go to dashboard
         return redirect()->intended(route('client.dashboard'));
     }
 
@@ -94,7 +101,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/company/setup', [CompanySetupController::class, 'store'])->name('company.setup.store');
 });
 
-// Account Switcher removed - 1 user = 1 company only
+// Account Switcher (for users with multiple company access - owned + staff)
+Route::middleware(['auth:web'])->group(function () {
+    Route::get('/account/selector', [\App\Http\Controllers\AccountSelectorController::class, 'index'])->name('account.selector');
+    Route::post('/account/switch', [\App\Http\Controllers\AccountSelectorController::class, 'switch'])->name('account.switch');
+});
 
 // Profile Routes - Separate for Client and Partner
 

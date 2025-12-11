@@ -38,6 +38,11 @@ class OAuthController extends Controller
                 // User exists, log them in
                 Auth::guard('web')->login($user, true);
                 
+                // Check if user has multiple company access
+                if ($user->hasMultipleCompanyAccess()) {
+                    return redirect()->route('account.selector');
+                }
+                
                 return redirect()->route('client.dashboard');
             }
             
@@ -53,6 +58,11 @@ class OAuthController extends Controller
                 ]);
                 
                 Auth::guard('web')->login($existingUser, true);
+                
+                // Check if user has multiple company access
+                if ($existingUser->hasMultipleCompanyAccess()) {
+                    return redirect()->route('account.selector');
+                }
                 
                 return redirect()->route('client.dashboard');
             }

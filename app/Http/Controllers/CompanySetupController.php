@@ -119,7 +119,17 @@ class CompanySetupController extends Controller
         }
 
         // Only create subscription and roles if this is a NEW company
+        // Also check if user already owns a company (1 user = 1 owned company only)
         if (!$existingCompany) {
+            // Check if user already owns a company
+            $userOwnsCompany = \App\Models\UserCompanyRole::where('user_id', $user->id)
+                ->where('is_active', true)
+                ->whereNull('company_custom_role_id')
+                ->exists();
+            
+            if ($userOwnsCompany) {
+                return back()->withErrors(['error' => 'You already own a company. Each user can only own one company.'])->withInput();
+            }
             // Create free subscription for the company
             $freePlan = SubscriptionPlan::where('plan_category', 'client')
                 ->where(function($query) {
