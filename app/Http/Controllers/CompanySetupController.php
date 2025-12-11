@@ -170,17 +170,13 @@ class CompanySetupController extends Controller
         }
 
         // Only create subscription and roles if this is a NEW company
-        // Also check if user already owns a company (1 user = 1 owned company only)
+        // Note: $existingCompany is checked at the top, so if we're here and it's null, it's a new company
         if (!$existingCompany) {
-            // Check if user already owns a company
-            $userOwnsCompany = \App\Models\UserCompanyRole::where('user_id', $user->id)
-                ->where('is_active', true)
-                ->whereNull('company_custom_role_id')
-                ->exists();
+            \Log::info('Creating subscription and default roles for new company', [
+                'company_id' => $company->id,
+                'user_id' => $user->id
+            ]);
             
-            if ($userOwnsCompany) {
-                return back()->withErrors(['error' => 'You already own a company. Each user can only own one company.'])->withInput();
-            }
             // Create free subscription for the company
             $freePlan = SubscriptionPlan::where('plan_category', 'client')
                 ->where(function($query) {
@@ -192,17 +188,36 @@ class CompanySetupController extends Controller
                 ->first();
 
             if ($freePlan) {
-                $startedAt = now();
-                $expiresAt = Carbon::parse($startedAt)->addYear();
+                try {
+                    $startedAt = now();
+                    $expiresAt = Carbon::parse($startedAt)->addYear();
 
-                ClientSubscription::create([
-                    'company_id' => $company->id,
-                    'subscription_plan_id' => $freePlan->id,
-                    'status' => 'active',
-                    'billing_cycle' => 'annual',
-                    'started_at' => $startedAt,
-                    'expires_at' => $expiresAt,
-                    'auto_renew' => true,
+                    $subscription = ClientSubscription::create([
+                        'company_id' => $company->id,
+                        'subscription_plan_id' => $freePlan->id,
+                        'status' => 'active',
+                        'billing_cycle' => 'annual',
+                        'started_at' => $startedAt,
+                        'expires_at' => $expiresAt,
+                        'auto_renew' => true,
+                    ]);
+                    
+                    \Log::info('Created free subscription for company', [
+                        'company_id' => $company->id,
+                        'subscription_id' => $subscription->id,
+                        'plan_id' => $freePlan->id
+                    ]);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to create subscription', [
+                        'company_id' => $company->id,
+                        'plan_id' => $freePlan->id,
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                }
+            } else {
+                \Log::warning('No free plan found to create subscription', [
+                    'company_id' => $company->id
                 ]);
             }
 
