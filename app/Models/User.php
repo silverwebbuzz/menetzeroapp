@@ -518,16 +518,13 @@ class User extends Authenticatable
     }
 
     /**
-     * Get all companies where user is owner (company_custom_role_id = 0 or NULL).
+     * Get all companies where user is owner (company_custom_role_id = NULL).
      */
     public function getOwnedCompanies()
     {
         try {
             return UserCompanyRole::where('user_id', $this->id)
-                ->where(function($query) {
-                    $query->where('company_custom_role_id', 0)
-                          ->orWhereNull('company_custom_role_id');
-                })
+                ->whereNull('company_custom_role_id') // NULL = Owner
                 ->where('is_active', true)
                 ->with('company')
                 ->get()

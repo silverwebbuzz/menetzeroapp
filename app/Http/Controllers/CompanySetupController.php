@@ -66,7 +66,8 @@ class CompanySetupController extends Controller
             'is_active' => true,
         ]);
 
-        // Create user_company_roles entry with company_custom_role_id = 0 (Owner)
+        // Create user_company_roles entry with company_custom_role_id = NULL (Owner)
+        // NULL = Owner (0 causes FK constraint violation, so we use NULL)
         // This makes the user the owner of this company
         try {
             // Check if entry already exists (prevent duplicates)
@@ -78,7 +79,7 @@ class CompanySetupController extends Controller
                 $userCompanyRole = \App\Models\UserCompanyRole::create([
                     'user_id' => $user->id,
                     'company_id' => $company->id,
-                    'company_custom_role_id' => 0, // 0 = Owner
+                    'company_custom_role_id' => null, // NULL = Owner (0 causes FK constraint violation)
                     'assigned_by' => $user->id, // Self-assigned
                     'is_active' => true,
                 ]);
