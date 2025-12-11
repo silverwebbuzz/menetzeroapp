@@ -9,6 +9,8 @@ class UserCompanyRole extends Model
 {
     use HasFactory;
 
+    protected $table = 'user_company_roles';
+
     protected $fillable = [
         'user_id',
         'company_id',

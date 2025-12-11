@@ -60,8 +60,8 @@ class DashboardController extends Controller
             ]);
         }
         
-        // Get all measurements for the user's company
-        $measurements = Measurement::whereHas('location', function($query) use ($user) {
+        // Get all measurements for the user's active company
+        $measurements = Measurement::whereHas('location', function($query) use ($company) {
                 $query->where('company_id', $company->id);
             })
             ->with('location')

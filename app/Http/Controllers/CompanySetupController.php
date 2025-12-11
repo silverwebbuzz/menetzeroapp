@@ -69,19 +69,47 @@ class CompanySetupController extends Controller
         // Create user_company_roles entry with company_custom_role_id = 0 (Owner)
         // This makes the user the owner of this company
         try {
-            \App\Models\UserCompanyRole::create([
+            // Check if entry already exists (prevent duplicates)
+            $existingRole = \App\Models\UserCompanyRole::where('user_id', $user->id)
+                ->where('company_id', $company->id)
+                ->first();
+            
+            if (!$existingRole) {
+                $userCompanyRole = \App\Models\UserCompanyRole::create([
+                    'user_id' => $user->id,
+                    'company_id' => $company->id,
+                    'company_custom_role_id' => 0, // 0 = Owner
+                    'assigned_by' => $user->id, // Self-assigned
+                    'is_active' => true,
+                ]);
+                
+                // Verify it was created
+                if (!$userCompanyRole || !$userCompanyRole->id) {
+                    throw new \Exception('UserCompanyRole was not created successfully');
+                }
+            }
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            \Log::error('Failed to create user_company_roles entry', [
+                'error' => $e->getMessage(),
                 'user_id' => $user->id,
                 'company_id' => $company->id,
-                'company_custom_role_id' => 0, // 0 = Owner
-                'assigned_by' => $user->id, // Self-assigned
-                'is_active' => true,
+                'trace' => $e->getTraceAsString()
             ]);
-        } catch (\Exception $e) {
-            // If table doesn't exist yet, fallback to old method
-            $user->update([
-                'company_id' => $company->id,
-                'role' => 'company_admin',
-            ]);
+            
+            // Don't silently fail - only fallback if it's a table doesn't exist error
+            if (strpos($e->getMessage(), "doesn't exist") !== false || 
+                strpos($e->getMessage(), "not found") !== false ||
+                strpos($e->getMessage(), "Unknown table") !== false) {
+                // Table doesn't exist yet, fallback to old method
+                $user->update([
+                    'company_id' => $company->id,
+                    'role' => 'company_admin',
+                ]);
+            } else {
+                // Re-throw other errors so we can see what's wrong
+                throw $e;
+            }
         }
 
         // Create free subscription for the company
