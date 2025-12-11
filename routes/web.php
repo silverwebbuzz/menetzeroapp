@@ -73,9 +73,8 @@ Route::post('/partner/login', function (\Illuminate\Http\Request $request) {
 })->name('partner.login.post');
 
 Route::post('/logout', function () {
-    // Logout from all guards
+    // Logout from web guard
     \Illuminate\Support\Facades\Auth::guard('web')->logout();
-    \Illuminate\Support\Facades\Auth::guard('partner')->logout();
     request()->session()->invalidate();
     request()->session()->regenerateToken();
     return redirect('/');
