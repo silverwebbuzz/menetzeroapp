@@ -21,13 +21,56 @@ class DashboardController extends Controller
             return redirect()->route('login');
         }
         
-        // Get active company from user_company_roles
+        // STEP 1: Check if user has multiple company access - show workspace selector
+        if ($user->hasMultipleCompanyAccess()) {
+            return redirect()->route('account.selector');
+        }
+        
+        // STEP 2: Get active company from user_company_roles
         $company = $user->getActiveCompany();
         
-        // Check if user has a company
+        // STEP 3: If no company, show company setup form on dashboard
         if (!$company) {
             return view('dashboard.index', [
                 'needsCompanySetup' => true,
+                'kpis' => [
+                    'total_emissions' => 0,
+                    'scope1_total' => 0,
+                    'scope2_total' => 0,
+                    'scope3_total' => 0,
+                    'monthly_change' => 0,
+                    'reports_count' => 0,
+                    'draft_reports' => 0,
+                    'submitted_reports' => 0,
+                ],
+                'chartData' => [
+                    'monthly_labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    'monthly_emissions' => [0, 0, 0, 0, 0, 0],
+                    'scope_breakdown' => [
+                        'Scope 1' => 0,
+                        'Scope 2' => 0,
+                        'Scope 3' => 0,
+                    ],
+                    'location_breakdown' => collect([]),
+                ],
+                'netZeroProgress' => [
+                    'current' => 0,
+                    'baseline' => 1000,
+                    'target' => 0,
+                    'progress' => 0,
+                    'years_remaining' => 25,
+                ],
+                'topSources' => collect([]),
+                'recentActivity' => collect([])
+            ]);
+        }
+        
+        // STEP 4: Check if company information is incomplete
+        // If company name is missing or very basic, show setup form
+        if (empty($company->name) || $company->name === 'New Company' || empty($company->industry)) {
+            return view('dashboard.index', [
+                'needsCompanySetup' => true,
+                'company' => $company,
                 'kpis' => [
                     'total_emissions' => 0,
                     'scope1_total' => 0,

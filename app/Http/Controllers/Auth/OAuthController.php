@@ -82,7 +82,7 @@ class OAuthController extends Controller
             
             Auth::guard('web')->login($newUser, true);
             
-            return redirect()->route('company.setup')
+            return redirect()->route('client.dashboard')
                 ->with('success', 'Account created successfully! Please complete your business profile to get started.');
             
         } catch (\Illuminate\Http\Client\ConnectionException $e) {

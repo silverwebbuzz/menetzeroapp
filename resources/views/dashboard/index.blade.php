@@ -53,14 +53,14 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Business Name *</label>
                                 <input class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" 
-                                       name="company_name" type="text" value="{{ old('company_name') }}" required placeholder="Enter your business name">
+                                       name="company_name" type="text" value="{{ old('company_name', isset($company) ? $company->name : '') }}" required placeholder="Enter your business name">
                                 @error('company_name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                             </div>
                             
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Business Email</label>
                                 <input class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" 
-                                       name="business_email" type="email" value="{{ old('business_email', auth()->user()->email) }}" placeholder="business@company.com">
+                                       name="business_email" type="email" value="{{ old('business_email', isset($company) ? $company->email : auth()->user()->email) }}" placeholder="business@company.com">
                                 @error('business_email')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                             </div>
                         </div>
@@ -69,7 +69,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Business Website</label>
                                 <input class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" 
-                                       name="business_website" type="url" value="{{ old('business_website') }}" placeholder="https://www.company.com">
+                                       name="business_website" type="url" value="{{ old('business_website', isset($company) ? $company->website : '') }}" placeholder="https://www.company.com">
                                 @error('business_website')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                             </div>
                             
@@ -77,16 +77,16 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Country</label>
                                 <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" name="country">
                                     <option value="">Select Country</option>
-                                    <option value="UAE" {{ old('country') == 'UAE' ? 'selected' : '' }}>United Arab Emirates</option>
-                                    <option value="SA" {{ old('country') == 'SA' ? 'selected' : '' }}>Saudi Arabia</option>
-                                    <option value="KW" {{ old('country') == 'KW' ? 'selected' : '' }}>Kuwait</option>
-                                    <option value="QA" {{ old('country') == 'QA' ? 'selected' : '' }}>Qatar</option>
-                                    <option value="BH" {{ old('country') == 'BH' ? 'selected' : '' }}>Bahrain</option>
-                                    <option value="OM" {{ old('country') == 'OM' ? 'selected' : '' }}>Oman</option>
-                                    <option value="US" {{ old('country') == 'US' ? 'selected' : '' }}>United States</option>
-                                    <option value="UK" {{ old('country') == 'UK' ? 'selected' : '' }}>United Kingdom</option>
-                                    <option value="IN" {{ old('country') == 'IN' ? 'selected' : '' }}>India</option>
-                                    <option value="Other" {{ old('country') == 'Other' ? 'selected' : '' }}>Other</option>
+                                    <option value="UAE" {{ old('country', isset($company) ? $company->country : '') == 'UAE' ? 'selected' : '' }}>United Arab Emirates</option>
+                                    <option value="SA" {{ old('country', isset($company) ? $company->country : '') == 'SA' ? 'selected' : '' }}>Saudi Arabia</option>
+                                    <option value="KW" {{ old('country', isset($company) ? $company->country : '') == 'KW' ? 'selected' : '' }}>Kuwait</option>
+                                    <option value="QA" {{ old('country', isset($company) ? $company->country : '') == 'QA' ? 'selected' : '' }}>Qatar</option>
+                                    <option value="BH" {{ old('country', isset($company) ? $company->country : '') == 'BH' ? 'selected' : '' }}>Bahrain</option>
+                                    <option value="OM" {{ old('country', isset($company) ? $company->country : '') == 'OM' ? 'selected' : '' }}>Oman</option>
+                                    <option value="US" {{ old('country', isset($company) ? $company->country : '') == 'US' ? 'selected' : '' }}>United States</option>
+                                    <option value="UK" {{ old('country', isset($company) ? $company->country : '') == 'UK' ? 'selected' : '' }}>United Kingdom</option>
+                                    <option value="IN" {{ old('country', isset($company) ? $company->country : '') == 'IN' ? 'selected' : '' }}>India</option>
+                                    <option value="Other" {{ old('country', isset($company) ? $company->country : '') == 'Other' ? 'selected' : '' }}>Other</option>
                                 </select>
                                 @error('country')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                             </div>
@@ -95,7 +95,7 @@
                         <div class="mt-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Business Address</label>
                             <textarea class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" 
-                                      name="business_address" rows="3" placeholder="Enter your registered business address">{{ old('business_address') }}</textarea>
+                                      name="business_address" rows="3" placeholder="Enter your registered business address">{{ old('business_address', isset($company) ? $company->address : '') }}</textarea>
                             @error('business_address')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                         </div>
                     </div>
@@ -110,15 +110,15 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Business Category</label>
                                 <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" name="business_category">
                                     <option value="">Select Category</option>
-                                    <option value="Technology" {{ old('business_category') == 'Technology' ? 'selected' : '' }}>Technology</option>
-                                    <option value="Manufacturing" {{ old('business_category') == 'Manufacturing' ? 'selected' : '' }}>Manufacturing</option>
-                                    <option value="Construction" {{ old('business_category') == 'Construction' ? 'selected' : '' }}>Construction</option>
-                                    <option value="Healthcare" {{ old('business_category') == 'Healthcare' ? 'selected' : '' }}>Healthcare</option>
-                                    <option value="Finance" {{ old('business_category') == 'Finance' ? 'selected' : '' }}>Finance</option>
-                                    <option value="Retail" {{ old('business_category') == 'Retail' ? 'selected' : '' }}>Retail</option>
-                                    <option value="Energy" {{ old('business_category') == 'Energy' ? 'selected' : '' }}>Energy</option>
-                                    <option value="Transportation" {{ old('business_category') == 'Transportation' ? 'selected' : '' }}>Transportation</option>
-                                    <option value="Other" {{ old('business_category') == 'Other' ? 'selected' : '' }}>Other</option>
+                                    <option value="Technology" {{ old('business_category', isset($company) ? $company->industry : '') == 'Technology' ? 'selected' : '' }}>Technology</option>
+                                    <option value="Manufacturing" {{ old('business_category', isset($company) ? $company->industry : '') == 'Manufacturing' ? 'selected' : '' }}>Manufacturing</option>
+                                    <option value="Construction" {{ old('business_category', isset($company) ? $company->industry : '') == 'Construction' ? 'selected' : '' }}>Construction</option>
+                                    <option value="Healthcare" {{ old('business_category', isset($company) ? $company->industry : '') == 'Healthcare' ? 'selected' : '' }}>Healthcare</option>
+                                    <option value="Finance" {{ old('business_category', isset($company) ? $company->industry : '') == 'Finance' ? 'selected' : '' }}>Finance</option>
+                                    <option value="Retail" {{ old('business_category', isset($company) ? $company->industry : '') == 'Retail' ? 'selected' : '' }}>Retail</option>
+                                    <option value="Energy" {{ old('business_category', isset($company) ? $company->industry : '') == 'Energy' ? 'selected' : '' }}>Energy</option>
+                                    <option value="Transportation" {{ old('business_category', isset($company) ? $company->industry : '') == 'Transportation' ? 'selected' : '' }}>Transportation</option>
+                                    <option value="Other" {{ old('business_category', isset($company) ? $company->industry : '') == 'Other' ? 'selected' : '' }}>Other</option>
                                 </select>
                                 @error('business_category')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                             </div>
@@ -126,7 +126,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Business Subcategory</label>
                                 <input class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" 
-                                       name="business_subcategory" type="text" value="{{ old('business_subcategory') }}" placeholder="e.g., Software Development">
+                                       name="business_subcategory" type="text" value="{{ old('business_subcategory', isset($company) ? $company->business_subcategory : '') }}" placeholder="e.g., Software Development">
                                 @error('business_subcategory')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                             </div>
                         </div>
@@ -134,7 +134,7 @@
                         <div class="mt-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Business Description</label>
                             <textarea class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" 
-                                      name="business_description" rows="4" placeholder="Tell us a bit about what you do...">{{ old('business_description') }}</textarea>
+                                      name="business_description" rows="4" placeholder="Tell us a bit about what you do...">{{ old('business_description', isset($company) ? $company->description : '') }}</textarea>
                             @error('business_description')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                         </div>
                     </div>

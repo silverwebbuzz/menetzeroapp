@@ -98,9 +98,8 @@ Route::post('/invitations/accept/{token}', [\App\Http\Controllers\InvitationCont
 Route::get('/invitations/{token}/setup-password/{password_token}', [\App\Http\Controllers\InvitationController::class, 'setupPassword'])->name('invitations.setup-password');
 Route::post('/invitations/{token}/setup-password/{password_token}', [\App\Http\Controllers\InvitationController::class, 'processSetupPassword'])->name('invitations.setup-password.process');
 
-// Company setup routes (accessible after registration)
+// Company setup route (POST only - form is on dashboard, not separate page)
 Route::middleware('auth')->group(function () {
-    Route::get('/company/setup', [CompanySetupController::class, 'index'])->name('company.setup');
     Route::post('/company/setup', [CompanySetupController::class, 'store'])->name('company.setup.store');
 });
 

@@ -33,7 +33,6 @@ class CheckCompanyType
             // Only allow dashboard and company setup routes
             $allowedRoutes = [
                 'client.dashboard', 
-                'company.setup', 
                 'company.setup.store',
                 'logout', // Allow logout
             ];

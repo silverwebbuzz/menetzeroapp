@@ -30,9 +30,9 @@ class AccountSelectorController extends Controller
             return redirect()->route('client.dashboard');
         }
         
-        // If no companies, redirect to company setup
+        // If no companies, redirect to dashboard (which will show company setup form)
         if ($accessibleCompanies->count() === 0) {
-            return redirect()->route('company.setup');
+            return redirect()->route('client.dashboard');
         }
 
         return view('account-selector', compact('accessibleCompanies'));

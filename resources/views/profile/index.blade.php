@@ -330,7 +330,7 @@
                 </div>
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">No Company Associated</h3>
                 <p class="text-gray-600 mb-4">You don't have a company profile yet. Complete your business profile to get started.</p>
-                <a href="{{ route('company.setup') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
+                <a href="{{ route('client.dashboard') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                     </svg>
