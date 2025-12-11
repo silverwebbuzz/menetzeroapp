@@ -181,6 +181,7 @@ Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client'])->
         Route::get('/create', function() { return redirect()->route('roles.index'); })->name('create');
         Route::post('/', [\App\Http\Controllers\StaffManagementController::class, 'store'])->name('store');
         Route::get('/invitations/{invitation}/success', [\App\Http\Controllers\StaffManagementController::class, 'invitationSuccess'])->name('invitation-success');
+        Route::post('/invitations/{invitation}/resend', [\App\Http\Controllers\StaffManagementController::class, 'resendInvitation'])->name('resend-invitation');
         Route::put('/{access}/role', [\App\Http\Controllers\StaffManagementController::class, 'updateRole'])->name('update-role');
         Route::delete('/{access}', [\App\Http\Controllers\StaffManagementController::class, 'destroy'])->name('destroy');
         Route::delete('/invitations/{invitation}', [\App\Http\Controllers\StaffManagementController::class, 'cancelInvitation'])->name('cancel-invitation');

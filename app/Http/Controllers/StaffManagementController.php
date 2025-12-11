@@ -381,12 +381,45 @@ class StaffManagementController extends Controller
     }
 
     /**
+     * Resend pending invitation.
+     */
+    public function resendInvitation(CompanyInvitation $invitation)
+    {
+        $company = Auth::user()->getActiveCompany();
+        if (!$company || $invitation->company_id !== $company->id) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+        }
+
+        if ($invitation->status !== 'pending') {
+            return response()->json(['success' => false, 'message' => 'Only pending invitations can be resent.'], 400);
+        }
+
+        // Update expiration date to extend it
+        $invitation->update([
+            'expires_at' => now()->addDays(7),
+            'invited_at' => now(),
+        ]);
+
+        // TODO: Send email when email functionality is configured
+        // Mail::to($invitation->email)->send(new CompanyInvitationMail($invitation));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Invitation resent successfully!',
+            'invitation' => $invitation->fresh()
+        ]);
+    }
+
+    /**
      * Cancel pending invitation.
      */
     public function cancelInvitation(CompanyInvitation $invitation)
     {
         $company = Auth::user()->getActiveCompany();
         if (!$company || $invitation->company_id !== $company->id) {
+            if (request()->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+            }
             abort(403, 'Unauthorized action.');
         }
 
@@ -394,7 +427,14 @@ class StaffManagementController extends Controller
         // Valid values are: 'pending', 'accepted', 'rejected', 'expired'
         $invitation->update(['status' => 'rejected']);
 
-        return redirect()->route('staff.index')
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Invitation cancelled successfully!'
+            ]);
+        }
+
+        return redirect()->route('roles.index')
             ->with('success', 'Invitation cancelled successfully.');
     }
 }

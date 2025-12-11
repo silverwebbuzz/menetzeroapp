@@ -214,6 +214,127 @@
             </div>
         </div>
     </div>
+
+    <!-- Pending Invitations Section -->
+    <div class="mb-8">
+        <div class="mb-6">
+            <h2 class="text-3xl font-bold text-gray-900">Pending Invitations</h2>
+            <p class="mt-2 text-gray-600">Invitations that have been sent but not yet accepted.</p>
+        </div>
+
+        <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invited By</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invited At</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expires At</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @forelse($pendingInvitations as $invitation)
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">{{ $invitation->email }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @php
+                                    $roleId = $invitation->company_custom_role_id ?? $invitation->custom_role_id;
+                                    $role = $roleId ? \App\Models\CompanyCustomRole::find($roleId) : null;
+                                @endphp
+                                @if($role)
+                                    <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">{{ $role->role_name }}</span>
+                                @else
+                                    <span class="text-sm text-gray-500">No role assigned</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($invitation->inviter)
+                                    <div class="text-sm text-gray-900">{{ $invitation->inviter->name }}</div>
+                                    <div class="text-sm text-gray-500">{{ $invitation->inviter->email }}</div>
+                                @else
+                                    <span class="text-sm text-gray-500">Unknown</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{{ $invitation->invited_at ? $invitation->invited_at->format('M d, Y') : 'N/A' }}</div>
+                                <div class="text-sm text-gray-500">{{ $invitation->invited_at ? $invitation->invited_at->format('h:i A') : '' }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($invitation->expires_at)
+                                    @if($invitation->expires_at->isPast())
+                                        <span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">Expired</span>
+                                    @else
+                                        <div class="text-sm text-gray-900">{{ $invitation->expires_at->format('M d, Y') }}</div>
+                                        <div class="text-sm text-gray-500">{{ $invitation->expires_at->diffForHumans() }}</div>
+                                    @endif
+                                @else
+                                    <span class="text-sm text-gray-500">N/A</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($invitation->status === 'pending')
+                                    <span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">Pending</span>
+                                @elseif($invitation->status === 'accepted')
+                                    <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Accepted</span>
+                                @elseif($invitation->status === 'rejected')
+                                    <span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">Rejected</span>
+                                @else
+                                    <span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full">{{ ucfirst($invitation->status) }}</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex items-center gap-2">
+                                    @if($invitation->status === 'pending')
+                                        <a href="{{ route('staff.invitation-success', $invitation->id) }}" 
+                                           class="text-blue-600 hover:text-blue-900" 
+                                           title="View Invitation Link">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                            </svg>
+                                        </a>
+                                        <button onclick="resendInvitation({{ $invitation->id }})" 
+                                                class="text-green-600 hover:text-green-900" 
+                                                title="Resend Invitation">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                            </svg>
+                                        </button>
+                                        <button onclick="cancelInvitation({{ $invitation->id }})" 
+                                                class="text-red-600 hover:text-red-900" 
+                                                title="Cancel Invitation">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                        </button>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="7" class="px-6 py-12 text-center">
+                                <div class="text-gray-500">
+                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                    </svg>
+                                    <p class="mt-2 text-sm">No pending invitations.</p>
+                                    <p class="text-xs text-gray-400 mt-1">Invite new users to see them here.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Add User Modal -->
@@ -511,4 +632,60 @@ function showUpgradeMessage() {
     alert(message);
 }
 </script>
+// Resend Invitation
+function resendInvitation(invitationId) {
+    if (!confirm('Are you sure you want to resend this invitation?')) {
+        return;
+    }
+    
+    fetch(`{{ url('/staff/invitations') }}/${invitationId}/resend`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Invitation resent successfully!');
+            location.reload();
+        } else {
+            alert('Error: ' + (data.message || 'Failed to resend invitation'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while resending the invitation.');
+    });
+}
+
+// Cancel Invitation
+function cancelInvitation(invitationId) {
+    if (!confirm('Are you sure you want to cancel this invitation? This action cannot be undone.')) {
+        return;
+    }
+    
+    fetch(`{{ url('/staff/invitations') }}/${invitationId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Invitation cancelled successfully!');
+            location.reload();
+        } else {
+            alert('Error: ' + (data.message || 'Failed to cancel invitation'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while cancelling the invitation.');
+    });
+}
+
 @endsection

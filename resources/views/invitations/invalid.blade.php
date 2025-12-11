@@ -13,7 +13,7 @@
         
         <h1 class="text-2xl font-bold text-gray-900 mb-2">Invalid Invitation</h1>
         <p class="text-gray-600 mb-6">
-            This invitation link is invalid or has already been used. Please contact the company administrator for assistance.
+            {{ $message ?? 'This invitation link is invalid or has already been used. Please contact the company administrator for assistance.' }}
         </p>
         
         <a href="{{ route('home') }}" class="inline-block px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700">

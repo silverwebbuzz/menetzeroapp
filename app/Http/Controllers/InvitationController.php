@@ -22,10 +22,27 @@ class InvitationController extends Controller
     public function accept($token)
     {
         try {
-            $invitation = CompanyInvitation::with(['company', 'customRole'])
+            // Use companyCustomRole relationship instead of customRole
+            // Don't filter by status here - we'll check it later to show proper error messages
+            $invitation = CompanyInvitation::with(['company', 'companyCustomRole'])
                 ->where('token', $token)
-                ->where('status', 'pending')
                 ->first();
+            
+            // Check if invitation exists
+            if (!$invitation) {
+                return view('invitations.invalid');
+            }
+            
+            // Check if invitation is already accepted or rejected
+            if ($invitation->status !== 'pending') {
+                if ($invitation->status === 'accepted') {
+                    return view('invitations.invalid', ['message' => 'This invitation has already been accepted.']);
+                } elseif ($invitation->status === 'rejected') {
+                    return view('invitations.invalid', ['message' => 'This invitation has been cancelled.']);
+                } else {
+                    return view('invitations.invalid', ['message' => 'This invitation is no longer valid.']);
+                }
+            }
             
             // If not found in DB, check session (for testing without migrations)
             if (!$invitation) {
@@ -37,8 +54,22 @@ class InvitationController extends Controller
                 if ($invitation->company_id) {
                     $invitation->company = \App\Models\Company::find($invitation->company_id);
                 }
-                if ($invitation->custom_role_id) {
-                    $invitation->customRole = \App\Models\CompanyCustomRole::find($invitation->custom_role_id);
+                // Load custom role (use companyCustomRole if available, fallback to custom_role_id)
+                $roleId = $invitation->company_custom_role_id ?? $invitation->custom_role_id;
+                if ($roleId) {
+                    $invitation->setRelation('companyCustomRole', \App\Models\CompanyCustomRole::find($roleId));
+                    $invitation->setRelation('customRole', \App\Models\CompanyCustomRole::find($roleId));
+                }
+            } else {
+                // Set customRole for backward compatibility
+                if ($invitation->companyCustomRole) {
+                    $invitation->setRelation('customRole', $invitation->companyCustomRole);
+                } else {
+                    // Fallback to custom_role_id
+                    $roleId = $invitation->custom_role_id;
+                    if ($roleId) {
+                        $invitation->setRelation('customRole', \App\Models\CompanyCustomRole::find($roleId));
+                    }
                 }
             }
 
