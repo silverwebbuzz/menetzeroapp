@@ -109,11 +109,12 @@ class StaffManagementController extends Controller
         if ($request->filled('name') && $request->filled('password')) {
             $request->validate([
                 'name' => 'required|string|max:255',
-                'email' => 'required|email|max:255|unique:users,email',
+                'email' => 'required|email|max:255',
                 'password' => 'required|string|min:8',
                 'confirm_password' => 'required|same:password',
                 'phone' => 'nullable|string|max:20',
                 'custom_role_id' => 'required|exists:company_custom_roles,id',
+                'status' => 'nullable|in:active,inactive',
             ]);
 
             // Check user limit
@@ -122,28 +123,53 @@ class StaffManagementController extends Controller
                 return back()->withErrors(['email' => $limitCheck['message']])->withInput();
             }
 
-            // Create user
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => bcrypt($request->password),
-                'phone' => $request->phone,
-                'company_id' => $company->id,
-                'role' => 'company_user',
-                'is_active' => $request->status === 'active',
-            ]);
+            // Check if user already exists
+            $user = User::where('email', $request->email)->first();
+            
+            if (!$user) {
+                // Create new user (company_id is null, access is via UserCompanyRole)
+                $user = User::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+                    'phone' => $request->phone ?: null,
+                    'company_id' => null, // Access is managed via UserCompanyRole
+                    'role' => 'company_user',
+                    'is_active' => ($request->status ?? 'active') === 'active',
+                ]);
+            } else {
+                // User exists, check if they already have access to this company
+                $existingAccess = UserCompanyRole::where('user_id', $user->id)
+                    ->where('company_id', $company->id)
+                    ->where('is_active', true)
+                    ->first();
+                
+                if ($existingAccess) {
+                    return back()->withErrors(['email' => 'This user already has access to this company.'])->withInput();
+                }
+            }
 
-            // Assign role
-            \App\Models\UserCompanyRole::create([
-                'user_id' => $user->id,
-                'company_id' => $company->id,
-                'company_custom_role_id' => $request->custom_role_id,
-                'assigned_by' => Auth::id(),
-                'is_active' => true,
-            ]);
+            // Assign role via UserCompanyRole
+            try {
+                UserCompanyRole::create([
+                    'user_id' => $user->id,
+                    'company_id' => $company->id,
+                    'company_custom_role_id' => $request->custom_role_id,
+                    'assigned_by' => Auth::id(),
+                    'is_active' => ($request->status ?? 'active') === 'active',
+                ]);
 
-            return redirect()->route('roles.index')
-                ->with('success', 'User created successfully.');
+                return redirect()->route('roles.index')
+                    ->with('success', 'User created successfully.');
+            } catch (\Exception $e) {
+                \Log::error('Error creating UserCompanyRole', [
+                    'error' => $e->getMessage(),
+                    'user_id' => $user->id,
+                    'company_id' => $company->id,
+                ]);
+                
+                return back()->withErrors(['error' => 'Failed to assign role: ' . $e->getMessage()])->withInput();
+            }
         } else {
             // Send invitation (existing flow)
             $request->validate([

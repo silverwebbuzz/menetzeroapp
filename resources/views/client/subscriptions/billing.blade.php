@@ -163,17 +163,28 @@
                             <div class="flex items-center gap-2">
                                 @if($method->is_default)
                                     <span class="px-2 py-1 text-xs font-semibold rounded bg-blue-100 text-blue-800">Default</span>
+                                @else
+                                    <form action="{{ route('subscriptions.billing-methods.set-default', $method->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="text-xs text-blue-600 hover:text-blue-800 px-2 py-1 border border-blue-300 rounded hover:bg-blue-50" title="Set as Default">
+                                            Set Default
+                                        </button>
+                                    </form>
                                 @endif
                                 <button onclick="editBillingMethod({{ $method->id }})" class="text-blue-600 hover:text-blue-800" title="Edit">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                     </svg>
                                 </button>
-                                <button onclick="deleteBillingMethod({{ $method->id }})" class="text-red-600 hover:text-red-800" title="Delete">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                    </svg>
-                                </button>
+                                <form action="{{ route('subscriptions.billing-methods.destroy', $method->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this billing method?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-red-600 hover:text-red-800" title="Delete">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -286,6 +297,87 @@
     </div>
 </div>
 
+<!-- Add/Edit Billing Method Modal -->
+<div id="billingMethodModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900" id="modalTitle">Add New Card</h3>
+                <button onclick="closeBillingMethodModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="billingMethodForm" method="POST">
+                @csrf
+                <div id="formMethod" style="display: none;"></div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Card Number *</label>
+                    <input type="text" name="card_number" id="card_number" maxlength="19" 
+                           placeholder="1234 5678 9012 3456" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                           required>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Cardholder Name *</label>
+                    <input type="text" name="cardholder_name" id="cardholder_name" 
+                           placeholder="John Doe" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                           required>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Expiry Month *</label>
+                        <select name="card_exp_month" id="card_exp_month" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                required>
+                            <option value="">MM</option>
+                            @for($i = 1; $i <= 12; $i++)
+                                <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}">{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</option>
+                            @endfor
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Expiry Year *</label>
+                        <select name="card_exp_year" id="card_exp_year" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                required>
+                            <option value="">YYYY</option>
+                            @for($i = date('Y'); $i <= date('Y') + 15; $i++)
+                                <option value="{{ $i }}">{{ $i }}</option>
+                            @endfor
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="flex items-center">
+                        <input type="checkbox" name="is_default" id="is_default" 
+                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <span class="ml-2 text-sm text-gray-700">Set as default payment method</span>
+                    </label>
+                </div>
+                
+                <div class="flex items-center justify-end gap-3 mt-6">
+                    <button type="button" onclick="closeBillingMethodModal()" 
+                            class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">
+                        Cancel
+                    </button>
+                    <button type="submit" 
+                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        Save Card
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
 function showTab(tabName) {
     // Hide all tab contents
@@ -308,28 +400,67 @@ function showTab(tabName) {
     activeTab.classList.remove('border-transparent', 'text-gray-500');
 }
 
-// Auto-open transactions tab if redirected from payment-history
-@if(session('active_tab') === 'transactions')
+// Auto-open tabs if redirected
+@if(session('active_tab'))
     document.addEventListener('DOMContentLoaded', function() {
-        showTab('transactions');
+        showTab('{{ session('active_tab') }}');
     });
 @endif
 
+// Format card number input
+document.getElementById('card_number')?.addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\s+/g, '');
+    let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+    e.target.value = formattedValue;
+});
+
 function openAddBillingMethodModal() {
-    // Implement add billing method modal
-    alert('Add billing method functionality will be implemented here.');
+    document.getElementById('modalTitle').textContent = 'Add New Card';
+    document.getElementById('billingMethodForm').action = '{{ route('subscriptions.billing-methods.store') }}';
+    document.getElementById('formMethod').innerHTML = '';
+    document.getElementById('billingMethodForm').reset();
+    document.getElementById('billingMethodModal').classList.remove('hidden');
 }
 
 function editBillingMethod(methodId) {
-    // Implement edit billing method
-    alert('Edit billing method functionality will be implemented here.');
+    // For now, just show a message that edit will be implemented
+    // You can fetch the billing method data via AJAX and populate the form
+    alert('Edit functionality will be enhanced to load card details. For now, please delete and add a new card.');
+}
+
+function closeBillingMethodModal() {
+    document.getElementById('billingMethodModal').classList.add('hidden');
+    document.getElementById('billingMethodForm').reset();
 }
 
 function deleteBillingMethod(methodId) {
     if (confirm('Are you sure you want to delete this billing method?')) {
-        // Implement delete billing method
-        alert('Delete billing method functionality will be implemented here.');
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/subscriptions/billing-methods/${methodId}`;
+        
+        const csrfToken = document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = '_token';
+        csrfToken.value = '{{ csrf_token() }}';
+        form.appendChild(csrfToken);
+        
+        const methodField = document.createElement('input');
+        methodField.type = 'hidden';
+        methodField.name = '_method';
+        methodField.value = 'DELETE';
+        form.appendChild(methodField);
+        
+        document.body.appendChild(form);
+        form.submit();
     }
 }
+
+// Close modal on outside click
+document.getElementById('billingMethodModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeBillingMethodModal();
+    }
+});
 </script>
 @endsection

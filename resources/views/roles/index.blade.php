@@ -237,13 +237,35 @@
 
             <form action="{{ route('staff.store') }}" method="POST" id="addUserForm" onsubmit="return submitAddUserForm(event)">
                 @csrf
+                
+                @if($errors->any())
+                <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <div class="flex">
+                        <svg class="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div>
+                            <h3 class="text-sm font-medium text-red-800">Please fix the following errors:</h3>
+                            <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                @endif
+                
                 <div class="grid grid-cols-2 gap-6">
                     <!-- Left Column -->
                     <div class="space-y-4">
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Name</label>
-                            <input type="text" name="name" id="name" 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <input type="text" name="name" id="name" required value="{{ old('name') }}"
+                                   class="w-full px-3 py-2 border {{ $errors->has('name') ? 'border-red-500' : 'border-gray-300' }} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            @error('name')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
                             <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
@@ -256,17 +278,20 @@
                         <div>
                             <label for="custom_role_id" class="block text-sm font-medium text-gray-700 mb-2">Role</label>
                             <select name="custom_role_id" id="custom_role_id" required
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    class="w-full px-3 py-2 border {{ $errors->has('custom_role_id') ? 'border-red-500' : 'border-gray-300' }} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                 <option value="">Select value</option>
                                 @foreach($customRoles as $role)
-                                    <option value="{{ $role->id }}">{{ $role->role_name }}</option>
+                                    <option value="{{ $role->id }}" {{ old('custom_role_id') == $role->id ? 'selected' : '' }}>{{ $role->role_name }}</option>
                                 @endforeach
                             </select>
+                            @error('custom_role_id')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
                             <label for="confirm_password" class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
                             <div class="relative">
-                                <input type="password" name="confirm_password" id="confirm_password" 
+                                <input type="password" name="confirm_password" id="confirm_password" required minlength="8"
                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                 <button type="button" onclick="togglePassword('confirm_password')" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -281,8 +306,11 @@
                     <div class="space-y-4">
                         <div>
                             <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                            <input type="email" name="email" id="email" required
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <input type="email" name="email" id="email" required value="{{ old('email') }}"
+                                   class="w-full px-3 py-2 border {{ $errors->has('email') ? 'border-red-500' : 'border-gray-300' }} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            @error('email')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
                             <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
@@ -297,7 +325,7 @@
                         <div>
                             <label for="password" class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
                             <div class="relative">
-                                <input type="password" name="password" id="password" 
+                                <input type="password" name="password" id="password" required minlength="8"
                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                 <button type="button" onclick="togglePassword('password')" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -354,7 +382,33 @@ function editUser(userId) {
 }
 
 function submitAddUserForm(event) {
-    // Form will submit normally, modal will close on redirect
+    // Validate form before submission
+    const form = document.getElementById('addUserForm');
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirm_password').value;
+    const customRoleId = document.getElementById('custom_role_id').value;
+    
+    if (!name || !email || !password || !confirmPassword || !customRoleId) {
+        alert('Please fill in all required fields.');
+        event.preventDefault();
+        return false;
+    }
+    
+    if (password.length < 8) {
+        alert('Password must be at least 8 characters long.');
+        event.preventDefault();
+        return false;
+    }
+    
+    if (password !== confirmPassword) {
+        alert('Passwords do not match.');
+        event.preventDefault();
+        return false;
+    }
+    
+    // Form will submit normally
     return true;
 }
 
@@ -365,9 +419,16 @@ document.getElementById('addUserModal')?.addEventListener('click', function(e) {
     }
 });
 
-// Close modal on successful form submission (if using AJAX)
+// Close modal on successful form submission
 @if(session('success'))
     closeAddUserModal();
+@endif
+
+// Keep modal open if there are errors
+@if($errors->any())
+    document.addEventListener('DOMContentLoaded', function() {
+        openAddUserModal();
+    });
 @endif
 
 function showUpgradeMessage() {
