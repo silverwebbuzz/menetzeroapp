@@ -298,4 +298,3 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
         // Statistics
         Route::get('/statistics', [\App\Http\Controllers\Admin\SuperAdminController::class, 'statistics'])->name('statistics');
     });
-});
