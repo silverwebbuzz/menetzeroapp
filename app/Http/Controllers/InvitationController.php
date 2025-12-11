@@ -153,16 +153,43 @@ class InvitationController extends Controller
                     // Existing user - log them in if not already logged in
                     if (!$loggedInUser || $loggedInUser->id !== $newUser->id) {
                         Auth::guard('web')->login($newUser);
-                        // Get fresh user instance after login
+                        // Get fresh user instance after login and reload relationships
                         $newUser = Auth::guard('web')->user();
+                        // Reload relationships to ensure companyRoles are fresh
+                        $newUser->load('companyRoles', 'activeContext');
+                    } else {
+                        // Reload relationships even if already logged in
+                        $newUser->load('companyRoles', 'activeContext');
+                    }
+                    
+                    // Verify UserCompanyRole was created/reactivated
+                    try {
+                        $userCompanyRole = \App\Models\UserCompanyRole::where('user_id', $newUser->id)
+                            ->where('company_id', $invitation->company_id)
+                            ->where('is_active', true)
+                            ->first();
+                        
+                        \Log::info('After invitation acceptance - UserCompanyRole check', [
+                            'user_id' => $newUser->id,
+                            'company_id' => $invitation->company_id,
+                            'user_company_role_exists' => $userCompanyRole !== null,
+                            'user_company_role_id' => $userCompanyRole?->id,
+                            'is_staff_in_any' => $newUser->isStaffInAnyCompany(),
+                            'company_roles_count' => $newUser->companyRoles()->where('is_active', true)->count(),
+                        ]);
+                    } catch (\Exception $e) {
+                        \Log::error('Error checking UserCompanyRole after invitation acceptance', [
+                            'user_id' => $newUser->id,
+                            'error' => $e->getMessage()
+                        ]);
                     }
                     
                     // Set active company context from invitation (already done in acceptInvitation, but ensure it's set)
                     try {
                         if ($invitation && $invitation->company_id) {
                             $newUser->switchToCompany($invitation->company_id);
-                            // Refresh user to get updated context
-                            $newUser = $newUser->fresh();
+                            // Refresh user to get updated context and relationships
+                            $newUser = $newUser->fresh(['companyRoles', 'activeContext']);
                         }
                     } catch (\Exception $e) {
                         \Log::warning('Failed to set active company context after invitation acceptance', [

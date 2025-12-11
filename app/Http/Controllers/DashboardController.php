@@ -21,6 +21,9 @@ class DashboardController extends Controller
             return redirect()->route('login');
         }
         
+        // Reload relationships to ensure fresh data (important after invitation acceptance)
+        $user->load('companyRoles', 'activeContext');
+        
         // Check if user has multiple company access - show workspace selector
         if ($user->hasMultipleCompanyAccess()) {
             return redirect()->route('account.selector');
@@ -33,6 +36,17 @@ class DashboardController extends Controller
         if (!$company) {
             // Check if user has any company access (owned or staff)
             $hasAnyCompany = $user->ownsCompany() || $user->isStaffInAnyCompany();
+            
+            // Debug logging
+            \Log::info('Dashboard - No active company found', [
+                'user_id' => $user->id,
+                'user_email' => $user->email,
+                'owns_company' => $user->ownsCompany(),
+                'is_staff_in_any' => $user->isStaffInAnyCompany(),
+                'has_any_company' => $hasAnyCompany,
+                'company_roles_count' => $user->companyRoles()->where('is_active', true)->count(),
+                'staff_companies_count' => $user->getStaffCompanies()->count(),
+            ]);
             
             if (!$hasAnyCompany) {
                 // User has no company access - show message
