@@ -107,9 +107,14 @@
                         <ul class="space-y-2">
                             @if($subscription->plan)
                                 @php
-                                    $features = json_decode($subscription->plan->features ?? '[]', true);
+                                    // Features is already cast to array in SubscriptionPlan model
+                                    $features = $subscription->plan->features ?? [];
+                                    // If it's a string, decode it; if it's already an array, use it directly
+                                    if (is_string($features)) {
+                                        $features = json_decode($features, true) ?? [];
+                                    }
                                 @endphp
-                                @if(is_array($features))
+                                @if(is_array($features) && count($features) > 0)
                                     @foreach($features as $feature)
                                         <li class="flex items-center text-gray-700">
                                             <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -118,6 +123,8 @@
                                             {{ $feature }}
                                         </li>
                                     @endforeach
+                                @else
+                                    <li class="text-gray-500 text-sm">No features listed</li>
                                 @endif
                             @endif
                         </ul>
