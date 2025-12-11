@@ -57,6 +57,13 @@ class CompanySetupController extends Controller
             // Refresh the model to get updated data
             $company = $existingCompany->fresh();
             
+            // Also update users.company_id for backward compatibility (in case it wasn't set)
+            if ($user->company_id != $company->id) {
+                $user->update([
+                    'company_id' => $company->id,
+                ]);
+            }
+            
             // Set active company context to ensure dashboard recognizes it
             try {
                 $user->switchToCompany($company->id);
@@ -105,6 +112,12 @@ class CompanySetupController extends Controller
                         throw new \Exception('UserCompanyRole was not created successfully');
                     }
                 }
+                
+                // Also update users.company_id for backward compatibility
+                // This ensures fallback logic in User model works correctly
+                $user->update([
+                    'company_id' => $company->id,
+                ]);
                 
                 // Set active company context to ensure dashboard recognizes it
                 try {
