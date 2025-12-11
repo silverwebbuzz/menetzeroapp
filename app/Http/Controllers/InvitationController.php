@@ -96,20 +96,14 @@ class InvitationController extends Controller
                     return redirect()->route('invitations.setup-password', ['token' => $token, 'password_token' => $passwordToken])
                         ->with('user', $newUser);
                 } else {
-                    // Existing user - log them in if not already logged in
-                    if (!$loggedInUser) {
-                        Auth::guard('web')->login($newUser);
-                    }
-                    
-                    // Check if user has multiple company access - show workspace selector
-                    if ($newUser->hasMultipleCompanyAccess()) {
-                        return redirect()->route('account.selector')
-                            ->with('success', 'Invitation accepted successfully! Select a workspace to continue.');
-                    }
-                    
-                    // Single company access - go to dashboard
-                    return redirect()->route('client.dashboard')
-                        ->with('success', 'Invitation accepted successfully!');
+                // Existing user - log them in if not already logged in
+                if (!$loggedInUser) {
+                    Auth::guard('web')->login($newUser);
+                }
+                
+                // Go to dashboard (1 user = 1 company, no workspace selector needed)
+                return redirect()->route('client.dashboard')
+                    ->with('success', 'Invitation accepted successfully!');
                 }
             } else {
                 // Decline invitation

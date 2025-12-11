@@ -310,6 +310,7 @@ class User extends Authenticatable
 
     /**
      * Get current active company.
+     * Simplified: 1 user = 1 company only.
      */
     public function getActiveCompany()
     {
@@ -319,24 +320,10 @@ class User extends Authenticatable
         }
 
         try {
-            // Check active context first
-            $context = $this->activeContext;
-            if ($context && $context->active_company_id) {
-                $company = Company::find($context->active_company_id);
-                if ($company && $this->hasAccessToCompany($company->id)) {
-                    return $company;
-                }
-            }
-            
-            // Fallback: If only one company access, use that
-            $userCompanyRoles = $this->companyRoles()->where('is_active', true)->get();
-            if ($userCompanyRoles->count() == 1) {
-                return Company::find($userCompanyRoles->first()->company_id);
-            }
-            
-            // If multiple companies, return first one (user should select via workspace selector)
-            if ($userCompanyRoles->count() > 0) {
-                return Company::find($userCompanyRoles->first()->company_id);
+            // Get the single company from user_company_roles
+            $userCompanyRole = $this->companyRoles()->where('is_active', true)->first();
+            if ($userCompanyRole) {
+                return Company::find($userCompanyRole->company_id);
             }
         } catch (\Exception $e) {
             // If tables don't exist yet, fall back to company_id
@@ -347,91 +334,15 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user has multiple company access.
+     * Check if user already has a company (1 user = 1 company only).
      */
-    public function hasMultipleCompanyAccess()
-    {
-        // Super admin doesn't need company access
-        if ($this->isAdmin()) {
-            return false;
-        }
-
-        try {
-            $accessCount = $this->companyRoles()->where('is_active', true)->count();
-            return $accessCount > 1;
-        } catch (\Exception $e) {
-            // If table doesn't exist yet, return false
-            return false;
-        }
-    }
-
-    /**
-     * Get all companies user has access to (for workspace selector).
-     */
-    public function getAccessibleCompanies()
+    public function hasCompany()
     {
         try {
-            return $this->companyRoles()
-                ->where('is_active', true)
-                ->with(['company', 'companyCustomRole'])
-                ->get()
-                ->map(function($userCompanyRole) {
-                    $company = $userCompanyRole->company;
-                    if (!$company) {
-                        return null;
-                    }
-                    
-                    return [
-                        'id' => $company->id,
-                        'name' => $company->name,
-                        'type' => $company->company_type ?? 'client',
-                        'role_name' => $userCompanyRole->company_custom_role_id == 0 || $userCompanyRole->company_custom_role_id === null
-                            ? 'Owner'
-                            : ($userCompanyRole->companyCustomRole ? $userCompanyRole->companyCustomRole->role_name : 'Staff'),
-                        'is_owner' => $userCompanyRole->company_custom_role_id == 0 || $userCompanyRole->company_custom_role_id === null,
-                        'user_company_role_id' => $userCompanyRole->id,
-                    ];
-                })
-                ->filter();
+            return $this->companyRoles()->where('is_active', true)->exists();
         } catch (\Exception $e) {
-            // Fallback: return company if company_id is set
-            if ($this->company_id) {
-                $company = $this->company;
-                if ($company) {
-                    return collect([[
-                        'id' => $company->id,
-                        'name' => $company->name,
-                        'type' => $company->company_type ?? 'client',
-                        'role_name' => 'Owner',
-                        'is_owner' => true,
-                        'user_company_role_id' => null,
-                    ]]);
-                }
-            }
-            return collect([]);
-        }
-    }
-
-    /**
-     * Switch active company.
-     */
-    public function switchToCompany($companyId)
-    {
-        if (!$this->hasAccessToCompany($companyId)) {
-            throw new \Exception('User does not have access to this company');
-        }
-        
-        try {
-            UserActiveContext::updateOrCreate(
-                ['user_id' => $this->id],
-                [
-                    'active_company_id' => $companyId,
-                    'last_switched_at' => now(),
-                ]
-            );
-        } catch (\Exception $e) {
-            // If table doesn't exist, store in session
-            session(['active_company_id' => $companyId]);
+            // If table doesn't exist, check company_id
+            return !empty($this->company_id);
         }
     }
 

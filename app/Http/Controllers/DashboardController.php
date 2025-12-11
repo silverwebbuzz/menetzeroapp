@@ -21,12 +21,7 @@ class DashboardController extends Controller
             return redirect()->route('login');
         }
         
-        // STEP 1: Check if user has multiple company access - show workspace selector
-        if ($user->hasMultipleCompanyAccess()) {
-            return redirect()->route('account.selector');
-        }
-        
-        // STEP 2: Get active company from user_company_roles
+        // Get active company from user_company_roles (1 user = 1 company)
         $company = $user->getActiveCompany();
         
         // STEP 3: If no company, show company setup form on dashboard

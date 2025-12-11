@@ -177,18 +177,6 @@ class CompanySetupController extends Controller
             }
         }
 
-        // Set active company context for the user (so getActiveCompany() works)
-        try {
-            $user->switchToCompany($company->id);
-        } catch (\Exception $e) {
-            // If switchToCompany fails, that's okay - getActiveCompany() has fallback logic
-            \Log::warning('Failed to set active company context', [
-                'user_id' => $user->id,
-                'company_id' => $company->id,
-                'error' => $e->getMessage()
-            ]);
-        }
-
         return redirect()->route('client.dashboard')->with('success', 'Business profile completed successfully!');
     }
 

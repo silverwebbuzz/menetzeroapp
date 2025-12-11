@@ -12,7 +12,6 @@ use App\Http\Controllers\MeasurementController;
 use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\DocumentUploadController;
-use App\Http\Controllers\AccountSelectorController;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -35,14 +34,7 @@ Route::post('/login', function (\Illuminate\Http\Request $request) {
     if (\Illuminate\Support\Facades\Auth::guard('web')->attempt($credentials, true)) {
         $request->session()->regenerate();
         
-        $user = auth('web')->user();
-        
-        // Check if user has multiple company access (Slack-style workspace selector)
-        if ($user && $user->hasMultipleCompanyAccess()) {
-            return redirect()->route('account.selector');
-        }
-        
-        // Single company access - go to dashboard
+        // Go to dashboard (1 user = 1 company, no workspace selector needed)
         return redirect()->intended(route('client.dashboard'));
     }
 
@@ -102,11 +94,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/company/setup', [CompanySetupController::class, 'store'])->name('company.setup.store');
 });
 
-// Account Switcher (for multi-company staff)
-Route::middleware(['auth:web'])->group(function () {
-    Route::get('/account/selector', [AccountSelectorController::class, 'index'])->name('account.selector');
-    Route::post('/account/switch', [AccountSelectorController::class, 'switch'])->name('account.switch');
-});
+// Account Switcher removed - 1 user = 1 company only
 
 // Profile Routes - Separate for Client and Partner
 

@@ -17,10 +17,11 @@ class CompanyInvitationService
     {
         $company = \App\Models\Company::findOrFail($companyId);
 
-        // Check if user already has access
+        // Check if user already has a company (1 user = 1 company only)
         try {
             $existingUser = User::where('email', $email)->first();
             if ($existingUser) {
+                // Check if user already has access to this specific company
                 $existingAccess = UserCompanyRole::where('user_id', $existingUser->id)
                     ->where('company_id', $companyId)
                     ->where('is_active', true)
@@ -29,10 +30,19 @@ class CompanyInvitationService
                 if ($existingAccess) {
                     throw new \Exception('User already has access to this company');
                 }
+                
+                // Check if user already has ANY company (1 user = 1 company only)
+                $hasAnyCompany = UserCompanyRole::where('user_id', $existingUser->id)
+                    ->where('is_active', true)
+                    ->exists();
+                
+                if ($hasAnyCompany) {
+                    throw new \Exception('User already belongs to a company. Each user can only be associated with one company.');
+                }
             }
         } catch (\Exception $e) {
             // If table doesn't exist, continue without checking
-            if (strpos($e->getMessage(), "doesn't exist") === false && strpos($e->getMessage(), 'already has access') !== false) {
+            if (strpos($e->getMessage(), "doesn't exist") === false) {
                 throw $e;
             }
         }

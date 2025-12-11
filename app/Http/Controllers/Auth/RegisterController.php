@@ -41,20 +41,14 @@ class RegisterController extends Controller
 
         Auth::guard('web')->login($user);
 
-        // Check if user has any existing company access (from invitations they accepted before registering)
-        if ($user->hasMultipleCompanyAccess()) {
-            return redirect()->route('account.selector')
-                ->with('success', 'Account created successfully! Select a workspace to continue.');
-        }
-        
-        // Check if user has single company access
+        // Check if user has company access (from invitations they accepted before registering)
         $activeCompany = $user->getActiveCompany();
         if ($activeCompany) {
             return redirect()->route('client.dashboard')
                 ->with('success', 'Account created successfully!');
         }
 
-        // No company access - redirect to company setup
+        // No company access - redirect to dashboard (which will show company setup form)
         return redirect()->route('client.dashboard')
             ->with('success', 'Account created successfully! Please complete your business profile to get started.');
     }
