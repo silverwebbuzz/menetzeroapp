@@ -196,6 +196,18 @@ class CompanyInvitationService
             }
         }
 
+        // Set active company context for the user
+        try {
+            $user->switchToCompany($invitation->company_id);
+        } catch (\Exception $e) {
+            // Log but don't fail - context will be set on next login
+            \Log::warning('Failed to set active company context after invitation acceptance', [
+                'user_id' => $user->id,
+                'company_id' => $invitation->company_id,
+                'error' => $e->getMessage()
+            ]);
+        }
+
         return $user;
     }
 

@@ -631,7 +631,7 @@ function showUpgradeMessage() {
     const message = @json($userLimitMessage ?? "You have reached your plan limit for users. Please upgrade your subscription to add more users.");
     alert(message);
 }
-</script>
+
 // Resend Invitation
 function resendInvitation(invitationId) {
     if (!confirm('Are you sure you want to resend this invitation?')) {
@@ -687,5 +687,6 @@ function cancelInvitation(invitationId) {
         alert('An error occurred while cancelling the invitation.');
     });
 }
+</script>
 
 @endsection

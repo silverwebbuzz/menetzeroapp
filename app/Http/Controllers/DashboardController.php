@@ -66,44 +66,51 @@ class DashboardController extends Controller
         }
         
         // STEP 4: Check if company information is incomplete
-        // Only check if company name is missing or very basic - other fields are optional
-        // Also check if company name is just a placeholder or empty string
-        $companyName = trim($company->name ?? '');
-        if (empty($companyName) || $companyName === 'New Company' || $companyName === '') {
-            return view('dashboard.index', [
-                'needsCompanySetup' => true,
-                'company' => $company,
-                'kpis' => [
-                    'total_emissions' => 0,
-                    'scope1_total' => 0,
-                    'scope2_total' => 0,
-                    'scope3_total' => 0,
-                    'monthly_change' => 0,
-                    'reports_count' => 0,
-                    'draft_reports' => 0,
-                    'submitted_reports' => 0,
-                ],
-                'chartData' => [
-                    'monthly_labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    'monthly_emissions' => [0, 0, 0, 0, 0, 0],
-                    'scope_breakdown' => [
-                        'Scope 1' => 0,
-                        'Scope 2' => 0,
-                        'Scope 3' => 0,
+        // Only ask for company setup if user is the OWNER (not staff)
+        // Staff users don't need to add company information - they're just accessing an existing company
+        $isOwner = $user->ownsCompany() && $user->getOwnedCompany()?->id === $company->id;
+        
+        if ($isOwner) {
+            // Only check if company name is missing or very basic - other fields are optional
+            // Also check if company name is just a placeholder or empty string
+            $companyName = trim($company->name ?? '');
+            if (empty($companyName) || $companyName === 'New Company' || $companyName === '') {
+                return view('dashboard.index', [
+                    'needsCompanySetup' => true,
+                    'company' => $company,
+                    'kpis' => [
+                        'total_emissions' => 0,
+                        'scope1_total' => 0,
+                        'scope2_total' => 0,
+                        'scope3_total' => 0,
+                        'monthly_change' => 0,
+                        'reports_count' => 0,
+                        'draft_reports' => 0,
+                        'submitted_reports' => 0,
                     ],
-                    'location_breakdown' => collect([]),
-                ],
-                'netZeroProgress' => [
-                    'current' => 0,
-                    'baseline' => 1000,
-                    'target' => 0,
-                    'progress' => 0,
-                    'years_remaining' => 25,
-                ],
-                'topSources' => collect([]),
-                'recentActivity' => collect([])
-            ]);
+                    'chartData' => [
+                        'monthly_labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        'monthly_emissions' => [0, 0, 0, 0, 0, 0],
+                        'scope_breakdown' => [
+                            'Scope 1' => 0,
+                            'Scope 2' => 0,
+                            'Scope 3' => 0,
+                        ],
+                        'location_breakdown' => collect([]),
+                    ],
+                    'netZeroProgress' => [
+                        'current' => 0,
+                        'baseline' => 1000,
+                        'target' => 0,
+                        'progress' => 0,
+                        'years_remaining' => 25,
+                    ],
+                    'topSources' => collect([]),
+                    'recentActivity' => collect([])
+                ]);
+            }
         }
+        // If user is staff, skip company setup check - they don't need to add company info
         
         // Get all measurements for the user's active company
         $measurements = Measurement::whereHas('location', function($query) use ($company) {

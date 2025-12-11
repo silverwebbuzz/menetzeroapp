@@ -132,6 +132,19 @@ class InvitationController extends Controller
                     Auth::guard('web')->login($newUser);
                 }
                 
+                // Set active company context from invitation
+                try {
+                    if ($invitation && $invitation->company_id) {
+                        $newUser->switchToCompany($invitation->company_id);
+                    }
+                } catch (\Exception $e) {
+                    \Log::warning('Failed to set active company context after invitation acceptance', [
+                        'user_id' => $newUser->id,
+                        'company_id' => $invitation->company_id ?? null,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+                
                 // Check if user has multiple company access - show workspace selector
                 if ($newUser->hasMultipleCompanyAccess()) {
                     return redirect()->route('account.selector')
@@ -234,6 +247,25 @@ class InvitationController extends Controller
             if ($status === \Illuminate\Support\Facades\Password::PASSWORD_RESET) {
                 // Log the user in
                 Auth::guard('web')->login($user);
+                
+                // Set active company context from invitation
+                try {
+                    if ($invitation && $invitation->company_id) {
+                        $user->switchToCompany($invitation->company_id);
+                    }
+                } catch (\Exception $e) {
+                    \Log::warning('Failed to set active company context after password setup', [
+                        'user_id' => $user->id,
+                        'company_id' => $invitation->company_id ?? null,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+                
+                // Check if user has multiple company access - show workspace selector
+                if ($user->hasMultipleCompanyAccess()) {
+                    return redirect()->route('account.selector')
+                        ->with('success', 'Password set successfully! Select a company to continue.');
+                }
                 
                 return redirect()->route('client.dashboard')
                     ->with('success', 'Password set successfully! Welcome to the platform.');
