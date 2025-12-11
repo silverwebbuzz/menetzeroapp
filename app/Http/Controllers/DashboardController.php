@@ -29,7 +29,31 @@ class DashboardController extends Controller
         // Get active company (owned or staff)
         $company = $user->getActiveCompany();
         
-        // STEP 3: If no company, show company setup form on dashboard
+        // STEP 3: If no company, check if user has any company access
+        if (!$company) {
+            // Check if user has any company access (owned or staff)
+            $hasAnyCompany = $user->ownsCompany() || $user->isStaffInAnyCompany();
+            
+            if (!$hasAnyCompany) {
+                // User has no company access - show message
+                return view('dashboard.no-company-access');
+            }
+            
+            // User has company access but no active context - redirect to selector
+            if ($user->hasMultipleCompanyAccess()) {
+                return redirect()->route('account.selector');
+            }
+            
+            // Single company but no active context - try to set it
+            $accessibleCompanies = $user->getAccessibleCompanies();
+            if ($accessibleCompanies->isNotEmpty()) {
+                $firstCompany = $accessibleCompanies->first();
+                $user->switchToCompany($firstCompany['id']);
+                $company = $user->getActiveCompany();
+            }
+        }
+        
+        // If still no company after trying to set context, show no access message
         if (!$company) {
             return view('dashboard.index', [
                 'needsCompanySetup' => true,

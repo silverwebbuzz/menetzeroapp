@@ -268,17 +268,66 @@ class StaffManagementController extends Controller
      */
     public function destroy(UserCompanyRole $userCompanyRole)
     {
-        $this->requirePermission('staff_management', 'delete');
-        
         $company = Auth::user()->getActiveCompany();
         if (!$company || $userCompanyRole->company_id !== $company->id) {
             abort(403, 'Unauthorized action.');
         }
 
+        // Check if user is owner/admin of the company OR has delete permission
+        // Owners can always delete staff (they own the company)
+        $isOwner = Auth::user()->isCompanyAdmin($company->id);
+        $hasPermission = Auth::user()->hasModulePermission('staff_management', 'delete', $company->id);
+        
+        if (!$isOwner && !$hasPermission) {
+            abort(403, 'You do not have permission to remove staff members.');
+        }
+
+        // Prevent deleting yourself if you're the owner
+        if ($userCompanyRole->user_id === Auth::id() && $isOwner) {
+            return back()->withErrors(['error' => 'You cannot remove yourself as the company owner.']);
+        }
+
+        // Get the user before deactivating
+        $removedUser = $userCompanyRole->user;
+        $removedCompanyId = $userCompanyRole->company_id;
+
+        // Deactivate the user's access to this company
         $userCompanyRole->update(['is_active' => false]);
 
-        return redirect()->route('staff.index')
-            ->with('success', 'Staff access revoked successfully.');
+        // Clear active company context if it was set to this company
+        if ($removedUser) {
+            try {
+                $activeContext = \App\Models\UserActiveContext::where('user_id', $removedUser->id)
+                    ->where('active_company_id', $removedCompanyId)
+                    ->first();
+                
+                if ($activeContext) {
+                    // If user has other companies, switch to the first available one
+                    $otherCompanies = \App\Models\UserCompanyRole::where('user_id', $removedUser->id)
+                        ->where('is_active', true)
+                        ->where('company_id', '!=', $removedCompanyId)
+                        ->with('company')
+                        ->first();
+                    
+                    if ($otherCompanies) {
+                        // Switch to another company
+                        $activeContext->update(['active_company_id' => $otherCompanies->company_id]);
+                    } else {
+                        // No other companies - clear the context
+                        $activeContext->delete();
+                    }
+                }
+            } catch (\Exception $e) {
+                \Log::warning('Failed to update active company context after staff removal', [
+                    'user_id' => $removedUser->id,
+                    'company_id' => $removedCompanyId,
+                    'error' => $e->getMessage()
+                ]);
+            }
+        }
+
+        return redirect()->route('roles.index')
+            ->with('success', 'Staff member removed successfully. They will no longer have access to this company.');
     }
 
     /**
