@@ -100,6 +100,9 @@ class RoleManagementController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
+        // Refresh the role to ensure casts are applied
+        $role->refresh();
+        
         $templates = $this->roleManagementService->getAvailableTemplates($company->company_type);
 
         return view('roles.edit', compact('role', 'templates'));

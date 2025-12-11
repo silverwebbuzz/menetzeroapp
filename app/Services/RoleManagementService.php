@@ -26,10 +26,18 @@ class RoleManagementService
      */
     public function createCustomRole($companyId, $roleName, $permissions, $data = [])
     {
-        // Ensure permissions is an array
-        if (!is_array($permissions)) {
+        // Normalize permissions - handle array, JSON string, or null
+        if (is_string($permissions)) {
             $permissions = json_decode($permissions, true) ?? [];
         }
+        if (!is_array($permissions)) {
+            $permissions = [];
+        }
+        
+        // Ensure all permissions are strings and filter out empty values
+        $permissions = array_values(array_filter(array_map('strval', $permissions), function($p) {
+            return !empty($p);
+        }));
         
         return CompanyCustomRole::create([
             'company_id' => $companyId,
@@ -48,10 +56,24 @@ class RoleManagementService
     {
         $role = CompanyCustomRole::findOrFail($roleId);
         
-        // Ensure permissions is an array if provided
+        // Normalize permissions if provided
         $permissions = $data['permissions'] ?? $role->permissions;
-        if (isset($data['permissions']) && !is_array($permissions)) {
-            $permissions = json_decode($permissions, true) ?? [];
+        if (isset($data['permissions'])) {
+            // Normalize permissions - handle array, JSON string, or null
+            if (is_string($permissions)) {
+                $permissions = json_decode($permissions, true) ?? [];
+            }
+            if (!is_array($permissions)) {
+                $permissions = [];
+            }
+            
+            // Ensure all permissions are strings and filter out empty values
+            $permissions = array_values(array_filter(array_map('strval', $permissions), function($p) {
+                return !empty($p);
+            }));
+        } else {
+            // Use existing permissions and normalize them
+            $permissions = $role->getNormalizedPermissions();
         }
         
         $role->update([

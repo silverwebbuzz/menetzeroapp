@@ -38,5 +38,28 @@ class CompanyCustomRole extends Model
     {
         return $query->where('is_active', true);
     }
+
+    /**
+     * Get normalized permissions as array.
+     */
+    public function getNormalizedPermissions()
+    {
+        $permissions = $this->permissions;
+        
+        // If it's a string, decode it
+        if (is_string($permissions)) {
+            $permissions = json_decode($permissions, true);
+        }
+        
+        // Ensure it's an array
+        if (!is_array($permissions)) {
+            $permissions = [];
+        }
+        
+        // Filter out empty values and ensure all are strings
+        return array_values(array_filter(array_map('strval', $permissions), function($p) {
+            return !empty($p);
+        }));
+    }
 }
 

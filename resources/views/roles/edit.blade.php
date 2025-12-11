@@ -36,7 +36,8 @@
                 <div class="border border-gray-300 rounded-lg p-4 max-h-96 overflow-y-auto">
                     <div class="space-y-2">
                         @php
-                            $currentPermissions = is_array($role->permissions) ? $role->permissions : [];
+                            // Use the model's normalized permissions method
+                            $currentPermissions = $role->getNormalizedPermissions();
                         @endphp
                         <label class="flex items-center">
                             <input type="checkbox" name="permissions[]" value="view_dashboard" 

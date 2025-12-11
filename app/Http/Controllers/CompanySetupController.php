@@ -108,16 +108,25 @@ class CompanySetupController extends Controller
         foreach ($roleTemplates as $template) {
             // Ensure permissions is an array and matches template exactly
             $permissions = $template->permissions;
-            if (!is_array($permissions)) {
-                // If permissions is stored as JSON string, decode it
+            
+            // Normalize permissions - handle array, JSON string, or null
+            if (is_string($permissions)) {
                 $permissions = json_decode($permissions, true) ?? [];
             }
+            if (!is_array($permissions)) {
+                $permissions = [];
+            }
+            
+            // Ensure all permissions are strings and filter out empty values
+            $permissions = array_values(array_filter(array_map('strval', $permissions), function($p) {
+                return !empty($p);
+            }));
             
             CompanyCustomRole::create([
                 'company_id' => $company->id,
                 'role_name' => $template->template_name,
                 'description' => $template->description,
-                'permissions' => $permissions,
+                'permissions' => $permissions, // Will be automatically cast to JSON by Eloquent
                 'based_on_template' => $template->template_code,
                 'is_active' => true,
             ]);
