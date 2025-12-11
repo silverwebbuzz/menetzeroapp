@@ -39,7 +39,21 @@ class CompanySetupController extends Controller
         }
 
         // Get active company (if exists) - for updating incomplete info
-        $existingCompany = $user->getActiveCompany();
+        // Check if user already has a company via user_company_roles (more reliable)
+        $existingCompany = null;
+        try {
+            $existingUserCompanyRole = \App\Models\UserCompanyRole::where('user_id', $user->id)
+                ->where('is_active', true)
+                ->whereNull('company_custom_role_id') // Owner role
+                ->first();
+            
+            if ($existingUserCompanyRole) {
+                $existingCompany = \App\Models\Company::find($existingUserCompanyRole->company_id);
+            }
+        } catch (\Exception $e) {
+            // Fallback to getActiveCompany if table doesn't exist
+            $existingCompany = $user->getActiveCompany();
+        }
         
         if ($existingCompany) {
             // Update existing company information
@@ -193,34 +207,95 @@ class CompanySetupController extends Controller
             }
 
             // Create default custom roles from role templates
-            $roleTemplates = RoleTemplate::where('is_active', true)
-                ->where('is_system_template', true)
-                ->orderBy('sort_order')
-                ->get();
+            try {
+                $roleTemplates = RoleTemplate::where('is_active', true)
+                    ->where('is_system_template', true)
+                    ->orderBy('sort_order')
+                    ->get();
 
-            foreach ($roleTemplates as $template) {
-                // Check if role already exists for this company
-                $existingRole = CompanyCustomRole::where('company_id', $company->id)
-                    ->where('based_on_template', $template->template_code)
-                    ->first();
-                
-                if (!$existingRole) {
-                    // Create company custom role
-                    $customRole = CompanyCustomRole::create([
-                        'company_id' => $company->id,
-                        'role_name' => $template->template_name,
-                        'description' => $template->description,
-                        'based_on_template' => $template->template_code,
-                        'is_active' => true,
+                \Log::info('Creating default roles for company', [
+                    'company_id' => $company->id,
+                    'templates_found' => $roleTemplates->count()
+                ]);
+
+                if ($roleTemplates->isEmpty()) {
+                    \Log::warning('No role templates found to create default roles', [
+                        'company_id' => $company->id
                     ]);
+                }
 
-                    // Copy permissions from template to company custom role
-                    // Use syncWithoutDetaching to avoid duplicate entry errors
-                    $templatePermissions = $template->permissions()->pluck('permissions.id')->toArray();
-                    if (!empty($templatePermissions)) {
-                        $customRole->permissions()->syncWithoutDetaching($templatePermissions);
+                foreach ($roleTemplates as $template) {
+                    try {
+                        // Check if role already exists for this company
+                        $existingRole = CompanyCustomRole::where('company_id', $company->id)
+                            ->where('based_on_template', $template->template_code)
+                            ->first();
+                        
+                        if (!$existingRole) {
+                            // Create company custom role
+                            $customRole = CompanyCustomRole::create([
+                                'company_id' => $company->id,
+                                'role_name' => $template->template_name,
+                                'description' => $template->description,
+                                'based_on_template' => $template->template_code,
+                                'is_active' => true,
+                            ]);
+
+                            \Log::info('Created company custom role', [
+                                'company_id' => $company->id,
+                                'role_id' => $customRole->id,
+                                'role_name' => $customRole->role_name,
+                                'template_code' => $template->template_code
+                            ]);
+
+                            // Copy permissions from template to company custom role
+                            // Use syncWithoutDetaching to avoid duplicate entry errors
+                            $templatePermissions = $template->permissions()->pluck('permissions.id')->toArray();
+                            
+                            \Log::info('Copying permissions from template', [
+                                'template_id' => $template->id,
+                                'template_code' => $template->template_code,
+                                'permissions_count' => count($templatePermissions)
+                            ]);
+
+                            if (!empty($templatePermissions)) {
+                                $customRole->permissions()->syncWithoutDetaching($templatePermissions);
+                                
+                                \Log::info('Permissions copied successfully', [
+                                    'role_id' => $customRole->id,
+                                    'permissions_count' => count($templatePermissions)
+                                ]);
+                            } else {
+                                \Log::warning('Template has no permissions to copy', [
+                                    'template_id' => $template->id,
+                                    'template_code' => $template->template_code
+                                ]);
+                            }
+                        } else {
+                            \Log::info('Role already exists, skipping', [
+                                'company_id' => $company->id,
+                                'template_code' => $template->template_code,
+                                'existing_role_id' => $existingRole->id
+                            ]);
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error('Error creating role from template', [
+                            'company_id' => $company->id,
+                            'template_id' => $template->id,
+                            'template_code' => $template->template_code,
+                            'error' => $e->getMessage(),
+                            'trace' => $e->getTraceAsString()
+                        ]);
+                        // Continue with next template even if one fails
                     }
                 }
+            } catch (\Exception $e) {
+                \Log::error('Error creating default roles from templates', [
+                    'company_id' => $company->id,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                // Don't fail the entire company setup if roles fail
             }
         }
 
