@@ -67,7 +67,9 @@ class DashboardController extends Controller
         
         // STEP 4: Check if company information is incomplete
         // Only check if company name is missing or very basic - other fields are optional
-        if (empty($company->name) || trim($company->name) === '' || $company->name === 'New Company') {
+        // Also check if company name is just a placeholder or empty string
+        $companyName = trim($company->name ?? '');
+        if (empty($companyName) || $companyName === 'New Company' || $companyName === '') {
             return view('dashboard.index', [
                 'needsCompanySetup' => true,
                 'company' => $company,

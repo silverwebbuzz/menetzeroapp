@@ -31,11 +31,12 @@ class RegisterController extends Controller
         ]);
 
         // Create new user in users table (clients only)
-        // No role field - all roles managed in user_company_roles
+        // Set role to company_admin since they're registering as a client
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => 'company_admin', // Client registration = company_admin
             'is_active' => true,
         ]);
 

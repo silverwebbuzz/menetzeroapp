@@ -76,7 +76,7 @@ class OAuthController extends Controller
                 'provider' => 'google',
                 'password' => Hash::make(Str::random(24)),
                 'email_verified_at' => now(),
-                'role' => 'company_user',
+                'role' => 'company_admin', // Client registration = company_admin
                 'is_active' => true,
             ]);
             

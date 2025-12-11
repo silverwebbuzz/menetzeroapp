@@ -56,6 +56,18 @@ class CompanySetupController extends Controller
             
             // Refresh the model to get updated data
             $company = $existingCompany->fresh();
+            
+            // Set active company context to ensure dashboard recognizes it
+            try {
+                $user->switchToCompany($company->id);
+            } catch (\Exception $e) {
+                // If switchToCompany fails, that's okay - getActiveCompany() has fallback logic
+                \Log::warning('Failed to set active company context after update', [
+                    'user_id' => $user->id,
+                    'company_id' => $company->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
         } else {
             // Create new company (always client type)
             $company = Company::create([
@@ -92,6 +104,18 @@ class CompanySetupController extends Controller
                     if (!$userCompanyRole || !$userCompanyRole->id) {
                         throw new \Exception('UserCompanyRole was not created successfully');
                     }
+                }
+                
+                // Set active company context to ensure dashboard recognizes it
+                try {
+                    $user->switchToCompany($company->id);
+                } catch (\Exception $e) {
+                    // If switchToCompany fails, that's okay - getActiveCompany() has fallback logic
+                    \Log::warning('Failed to set active company context after creation', [
+                        'user_id' => $user->id,
+                        'company_id' => $company->id,
+                        'error' => $e->getMessage()
+                    ]);
                 }
             } catch (\Exception $e) {
                 // Log the error for debugging
