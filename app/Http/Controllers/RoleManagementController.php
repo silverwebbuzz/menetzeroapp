@@ -18,7 +18,7 @@ class RoleManagementController extends Controller
     }
 
     /**
-     * Display a listing of custom roles.
+     * Display a listing of custom roles and staff members.
      */
     public function index()
     {
@@ -30,6 +30,7 @@ class RoleManagementController extends Controller
                 ->with('error', 'Please complete your company setup first.');
         }
 
+        // Get roles with user counts
         $customRoles = $company->customRoles()
             ->where('is_active', true)
             ->withCount(['users' => function($query) {
@@ -37,7 +38,20 @@ class RoleManagementController extends Controller
             }])
             ->get();
 
-        return view('roles.index', compact('customRoles'));
+        // Get all staff members (users with roles in this company)
+        $staffMembers = \App\Models\UserCompanyRole::where('company_id', $company->id)
+            ->where('is_active', true)
+            ->with(['user', 'companyCustomRole'])
+            ->get();
+
+        // Get pending invitations
+        $pendingInvitations = \App\Models\CompanyInvitation::where('company_id', $company->id)
+            ->where('status', 'pending')
+            ->where('expires_at', '>', now())
+            ->with('inviter')
+            ->get();
+
+        return view('roles.index', compact('customRoles', 'staffMembers', 'pendingInvitations'));
     }
 
     /**

@@ -152,10 +152,10 @@ Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client'])->
         'destroy' => 'roles.destroy',
     ]);
     
-    // Staff Management routes - EXPLICIT NAMES for client
+    // Staff Management routes - Redirect to roles page (combined view)
     Route::prefix('staff')->name('staff.')->group(function () {
-        Route::get('/', [\App\Http\Controllers\StaffManagementController::class, 'index'])->name('index');
-        Route::get('/create', [\App\Http\Controllers\StaffManagementController::class, 'create'])->name('create');
+        Route::get('/', function() { return redirect()->route('roles.index'); })->name('index');
+        Route::get('/create', function() { return redirect()->route('roles.index'); })->name('create');
         Route::post('/', [\App\Http\Controllers\StaffManagementController::class, 'store'])->name('store');
         Route::get('/invitations/{invitation}/success', [\App\Http\Controllers\StaffManagementController::class, 'invitationSuccess'])->name('invitation-success');
         Route::put('/{access}/role', [\App\Http\Controllers\StaffManagementController::class, 'updateRole'])->name('update-role');

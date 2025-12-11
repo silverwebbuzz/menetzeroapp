@@ -89,15 +89,15 @@ class StaffManagementController extends Controller
         
         // No templates needed - using company custom roles only
 
-        return view('staff.create', compact('customRoles', 'templates'));
+        return view('staff.create', compact('customRoles'));
     }
 
     /**
-     * Store a newly invited staff member.
+     * Store a newly created or invited staff member.
      */
     public function store(Request $request)
     {
-        $this->requirePermission('staff_management', 'view');
+        $this->requirePermission('staff_management', 'add');
         
         $company = Auth::user()->getActiveCompany();
         if (!$company) {
@@ -105,39 +105,77 @@ class StaffManagementController extends Controller
                 ->with('error', 'Please complete your company setup first.');
         }
 
-        $request->validate([
-            'email' => 'required|email|max:255',
-            'custom_role_id' => 'required|exists:company_custom_roles,id',
-            'notes' => 'nullable|string',
-        ]);
+        // If name and password provided, create user directly; otherwise send invitation
+        if ($request->filled('name') && $request->filled('password')) {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|max:255|unique:users,email',
+                'password' => 'required|string|min:8',
+                'confirm_password' => 'required|same:password',
+                'phone' => 'nullable|string|max:20',
+                'custom_role_id' => 'required|exists:company_custom_roles,id',
+            ]);
 
-        // Check user limit before inviting
-        $limitCheck = $this->subscriptionService->canPerformAction($company->id, 'users', 1);
-        if (!$limitCheck['allowed']) {
-            return back()->withErrors(['email' => $limitCheck['message']])->withInput();
-        }
+            // Check user limit
+            $limitCheck = $this->subscriptionService->canPerformAction($company->id, 'users', 1);
+            if (!$limitCheck['allowed']) {
+                return back()->withErrors(['email' => $limitCheck['message']])->withInput();
+            }
 
-        try {
-            $invitation = $this->invitationService->inviteUser(
-                $company->id,
-                $request->email,
-                null, // role_id removed
-                Auth::id(),
-                [
-                    'custom_role_id' => $request->custom_role_id,
-                    'notes' => $request->notes,
-                ]
-            );
+            // Create user
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => bcrypt($request->password),
+                'phone' => $request->phone,
+                'company_id' => $company->id,
+                'role' => 'company_user',
+                'is_active' => $request->status === 'active',
+            ]);
 
-            // Store invitation in session in case it wasn't saved to DB
-            session(['invitation' => $invitation]);
+            // Assign role
+            \App\Models\UserCompanyRole::create([
+                'user_id' => $user->id,
+                'company_id' => $company->id,
+                'company_custom_role_id' => $request->custom_role_id,
+                'assigned_by' => Auth::id(),
+                'is_active' => true,
+            ]);
 
-            // Redirect to success page with invitation details
-            $invitationId = $invitation->id ?? 0;
-            return redirect()->route('staff.invitation-success', $invitationId)
-                ->with('invitation', $invitation);
-        } catch (\Exception $e) {
-            return back()->withErrors(['email' => $e->getMessage()])->withInput();
+            return redirect()->route('roles.index')
+                ->with('success', 'User created successfully.');
+        } else {
+            // Send invitation (existing flow)
+            $request->validate([
+                'email' => 'required|email|max:255',
+                'custom_role_id' => 'required|exists:company_custom_roles,id',
+                'notes' => 'nullable|string',
+            ]);
+
+            $limitCheck = $this->subscriptionService->canPerformAction($company->id, 'users', 1);
+            if (!$limitCheck['allowed']) {
+                return back()->withErrors(['email' => $limitCheck['message']])->withInput();
+            }
+
+            try {
+                $invitation = $this->invitationService->inviteUser(
+                    $company->id,
+                    $request->email,
+                    null,
+                    Auth::id(),
+                    [
+                        'custom_role_id' => $request->custom_role_id,
+                        'notes' => $request->notes,
+                    ]
+                );
+
+                session(['invitation' => $invitation]);
+                $invitationId = $invitation->id ?? 0;
+                return redirect()->route('staff.invitation-success', $invitationId)
+                    ->with('invitation', $invitation);
+            } catch (\Exception $e) {
+                return back()->withErrors(['email' => $e->getMessage()])->withInput();
+            }
         }
     }
 
