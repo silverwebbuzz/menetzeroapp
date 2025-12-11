@@ -53,8 +53,17 @@ class DashboardController extends Controller
             }
         }
         
-        // If still no company after trying to set context, show no access message
+        // If still no company after trying to set context
         if (!$company) {
+            // Check if user is staff (not owner) - they shouldn't see company setup
+            $isStaff = $user->isStaffInAnyCompany() && !$user->ownsCompany();
+            
+            if ($isStaff) {
+                // Staff user with no active company - show no access message
+                return view('dashboard.no-company-access');
+            }
+            
+            // Owner with no company - show company setup form
             return view('dashboard.index', [
                 'needsCompanySetup' => true,
                 'kpis' => [

@@ -389,16 +389,37 @@ class User extends Authenticatable
             // Fallback: Get owned company first (if exists)
             $ownedCompany = $this->getOwnedCompany();
             if ($ownedCompany) {
+                // Auto-set active context for owned company if not set
+                if (!$context || !$context->active_company_id) {
+                    try {
+                        $this->switchToCompany($ownedCompany->id);
+                    } catch (\Exception $e) {
+                        // Ignore if switch fails
+                    }
+                }
                 return $ownedCompany;
             }
             
             // Fallback: Get first staff company
             $staffCompanies = $this->getStaffCompanies();
             if ($staffCompanies->isNotEmpty()) {
-                return $staffCompanies->first()['company'];
+                $firstStaffCompany = $staffCompanies->first()['company'];
+                // Auto-set active context for staff company if not set
+                if (!$context || !$context->active_company_id) {
+                    try {
+                        $this->switchToCompany($firstStaffCompany->id);
+                    } catch (\Exception $e) {
+                        // Ignore if switch fails
+                    }
+                }
+                return $firstStaffCompany;
             }
         } catch (\Exception $e) {
             // If tables don't exist yet, fall back to company_id
+            \Log::warning('Error in getActiveCompany', [
+                'user_id' => $this->id,
+                'error' => $e->getMessage()
+            ]);
         }
         
         // Fallback: Internal user's company (backward compatibility)
