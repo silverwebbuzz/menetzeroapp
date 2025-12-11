@@ -141,19 +141,31 @@ class CompanyInvitationService
             }
         }
 
-        // Create user company role record
+        // Create or reactivate user company role record
         // Use company_custom_role_id (primary) or fallback to custom_role_id (backward compatibility)
         $roleId = $invitation->company_custom_role_id ?? $invitation->custom_role_id;
         
         try {
             if ($roleId) {
-                // Check if user already has access to this company
+                // Check if user already has (or had) access to this company (including inactive records)
                 $existingAccess = UserCompanyRole::where('user_id', $user->id)
                     ->where('company_id', $invitation->company_id)
-                    ->where('is_active', true)
                     ->first();
                 
-                if (!$existingAccess) {
+                if ($existingAccess) {
+                    // Reactivate existing access and update role if needed
+                    $existingAccess->update([
+                        'company_custom_role_id' => $roleId,
+                        'assigned_by' => $invitation->invited_by,
+                        'is_active' => true,
+                    ]);
+                    \Log::info('Reactivated existing UserCompanyRole for re-invited staff', [
+                        'user_id' => $user->id,
+                        'company_id' => $invitation->company_id,
+                        'user_company_role_id' => $existingAccess->id
+                    ]);
+                } else {
+                    // Create new access record
                     UserCompanyRole::create([
                         'user_id' => $user->id,
                         'company_id' => $invitation->company_id,
@@ -161,11 +173,20 @@ class CompanyInvitationService
                         'assigned_by' => $invitation->invited_by,
                         'is_active' => true,
                     ]);
+                    \Log::info('Created new UserCompanyRole for invited staff', [
+                        'user_id' => $user->id,
+                        'company_id' => $invitation->company_id
+                    ]);
                 }
             }
         } catch (\Exception $e) {
             // If table doesn't exist, this is fine - will be created when migration runs
             if (strpos($e->getMessage(), "doesn't exist") === false) {
+                \Log::error('Failed to create/reactivate UserCompanyRole', [
+                    'user_id' => $user->id,
+                    'company_id' => $invitation->company_id,
+                    'error' => $e->getMessage()
+                ]);
                 throw $e;
             }
         }

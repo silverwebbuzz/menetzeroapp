@@ -114,11 +114,34 @@ class InvitationController extends Controller
                     return back()->withErrors(['error' => 'Invitation not found.'])->withInput();
                 }
                 
+                // Check if invitation is still valid
+                if ($invitation->status !== 'pending') {
+                    return back()->withErrors(['error' => 'This invitation has already been processed.'])->withInput();
+                }
+                
                 // Check if user already exists before accepting
                 $userBeforeAccept = \App\Models\User::where('email', $invitation->email)->first();
                 $userId = $loggedInUser ? $loggedInUser->id : null;
 
-                $newUser = $this->invitationService->acceptInvitation($token, $userId);
+                // If logged in user email doesn't match invitation email, log them out first
+                if ($loggedInUser && $loggedInUser->email !== $invitation->email) {
+                    Auth::guard('web')->logout();
+                    $loggedInUser = null;
+                    $userId = null;
+                }
+
+                // Accept the invitation (this will create/reactivate UserCompanyRole)
+                try {
+                    $newUser = $this->invitationService->acceptInvitation($token, $userId);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to accept invitation', [
+                        'token' => $token,
+                        'email' => $invitation->email,
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                    return back()->withErrors(['error' => 'Failed to accept invitation: ' . $e->getMessage()])->withInput();
+                }
 
                 // If user didn't exist before accepting, redirect to password setup (Slack-style)
                 if (!$userBeforeAccept) {
@@ -127,33 +150,37 @@ class InvitationController extends Controller
                     return redirect()->route('invitations.setup-password', ['token' => $token, 'password_token' => $passwordToken])
                         ->with('user', $newUser);
                 } else {
-                // Existing user - log them in if not already logged in
-                if (!$loggedInUser) {
-                    Auth::guard('web')->login($newUser);
-                }
-                
-                // Set active company context from invitation
-                try {
-                    if ($invitation && $invitation->company_id) {
-                        $newUser->switchToCompany($invitation->company_id);
+                    // Existing user - log them in if not already logged in
+                    if (!$loggedInUser || $loggedInUser->id !== $newUser->id) {
+                        Auth::guard('web')->login($newUser);
+                        // Get fresh user instance after login
+                        $newUser = Auth::guard('web')->user();
                     }
-                } catch (\Exception $e) {
-                    \Log::warning('Failed to set active company context after invitation acceptance', [
-                        'user_id' => $newUser->id,
-                        'company_id' => $invitation->company_id ?? null,
-                        'error' => $e->getMessage()
-                    ]);
-                }
-                
-                // Check if user has multiple company access - show workspace selector
-                if ($newUser->hasMultipleCompanyAccess()) {
-                    return redirect()->route('account.selector')
-                        ->with('success', 'Invitation accepted successfully! Select a company to continue.');
-                }
-                
-                // Single company access - go to dashboard
-                return redirect()->route('client.dashboard')
-                    ->with('success', 'Invitation accepted successfully!');
+                    
+                    // Set active company context from invitation (already done in acceptInvitation, but ensure it's set)
+                    try {
+                        if ($invitation && $invitation->company_id) {
+                            $newUser->switchToCompany($invitation->company_id);
+                            // Refresh user to get updated context
+                            $newUser = $newUser->fresh();
+                        }
+                    } catch (\Exception $e) {
+                        \Log::warning('Failed to set active company context after invitation acceptance', [
+                            'user_id' => $newUser->id,
+                            'company_id' => $invitation->company_id ?? null,
+                            'error' => $e->getMessage()
+                        ]);
+                    }
+                    
+                    // Check if user has multiple company access - show workspace selector
+                    if ($newUser->hasMultipleCompanyAccess()) {
+                        return redirect()->route('account.selector')
+                            ->with('success', 'Invitation accepted successfully! Select a company to continue.');
+                    }
+                    
+                    // Single company access - go to dashboard
+                    return redirect()->route('client.dashboard')
+                        ->with('success', 'Invitation accepted successfully! Welcome back!');
                 }
             } else {
                 // Decline invitation
