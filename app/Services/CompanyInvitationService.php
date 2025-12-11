@@ -61,15 +61,22 @@ class CompanyInvitationService
             }
         }
 
-        // Create invitation (will work even if table doesn't exist yet - Laravel will handle it)
+        // Create invitation - DO NOT create user yet (user will be created when accepting invitation)
         // Use company_custom_role_id as primary field
         try {
+            \Log::info('Attempting to create invitation record', [
+                'company_id' => $companyId,
+                'email' => $email,
+                'custom_role_id' => $data['custom_role_id'] ?? null,
+                'company_custom_role_id' => $data['company_custom_role_id'] ?? $data['custom_role_id'] ?? null,
+            ]);
+
             $invitation = CompanyInvitation::create([
                 'company_id' => $companyId,
                 'email' => $email,
                 'role_id' => null, // Legacy - not used
                 'custom_role_id' => $data['custom_role_id'] ?? null, // Legacy - for backward compatibility
-                'company_custom_role_id' => $data['custom_role_id'] ?? $data['company_custom_role_id'] ?? null, // Primary field
+                'company_custom_role_id' => $data['company_custom_role_id'] ?? $data['custom_role_id'] ?? null, // Primary field
                 'access_level' => 'view', // Legacy - not used
                 'token' => Str::random(64),
                 'status' => 'pending',
@@ -78,29 +85,22 @@ class CompanyInvitationService
                 'expires_at' => now()->addDays(7),
                 'notes' => $data['notes'] ?? null,
             ]);
+
+            \Log::info('Invitation created successfully in database', [
+                'invitation_id' => $invitation->id,
+                'token' => $invitation->token,
+                'email' => $email
+            ]);
         } catch (\Exception $e) {
-            // If table doesn't exist, create a temporary invitation object
-            if (strpos($e->getMessage(), "doesn't exist") !== false) {
-                $invitation = new CompanyInvitation([
-                    'company_id' => $companyId,
-                    'email' => $email,
-                    'role_id' => null,
-                    'custom_role_id' => $data['custom_role_id'] ?? null,
-                    'company_custom_role_id' => $data['custom_role_id'] ?? $data['company_custom_role_id'] ?? null,
-                    'access_level' => 'view',
-                    'token' => Str::random(64),
-                    'status' => 'pending',
-                    'invited_by' => $invitedBy,
-                    'invited_at' => now(),
-                    'expires_at' => now()->addDays(7),
-                    'notes' => $data['notes'] ?? null,
-                ]);
-                // Set ID manually for display purposes
-                $invitation->id = 0;
-                $invitation->exists = false;
-            } else {
-                throw $e;
-            }
+            \Log::error('Failed to create invitation in database', [
+                'company_id' => $companyId,
+                'email' => $email,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            // Re-throw the error so we can see what's wrong
+            throw new \Exception('Failed to create invitation: ' . $e->getMessage());
         }
 
         // Send invitation email (you'll need to create the mailable)

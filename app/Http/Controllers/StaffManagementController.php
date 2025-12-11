@@ -105,8 +105,9 @@ class StaffManagementController extends Controller
                 ->with('error', 'Please complete your company setup first.');
         }
 
-        // If name and password provided, create user directly; otherwise send invitation
-        if ($request->filled('name') && $request->filled('password')) {
+        // Always send invitation - users will set password when accepting
+        // Remove direct user creation flow - all staff must be invited
+        if (false && $request->filled('name') && $request->filled('password')) {
             $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|max:255',
@@ -170,11 +171,11 @@ class StaffManagementController extends Controller
                 return back()->withErrors(['error' => 'Failed to assign role: ' . $e->getMessage()])->withInput();
             }
         } else {
-            // Send invitation (existing flow)
+            // Send invitation (always use invitation flow - no direct user creation)
             $request->validate([
                 'email' => 'required|email|max:255',
                 'custom_role_id' => 'required|exists:company_custom_roles,id',
-                'notes' => 'nullable|string',
+                'notes' => 'nullable|string|max:1000',
             ]);
 
             $limitCheck = $this->subscriptionService->canPerformAction($company->id, 'users', 1);
@@ -183,6 +184,13 @@ class StaffManagementController extends Controller
             }
 
             try {
+                \Log::info('Creating invitation for staff', [
+                    'company_id' => $company->id,
+                    'email' => $request->email,
+                    'custom_role_id' => $request->custom_role_id,
+                    'invited_by' => Auth::id()
+                ]);
+
                 $invitation = $this->invitationService->inviteUser(
                     $company->id,
                     $request->email,
@@ -190,15 +198,40 @@ class StaffManagementController extends Controller
                     Auth::id(),
                     [
                         'custom_role_id' => $request->custom_role_id,
+                        'company_custom_role_id' => $request->custom_role_id, // Ensure both are set
                         'notes' => $request->notes,
                     ]
                 );
 
+                \Log::info('Invitation created successfully', [
+                    'invitation_id' => $invitation->id ?? 'N/A',
+                    'token' => $invitation->token ?? 'N/A',
+                    'email' => $request->email
+                ]);
+
+                // Store in session as backup
                 session(['invitation' => $invitation]);
                 $invitationId = $invitation->id ?? 0;
-                return redirect()->route('staff.invitation-success', $invitationId)
-                    ->with('invitation', $invitation);
+                
+                // Redirect to invitation success page
+                // Use invitation ID if available, otherwise use token
+                if ($invitationId > 0) {
+                    return redirect()->route('staff.invitation-success', ['invitation' => $invitationId])
+                        ->with('invitation', $invitation)
+                        ->with('success', 'Invitation sent successfully!');
+                } else {
+                    // If invitation ID is 0 (table doesn't exist), use token in session
+                    return redirect()->route('staff.invitation-success', ['invitation' => 0])
+                        ->with('invitation', $invitation)
+                        ->with('success', 'Invitation sent successfully!');
+                }
             } catch (\Exception $e) {
+                \Log::error('Failed to create invitation', [
+                    'company_id' => $company->id,
+                    'email' => $request->email,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
                 return back()->withErrors(['email' => $e->getMessage()])->withInput();
             }
         }
@@ -250,8 +283,9 @@ class StaffManagementController extends Controller
 
     /**
      * Show invitation success page with details.
+     * Displays email and invitation link for testing (since email is not configured).
      */
-    public function invitationSuccess($invitationId)
+    public function invitationSuccess($invitation)
     {
         $company = Auth::user()->getActiveCompany();
         if (!$company) {
@@ -259,49 +293,71 @@ class StaffManagementController extends Controller
                 ->with('error', 'Please complete your company setup first.');
         }
 
+        // $invitation can be ID (int) from route parameter
+        $invitationId = is_numeric($invitation) ? (int)$invitation : (is_object($invitation) ? $invitation->id : 0);
+        
+        // Try to get invitation from database first
+        $invitationModel = null;
         try {
-            $invitation = CompanyInvitation::with(['company', 'inviter', 'customRole'])
-                ->where('id', $invitationId)
-                ->where('company_id', $company->id)
-                ->first();
-            
-            // If invitation not found in DB (table doesn't exist), get from session
-            if (!$invitation) {
-                $invitation = session('invitation');
-                if (!$invitation) {
-                    return redirect()->route('staff.index')
-                        ->with('error', 'Invitation not found.');
-                }
-                // Load relationships manually
-                $invitation->company = $company;
-                $invitation->inviter = Auth::user();
-                if ($invitation->custom_role_id) {
-                    $invitation->customRole = CompanyCustomRole::find($invitation->custom_role_id);
-                }
+            if ($invitationId > 0) {
+                $invitationModel = CompanyInvitation::with(['company', 'inviter', 'customRole'])
+                    ->where('id', $invitationId)
+                    ->where('company_id', $company->id)
+                    ->first();
             }
         } catch (\Exception $e) {
-            // If table doesn't exist, get from session
-            $invitation = session('invitation');
-            if (!$invitation) {
-                return redirect()->route('staff.index')
-                    ->with('error', 'Invitation not found.');
+            \Log::warning('Error fetching invitation from database', [
+                'error' => $e->getMessage(),
+                'invitation_id' => $invitationId
+            ]);
+        }
+        
+        // If not found in DB, get from session
+        if (!$invitationModel) {
+            $invitationModel = session('invitation');
+            if (!$invitationModel) {
+                return redirect()->route('roles.index')
+                    ->with('error', 'Invitation not found. Please try sending the invitation again.');
             }
+            
             // Load relationships manually
-            $invitation->company = $company;
-            $invitation->inviter = Auth::user();
-            if ($invitation->custom_role_id) {
+            $invitationModel->company = $company;
+            $invitationModel->inviter = Auth::user();
+            
+            // Get custom role (check both company_custom_role_id and custom_role_id)
+            $roleId = $invitationModel->company_custom_role_id ?? $invitationModel->custom_role_id;
+            if ($roleId) {
                 try {
-                    $invitation->customRole = CompanyCustomRole::find($invitation->custom_role_id);
+                    $invitationModel->customRole = CompanyCustomRole::find($roleId);
                 } catch (\Exception $e) {
-                    $invitation->customRole = null;
+                    $invitationModel->customRole = null;
                 }
             }
         }
 
-        // Generate invitation acceptance URL
-        $acceptUrl = route('invitations.accept', ['token' => $invitation->token]);
+        // Ensure token exists
+        if (empty($invitationModel->token)) {
+            \Log::error('Invitation missing token', [
+                'invitation_id' => $invitationModel->id ?? 'N/A'
+            ]);
+            return redirect()->route('roles.index')
+                ->with('error', 'Invitation is missing required information. Please try again.');
+        }
 
-        return view('staff.invitation-success', compact('invitation', 'acceptUrl'));
+        // Generate invitation acceptance URL
+        $acceptUrl = route('invitations.accept', ['token' => $invitationModel->token]);
+
+        \Log::info('Displaying invitation success page', [
+            'invitation_id' => $invitationModel->id ?? 'N/A',
+            'email' => $invitationModel->email,
+            'token' => $invitationModel->token,
+            'accept_url' => $acceptUrl
+        ]);
+
+        return view('staff.invitation-success', [
+            'invitation' => $invitationModel,
+            'acceptUrl' => $acceptUrl
+        ]);
     }
 
     /**

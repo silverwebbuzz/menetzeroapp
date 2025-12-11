@@ -13,8 +13,13 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                 </svg>
             </div>
-            <h1 class="mt-4 text-2xl font-bold text-gray-900">Invitation Sent Successfully!</h1>
-            <p class="mt-2 text-gray-600">An invitation has been sent to <strong>{{ $invitation->email }}</strong></p>
+            <h1 class="mt-4 text-2xl font-bold text-gray-900">Invitation Created Successfully!</h1>
+            <p class="mt-2 text-gray-700">
+                Invitation for <strong class="text-lg text-blue-600">{{ $invitation->email }}</strong> has been created.
+            </p>
+            <p class="mt-2 text-sm text-yellow-600 font-medium bg-yellow-50 px-3 py-2 rounded-lg inline-block">
+                ⚠️ Email functionality is not configured yet. Use the test link below to test the invitation.
+            </p>
         </div>
 
         <!-- Invitation Details -->
@@ -101,8 +106,12 @@
         <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-3">🔗 Test Invitation Link</h3>
             <p class="text-sm text-gray-700 mb-4">
-                Since email is not configured, you can use this link to test the invitation acceptance:
+                <strong>Email functionality is not configured yet.</strong> Use this link to test the invitation acceptance:
             </p>
+            <div class="mb-4 p-4 bg-white border-2 border-yellow-300 rounded-lg">
+                <p class="text-sm font-medium text-gray-700 mb-1">📧 Invited Email:</p>
+                <p class="text-lg font-bold text-blue-600">{{ $invitation->email }}</p>
+            </div>
             <div class="bg-white rounded-lg p-4 border border-yellow-200 mb-4">
                 <div class="flex items-center gap-2">
                     <input type="text" 
@@ -130,14 +139,14 @@
 
         <!-- Actions -->
         <div class="flex items-center justify-between pt-6 border-t border-gray-200">
-            <a href="{{ route('staff.index') }}" 
+            <a href="{{ route('roles.index') }}" 
                class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-                Back to Staff List
+                Back to Staff & Roles
             </a>
-            <a href="{{ route('staff.create') }}" 
+            <button onclick="openAddUserModal()" 
                class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700">
                 Invite Another Staff Member
-            </a>
+            </button>
         </div>
     </div>
 </div>
