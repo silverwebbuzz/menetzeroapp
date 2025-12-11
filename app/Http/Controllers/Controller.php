@@ -8,9 +8,9 @@ abstract class Controller
 {
     /**
      * Check if user has permission, abort if not.
-     * Supports multiple permission formats for backward compatibility.
+     * Supports both old format (single string) and new format (module, action).
      */
-    protected function requirePermission($permission, $alternativePermissions = [])
+    protected function requirePermission($permissionOrModule, $action = null, $alternativePermissions = [])
     {
         $user = Auth::user();
         $company = $user->getActiveCompany();
@@ -21,15 +21,30 @@ abstract class Controller
             return;
         }
 
-        // Check primary permission
-        if ($user->hasPermission($permission, $companyId)) {
-            return;
+        // New format: module and action
+        if ($action !== null) {
+            if ($user->hasModulePermission($permissionOrModule, $action, $companyId)) {
+                return;
+            }
+        } else {
+            // Old format: single permission string
+            if ($user->hasPermission($permissionOrModule, $companyId)) {
+                return;
+            }
         }
 
         // Check alternative permissions if provided
         foreach ($alternativePermissions as $altPermission) {
-            if ($user->hasPermission($altPermission, $companyId)) {
-                return;
+            if (is_array($altPermission) && count($altPermission) === 2) {
+                // New format: [module, action]
+                if ($user->hasModulePermission($altPermission[0], $altPermission[1], $companyId)) {
+                    return;
+                }
+            } else {
+                // Old format: string
+                if ($user->hasPermission($altPermission, $companyId)) {
+                    return;
+                }
             }
         }
 

@@ -22,7 +22,7 @@ class RoleManagementController extends Controller
      */
     public function index()
     {
-        $this->requirePermission('manage_settings');
+        $this->requirePermission('roles_permissions', 'view');
         
         $company = Auth::user()->getActiveCompany();
         if (!$company) {
@@ -30,10 +30,14 @@ class RoleManagementController extends Controller
                 ->with('error', 'Please complete your company setup first.');
         }
 
-        $customRoles = $company->customRoles()->where('is_active', true)->get();
-        $templates = $this->roleManagementService->getAvailableTemplates($company->company_type);
+        $customRoles = $company->customRoles()
+            ->where('is_active', true)
+            ->withCount(['users' => function($query) {
+                $query->where('is_active', true);
+            }])
+            ->get();
 
-        return view('roles.index', compact('customRoles', 'templates'));
+        return view('roles.index', compact('customRoles'));
     }
 
     /**
@@ -41,7 +45,7 @@ class RoleManagementController extends Controller
      */
     public function create()
     {
-        $this->requirePermission('manage_settings');
+        $this->requirePermission('roles_permissions', 'add');
         
         $company = Auth::user()->getActiveCompany();
         if (!$company) {
@@ -49,9 +53,9 @@ class RoleManagementController extends Controller
                 ->with('error', 'Please complete your company setup first.');
         }
 
-        $templates = $this->roleManagementService->getAvailableTemplates($company->company_type);
+        $permissions = $this->roleManagementService->getPermissionsGroupedByModule();
 
-        return view('roles.create', compact('templates'));
+        return view('roles.create', compact('permissions'));
     }
 
     /**
@@ -59,7 +63,7 @@ class RoleManagementController extends Controller
      */
     public function store(Request $request)
     {
-        $this->requirePermission('manage_settings');
+        $this->requirePermission('roles_permissions', 'add');
         
         $company = Auth::user()->getActiveCompany();
         if (!$company) {
@@ -70,17 +74,16 @@ class RoleManagementController extends Controller
         $request->validate([
             'role_name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'permissions' => 'required|array',
-            'based_on_template' => 'nullable|string',
+            'permission_ids' => 'required|array|min:1',
+            'permission_ids.*' => 'exists:permissions,id',
         ]);
 
         $this->roleManagementService->createCustomRole(
             $company->id,
             $request->role_name,
-            $request->permissions,
+            $request->permission_ids,
             [
                 'description' => $request->description,
-                'based_on_template' => $request->based_on_template,
             ]
         );
 
@@ -93,19 +96,18 @@ class RoleManagementController extends Controller
      */
     public function edit(CompanyCustomRole $role)
     {
-        $this->requirePermission('manage_settings');
+        $this->requirePermission('roles_permissions', 'edit');
         
         $company = Auth::user()->getActiveCompany();
         if (!$company || $role->company_id !== $company->id) {
             abort(403, 'Unauthorized action.');
         }
 
-        // Refresh the role to ensure casts are applied
-        $role->refresh();
-        
-        $templates = $this->roleManagementService->getAvailableTemplates($company->company_type);
+        $role->load('permissions');
+        $permissions = $this->roleManagementService->getPermissionsGroupedByModule();
+        $selectedPermissionIds = $role->getPermissionIds();
 
-        return view('roles.edit', compact('role', 'templates'));
+        return view('roles.edit', compact('role', 'permissions', 'selectedPermissionIds'));
     }
 
     /**
@@ -113,7 +115,7 @@ class RoleManagementController extends Controller
      */
     public function update(Request $request, CompanyCustomRole $role)
     {
-        $this->requirePermission('manage_settings');
+        $this->requirePermission('roles_permissions', 'edit');
         
         $company = Auth::user()->getActiveCompany();
         if (!$company || $role->company_id !== $company->id) {
@@ -123,14 +125,15 @@ class RoleManagementController extends Controller
         $request->validate([
             'role_name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'permissions' => 'required|array',
+            'permission_ids' => 'required|array|min:1',
+            'permission_ids.*' => 'exists:permissions,id',
             'is_active' => 'boolean',
         ]);
 
         $this->roleManagementService->updateCustomRole($role->id, [
             'role_name' => $request->role_name,
             'description' => $request->description,
-            'permissions' => $request->permissions,
+            'permission_ids' => $request->permission_ids,
             'is_active' => $request->has('is_active'),
         ]);
 

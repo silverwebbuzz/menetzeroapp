@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\UserCompanyAccess;
+use App\Models\UserCompanyRole;
 use App\Models\Company;
 
 class AccountSelectorController extends Controller
@@ -26,17 +26,17 @@ class AccountSelectorController extends Controller
 
         $accessibleCompanies = collect();
         
-        // Add companies from user_company_access
-        $accessRecords = $user->accessibleCompanies()->where('status', 'active')->get();
-        foreach ($accessRecords as $access) {
-            $company = Company::find($access->company_id);
+        // Add companies from user_company_roles
+        $userCompanyRoles = $user->companyRoles()->where('is_active', true)->with('companyCustomRole')->get();
+        foreach ($userCompanyRoles as $userCompanyRole) {
+            $company = Company::find($userCompanyRole->company_id);
             if ($company) {
                 $accessibleCompanies->push([
                     'id' => $company->id,
                     'name' => $company->name,
-                    'type' => $access->company_type,
-                    'role' => $access->role ? $access->role->name : ($access->customRole ? $access->customRole->role_name : 'N/A'),
-                    'last_accessed' => $access->last_accessed_at,
+                    'type' => $company->company_type ?? 'client',
+                    'role' => $userCompanyRole->companyCustomRole ? $userCompanyRole->companyCustomRole->role_name : 'N/A',
+                    'last_accessed' => null,
                 ]);
             }
         }
@@ -77,10 +77,8 @@ class AccountSelectorController extends Controller
         
         $user->switchToCompany($request->company_id);
         
-        // Update last accessed
-        UserCompanyAccess::where('user_id', $user->id)
-            ->where('company_id', $request->company_id)
-            ->update(['last_accessed_at' => now()]);
+        // Update last accessed (if needed in future)
+        // UserCompanyRole doesn't have last_accessed_at, but we can add it if needed
         
         return redirect()->route('client.dashboard');
     }

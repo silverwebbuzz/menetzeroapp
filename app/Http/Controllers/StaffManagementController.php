@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Services\CompanyInvitationService;
 use App\Services\SubscriptionService;
 use App\Models\User;
-use App\Models\UserCompanyAccess;
+use App\Models\UserCompanyRole;
 use App\Models\CompanyInvitation;
 use App\Models\CompanyCustomRole;
 use App\Models\RoleTemplate;
@@ -29,7 +29,7 @@ class StaffManagementController extends Controller
      */
     public function index()
     {
-        $this->requirePermission('manage_staff');
+        $this->requirePermission('staff_management', 'view');
         
         $company = Auth::user()->getActiveCompany();
         if (!$company) {
@@ -39,9 +39,9 @@ class StaffManagementController extends Controller
 
         // Get all users with access to this company
         try {
-            $staffMembers = UserCompanyAccess::where('company_id', $company->id)
-                ->where('status', 'active')
-                ->with(['user', 'customRole'])
+            $staffMembers = UserCompanyRole::where('company_id', $company->id)
+                ->where('is_active', true)
+                ->with(['user', 'companyCustomRole'])
                 ->get();
         } catch (\Exception $e) {
             // Table doesn't exist yet, use empty collection
@@ -73,7 +73,7 @@ class StaffManagementController extends Controller
      */
     public function create()
     {
-        $this->requirePermission('manage_staff');
+        $this->requirePermission('staff_management', 'view');
         
         $company = Auth::user()->getActiveCompany();
         if (!$company) {
@@ -87,12 +87,7 @@ class StaffManagementController extends Controller
             $customRoles = collect([]);
         }
         
-        $templates = RoleTemplate::where('is_active', true)
-            ->where(function($query) use ($company) {
-                $query->where('category', $company->company_type)
-                      ->orWhere('category', 'both');
-            })
-            ->get();
+        // No templates needed - using company custom roles only
 
         return view('staff.create', compact('customRoles', 'templates'));
     }
@@ -102,7 +97,7 @@ class StaffManagementController extends Controller
      */
     public function store(Request $request)
     {
-        $this->requirePermission('manage_staff');
+        $this->requirePermission('staff_management', 'view');
         
         $company = Auth::user()->getActiveCompany();
         if (!$company) {
@@ -149,24 +144,23 @@ class StaffManagementController extends Controller
     /**
      * Update staff member role.
      */
-    public function updateRole(Request $request, UserCompanyAccess $access)
+    public function updateRole(Request $request, UserCompanyRole $userCompanyRole)
     {
-        $this->requirePermission('manage_staff');
+        $this->requirePermission('staff_management', 'edit');
         
         $company = Auth::user()->getActiveCompany();
-        if (!$company || $access->company_id !== $company->id) {
+        if (!$company || $userCompanyRole->company_id !== $company->id) {
             abort(403, 'Unauthorized action.');
         }
 
         $request->validate([
-            'custom_role_id' => 'required|exists:company_custom_roles,id',
+            'company_custom_role_id' => 'required|exists:company_custom_roles,id',
         ]);
 
-        $this->invitationService->updateAccessRole(
-            $access->id,
-            null, // role_id removed
-            $request->custom_role_id
-        );
+        $userCompanyRole->update([
+            'company_custom_role_id' => $request->company_custom_role_id,
+            'assigned_by' => Auth::id(),
+        ]);
 
         return redirect()->route('staff.index')
             ->with('success', 'Staff role updated successfully.');
@@ -175,16 +169,16 @@ class StaffManagementController extends Controller
     /**
      * Remove staff member access.
      */
-    public function destroy(UserCompanyAccess $access)
+    public function destroy(UserCompanyRole $userCompanyRole)
     {
-        $this->requirePermission('manage_staff');
+        $this->requirePermission('staff_management', 'delete');
         
         $company = Auth::user()->getActiveCompany();
-        if (!$company || $access->company_id !== $company->id) {
+        if (!$company || $userCompanyRole->company_id !== $company->id) {
             abort(403, 'Unauthorized action.');
         }
 
-        $this->invitationService->revokeAccess($access->id);
+        $userCompanyRole->update(['is_active' => false]);
 
         return redirect()->route('staff.index')
             ->with('success', 'Staff access revoked successfully.');

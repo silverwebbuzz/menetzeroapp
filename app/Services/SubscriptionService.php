@@ -137,11 +137,11 @@ class SubscriptionService
                 // Get all user IDs (direct company users)
                 $directUserIds = \App\Models\User::where('company_id', $companyId)->pluck('id')->toArray();
                 
-                // Get all user IDs from user_company_access
+                // Get all user IDs from user_company_roles
                 $accessUserIds = [];
                 try {
-                    $accessUserIds = \App\Models\UserCompanyAccess::where('company_id', $companyId)
-                        ->where('status', 'active')
+                    $accessUserIds = \App\Models\UserCompanyRole::where('company_id', $companyId)
+                        ->where('is_active', true)
                         ->pluck('user_id')
                         ->unique()
                         ->toArray();

@@ -13,8 +13,6 @@ class RoleTemplate extends Model
         'template_code',
         'template_name',
         'description',
-        'permissions',
-        'category',
         'is_system_template',
         'is_active',
         'sort_order',
@@ -23,8 +21,16 @@ class RoleTemplate extends Model
     protected $casts = [
         'is_system_template' => 'boolean',
         'is_active' => 'boolean',
-        'permissions' => 'array',
     ];
+
+    /**
+     * Get permissions for this role template.
+     */
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'role_template_permissions')
+            ->withTimestamps();
+    }
 
     /**
      * Scope for active templates.
@@ -35,15 +41,11 @@ class RoleTemplate extends Model
     }
 
     /**
-     * Scope for client templates.
+     * Get permission IDs as array.
      */
-    public function scopeForClients($query)
+    public function getPermissionIds()
     {
-        return $query->where(function($q) {
-            $q->where('category', 'client')
-              ->orWhere('category', 'both');
-        });
+        return $this->permissions()->pluck('permissions.id')->toArray();
     }
-
 }
 

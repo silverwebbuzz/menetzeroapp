@@ -80,7 +80,15 @@ class User extends Authenticatable
      */
     public function accessibleCompanies()
     {
-        return $this->hasMany(UserCompanyAccess::class);
+        return $this->hasMany(UserCompanyRole::class);
+    }
+
+    /**
+     * Get user company roles.
+     */
+    public function companyRoles()
+    {
+        return $this->hasMany(UserCompanyRole::class);
     }
 
     /**
@@ -100,7 +108,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get custom role for a specific company (from UserCompanyAccess).
+     * Get custom role for a specific company (from UserCompanyRole).
      */
     public function getCustomRoleForCompany($companyId = null)
     {
@@ -112,16 +120,16 @@ class User extends Authenticatable
             return null;
         }
 
-        // First check UserCompanyAccess for this company (for invited users)
+        // Check UserCompanyRole for this company
         try {
-            $access = UserCompanyAccess::where('user_id', $this->id)
+            $userCompanyRole = UserCompanyRole::where('user_id', $this->id)
                 ->where('company_id', $companyId)
-                ->where('status', 'active')
-                ->with('customRole')
+                ->where('is_active', true)
+                ->with('companyCustomRole')
                 ->first();
             
-            if ($access && $access->customRole) {
-                return $access->customRole;
+            if ($userCompanyRole && $userCompanyRole->companyCustomRole) {
+                return $userCompanyRole->companyCustomRole;
             }
         } catch (\Exception $e) {
             // Table doesn't exist, continue to check direct custom_role_id
@@ -137,6 +145,7 @@ class User extends Authenticatable
 
     /**
      * Get user's permissions for the active company.
+     * Returns array of permission names for backward compatibility.
      */
     public function getPermissions($companyId = null)
     {
@@ -156,18 +165,38 @@ class User extends Authenticatable
             return [];
         }
 
-        $permissions = $customRole->permissions ?? [];
+        // Get permissions from the new structure
+        $permissions = $customRole->getPermissionNames();
         
-        // If permissions is ['*'], return it as is
-        if (in_array('*', $permissions)) {
-            return ['*'];
+        // If empty, return empty array
+        if (empty($permissions)) {
+            return [];
         }
 
         return $permissions;
     }
 
     /**
-     * Check if user has a specific permission.
+     * Get user's permission IDs for the active company.
+     */
+    public function getPermissionIds($companyId = null)
+    {
+        // Super admin has all permissions
+        if ($this->isAdmin() || $this->isCompanyAdmin()) {
+            return ['*'];
+        }
+
+        $customRole = $this->getCustomRoleForCompany($companyId);
+        
+        if (!$customRole) {
+            return [];
+        }
+
+        return $customRole->getPermissionIds();
+    }
+
+    /**
+     * Check if user has a specific permission (backward compatibility).
      */
     public function hasPermission($permission, $companyId = null)
     {
@@ -178,7 +207,7 @@ class User extends Authenticatable
             return true;
         }
 
-        // Check exact permission
+        // Check exact permission name
         if (in_array($permission, $permissions)) {
             return true;
         }
@@ -194,6 +223,31 @@ class User extends Authenticatable
         }
 
         return false;
+    }
+
+    /**
+     * Check if user has permission for a specific module and action.
+     */
+    public function hasModulePermission($module, $action, $companyId = null)
+    {
+        // Super admin and company admin have all permissions
+        if ($this->isAdmin() || $this->isCompanyAdmin()) {
+            return true;
+        }
+
+        $customRole = $this->getCustomRoleForCompany($companyId);
+        
+        if (!$customRole) {
+            return false;
+        }
+
+        // Check if the role has this specific permission
+        $hasPermission = $customRole->permissions()
+            ->where('module', $module)
+            ->where('action', $action)
+            ->exists();
+
+        return $hasPermission;
     }
 
     /**
@@ -215,9 +269,9 @@ class User extends Authenticatable
     public function hasAccessToCompany($companyId)
     {
         try {
-            return $this->accessibleCompanies()
+            return $this->companyRoles()
                 ->where('company_id', $companyId)
-                ->where('status', 'active')
+                ->where('is_active', true)
                 ->exists();
         } catch (\Exception $e) {
             // If table doesn't exist, fall back to company_id check
@@ -242,9 +296,9 @@ class User extends Authenticatable
             }
             
             // Fallback: If only one company access, use that
-            $access = $this->accessibleCompanies()->where('status', 'active')->first();
-            if ($access) {
-                return Company::find($access->company_id);
+            $userCompanyRole = $this->companyRoles()->where('is_active', true)->first();
+            if ($userCompanyRole) {
+                return Company::find($userCompanyRole->company_id);
             }
         } catch (\Exception $e) {
             // If tables don't exist yet, fall back to company_id
@@ -265,7 +319,7 @@ class User extends Authenticatable
         }
 
         try {
-            $accessCount = $this->accessibleCompanies()->where('status', 'active')->count();
+            $accessCount = $this->companyRoles()->where('is_active', true)->count();
             
             // If user has company_id set, count that too
             if ($this->company_id) {

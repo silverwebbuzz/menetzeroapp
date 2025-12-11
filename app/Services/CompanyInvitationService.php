@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\CompanyInvitation;
 use App\Models\User;
-use App\Models\UserCompanyAccess;
+use App\Models\UserCompanyRole;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 
@@ -17,13 +17,13 @@ class CompanyInvitationService
     {
         $company = \App\Models\Company::findOrFail($companyId);
 
-        // Check if user already has access (only if table exists)
+        // Check if user already has access
         try {
             $existingUser = User::where('email', $email)->first();
             if ($existingUser) {
-                $existingAccess = UserCompanyAccess::where('user_id', $existingUser->id)
+                $existingAccess = UserCompanyRole::where('user_id', $existingUser->id)
                     ->where('company_id', $companyId)
-                    ->where('status', 'active')
+                    ->where('is_active', true)
                     ->first();
                 
                 if ($existingAccess) {
@@ -115,32 +115,29 @@ class CompanyInvitationService
             }
         }
 
-        // Create access record (only if table exists)
+        // Create user company role record
         try {
-            UserCompanyAccess::create([
-                'user_id' => $user->id,
-                'company_id' => $invitation->company_id,
-                'role_id' => $invitation->role_id,
-                'custom_role_id' => $invitation->custom_role_id,
-                'access_level' => $invitation->access_level,
-                'status' => 'active',
-                'invited_by' => $invitation->invited_by,
-                'invited_at' => $invitation->invited_at,
-            ]);
+            if ($invitation->custom_role_id) {
+                UserCompanyRole::create([
+                    'user_id' => $user->id,
+                    'company_id' => $invitation->company_id,
+                    'company_custom_role_id' => $invitation->custom_role_id,
+                    'assigned_by' => $invitation->invited_by,
+                    'is_active' => true,
+                ]);
+            }
 
-            // If user doesn't have a company_id, set it and also set custom_role_id for direct access
+            // If user doesn't have a company_id, set it
             if (!$user->company_id) {
                 $user->update([
                     'company_id' => $invitation->company_id,
-                    'custom_role_id' => $invitation->custom_role_id,
                 ]);
             }
         } catch (\Exception $e) {
-            // If table doesn't exist, just assign company_id and custom_role_id to user
+            // If table doesn't exist, just assign company_id to user
             if (strpos($e->getMessage(), "doesn't exist") !== false) {
                 $user->update([
                     'company_id' => $invitation->company_id,
-                    'custom_role_id' => $invitation->custom_role_id,
                 ]);
             } else {
                 throw $e;
@@ -179,24 +176,23 @@ class CompanyInvitationService
     /**
      * Revoke access.
      */
-    public function revokeAccess($userCompanyAccessId)
+    public function revokeAccess($userCompanyRoleId)
     {
-        $access = UserCompanyAccess::findOrFail($userCompanyAccessId);
-        $access->update(['status' => 'revoked']);
-        return $access;
+        $userCompanyRole = UserCompanyRole::findOrFail($userCompanyRoleId);
+        $userCompanyRole->update(['is_active' => false]);
+        return $userCompanyRole;
     }
 
     /**
      * Update access role.
      */
-    public function updateAccessRole($userCompanyAccessId, $roleId, $customRoleId = null)
+    public function updateAccessRole($userCompanyRoleId, $roleId, $customRoleId = null)
     {
-        $access = UserCompanyAccess::findOrFail($userCompanyAccessId);
-        $access->update([
-            'role_id' => $roleId,
-            'custom_role_id' => $customRoleId,
+        $userCompanyRole = UserCompanyRole::findOrFail($userCompanyRoleId);
+        $userCompanyRole->update([
+            'company_custom_role_id' => $customRoleId,
         ]);
-        return $access;
+        return $userCompanyRole;
     }
 }
 

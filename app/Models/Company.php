@@ -114,11 +114,11 @@ class Company extends Model
     }
 
     /**
-     * Get user company access records.
+     * Get user company roles.
      */
-    public function userAccesses()
+    public function userCompanyRoles()
     {
-        return $this->hasMany(UserCompanyAccess::class);
+        return $this->hasMany(UserCompanyRole::class);
     }
 
     /**

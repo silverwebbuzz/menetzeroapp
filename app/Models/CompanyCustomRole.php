@@ -13,14 +13,12 @@ class CompanyCustomRole extends Model
         'company_id',
         'role_name',
         'description',
-        'permissions',
         'based_on_template',
         'is_active',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
-        'permissions' => 'array',
     ];
 
     /**
@@ -32,6 +30,23 @@ class CompanyCustomRole extends Model
     }
 
     /**
+     * Get permissions for this role.
+     */
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'company_custom_role_permissions')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get users assigned to this role.
+     */
+    public function users()
+    {
+        return $this->hasMany(UserCompanyRole::class, 'company_custom_role_id');
+    }
+
+    /**
      * Scope for active roles.
      */
     public function scopeActive($query)
@@ -40,26 +55,30 @@ class CompanyCustomRole extends Model
     }
 
     /**
-     * Get normalized permissions as array.
+     * Get permission IDs as array.
      */
-    public function getNormalizedPermissions()
+    public function getPermissionIds()
     {
-        $permissions = $this->permissions;
-        
-        // If it's a string, decode it
-        if (is_string($permissions)) {
-            $permissions = json_decode($permissions, true);
-        }
-        
-        // Ensure it's an array
-        if (!is_array($permissions)) {
-            $permissions = [];
-        }
-        
-        // Filter out empty values and ensure all are strings
-        return array_values(array_filter(array_map('strval', $permissions), function($p) {
-            return !empty($p);
-        }));
+        return $this->permissions()->pluck('permissions.id')->toArray();
+    }
+
+    /**
+     * Get permission names as array (for backward compatibility).
+     */
+    public function getPermissionNames()
+    {
+        return $this->permissions()->pluck('permissions.name')->toArray();
+    }
+
+    /**
+     * Get permissions grouped by module.
+     */
+    public function getPermissionsGroupedByModule()
+    {
+        return $this->permissions()
+            ->orderBy('sort_order')
+            ->get()
+            ->groupBy('module');
     }
 }
 

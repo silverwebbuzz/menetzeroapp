@@ -98,38 +98,24 @@ class CompanySetupController extends Controller
         // Create default custom roles from role templates
         $roleTemplates = RoleTemplate::where('is_active', true)
             ->where('is_system_template', true)
-            ->where(function($query) {
-                $query->where('category', 'client')
-                      ->orWhere('category', 'both');
-            })
             ->orderBy('sort_order')
             ->get();
 
         foreach ($roleTemplates as $template) {
-            // Ensure permissions is an array and matches template exactly
-            $permissions = $template->permissions;
-            
-            // Normalize permissions - handle array, JSON string, or null
-            if (is_string($permissions)) {
-                $permissions = json_decode($permissions, true) ?? [];
-            }
-            if (!is_array($permissions)) {
-                $permissions = [];
-            }
-            
-            // Ensure all permissions are strings and filter out empty values
-            $permissions = array_values(array_filter(array_map('strval', $permissions), function($p) {
-                return !empty($p);
-            }));
-            
-            CompanyCustomRole::create([
+            // Create company custom role
+            $customRole = CompanyCustomRole::create([
                 'company_id' => $company->id,
                 'role_name' => $template->template_name,
                 'description' => $template->description,
-                'permissions' => $permissions, // Will be automatically cast to JSON by Eloquent
                 'based_on_template' => $template->template_code,
                 'is_active' => true,
             ]);
+
+            // Copy permissions from template to company custom role
+            $templatePermissions = $template->permissions()->pluck('permissions.id')->toArray();
+            if (!empty($templatePermissions)) {
+                $customRole->permissions()->attach($templatePermissions);
+            }
         }
 
         return redirect()->route('client.dashboard')->with('success', 'Business profile completed successfully!');
