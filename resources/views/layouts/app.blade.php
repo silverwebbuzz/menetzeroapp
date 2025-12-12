@@ -317,7 +317,9 @@
                 <nav class="mt-8 px-4 flex-1 flex flex-col">
             @php
                 $user = auth('web')->user();
-                $hasCompany = $user && $user->company_id;
+                // Check for active company (works for both owners and staff members)
+                $activeCompany = $user ? $user->getActiveCompany() : null;
+                $hasCompany = $activeCompany !== null;
             @endphp
             
             <div class="flex-1">
