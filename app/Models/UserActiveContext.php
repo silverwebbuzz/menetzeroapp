@@ -9,6 +9,8 @@ class UserActiveContext extends Model
 {
     use HasFactory;
 
+    protected $table = 'user_active_context';
+
     protected $fillable = [
         'user_id',
         'active_company_id',

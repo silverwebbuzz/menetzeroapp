@@ -381,7 +381,7 @@ class User extends Authenticatable
             $activeCompanyId = null;
             
             // Check active context first (only if table exists)
-            if (\Illuminate\Support\Facades\Schema::hasTable('user_active_contexts')) {
+            if (\Illuminate\Support\Facades\Schema::hasTable('user_active_context')) {
                 try {
                     $context = $this->activeContext;
                     if ($context && $context->active_company_id) {
@@ -553,7 +553,7 @@ class User extends Authenticatable
         
         try {
             // Only use UserActiveContext if table exists
-            if (\Illuminate\Support\Facades\Schema::hasTable('user_active_contexts')) {
+            if (\Illuminate\Support\Facades\Schema::hasTable('user_active_context')) {
                 UserActiveContext::updateOrCreate(
                     ['user_id' => $this->id],
                     [

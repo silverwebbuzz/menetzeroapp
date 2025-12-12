@@ -158,14 +158,14 @@ class InvitationController extends Controller
                         // Reload relationships to ensure companyRoles are fresh
                         $newUser->load('companyRoles');
                         // Try to load activeContext if table exists
-                        if (\Illuminate\Support\Facades\Schema::hasTable('user_active_contexts')) {
+                        if (\Illuminate\Support\Facades\Schema::hasTable('user_active_context')) {
                             $newUser->load('activeContext');
                         }
                     } else {
                         // Reload relationships even if already logged in
                         $newUser->load('companyRoles');
                         // Try to load activeContext if table exists
-                        if (\Illuminate\Support\Facades\Schema::hasTable('user_active_contexts')) {
+                        if (\Illuminate\Support\Facades\Schema::hasTable('user_active_context')) {
                             $newUser->load('activeContext');
                         }
                     }

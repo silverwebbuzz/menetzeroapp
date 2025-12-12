@@ -26,7 +26,7 @@ class DashboardController extends Controller
         try {
             $user->load('companyRoles');
             // Try to load activeContext, but don't fail if table doesn't exist
-            if (\Illuminate\Support\Facades\Schema::hasTable('user_active_contexts')) {
+            if (\Illuminate\Support\Facades\Schema::hasTable('user_active_context')) {
                 $user->load('activeContext');
             }
         } catch (\Exception $e) {
