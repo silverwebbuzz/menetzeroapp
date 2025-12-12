@@ -135,9 +135,11 @@ class DashboardController extends Controller
             // Also check if company name is just a placeholder or empty string
             $companyName = trim($company->name ?? '');
             if (empty($companyName) || $companyName === 'New Company' || $companyName === '') {
+                $sectors = MasterIndustryCategory::getSectors();
                 return view('dashboard.index', [
                     'needsCompanySetup' => true,
                     'company' => $company,
+                    'sectors' => $sectors,
                     'kpis' => [
                         'total_emissions' => 0,
                         'scope1_total' => 0,
