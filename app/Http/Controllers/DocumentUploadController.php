@@ -40,8 +40,15 @@ class DocumentUploadController extends Controller
      */
     public function index(Request $request)
     {
+        $user = Auth::user();
+        $company = $user->getActiveCompany();
+        
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+        
         $query = DocumentUpload::with(['company', 'location', 'approvedBy'])
-            ->where('company_id', Auth::user()->company_id);
+            ->where('company_id', $company->id);
 
         // Apply filters
         if ($request->filled('status')) {
@@ -71,7 +78,14 @@ class DocumentUploadController extends Controller
     {
         $this->requirePermission('documents.upload', ['upload_documents']);
         
-        $locations = Location::where('company_id', Auth::user()->company_id)
+        $user = Auth::user();
+        $company = $user->getActiveCompany();
+        
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+        
+        $locations = Location::where('company_id', $company->id)
             ->where('is_active', true)
             ->get();
 
@@ -93,22 +107,26 @@ class DocumentUploadController extends Controller
         ]);
 
         // Check document limit before uploading
-        $company = Auth::user()->getActiveCompany();
-        if ($company) {
-            $limitCheck = $this->subscriptionService->canPerformAction($company->id, 'documents', 1);
-            if (!$limitCheck['allowed']) {
-                return back()->withErrors(['file' => $limitCheck['message']])->withInput();
-            }
+        $user = Auth::user();
+        $company = $user->getActiveCompany();
+        
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+        
+        $limitCheck = $this->subscriptionService->canPerformAction($company->id, 'documents', 1);
+        if (!$limitCheck['allowed']) {
+            return back()->withErrors(['file' => $limitCheck['message']])->withInput();
         }
 
         try {
             $file = $request->file('file');
             $originalName = $file->getClientOriginalName();
             $fileName = Str::uuid() . '.' . $file->getClientOriginalExtension();
-            $filePath = $file->storeAs('documents/' . Auth::user()->company_id, $fileName, 'private');
+            $filePath = $file->storeAs('documents/' . $company->id, $fileName, 'private');
 
             $document = DocumentUpload::create([
-                'company_id' => Auth::user()->company_id,
+                'company_id' => $company->id,
                 'location_id' => $request->location_id,
                 'file_name' => $fileName,
                 'file_path' => $filePath,
@@ -139,10 +157,12 @@ class DocumentUploadController extends Controller
 
         } catch (\Exception $e) {
             // Log the error for debugging
+            $user = Auth::user();
+            $company = $user ? $user->getActiveCompany() : null;
             \Log::error('Document upload failed: ' . $e->getMessage(), [
                 'error' => $e->getTraceAsString(),
                 'user_id' => Auth::id(),
-                'company_id' => Auth::user()->company_id ?? 'null',
+                'company_id' => $company ? $company->id : 'null',
                 'source_type' => $request->source_type ?? 'null'
             ]);
 
@@ -167,7 +187,14 @@ class DocumentUploadController extends Controller
     public function show(DocumentUpload $document)
     {
         // Check if user has access to this document
-        if ($document->company_id !== Auth::user()->company_id) {
+        $user = Auth::user();
+        $company = $user->getActiveCompany();
+        
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+        
+        if ($document->company_id !== $company->id) {
             abort(403, 'Unauthorized access to document.');
         }
 
@@ -184,7 +211,14 @@ class DocumentUploadController extends Controller
     public function edit(DocumentUpload $document)
     {
         // Check if user has access to this document
-        if ($document->company_id !== Auth::user()->company_id) {
+        $user = Auth::user();
+        $company = $user->getActiveCompany();
+        
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+        
+        if ($document->company_id !== $company->id) {
             abort(403, 'Unauthorized access to document.');
         }
 
@@ -193,7 +227,14 @@ class DocumentUploadController extends Controller
                 ->with('error', 'This document cannot be edited in its current status.');
         }
 
-        $locations = Location::where('company_id', Auth::user()->company_id)
+        $user = Auth::user();
+        $company = $user->getActiveCompany();
+        
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+        
+        $locations = Location::where('company_id', $company->id)
             ->where('is_active', true)
             ->get();
 
@@ -206,7 +247,14 @@ class DocumentUploadController extends Controller
     public function update(Request $request, DocumentUpload $document)
     {
         // Check if user has access to this document
-        if ($document->company_id !== Auth::user()->company_id) {
+        $user = Auth::user();
+        $company = $user->getActiveCompany();
+        
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+        
+        if ($document->company_id !== $company->id) {
             abort(403, 'Unauthorized access to document.');
         }
 
@@ -258,7 +306,14 @@ class DocumentUploadController extends Controller
     public function approve(Request $request, DocumentUpload $document)
     {
         // Check if user has access to this document
-        if ($document->company_id !== Auth::user()->company_id) {
+        $user = Auth::user();
+        $company = $user->getActiveCompany();
+        
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+        
+        if ($document->company_id !== $company->id) {
             abort(403, 'Unauthorized access to document.');
         }
 
@@ -313,7 +368,14 @@ class DocumentUploadController extends Controller
     public function reject(Request $request, DocumentUpload $document)
     {
         // Check if user has access to this document
-        if ($document->company_id !== Auth::user()->company_id) {
+        $user = Auth::user();
+        $company = $user->getActiveCompany();
+        
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+        
+        if ($document->company_id !== $company->id) {
             abort(403, 'Unauthorized access to document.');
         }
 
@@ -358,7 +420,14 @@ class DocumentUploadController extends Controller
     public function destroy(DocumentUpload $document)
     {
         // Check if user has access to this document
-        if ($document->company_id !== Auth::user()->company_id) {
+        $user = Auth::user();
+        $company = $user->getActiveCompany();
+        
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+        
+        if ($document->company_id !== $company->id) {
             abort(403, 'Unauthorized access to document.');
         }
 
@@ -385,7 +454,14 @@ class DocumentUploadController extends Controller
     public function retryOcr(DocumentUpload $document)
     {
         // Check if user has access to this document
-        if ($document->company_id !== Auth::user()->company_id) {
+        $user = Auth::user();
+        $company = $user->getActiveCompany();
+        
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+        
+        if ($document->company_id !== $company->id) {
             abort(403, 'Unauthorized access to document.');
         }
 
@@ -417,7 +493,14 @@ class DocumentUploadController extends Controller
     public function showFieldMapping(DocumentUpload $document)
     {
         // Check if user has access to this document
-        if ($document->company_id !== Auth::user()->company_id) {
+        $user = Auth::user();
+        $company = $user->getActiveCompany();
+        
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+        
+        if ($document->company_id !== $company->id) {
             abort(403, 'Unauthorized access to document.');
         }
 
@@ -432,7 +515,14 @@ class DocumentUploadController extends Controller
         $currentMapping = $document->field_mapping ?? [];
 
         // Get locations for assignment
-        $locations = Location::where('company_id', Auth::user()->company_id)->get();
+        $user = Auth::user();
+        $company = $user->getActiveCompany();
+        
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+        
+        $locations = Location::where('company_id', $company->id)->get();
 
         // Check for carbon footprint data
         $carbonFootprint = [];
@@ -456,7 +546,14 @@ class DocumentUploadController extends Controller
     public function updateFieldMapping(Request $request, DocumentUpload $document)
     {
         // Check if user has access to this document
-        if ($document->company_id !== Auth::user()->company_id) {
+        $user = Auth::user();
+        $company = $user->getActiveCompany();
+        
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+        
+        if ($document->company_id !== $company->id) {
             abort(403, 'Unauthorized access to document.');
         }
 
@@ -488,7 +585,14 @@ class DocumentUploadController extends Controller
     public function showScopeAssignment(DocumentUpload $document)
     {
         // Check if user has access to this document
-        if ($document->company_id !== Auth::user()->company_id) {
+        $user = Auth::user();
+        $company = $user->getActiveCompany();
+        
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+        
+        if ($document->company_id !== $company->id) {
             abort(403, 'Unauthorized access to document.');
         }
 
@@ -496,7 +600,14 @@ class DocumentUploadController extends Controller
         $extractedData = $document->processed_data ?? [];
 
         // Get locations for assignment
-        $locations = Location::where('company_id', Auth::user()->company_id)->get();
+        $user = Auth::user();
+        $company = $user->getActiveCompany();
+        
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+        
+        $locations = Location::where('company_id', $company->id)->get();
 
         return view('document-uploads.assign-scope', compact(
             'document',
@@ -511,7 +622,14 @@ class DocumentUploadController extends Controller
     public function updateScopeAssignment(Request $request, DocumentUpload $document)
     {
         // Check if user has access to this document
-        if ($document->company_id !== Auth::user()->company_id) {
+        $user = Auth::user();
+        $company = $user->getActiveCompany();
+        
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+        
+        if ($document->company_id !== $company->id) {
             abort(403, 'Unauthorized access to document.');
         }
 
