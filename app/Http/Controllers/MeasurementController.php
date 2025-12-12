@@ -26,7 +26,9 @@ class MeasurementController extends Controller
         $companyId = $company ? $company->id : null;
         
         // Always check permission first
-        $this->requirePermission('measurements.view', ['measurements.*', 'manage_measurements']);
+        // Note: requirePermission($permissionOrModule, $action = null, $alternativePermissions = [])
+        // So we pass null for action, and the alternatives as third parameter
+        $this->requirePermission('measurements.view', null, ['measurements.*', 'manage_measurements']);
         
         if (!$company) {
             abort(403, 'No active company found.');
@@ -172,7 +174,7 @@ class MeasurementController extends Controller
      */
     public function show(Measurement $measurement)
     {
-        $this->requirePermission('measurements.view', ['measurements.*', 'manage_measurements']);
+        $this->requirePermission('measurements.view', null, ['measurements.*', 'manage_measurements']);
         
         try {
             $user = Auth::user();
@@ -224,7 +226,7 @@ class MeasurementController extends Controller
      */
     public function edit(Measurement $measurement)
     {
-        $this->requirePermission('measurements.edit', ['measurements.*', 'manage_measurements']);
+        $this->requirePermission('measurements.edit', null, ['measurements.*', 'manage_measurements']);
         
         $user = Auth::user();
         $company = $user->getActiveCompany();
@@ -250,7 +252,7 @@ class MeasurementController extends Controller
      */
     public function update(Request $request, Measurement $measurement)
     {
-        $this->requirePermission('measurements.edit', ['measurements.*', 'manage_measurements']);
+        $this->requirePermission('measurements.edit', null, ['measurements.*', 'manage_measurements']);
         
         $user = Auth::user();
         $company = $user->getActiveCompany();
@@ -331,7 +333,7 @@ class MeasurementController extends Controller
      */
     public function destroy(Measurement $measurement)
     {
-        $this->requirePermission('measurements.delete', ['measurements.*', 'manage_measurements']);
+        $this->requirePermission('measurements.delete', null, ['measurements.*', 'manage_measurements']);
         
         $user = Auth::user();
         $company = $user->getActiveCompany();
@@ -379,7 +381,7 @@ class MeasurementController extends Controller
      */
     public function submit(Measurement $measurement)
     {
-        $this->requirePermission('measurements.edit', ['measurements.*', 'manage_measurements']);
+        $this->requirePermission('measurements.edit', null, ['measurements.*', 'manage_measurements']);
         
         $user = Auth::user();
         $company = $user->getActiveCompany();
@@ -422,7 +424,7 @@ class MeasurementController extends Controller
      */
     public function calculateSource(Measurement $measurement, $sourceId)
     {
-        $this->requirePermission('measurements.create', ['measurements.edit', 'measurements.*', 'manage_measurements']);
+        $this->requirePermission('measurements.create', null, ['measurements.edit', 'measurements.*', 'manage_measurements']);
         
         $user = Auth::user();
         $company = $user->getActiveCompany();
@@ -448,7 +450,7 @@ class MeasurementController extends Controller
      */
     public function storeSourceData(Request $request, Measurement $measurement, $sourceId)
     {
-        $this->requirePermission('measurements.create', ['measurements.edit', 'measurements.*', 'manage_measurements']);
+        $this->requirePermission('measurements.create', null, ['measurements.edit', 'measurements.*', 'manage_measurements']);
         
         $user = Auth::user();
         
@@ -535,7 +537,7 @@ class MeasurementController extends Controller
      */
     public function editSource(Measurement $measurement, $sourceId)
     {
-        $this->requirePermission('measurements.edit', ['measurements.*', 'manage_measurements']);
+        $this->requirePermission('measurements.edit', null, ['measurements.*', 'manage_measurements']);
         
         $user = Auth::user();
         
@@ -561,7 +563,7 @@ class MeasurementController extends Controller
      */
     public function updateSourceData(Request $request, Measurement $measurement, $sourceId)
     {
-        $this->requirePermission('measurements.edit', ['measurements.*', 'manage_measurements']);
+        $this->requirePermission('measurements.edit', null, ['measurements.*', 'manage_measurements']);
         
         $user = Auth::user();
         
