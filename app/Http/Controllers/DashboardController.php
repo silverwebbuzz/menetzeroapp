@@ -22,7 +22,17 @@ class DashboardController extends Controller
         }
         
         // Reload relationships to ensure fresh data (important after invitation acceptance)
-        $user->load('companyRoles', 'activeContext');
+        // Only load activeContext if table exists
+        try {
+            $user->load('companyRoles');
+            // Try to load activeContext, but don't fail if table doesn't exist
+            if (\Illuminate\Support\Facades\Schema::hasTable('user_active_contexts')) {
+                $user->load('activeContext');
+            }
+        } catch (\Exception $e) {
+            // If table doesn't exist, just load companyRoles
+            $user->load('companyRoles');
+        }
         
         // Check if user has multiple company access - show workspace selector
         if ($user->hasMultipleCompanyAccess()) {

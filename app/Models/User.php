@@ -377,12 +377,33 @@ class User extends Authenticatable
         }
 
         try {
-            // Check active context first
-            $context = $this->activeContext;
-            if ($context && $context->active_company_id) {
-                $company = Company::find($context->active_company_id);
-                if ($company && $this->hasAccessToCompany($company->id)) {
-                    return $company;
+            $hasActiveContext = false;
+            $activeCompanyId = null;
+            
+            // Check active context first (only if table exists)
+            if (\Illuminate\Support\Facades\Schema::hasTable('user_active_contexts')) {
+                try {
+                    $context = $this->activeContext;
+                    if ($context && $context->active_company_id) {
+                        $company = Company::find($context->active_company_id);
+                        if ($company && $this->hasAccessToCompany($company->id)) {
+                            return $company;
+                        }
+                        $activeCompanyId = $context->active_company_id;
+                        $hasActiveContext = true;
+                    }
+                } catch (\Exception $e) {
+                    // Table might not exist or relationship might fail
+                }
+            } else {
+                // Check session if table doesn't exist
+                $activeCompanyId = session('active_company_id');
+                $hasActiveContext = !empty($activeCompanyId);
+                if ($hasActiveContext) {
+                    $company = Company::find($activeCompanyId);
+                    if ($company && $this->hasAccessToCompany($company->id)) {
+                        return $company;
+                    }
                 }
             }
             
@@ -390,7 +411,7 @@ class User extends Authenticatable
             $ownedCompany = $this->getOwnedCompany();
             if ($ownedCompany) {
                 // Auto-set active context for owned company if not set
-                if (!$context || !$context->active_company_id) {
+                if (!$hasActiveContext) {
                     try {
                         $this->switchToCompany($ownedCompany->id);
                     } catch (\Exception $e) {
@@ -405,7 +426,7 @@ class User extends Authenticatable
             if ($staffCompanies->isNotEmpty()) {
                 $firstStaffCompany = $staffCompanies->first()['company'];
                 // Auto-set active context for staff company if not set
-                if (!$context || !$context->active_company_id) {
+                if (!$hasActiveContext) {
                     try {
                         $this->switchToCompany($firstStaffCompany->id);
                     } catch (\Exception $e) {
@@ -531,15 +552,21 @@ class User extends Authenticatable
         }
         
         try {
-            UserActiveContext::updateOrCreate(
-                ['user_id' => $this->id],
-                [
-                    'active_company_id' => $companyId,
-                    'last_switched_at' => now(),
-                ]
-            );
+            // Only use UserActiveContext if table exists
+            if (\Illuminate\Support\Facades\Schema::hasTable('user_active_contexts')) {
+                UserActiveContext::updateOrCreate(
+                    ['user_id' => $this->id],
+                    [
+                        'active_company_id' => $companyId,
+                        'last_switched_at' => now(),
+                    ]
+                );
+            } else {
+                // If table doesn't exist, store in session
+                session(['active_company_id' => $companyId]);
+            }
         } catch (\Exception $e) {
-            // If table doesn't exist, store in session
+            // If table doesn't exist or error occurs, store in session
             session(['active_company_id' => $companyId]);
         }
     }

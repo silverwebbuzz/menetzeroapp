@@ -156,10 +156,18 @@ class InvitationController extends Controller
                         // Get fresh user instance after login and reload relationships
                         $newUser = Auth::guard('web')->user();
                         // Reload relationships to ensure companyRoles are fresh
-                        $newUser->load('companyRoles', 'activeContext');
+                        $newUser->load('companyRoles');
+                        // Try to load activeContext if table exists
+                        if (\Illuminate\Support\Facades\Schema::hasTable('user_active_contexts')) {
+                            $newUser->load('activeContext');
+                        }
                     } else {
                         // Reload relationships even if already logged in
-                        $newUser->load('companyRoles', 'activeContext');
+                        $newUser->load('companyRoles');
+                        // Try to load activeContext if table exists
+                        if (\Illuminate\Support\Facades\Schema::hasTable('user_active_contexts')) {
+                            $newUser->load('activeContext');
+                        }
                     }
                     
                     // Verify UserCompanyRole was created/reactivated
