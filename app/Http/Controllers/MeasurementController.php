@@ -25,8 +25,15 @@ class MeasurementController extends Controller
         $company = $user->getActiveCompany();
         $companyId = $company ? $company->id : null;
         
-        // DEBUG: Display permission debugging information
-        if ($request->has('debug') || config('app.debug')) {
+        // Always check permission first
+        $this->requirePermission('measurements.view', ['measurements.*', 'manage_measurements']);
+        
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+        
+        // DEBUG: Display permission debugging information (only if debug param is passed)
+        if ($request->has('debug')) {
             $debugInfo = [
                 'user_id' => $user->id,
                 'user_email' => $user->email,
@@ -63,6 +70,7 @@ class MeasurementController extends Controller
                         'description' => $perm->description,
                     ];
                 }) : [],
+                'permission_check_result' => 'PASSED - User has measurements.view permission',
             ];
             
             return response()->json([
@@ -71,13 +79,8 @@ class MeasurementController extends Controller
                 'data' => $debugInfo,
                 'checking_permission' => 'measurements.view',
                 'alternative_permissions' => ['measurements.*', 'manage_measurements'],
+                'note' => 'Permission check should PASS. If you still get 403, check Laravel logs for middleware issues.',
             ], 200, [], JSON_PRETTY_PRINT);
-        }
-        
-        $this->requirePermission('measurements.view', ['measurements.*', 'manage_measurements']);
-        
-        if (!$company) {
-            abort(403, 'No active company found.');
         }
         
         // Get measurements for user's company locations
