@@ -64,10 +64,29 @@ class CompanyCustomRole extends Model
 
     /**
      * Get permission names as array (for backward compatibility).
+     * Returns both the permission name field and constructed module.action format.
      */
     public function getPermissionNames()
     {
-        return $this->permissions()->pluck('permissions.name')->toArray();
+        $permissions = $this->permissions()->get();
+        $names = [];
+        
+        foreach ($permissions as $permission) {
+            // Add the name field if it exists
+            if ($permission->name) {
+                $names[] = $permission->name;
+            }
+            
+            // Also add module.action format for compatibility
+            if ($permission->module && $permission->action) {
+                $moduleAction = $permission->module . '.' . $permission->action;
+                if (!in_array($moduleAction, $names)) {
+                    $names[] = $moduleAction;
+                }
+            }
+        }
+        
+        return array_unique($names);
     }
 
     /**

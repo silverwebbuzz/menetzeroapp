@@ -19,15 +19,28 @@ class CheckPermission
             abort(401, 'Unauthenticated');
         }
 
-        // Super admin and company admin bypass permission checks
-        if ($user->isAdmin() || $user->isCompanyAdmin()) {
-            return $next($request);
-        }
-
         $company = $user->getActiveCompany();
         $companyId = $company ? $company->id : null;
 
-        if (!$user->hasPermission($permission, $companyId)) {
+        // Super admin and company admin bypass permission checks
+        if ($user->isAdmin() || ($companyId && $user->isCompanyAdmin($companyId))) {
+            return $next($request);
+        }
+
+        // Check permission using both name format and module/action format
+        $hasPermission = $user->hasPermission($permission, $companyId);
+        
+        // Also try to parse as module.action format if permission name check failed
+        if (!$hasPermission && str_contains($permission, '.')) {
+            $parts = explode('.', $permission, 2);
+            if (count($parts) === 2) {
+                $module = $parts[0];
+                $action = $parts[1];
+                $hasPermission = $user->hasModulePermission($module, $action, $companyId);
+            }
+        }
+
+        if (!$hasPermission) {
             abort(403, 'You do not have permission to perform this action.');
         }
 
