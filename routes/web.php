@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DashboardController;
@@ -208,25 +209,33 @@ Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client'])->
 
 // API routes for dynamic industry category dropdowns
 Route::get('/api/industries', function(Request $request) {
-    $sectorId = $request->get('sector_id');
-    if (!$sectorId) {
-        return response()->json([]);
+    try {
+        $sectorId = $request->get('sector_id');
+        if (!$sectorId) {
+            return response()->json([]);
+        }
+        $industries = \App\Models\MasterIndustryCategory::getIndustriesBySector($sectorId);
+        return response()->json($industries->map(function($item) {
+            return ['id' => $item->id, 'name' => $item->name];
+        }));
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Failed to fetch industries'], 500);
     }
-    $industries = \App\Models\MasterIndustryCategory::getIndustriesBySector($sectorId);
-    return response()->json($industries->map(function($item) {
-        return ['id' => $item->id, 'name' => $item->name];
-    }));
 });
 
 Route::get('/api/subcategories', function(Request $request) {
-    $industryId = $request->get('industry_id');
-    if (!$industryId) {
-        return response()->json([]);
+    try {
+        $industryId = $request->get('industry_id');
+        if (!$industryId) {
+            return response()->json([]);
+        }
+        $subcategories = \App\Models\MasterIndustryCategory::getSubcategoriesByIndustry($industryId);
+        return response()->json($subcategories->map(function($item) {
+            return ['id' => $item->id, 'name' => $item->name];
+        }));
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Failed to fetch subcategories'], 500);
     }
-    $subcategories = \App\Models\MasterIndustryCategory::getSubcategoriesByIndustry($industryId);
-    return response()->json($subcategories->map(function($item) {
-        return ['id' => $item->id, 'name' => $item->name];
-    }));
 });
 
 // Partner Routes - Use partner guard

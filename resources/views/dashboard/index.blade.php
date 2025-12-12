@@ -148,57 +148,90 @@
                     </div>
 
                     <script>
-                    document.getElementById('sector').addEventListener('change', function() {
-                        const sectorId = this.options[this.selectedIndex].getAttribute('data-id');
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const sectorSelect = document.getElementById('sector');
                         const industrySelect = document.getElementById('industry');
                         const subcategorySelect = document.getElementById('business_subcategory');
                         
-                        if (sectorId) {
-                            fetch(`/api/industries?sector_id=${sectorId}`)
-                                .then(response => response.json())
-                                .then(data => {
-                                    industrySelect.innerHTML = '<option value="">Select Industry</option>';
-                                    data.forEach(industry => {
-                                        industrySelect.innerHTML += `<option value="${industry.name}" data-id="${industry.id}">${industry.name}</option>`;
-                                    });
-                                    industrySelect.disabled = false;
-                                    
-                                    // Reset subcategory
-                                    subcategorySelect.innerHTML = '<option value="">Select Subcategory (Optional)</option>';
-                                    subcategorySelect.disabled = true;
-                                })
-                                .catch(error => {
-                                    console.error('Error fetching industries:', error);
-                                });
-                        } else {
-                            industrySelect.innerHTML = '<option value="">Select Industry</option>';
-                            industrySelect.disabled = true;
-                            subcategorySelect.innerHTML = '<option value="">Select Subcategory (Optional)</option>';
-                            subcategorySelect.disabled = true;
+                        if (!sectorSelect || !industrySelect || !subcategorySelect) {
+                            return;
                         }
-                    });
-
-                    document.getElementById('industry').addEventListener('change', function() {
-                        const industryId = this.options[this.selectedIndex].getAttribute('data-id');
-                        const subcategorySelect = document.getElementById('business_subcategory');
                         
-                        if (industryId) {
-                            fetch(`/api/subcategories?industry_id=${industryId}`)
-                                .then(response => response.json())
-                                .then(data => {
-                                    subcategorySelect.innerHTML = '<option value="">Select Subcategory (Optional)</option>';
-                                    data.forEach(subcategory => {
-                                        subcategorySelect.innerHTML += `<option value="${subcategory.name}">${subcategory.name}</option>`;
+                        sectorSelect.addEventListener('change', function() {
+                            const selectedOption = this.options[this.selectedIndex];
+                            const sectorId = selectedOption ? selectedOption.getAttribute('data-id') : null;
+                            
+                            if (sectorId) {
+                                fetch(`/api/industries?sector_id=${sectorId}`)
+                                    .then(response => {
+                                        if (!response.ok) {
+                                            throw new Error(`HTTP error! status: ${response.status}`);
+                                        }
+                                        return response.json();
+                                    })
+                                    .then(data => {
+                                        if (Array.isArray(data)) {
+                                            industrySelect.innerHTML = '<option value="">Select Industry</option>';
+                                            data.forEach(industry => {
+                                                industrySelect.innerHTML += `<option value="${industry.name}" data-id="${industry.id}">${industry.name}</option>`;
+                                            });
+                                            industrySelect.disabled = false;
+                                            
+                                            // Reset subcategory
+                                            subcategorySelect.innerHTML = '<option value="">Select Subcategory (Optional)</option>';
+                                            subcategorySelect.disabled = true;
+                                        } else {
+                                            console.error('Invalid data format received:', data);
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error fetching industries:', error);
+                                        industrySelect.innerHTML = '<option value="">Error loading industries</option>';
+                                        industrySelect.disabled = true;
+                                        subcategorySelect.innerHTML = '<option value="">Select Subcategory (Optional)</option>';
+                                        subcategorySelect.disabled = true;
                                     });
-                                    subcategorySelect.disabled = false;
-                                })
-                                .catch(error => {
-                                    console.error('Error fetching subcategories:', error);
-                                });
-                        } else {
-                            subcategorySelect.innerHTML = '<option value="">Select Subcategory (Optional)</option>';
-                            subcategorySelect.disabled = true;
-                        }
+                            } else {
+                                industrySelect.innerHTML = '<option value="">Select Industry</option>';
+                                industrySelect.disabled = true;
+                                subcategorySelect.innerHTML = '<option value="">Select Subcategory (Optional)</option>';
+                                subcategorySelect.disabled = true;
+                            }
+                        });
+
+                        industrySelect.addEventListener('change', function() {
+                            const selectedOption = this.options[this.selectedIndex];
+                            const industryId = selectedOption ? selectedOption.getAttribute('data-id') : null;
+                            
+                            if (industryId) {
+                                fetch(`/api/subcategories?industry_id=${industryId}`)
+                                    .then(response => {
+                                        if (!response.ok) {
+                                            throw new Error(`HTTP error! status: ${response.status}`);
+                                        }
+                                        return response.json();
+                                    })
+                                    .then(data => {
+                                        if (Array.isArray(data)) {
+                                            subcategorySelect.innerHTML = '<option value="">Select Subcategory (Optional)</option>';
+                                            data.forEach(subcategory => {
+                                                subcategorySelect.innerHTML += `<option value="${subcategory.name}">${subcategory.name}</option>`;
+                                            });
+                                            subcategorySelect.disabled = false;
+                                        } else {
+                                            console.error('Invalid data format received:', data);
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error fetching subcategories:', error);
+                                        subcategorySelect.innerHTML = '<option value="">Error loading subcategories</option>';
+                                        subcategorySelect.disabled = true;
+                                    });
+                            } else {
+                                subcategorySelect.innerHTML = '<option value="">Select Subcategory (Optional)</option>';
+                                subcategorySelect.disabled = true;
+                            }
+                        });
                     });
                     </script>
                     </div>
