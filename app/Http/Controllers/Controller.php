@@ -21,14 +21,38 @@ abstract class Controller
             return;
         }
 
+        // DEBUG: Log permission check details
+        \Log::info('Permission Check', [
+            'user_id' => $user->id,
+            'company_id' => $companyId,
+            'permission' => $permissionOrModule,
+            'action' => $action,
+            'alternatives' => $alternativePermissions,
+            'is_admin' => $user->isAdmin(),
+            'is_company_admin' => $companyId ? $user->isCompanyAdmin($companyId) : false,
+            'custom_role' => $user->getCustomRoleForCompany($companyId) ? $user->getCustomRoleForCompany($companyId)->role_name : null,
+            'user_permissions' => $user->getPermissions($companyId),
+        ]);
+
         // New format: module and action
         if ($action !== null) {
-            if ($user->hasModulePermission($permissionOrModule, $action, $companyId)) {
+            $hasPermission = $user->hasModulePermission($permissionOrModule, $action, $companyId);
+            \Log::info('Module Permission Check', [
+                'module' => $permissionOrModule,
+                'action' => $action,
+                'result' => $hasPermission,
+            ]);
+            if ($hasPermission) {
                 return;
             }
         } else {
             // Old format: single permission string
-            if ($user->hasPermission($permissionOrModule, $companyId)) {
+            $hasPermission = $user->hasPermission($permissionOrModule, $companyId);
+            \Log::info('Permission Name Check', [
+                'permission' => $permissionOrModule,
+                'result' => $hasPermission,
+            ]);
+            if ($hasPermission) {
                 return;
             }
             
@@ -39,7 +63,13 @@ abstract class Controller
                 if (count($parts) === 2) {
                     $module = $parts[0];
                     $actionPart = $parts[1];
-                    if ($user->hasModulePermission($module, $actionPart, $companyId)) {
+                    $hasModulePermission = $user->hasModulePermission($module, $actionPart, $companyId);
+                    \Log::info('Parsed Module Permission Check', [
+                        'parsed_module' => $module,
+                        'parsed_action' => $actionPart,
+                        'result' => $hasModulePermission,
+                    ]);
+                    if ($hasModulePermission) {
                         return;
                     }
                 }
@@ -50,12 +80,23 @@ abstract class Controller
         foreach ($alternativePermissions as $altPermission) {
             if (is_array($altPermission) && count($altPermission) === 2) {
                 // New format: [module, action]
-                if ($user->hasModulePermission($altPermission[0], $altPermission[1], $companyId)) {
+                $hasAltPermission = $user->hasModulePermission($altPermission[0], $altPermission[1], $companyId);
+                \Log::info('Alternative Module Permission Check', [
+                    'module' => $altPermission[0],
+                    'action' => $altPermission[1],
+                    'result' => $hasAltPermission,
+                ]);
+                if ($hasAltPermission) {
                     return;
                 }
             } else {
                 // Old format: string
-                if ($user->hasPermission($altPermission, $companyId)) {
+                $hasAltPermission = $user->hasPermission($altPermission, $companyId);
+                \Log::info('Alternative Permission Check', [
+                    'permission' => $altPermission,
+                    'result' => $hasAltPermission,
+                ]);
+                if ($hasAltPermission) {
                     return;
                 }
                 
@@ -65,13 +106,27 @@ abstract class Controller
                     if (count($parts) === 2) {
                         $module = $parts[0];
                         $actionPart = $parts[1];
-                        if ($user->hasModulePermission($module, $actionPart, $companyId)) {
+                        $hasParsedAltPermission = $user->hasModulePermission($module, $actionPart, $companyId);
+                        \Log::info('Parsed Alternative Permission Check', [
+                            'parsed_module' => $module,
+                            'parsed_action' => $actionPart,
+                            'result' => $hasParsedAltPermission,
+                        ]);
+                        if ($hasParsedAltPermission) {
                             return;
                         }
                     }
                 }
             }
         }
+
+        \Log::warning('Permission Denied', [
+            'user_id' => $user->id,
+            'company_id' => $companyId,
+            'permission' => $permissionOrModule,
+            'action' => $action,
+            'alternatives' => $alternativePermissions,
+        ]);
 
         abort(403, 'You do not have permission to perform this action.');
     }
