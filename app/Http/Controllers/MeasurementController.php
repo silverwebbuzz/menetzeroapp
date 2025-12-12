@@ -21,68 +21,13 @@ class MeasurementController extends Controller
      */
     public function index(Request $request)
     {
+        $this->requirePermission('measurements.view', null, ['measurements.*', 'manage_measurements']);
+        
         $user = Auth::user();
         $company = $user->getActiveCompany();
-        $companyId = $company ? $company->id : null;
-        
-        // Always check permission first
-        // Note: requirePermission($permissionOrModule, $action = null, $alternativePermissions = [])
-        // So we pass null for action, and the alternatives as third parameter
-        $this->requirePermission('measurements.view', null, ['measurements.*', 'manage_measurements']);
         
         if (!$company) {
             abort(403, 'No active company found.');
-        }
-        
-        // DEBUG: Display permission debugging information (only if debug param is passed)
-        if ($request->has('debug')) {
-            $debugInfo = [
-                'user_id' => $user->id,
-                'user_email' => $user->email,
-                'user_name' => $user->name,
-                'is_admin' => $user->isAdmin(),
-                'is_company_admin' => $companyId ? $user->isCompanyAdmin($companyId) : false,
-                'active_company_id' => $companyId,
-                'active_company_name' => $company ? $company->name : null,
-                'user_company_roles' => $user->companyRoles()->where('company_id', $companyId)->where('is_active', true)->get()->map(function($role) {
-                    return [
-                        'id' => $role->id,
-                        'company_id' => $role->company_id,
-                        'company_custom_role_id' => $role->company_custom_role_id,
-                        'is_active' => $role->is_active,
-                    ];
-                }),
-                'custom_role' => $user->getCustomRoleForCompany($companyId) ? [
-                    'id' => $user->getCustomRoleForCompany($companyId)->id,
-                    'role_name' => $user->getCustomRoleForCompany($companyId)->role_name,
-                    'company_id' => $user->getCustomRoleForCompany($companyId)->company_id,
-                ] : null,
-                'permissions' => $user->getPermissions($companyId),
-                'permission_names' => $user->getCustomRoleForCompany($companyId) ? $user->getCustomRoleForCompany($companyId)->getPermissionNames() : [],
-                'has_measurements_view' => $user->hasPermission('measurements.view', $companyId),
-                'has_measurements_wildcard' => $user->hasPermission('measurements.*', $companyId),
-                'has_manage_measurements' => $user->hasPermission('manage_measurements', $companyId),
-                'has_module_permission' => $user->hasModulePermission('measurements', 'view', $companyId),
-                'all_permissions_from_role' => $user->getCustomRoleForCompany($companyId) ? $user->getCustomRoleForCompany($companyId)->permissions()->get()->map(function($perm) {
-                    return [
-                        'id' => $perm->id,
-                        'name' => $perm->name,
-                        'module' => $perm->module,
-                        'action' => $perm->action,
-                        'description' => $perm->description,
-                    ];
-                }) : [],
-                'permission_check_result' => 'PASSED - User has measurements.view permission',
-            ];
-            
-            return response()->json([
-                'debug' => true,
-                'message' => 'Permission Debug Information',
-                'data' => $debugInfo,
-                'checking_permission' => 'measurements.view',
-                'alternative_permissions' => ['measurements.*', 'manage_measurements'],
-                'note' => 'Permission check should PASS. If you still get 403, check Laravel logs for middleware issues.',
-            ], 200, [], JSON_PRETTY_PRINT);
         }
         
         // Get measurements for user's company locations
