@@ -281,27 +281,39 @@
                     <div class="border-t pt-6">
                         <h4 class="text-md font-semibold text-gray-900 mb-4">Business Details</h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Sector -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Business Category</label>
-                                <select name="business_category" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                                    <option value="">Select Category</option>
-                                    <option value="Technology" {{ old('business_category', $company->industry) == 'Technology' ? 'selected' : '' }}>Technology</option>
-                                    <option value="Manufacturing" {{ old('business_category', $company->industry) == 'Manufacturing' ? 'selected' : '' }}>Manufacturing</option>
-                                    <option value="Construction" {{ old('business_category', $company->industry) == 'Construction' ? 'selected' : '' }}>Construction</option>
-                                    <option value="Healthcare" {{ old('business_category', $company->industry) == 'Healthcare' ? 'selected' : '' }}>Healthcare</option>
-                                    <option value="Finance" {{ old('business_category', $company->industry) == 'Finance' ? 'selected' : '' }}>Finance</option>
-                                    <option value="Retail" {{ old('business_category', $company->industry) == 'Retail' ? 'selected' : '' }}>Retail</option>
-                                    <option value="Energy" {{ old('business_category', $company->industry) == 'Energy' ? 'selected' : '' }}>Energy</option>
-                                    <option value="Transportation" {{ old('business_category', $company->industry) == 'Transportation' ? 'selected' : '' }}>Transportation</option>
-                                    <option value="Other" {{ old('business_category', $company->industry) == 'Other' ? 'selected' : '' }}>Other</option>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Sector</label>
+                                <select name="sector" id="sector" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                    <option value="">Select Sector</option>
+                                    @foreach($sectors as $sector)
+                                        <option value="{{ $sector->name }}" data-id="{{ $sector->id }}" {{ old('sector', $company->sector) == $sector->name ? 'selected' : '' }}>{{ $sector->name }}</option>
+                                    @endforeach
                                 </select>
-                                @error('business_category')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
+                                @error('sector')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                             </div>
                             
+                            <!-- Industry -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Industry</label>
+                                <select name="industry" id="industry" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" {{ $industries->isEmpty() ? 'disabled' : '' }}>
+                                    <option value="">Select Industry</option>
+                                    @foreach($industries as $industry)
+                                        <option value="{{ $industry->name }}" data-id="{{ $industry->id }}" {{ old('industry', $company->industry) == $industry->name ? 'selected' : '' }}>{{ $industry->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('industry')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
+                            </div>
+                            
+                            <!-- Business Subcategory -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Business Subcategory</label>
-                                <input type="text" name="business_subcategory" value="{{ old('business_subcategory', $company->business_subcategory) }}" 
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                <select name="business_subcategory" id="business_subcategory" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" {{ $subcategories->isEmpty() ? 'disabled' : '' }}>
+                                    <option value="">Select Subcategory (Optional)</option>
+                                    @foreach($subcategories as $subcategory)
+                                        <option value="{{ $subcategory->name }}" {{ old('business_subcategory', $company->business_subcategory) == $subcategory->name ? 'selected' : '' }}>{{ $subcategory->name }}</option>
+                                    @endforeach
+                                </select>
                                 @error('business_subcategory')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                             </div>
                         </div>
@@ -313,6 +325,61 @@
                             @error('business_description')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                         </div>
                     </div>
+
+                    <script>
+                    document.getElementById('sector').addEventListener('change', function() {
+                        const sectorId = this.options[this.selectedIndex].getAttribute('data-id');
+                        const industrySelect = document.getElementById('industry');
+                        const subcategorySelect = document.getElementById('business_subcategory');
+                        
+                        if (sectorId) {
+                            fetch(`/api/industries?sector_id=${sectorId}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    industrySelect.innerHTML = '<option value="">Select Industry</option>';
+                                    data.forEach(industry => {
+                                        industrySelect.innerHTML += `<option value="${industry.name}" data-id="${industry.id}">${industry.name}</option>`;
+                                    });
+                                    industrySelect.disabled = false;
+                                    
+                                    // Reset subcategory
+                                    subcategorySelect.innerHTML = '<option value="">Select Subcategory (Optional)</option>';
+                                    subcategorySelect.disabled = true;
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching industries:', error);
+                                });
+                        } else {
+                            industrySelect.innerHTML = '<option value="">Select Industry</option>';
+                            industrySelect.disabled = true;
+                            subcategorySelect.innerHTML = '<option value="">Select Subcategory (Optional)</option>';
+                            subcategorySelect.disabled = true;
+                        }
+                    });
+
+                    document.getElementById('industry').addEventListener('change', function() {
+                        const industryId = this.options[this.selectedIndex].getAttribute('data-id');
+                        const subcategorySelect = document.getElementById('business_subcategory');
+                        
+                        if (industryId) {
+                            fetch(`/api/subcategories?industry_id=${industryId}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    subcategorySelect.innerHTML = '<option value="">Select Subcategory (Optional)</option>';
+                                    data.forEach(subcategory => {
+                                        subcategorySelect.innerHTML += `<option value="${subcategory.name}">${subcategory.name}</option>`;
+                                    });
+                                    subcategorySelect.disabled = false;
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching subcategories:', error);
+                                });
+                        } else {
+                            subcategorySelect.innerHTML = '<option value="">Select Subcategory (Optional)</option>';
+                            subcategorySelect.disabled = true;
+                        }
+                    });
+                    </script>
 
                     <div class="flex justify-end">
                         <button type="submit" class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">

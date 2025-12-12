@@ -206,6 +206,29 @@ Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client'])->
     
 });
 
+// API routes for dynamic industry category dropdowns
+Route::get('/api/industries', function(Request $request) {
+    $sectorId = $request->get('sector_id');
+    if (!$sectorId) {
+        return response()->json([]);
+    }
+    $industries = \App\Models\MasterIndustryCategory::getIndustriesBySector($sectorId);
+    return response()->json($industries->map(function($item) {
+        return ['id' => $item->id, 'name' => $item->name];
+    }));
+});
+
+Route::get('/api/subcategories', function(Request $request) {
+    $industryId = $request->get('industry_id');
+    if (!$industryId) {
+        return response()->json([]);
+    }
+    $subcategories = \App\Models\MasterIndustryCategory::getSubcategoriesByIndustry($industryId);
+    return response()->json($subcategories->map(function($item) {
+        return ['id' => $item->id, 'name' => $item->name];
+    }));
+});
+
 // Partner Routes - Use partner guard
 Route::prefix('partner')->middleware(['auth:partner', 'setActiveCompany', 'checkCompanyType:partner'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('partner.dashboard');

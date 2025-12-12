@@ -7,6 +7,7 @@ use App\Models\EmissionSourceMaster;
 use App\Models\Company;
 use App\Models\Facility;
 use App\Models\Measurement;
+use App\Models\MasterIndustryCategory;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -88,8 +89,10 @@ class DashboardController extends Controller
             }
             
             // Owner with no company - show company setup form
+            $sectors = MasterIndustryCategory::getSectors();
             return view('dashboard.index', [
                 'needsCompanySetup' => true,
+                'sectors' => $sectors,
                 'kpis' => [
                     'total_emissions' => 0,
                     'scope1_total' => 0,

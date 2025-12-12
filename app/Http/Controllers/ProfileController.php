@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Company;
+use App\Models\MasterIndustryCategory;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -14,9 +15,32 @@ class ProfileController extends Controller
     {
         // Get user from web guard
         $user = Auth::guard('web')->user();
-        $company = $user->company;
+        $company = $user->getActiveCompany();
         
-        return view('profile.index', compact('user', 'company'));
+        if (!$company) {
+            return redirect()->route('client.dashboard')->with('error', 'No active company found.');
+        }
+        
+        // Get industry categories for dropdowns
+        $sectors = MasterIndustryCategory::getSectors();
+        $industries = collect();
+        $subcategories = collect();
+
+        if ($company->sector) {
+            $sectorCategory = MasterIndustryCategory::findByNameAndLevel($company->sector, 1);
+            if ($sectorCategory) {
+                $industries = MasterIndustryCategory::getIndustriesBySector($sectorCategory->id);
+                
+                if ($company->industry) {
+                    $industryCategory = MasterIndustryCategory::findByNameAndLevel($company->industry, 2, $sectorCategory->id);
+                    if ($industryCategory) {
+                        $subcategories = MasterIndustryCategory::getSubcategoriesByIndustry($industryCategory->id);
+                    }
+                }
+            }
+        }
+        
+        return view('profile.index', compact('user', 'company', 'sectors', 'industries', 'subcategories'));
     }
 
     public function updatePersonal(Request $request)
@@ -83,28 +107,33 @@ class ProfileController extends Controller
             'business_website' => 'nullable|url|max:255',
             'business_address' => 'nullable|string|max:500',
             'country' => 'nullable|string|max:100',
-            'business_category' => 'nullable|string|max:100',
-            'business_subcategory' => 'nullable|string|max:100',
+            'sector' => 'nullable|string|max:255',
+            'industry' => 'nullable|string|max:255',
+            'business_subcategory' => 'nullable|string|max:255',
             'business_description' => 'nullable|string|max:1000',
             'contact_person' => 'nullable|string|max:255',
             'license_no' => 'nullable|string|max:100',
             'emirate' => 'nullable|string|max:100',
-            'sector' => 'nullable|string|max:100',
         ]);
 
-        $user->company->update([
+        $company = $user->getActiveCompany();
+        if (!$company) {
+            return back()->withErrors(['company' => 'No active company found.']);
+        }
+
+        $company->update([
             'name' => $request->company_name,
             'email' => $request->business_email,
             'website' => $request->business_website,
             'address' => $request->business_address,
             'country' => $request->country,
-            'industry' => $request->business_category,
+            'sector' => $request->sector,
+            'industry' => $request->industry,
             'business_subcategory' => $request->business_subcategory,
             'description' => $request->business_description,
             'contact_person' => $request->contact_person,
             'license_no' => $request->license_no,
             'emirate' => $request->emirate,
-            'sector' => $request->sector,
         ]);
 
         return back()->with('success', 'Company information updated successfully!');

@@ -106,27 +106,35 @@
                         <p class="text-sm text-gray-600 mb-4">Describe briefly what your business does.</p>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Sector -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Business Category</label>
-                                <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" name="business_category">
-                                    <option value="">Select Category</option>
-                                    <option value="Technology" {{ old('business_category', isset($company) ? $company->industry : '') == 'Technology' ? 'selected' : '' }}>Technology</option>
-                                    <option value="Manufacturing" {{ old('business_category', isset($company) ? $company->industry : '') == 'Manufacturing' ? 'selected' : '' }}>Manufacturing</option>
-                                    <option value="Construction" {{ old('business_category', isset($company) ? $company->industry : '') == 'Construction' ? 'selected' : '' }}>Construction</option>
-                                    <option value="Healthcare" {{ old('business_category', isset($company) ? $company->industry : '') == 'Healthcare' ? 'selected' : '' }}>Healthcare</option>
-                                    <option value="Finance" {{ old('business_category', isset($company) ? $company->industry : '') == 'Finance' ? 'selected' : '' }}>Finance</option>
-                                    <option value="Retail" {{ old('business_category', isset($company) ? $company->industry : '') == 'Retail' ? 'selected' : '' }}>Retail</option>
-                                    <option value="Energy" {{ old('business_category', isset($company) ? $company->industry : '') == 'Energy' ? 'selected' : '' }}>Energy</option>
-                                    <option value="Transportation" {{ old('business_category', isset($company) ? $company->industry : '') == 'Transportation' ? 'selected' : '' }}>Transportation</option>
-                                    <option value="Other" {{ old('business_category', isset($company) ? $company->industry : '') == 'Other' ? 'selected' : '' }}>Other</option>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Sector</label>
+                                <select name="sector" id="sector" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                    <option value="">Select Sector</option>
+                                    @if(isset($sectors))
+                                        @foreach($sectors as $sector)
+                                            <option value="{{ $sector->name }}" data-id="{{ $sector->id }}" {{ old('sector', isset($company) ? $company->sector : '') == $sector->name ? 'selected' : '' }}>{{ $sector->name }}</option>
+                                        @endforeach
+                                    @endif
                                 </select>
-                                @error('business_category')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                                @error('sector')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                             </div>
                             
+                            <!-- Industry -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Industry</label>
+                                <select name="industry" id="industry" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" disabled>
+                                    <option value="">Select Industry</option>
+                                </select>
+                                @error('industry')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                            </div>
+                            
+                            <!-- Business Subcategory -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Business Subcategory</label>
-                                <input class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" 
-                                       name="business_subcategory" type="text" value="{{ old('business_subcategory', isset($company) ? $company->business_subcategory : '') }}" placeholder="e.g., Software Development">
+                                <select name="business_subcategory" id="business_subcategory" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" disabled>
+                                    <option value="">Select Subcategory (Optional)</option>
+                                </select>
                                 @error('business_subcategory')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                             </div>
                         </div>
@@ -137,6 +145,62 @@
                                       name="business_description" rows="4" placeholder="Tell us a bit about what you do...">{{ old('business_description', isset($company) ? $company->description : '') }}</textarea>
                             @error('business_description')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                         </div>
+                    </div>
+
+                    <script>
+                    document.getElementById('sector').addEventListener('change', function() {
+                        const sectorId = this.options[this.selectedIndex].getAttribute('data-id');
+                        const industrySelect = document.getElementById('industry');
+                        const subcategorySelect = document.getElementById('business_subcategory');
+                        
+                        if (sectorId) {
+                            fetch(`/api/industries?sector_id=${sectorId}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    industrySelect.innerHTML = '<option value="">Select Industry</option>';
+                                    data.forEach(industry => {
+                                        industrySelect.innerHTML += `<option value="${industry.name}" data-id="${industry.id}">${industry.name}</option>`;
+                                    });
+                                    industrySelect.disabled = false;
+                                    
+                                    // Reset subcategory
+                                    subcategorySelect.innerHTML = '<option value="">Select Subcategory (Optional)</option>';
+                                    subcategorySelect.disabled = true;
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching industries:', error);
+                                });
+                        } else {
+                            industrySelect.innerHTML = '<option value="">Select Industry</option>';
+                            industrySelect.disabled = true;
+                            subcategorySelect.innerHTML = '<option value="">Select Subcategory (Optional)</option>';
+                            subcategorySelect.disabled = true;
+                        }
+                    });
+
+                    document.getElementById('industry').addEventListener('change', function() {
+                        const industryId = this.options[this.selectedIndex].getAttribute('data-id');
+                        const subcategorySelect = document.getElementById('business_subcategory');
+                        
+                        if (industryId) {
+                            fetch(`/api/subcategories?industry_id=${industryId}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    subcategorySelect.innerHTML = '<option value="">Select Subcategory (Optional)</option>';
+                                    data.forEach(subcategory => {
+                                        subcategorySelect.innerHTML += `<option value="${subcategory.name}">${subcategory.name}</option>`;
+                                    });
+                                    subcategorySelect.disabled = false;
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching subcategories:', error);
+                                });
+                        } else {
+                            subcategorySelect.innerHTML = '<option value="">Select Subcategory (Optional)</option>';
+                            subcategorySelect.disabled = true;
+                        }
+                    });
+                    </script>
                     </div>
 
                     <!-- Why Complete Section -->

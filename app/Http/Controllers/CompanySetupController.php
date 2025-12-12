@@ -9,6 +9,7 @@ use App\Models\ClientSubscription;
 use App\Models\SubscriptionPlan;
 use App\Models\RoleTemplate;
 use App\Models\CompanyCustomRole;
+use App\Models\MasterIndustryCategory;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
@@ -26,8 +27,9 @@ class CompanySetupController extends Controller
             'business_website' => 'nullable|url|max:255',
             'business_address' => 'nullable|string|max:500',
             'country' => 'nullable|string|max:100',
-            'business_category' => 'nullable|string|max:100',
-            'business_subcategory' => 'nullable|string|max:100',
+            'sector' => 'nullable|string|max:255',
+            'industry' => 'nullable|string|max:255',
+            'business_subcategory' => 'nullable|string|max:255',
             'business_description' => 'nullable|string|max:1000',
         ]);
 
@@ -63,7 +65,8 @@ class CompanySetupController extends Controller
                 'website' => $request->business_website,
                 'address' => $request->business_address,
                 'country' => $request->country,
-                'industry' => $request->business_category,
+                'sector' => $request->sector,
+                'industry' => $request->industry,
                 'business_subcategory' => $request->business_subcategory,
                 'description' => $request->business_description,
             ]);
@@ -97,7 +100,8 @@ class CompanySetupController extends Controller
                 'website' => $request->business_website,
                 'address' => $request->business_address,
                 'country' => $request->country,
-                'industry' => $request->business_category,
+                'sector' => $request->sector,
+                'industry' => $request->industry,
                 'business_subcategory' => $request->business_subcategory,
                 'description' => $request->business_description,
                 'is_active' => true,
