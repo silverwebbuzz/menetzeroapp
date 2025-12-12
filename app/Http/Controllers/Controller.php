@@ -17,7 +17,7 @@ abstract class Controller
         $companyId = $company ? $company->id : null;
 
         // Super admin and company admin bypass permission checks
-        if ($user->isAdmin() || $user->isCompanyAdmin()) {
+        if ($user->isAdmin() || ($companyId && $user->isCompanyAdmin($companyId))) {
             return;
         }
 
@@ -30,6 +30,19 @@ abstract class Controller
             // Old format: single permission string
             if ($user->hasPermission($permissionOrModule, $companyId)) {
                 return;
+            }
+            
+            // Also try to parse as module.action format and check module/action
+            // e.g., "measurements.view" -> module="measurements", action="view"
+            if (str_contains($permissionOrModule, '.')) {
+                $parts = explode('.', $permissionOrModule, 2);
+                if (count($parts) === 2) {
+                    $module = $parts[0];
+                    $actionPart = $parts[1];
+                    if ($user->hasModulePermission($module, $actionPart, $companyId)) {
+                        return;
+                    }
+                }
             }
         }
 
@@ -44,6 +57,18 @@ abstract class Controller
                 // Old format: string
                 if ($user->hasPermission($altPermission, $companyId)) {
                     return;
+                }
+                
+                // Also try to parse as module.action format
+                if (str_contains($altPermission, '.')) {
+                    $parts = explode('.', $altPermission, 2);
+                    if (count($parts) === 2) {
+                        $module = $parts[0];
+                        $actionPart = $parts[1];
+                        if ($user->hasModulePermission($module, $actionPart, $companyId)) {
+                            return;
+                        }
+                    }
                 }
             }
         }

@@ -20,10 +20,10 @@ class LocationController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $company = $user->company;
+        $company = $user->getActiveCompany();
         
         if (!$company) {
-            return redirect()->route('client.dashboard')->with('error', 'Please complete your business profile first to access this feature.');
+            abort(403, 'No active company found.');
         }
 
         $locations = $company->locations()
@@ -62,10 +62,10 @@ class LocationController extends Controller
         $this->requirePermission('locations.*', ['manage_locations']);
         
         $user = Auth::user();
-        $company = $user->company;
+        $company = $user->getActiveCompany();
         
         if (!$company) {
-            return redirect()->route('client.dashboard')->with('error', 'Please complete your business profile first to access this feature.');
+            abort(403, 'No active company found.');
         }
 
         return view('locations.create', compact('company'));
@@ -76,10 +76,10 @@ class LocationController extends Controller
         $this->requirePermission('locations.*', ['manage_locations']);
         
         $user = Auth::user();
-        $company = $user->company;
+        $company = $user->getActiveCompany();
         
         if (!$company) {
-            return redirect()->route('client.dashboard')->with('error', 'Please complete your business profile first to access this feature.');
+            abort(403, 'No active company found.');
         }
 
         $request->validate([
@@ -140,7 +140,11 @@ class LocationController extends Controller
     public function storeStep(Request $request, $step)
     {
         $user = Auth::user();
-        $company = $user->company;
+        $company = $user->getActiveCompany();
+        
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
         
         if (!$company) {
             return redirect()->route('client.dashboard')->with('error', 'Please complete your business profile first to access this feature.');
@@ -237,7 +241,9 @@ class LocationController extends Controller
     public function show(Location $location)
     {
         $user = Auth::user();
-        if ($location->company_id !== $user->company_id) {
+        $company = $user->getActiveCompany();
+        
+        if (!$company || $location->company_id !== $company->id) {
             abort(403, 'Unauthorized access to this location.');
         }
         return view('locations.show', compact('location'));
@@ -246,7 +252,8 @@ class LocationController extends Controller
     public function edit(Location $location)
     {
         $user = Auth::user();
-        if ($location->company_id !== $user->company_id) {
+        $company = $user->getActiveCompany();
+        if (!$company || $location->company_id !== $company->id) {
             abort(403, 'Unauthorized access to this location.');
         }
         return view('locations.edit', compact('location'));
@@ -263,7 +270,8 @@ class LocationController extends Controller
 
         try {
             $user = Auth::user();
-            if ($location->company_id !== $user->company_id) {
+            $company = $user->getActiveCompany();
+        if (!$company || $location->company_id !== $company->id) {
                 abort(403, 'Unauthorized access to this location.');
             }
 
@@ -340,7 +348,8 @@ class LocationController extends Controller
     public function destroy(Location $location)
     {
         $user = Auth::user();
-        if ($location->company_id !== $user->company_id) {
+        $company = $user->getActiveCompany();
+        if (!$company || $location->company_id !== $company->id) {
             abort(403, 'Unauthorized access to this location.');
         }
         $location->delete();
@@ -350,7 +359,8 @@ class LocationController extends Controller
     public function toggleStatus(Location $location)
     {
         $user = Auth::user();
-        if ($location->company_id !== $user->company_id) {
+        $company = $user->getActiveCompany();
+        if (!$company || $location->company_id !== $company->id) {
             abort(403, 'Unauthorized access to this location.');
         }
         
@@ -363,7 +373,8 @@ class LocationController extends Controller
     public function toggleHeadOffice(Location $location)
     {
         $user = Auth::user();
-        if ($location->company_id !== $user->company_id) {
+        $company = $user->getActiveCompany();
+        if (!$company || $location->company_id !== $company->id) {
             abort(403, 'Unauthorized access to this location.');
         }
         
