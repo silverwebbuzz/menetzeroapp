@@ -78,6 +78,153 @@
 </a>
 @endif
 
+@if($hasCompany)
+<!-- Quick Input Section -->
+<div class="mt-6 mb-2">
+    <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3">
+        Quick Input
+    </div>
+</div>
+
+<div x-data="{ 
+    scope1Open: false,
+    scope2Open: false,
+    scope3Open: false
+}" class="space-y-1">
+    <!-- Scope 1 - DIRECT EMISSIONS -->
+    <div>
+        <button @click="scope1Open = !scope1Open" class="nav-link w-full text-left flex items-center justify-between">
+            <div class="flex items-center">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="flex-shrink-0">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                <span>Scope 1 - DIRECT EMISSIONS</span>
+            </div>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4 transition-transform" :class="{ 'rotate-180': scope1Open }">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+        </button>
+        <div x-show="scope1Open" 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 transform -translate-y-1"
+             x-transition:enter-end="opacity-100 transform translate-y-0"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 transform translate-y-0"
+             x-transition:leave-end="opacity-0 transform -translate-y-1"
+             class="ml-4 space-y-1">
+            <a href="#" class="nav-link text-sm py-2">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Natural Gas (Stationary combustion)
+            </a>
+            <a href="#" class="nav-link text-sm py-2">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Fuel (Stationary combustion)
+            </a>
+            <a href="#" class="nav-link text-sm py-2">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Vehicle (Mobile combustion)
+            </a>
+            <a href="#" class="nav-link text-sm py-2">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Refrigerants (Fugitive emissions)
+            </a>
+            <a href="#" class="nav-link text-sm py-2">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Process (Process Emissions)
+            </a>
+        </div>
+    </div>
+
+    <!-- Scope 2 - INDIRECT ENERGY EMISSIONS -->
+    <div>
+        <button @click="scope2Open = !scope2Open" class="nav-link w-full text-left flex items-center justify-between">
+            <div class="flex items-center">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="flex-shrink-0">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                <span>Scope 2 - INDIRECT ENERGY EMISSIONS</span>
+            </div>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4 transition-transform" :class="{ 'rotate-180': scope2Open }">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+        </button>
+        <div x-show="scope2Open" 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 transform -translate-y-1"
+             x-transition:enter-end="opacity-100 transform translate-y-0"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 transform translate-y-0"
+             x-transition:leave-end="opacity-0 transform -translate-y-1"
+             class="ml-4 space-y-1">
+            <a href="#" class="nav-link text-sm py-2">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Electricity (Purchased Electricity)
+            </a>
+            <a href="#" class="nav-link text-sm py-2">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Purchased Heat, Steam & Cooling
+            </a>
+        </div>
+    </div>
+
+    <!-- Scope 3 -->
+    <div>
+        <button @click="scope3Open = !scope3Open" class="nav-link w-full text-left flex items-center justify-between">
+            <div class="flex items-center">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="flex-shrink-0">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                <span>Scope 3</span>
+            </div>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4 transition-transform" :class="{ 'rotate-180': scope3Open }">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+        </button>
+        <div x-show="scope3Open" 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 transform -translate-y-1"
+             x-transition:enter-end="opacity-100 transform translate-y-0"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 transform translate-y-0"
+             x-transition:leave-end="opacity-0 transform -translate-y-1"
+             class="ml-4 space-y-1">
+            <a href="#" class="nav-link text-sm py-2">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Flights (Business travel)
+            </a>
+            <a href="#" class="nav-link text-sm py-2">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Public Transport (Employee commuting)
+            </a>
+            <a href="#" class="nav-link text-sm py-2">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Home Workers (Remote work)
+            </a>
+        </div>
+    </div>
+</div>
+@endif
+
 @if($canViewDocuments)
 <!-- AI Smart Uploads Section -->
 <div class="mt-6 mb-2">
