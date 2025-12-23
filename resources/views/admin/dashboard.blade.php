@@ -1,7 +1,10 @@
-@extends('layouts.app')
+@extends('admin.layouts.app')
+
+@section('title', 'Super Admin Dashboard | MENetZero')
+@section('page-title', 'Super Admin Dashboard')
 
 @section('content')
-    <div class="max-w-6xl mx-auto py-10">
+    <div class="max-w-6xl mx-auto py-6">
         <div class="mb-8">
             <h1 class="text-2xl font-bold text-gray-900">Super Admin Dashboard</h1>
             <p class="mt-2 text-sm text-gray-600">
