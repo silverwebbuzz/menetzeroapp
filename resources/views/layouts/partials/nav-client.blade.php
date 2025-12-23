@@ -1,8 +1,12 @@
 {{-- Client Navigation Menu --}}
 @php
-    $user = auth()->user();
-    // Check for active company (works for both owners and staff members)
-    $activeCompany = $user ? $user->getActiveCompany() : null;
+    // Always use the web guard here so admin users (App\Models\Admin) don't hit client-specific methods
+    $user = auth('web')->user();
+
+    // Check for active company (works for both owners and staff members), only if method exists
+    $activeCompany = ($user && method_exists($user, 'getActiveCompany'))
+        ? $user->getActiveCompany()
+        : null;
     $hasCompany = $activeCompany !== null;
     $companyId = $activeCompany ? $activeCompany->id : null;
     
