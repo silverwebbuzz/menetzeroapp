@@ -7,15 +7,50 @@
     <div class="bg-white shadow rounded-lg">
         <div class="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
             <h2 class="text-lg font-medium text-gray-900">Role Templates</h2>
-            <a href="{{ route('admin.role-templates.create') }}"
-               class="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium bg-purple-600 text-white hover:bg-purple-700">
-                + New Role Template
-            </a>
         </div>
-        <div class="p-4 text-sm text-gray-500">
-            This page will list all role templates used to seed company roles. (Initial stub view.)
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 text-sm">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                        <th class="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                        <th class="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">System</th>
+                        <th class="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Active</th>
+                        <th class="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Sort Order</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @forelse ($templates as $template)
+                        <tr>
+                            <td class="px-4 py-2 text-gray-900">
+                                {{ $template->template_code }}
+                            </td>
+                            <td class="px-4 py-2 text-gray-900">
+                                {{ $template->template_name }}
+                            </td>
+                            <td class="px-4 py-2 text-gray-500">
+                                {{ $template->is_system_template ? 'Yes' : 'No' }}
+                            </td>
+                            <td class="px-4 py-2 text-gray-500">
+                                {{ $template->is_active ? 'Yes' : 'No' }}
+                            </td>
+                            <td class="px-4 py-2 text-gray-500">
+                                {{ $template->sort_order }}
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-4 py-4 text-center text-gray-500">
+                                No role templates defined.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 @endsection
+
 
 
