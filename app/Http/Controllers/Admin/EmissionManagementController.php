@@ -296,9 +296,14 @@ class EmissionManagementController extends Controller
             'conversion_factor' => 'required|numeric',
             'fuel_type' => 'nullable|string|max:100',
             'region' => 'nullable|string|max:50',
+            'is_active' => 'boolean',
+            'notes' => 'nullable|string',
         ]);
 
-        EmissionUnitConversion::create($request->all());
+        $data = $request->all();
+        $data['is_active'] = $request->has('is_active');
+
+        EmissionUnitConversion::create($data);
 
         return redirect()->route('admin.emissions.unit-conversions')
             ->with('success', 'Unit conversion created successfully');
@@ -320,9 +325,14 @@ class EmissionManagementController extends Controller
             'conversion_factor' => 'required|numeric',
             'fuel_type' => 'nullable|string|max:100',
             'region' => 'nullable|string|max:50',
+            'is_active' => 'boolean',
+            'notes' => 'nullable|string',
         ]);
 
-        $conversion->update($request->all());
+        $data = $request->all();
+        $data['is_active'] = $request->has('is_active');
+
+        $conversion->update($data);
 
         return redirect()->route('admin.emissions.unit-conversions')
             ->with('success', 'Unit conversion updated successfully');
@@ -369,9 +379,19 @@ class EmissionManagementController extends Controller
             'industry_category_id' => 'nullable|exists:master_industry_categories,id',
             'user_friendly_name' => 'required|string|max:255',
             'match_level' => 'nullable|in:1,2,3',
+            'unit_type' => 'nullable|string|max:255',
+            'display_order' => 'nullable|integer',
+            'also_match_children' => 'boolean',
+            'is_active' => 'boolean',
+            'user_friendly_description' => 'nullable|string',
+            'typical_units' => 'nullable|string|max:255',
         ]);
 
-        EmissionIndustryLabel::create($request->all());
+        $data = $request->all();
+        $data['also_match_children'] = $request->has('also_match_children');
+        $data['is_active'] = $request->has('is_active');
+
+        EmissionIndustryLabel::create($data);
 
         return redirect()->route('admin.emissions.industry-labels')
             ->with('success', 'Industry label created successfully');
@@ -394,9 +414,19 @@ class EmissionManagementController extends Controller
             'industry_category_id' => 'nullable|exists:master_industry_categories,id',
             'user_friendly_name' => 'required|string|max:255',
             'match_level' => 'nullable|in:1,2,3',
+            'unit_type' => 'nullable|string|max:255',
+            'display_order' => 'nullable|integer',
+            'also_match_children' => 'boolean',
+            'is_active' => 'boolean',
+            'user_friendly_description' => 'nullable|string',
+            'typical_units' => 'nullable|string|max:255',
         ]);
 
-        $label->update($request->all());
+        $data = $request->all();
+        $data['also_match_children'] = $request->has('also_match_children');
+        $data['is_active'] = $request->has('is_active');
+
+        $label->update($data);
 
         return redirect()->route('admin.emissions.industry-labels')
             ->with('success', 'Industry label updated successfully');
@@ -441,11 +471,27 @@ class EmissionManagementController extends Controller
             'emission_source_id' => 'required|exists:emission_sources_master,id',
             'rule_name' => 'required|string|max:255',
             'priority' => 'nullable|integer',
-            'conditions' => 'nullable|json',
+            'conditions' => 'nullable|string',
             'emission_factor_id' => 'nullable|exists:emission_factors,id',
+            'is_active' => 'boolean',
         ]);
 
-        EmissionFactorSelectionRule::create($request->all());
+        $data = $request->all();
+        $data['is_active'] = $request->has('is_active');
+        
+        // Parse JSON conditions if provided
+        if ($request->filled('conditions')) {
+            $decoded = json_decode($request->conditions, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $data['conditions'] = $decoded;
+            } else {
+                $data['conditions'] = [];
+            }
+        } else {
+            $data['conditions'] = [];
+        }
+
+        EmissionFactorSelectionRule::create($data);
 
         return redirect()->route('admin.emissions.selection-rules')
             ->with('success', 'Selection rule created successfully');
@@ -467,11 +513,27 @@ class EmissionManagementController extends Controller
             'emission_source_id' => 'required|exists:emission_sources_master,id',
             'rule_name' => 'required|string|max:255',
             'priority' => 'nullable|integer',
-            'conditions' => 'nullable|json',
+            'conditions' => 'nullable|string',
             'emission_factor_id' => 'nullable|exists:emission_factors,id',
+            'is_active' => 'boolean',
         ]);
 
-        $rule->update($request->all());
+        $data = $request->all();
+        $data['is_active'] = $request->has('is_active');
+        
+        // Parse JSON conditions if provided
+        if ($request->filled('conditions')) {
+            $decoded = json_decode($request->conditions, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $data['conditions'] = $decoded;
+            } else {
+                $data['conditions'] = $rule->conditions ?? [];
+            }
+        } else {
+            $data['conditions'] = $rule->conditions ?? [];
+        }
+
+        $rule->update($data);
 
         return redirect()->route('admin.emissions.selection-rules')
             ->with('success', 'Selection rule updated successfully');
