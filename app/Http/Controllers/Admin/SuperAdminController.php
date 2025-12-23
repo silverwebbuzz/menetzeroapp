@@ -188,7 +188,8 @@ class SuperAdminController extends Controller
      */
     public function roleTemplates()
     {
-        $templates = RoleTemplate::orderBy('category')->orderBy('sort_order')->get();
+        // In current deployment we only have client-side templates, so no category column is needed
+        $templates = RoleTemplate::orderBy('sort_order')->get();
         return view('admin.role-templates.index', compact('templates'));
     }
 
@@ -210,7 +211,6 @@ class SuperAdminController extends Controller
             'template_name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'permissions' => 'nullable|array',
-            'category' => 'required|in:client,both',
             'sort_order' => 'nullable|integer',
         ]);
 
@@ -219,7 +219,6 @@ class SuperAdminController extends Controller
             'template_name' => $request->template_name,
             'description' => $request->description,
             'permissions' => $request->permissions ?? [],
-            'category' => $request->category,
             'is_system_template' => true,
             'is_active' => $request->has('is_active'),
             'sort_order' => $request->sort_order ?? 0,
@@ -250,7 +249,6 @@ class SuperAdminController extends Controller
             'template_name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'permissions' => 'nullable|array',
-            'category' => 'required|in:client,both',
             'sort_order' => 'nullable|integer',
         ]);
 
@@ -259,7 +257,6 @@ class SuperAdminController extends Controller
             'template_name' => $request->template_name,
             'description' => $request->description,
             'permissions' => $request->permissions ?? [],
-            'category' => $request->category,
             'is_active' => $request->has('is_active'),
             'sort_order' => $request->sort_order ?? 0,
         ]);
