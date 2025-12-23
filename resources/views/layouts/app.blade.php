@@ -297,7 +297,7 @@
 </head>
 <body class="font-sans antialiased bg-gray-50">
     <div>
-        @auth
+        @auth('web')
             <!-- Mobile Overlay -->
             <div class="mobile-overlay" id="mobileOverlay" onclick="
                 const sidebar = document.getElementById('sidebar');
