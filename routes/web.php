@@ -320,6 +320,7 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
         Route::post('/subscription-plans', [\App\Http\Controllers\Admin\SuperAdminController::class, 'storeSubscriptionPlan'])->name('subscription-plans.store');
         Route::get('/subscription-plans/{id}/edit', [\App\Http\Controllers\Admin\SuperAdminController::class, 'editSubscriptionPlan'])->name('subscription-plans.edit');
         Route::put('/subscription-plans/{id}', [\App\Http\Controllers\Admin\SuperAdminController::class, 'updateSubscriptionPlan'])->name('subscription-plans.update');
+        Route::delete('/subscription-plans/{id}', [\App\Http\Controllers\Admin\SuperAdminController::class, 'destroySubscriptionPlan'])->name('subscription-plans.destroy');
         
         // Role Templates Management
         Route::get('/role-templates', [\App\Http\Controllers\Admin\SuperAdminController::class, 'roleTemplates'])->name('role-templates');
@@ -327,6 +328,7 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
         Route::post('/role-templates', [\App\Http\Controllers\Admin\SuperAdminController::class, 'storeRoleTemplate'])->name('role-templates.store');
         Route::get('/role-templates/{id}/edit', [\App\Http\Controllers\Admin\SuperAdminController::class, 'editRoleTemplate'])->name('role-templates.edit');
         Route::put('/role-templates/{id}', [\App\Http\Controllers\Admin\SuperAdminController::class, 'updateRoleTemplate'])->name('role-templates.update');
+        Route::delete('/role-templates/{id}', [\App\Http\Controllers\Admin\SuperAdminController::class, 'destroyRoleTemplate'])->name('role-templates.destroy');
         
         // Users Management
         Route::get('/users', [\App\Http\Controllers\Admin\SuperAdminController::class, 'users'])->name('users.index');
@@ -334,4 +336,57 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
         
         // Statistics
         Route::get('/statistics', [\App\Http\Controllers\Admin\SuperAdminController::class, 'statistics'])->name('statistics');
+        
+        // Emission Management
+        Route::prefix('emissions')->name('emissions.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'index'])->name('index');
+            
+            // Emission Sources
+            Route::get('/sources', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'sources'])->name('sources');
+            Route::get('/sources/create', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'createSource'])->name('sources.create');
+            Route::post('/sources', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'storeSource'])->name('sources.store');
+            Route::get('/sources/{id}/edit', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'editSource'])->name('sources.edit');
+            Route::put('/sources/{id}', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'updateSource'])->name('sources.update');
+            Route::delete('/sources/{id}', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'destroySource'])->name('sources.destroy');
+            
+            // Emission Factors
+            Route::get('/factors', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'factors'])->name('factors');
+            Route::get('/factors/create', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'createFactor'])->name('factors.create');
+            Route::post('/factors', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'storeFactor'])->name('factors.store');
+            Route::get('/factors/{id}/edit', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'editFactor'])->name('factors.edit');
+            Route::put('/factors/{id}', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'updateFactor'])->name('factors.update');
+            Route::delete('/factors/{id}', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'destroyFactor'])->name('factors.destroy');
+            
+            // GWP Values
+            Route::get('/gwp-values', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'gwpValues'])->name('gwp-values');
+            Route::get('/gwp-values/create', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'createGwpValue'])->name('gwp-values.create');
+            Route::post('/gwp-values', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'storeGwpValue'])->name('gwp-values.store');
+            Route::get('/gwp-values/{id}/edit', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'editGwpValue'])->name('gwp-values.edit');
+            Route::put('/gwp-values/{id}', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'updateGwpValue'])->name('gwp-values.update');
+            Route::delete('/gwp-values/{id}', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'destroyGwpValue'])->name('gwp-values.destroy');
+            
+            // Unit Conversions
+            Route::get('/unit-conversions', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'unitConversions'])->name('unit-conversions');
+            Route::get('/unit-conversions/create', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'createUnitConversion'])->name('unit-conversions.create');
+            Route::post('/unit-conversions', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'storeUnitConversion'])->name('unit-conversions.store');
+            Route::get('/unit-conversions/{id}/edit', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'editUnitConversion'])->name('unit-conversions.edit');
+            Route::put('/unit-conversions/{id}', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'updateUnitConversion'])->name('unit-conversions.update');
+            Route::delete('/unit-conversions/{id}', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'destroyUnitConversion'])->name('unit-conversions.destroy');
+            
+            // Industry Labels
+            Route::get('/industry-labels', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'industryLabels'])->name('industry-labels');
+            Route::get('/industry-labels/create', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'createIndustryLabel'])->name('industry-labels.create');
+            Route::post('/industry-labels', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'storeIndustryLabel'])->name('industry-labels.store');
+            Route::get('/industry-labels/{id}/edit', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'editIndustryLabel'])->name('industry-labels.edit');
+            Route::put('/industry-labels/{id}', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'updateIndustryLabel'])->name('industry-labels.update');
+            Route::delete('/industry-labels/{id}', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'destroyIndustryLabel'])->name('industry-labels.destroy');
+            
+            // Selection Rules
+            Route::get('/selection-rules', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'selectionRules'])->name('selection-rules');
+            Route::get('/selection-rules/create', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'createSelectionRule'])->name('selection-rules.create');
+            Route::post('/selection-rules', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'storeSelectionRule'])->name('selection-rules.store');
+            Route::get('/selection-rules/{id}/edit', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'editSelectionRule'])->name('selection-rules.edit');
+            Route::put('/selection-rules/{id}', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'updateSelectionRule'])->name('selection-rules.update');
+            Route::delete('/selection-rules/{id}', [\App\Http\Controllers\Admin\EmissionManagementController::class, 'destroySelectionRule'])->name('selection-rules.destroy');
+        });
     });

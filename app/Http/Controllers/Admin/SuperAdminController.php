@@ -8,6 +8,7 @@ use App\Models\Company;
 use App\Models\User;
 use App\Models\SubscriptionPlan;
 use App\Models\RoleTemplate;
+use App\Models\Permission;
 use App\Models\ClientSubscription;
 use App\Models\UsageTracking;
 use App\Services\SubscriptionService;
@@ -184,6 +185,25 @@ class SuperAdminController extends Controller
     }
 
     /**
+     * Delete Subscription Plan
+     */
+    public function destroySubscriptionPlan($id)
+    {
+        $plan = SubscriptionPlan::findOrFail($id);
+        
+        // Check if plan has active subscriptions
+        if ($plan->clientSubscriptions()->where('status', 'active')->exists()) {
+            return redirect()->route('admin.subscription-plans')
+                ->with('error', 'Cannot delete subscription plan with active subscriptions.');
+        }
+
+        $plan->delete();
+
+        return redirect()->route('admin.subscription-plans')
+            ->with('success', 'Subscription plan deleted successfully');
+    }
+
+    /**
      * Manage Role Templates
      */
     public function roleTemplates()
@@ -198,7 +218,8 @@ class SuperAdminController extends Controller
      */
     public function createRoleTemplate()
     {
-        return view('admin.role-templates.create');
+        $permissions = Permission::active()->orderBy('module')->orderBy('sort_order')->get()->groupBy('module');
+        return view('admin.role-templates.create', compact('permissions'));
     }
 
     /**
@@ -214,15 +235,19 @@ class SuperAdminController extends Controller
             'sort_order' => 'nullable|integer',
         ]);
 
-        RoleTemplate::create([
+        $template = RoleTemplate::create([
             'template_code' => $request->template_code,
             'template_name' => $request->template_name,
             'description' => $request->description,
-            'permissions' => $request->permissions ?? [],
-            'is_system_template' => true,
+            'is_system_template' => $request->has('is_system_template'),
             'is_active' => $request->has('is_active'),
             'sort_order' => $request->sort_order ?? 0,
         ]);
+
+        // Attach permissions
+        if ($request->has('permissions') && is_array($request->permissions)) {
+            $template->permissions()->attach($request->permissions);
+        }
 
         return redirect()->route('admin.role-templates')
             ->with('success', 'Role template created successfully');
@@ -233,8 +258,9 @@ class SuperAdminController extends Controller
      */
     public function editRoleTemplate($id)
     {
-        $template = RoleTemplate::findOrFail($id);
-        return view('admin.role-templates.edit', compact('template'));
+        $template = RoleTemplate::with('permissions')->findOrFail($id);
+        $permissions = Permission::active()->orderBy('module')->orderBy('sort_order')->get()->groupBy('module');
+        return view('admin.role-templates.edit', compact('template', 'permissions'));
     }
 
     /**
@@ -256,13 +282,40 @@ class SuperAdminController extends Controller
             'template_code' => $request->template_code,
             'template_name' => $request->template_name,
             'description' => $request->description,
-            'permissions' => $request->permissions ?? [],
             'is_active' => $request->has('is_active'),
             'sort_order' => $request->sort_order ?? 0,
         ]);
 
+        // Sync permissions
+        if ($request->has('permissions') && is_array($request->permissions)) {
+            $template->permissions()->sync($request->permissions);
+        } else {
+            $template->permissions()->detach();
+        }
+
         return redirect()->route('admin.role-templates')
             ->with('success', 'Role template updated successfully');
+    }
+
+    /**
+     * Delete Role Template
+     */
+    public function destroyRoleTemplate($id)
+    {
+        $template = RoleTemplate::findOrFail($id);
+        
+        // Check if it's a system template (optional: prevent deletion of system templates)
+        if ($template->is_system_template) {
+            return redirect()->route('admin.role-templates')
+                ->with('error', 'Cannot delete system templates. Deactivate them instead.');
+        }
+
+        // Detach permissions before deleting
+        $template->permissions()->detach();
+        $template->delete();
+
+        return redirect()->route('admin.role-templates')
+            ->with('success', 'Role template deleted successfully');
     }
 
     /**
