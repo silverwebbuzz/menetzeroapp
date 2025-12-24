@@ -640,6 +640,34 @@ ON DUPLICATE KEY UPDATE
 -- Note: Fuel form has cascading dropdowns: fuel_category -> fuel_type -> unit_of_measure
 -- The fuel_type and unit_of_measure options are loaded dynamically via API based on selections
 
+-- 8.0 Ensure all required columns exist in emission_source_form_fields table
+-- IMPORTANT: If you get "Duplicate column name" error, that column already exists - skip that ALTER statement
+-- Add columns one by one without AFTER clause to avoid dependency issues
+
+-- Add default_value if it doesn't exist
+ALTER TABLE `emission_source_form_fields`
+ADD COLUMN `default_value` VARCHAR(255) NULL COMMENT 'Default value for this field';
+
+-- Add conditional_logic if it doesn't exist
+ALTER TABLE `emission_source_form_fields`
+ADD COLUMN `conditional_logic` JSON NULL COMMENT 'Show/hide rules: {"depends_on": "field_name", "show_if": "value"}';
+
+-- Add depends_on_field if it doesn't exist
+ALTER TABLE `emission_source_form_fields`
+ADD COLUMN `depends_on_field` VARCHAR(100) NULL COMMENT 'Field name this depends on';
+
+-- Add depends_on_value if it doesn't exist
+ALTER TABLE `emission_source_form_fields`
+ADD COLUMN `depends_on_value` VARCHAR(255) NULL COMMENT 'Value that triggers this field';
+
+-- Add calculation_formula if it doesn't exist
+ALTER TABLE `emission_source_form_fields`
+ADD COLUMN `calculation_formula` TEXT NULL COMMENT 'Formula for calculated fields';
+
+-- Add unit_conversion if it doesn't exist
+ALTER TABLE `emission_source_form_fields`
+ADD COLUMN `unit_conversion` JSON NULL COMMENT 'Unit conversion factors';
+
 -- 8.1 Fuel Category (First dropdown - static options)
 INSERT INTO `emission_source_form_fields` 
 (`emission_source_id`, `field_name`, `field_type`, `field_label`, `field_placeholder`, 

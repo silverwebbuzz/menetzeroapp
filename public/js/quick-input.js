@@ -486,18 +486,36 @@
      */
     function setupCascadingDropdowns() {
         const form = document.querySelector('form[data-source-id]');
-        if (!form) return;
+        if (!form) {
+            console.log('Quick Input: Form with data-source-id not found');
+            return;
+        }
 
         const emissionSourceId = form.dataset.sourceId;
+        if (!emissionSourceId) {
+            console.error('Quick Input: Emission source ID not found in form data-source-id');
+            return;
+        }
+
+        console.log('Quick Input: Setting up cascading dropdowns for source ID:', emissionSourceId);
+
         const fuelCategorySelect = document.getElementById('fuel_category');
         const fuelTypeSelect = document.getElementById('fuel_type');
         const unitSelect = document.getElementById('unit_of_measure') || document.getElementById('unit');
 
+        console.log('Quick Input: Found elements:', {
+            fuelCategory: !!fuelCategorySelect,
+            fuelType: !!fuelTypeSelect,
+            unit: !!unitSelect
+        });
+
         // Handle fuel_category change -> update fuel_type
         if (fuelCategorySelect && !fuelCategorySelect.dataset.handlerAttached) {
             fuelCategorySelect.dataset.handlerAttached = 'true';
+            console.log('Quick Input: Attaching handler to fuel_category');
             fuelCategorySelect.addEventListener('change', function() {
                 const category = this.value;
+                console.log('Quick Input: fuel_category changed to:', category);
                 if (category && fuelTypeSelect) {
                     loadFuelTypes(emissionSourceId, category, fuelTypeSelect);
                     // Clear unit options when category changes
@@ -508,6 +526,8 @@
                     fuelTypeSelect.innerHTML = '<option value="">Select an option</option>';
                 }
             });
+        } else if (fuelCategorySelect) {
+            console.log('Quick Input: fuel_category handler already attached');
         }
 
         // Handle fuel_type change -> update unit_of_measure
@@ -539,28 +559,44 @@
 
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
 
-        fetch(`/api/quick-input/fuel-types/${sourceId}?fuel_category=${encodeURIComponent(category)}`, {
+        const url = `/api/quick-input/fuel-types/${sourceId}?fuel_category=${encodeURIComponent(category)}`;
+        console.log('Quick Input: Loading fuel types from:', url);
+
+        fetch(url, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
                 'X-CSRF-TOKEN': csrfToken
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Quick Input: Fuel types response status:', response.status);
+            if (!response.ok) {
+                return response.json().then(err => {
+                    throw new Error(err.message || `HTTP error! status: ${response.status}`);
+                });
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log('Quick Input: Fuel types data:', data);
             selectElement.innerHTML = '<option value="">Select an option</option>';
-            if (data.success && data.fuel_types) {
+            if (data.success && data.fuel_types && data.fuel_types.length > 0) {
                 data.fuel_types.forEach(fuelType => {
                     const option = document.createElement('option');
                     option.value = fuelType;
                     option.textContent = fuelType;
                     selectElement.appendChild(option);
                 });
+                console.log('Quick Input: Loaded', data.fuel_types.length, 'fuel types');
+            } else {
+                console.warn('Quick Input: No fuel types returned', data);
+                selectElement.innerHTML = '<option value="">No options available</option>';
             }
             selectElement.disabled = false;
         })
         .catch(error => {
-            console.error('Error loading fuel types:', error);
+            console.error('Quick Input: Error loading fuel types:', error);
             selectElement.innerHTML = '<option value="">Error loading options</option>';
             selectElement.disabled = false;
         });
@@ -585,6 +621,8 @@
             url += `&fuel_category=${encodeURIComponent(fuelCategory)}`;
         }
 
+        console.log('Quick Input: Loading units from:', url);
+
         fetch(url, {
             method: 'GET',
             headers: {
@@ -592,10 +630,19 @@
                 'X-CSRF-TOKEN': csrfToken
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Quick Input: Units response status:', response.status);
+            if (!response.ok) {
+                return response.json().then(err => {
+                    throw new Error(err.message || `HTTP error! status: ${response.status}`);
+                });
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log('Quick Input: Units data:', data);
             selectElement.innerHTML = '<option value="">Select an option</option>';
-            if (data.success && data.units) {
+            if (data.success && data.units && data.units.length > 0) {
                 data.units.forEach(unit => {
                     const option = document.createElement('option');
                     option.value = unit;
@@ -605,11 +652,15 @@
                     }
                     selectElement.appendChild(option);
                 });
+                console.log('Quick Input: Loaded', data.units.length, 'units');
+            } else {
+                console.warn('Quick Input: No units returned', data);
+                selectElement.innerHTML = '<option value="">No options available</option>';
             }
             selectElement.disabled = false;
         })
         .catch(error => {
-            console.error('Error loading units:', error);
+            console.error('Quick Input: Error loading units:', error);
             selectElement.innerHTML = '<option value="">Error loading options</option>';
             selectElement.disabled = false;
         });
@@ -617,6 +668,7 @@
 
     // Initialize additional features
     document.addEventListener('DOMContentLoaded', function() {
+        console.log('Quick Input: DOM loaded, initializing features');
         setupDeleteConfirmations();
         setupFormLoadingStates();
         setupCascadingDropdowns();
@@ -627,12 +679,24 @@
             button.dataset.originalText = button.textContent;
         });
         
-        // Also setup cascading dropdowns after a delay (for conditionally rendered forms)
-        setTimeout(setupCascadingDropdowns, 500);
+        // Also setup cascading dropdowns after delays (for conditionally rendered forms)
+        setTimeout(function() {
+            console.log('Quick Input: Retrying setup after 500ms');
+            setupCascadingDropdowns();
+        }, 500);
+        
+        setTimeout(function() {
+            console.log('Quick Input: Retrying setup after 1500ms');
+            setupCascadingDropdowns();
+        }, 1500);
         
         // Watch for form appearance
-        const observer = new MutationObserver(function() {
-            setupCascadingDropdowns();
+        const observer = new MutationObserver(function(mutations) {
+            const form = document.querySelector('form[data-source-id]');
+            if (form) {
+                console.log('Quick Input: Form detected in DOM changes, setting up cascading dropdowns');
+                setupCascadingDropdowns();
+            }
         });
         
         if (document.body) {
