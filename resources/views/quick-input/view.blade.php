@@ -142,25 +142,41 @@
     </div>
 
     <!-- Additional Data Card -->
-    @if($entry->additional_data)
+    @php
+        $additionalData = [];
+        if ($entry->additional_data) {
+            $additionalData = is_string($entry->additional_data) ? json_decode($entry->additional_data, true) : $entry->additional_data;
+        }
+        // Add unit, fuel_category, and fuel_type if they exist
+        if ($entry->unit) {
+            $additionalData['Unit'] = $entry->unit;
+        }
+        if ($entry->fuel_category) {
+            $additionalData['Fuel Category'] = $entry->fuel_category;
+        } elseif (isset($additionalData['fuel_category'])) {
+            $additionalData['Fuel Category'] = $additionalData['fuel_category'];
+            unset($additionalData['fuel_category']);
+        }
+        if ($entry->fuel_type) {
+            $additionalData['Fuel Type'] = $entry->fuel_type;
+        }
+    @endphp
+    @if(is_array($additionalData) && count($additionalData) > 0)
     <div class="bg-white rounded-lg shadow mt-6 overflow-hidden entry-detail-card">
         <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
             <h2 class="text-lg font-semibold text-gray-900">Additional Information</h2>
         </div>
         <div class="px-6 py-4">
-            @php
-                $additionalData = is_string($entry->additional_data) ? json_decode($entry->additional_data, true) : $entry->additional_data;
-            @endphp
-            @if(is_array($additionalData) && count($additionalData) > 0)
-                <dl class="space-y-4">
-                    @foreach($additionalData as $key => $value)
+            <dl class="space-y-4">
+                @foreach($additionalData as $key => $value)
+                    @if($value !== null && $value !== '')
                         <div class="flex items-center border-b border-gray-100 pb-3">
                             <dt class="text-sm font-medium text-gray-500 w-1/3">{{ ucwords(str_replace('_', ' ', $key)) }}</dt>
                             <dd class="text-sm text-gray-900 flex-1">{{ $value }}</dd>
                         </div>
-                    @endforeach
-                </dl>
-            @endif
+                    @endif
+                @endforeach
+            </dl>
         </div>
     </div>
     @endif

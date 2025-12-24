@@ -526,6 +526,13 @@
                     fuelTypeSelect.innerHTML = '<option value="">Select an option</option>';
                 }
             });
+            
+            // If editing and fuel_category has a value, load fuel types
+            const initialFuelCategory = document.getElementById('fuel_category_initial_value')?.value;
+            if (initialFuelCategory && fuelCategorySelect.value === initialFuelCategory && fuelTypeSelect) {
+                console.log('Quick Input: Loading initial fuel types for category:', initialFuelCategory);
+                loadFuelTypes(emissionSourceId, initialFuelCategory, fuelTypeSelect, document.getElementById('fuel_type_initial_value')?.value);
+            }
         } else if (fuelCategorySelect) {
             console.log('Quick Input: fuel_category handler already attached');
         }
@@ -542,19 +549,28 @@
                     unitSelect.innerHTML = '<option value="">Select an option</option>';
                 }
             });
+            
+            // If editing and fuel_type has a value, load units
+            const initialFuelType = document.getElementById('fuel_type_initial_value')?.value;
+            if (initialFuelType && fuelTypeSelect.value === initialFuelType && unitSelect) {
+                const fuelCategory = fuelCategorySelect ? fuelCategorySelect.value : null;
+                console.log('Quick Input: Loading initial units for fuel type:', initialFuelType);
+                loadUnits(emissionSourceId, initialFuelType, fuelCategory, unitSelect, document.getElementById('unit_of_measure_initial_value')?.value || document.getElementById('unit_initial_value')?.value);
+            }
         }
     }
 
     /**
      * Load fuel types based on fuel category
      */
-    function loadFuelTypes(sourceId, category, selectElement) {
+    function loadFuelTypes(sourceId, category, selectElement, initialValue = null) {
         if (!category) {
             selectElement.innerHTML = '<option value="">Select an option</option>';
             return;
         }
 
         selectElement.disabled = true;
+        const currentValue = selectElement.value || initialValue;
         selectElement.innerHTML = '<option value="">Loading...</option>';
 
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
@@ -586,9 +602,16 @@
                     const option = document.createElement('option');
                     option.value = fuelType;
                     option.textContent = fuelType;
+                    if (currentValue && fuelType === currentValue) {
+                        option.selected = true;
+                    }
                     selectElement.appendChild(option);
                 });
                 console.log('Quick Input: Loaded', data.fuel_types.length, 'fuel types');
+                // If we have an initial value and it wasn't selected, try to select it
+                if (currentValue && selectElement.value !== currentValue) {
+                    selectElement.value = currentValue;
+                }
             } else {
                 console.warn('Quick Input: No fuel types returned', data);
                 selectElement.innerHTML = '<option value="">No options available</option>';
@@ -605,14 +628,14 @@
     /**
      * Load units based on fuel type
      */
-    function loadUnits(sourceId, fuelType, fuelCategory, selectElement) {
+    function loadUnits(sourceId, fuelType, fuelCategory, selectElement, initialValue = null) {
         if (!fuelType) {
             selectElement.innerHTML = '<option value="">Select an option</option>';
             return;
         }
 
         selectElement.disabled = true;
-        const currentValue = selectElement.value;
+        const currentValue = selectElement.value || initialValue;
         selectElement.innerHTML = '<option value="">Loading...</option>';
 
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
@@ -647,12 +670,16 @@
                     const option = document.createElement('option');
                     option.value = unit;
                     option.textContent = unit;
-                    if (currentValue === unit) {
+                    if (currentValue && unit === currentValue) {
                         option.selected = true;
                     }
                     selectElement.appendChild(option);
                 });
                 console.log('Quick Input: Loaded', data.units.length, 'units');
+                // If we have a current value and it wasn't selected, try to select it
+                if (currentValue && selectElement.value !== currentValue) {
+                    selectElement.value = currentValue;
+                }
             } else {
                 console.warn('Quick Input: No units returned', data);
                 selectElement.innerHTML = '<option value="">No options available</option>';

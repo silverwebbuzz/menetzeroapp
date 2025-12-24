@@ -108,6 +108,11 @@
                             $editAdditionalData = is_string($editEntry->additional_data) ? json_decode($editEntry->additional_data, true) : ($editEntry->additional_data ?? []);
                         }
                         
+                        // Get fuel_category, fuel_type, and unit from edit entry
+                        $editFuelCategory = $editEntry ? ($editAdditionalData['fuel_category'] ?? null) : null;
+                        $editFuelType = $editEntry ? ($editEntry->fuel_type ?? null) : null;
+                        $editUnit = $editEntry ? ($editEntry->unit ?? null) : null;
+                        
                         // Get main fields (required fields that are not in Additional Data section)
                         // These are fields like fuel_category, fuel_type, unit_of_measure, amount, quantity
                         // Deduplicate by field_name to prevent showing the same field twice
@@ -152,10 +157,27 @@
                                         @endphp
                                         @if(is_array($options))
                                             @foreach($options as $option)
+                                                @php
+                                                    // Determine the value to check for selection
+                                                    $fieldValue = old($field->field_name);
+                                                    if (!$fieldValue && $editEntry) {
+                                                        if ($field->field_name === 'fuel_category') {
+                                                            $fieldValue = $editFuelCategory;
+                                                        } elseif ($field->field_name === 'fuel_type') {
+                                                            $fieldValue = $editFuelType;
+                                                        } elseif ($field->field_name === 'unit_of_measure' || $field->field_name === 'unit') {
+                                                            $fieldValue = $editUnit;
+                                                        } else {
+                                                            $fieldValue = $editAdditionalData[$field->field_name] ?? null;
+                                                        }
+                                                    }
+                                                    $optionValue = is_array($option) ? ($option['value'] ?? $option) : $option;
+                                                    $isSelected = $fieldValue == $optionValue;
+                                                @endphp
                                                 @if(is_array($option))
-                                                    <option value="{{ $option['value'] ?? $option }}" {{ old($field->field_name, $editAdditionalData[$field->field_name] ?? ($field->field_name === 'unit_of_measure' || $field->field_name === 'unit' ? ($editEntry->unit ?? '') : '')) == ($option['value'] ?? $option) ? 'selected' : '' }}>{{ $option['label'] ?? $option['value'] ?? $option }}</option>
+                                                    <option value="{{ $optionValue }}" {{ $isSelected ? 'selected' : '' }}>{{ $option['label'] ?? $optionValue }}</option>
                                                 @else
-                                                    <option value="{{ $option }}" {{ old($field->field_name, $editAdditionalData[$field->field_name] ?? ($field->field_name === 'unit_of_measure' || $field->field_name === 'unit' ? ($editEntry->unit ?? '') : '')) == $option ? 'selected' : '' }}>{{ $option }}</option>
+                                                    <option value="{{ $optionValue }}" {{ $isSelected ? 'selected' : '' }}>{{ $option }}</option>
                                                 @endif
                                             @endforeach
                                         @endif
@@ -489,6 +511,14 @@
             </div>
             @endif
         </div>
+    @endif
+    
+    {{-- Hidden inputs for edit mode initial values (for JavaScript) --}}
+    @if($editEntry)
+        <input type="hidden" id="fuel_category_initial_value" value="{{ $editFuelCategory ?? '' }}">
+        <input type="hidden" id="fuel_type_initial_value" value="{{ $editFuelType ?? '' }}">
+        <input type="hidden" id="unit_of_measure_initial_value" value="{{ $editUnit ?? '' }}">
+        <input type="hidden" id="unit_initial_value" value="{{ $editUnit ?? '' }}">
     @endif
 </div>
 

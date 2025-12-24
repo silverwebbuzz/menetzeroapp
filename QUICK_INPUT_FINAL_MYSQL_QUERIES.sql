@@ -463,6 +463,11 @@ VALUES
 -- Heat, Steam & Cooling - USEPA (Alternative)
 (58, 0.226543, 'kWh', 'USEPA District Heating & Cooling (Tier 2)', 'UAE', 2024, NULL, 1, 'CO2e emission factor for purchased heat, steam, and cooling energy (alternative factor).', NULL, 'USEPA', 'USEPA', 'AR6', 0, 90);
 
+-- 4.4 Insert Emission Factors for Fuel (Stationary Combustion)
+-- IMPORTANT: See FUEL_EMISSION_FACTORS_DATA.sql for complete Fuel emission factors data
+-- This section is moved to a separate file to keep the main SQL file manageable
+-- Run FUEL_EMISSION_FACTORS_DATA.sql after running this main file
+
 -- ============================================================================
 -- PART 5: INSERT FORM FIELDS
 -- ============================================================================
