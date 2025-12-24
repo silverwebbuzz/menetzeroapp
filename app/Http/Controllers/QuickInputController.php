@@ -265,11 +265,20 @@ class QuickInputController extends Controller
         
         // Check if form uses 'amount' or 'quantity'
         $formFields = EmissionSourceFormField::where('emission_source_id', $emissionSource->id)->get();
-        $hasAmountField = $formFields->contains('field_name', 'amount');
+        $hasAmountField = $formFields->contains(function($field) {
+            return $field->field_name === 'amount';
+        });
+        $hasUnitOfMeasure = $formFields->contains(function($field) {
+            return $field->field_name === 'unit_of_measure';
+        });
         
         if ($hasAmountField) {
             $validationRules['amount'] = 'required|numeric|min:0';
-            $validationRules['unit_of_measure'] = 'required|string';
+            if ($hasUnitOfMeasure) {
+                $validationRules['unit_of_measure'] = 'required|string';
+            } else {
+                $validationRules['unit'] = 'required|string';
+            }
         } else {
             $validationRules['quantity'] = 'required|numeric|min:0';
             $validationRules['unit'] = 'required|string';
@@ -305,17 +314,31 @@ class QuickInputController extends Controller
             }
             
             // Calculate CO2e
-            $calculation = $this->calculationService->calculateCO2e(
-                $quantity,
-                $emissionFactor,
-                $unit
-            );
+            try {
+                $calculation = $this->calculationService->calculateCO2e(
+                    $quantity,
+                    $emissionFactor,
+                    $unit
+                );
+                
+                // Ensure calculation returns expected structure
+                if (!is_array($calculation)) {
+                    throw new \Exception('Calculation service returned invalid result');
+                }
+            } catch (\Exception $calcError) {
+                \Log::error('Calculation error in store: ' . $calcError->getMessage());
+                return back()->withErrors(['quantity' => 'Error calculating CO2e: ' . $calcError->getMessage()])->withInput();
+            }
             
             // Prepare additional data (form field values)
             $additionalData = [];
             $formFields = EmissionSourceFormField::where('emission_source_id', $emissionSource->id)->get();
             foreach ($formFields as $field) {
-                if ($request->has($field->field_name)) {
+                // Skip main fields that are stored directly
+                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments'])) {
+                    continue;
+                }
+                if ($request->has($field->field_name) && $request->input($field->field_name) !== null && $request->input($field->field_name) !== '') {
                     $additionalData[$field->field_name] = $request->input($field->field_name);
                 }
             }
@@ -323,21 +346,27 @@ class QuickInputController extends Controller
             // Get notes/comments (handle both 'comments' from form fields and 'notes' for backward compatibility)
             $notes = $request->input('comments') ?? $request->input('notes') ?? null;
             
+            // Ensure calculation result has the expected structure
+            $co2e = $calculation['co2e'] ?? $calculation['total_co2e'] ?? 0;
+            if (!is_numeric($co2e)) {
+                $co2e = 0;
+            }
+            
             // Create measurement_data record
             $measurementData = MeasurementData::create([
                 'measurement_id' => $measurement->id,
                 'emission_source_id' => $emissionSource->id,
                 'quantity' => $quantity,
                 'unit' => $unit,
-                'calculated_co2e' => $calculation['co2e'] ?? $calculation['total_co2e'] ?? 0,
-                'co2_emissions' => $calculation['co2'] ?? null,
-                'ch4_emissions' => $calculation['ch4'] ?? null,
-                'n2o_emissions' => $calculation['n2o'] ?? null,
+                'calculated_co2e' => $co2e,
+                'co2_emissions' => isset($calculation['co2']) && is_numeric($calculation['co2']) ? $calculation['co2'] : null,
+                'ch4_emissions' => isset($calculation['ch4']) && is_numeric($calculation['ch4']) ? $calculation['ch4'] : null,
+                'n2o_emissions' => isset($calculation['n2o']) && is_numeric($calculation['n2o']) ? $calculation['n2o'] : null,
                 'scope' => $emissionSource->scope,
                 'entry_date' => $request->entry_date,
                 'emission_factor_id' => $emissionFactor->id,
                 'gwp_version_used' => $emissionFactor->gwp_version ?? 'AR6',
-                'additional_data' => !empty($additionalData) ? json_encode($additionalData) : null,
+                'additional_data' => !empty($additionalData) ? $additionalData : null,
                 'notes' => $notes,
                 'created_by' => $user->id,
             ]);
@@ -357,11 +386,20 @@ class QuickInputController extends Controller
             DB::rollBack();
             \Log::error('Quick Input Store Error: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
                 'user_id' => Auth::id(),
-                'request_data' => $request->except(['_token'])
+                'request_data' => $request->except(['_token', '_method']),
+                'emission_source_id' => $emissionSource->id ?? null,
             ]);
+            
+            // Return more detailed error in development, generic in production
+            $errorMessage = config('app.debug') 
+                ? 'Error: ' . $e->getMessage() . ' (Line: ' . $e->getLine() . ')'
+                : 'An unexpected error occurred while saving. Please try again or contact support if the problem persists.';
+            
             return back()
-                ->withErrors(['error' => 'An unexpected error occurred while saving. Please try again or contact support if the problem persists.'])
+                ->withErrors(['error' => $errorMessage])
                 ->withInput()
                 ->with('error', 'Failed to save entry. Please check your inputs and try again.');
         }
@@ -372,44 +410,56 @@ class QuickInputController extends Controller
      */
     public function calculate(Request $request)
     {
-        $request->validate([
-            'emission_source_id' => 'required|exists:emission_sources_master,id',
-            'quantity' => 'required|numeric|min:0',
-            'unit' => 'required|string',
-        ]);
-        
-        $emissionSource = EmissionSourceMaster::findOrFail($request->emission_source_id);
-        
-        // Select emission factor
-        $emissionFactor = $this->calculationService->selectEmissionFactor(
-            $emissionSource->id,
-            $request->all()
-        );
-        
-        if (!$emissionFactor) {
+        try {
+            $request->validate([
+                'emission_source_id' => 'required|exists:emission_sources_master,id',
+                'quantity' => 'required|numeric|min:0',
+                'unit' => 'required|string',
+            ]);
+            
+            $emissionSource = EmissionSourceMaster::findOrFail($request->emission_source_id);
+            
+            // Select emission factor
+            $emissionFactor = $this->calculationService->selectEmissionFactor(
+                $emissionSource->id,
+                $request->all()
+            );
+            
+            if (!$emissionFactor) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No suitable emission factor found for the selected criteria.'
+                ], 400);
+            }
+            
+            // Calculate CO2e
+            $calculation = $this->calculationService->calculateCO2e(
+                $request->quantity,
+                $emissionFactor,
+                $request->unit
+            );
+            
+            return response()->json([
+                'success' => true,
+                'calculation' => $calculation,
+                'factor' => [
+                    'id' => $emissionFactor->id,
+                    'unit' => $emissionFactor->unit ?? '',
+                    'region' => $emissionFactor->region ?? '',
+                    'source_standard' => $emissionFactor->source_standard ?? '',
+                ]
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Calculate API Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request' => $request->all()
+            ]);
+            
             return response()->json([
                 'success' => false,
-                'message' => 'No suitable emission factor found for the selected criteria.'
-            ], 400);
+                'message' => config('app.debug') ? $e->getMessage() : 'Calculation failed. Please try again.'
+            ], 500);
         }
-        
-        // Calculate CO2e
-        $calculation = $this->calculationService->calculateCO2e(
-            $request->quantity,
-            $emissionFactor,
-            $request->unit
-        );
-        
-        return response()->json([
-            'success' => true,
-            'calculation' => $calculation,
-            'factor' => [
-                'id' => $emissionFactor->id,
-                'unit' => $emissionFactor->unit,
-                'region' => $emissionFactor->region,
-                'source_standard' => $emissionFactor->source_standard,
-            ]
-        ]);
     }
 
     /**
