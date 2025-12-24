@@ -205,9 +205,15 @@ class QuickInputController extends Controller
             
             session(['quick_input.location_id' => $selectedLocationId, 'quick_input.fiscal_year' => $selectedFiscalYear]);
             
-            // Get existing entries for this emission source and measurement
+            // Get all measurement IDs for this location and fiscal year
+            $measurementIds = Measurement::where('location_id', $selectedLocationId)
+                ->where('fiscal_year', $selectedFiscalYear)
+                ->pluck('id')
+                ->toArray();
+            
+            // Get existing entries for this emission source from all measurements matching location and year
             $existingEntries = MeasurementData::with(['emissionSource', 'measurement.location'])
-                ->where('measurement_id', $measurement->id)
+                ->whereIn('measurement_id', $measurementIds)
                 ->where('emission_source_id', $emissionSource->id)
                 ->orderBy('entry_date', 'desc')
                 ->orderBy('created_at', 'desc')

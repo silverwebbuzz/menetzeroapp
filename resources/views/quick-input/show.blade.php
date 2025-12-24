@@ -170,9 +170,19 @@
 
         <!-- Dynamic Form Fields (Optional Additional Information) -->
         @php
-            $additionalFields = $formFields->filter(function($field) {
-                // Skip unit_of_measure, amount, and comments (we'll handle comments separately if needed)
-                return !in_array($field->field_name, ['unit_of_measure', 'amount', 'comments']) && !$field->is_required;
+            // Filter and deduplicate fields - only show unique field names
+            $seenFieldNames = [];
+            $additionalFields = $formFields->filter(function($field) use (&$seenFieldNames) {
+                // Skip unit_of_measure, amount, and comments (we'll handle comments separately)
+                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'comments']) || $field->is_required) {
+                    return false;
+                }
+                // Deduplicate by field_name - only show first occurrence
+                if (in_array($field->field_name, $seenFieldNames)) {
+                    return false;
+                }
+                $seenFieldNames[] = $field->field_name;
+                return true;
             });
             $commentsField = $formFields->firstWhere('field_name', 'comments');
         @endphp

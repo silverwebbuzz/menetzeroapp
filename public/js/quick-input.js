@@ -132,56 +132,78 @@
      * Setup AJAX calculation
      */
     function setupCalculation() {
-        const calculateButton = document.getElementById('calculate-btn');
-        const quantityInput = document.getElementById('quantity') || document.getElementById('amount');
-        const unitSelect = document.getElementById('unit') || document.getElementById('unit_of_measure');
-        const form = document.querySelector('form[action*="store"]');
-
-        if (!form || !calculateButton) return;
-        
-        // Attach click handler to calculate button
-        calculateButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            calculateEmissions(form);
+        // Use event delegation for dynamically rendered forms
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.id === 'calculate-btn') {
+                e.preventDefault();
+                e.stopPropagation();
+                const form = e.target.closest('form') || document.querySelector('form[data-source-id]');
+                if (form) {
+                    console.log('Calculate button clicked');
+                    calculateEmissions(form);
+                }
+            }
         });
 
-        // Add calculate button if it doesn't exist
-        if (!calculateButton) {
-            const submitButton = form.querySelector('button[type="submit"]');
-            if (submitButton) {
-                const calcBtn = document.createElement('button');
-                calcBtn.type = 'button';
-                calcBtn.id = 'calculate-btn';
-                calcBtn.className = 'px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 mr-2';
-                calcBtn.textContent = 'Calculate';
-                calcBtn.onclick = function() {
-                    calculateEmissions(form);
-                };
-                submitButton.parentNode.insertBefore(calcBtn, submitButton);
+        // Also setup for existing form (in case it's already rendered)
+        function attachHandlers() {
+            const calculateButton = document.getElementById('calculate-btn');
+            const quantityInput = document.getElementById('quantity') || document.getElementById('amount');
+            const unitSelect = document.getElementById('unit') || document.getElementById('unit_of_measure');
+            const form = document.querySelector('form[action*="store"]') || document.querySelector('form[data-source-id]');
+
+            if (form && calculateButton && !calculateButton.dataset.handlerAttached) {
+                calculateButton.dataset.handlerAttached = 'true';
+                
+                // Auto-calculate on quantity/unit change (only if inputs exist)
+                if (quantityInput) {
+                    quantityInput.addEventListener('input', debounce(function() {
+                        if (quantityInput.value && unitSelect && unitSelect.value) {
+                            calculateEmissions(form);
+                        }
+                    }, 500));
+                }
+
+                if (unitSelect) {
+                    unitSelect.addEventListener('change', function() {
+                        if (quantityInput && quantityInput.value && unitSelect.value) {
+                            calculateEmissions(form);
+                        }
+                    });
+                }
             }
         }
 
-        // Auto-calculate on quantity/unit change
-        quantityInput.addEventListener('input', debounce(function() {
-            if (quantityInput.value && unitSelect.value) {
-                calculateEmissions(form);
-            }
-        }, 500));
-
-        unitSelect.addEventListener('change', function() {
-            if (quantityInput.value && unitSelect.value) {
-                calculateEmissions(form);
-            }
+        // Try immediately
+        attachHandlers();
+        
+        // Also try after a delay (for conditionally rendered forms)
+        setTimeout(attachHandlers, 500);
+        
+        // Watch for form appearance
+        const observer = new MutationObserver(function(mutations) {
+            attachHandlers();
         });
+        
+        const targetNode = document.body;
+        if (targetNode) {
+            observer.observe(targetNode, {
+                childList: true,
+                subtree: true
+            });
+        }
     }
 
     /**
      * Calculate emissions via AJAX
      */
     function calculateEmissions(form) {
+        console.log('calculateEmissions called', { form: !!form });
         const quantity = document.getElementById('quantity')?.value || document.getElementById('amount')?.value;
         const unit = document.getElementById('unit')?.value || document.getElementById('unit_of_measure')?.value;
-        const emissionSourceId = form.dataset.sourceId || getEmissionSourceIdFromUrl();
+        const emissionSourceId = form?.dataset?.sourceId || document.querySelector('input[name="emission_source_id"]')?.value || getEmissionSourceIdFromUrl();
+
+        console.log('Calculation inputs:', { quantity, unit, emissionSourceId });
 
         if (!quantity || !unit || !emissionSourceId) {
             showError('Please enter quantity and select unit before calculating.');
@@ -216,7 +238,14 @@
                 region: document.getElementById('region')?.value || 'UAE',
             })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => {
+                    throw new Error(err.message || 'Calculation failed');
+                });
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 displayCalculationResult(data.calculation, data.factor);
@@ -226,7 +255,7 @@
         })
         .catch(error => {
             console.error('Calculation error:', error);
-            showError('An error occurred during calculation. Please try again.');
+            showError(error.message || 'An error occurred during calculation. Please try again.');
         })
         .finally(() => {
             if (calculateBtn) {
