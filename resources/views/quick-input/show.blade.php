@@ -163,12 +163,15 @@
                                     @endif
                                 </label>
                                 <div class="flex-1">
+                                    @php
+                                        $validationRules = is_array($field->validation_rules) ? $field->validation_rules : (is_string($field->validation_rules) ? json_decode($field->validation_rules, true) : []);
+                                    @endphp
                                     <input type="number" 
                                            name="{{ $field->field_name }}" 
                                            id="{{ $field->field_name }}"
                                            value="{{ old($field->field_name, $editEntry && ($field->field_name === 'amount' || $field->field_name === 'quantity') ? $editEntry->quantity : ($editAdditionalData[$field->field_name] ?? '')) }}"
-                                           step="{{ $field->validation_rules && is_array(json_decode($field->validation_rules, true)) ? (json_decode($field->validation_rules, true)['step'] ?? '0.01') : '0.01' }}"
-                                           min="{{ $field->validation_rules && is_array(json_decode($field->validation_rules, true)) ? (json_decode($field->validation_rules, true)['min'] ?? '0') : '0' }}"
+                                           step="{{ is_array($validationRules) && isset($validationRules['step']) ? $validationRules['step'] : '0.01' }}"
+                                           min="{{ is_array($validationRules) && isset($validationRules['min']) ? $validationRules['min'] : '0' }}"
                                            {{ $field->is_required ? 'required' : '' }}
                                            placeholder="{{ $field->field_placeholder ?? 'Enter ' . strtolower($field->field_label ?? $field->field_name) }}"
                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
