@@ -96,7 +96,12 @@
             </div>
             <div>
                 <label for="fiscal_year" class="block text-sm font-medium text-gray-700 mb-1">Year</label>
-                <input type="number" name="fiscal_year" id="fiscal_year" value="{{ request('fiscal_year') }}" min="2000" max="2100" class="w-full rounded-md border-gray-300 shadow-sm">
+                <select name="fiscal_year" id="fiscal_year" class="w-full rounded-md border-gray-300 shadow-sm">
+                    <option value="">All Years</option>
+                    @for($year = date('Y'); $year >= 2000; $year--)
+                        <option value="{{ $year }}" {{ request('fiscal_year') == $year ? 'selected' : '' }}>{{ $year }}</option>
+                    @endfor
+                </select>
             </div>
             <div class="flex items-end">
                 <button type="submit" class="w-full bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">Filter</button>
@@ -113,6 +118,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CO2e (kg)</th>

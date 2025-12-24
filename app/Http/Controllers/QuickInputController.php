@@ -189,13 +189,25 @@ class QuickInputController extends Controller
             ->firstOrFail();
         
         // Validate basic required fields
-        $request->validate([
+        $validationRules = [
             'location_id' => 'required|exists:locations,id',
             'fiscal_year' => 'required|integer|min:2000|max:2100',
-            'quantity' => 'required|numeric|min:0',
-            'unit' => 'required|string',
             'entry_date' => 'required|date',
-        ]);
+        ];
+        
+        // Check if form uses 'amount' or 'quantity'
+        $formFields = EmissionSourceFormField::where('emission_source_id', $emissionSource->id)->get();
+        $hasAmountField = $formFields->contains('field_name', 'amount');
+        
+        if ($hasAmountField) {
+            $validationRules['amount'] = 'required|numeric|min:0';
+            $validationRules['unit_of_measure'] = 'required|string';
+        } else {
+            $validationRules['quantity'] = 'required|numeric|min:0';
+            $validationRules['unit'] = 'required|string';
+        }
+        
+        $request->validate($validationRules);
         
         // Verify location belongs to company
         $location = Location::where('id', $request->location_id)
@@ -216,15 +228,19 @@ class QuickInputController extends Controller
                 $request->all()
             );
             
+            // Get quantity and unit from request (handle both 'amount' and 'quantity' fields)
+            $quantity = $request->input('amount') ?? $request->input('quantity');
+            $unit = $request->input('unit_of_measure') ?? $request->input('unit');
+            
             if (!$emissionFactor) {
                 return back()->withErrors(['quantity' => 'No suitable emission factor found for the selected criteria. Please contact support.'])->withInput();
             }
             
             // Calculate CO2e
             $calculation = $this->calculationService->calculateCO2e(
-                $request->quantity,
+                $quantity,
                 $emissionFactor,
-                $request->unit
+                $unit
             );
             
             // Prepare additional data (form field values)
@@ -240,8 +256,8 @@ class QuickInputController extends Controller
             $measurementData = MeasurementData::create([
                 'measurement_id' => $measurement->id,
                 'emission_source_id' => $emissionSource->id,
-                'quantity' => $request->quantity,
-                'unit' => $request->unit,
+                'quantity' => $quantity,
+                'unit' => $unit,
                 'calculated_co2e' => $calculation['co2e'],
                 'co2_emissions' => $calculation['co2'] ?? null,
                 'ch4_emissions' => $calculation['ch4'] ?? null,
