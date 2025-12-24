@@ -377,6 +377,57 @@
         };
     }
 
+    /**
+     * Setup confirmation dialogs for delete actions
+     */
+    function setupDeleteConfirmations() {
+        const deleteForms = document.querySelectorAll('form[action*="destroy"]');
+        deleteForms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                if (!confirm('Are you sure you want to delete this entry? This action cannot be undone.')) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        });
+    }
+
+    /**
+     * Setup loading states for forms
+     */
+    function setupFormLoadingStates() {
+        const forms = document.querySelectorAll('form[action*="quick-input"]');
+        forms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const submitButton = form.querySelector('button[type="submit"]');
+                if (submitButton && !form.dataset.submitting) {
+                    form.dataset.submitting = 'true';
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<span class="inline-block animate-spin mr-2">⏳</span> Saving...';
+                    
+                    // Re-enable after 10 seconds as fallback
+                    setTimeout(() => {
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = submitButton.dataset.originalText || 'Submit';
+                        delete form.dataset.submitting;
+                    }, 10000);
+                }
+            });
+        });
+    }
+
+    // Initialize additional features
+    document.addEventListener('DOMContentLoaded', function() {
+        setupDeleteConfirmations();
+        setupFormLoadingStates();
+        
+        // Store original button text
+        const submitButtons = document.querySelectorAll('button[type="submit"]');
+        submitButtons.forEach(button => {
+            button.dataset.originalText = button.textContent;
+        });
+    });
+
     // Export functions for global use
     window.QuickInput = {
         calculate: calculateEmissions,

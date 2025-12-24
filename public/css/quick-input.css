@@ -105,3 +105,86 @@
     }
 }
 
+/* Action buttons in table */
+.action-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.action-buttons a,
+.action-buttons button {
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    transition: all 0.2s;
+}
+
+.action-buttons a:hover,
+.action-buttons button:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Export button */
+.export-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Entry details cards */
+.entry-detail-card {
+    transition: box-shadow 0.2s;
+}
+
+.entry-detail-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Loading spinner */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Disabled form state */
+form[data-submitting="true"] {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* Export button icon */
+.export-button svg {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* Table action buttons hover effect */
+.action-buttons a:hover svg,
+.action-buttons button:hover svg {
+    transform: scale(1.1);
+    transition: transform 0.2s;
+}
+
+/* Success/Error message animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.bg-green-100,
+.bg-red-100 {
+    animation: slideIn 0.3s ease-out;
+}
+

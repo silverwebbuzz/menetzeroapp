@@ -144,6 +144,11 @@ Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client'])->
     // Quick Input routes
     Route::prefix('quick-input')->name('quick-input.')->group(function () {
         Route::get('/entries', [\App\Http\Controllers\QuickInputController::class, 'index'])->name('index');
+        Route::get('/entries/export', [\App\Http\Controllers\QuickInputController::class, 'export'])->name('export');
+        Route::get('/entries/{id}', [\App\Http\Controllers\QuickInputController::class, 'view'])->name('view');
+        Route::get('/entries/{id}/edit', [\App\Http\Controllers\QuickInputController::class, 'edit'])->name('edit');
+        Route::put('/entries/{id}', [\App\Http\Controllers\QuickInputController::class, 'update'])->name('update');
+        Route::delete('/entries/{id}', [\App\Http\Controllers\QuickInputController::class, 'destroy'])->name('destroy');
         Route::get('/{scope}/{slug}', [\App\Http\Controllers\QuickInputController::class, 'show'])->name('show');
         Route::post('/{scope}/{slug}', [\App\Http\Controllers\QuickInputController::class, 'store'])->name('store');
     });

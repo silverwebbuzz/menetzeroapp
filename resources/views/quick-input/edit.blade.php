@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', ($userFriendlyName ?? $emissionSource->name) . ' - Quick Input - MENetZero')
-@section('page-title', $userFriendlyName ?? $emissionSource->name)
+@section('title', 'Edit Entry - Quick Input - MENetZero')
+@section('page-title', 'Edit Entry')
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/quick-input.css') }}">
@@ -11,7 +11,7 @@
 <div class="max-w-4xl mx-auto">
     <!-- Header -->
     <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-900">{{ $userFriendlyName ?? $emissionSource->name }}</h1>
+        <h1 class="text-3xl font-bold text-gray-900">Edit Entry: {{ $userFriendlyName ?? $emissionSource->name }}</h1>
         @if($emissionSource->instructions)
             <p class="mt-2 text-gray-600">{{ $emissionSource->instructions }}</p>
         @endif
@@ -28,17 +28,18 @@
     @endif
 
     <!-- Form -->
-    <form method="POST" action="{{ route('quick-input.store', ['scope' => $scope, 'slug' => $slug]) }}" 
+    <form method="POST" action="{{ route('quick-input.update', $entry->id) }}" 
           class="bg-white rounded-lg shadow p-6"
           data-source-id="{{ $emissionSource->id }}">
         @csrf
+        @method('PUT')
         <input type="hidden" name="emission_source_id" value="{{ $emissionSource->id }}">
 
         <!-- Year and Location Selection -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
                 <label for="fiscal_year" class="block text-sm font-medium text-gray-700 mb-1">Year *</label>
-                <input type="number" name="fiscal_year" id="fiscal_year" value="{{ old('fiscal_year', date('Y')) }}" min="2000" max="2100" required
+                <input type="number" name="fiscal_year" id="fiscal_year" value="{{ old('fiscal_year', $entry->measurement->fiscal_year) }}" min="2000" max="2100" required
                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
                 @error('fiscal_year')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -50,7 +51,7 @@
                         class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
                     <option value="">Select Location</option>
                     @foreach($locations as $location)
-                        <option value="{{ $location->id }}" {{ old('location_id') == $location->id ? 'selected' : '' }}>{{ $location->name }}</option>
+                        <option value="{{ $location->id }}" {{ old('location_id', $entry->measurement->location_id) == $location->id ? 'selected' : '' }}>{{ $location->name }}</option>
                     @endforeach
                 </select>
                 @error('location_id')
@@ -68,7 +69,7 @@
                         <span class="text-xs text-gray-500 font-normal">(in {{ $emissionSource->default_unit }})</span>
                     @endif
                 </label>
-                <input type="number" name="quantity" id="quantity" step="0.0001" value="{{ old('quantity') }}" min="0" required
+                <input type="number" name="quantity" id="quantity" step="0.0001" value="{{ old('quantity', $entry->quantity) }}" min="0" required
                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
                        placeholder="Enter quantity">
                 @error('quantity')
@@ -83,10 +84,10 @@
                     <option value="">Select Unit</option>
                     @if(!empty($availableUnits))
                         @foreach($availableUnits as $unit)
-                            <option value="{{ $unit }}" {{ old('unit', $emissionSource->default_unit) == $unit ? 'selected' : '' }}>{{ $unit }}</option>
+                            <option value="{{ $unit }}" {{ old('unit', $entry->unit) == $unit ? 'selected' : '' }}>{{ $unit }}</option>
                         @endforeach
                     @else
-                        <option value="{{ $emissionSource->default_unit ?? 'unit' }}" selected>{{ $emissionSource->default_unit ?? 'unit' }}</option>
+                        <option value="{{ $emissionSource->default_unit ?? 'unit' }}" {{ old('unit', $entry->unit) == ($emissionSource->default_unit ?? 'unit') ? 'selected' : '' }}>{{ $emissionSource->default_unit ?? 'unit' }}</option>
                     @endif
                 </select>
                 @error('unit')
@@ -99,7 +100,7 @@
         <!-- Entry Date -->
         <div class="mb-6">
             <label for="entry_date" class="block text-sm font-medium text-gray-700 mb-1">Entry Date *</label>
-            <input type="date" name="entry_date" id="entry_date" value="{{ old('entry_date', date('Y-m-d')) }}" required
+            <input type="date" name="entry_date" id="entry_date" value="{{ old('entry_date', $entry->entry_date ? $entry->entry_date->format('Y-m-d') : date('Y-m-d')) }}" required
                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
             @error('entry_date')
                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -111,12 +112,23 @@
             <div class="mb-6 border-t pt-6">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Additional Information</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    @php
+                        $additionalData = is_string($entry->additional_data) ? json_decode($entry->additional_data, true) : ($entry->additional_data ?? []);
+                    @endphp
                     @foreach($formFields as $field)
                         <div>
                             <label for="{{ $field->field_name }}" class="block text-sm font-medium text-gray-700 mb-1">
                                 {{ $field->label }}
                                 @if($field->is_required)
                                     <span class="text-red-500">*</span>
+                                @endif
+                                @if($field->description)
+                                    <span class="tooltip">
+                                        <svg class="w-4 h-4 inline text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+                                        </svg>
+                                        <span class="tooltiptext">{{ $field->description }}</span>
+                                    </span>
                                 @endif
                             </label>
                             @if($field->field_type === 'select')
@@ -126,27 +138,19 @@
                                     <option value="">Select {{ $field->label }}</option>
                                     @if($field->options)
                                         @foreach(json_decode($field->options, true) as $option)
-                                            <option value="{{ $option }}" {{ old($field->field_name) == $option ? 'selected' : '' }}>{{ $option }}</option>
+                                            <option value="{{ $option }}" {{ old($field->field_name, $additionalData[$field->field_name] ?? '') == $option ? 'selected' : '' }}>{{ $option }}</option>
                                         @endforeach
                                     @endif
                                 </select>
                             @elseif($field->field_type === 'textarea')
                                 <textarea name="{{ $field->field_name }}" id="{{ $field->field_name }}" rows="3"
                                           {{ $field->is_required ? 'required' : '' }}
-                                          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">{{ old($field->field_name) }}</textarea>
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">{{ old($field->field_name, $additionalData[$field->field_name] ?? '') }}</textarea>
                             @else
                                 <input type="{{ $field->field_type }}" name="{{ $field->field_name }}" id="{{ $field->field_name }}"
-                                       value="{{ old($field->field_name) }}"
+                                       value="{{ old($field->field_name, $additionalData[$field->field_name] ?? '') }}"
                                        {{ $field->is_required ? 'required' : '' }}
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                            @endif
-                            @if($field->description)
-                                <span class="tooltip">
-                                    <svg class="w-4 h-4 inline text-gray-400 ml-1" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
-                                    </svg>
-                                    <span class="tooltiptext">{{ $field->description }}</span>
-                                </span>
                             @endif
                             @error($field->field_name)
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -161,7 +165,7 @@
         <div class="mb-6">
             <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
             <textarea name="notes" id="notes" rows="3"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">{{ old('notes') }}</textarea>
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">{{ old('notes', $entry->notes) }}</textarea>
         </div>
 
         <!-- Calculation Preview Section -->
@@ -176,22 +180,21 @@
 
         <!-- Submit Buttons -->
         <div class="flex items-center justify-end space-x-4">
-            <a href="{{ route('quick-input.index') }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+            <a href="{{ route('quick-input.view', $entry->id) }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
                 Cancel
             </a>
             <button type="button" id="calculate-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                 Calculate
             </button>
             <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">
-                Add to Footprint
+                Update Entry
             </button>
         </div>
     </form>
 </div>
 
-@endsection
-
 @push('scripts')
 <script src="{{ asset('js/quick-input.js') }}"></script>
 @endpush
+@endsection
 
