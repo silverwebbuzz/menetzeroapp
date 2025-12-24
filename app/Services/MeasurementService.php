@@ -6,6 +6,7 @@ use App\Models\Measurement;
 use App\Models\MeasurementData;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class MeasurementService
 {
@@ -47,22 +48,50 @@ class MeasurementService
     {
         $measurement = Measurement::findOrFail($measurementId);
 
-        $totals = MeasurementData::where('measurement_id', $measurementId)
-            ->selectRaw('
-                SUM(calculated_co2e) as total_co2e,
-                SUM(CASE WHEN scope = "Scope 1" THEN calculated_co2e ELSE 0 END) as scope_1_co2e,
-                SUM(CASE WHEN scope = "Scope 2" THEN calculated_co2e ELSE 0 END) as scope_2_co2e,
-                SUM(CASE WHEN scope = "Scope 3" THEN calculated_co2e ELSE 0 END) as scope_3_co2e
-            ')
-            ->first();
+        // Check if calculated_co2e column exists
+        $hasCalculatedCo2e = Schema::hasColumn('measurement_data', 'calculated_co2e');
+        
+        if ($hasCalculatedCo2e) {
+            $totals = MeasurementData::where('measurement_id', $measurementId)
+                ->selectRaw('
+                    SUM(calculated_co2e) as total_co2e,
+                    SUM(CASE WHEN scope = "Scope 1" THEN calculated_co2e ELSE 0 END) as scope_1_co2e,
+                    SUM(CASE WHEN scope = "Scope 2" THEN calculated_co2e ELSE 0 END) as scope_2_co2e,
+                    SUM(CASE WHEN scope = "Scope 3" THEN calculated_co2e ELSE 0 END) as scope_3_co2e
+                ')
+                ->first();
+        } else {
+            // Fallback if column doesn't exist yet
+            $totals = (object) [
+                'total_co2e' => 0,
+                'scope_1_co2e' => 0,
+                'scope_2_co2e' => 0,
+                'scope_3_co2e' => 0,
+            ];
+        }
 
-        $measurement->update([
-            'total_co2e' => $totals->total_co2e ?? 0,
-            'scope_1_co2e' => $totals->scope_1_co2e ?? 0,
-            'scope_2_co2e' => $totals->scope_2_co2e ?? 0,
-            'scope_3_co2e' => $totals->scope_3_co2e ?? 0,
-            'co2e_calculated_at' => now(),
-        ]);
+        // Check if columns exist before updating
+        $updateData = [];
+        
+        if (Schema::hasColumn('measurements', 'total_co2e')) {
+            $updateData['total_co2e'] = $totals->total_co2e ?? 0;
+        }
+        if (Schema::hasColumn('measurements', 'scope_1_co2e')) {
+            $updateData['scope_1_co2e'] = $totals->scope_1_co2e ?? 0;
+        }
+        if (Schema::hasColumn('measurements', 'scope_2_co2e')) {
+            $updateData['scope_2_co2e'] = $totals->scope_2_co2e ?? 0;
+        }
+        if (Schema::hasColumn('measurements', 'scope_3_co2e')) {
+            $updateData['scope_3_co2e'] = $totals->scope_3_co2e ?? 0;
+        }
+        if (Schema::hasColumn('measurements', 'co2e_calculated_at')) {
+            $updateData['co2e_calculated_at'] = now();
+        }
+        
+        if (!empty($updateData)) {
+            $measurement->update($updateData);
+        }
     }
 
     /**
@@ -127,13 +156,27 @@ class MeasurementService
             });
         }
 
-        return $query->selectRaw('
-            COUNT(*) as total_entries,
-            SUM(calculated_co2e) as total_co2e,
-            SUM(CASE WHEN scope = "Scope 1" THEN calculated_co2e ELSE 0 END) as scope_1_co2e,
-            SUM(CASE WHEN scope = "Scope 2" THEN calculated_co2e ELSE 0 END) as scope_2_co2e,
-            SUM(CASE WHEN scope = "Scope 3" THEN calculated_co2e ELSE 0 END) as scope_3_co2e
-        ')->first();
+        // Check if calculated_co2e column exists, otherwise use 0
+        $hasCalculatedCo2e = Schema::hasColumn('measurement_data', 'calculated_co2e');
+        
+        if ($hasCalculatedCo2e) {
+            return $query->selectRaw('
+                COUNT(*) as total_entries,
+                SUM(calculated_co2e) as total_co2e,
+                SUM(CASE WHEN scope = "Scope 1" THEN calculated_co2e ELSE 0 END) as scope_1_co2e,
+                SUM(CASE WHEN scope = "Scope 2" THEN calculated_co2e ELSE 0 END) as scope_2_co2e,
+                SUM(CASE WHEN scope = "Scope 3" THEN calculated_co2e ELSE 0 END) as scope_3_co2e
+            ')->first();
+        } else {
+            // Fallback if column doesn't exist yet
+            return (object) [
+                'total_entries' => $query->count(),
+                'total_co2e' => 0,
+                'scope_1_co2e' => 0,
+                'scope_2_co2e' => 0,
+                'scope_3_co2e' => 0,
+            ];
+        }
     }
 }
 
