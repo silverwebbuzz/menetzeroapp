@@ -133,11 +133,17 @@
      */
     function setupCalculation() {
         const calculateButton = document.getElementById('calculate-btn');
-        const quantityInput = document.getElementById('quantity');
-        const unitSelect = document.getElementById('unit');
-        const form = document.querySelector('form[action*="quick-input"]');
+        const quantityInput = document.getElementById('quantity') || document.getElementById('amount');
+        const unitSelect = document.getElementById('unit') || document.getElementById('unit_of_measure');
+        const form = document.querySelector('form[action*="store"]');
 
-        if (!form || !quantityInput || !unitSelect) return;
+        if (!form || !calculateButton) return;
+        
+        // Attach click handler to calculate button
+        calculateButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            calculateEmissions(form);
+        });
 
         // Add calculate button if it doesn't exist
         if (!calculateButton) {
@@ -173,11 +179,12 @@
      * Calculate emissions via AJAX
      */
     function calculateEmissions(form) {
-        const quantity = document.getElementById('quantity')?.value;
-        const unit = document.getElementById('unit')?.value;
+        const quantity = document.getElementById('quantity')?.value || document.getElementById('amount')?.value;
+        const unit = document.getElementById('unit')?.value || document.getElementById('unit_of_measure')?.value;
         const emissionSourceId = form.dataset.sourceId || getEmissionSourceIdFromUrl();
 
         if (!quantity || !unit || !emissionSourceId) {
+            showError('Please enter quantity and select unit before calculating.');
             return;
         }
 
@@ -233,56 +240,84 @@
      * Display calculation result
      */
     function displayCalculationResult(calculation, factor) {
-        // Remove existing result display
-        const existingResult = document.getElementById('calculation-result');
-        if (existingResult) {
-            existingResult.remove();
-        }
-
-        // Create result display
-        const resultDiv = document.createElement('div');
-        resultDiv.id = 'calculation-result';
-        resultDiv.className = 'mb-6 bg-green-50 border border-green-200 rounded-lg p-4';
+        // Use existing preview section if available
+        const previewSection = document.getElementById('calculation-preview');
+        const previewContent = document.getElementById('preview-content');
         
-        let html = '<div class="flex items-start">';
-        html += '<div class="flex-shrink-0">';
-        html += '<svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">';
-        html += '<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>';
-        html += '</svg></div>';
-        html += '<div class="ml-3 flex-1">';
-        html += '<h4 class="text-sm font-medium text-green-800 mb-2">Calculation Result</h4>';
-        html += '<div class="text-sm text-green-700">';
-        html += '<p class="mb-1"><strong>CO2e:</strong> ' + parseFloat(calculation.co2e).toFixed(2) + ' kg</p>';
-        
-        if (calculation.co2 !== null) {
-            html += '<p class="mb-1"><strong>CO2:</strong> ' + parseFloat(calculation.co2).toFixed(2) + ' kg</p>';
-        }
-        if (calculation.ch4 !== null) {
-            html += '<p class="mb-1"><strong>CH4:</strong> ' + parseFloat(calculation.ch4).toFixed(6) + ' kg</p>';
-        }
-        if (calculation.n2o !== null) {
-            html += '<p class="mb-1"><strong>N2O:</strong> ' + parseFloat(calculation.n2o).toFixed(6) + ' kg</p>';
-        }
-        
-        if (factor) {
-            html += '<p class="mt-2 text-xs text-green-600">';
-            html += 'Using factor: ' + (factor.region || 'Default') + ' (' + (factor.source_standard || 'Standard') + ')';
-            html += '</p>';
-        }
-        
-        html += '</div></div></div>';
-        resultDiv.innerHTML = html;
-
-        // Insert before submit button
-        const submitButton = document.querySelector('form button[type="submit"]');
-        if (submitButton) {
-            submitButton.parentNode.insertBefore(resultDiv, submitButton);
+        if (previewSection && previewContent) {
+            // Show the preview section
+            previewSection.classList.remove('hidden');
+            
+            // Build HTML content
+            let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
+            html += '<div><strong>CO2e:</strong> <span class="text-lg font-bold text-green-700">' + parseFloat(calculation.co2e || calculation.total_co2e || 0).toFixed(2) + ' kg</span></div>';
+            
+            if (calculation.co2 !== null && calculation.co2 !== undefined) {
+                html += '<div><strong>CO2:</strong> ' + parseFloat(calculation.co2).toFixed(2) + ' kg</div>';
+            }
+            if (calculation.ch4 !== null && calculation.ch4 !== undefined) {
+                html += '<div><strong>CH4:</strong> ' + parseFloat(calculation.ch4).toFixed(6) + ' kg</div>';
+            }
+            if (calculation.n2o !== null && calculation.n2o !== undefined) {
+                html += '<div><strong>N2O:</strong> ' + parseFloat(calculation.n2o).toFixed(6) + ' kg</div>';
+            }
+            
+            if (factor) {
+                html += '<div class="md:col-span-2 text-xs text-gray-600 mt-2">';
+                html += '<strong>Emission Factor:</strong> ' + (factor.region || 'Default') + ' (' + (factor.source_standard || 'Standard') + ')';
+                html += '</div>';
+            }
+            
+            html += '</div>';
+            previewContent.innerHTML = html;
+            
+            // Scroll to preview
+            previewSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         } else {
-            document.querySelector('form').appendChild(resultDiv);
-        }
+            // Fallback: create result display if preview section doesn't exist
+            const existingResult = document.getElementById('calculation-result');
+            if (existingResult) {
+                existingResult.remove();
+            }
 
-        // Scroll to result
-        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            const resultDiv = document.createElement('div');
+            resultDiv.id = 'calculation-result';
+            resultDiv.className = 'mb-6 bg-green-50 border border-green-200 rounded-lg p-4';
+            
+            let html = '<h4 class="text-sm font-medium text-green-800 mb-2">Calculation Result</h4>';
+            html += '<div class="text-sm text-green-700">';
+            html += '<p class="mb-1"><strong>CO2e:</strong> ' + parseFloat(calculation.co2e || calculation.total_co2e || 0).toFixed(2) + ' kg</p>';
+            
+            if (calculation.co2 !== null && calculation.co2 !== undefined) {
+                html += '<p class="mb-1"><strong>CO2:</strong> ' + parseFloat(calculation.co2).toFixed(2) + ' kg</p>';
+            }
+            if (calculation.ch4 !== null && calculation.ch4 !== undefined) {
+                html += '<p class="mb-1"><strong>CH4:</strong> ' + parseFloat(calculation.ch4).toFixed(6) + ' kg</p>';
+            }
+            if (calculation.n2o !== null && calculation.n2o !== undefined) {
+                html += '<p class="mb-1"><strong>N2O:</strong> ' + parseFloat(calculation.n2o).toFixed(6) + ' kg</p>';
+            }
+            
+            if (factor) {
+                html += '<p class="mt-2 text-xs text-green-600">';
+                html += 'Using factor: ' + (factor.region || 'Default') + ' (' + (factor.source_standard || 'Standard') + ')';
+                html += '</p>';
+            }
+            
+            html += '</div>';
+            resultDiv.innerHTML = html;
+
+            // Insert before submit button
+            const submitButton = document.querySelector('form button[type="submit"]');
+            if (submitButton) {
+                submitButton.parentNode.insertBefore(resultDiv, submitButton);
+            } else {
+                document.querySelector('form').appendChild(resultDiv);
+            }
+
+            // Scroll to result
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
     }
 
     /**

@@ -169,11 +169,12 @@
         <!-- Dynamic Form Fields (Optional Additional Information) -->
         @php
             $additionalFields = $formFields->filter(function($field) {
-                // Skip unit_of_measure and amount as they're handled separately
-                return !in_array($field->field_name, ['unit_of_measure', 'amount']) && !$field->is_required;
+                // Skip unit_of_measure, amount, and comments (we'll handle comments separately if needed)
+                return !in_array($field->field_name, ['unit_of_measure', 'amount', 'comments']) && !$field->is_required;
             });
+            $commentsField = $formFields->firstWhere('field_name', 'comments');
         @endphp
-        @if($additionalFields->count() > 0)
+        @if($additionalFields->count() > 0 || $commentsField)
             <div class="mb-6 border-t pt-6">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Additional Data</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -218,15 +219,45 @@
                             @enderror
                         </div>
                     @endforeach
+                    
+                    @if($commentsField)
+                        <!-- Comments field (full width) -->
+                        <div class="md:col-span-2">
+                            <label for="comments" class="block text-sm font-medium text-gray-700 mb-1">
+                                {{ $commentsField->field_label ?? 'Comments' }}
+                            </label>
+                            <textarea name="comments" id="comments" rows="3"
+                                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
+                                      placeholder="{{ $commentsField->field_placeholder ?? 'Add any additional notes...' }}">{{ old('comments') }}</textarea>
+                            @if($commentsField->help_text)
+                                <p class="mt-1 text-xs text-gray-500">{{ $commentsField->help_text }}</p>
+                            @endif
+                            @error('comments')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    @endif
                 </div>
             </div>
         @endif
 
-        <!-- Notes -->
-        <div class="mb-6">
-            <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Comments</label>
-            <textarea name="notes" id="notes" rows="3"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">{{ old('notes') }}</textarea>
+        <!-- Notes field (for backward compatibility, only if comments field doesn't exist) -->
+        @if(!$commentsField)
+            <div class="mb-6">
+                <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Comments</label>
+                <textarea name="notes" id="notes" rows="3"
+                          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">{{ old('notes') }}</textarea>
+            </div>
+        @endif
+
+        <!-- Calculation Preview Section -->
+        <div id="calculation-preview" class="mb-6 hidden">
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                <h3 class="text-sm font-medium text-green-900 mb-2">Calculation Preview</h3>
+                <div id="preview-content" class="text-sm text-green-800">
+                    <!-- Preview content will be inserted here by JavaScript -->
+                </div>
+            </div>
         </div>
 
         <!-- Submit Buttons -->

@@ -252,13 +252,16 @@ class QuickInputController extends Controller
                 }
             }
             
+            // Get notes/comments (handle both 'comments' from form fields and 'notes' for backward compatibility)
+            $notes = $request->input('comments') ?? $request->input('notes') ?? null;
+            
             // Create measurement_data record
             $measurementData = MeasurementData::create([
                 'measurement_id' => $measurement->id,
                 'emission_source_id' => $emissionSource->id,
                 'quantity' => $quantity,
                 'unit' => $unit,
-                'calculated_co2e' => $calculation['co2e'],
+                'calculated_co2e' => $calculation['co2e'] ?? $calculation['total_co2e'] ?? 0,
                 'co2_emissions' => $calculation['co2'] ?? null,
                 'ch4_emissions' => $calculation['ch4'] ?? null,
                 'n2o_emissions' => $calculation['n2o'] ?? null,
@@ -267,7 +270,7 @@ class QuickInputController extends Controller
                 'emission_factor_id' => $emissionFactor->id,
                 'gwp_version_used' => $emissionFactor->gwp_version ?? 'AR6',
                 'additional_data' => !empty($additionalData) ? json_encode($additionalData) : null,
-                'notes' => $request->notes ?? null,
+                'notes' => $notes,
                 'created_by' => $user->id,
             ]);
             
