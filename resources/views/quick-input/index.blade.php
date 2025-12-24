@@ -6,9 +6,16 @@
 @section('content')
 <div class="max-w-7xl mx-auto">
     <!-- Header -->
-    <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-900">Quick Input Entries</h1>
-        <p class="mt-2 text-gray-600">View and manage your emission data entries.</p>
+    <div class="mb-6 flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Quick Input Entries</h1>
+            <p class="mt-2 text-gray-600">View and manage your emission data entries.</p>
+        </div>
+        <div class="flex space-x-3">
+            <a href="{{ route('quick-input.show', ['scope' => 1, 'slug' => 'natural-gas']) }}" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">
+                + Add Entry
+            </a>
+        </div>
     </div>
 
     @if(session('success'))

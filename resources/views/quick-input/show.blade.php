@@ -3,6 +3,10 @@
 @section('title', ($userFriendlyName ?? $emissionSource->name) . ' - Quick Input - MENetZero')
 @section('page-title', $userFriendlyName ?? $emissionSource->name)
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/quick-input.css') }}">
+@endpush
+
 @section('content')
 <div class="max-w-4xl mx-auto">
     <!-- Header -->
@@ -24,8 +28,11 @@
     @endif
 
     <!-- Form -->
-    <form method="POST" action="{{ route('quick-input.store', ['scope' => $scope, 'slug' => $slug]) }}" class="bg-white rounded-lg shadow p-6">
+    <form method="POST" action="{{ route('quick-input.store', ['scope' => $scope, 'slug' => $slug]) }}" 
+          class="bg-white rounded-lg shadow p-6"
+          data-source-id="{{ $emissionSource->id }}">
         @csrf
+        <input type="hidden" name="emission_source_id" value="{{ $emissionSource->id }}">
 
         <!-- Year and Location Selection -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -55,12 +62,19 @@
         <!-- Quantity and Unit -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-                <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">Quantity *</label>
+                <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">
+                    Quantity *
+                    @if($emissionSource->default_unit)
+                        <span class="text-xs text-gray-500 font-normal">(in {{ $emissionSource->default_unit }})</span>
+                    @endif
+                </label>
                 <input type="number" name="quantity" id="quantity" step="0.0001" value="{{ old('quantity') }}" min="0" required
-                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
+                       placeholder="Enter quantity">
                 @error('quantity')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
+                <p class="mt-1 text-xs text-gray-500">Enter the amount consumed or used</p>
             </div>
             <div>
                 <label for="unit" class="block text-sm font-medium text-gray-700 mb-1">Unit *</label>
@@ -69,15 +83,16 @@
                     <option value="">Select Unit</option>
                     @if(!empty($availableUnits))
                         @foreach($availableUnits as $unit)
-                            <option value="{{ $unit }}" {{ old('unit') == $unit ? 'selected' : '' }}>{{ $unit }}</option>
+                            <option value="{{ $unit }}" {{ old('unit', $emissionSource->default_unit) == $unit ? 'selected' : '' }}>{{ $unit }}</option>
                         @endforeach
                     @else
-                        <option value="{{ $emissionSource->default_unit ?? 'unit' }}">{{ $emissionSource->default_unit ?? 'unit' }}</option>
+                        <option value="{{ $emissionSource->default_unit ?? 'unit' }}" selected>{{ $emissionSource->default_unit ?? 'unit' }}</option>
                     @endif
                 </select>
                 @error('unit')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
+                <p class="mt-1 text-xs text-gray-500">Select the unit of measurement</p>
             </div>
         </div>
 
@@ -144,16 +159,34 @@
                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">{{ old('notes') }}</textarea>
         </div>
 
+        <!-- Calculation Preview Section -->
+        <div id="calculation-preview" class="mb-6 hidden">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 class="text-sm font-medium text-blue-900 mb-2">Calculation Preview</h3>
+                <div id="preview-content" class="text-sm text-blue-800">
+                    <!-- Preview content will be inserted here by JavaScript -->
+                </div>
+            </div>
+        </div>
+
         <!-- Submit Buttons -->
         <div class="flex items-center justify-end space-x-4">
             <a href="{{ route('quick-input.index') }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
                 Cancel
             </a>
+            <button type="button" id="calculate-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                Calculate
+            </button>
             <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">
                 Add to Footprint
             </button>
         </div>
     </form>
 </div>
+
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/quick-input.js') }}"></script>
+@endpush
 

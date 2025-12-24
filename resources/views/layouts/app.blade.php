@@ -20,6 +20,7 @@
         // Suppress Tailwind CDN warning
         window.tailwind = { config: { theme: { extend: {} } } };
     </script>
+    @stack('styles')
     <style>
         body { 
             font-family: 'Inter', system-ui, -apple-system, sans-serif; 
