@@ -8,7 +8,7 @@
 @endpush
 
 @section('content')
-<div class="max-w-4xl mx-auto">
+<div class="max-w-7xl mx-auto">
     <!-- Header -->
     <div class="mb-6">
         <h1 class="text-3xl font-bold text-gray-900">
@@ -32,13 +32,13 @@
         </div>
     @endif
 
-    <!-- Year and Location Selection Form -->
-    <form method="GET" action="{{ route('quick-input.show', ['scope' => $scope, 'slug' => $slug]) }}" class="bg-white rounded-lg shadow p-6 mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <label for="fiscal_year" class="block text-sm font-medium text-gray-700 mb-1">Year *</label>
+    <!-- Year and Location Selection Form - Compact Single Line -->
+    <form method="GET" action="{{ route('quick-input.show', ['scope' => $scope, 'slug' => $slug]) }}" class="bg-white rounded-lg shadow p-4 mb-6">
+        <div class="flex flex-wrap items-end gap-4">
+            <div class="flex-1 min-w-[120px]">
+                <label for="fiscal_year" class="block text-xs font-medium text-gray-700 mb-1">Year *</label>
                 <select name="fiscal_year" id="fiscal_year" required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                        class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
                     <option value="">Select Year</option>
                     @if(isset($yearsWithMeasurements) && count($yearsWithMeasurements) > 0)
                         @foreach($yearsWithMeasurements as $year)
@@ -47,26 +47,26 @@
                     @endif
                 </select>
             </div>
-            <div>
-                <label for="location_id" class="block text-sm font-medium text-gray-700 mb-1">Location *</label>
+            <div class="flex-1 min-w-[180px]">
+                <label for="location_id" class="block text-xs font-medium text-gray-700 mb-1">Location *</label>
                 <select name="location_id" id="location_id" required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                        class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
                     <option value="">Select Location</option>
                     @foreach($locations as $location)
                         <option value="{{ $location->id }}" {{ ($selectedLocationId ?? request('location_id')) == $location->id ? 'selected' : '' }}>{{ $location->name }}</option>
                     @endforeach
                 </select>
             </div>
-        </div>
-        <div class="mt-4 text-right">
-            <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">
-                Select
-            </button>
+            <div>
+                <button type="submit" class="px-4 py-1.5 text-sm bg-purple-600 text-white rounded-md hover:bg-purple-700 whitespace-nowrap">
+                    Select
+                </button>
+            </div>
         </div>
     </form>
 
     @if($selectedLocationId && $selectedFiscalYear && $measurement)
-    <!-- Entry Form (Handles both Add and Edit) -->
+    <!-- Entry Form (Handles both Add and Edit) - Split Layout: 50% Form, 50% Additional Data -->
     <form method="POST" 
           action="{{ $editEntry ? route('quick-input.update', $editEntry->id) : route('quick-input.store', ['scope' => $scope, 'slug' => $slug]) }}" 
           class="bg-white rounded-lg shadow p-6 mb-6"
@@ -82,8 +82,14 @@
             <input type="hidden" name="edit_entry_id" value="{{ $editEntry->id }}">
         @endif
 
-        <!-- Main Input Fields -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <!-- Split Layout: Main Form (Left) and Additional Data (Right) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- Left Side: Main Form Fields (50%) -->
+            <div class="space-y-6">
+                <h3 class="text-lg font-medium text-gray-900 border-b pb-2">Main Information</h3>
+                
+                <!-- Main Input Fields -->
+                <div class="grid grid-cols-1 gap-6">
             <!-- Unit of Measure -->
             @php
                 $unitField = $formFields->firstWhere('field_name', 'unit_of_measure');
@@ -168,119 +174,129 @@
                     <p class="mt-1 text-xs text-gray-500">Enter the amount consumed or used</p>
                 </div>
             @endif
-        </div>
+                </div>
 
-        <!-- Entry Date -->
-        <div class="mb-6">
-            <label for="entry_date" class="block text-sm font-medium text-gray-700 mb-1">Entry Date *</label>
-            <input type="date" name="entry_date" id="entry_date" value="{{ old('entry_date', $editEntry && $editEntry->entry_date ? $editEntry->entry_date->format('Y-m-d') : date('Y-m-d')) }}" required
-                   class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-            @error('entry_date')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-            @enderror
-        </div>
-
-        <!-- Dynamic Form Fields (Optional Additional Information) -->
-        @php
-            // Get additional data from edit entry if available
-            $editAdditionalData = [];
-            if ($editEntry && $editEntry->additional_data) {
-                $editAdditionalData = is_string($editEntry->additional_data) ? json_decode($editEntry->additional_data, true) : ($editEntry->additional_data ?? []);
-            }
-            
-            // Filter and deduplicate fields - only show unique field names
-            $seenFieldNames = [];
-            $additionalFields = $formFields->filter(function($field) use (&$seenFieldNames) {
-                // Skip unit_of_measure, amount, and comments (we'll handle comments separately)
-                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'comments']) || $field->is_required) {
-                    return false;
-                }
-                // Deduplicate by field_name - only show first occurrence
-                if (in_array($field->field_name, $seenFieldNames)) {
-                    return false;
-                }
-                $seenFieldNames[] = $field->field_name;
-                return true;
-            });
-            $commentsField = $formFields->firstWhere('field_name', 'comments');
-        @endphp
-        @if($additionalFields->count() > 0 || $commentsField)
-            <div class="mb-6 border-t pt-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Additional Data</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    @foreach($additionalFields as $field)
-                        <div>
-                            <label for="{{ $field->field_name }}" class="block text-sm font-medium text-gray-700 mb-1">
-                                {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
-                            </label>
-                            @if($field->field_type === 'select')
-                                <select name="{{ $field->field_name }}" id="{{ $field->field_name }}"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                                    <option value="">Select {{ $field->field_label ?? $field->field_name }}</option>
-                                    @if($field->field_options)
-                                        @php
-                                            $options = is_array($field->field_options) ? $field->field_options : json_decode($field->field_options, true);
-                                        @endphp
-                                        @if(is_array($options))
-                                            @foreach($options as $option)
-                                                @if(is_array($option))
-                                                    <option value="{{ $option['value'] ?? $option }}" {{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') == ($option['value'] ?? $option) ? 'selected' : '' }}>{{ $option['label'] ?? $option['value'] ?? $option }}</option>
-                                                @else
-                                                    <option value="{{ $option }}" {{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') == $option ? 'selected' : '' }}>{{ $option }}</option>
-                                                @endif
-                                            @endforeach
-                                        @endif
-                                    @endif
-                                </select>
-                            @elseif($field->field_type === 'textarea')
-                                <textarea name="{{ $field->field_name }}" id="{{ $field->field_name }}" rows="3"
-                                          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}</textarea>
-                            @else
-                                <input type="{{ $field->field_type }}" name="{{ $field->field_name }}" id="{{ $field->field_name }}"
-                                       value="{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}"
-                                       placeholder="{{ $field->field_placeholder ?? '' }}"
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                            @endif
-                            @if($field->help_text)
-                                <p class="mt-1 text-xs text-gray-500">{{ $field->help_text }}</p>
-                            @endif
-                            @error($field->field_name)
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    @endforeach
-                    
-                    @if($commentsField)
-                        <!-- Comments field (full width) -->
-                        <div class="md:col-span-2">
-                            <label for="comments" class="block text-sm font-medium text-gray-700 mb-1">
-                                {{ $commentsField->field_label ?? 'Comments' }}
-                            </label>
-                            <textarea name="comments" id="comments" rows="3"
-                                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
-                                      placeholder="{{ $commentsField->field_placeholder ?? 'Add any additional notes...' }}">{{ old('comments', $editEntry->notes ?? '') }}</textarea>
-                            @if($commentsField->help_text)
-                                <p class="mt-1 text-xs text-gray-500">{{ $commentsField->help_text }}</p>
-                            @endif
-                            @error('comments')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    @endif
+                <!-- Entry Date -->
+                <div>
+                    <label for="entry_date" class="block text-sm font-medium text-gray-700 mb-1">Entry Date *</label>
+                    <input type="date" name="entry_date" id="entry_date" value="{{ old('entry_date', $editEntry && $editEntry->entry_date ? $editEntry->entry_date->format('Y-m-d') : date('Y-m-d')) }}" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                    @error('entry_date')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
-        @endif
 
-        <!-- Notes field (for backward compatibility, only if comments field doesn't exist) -->
-        @if(!$commentsField)
-            <div class="mb-6">
-                <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Comments</label>
-                <textarea name="notes" id="notes" rows="3"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">{{ old('notes', $editEntry->notes ?? '') }}</textarea>
+            <!-- Right Side: Additional Data (50%) -->
+            <div class="space-y-6">
+                @php
+                    // Get additional data from edit entry if available
+                    $editAdditionalData = [];
+                    if ($editEntry && $editEntry->additional_data) {
+                        $editAdditionalData = is_string($editEntry->additional_data) ? json_decode($editEntry->additional_data, true) : ($editEntry->additional_data ?? []);
+                    }
+                    
+                    // Filter and deduplicate fields - only show unique field names
+                    $seenFieldNames = [];
+                    $additionalFields = $formFields->filter(function($field) use (&$seenFieldNames) {
+                        // Skip unit_of_measure, amount, quantity, unit, and comments (we'll handle comments separately)
+                        if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments']) || $field->is_required) {
+                            return false;
+                        }
+                        // Deduplicate by field_name - only show first occurrence
+                        if (in_array($field->field_name, $seenFieldNames)) {
+                            return false;
+                        }
+                        $seenFieldNames[] = $field->field_name;
+                        return true;
+                    });
+                    $commentsField = $formFields->firstWhere('field_name', 'comments');
+                @endphp
+                @if($additionalFields->count() > 0 || $commentsField)
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900 border-b pb-2 mb-4">Additional Data</h3>
+                        <div class="space-y-4">
+                            @foreach($additionalFields as $field)
+                                <div>
+                                    <label for="{{ $field->field_name }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                        {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
+                                    </label>
+                                    @if($field->field_type === 'select')
+                                        <select name="{{ $field->field_name }}" id="{{ $field->field_name }}"
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                                            <option value="">Select {{ $field->field_label ?? $field->field_name }}</option>
+                                            @if($field->field_options)
+                                                @php
+                                                    $options = is_array($field->field_options) ? $field->field_options : json_decode($field->field_options, true);
+                                                @endphp
+                                                @if(is_array($options))
+                                                    @foreach($options as $option)
+                                                        @if(is_array($option))
+                                                            <option value="{{ $option['value'] ?? $option }}" {{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') == ($option['value'] ?? $option) ? 'selected' : '' }}>{{ $option['label'] ?? $option['value'] ?? $option }}</option>
+                                                        @else
+                                                            <option value="{{ $option }}" {{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') == $option ? 'selected' : '' }}>{{ $option }}</option>
+                                                        @endif
+                                                    @endforeach
+                                                @endif
+                                            @endif
+                                        </select>
+                                    @elseif($field->field_type === 'textarea')
+                                        <textarea name="{{ $field->field_name }}" id="{{ $field->field_name }}" rows="3"
+                                                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}</textarea>
+                                    @else
+                                        <input type="{{ $field->field_type }}" name="{{ $field->field_name }}" id="{{ $field->field_name }}"
+                                               value="{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}"
+                                               placeholder="{{ $field->field_placeholder ?? '' }}"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                                    @endif
+                                    @if($field->help_text)
+                                        <p class="mt-1 text-xs text-gray-500">{{ $field->help_text }}</p>
+                                    @endif
+                                    @error($field->field_name)
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            @endforeach
+                            
+                            @if($commentsField)
+                                <!-- Comments field -->
+                                <div>
+                                    <label for="comments" class="block text-sm font-medium text-gray-700 mb-1">
+                                        {{ $commentsField->field_label ?? 'Comments' }}
+                                    </label>
+                                    <textarea name="comments" id="comments" rows="3"
+                                              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
+                                              placeholder="{{ $commentsField->field_placeholder ?? 'Add any additional notes...' }}">{{ old('comments', $editEntry->notes ?? '') }}</textarea>
+                                    @if($commentsField->help_text)
+                                        <p class="mt-1 text-xs text-gray-500">{{ $commentsField->help_text }}</p>
+                                    @endif
+                                    @error('comments')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                @else
+                    <!-- If no additional fields, show placeholder -->
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900 border-b pb-2 mb-4">Additional Data</h3>
+                        <p class="text-sm text-gray-500">No additional fields configured for this emission source.</p>
+                    </div>
+                @endif
+
+                <!-- Notes field (for backward compatibility, only if comments field doesn't exist) -->
+                @if(!$commentsField)
+                    <div>
+                        <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Comments</label>
+                        <textarea name="notes" id="notes" rows="3"
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">{{ old('notes', $editEntry->notes ?? '') }}</textarea>
+                    </div>
+                @endif
             </div>
-        @endif
+        </div>
 
-        <!-- Calculation Preview Section -->
+        <!-- Calculation Preview Section - Below Additional Data -->
         <div id="calculation-preview" class="mb-6 hidden">
             <div class="bg-green-50 border border-green-200 rounded-lg p-4">
                 <h3 class="text-sm font-medium text-green-900 mb-2">Calculation Preview</h3>
