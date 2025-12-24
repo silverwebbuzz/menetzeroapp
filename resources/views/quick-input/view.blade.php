@@ -38,30 +38,30 @@
             <h2 class="text-lg font-semibold text-gray-900">Basic Information</h2>
         </div>
         <div class="px-6 py-4">
-            <dl class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <dt class="text-sm font-medium text-gray-500">Emission Source</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $entry->emissionSource->name ?? 'N/A' }}</dd>
+            <dl class="space-y-4">
+                <div class="flex items-center border-b border-gray-100 pb-3">
+                    <dt class="text-sm font-medium text-gray-500 w-1/3">Emission Source</dt>
+                    <dd class="text-sm text-gray-900 flex-1">{{ $entry->emissionSource->name ?? 'N/A' }}</dd>
                 </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-500">Location</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $entry->measurement->location->name ?? 'N/A' }}</dd>
+                <div class="flex items-center border-b border-gray-100 pb-3">
+                    <dt class="text-sm font-medium text-gray-500 w-1/3">Location</dt>
+                    <dd class="text-sm text-gray-900 flex-1">{{ $entry->measurement->location->name ?? 'N/A' }}</dd>
                 </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-500">Year</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $entry->measurement->fiscal_year ?? 'N/A' }}</dd>
+                <div class="flex items-center border-b border-gray-100 pb-3">
+                    <dt class="text-sm font-medium text-gray-500 w-1/3">Year</dt>
+                    <dd class="text-sm text-gray-900 flex-1">{{ $entry->measurement->fiscal_year ?? 'N/A' }}</dd>
                 </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-500">Entry Date</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $entry->entry_date ? $entry->entry_date->format('Y-m-d') : 'N/A' }}</dd>
+                <div class="flex items-center border-b border-gray-100 pb-3">
+                    <dt class="text-sm font-medium text-gray-500 w-1/3">Entry Date</dt>
+                    <dd class="text-sm text-gray-900 flex-1">{{ $entry->entry_date ? $entry->entry_date->format('Y-m-d') : 'N/A' }}</dd>
                 </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-500">Quantity</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ number_format($entry->quantity, 4) }} {{ $entry->unit }}</dd>
+                <div class="flex items-center border-b border-gray-100 pb-3">
+                    <dt class="text-sm font-medium text-gray-500 w-1/3">Quantity</dt>
+                    <dd class="text-sm text-gray-900 flex-1">{{ number_format($entry->quantity, 4) }} {{ $entry->unit }}</dd>
                 </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-500">Scope</dt>
-                    <dd class="mt-1">
+                <div class="flex items-center border-b border-gray-100 pb-3">
+                    <dt class="text-sm font-medium text-gray-500 w-1/3">Scope</dt>
+                    <dd class="flex-1">
                         <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">{{ $entry->scope }}</span>
                     </dd>
                 </div>
@@ -75,43 +75,43 @@
             <h2 class="text-lg font-semibold text-gray-900">Calculation Details</h2>
         </div>
         <div class="px-6 py-4">
-            <dl class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <dt class="text-sm font-medium text-gray-500">Total CO2e</dt>
-                    <dd class="mt-1 text-2xl font-bold text-purple-600">{{ number_format($entry->calculated_co2e, 2) }} kg</dd>
+            <dl class="space-y-4">
+                <div class="flex items-center border-b border-gray-100 pb-3">
+                    <dt class="text-sm font-medium text-gray-500 w-1/3">Total CO2e</dt>
+                    <dd class="text-2xl font-bold text-purple-600 flex-1">{{ number_format($entry->calculated_co2e, 2) }} kg</dd>
                 </div>
                 @if($entry->co2_emissions !== null)
-                <div>
-                    <dt class="text-sm font-medium text-gray-500">CO2 Emissions</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ number_format($entry->co2_emissions, 6) }} kg</dd>
+                <div class="flex items-center border-b border-gray-100 pb-3">
+                    <dt class="text-sm font-medium text-gray-500 w-1/3">CO2 Emissions</dt>
+                    <dd class="text-sm text-gray-900 flex-1">{{ number_format($entry->co2_emissions, 6) }} kg</dd>
                 </div>
                 @endif
                 @if($entry->ch4_emissions !== null)
-                <div>
-                    <dt class="text-sm font-medium text-gray-500">CH4 Emissions</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ number_format($entry->ch4_emissions, 6) }} kg</dd>
+                <div class="flex items-center border-b border-gray-100 pb-3">
+                    <dt class="text-sm font-medium text-gray-500 w-1/3">CH4 Emissions</dt>
+                    <dd class="text-sm text-gray-900 flex-1">{{ number_format($entry->ch4_emissions, 6) }} kg</dd>
                 </div>
                 @endif
                 @if($entry->n2o_emissions !== null)
-                <div>
-                    <dt class="text-sm font-medium text-gray-500">N2O Emissions</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ number_format($entry->n2o_emissions, 6) }} kg</dd>
+                <div class="flex items-center border-b border-gray-100 pb-3">
+                    <dt class="text-sm font-medium text-gray-500 w-1/3">N2O Emissions</dt>
+                    <dd class="text-sm text-gray-900 flex-1">{{ number_format($entry->n2o_emissions, 6) }} kg</dd>
                 </div>
                 @endif
-                <div>
-                    <dt class="text-sm font-medium text-gray-500">GWP Version Used</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $entry->gwp_version_used ?? 'AR6' }}</dd>
+                <div class="flex items-center border-b border-gray-100 pb-3">
+                    <dt class="text-sm font-medium text-gray-500 w-1/3">GWP Version Used</dt>
+                    <dd class="text-sm text-gray-900 flex-1">{{ $entry->gwp_version_used ?? 'AR6' }}</dd>
                 </div>
                 @if($entry->emissionFactor)
-                <div>
-                    <dt class="text-sm font-medium text-gray-500">Calculation Method</dt>
-                    <dd class="mt-1 text-sm text-gray-900">
+                <div class="flex items-center border-b border-gray-100 pb-3">
+                    <dt class="text-sm font-medium text-gray-500 w-1/3">Calculation Method</dt>
+                    <dd class="text-sm text-gray-900 flex-1">
                         {{ $entry->emissionFactor->calculation_method ?? $entry->calculation_method ?? 'N/A' }}
                     </dd>
                 </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-500">Emission Factor</dt>
-                    <dd class="mt-1 text-sm text-gray-900">
+                <div class="flex items-center border-b border-gray-100 pb-3">
+                    <dt class="text-sm font-medium text-gray-500 w-1/3">Emission Factor</dt>
+                    <dd class="text-sm text-gray-900 flex-1">
                         {{ number_format($entry->emissionFactor->factor_value ?? 0, 6) }} 
                         {{ $entry->emissionFactor->unit ?? $entry->unit ?? '' }} 
                         @if($entry->emissionFactor->source_reference)
@@ -120,21 +120,21 @@
                     </dd>
                 </div>
                 @if($entry->emissionFactor->source_standard)
-                <div>
-                    <dt class="text-sm font-medium text-gray-500">Source Standard</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $entry->emissionFactor->source_standard }}</dd>
+                <div class="flex items-center border-b border-gray-100 pb-3">
+                    <dt class="text-sm font-medium text-gray-500 w-1/3">Source Standard</dt>
+                    <dd class="text-sm text-gray-900 flex-1">{{ $entry->emissionFactor->source_standard }}</dd>
                 </div>
                 @endif
                 @if($entry->emissionFactor->region)
-                <div>
-                    <dt class="text-sm font-medium text-gray-500">Region</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $entry->emissionFactor->region }}</dd>
+                <div class="flex items-center border-b border-gray-100 pb-3">
+                    <dt class="text-sm font-medium text-gray-500 w-1/3">Region</dt>
+                    <dd class="text-sm text-gray-900 flex-1">{{ $entry->emissionFactor->region }}</dd>
                 </div>
                 @endif
                 @elseif($entry->emission_factor_id)
-                <div>
-                    <dt class="text-sm font-medium text-gray-500">Calculation Method</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $entry->calculation_method ?? 'N/A' }}</dd>
+                <div class="flex items-center border-b border-gray-100 pb-3">
+                    <dt class="text-sm font-medium text-gray-500 w-1/3">Calculation Method</dt>
+                    <dd class="text-sm text-gray-900 flex-1">{{ $entry->calculation_method ?? 'N/A' }}</dd>
                 </div>
                 @endif
             </dl>
@@ -152,11 +152,11 @@
                 $additionalData = is_string($entry->additional_data) ? json_decode($entry->additional_data, true) : $entry->additional_data;
             @endphp
             @if(is_array($additionalData) && count($additionalData) > 0)
-                <dl class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <dl class="space-y-4">
                     @foreach($additionalData as $key => $value)
-                        <div>
-                            <dt class="text-sm font-medium text-gray-500">{{ ucwords(str_replace('_', ' ', $key)) }}</dt>
-                            <dd class="mt-1 text-sm text-gray-900">{{ $value }}</dd>
+                        <div class="flex items-center border-b border-gray-100 pb-3">
+                            <dt class="text-sm font-medium text-gray-500 w-1/3">{{ ucwords(str_replace('_', ' ', $key)) }}</dt>
+                            <dd class="text-sm text-gray-900 flex-1">{{ $value }}</dd>
                         </div>
                     @endforeach
                 </dl>
@@ -183,14 +183,14 @@
             <h2 class="text-lg font-semibold text-gray-900">Metadata</h2>
         </div>
         <div class="px-6 py-4">
-            <dl class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-                <div>
-                    <dt class="font-medium text-gray-500">Created At</dt>
-                    <dd class="mt-1 text-gray-900">{{ $entry->created_at->format('Y-m-d H:i:s') }}</dd>
+            <dl class="space-y-4">
+                <div class="flex items-center border-b border-gray-100 pb-3">
+                    <dt class="text-sm font-medium text-gray-500 w-1/3">Created At</dt>
+                    <dd class="text-sm text-gray-900 flex-1">{{ $entry->created_at->format('Y-m-d H:i:s') }}</dd>
                 </div>
-                <div>
-                    <dt class="font-medium text-gray-500">Last Updated</dt>
-                    <dd class="mt-1 text-gray-900">{{ $entry->updated_at->format('Y-m-d H:i:s') }}</dd>
+                <div class="flex items-center border-b border-gray-100 pb-3">
+                    <dt class="text-sm font-medium text-gray-500 w-1/3">Last Updated</dt>
+                    <dd class="text-sm text-gray-900 flex-1">{{ $entry->updated_at->format('Y-m-d H:i:s') }}</dd>
                 </div>
             </dl>
         </div>

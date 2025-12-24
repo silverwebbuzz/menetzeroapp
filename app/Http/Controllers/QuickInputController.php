@@ -280,7 +280,6 @@ class QuickInputController extends Controller
         $validationRules = [
             'location_id' => 'required|exists:locations,id',
             'fiscal_year' => 'required|integer|min:2000|max:2100',
-            'entry_date' => 'required|date',
         ];
         
         // Check if form uses 'amount' or 'quantity'
@@ -394,7 +393,7 @@ class QuickInputController extends Controller
                 'ch4_emissions' => isset($calculation['ch4']) && is_numeric($calculation['ch4']) ? $calculation['ch4'] : null,
                 'n2o_emissions' => isset($calculation['n2o']) && is_numeric($calculation['n2o']) ? $calculation['n2o'] : null,
                 'scope' => $emissionSource->scope,
-                'entry_date' => $request->entry_date,
+                'entry_date' => Carbon::now()->toDateString(), // Automatically set to current date
                 'emission_factor_id' => $emissionFactor->id,
                 'gwp_version_used' => $emissionFactor->gwp_version ?? 'AR6',
                 'calculation_method' => $emissionFactor->calculation_method ?? null, // Save calculation method from emission factor
@@ -587,7 +586,6 @@ class QuickInputController extends Controller
         $validationRules = [
             'location_id' => 'required|exists:locations,id',
             'fiscal_year' => 'required|integer|min:2000|max:2100',
-            'entry_date' => 'required|date',
         ];
         
         if ($hasAmountField) {
@@ -663,7 +661,7 @@ class QuickInputController extends Controller
                 'co2_emissions' => isset($calculation['co2']) && is_numeric($calculation['co2']) ? $calculation['co2'] : null,
                 'ch4_emissions' => isset($calculation['ch4']) && is_numeric($calculation['ch4']) ? $calculation['ch4'] : null,
                 'n2o_emissions' => isset($calculation['n2o']) && is_numeric($calculation['n2o']) ? $calculation['n2o'] : null,
-                'entry_date' => $request->entry_date,
+                'entry_date' => Carbon::now()->toDateString(), // Automatically set to current date
                 'emission_factor_id' => $emissionFactor->id,
                 'gwp_version_used' => $emissionFactor->gwp_version ?? 'AR6',
                 'calculation_method' => $emissionFactor->calculation_method ?? null, // Save calculation method from emission factor

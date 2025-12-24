@@ -175,16 +175,6 @@
                 </div>
             @endif
                 </div>
-
-                <!-- Entry Date -->
-                <div>
-                    <label for="entry_date" class="block text-sm font-medium text-gray-700 mb-1">Entry Date *</label>
-                    <input type="date" name="entry_date" id="entry_date" value="{{ old('entry_date', $editEntry && $editEntry->entry_date ? $editEntry->entry_date->format('Y-m-d') : date('Y-m-d')) }}" required
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                    @error('entry_date')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
             </div>
 
             <!-- Right Side: Additional Data (50%) -->
