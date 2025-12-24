@@ -110,9 +110,23 @@
                         
                         // Get main fields (required fields that are not in Additional Data section)
                         // These are fields like fuel_category, fuel_type, unit_of_measure, amount, quantity
-                        $mainFields = $formFields->filter(function($field) {
+                        // Deduplicate by field_name to prevent showing the same field twice
+                        $seenMainFieldNames = [];
+                        $mainFields = $formFields->filter(function($field) use (&$seenMainFieldNames) {
                             // Include required fields and main input fields
-                            return $field->is_required || in_array($field->field_name, ['fuel_category', 'fuel_type', 'unit_of_measure', 'unit', 'amount', 'quantity']);
+                            $isMainField = $field->is_required || in_array($field->field_name, ['fuel_category', 'fuel_type', 'unit_of_measure', 'unit', 'amount', 'quantity']);
+                            
+                            if (!$isMainField) {
+                                return false;
+                            }
+                            
+                            // Deduplicate by field_name - only show first occurrence
+                            if (in_array($field->field_name, $seenMainFieldNames)) {
+                                return false;
+                            }
+                            
+                            $seenMainFieldNames[] = $field->field_name;
+                            return true;
                         })->sortBy('field_order');
                     @endphp
                     
