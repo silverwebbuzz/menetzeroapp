@@ -4,7 +4,7 @@
 @section('page-title', 'Edit Entry')
 
 @push('styles')
-<link rel="stylesheet" href="/css/quick-input.css">
+<link rel="stylesheet" href="/public/css/quick-input.css">
 @endpush
 
 @section('content')
@@ -194,7 +194,7 @@
 </div>
 
 @push('scripts')
-<script src="/js/quick-input.js"></script>
+<script src="/public/js/quick-input.js"></script>
 @endpush
 @endsection
 

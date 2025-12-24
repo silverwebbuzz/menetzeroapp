@@ -4,7 +4,7 @@
 @section('page-title', $userFriendlyName ?? $emissionSource->name)
 
 @push('styles')
-<link rel="stylesheet" href="/css/quick-input.css">
+<link rel="stylesheet" href="/public/css/quick-input.css">
 @endpush
 
 @section('content')
@@ -368,5 +368,5 @@
 @endsection
 
 @push('scripts')
-<script src="/js/quick-input.js"></script>
+<script src="/public/js/quick-input.js"></script>
 @endpush
