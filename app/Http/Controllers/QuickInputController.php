@@ -99,7 +99,7 @@ class QuickInputController extends Controller
     /**
      * Show Quick Input form for a specific emission source
      */
-    public function show($scope, $slug)
+    public function show($scope, $slug, Request $request)
     {
         $this->requirePermission('measurements.add', null, ['measurements.*', 'manage_measurements']);
         
