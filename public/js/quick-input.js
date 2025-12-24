@@ -234,6 +234,7 @@
                 quantity: parseFloat(quantity),
                 unit: unit,
                 // Include other form fields that might affect factor selection
+                fuel_category: document.getElementById('fuel_category')?.value,
                 fuel_type: document.getElementById('fuel_type')?.value,
                 region: document.getElementById('region')?.value || 'UAE',
             })
@@ -480,22 +481,174 @@
         });
     }
 
+    /**
+     * Setup cascading dropdowns for Fuel and other sources
+     */
+    function setupCascadingDropdowns() {
+        const form = document.querySelector('form[data-source-id]');
+        if (!form) return;
+
+        const emissionSourceId = form.dataset.sourceId;
+        const fuelCategorySelect = document.getElementById('fuel_category');
+        const fuelTypeSelect = document.getElementById('fuel_type');
+        const unitSelect = document.getElementById('unit_of_measure') || document.getElementById('unit');
+
+        // Handle fuel_category change -> update fuel_type
+        if (fuelCategorySelect && !fuelCategorySelect.dataset.handlerAttached) {
+            fuelCategorySelect.dataset.handlerAttached = 'true';
+            fuelCategorySelect.addEventListener('change', function() {
+                const category = this.value;
+                if (category && fuelTypeSelect) {
+                    loadFuelTypes(emissionSourceId, category, fuelTypeSelect);
+                    // Clear unit options when category changes
+                    if (unitSelect) {
+                        unitSelect.innerHTML = '<option value="">Select an option</option>';
+                    }
+                } else if (fuelTypeSelect) {
+                    fuelTypeSelect.innerHTML = '<option value="">Select an option</option>';
+                }
+            });
+        }
+
+        // Handle fuel_type change -> update unit_of_measure
+        if (fuelTypeSelect && !fuelTypeSelect.dataset.handlerAttached) {
+            fuelTypeSelect.dataset.handlerAttached = 'true';
+            fuelTypeSelect.addEventListener('change', function() {
+                const fuelType = this.value;
+                const fuelCategory = fuelCategorySelect ? fuelCategorySelect.value : null;
+                if (fuelType && unitSelect) {
+                    loadUnits(emissionSourceId, fuelType, fuelCategory, unitSelect);
+                } else if (unitSelect) {
+                    unitSelect.innerHTML = '<option value="">Select an option</option>';
+                }
+            });
+        }
+    }
+
+    /**
+     * Load fuel types based on fuel category
+     */
+    function loadFuelTypes(sourceId, category, selectElement) {
+        if (!category) {
+            selectElement.innerHTML = '<option value="">Select an option</option>';
+            return;
+        }
+
+        selectElement.disabled = true;
+        selectElement.innerHTML = '<option value="">Loading...</option>';
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+        fetch(`/api/quick-input/fuel-types/${sourceId}?fuel_category=${encodeURIComponent(category)}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            selectElement.innerHTML = '<option value="">Select an option</option>';
+            if (data.success && data.fuel_types) {
+                data.fuel_types.forEach(fuelType => {
+                    const option = document.createElement('option');
+                    option.value = fuelType;
+                    option.textContent = fuelType;
+                    selectElement.appendChild(option);
+                });
+            }
+            selectElement.disabled = false;
+        })
+        .catch(error => {
+            console.error('Error loading fuel types:', error);
+            selectElement.innerHTML = '<option value="">Error loading options</option>';
+            selectElement.disabled = false;
+        });
+    }
+
+    /**
+     * Load units based on fuel type
+     */
+    function loadUnits(sourceId, fuelType, fuelCategory, selectElement) {
+        if (!fuelType) {
+            selectElement.innerHTML = '<option value="">Select an option</option>';
+            return;
+        }
+
+        selectElement.disabled = true;
+        const currentValue = selectElement.value;
+        selectElement.innerHTML = '<option value="">Loading...</option>';
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+        let url = `/api/quick-input/units/${sourceId}?fuel_type=${encodeURIComponent(fuelType)}`;
+        if (fuelCategory) {
+            url += `&fuel_category=${encodeURIComponent(fuelCategory)}`;
+        }
+
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            selectElement.innerHTML = '<option value="">Select an option</option>';
+            if (data.success && data.units) {
+                data.units.forEach(unit => {
+                    const option = document.createElement('option');
+                    option.value = unit;
+                    option.textContent = unit;
+                    if (currentValue === unit) {
+                        option.selected = true;
+                    }
+                    selectElement.appendChild(option);
+                });
+            }
+            selectElement.disabled = false;
+        })
+        .catch(error => {
+            console.error('Error loading units:', error);
+            selectElement.innerHTML = '<option value="">Error loading options</option>';
+            selectElement.disabled = false;
+        });
+    }
+
     // Initialize additional features
     document.addEventListener('DOMContentLoaded', function() {
         setupDeleteConfirmations();
         setupFormLoadingStates();
+        setupCascadingDropdowns();
         
         // Store original button text
         const submitButtons = document.querySelectorAll('button[type="submit"]');
         submitButtons.forEach(button => {
             button.dataset.originalText = button.textContent;
         });
+        
+        // Also setup cascading dropdowns after a delay (for conditionally rendered forms)
+        setTimeout(setupCascadingDropdowns, 500);
+        
+        // Watch for form appearance
+        const observer = new MutationObserver(function() {
+            setupCascadingDropdowns();
+        });
+        
+        if (document.body) {
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        }
     });
 
     // Export functions for global use
     window.QuickInput = {
         calculate: calculateEmissions,
         validate: validateForm,
+        loadFuelTypes: loadFuelTypes,
+        loadUnits: loadUnits,
     };
 })();
 

@@ -17,8 +17,25 @@
             @endif
             {{ $userFriendlyName ?? $emissionSource->name }}
         </h1>
-        @if($emissionSource->instructions)
-            <p class="mt-2 text-gray-600">{{ $emissionSource->instructions }}</p>
+        
+        @php
+            $instructions = $industryLabel->user_friendly_description ?? $emissionSource->instructions ?? null;
+        @endphp
+        @if($instructions)
+            <p class="mt-2 text-gray-600">{{ $instructions }}</p>
+        @endif
+        
+        @if(isset($industryLabel) && $industryLabel && $industryLabel->common_equipment)
+            <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                <p class="text-sm font-medium text-blue-900 mb-1">Common Equipment:</p>
+                <p class="text-sm text-blue-800">{{ $industryLabel->common_equipment }}</p>
+            </div>
+        @endif
+        
+        @if(isset($industryLabel) && $industryLabel && $industryLabel->typical_units)
+            <div class="mt-2 text-sm text-gray-500">
+                <span class="font-medium">Typical Units:</span> {{ $industryLabel->typical_units }}
+            </div>
         @endif
     </div>
 
@@ -82,96 +99,123 @@
             <div class="space-y-6">
                 <h3 class="text-lg font-medium text-gray-900 border-b pb-2">Main Information</h3>
                 
-                <!-- Main Input Fields - Horizontal Layout -->
+                <!-- Main Input Fields - Horizontal Layout - Render all required fields dynamically -->
                 <div class="space-y-4">
-            <!-- Unit of Measure -->
-            @php
-                $unitField = $formFields->firstWhere('field_name', 'unit_of_measure');
-            @endphp
-            @if($unitField)
-                <div class="flex items-center gap-4">
-                    <label for="unit_of_measure" class="text-sm font-medium text-gray-700 w-40">
-                        {{ $unitField->field_label ?? 'Unit of Measure' }} *
-                    </label>
-                    <select name="unit_of_measure" id="unit_of_measure" required
-                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                        <option value="">Select an option</option>
-                        @if($unitField->field_options)
-                            @php
-                                $options = is_array($unitField->field_options) ? $unitField->field_options : json_decode($unitField->field_options, true);
-                            @endphp
-                            @if(is_array($options))
-                                @foreach($options as $option)
-                                    @if(is_array($option))
-                                        <option value="{{ $option['value'] ?? $option }}" {{ old('unit_of_measure', $editEntry->unit ?? '') == ($option['value'] ?? $option) ? 'selected' : '' }}>{{ $option['label'] ?? $option['value'] ?? $option }}</option>
-                                    @else
-                                        <option value="{{ $option }}" {{ old('unit_of_measure', $editEntry->unit ?? '') == $option ? 'selected' : '' }}>{{ $option }}</option>
+                    @php
+                        // Get additional data from edit entry if available
+                        $editAdditionalData = [];
+                        if ($editEntry && $editEntry->additional_data) {
+                            $editAdditionalData = is_string($editEntry->additional_data) ? json_decode($editEntry->additional_data, true) : ($editEntry->additional_data ?? []);
+                        }
+                        
+                        // Get main fields (required fields that are not in Additional Data section)
+                        // These are fields like fuel_category, fuel_type, unit_of_measure, amount, quantity
+                        $mainFields = $formFields->filter(function($field) {
+                            // Include required fields and main input fields
+                            return $field->is_required || in_array($field->field_name, ['fuel_category', 'fuel_type', 'unit_of_measure', 'unit', 'amount', 'quantity']);
+                        })->sortBy('field_order');
+                    @endphp
+                    
+                    @foreach($mainFields as $field)
+                        @if($field->field_type === 'select')
+                            <div class="flex items-center gap-4">
+                                <label for="{{ $field->field_name }}" class="text-sm font-medium text-gray-700 w-40">
+                                    {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
+                                    @if($field->is_required)
+                                        <span class="text-red-500">*</span>
                                     @endif
-                                @endforeach
-                            @endif
-                        @endif
-                    </select>
-                    @error('unit_of_measure')
-                        <p class="text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-            @else
-                <!-- Fallback Unit Select -->
-                <div class="flex items-center gap-4">
-                    <label for="unit" class="text-sm font-medium text-gray-700 w-40">Unit *</label>
-                    <select name="unit" id="unit" required
-                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                        <option value="">Select Unit</option>
-                        @if(!empty($availableUnits))
-                            @foreach($availableUnits as $unit)
-                                <option value="{{ $unit }}" {{ old('unit', $editEntry->unit ?? $emissionSource->default_unit) == $unit ? 'selected' : '' }}>{{ $unit }}</option>
-                            @endforeach
+                                </label>
+                                <select name="{{ $field->field_name }}" 
+                                        id="{{ $field->field_name }}" 
+                                        data-field-name="{{ $field->field_name }}"
+                                        data-depends-on="{{ $field->depends_on_field ?? '' }}"
+                                        {{ $field->is_required ? 'required' : '' }}
+                                        class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 dynamic-select">
+                                    <option value="">Select an option</option>
+                                    @if($field->field_options)
+                                        @php
+                                            $options = is_array($field->field_options) ? $field->field_options : json_decode($field->field_options, true);
+                                        @endphp
+                                        @if(is_array($options))
+                                            @foreach($options as $option)
+                                                @if(is_array($option))
+                                                    <option value="{{ $option['value'] ?? $option }}" {{ old($field->field_name, $editAdditionalData[$field->field_name] ?? ($field->field_name === 'unit_of_measure' || $field->field_name === 'unit' ? ($editEntry->unit ?? '') : '')) == ($option['value'] ?? $option) ? 'selected' : '' }}>{{ $option['label'] ?? $option['value'] ?? $option }}</option>
+                                                @else
+                                                    <option value="{{ $option }}" {{ old($field->field_name, $editAdditionalData[$field->field_name] ?? ($field->field_name === 'unit_of_measure' || $field->field_name === 'unit' ? ($editEntry->unit ?? '') : '')) == $option ? 'selected' : '' }}>{{ $option }}</option>
+                                                @endif
+                                            @endforeach
+                                        @endif
+                                    @endif
+                                </select>
+                                @error($field->field_name)
+                                    <p class="text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                                @if($field->help_text)
+                                    <p class="text-xs text-gray-500 mt-1">{{ $field->help_text }}</p>
+                                @endif
+                            </div>
+                        @elseif($field->field_type === 'number')
+                            <div class="flex items-center gap-4">
+                                <label for="{{ $field->field_name }}" class="text-sm font-medium text-gray-700 w-40">
+                                    {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
+                                    @if($field->is_required)
+                                        <span class="text-red-500">*</span>
+                                    @endif
+                                </label>
+                                <div class="flex-1">
+                                    <input type="number" 
+                                           name="{{ $field->field_name }}" 
+                                           id="{{ $field->field_name }}"
+                                           value="{{ old($field->field_name, $editEntry && ($field->field_name === 'amount' || $field->field_name === 'quantity') ? $editEntry->quantity : ($editAdditionalData[$field->field_name] ?? '')) }}"
+                                           step="{{ $field->validation_rules && is_array(json_decode($field->validation_rules, true)) ? (json_decode($field->validation_rules, true)['step'] ?? '0.01') : '0.01' }}"
+                                           min="{{ $field->validation_rules && is_array(json_decode($field->validation_rules, true)) ? (json_decode($field->validation_rules, true)['min'] ?? '0') : '0' }}"
+                                           {{ $field->is_required ? 'required' : '' }}
+                                           placeholder="{{ $field->field_placeholder ?? 'Enter ' . strtolower($field->field_label ?? $field->field_name) }}"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                                    @error($field->field_name)
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                    @if($field->help_text)
+                                        <p class="mt-1 text-xs text-gray-500">{{ $field->help_text }}</p>
+                                    @endif
+                                </div>
+                            </div>
                         @else
-                            <option value="{{ $emissionSource->default_unit ?? 'unit' }}" {{ old('unit', $editEntry->unit ?? '') == ($emissionSource->default_unit ?? 'unit') ? 'selected' : '' }}>{{ $emissionSource->default_unit ?? 'unit' }}</option>
+                            <!-- Text, textarea, etc. -->
+                            <div class="flex items-center gap-4">
+                                <label for="{{ $field->field_name }}" class="text-sm font-medium text-gray-700 w-40">
+                                    {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
+                                    @if($field->is_required)
+                                        <span class="text-red-500">*</span>
+                                    @endif
+                                </label>
+                                <div class="flex-1">
+                                    @if($field->field_type === 'textarea')
+                                        <textarea name="{{ $field->field_name }}" 
+                                                  id="{{ $field->field_name }}"
+                                                  rows="3"
+                                                  {{ $field->is_required ? 'required' : '' }}
+                                                  placeholder="{{ $field->field_placeholder ?? '' }}"
+                                                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}</textarea>
+                                    @else
+                                        <input type="{{ $field->field_type }}" 
+                                               name="{{ $field->field_name }}" 
+                                               id="{{ $field->field_name }}"
+                                               value="{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}"
+                                               {{ $field->is_required ? 'required' : '' }}
+                                               placeholder="{{ $field->field_placeholder ?? '' }}"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                                    @endif
+                                    @error($field->field_name)
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                    @if($field->help_text)
+                                        <p class="mt-1 text-xs text-gray-500">{{ $field->help_text }}</p>
+                                    @endif
+                                </div>
+                            </div>
                         @endif
-                    </select>
-                    @error('unit')
-                        <p class="text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-            @endif
-
-            <!-- Amount/Quantity -->
-            @php
-                $amountField = $formFields->firstWhere('field_name', 'amount');
-            @endphp
-            @if($amountField)
-                <div class="flex items-center gap-4">
-                    <label for="amount" class="text-sm font-medium text-gray-700 w-40">
-                        {{ $amountField->field_label ?? 'Amount' }} *
-                    </label>
-                    <div class="flex-1">
-                        <input type="number" name="amount" id="amount" step="0.01" value="{{ old('amount', $editEntry->quantity ?? '') }}" min="0" required
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
-                               placeholder="Enter amount">
-                        @error('amount')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                        @if($amountField->help_text)
-                            <p class="mt-1 text-xs text-gray-500">{{ $amountField->help_text }}</p>
-                        @endif
-                    </div>
-                </div>
-            @else
-                <!-- Fallback Quantity Input -->
-                <div class="flex items-center gap-4">
-                    <label for="quantity" class="text-sm font-medium text-gray-700 w-40">Quantity *</label>
-                    <div class="flex-1">
-                        <input type="number" name="quantity" id="quantity" step="0.0001" value="{{ old('quantity', $editEntry->quantity ?? '') }}" min="0" required
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
-                               placeholder="Enter quantity">
-                        @error('quantity')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                        <p class="mt-1 text-xs text-gray-500">Enter the amount consumed or used</p>
-                    </div>
-                </div>
-            @endif
+                    @endforeach
                 </div>
             </div>
 
@@ -185,10 +229,12 @@
                     }
                     
                     // Filter and deduplicate fields - only show unique field names
+                    // Exclude main fields (fuel_category, fuel_type, unit_of_measure, amount, quantity, unit) and required fields
+                    $mainFieldNames = ['fuel_category', 'fuel_type', 'unit_of_measure', 'amount', 'quantity', 'unit'];
                     $seenFieldNames = [];
-                    $additionalFields = $formFields->filter(function($field) use (&$seenFieldNames) {
-                        // Skip unit_of_measure, amount, quantity, unit, and comments (we'll handle comments separately)
-                        if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments']) || $field->is_required) {
+                    $additionalFields = $formFields->filter(function($field) use (&$seenFieldNames, $mainFieldNames) {
+                        // Skip main fields and required fields (they're in Main Information section)
+                        if (in_array($field->field_name, $mainFieldNames) || $field->is_required || $field->field_name === 'comments') {
                             return false;
                         }
                         // Deduplicate by field_name - only show first occurrence

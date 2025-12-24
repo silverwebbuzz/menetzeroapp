@@ -156,6 +156,9 @@ Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client'])->
     // Quick Input API routes (AJAX)
     Route::prefix('api/quick-input')->name('api.quick-input.')->group(function () {
         Route::post('/calculate', [\App\Http\Controllers\QuickInputController::class, 'calculate'])->name('calculate');
+        Route::get('/fuel-categories/{sourceId}', [\App\Http\Controllers\QuickInputController::class, 'getFuelCategories'])->name('fuel-categories');
+        Route::get('/fuel-types/{sourceId}', [\App\Http\Controllers\QuickInputController::class, 'getFuelTypes'])->name('fuel-types');
+        Route::get('/units/{sourceId}', [\App\Http\Controllers\QuickInputController::class, 'getUnits'])->name('units');
     });
     
     // Document Upload routes (AI Smart Uploads)

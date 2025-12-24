@@ -634,6 +634,141 @@ LIMIT 1
 ON DUPLICATE KEY UPDATE 
   `user_friendly_description` = VALUES(`user_friendly_description`);
 
+-- ============================================================================
+-- PART 8: INSERT FORM FIELDS FOR FUEL (Stationary Combustion)
+-- ============================================================================
+-- Note: Fuel form has cascading dropdowns: fuel_category -> fuel_type -> unit_of_measure
+-- The fuel_type and unit_of_measure options are loaded dynamically via API based on selections
+
+-- 8.1 Fuel Category (First dropdown - static options)
+INSERT INTO `emission_source_form_fields` 
+(`emission_source_id`, `field_name`, `field_type`, `field_label`, `field_placeholder`, 
+ `field_options`, `is_required`, `field_order`, `help_text`)
+SELECT 
+  es.id,
+  'fuel_category',
+  'select',
+  'Fuel Category',
+  'Select an option',
+  JSON_ARRAY(
+    JSON_OBJECT('value', 'Gaseous fuels', 'label', 'Gaseous fuels'),
+    JSON_OBJECT('value', 'Liquid fuels', 'label', 'Liquid fuels'),
+    JSON_OBJECT('value', 'Solid fuels', 'label', 'Solid fuels'),
+    JSON_OBJECT('value', 'Biofuel', 'label', 'Biofuel'),
+    JSON_OBJECT('value', 'Biomass', 'label', 'Biomass'),
+    JSON_OBJECT('value', 'Biogas', 'label', 'Biogas')
+  ),
+  1,
+  1,
+  'Select the category of fuel used'
+FROM `emission_sources_master` es
+WHERE es.quick_input_slug = 'fuel'
+LIMIT 1
+ON DUPLICATE KEY UPDATE 
+  `field_options` = VALUES(`field_options`);
+
+-- 8.2 Fuel Type (Second dropdown - loaded dynamically based on fuel_category)
+-- Note: Options will be loaded via API based on fuel_category selection
+INSERT INTO `emission_source_form_fields` 
+(`emission_source_id`, `field_name`, `field_type`, `field_label`, `field_placeholder`, 
+ `is_required`, `field_order`, `help_text`, `depends_on_field`)
+SELECT 
+  es.id,
+  'fuel_type',
+  'select',
+  'Fuel Type',
+  'Select an option',
+  1,
+  2,
+  'Select the specific type of fuel (options depend on fuel category selected above)',
+  'fuel_category'
+FROM `emission_sources_master` es
+WHERE es.quick_input_slug = 'fuel'
+LIMIT 1
+ON DUPLICATE KEY UPDATE 
+  `help_text` = VALUES(`help_text`),
+  `depends_on_field` = VALUES(`depends_on_field`);
+
+-- 8.3 Unit of Measure (Third dropdown - loaded dynamically based on fuel_type)
+-- Note: Options will be loaded via API based on fuel_type selection
+INSERT INTO `emission_source_form_fields` 
+(`emission_source_id`, `field_name`, `field_type`, `field_label`, `field_placeholder`, 
+ `is_required`, `field_order`, `help_text`, `depends_on_field`)
+SELECT 
+  es.id,
+  'unit_of_measure',
+  'select',
+  'Unit of Measure',
+  'Select an option',
+  1,
+  3,
+  'Select the unit of measure (options depend on fuel type selected above)',
+  'fuel_type'
+FROM `emission_sources_master` es
+WHERE es.quick_input_slug = 'fuel'
+LIMIT 1
+ON DUPLICATE KEY UPDATE 
+  `help_text` = VALUES(`help_text`),
+  `depends_on_field` = VALUES(`depends_on_field`);
+
+-- 8.4 Amount (Number input)
+INSERT INTO `emission_source_form_fields` 
+(`emission_source_id`, `field_name`, `field_type`, `field_label`, `field_placeholder`, 
+ `is_required`, `field_order`, `help_text`, `validation_rules`)
+SELECT 
+  es.id,
+  'amount',
+  'number',
+  'Amount',
+  'Enter amount',
+  1,
+  4,
+  'Amount of fuel used in the unit of measure specified above',
+  JSON_OBJECT('min', 0, 'step', '0.01')
+FROM `emission_sources_master` es
+WHERE es.quick_input_slug = 'fuel'
+LIMIT 1
+ON DUPLICATE KEY UPDATE 
+  `validation_rules` = VALUES(`validation_rules`);
+
+-- 8.5 Link field (Additional Data)
+INSERT INTO `emission_source_form_fields` 
+(`emission_source_id`, `field_name`, `field_type`, `field_label`, `field_placeholder`, 
+ `is_required`, `field_order`, `help_text`)
+SELECT 
+  es.id,
+  'link',
+  'text',
+  'Link',
+  'e.g. Sharepoint or Google Dr...',
+  0,
+  5,
+  'Link to supporting documents'
+FROM `emission_sources_master` es
+WHERE es.quick_input_slug = 'fuel'
+LIMIT 1
+ON DUPLICATE KEY UPDATE 
+  `help_text` = VALUES(`help_text`);
+
+-- 8.6 Comments field (Additional Data)
+INSERT INTO `emission_source_form_fields` 
+(`emission_source_id`, `field_name`, `field_type`, `field_label`, `field_placeholder`, 
+ `is_required`, `field_order`, `help_text`)
+SELECT 
+  es.id,
+  'comments',
+  'textarea',
+  'Comments',
+  'Add any additional notes...',
+  0,
+  6,
+  'Additional comments or notes'
+FROM `emission_sources_master` es
+WHERE es.quick_input_slug = 'fuel'
+LIMIT 1
+ON DUPLICATE KEY UPDATE 
+  `help_text` = VALUES(`help_text`);
+
 SET FOREIGN_KEY_CHECKS=1;
 
 -- ============================================================================

@@ -166,8 +166,14 @@ class QuickInputController extends Controller
         // Get form fields
         $formFields = $this->formBuilder->buildForm($emissionSource->id);
         
-        // Get user-friendly name based on company's industry
+        // Get user-friendly name and industry label details based on company's industry
         $userFriendlyName = $this->calculationService->getUserFriendlyName(
+            $emissionSource->id,
+            $company->industry_category_id ?? null
+        );
+        
+        // Get full industry label for additional details (description, equipment, etc.)
+        $industryLabel = $this->calculationService->getIndustryLabel(
             $emissionSource->id,
             $company->industry_category_id ?? null
         );
@@ -318,15 +324,23 @@ class QuickInputController extends Controller
                 $request->fiscal_year
             );
             
-            // Select emission factor
-            $emissionFactor = $this->calculationService->selectEmissionFactor(
-                $emissionSource->id,
-                $request->all()
-            );
-            
             // Get quantity and unit from request (handle both 'amount' and 'quantity' fields)
             $quantity = $request->input('amount') ?? $request->input('quantity');
             $unit = $request->input('unit_of_measure') ?? $request->input('unit');
+            
+            // Prepare conditions for factor selection (include fuel_category, fuel_type, etc.)
+            $conditions = [
+                'region' => $request->input('region', 'UAE'),
+                'fuel_category' => $request->input('fuel_category'),
+                'fuel_type' => $request->input('fuel_type'),
+                'unit' => $unit,
+            ];
+            
+            // Select emission factor
+            $emissionFactor = $this->calculationService->selectEmissionFactor(
+                $emissionSource->id,
+                $conditions
+            );
             
             if (!$emissionFactor) {
                 return back()->withErrors(['quantity' => 'No suitable emission factor found for the selected criteria. Please contact support.'])->withInput();
@@ -360,8 +374,8 @@ class QuickInputController extends Controller
             $additionalData = [];
             $formFields = EmissionSourceFormField::where('emission_source_id', $emissionSource->id)->get();
             foreach ($formFields as $field) {
-                // Skip main fields that are stored directly
-                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments'])) {
+                // Skip main fields that are stored directly or in dedicated columns
+                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments', 'fuel_category', 'fuel_type'])) {
                     continue;
                 }
                 if ($request->has($field->field_name) && $request->input($field->field_name) !== null && $request->input($field->field_name) !== '') {
@@ -398,10 +412,18 @@ class QuickInputController extends Controller
                 'gwp_version_used' => $emissionFactor->gwp_version ?? 'AR6',
                 'calculation_method' => $emissionFactor->calculation_method ?? null, // Save calculation method from emission factor
                 'supplier_emission_factor' => $request->input('supplier_emission_factor') ? (float) $request->input('supplier_emission_factor') : null, // Save supplier factor if provided
+                'fuel_type' => $request->input('fuel_type'), // Save fuel_type if provided
                 'additional_data' => !empty($additionalData) ? $additionalData : null,
                 'notes' => $notes,
                 'created_by' => $user->id,
             ]);
+            
+            // Store fuel_category in additional_data if provided (since there's no dedicated column)
+            if ($request->input('fuel_category')) {
+                $additionalDataWithCategory = $measurementData->additional_data ?? [];
+                $additionalDataWithCategory['fuel_category'] = $request->input('fuel_category');
+                $measurementData->update(['additional_data' => $additionalDataWithCategory]);
+            }
             
             // Update measurement totals
             $this->measurementService->updateMeasurementTotals($measurement->id);
@@ -451,10 +473,18 @@ class QuickInputController extends Controller
             
             $emissionSource = EmissionSourceMaster::findOrFail($request->emission_source_id);
             
+            // Prepare conditions for factor selection (include fuel_category, fuel_type, etc.)
+            $conditions = [
+                'region' => $request->input('region', 'UAE'),
+                'fuel_category' => $request->input('fuel_category'),
+                'fuel_type' => $request->input('fuel_type'),
+                'unit' => $request->input('unit') ?? $request->input('unit_of_measure'),
+            ];
+            
             // Select emission factor
             $emissionFactor = $this->calculationService->selectEmissionFactor(
                 $emissionSource->id,
-                $request->all()
+                $conditions
             );
             
             if (!$emissionFactor) {
@@ -464,11 +494,15 @@ class QuickInputController extends Controller
                 ], 400);
             }
             
+            // Get quantity (handle both 'amount' and 'quantity' fields)
+            $quantity = $request->input('quantity') ?? $request->input('amount');
+            $unit = $request->input('unit') ?? $request->input('unit_of_measure');
+            
             // Calculate CO2e
             $calculation = $this->calculationService->calculateCO2e(
-                $request->quantity,
+                $quantity,
                 $emissionFactor,
-                $request->unit
+                $unit
             );
             
             return response()->json([
@@ -615,19 +649,27 @@ class QuickInputController extends Controller
                 $request->fiscal_year
             );
             
+            // Get quantity and unit from request (handle both 'amount' and 'quantity' fields)
+            $quantity = $request->input('amount') ?? $request->input('quantity');
+            $unit = $request->input('unit_of_measure') ?? $request->input('unit');
+            
+            // Prepare conditions for factor selection (include fuel_category, fuel_type, etc.)
+            $conditions = [
+                'region' => $request->input('region', 'UAE'),
+                'fuel_category' => $request->input('fuel_category'),
+                'fuel_type' => $request->input('fuel_type'),
+                'unit' => $unit,
+            ];
+            
             // Select emission factor
             $emissionFactor = $this->calculationService->selectEmissionFactor(
                 $emissionSource->id,
-                $request->all()
+                $conditions
             );
             
             if (!$emissionFactor) {
                 return back()->withErrors(['quantity' => 'No suitable emission factor found for the selected criteria.'])->withInput();
             }
-            
-            // Get quantity and unit from request (handle both 'amount' and 'quantity' fields)
-            $quantity = $request->input('amount') ?? $request->input('quantity');
-            $unit = $request->input('unit_of_measure') ?? $request->input('unit');
             
             // Calculate CO2e
             $calculation = $this->calculationService->calculateCO2e(
@@ -834,6 +876,104 @@ class QuickInputController extends Controller
         };
         
         return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Get fuel categories for an emission source (AJAX)
+     */
+    public function getFuelCategories($sourceId)
+    {
+        try {
+            $categories = EmissionFactor::where('emission_source_id', $sourceId)
+                ->where('is_active', true)
+                ->whereNotNull('fuel_category')
+                ->select('fuel_category')
+                ->distinct()
+                ->orderBy('fuel_category')
+                ->pluck('fuel_category')
+                ->toArray();
+
+            return response()->json([
+                'success' => true,
+                'categories' => $categories
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Get Fuel Categories Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch fuel categories'
+            ], 500);
+        }
+    }
+
+    /**
+     * Get fuel types for an emission source based on fuel category (AJAX)
+     */
+    public function getFuelTypes($sourceId, Request $request)
+    {
+        try {
+            $query = EmissionFactor::where('emission_source_id', $sourceId)
+                ->where('is_active', true)
+                ->whereNotNull('fuel_type');
+
+            if ($request->has('fuel_category') && $request->fuel_category) {
+                $query->where('fuel_category', $request->fuel_category);
+            }
+
+            $fuelTypes = $query->select('fuel_type')
+                ->distinct()
+                ->orderBy('fuel_type')
+                ->pluck('fuel_type')
+                ->toArray();
+
+            return response()->json([
+                'success' => true,
+                'fuel_types' => $fuelTypes
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Get Fuel Types Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch fuel types'
+            ], 500);
+        }
+    }
+
+    /**
+     * Get available units for an emission source based on fuel type (AJAX)
+     */
+    public function getUnits($sourceId, Request $request)
+    {
+        try {
+            $query = EmissionFactor::where('emission_source_id', $sourceId)
+                ->where('is_active', true)
+                ->whereNotNull('unit');
+
+            if ($request->has('fuel_type') && $request->fuel_type) {
+                $query->where('fuel_type', $request->fuel_type);
+            }
+
+            if ($request->has('fuel_category') && $request->fuel_category) {
+                $query->where('fuel_category', $request->fuel_category);
+            }
+
+            $units = $query->select('unit')
+                ->distinct()
+                ->orderBy('unit')
+                ->pluck('unit')
+                ->toArray();
+
+            return response()->json([
+                'success' => true,
+                'units' => $units
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Get Units Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch units'
+            ], 500);
+        }
     }
     
 }
