@@ -333,6 +333,13 @@ class QuickInputController extends Controller
                 return back()->withErrors(['quantity' => 'No suitable emission factor found for the selected criteria. Please contact support.'])->withInput();
             }
             
+            // Debug: Log emission factor details
+            \Log::info('Emission Factor Selected', [
+                'factor_id' => $emissionFactor->id,
+                'calculation_method' => $emissionFactor->calculation_method,
+                'has_calculation_method' => !empty($emissionFactor->calculation_method),
+            ]);
+            
             // Calculate CO2e
             try {
                 $calculation = $this->calculationService->calculateCO2e(
