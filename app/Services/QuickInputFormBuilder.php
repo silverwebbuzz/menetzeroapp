@@ -16,7 +16,7 @@ class QuickInputFormBuilder
     public function buildForm($emissionSourceId)
     {
         return EmissionSourceFormField::where('emission_source_id', $emissionSourceId)
-            ->orderBy('display_order')
+            ->orderBy('field_order')
             ->get();
     }
 
