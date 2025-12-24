@@ -84,6 +84,19 @@ class QuickInputController extends Controller
             ->orderBy('name')
             ->get();
         
+        // Get only years that have entries
+        $yearsWithEntries = MeasurementData::whereHas('measurement', function($q) use ($company) {
+                $q->whereHas('location', function($locQuery) use ($company) {
+                    $locQuery->where('company_id', $company->id);
+                });
+            })
+            ->join('measurements', 'measurement_data.measurement_id', '=', 'measurements.id')
+            ->select('measurements.fiscal_year')
+            ->distinct()
+            ->orderBy('measurements.fiscal_year', 'desc')
+            ->pluck('fiscal_year')
+            ->toArray();
+        
         // Get emission sources with entry counts
         $sources = EmissionSourceMaster::where('is_quick_input', true)
             ->orderBy('scope')
@@ -127,7 +140,7 @@ class QuickInputController extends Controller
         // Calculate summary statistics
         $summary = $this->measurementService->calculateSummary($company->id, $request->all());
         
-        return view('quick-input.index', compact('entries', 'locations', 'sources', 'summary'));
+        return view('quick-input.index', compact('entries', 'locations', 'sources', 'summary', 'yearsWithEntries'));
     }
     
     /**
