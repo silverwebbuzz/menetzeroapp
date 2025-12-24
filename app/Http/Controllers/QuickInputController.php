@@ -14,6 +14,7 @@ use App\Services\QuickInputFormBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class QuickInputController extends Controller
 {
@@ -133,6 +134,25 @@ class QuickInputController extends Controller
         // Get available units from emission factors
         $availableUnits = $this->calculationService->getAvailableUnits($emissionSource->id);
         
+        // Get selected location and year from request or session
+        $selectedLocationId = $request->input('location_id', session('quick_input.location_id'));
+        $selectedFiscalYear = $request->input('fiscal_year', session('quick_input.fiscal_year', Carbon::now()->year));
+        
+        $measurement = null;
+        $existingEntries = collect();
+        
+        if ($selectedLocationId && $selectedFiscalYear) {
+            $measurement = $this->measurementService->getOrCreateMeasurement($selectedLocationId, $selectedFiscalYear);
+            session(['quick_input.location_id' => $selectedLocationId, 'quick_input.fiscal_year' => $selectedFiscalYear]);
+            
+            // Get existing entries for this emission source
+            $existingEntries = MeasurementData::where('measurement_id', $measurement->id)
+                ->where('emission_source_id', $emissionSource->id)
+                ->orderBy('entry_date', 'desc')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+        
         return view('quick-input.show', compact(
             'emissionSource',
             'formFields',
@@ -140,7 +160,11 @@ class QuickInputController extends Controller
             'locations',
             'availableUnits',
             'scope',
-            'slug'
+            'slug',
+            'selectedLocationId',
+            'selectedFiscalYear',
+            'measurement',
+            'existingEntries'
         ));
     }
     

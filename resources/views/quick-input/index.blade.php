@@ -18,9 +18,14 @@
                 </svg>
                 Export CSV
             </a>
-            <a href="{{ route('quick-input.show', ['scope' => 1, 'slug' => 'natural-gas']) }}" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">
-                + Add Entry
-            </a>
+            @php
+                $firstSource = $sources->first();
+            @endphp
+            @if($firstSource)
+                <a href="{{ route('quick-input.show', ['scope' => str_replace('Scope ', '', $firstSource->scope), 'slug' => $firstSource->quick_input_slug]) }}" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">
+                    + Add Entry
+                </a>
+            @endif
         </div>
     </div>
 
