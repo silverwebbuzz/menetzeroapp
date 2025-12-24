@@ -141,6 +141,18 @@ Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client'])->
     Route::put('/measurements/{measurement}/sources/{source}/edit', [MeasurementController::class, 'updateSourceData'])->name('measurements.update-source-data');
     Route::delete('/measurements/{measurement}/sources/{source}', [MeasurementController::class, 'deleteSourceData'])->name('measurements.delete-source-data');
     
+    // Quick Input routes
+    Route::prefix('quick-input')->name('quick-input.')->group(function () {
+        Route::get('/entries', [\App\Http\Controllers\QuickInputController::class, 'index'])->name('index');
+        Route::get('/{scope}/{slug}', [\App\Http\Controllers\QuickInputController::class, 'show'])->name('show');
+        Route::post('/{scope}/{slug}', [\App\Http\Controllers\QuickInputController::class, 'store'])->name('store');
+    });
+    
+    // Quick Input API routes (AJAX)
+    Route::prefix('api/quick-input')->name('api.quick-input.')->group(function () {
+        Route::post('/calculate', [\App\Http\Controllers\QuickInputController::class, 'calculate'])->name('calculate');
+    });
+    
     // Document Upload routes (AI Smart Uploads)
     Route::prefix('document-uploads')->name('document-uploads.')->group(function () {
         Route::get('/', [DocumentUploadController::class, 'index'])->name('index');

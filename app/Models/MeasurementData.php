@@ -12,15 +12,38 @@ class MeasurementData extends Model
     protected $fillable = [
         'measurement_id',
         'emission_source_id',
-        'field_name',
-        'field_value',
-        'field_type',
+        'quantity',
+        'unit',
+        'calculated_co2e',
+        'scope',
+        'calculation_method',
+        'supporting_docs',
+        'is_offset',
+        'notes',
+        'additional_data',
+        'entry_date',
+        'fuel_type',
+        'vehicle_type',
+        'gas_type',
+        'co2_emissions',
+        'ch4_emissions',
+        'n2o_emissions',
+        'emission_factor_id',
+        'gwp_version_used',
         'created_by',
         'updated_by'
     ];
 
     protected $casts = [
-        'field_value' => 'string'
+        'quantity' => 'decimal:4',
+        'calculated_co2e' => 'decimal:4',
+        'co2_emissions' => 'decimal:4',
+        'ch4_emissions' => 'decimal:4',
+        'n2o_emissions' => 'decimal:4',
+        'is_offset' => 'boolean',
+        'supporting_docs' => 'array',
+        'additional_data' => 'array',
+        'entry_date' => 'date',
     ];
 
     /**

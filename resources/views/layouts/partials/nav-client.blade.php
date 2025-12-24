@@ -172,13 +172,13 @@
              x-transition:leave-start="opacity-100 transform translate-y-0"
              x-transition:leave-end="opacity-0 transform -translate-y-1"
              class="ml-4 space-y-1">
-            <a href="#" class="nav-link text-sm py-2">
+            <a href="{{ route('quick-input.show', ['scope' => 2, 'slug' => 'electricity']) }}" class="nav-link text-sm py-2 {{ request()->routeIs('quick-input.show') && request()->route('slug') == 'electricity' ? 'active' : '' }}">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                 </svg>
                 Electricity
             </a>
-            <a href="#" class="nav-link text-sm py-2">
+            <a href="{{ route('quick-input.show', ['scope' => 2, 'slug' => 'heat-steam-cooling']) }}" class="nav-link text-sm py-2 {{ request()->routeIs('quick-input.show') && request()->route('slug') == 'heat-steam-cooling' ? 'active' : '' }}">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
                 </svg>
@@ -208,19 +208,19 @@
              x-transition:leave-start="opacity-100 transform translate-y-0"
              x-transition:leave-end="opacity-0 transform -translate-y-1"
              class="ml-4 space-y-1">
-            <a href="#" class="nav-link text-sm py-2">
+            <a href="{{ route('quick-input.show', ['scope' => 3, 'slug' => 'flights']) }}" class="nav-link text-sm py-2 {{ request()->routeIs('quick-input.show') && request()->route('slug') == 'flights' ? 'active' : '' }}">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                 </svg>
                 Flights
             </a>
-            <a href="#" class="nav-link text-sm py-2">
+            <a href="{{ route('quick-input.show', ['scope' => 3, 'slug' => 'public-transport']) }}" class="nav-link text-sm py-2 {{ request()->routeIs('quick-input.show') && request()->route('slug') == 'public-transport' ? 'active' : '' }}">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
                 </svg>
                 Public Transport
             </a>
-            <a href="#" class="nav-link text-sm py-2">
+            <a href="{{ route('quick-input.show', ['scope' => 3, 'slug' => 'home-workers']) }}" class="nav-link text-sm py-2 {{ request()->routeIs('quick-input.show') && request()->route('slug') == 'home-workers' ? 'active' : '' }}">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                 </svg>
