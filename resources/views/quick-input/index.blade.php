@@ -6,27 +6,9 @@
 @section('content')
 <div class="max-w-7xl mx-auto">
     <!-- Header -->
-    <div class="mb-6 flex justify-between items-center">
-        <div>
-            <h1 class="text-3xl font-bold text-gray-900">Quick Input Entries</h1>
-            <p class="mt-2 text-gray-600">View and manage your emission data entries.</p>
-        </div>
-        <div class="flex space-x-3">
-            <a href="{{ route('quick-input.export', request()->all()) }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 export-button">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-                Export CSV
-            </a>
-            @php
-                $firstSource = $sources->first();
-            @endphp
-            @if($firstSource)
-                <a href="{{ route('quick-input.show', ['scope' => str_replace('Scope ', '', $firstSource->scope), 'slug' => $firstSource->quick_input_slug]) }}" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">
-                    + Add Entry
-                </a>
-            @endif
-        </div>
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">Input data</h1>
+        <p class="mt-2 text-gray-600">View and manage your emission data entries.</p>
     </div>
 
     @if(session('success'))
@@ -51,6 +33,39 @@
         </div>
     @endif
 
+    <!-- Input Forms - Horizontal Cards -->
+    <div class="mb-8">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Input Forms</h2>
+        <div class="flex flex-wrap gap-4 overflow-x-auto pb-4">
+            @foreach($sources as $source)
+                @php
+                    $scopeNumber = str_replace('Scope ', '', $source->scope);
+                    $entryCount = $source->entry_count ?? 0;
+                    $expectedCount = $source->expected_count ?? 1;
+                @endphp
+                <a href="{{ route('quick-input.show', ['scope' => $scopeNumber, 'slug' => $source->quick_input_slug]) }}" 
+                   class="flex-shrink-0 bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow min-w-[180px]">
+                    <div class="flex flex-col items-center text-center">
+                        <!-- Icon -->
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
+                            @if($source->quick_input_icon)
+                                <i class="{{ $source->quick_input_icon }} text-green-600 text-2xl"></i>
+                            @else
+                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            @endif
+                        </div>
+                        <!-- Name -->
+                        <h3 class="font-semibold text-gray-900 mb-1">{{ $source->name }}</h3>
+                        <!-- Entry Count -->
+                        <p class="text-sm text-gray-500">({{ $entryCount }} of {{ $expectedCount }} entries)</p>
+                    </div>
+                </a>
+            @endforeach
+        </div>
+    </div>
+
     <!-- Summary Cards -->
     @if(isset($summary))
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -73,40 +88,51 @@
     </div>
     @endif
 
-    <!-- Filters -->
+    <!-- Filters and Export -->
     <div class="bg-white rounded-lg shadow mb-6 p-4">
-        <form method="GET" action="{{ route('quick-input.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-                <label for="scope" class="block text-sm font-medium text-gray-700 mb-1">Scope</label>
-                <select name="scope" id="scope" class="w-full rounded-md border-gray-300 shadow-sm">
-                    <option value="">All Scopes</option>
-                    <option value="Scope 1" {{ request('scope') == 'Scope 1' ? 'selected' : '' }}>Scope 1</option>
-                    <option value="Scope 2" {{ request('scope') == 'Scope 2' ? 'selected' : '' }}>Scope 2</option>
-                    <option value="Scope 3" {{ request('scope') == 'Scope 3' ? 'selected' : '' }}>Scope 3</option>
-                </select>
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <form method="GET" action="{{ route('quick-input.index') }}" id="filter-form" class="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
+                <div>
+                    <label for="scope" class="block text-sm font-medium text-gray-700 mb-1">Scope</label>
+                    <select name="scope" id="scope" class="w-full rounded-md border-gray-300 shadow-sm">
+                        <option value="">All Scopes</option>
+                        <option value="Scope 1" {{ request('scope') == 'Scope 1' ? 'selected' : '' }}>Scope 1</option>
+                        <option value="Scope 2" {{ request('scope') == 'Scope 2' ? 'selected' : '' }}>Scope 2</option>
+                        <option value="Scope 3" {{ request('scope') == 'Scope 3' ? 'selected' : '' }}>Scope 3</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="location_id" class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                    <select name="location_id" id="location_id" class="w-full rounded-md border-gray-300 shadow-sm">
+                        <option value="">All Locations</option>
+                        @foreach($locations as $location)
+                            <option value="{{ $location->id }}" {{ request('location_id') == $location->id ? 'selected' : '' }}>{{ $location->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label for="fiscal_year" class="block text-sm font-medium text-gray-700 mb-1">Year</label>
+                    <select name="fiscal_year" id="fiscal_year" class="w-full rounded-md border-gray-300 shadow-sm">
+                        <option value="">All Years</option>
+                        @for($year = date('Y'); $year >= 2000; $year--)
+                            <option value="{{ $year }}" {{ request('fiscal_year') == $year ? 'selected' : '' }}>{{ $year }}</option>
+                        @endfor
+                    </select>
+                </div>
+                <div class="flex items-end md:hidden">
+                    <button type="submit" class="w-full bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">Filter</button>
+                </div>
+            </form>
+            <div class="hidden md:flex items-end">
+                <button type="submit" form="filter-form" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 mr-2">Filter</button>
+                <a href="{{ route('quick-input.export', request()->all()) }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Export CSV
+                </a>
             </div>
-            <div>
-                <label for="location_id" class="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                <select name="location_id" id="location_id" class="w-full rounded-md border-gray-300 shadow-sm">
-                    <option value="">All Locations</option>
-                    @foreach($locations as $location)
-                        <option value="{{ $location->id }}" {{ request('location_id') == $location->id ? 'selected' : '' }}>{{ $location->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <label for="fiscal_year" class="block text-sm font-medium text-gray-700 mb-1">Year</label>
-                <select name="fiscal_year" id="fiscal_year" class="w-full rounded-md border-gray-300 shadow-sm">
-                    <option value="">All Years</option>
-                    @for($year = date('Y'); $year >= 2000; $year--)
-                        <option value="{{ $year }}" {{ request('fiscal_year') == $year ? 'selected' : '' }}>{{ $year }}</option>
-                    @endfor
-                </select>
-            </div>
-            <div class="flex items-end">
-                <button type="submit" class="w-full bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">Filter</button>
-            </div>
-        </form>
+        </div>
     </div>
 
     <!-- Entries Table -->

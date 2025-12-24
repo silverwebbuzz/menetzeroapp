@@ -84,11 +84,45 @@ class QuickInputController extends Controller
             ->orderBy('name')
             ->get();
         
-        // Get emission sources for filter dropdown
+        // Get emission sources with entry counts
         $sources = EmissionSourceMaster::where('is_quick_input', true)
             ->orderBy('scope')
             ->orderBy('quick_input_order')
-            ->get();
+            ->get()
+            ->map(function($source) use ($company, $request) {
+                // Count entries for this source
+                $entryCountQuery = MeasurementData::where('emission_source_id', $source->id)
+                    ->whereHas('measurement', function($q) use ($company) {
+                        $q->whereHas('location', function($locQuery) use ($company) {
+                            $locQuery->where('company_id', $company->id);
+                        });
+                    });
+                
+                // Apply same filters as main query
+                if ($request->filled('scope')) {
+                    $entryCountQuery->where('scope', $request->scope);
+                }
+                if ($request->filled('location_id')) {
+                    $entryCountQuery->whereHas('measurement', function($q) use ($request) {
+                        $q->where('location_id', $request->location_id);
+                    });
+                }
+                if ($request->filled('fiscal_year')) {
+                    $entryCountQuery->whereHas('measurement', function($q) use ($request) {
+                        $q->where('fiscal_year', $request->fiscal_year);
+                    });
+                }
+                
+                $entryCount = $entryCountQuery->count();
+                
+                // Get expected entry count (could be from a config or default to 1)
+                $expectedCount = 1; // Default, can be customized per source if needed
+                
+                $source->entry_count = $entryCount;
+                $source->expected_count = $expectedCount;
+                
+                return $source;
+            });
         
         // Calculate summary statistics
         $summary = $this->measurementService->calculateSummary($company->id, $request->all());
