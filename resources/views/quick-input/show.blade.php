@@ -32,34 +32,30 @@
         </div>
     @endif
 
-    <!-- Year and Location Selection Form - Horizontal Layout -->
+    <!-- Year and Location Selection Form - Single Line -->
     <form method="GET" action="{{ route('quick-input.show', ['scope' => $scope, 'slug' => $slug]) }}" class="bg-white rounded-lg shadow p-4 mb-6">
-        <div class="space-y-3">
-            <div class="flex items-center gap-4">
-                <label for="fiscal_year" class="text-sm font-medium text-gray-700 w-32">Year *</label>
-                <select name="fiscal_year" id="fiscal_year" required
-                        class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                    <option value="">Select Year</option>
-                    @if(isset($yearsWithMeasurements) && count($yearsWithMeasurements) > 0)
-                        @foreach($yearsWithMeasurements as $year)
-                            <option value="{{ $year }}" {{ ($selectedFiscalYear ?? request('fiscal_year')) == $year ? 'selected' : '' }}>{{ $year }}</option>
-                        @endforeach
-                    @endif
-                </select>
-            </div>
-            <div class="flex items-center gap-4">
-                <label for="location_id" class="text-sm font-medium text-gray-700 w-32">Location *</label>
-                <select name="location_id" id="location_id" required
-                        class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                    <option value="">Select Location</option>
-                    @foreach($locations as $location)
-                        <option value="{{ $location->id }}" {{ ($selectedLocationId ?? request('location_id')) == $location->id ? 'selected' : '' }}>{{ $location->name }}</option>
+        <div class="flex items-center gap-4">
+            <label for="fiscal_year" class="text-sm font-medium text-gray-700">Year *</label>
+            <select name="fiscal_year" id="fiscal_year" required
+                    class="w-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                <option value="">Select</option>
+                @if(isset($yearsWithMeasurements) && count($yearsWithMeasurements) > 0)
+                    @foreach($yearsWithMeasurements as $year)
+                        <option value="{{ $year }}" {{ ($selectedFiscalYear ?? request('fiscal_year')) == $year ? 'selected' : '' }}>{{ $year }}</option>
                     @endforeach
-                </select>
-                <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 whitespace-nowrap">
-                    Select
-                </button>
-            </div>
+                @endif
+            </select>
+            <label for="location_id" class="text-sm font-medium text-gray-700 ml-4">Location *</label>
+            <select name="location_id" id="location_id" required
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                <option value="">Select Location</option>
+                @foreach($locations as $location)
+                    <option value="{{ $location->id }}" {{ ($selectedLocationId ?? request('location_id')) == $location->id ? 'selected' : '' }}>{{ $location->name }}</option>
+                @endforeach
+            </select>
+            <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 whitespace-nowrap">
+                Select
+            </button>
         </div>
     </form>
 
