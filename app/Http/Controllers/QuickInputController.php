@@ -565,14 +565,35 @@ class QuickInputController extends Controller
         
         $emissionSource = $entry->emissionSource;
         
+        // Check if form uses 'amount' or 'quantity'
+        $formFields = EmissionSourceFormField::where('emission_source_id', $emissionSource->id)->get();
+        $hasAmountField = $formFields->contains(function($field) {
+            return $field->field_name === 'amount';
+        });
+        $hasUnitOfMeasure = $formFields->contains(function($field) {
+            return $field->field_name === 'unit_of_measure';
+        });
+        
         // Validate
-        $request->validate([
+        $validationRules = [
             'location_id' => 'required|exists:locations,id',
             'fiscal_year' => 'required|integer|min:2000|max:2100',
-            'quantity' => 'required|numeric|min:0',
-            'unit' => 'required|string',
             'entry_date' => 'required|date',
-        ]);
+        ];
+        
+        if ($hasAmountField) {
+            $validationRules['amount'] = 'required|numeric|min:0';
+            if ($hasUnitOfMeasure) {
+                $validationRules['unit_of_measure'] = 'required|string';
+            } else {
+                $validationRules['unit'] = 'required|string';
+            }
+        } else {
+            $validationRules['quantity'] = 'required|numeric|min:0';
+            $validationRules['unit'] = 'required|string';
+        }
+        
+        $request->validate($validationRules);
         
         // Verify location belongs to company
         $location = Location::where('id', $request->location_id)
@@ -597,18 +618,26 @@ class QuickInputController extends Controller
                 return back()->withErrors(['quantity' => 'No suitable emission factor found for the selected criteria.'])->withInput();
             }
             
+            // Get quantity and unit from request (handle both 'amount' and 'quantity' fields)
+            $quantity = $request->input('amount') ?? $request->input('quantity');
+            $unit = $request->input('unit_of_measure') ?? $request->input('unit');
+            
             // Calculate CO2e
             $calculation = $this->calculationService->calculateCO2e(
-                $request->quantity,
+                $quantity,
                 $emissionFactor,
-                $request->unit
+                $unit
             );
             
             // Prepare additional data
             $additionalData = [];
             $formFields = $this->formBuilder->buildForm($emissionSource->id);
             foreach ($formFields as $field) {
-                if ($request->has($field->field_name)) {
+                // Skip main fields that are stored directly
+                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments'])) {
+                    continue;
+                }
+                if ($request->has($field->field_name) && $request->input($field->field_name) !== null && $request->input($field->field_name) !== '') {
                     $additionalData[$field->field_name] = $request->input($field->field_name);
                 }
             }
@@ -618,9 +647,9 @@ class QuickInputController extends Controller
             $updateData = [
                 'measurement_id' => $measurement->id,
                 'field_name' => $entry->field_name ?? 'quick_input', // Preserve existing or set default
-                'field_value' => (string) $request->quantity, // Update field_value with new quantity
-                'quantity' => $request->quantity,
-                'unit' => $request->unit,
+                'field_value' => (string) $quantity, // Update field_value with new quantity
+                'quantity' => $quantity,
+                'unit' => $unit,
                 'calculated_co2e' => $calculation['co2e'] ?? $calculation['total_co2e'] ?? 0,
                 'co2_emissions' => isset($calculation['co2']) && is_numeric($calculation['co2']) ? $calculation['co2'] : null,
                 'ch4_emissions' => isset($calculation['ch4']) && is_numeric($calculation['ch4']) ? $calculation['ch4'] : null,

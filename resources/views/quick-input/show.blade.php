@@ -159,7 +159,7 @@
                 <!-- Fallback Quantity Input -->
                 <div>
                     <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">Quantity *</label>
-                    <input type="number" name="quantity" id="quantity" step="0.0001" value="{{ old('quantity') }}" min="0" required
+                    <input type="number" name="quantity" id="quantity" step="0.0001" value="{{ old('quantity', $editEntry->quantity ?? '') }}" min="0" required
                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
                            placeholder="Enter quantity">
                     @error('quantity')
@@ -359,14 +359,19 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div class="flex items-center justify-end space-x-2">
                                         @php
-                                            $entryScopeNumber = str_replace('Scope ', '', $entry->scope);
-                                            $entrySlug = $entry->emissionSource->quick_input_slug ?? '';
+                                            $entryScopeNumber = $entry->scope ? str_replace('Scope ', '', $entry->scope) : null;
+                                            $entrySlug = $entry->emissionSource->quick_input_slug ?? null;
+                                            $isCurrentlyEditing = $editEntry && $editEntry->id == $entry->id;
                                         @endphp
-                                        <a href="{{ route('quick-input.show', ['scope' => $entryScopeNumber, 'slug' => $entrySlug, 'edit' => $entry->id, 'location_id' => $entry->measurement->location_id, 'fiscal_year' => $entry->measurement->fiscal_year]) }}" class="text-indigo-600 hover:text-indigo-900" title="Edit">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                            </svg>
-                                        </a>
+                                        @if(!$isCurrentlyEditing && $entrySlug && $entryScopeNumber)
+                                            <a href="{{ route('quick-input.show', ['scope' => $entryScopeNumber, 'slug' => $entrySlug, 'edit' => $entry->id, 'location_id' => $entry->measurement->location_id, 'fiscal_year' => $entry->measurement->fiscal_year]) }}" class="text-indigo-600 hover:text-indigo-900" title="Edit">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                </svg>
+                                            </a>
+                                        @elseif($isCurrentlyEditing)
+                                            <span class="text-purple-600 font-medium text-xs" title="Currently editing">Editing...</span>
+                                        @endif
                                         <form action="{{ route('quick-input.destroy', $entry->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this entry?');">
                                             @csrf
                                             @method('DELETE')
