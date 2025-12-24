@@ -181,19 +181,33 @@ class QuickInputController extends Controller
         // Get available units from emission factors
         $availableUnits = $this->calculationService->getAvailableUnits($emissionSource->id);
         
+        // Get years from measurements table for this company
+        $yearsWithMeasurements = Measurement::whereHas('location', function($q) use ($company) {
+                $q->where('company_id', $company->id);
+            })
+            ->select('fiscal_year')
+            ->distinct()
+            ->orderBy('fiscal_year', 'desc')
+            ->pluck('fiscal_year')
+            ->toArray();
+        
         // Get selected location and year from request or session
         $selectedLocationId = $request->input('location_id', session('quick_input.location_id'));
-        $selectedFiscalYear = $request->input('fiscal_year', session('quick_input.fiscal_year', Carbon::now()->year));
+        $selectedFiscalYear = $request->input('fiscal_year', session('quick_input.fiscal_year'));
         
         $measurement = null;
         $existingEntries = collect();
         
         if ($selectedLocationId && $selectedFiscalYear) {
             $measurement = $this->measurementService->getOrCreateMeasurement($selectedLocationId, $selectedFiscalYear);
+            // Load location relationship
+            $measurement->load('location');
+            
             session(['quick_input.location_id' => $selectedLocationId, 'quick_input.fiscal_year' => $selectedFiscalYear]);
             
-            // Get existing entries for this emission source
-            $existingEntries = MeasurementData::where('measurement_id', $measurement->id)
+            // Get existing entries for this emission source and measurement
+            $existingEntries = MeasurementData::with(['emissionSource', 'measurement.location'])
+                ->where('measurement_id', $measurement->id)
                 ->where('emission_source_id', $emissionSource->id)
                 ->orderBy('entry_date', 'desc')
                 ->orderBy('created_at', 'desc')
@@ -211,7 +225,8 @@ class QuickInputController extends Controller
             'selectedLocationId',
             'selectedFiscalYear',
             'measurement',
-            'existingEntries'
+            'existingEntries',
+            'yearsWithMeasurements'
         ));
     }
     

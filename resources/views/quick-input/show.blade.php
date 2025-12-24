@@ -35,9 +35,11 @@
                 <select name="fiscal_year" id="fiscal_year" required
                         class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
                     <option value="">Select Year</option>
-                    @for($year = date('Y'); $year >= 2000; $year--)
-                        <option value="{{ $year }}" {{ ($selectedFiscalYear ?? request('fiscal_year')) == $year ? 'selected' : '' }}>{{ $year }}</option>
-                    @endfor
+                    @if(isset($yearsWithMeasurements) && count($yearsWithMeasurements) > 0)
+                        @foreach($yearsWithMeasurements as $year)
+                            <option value="{{ $year }}" {{ ($selectedFiscalYear ?? request('fiscal_year')) == $year ? 'selected' : '' }}>{{ $year }}</option>
+                        @endforeach
+                    @endif
                 </select>
             </div>
             <div>
