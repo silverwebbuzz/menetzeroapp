@@ -19,6 +19,7 @@ class MeasurementData extends Model
         'calculated_co2e',
         'scope',
         'calculation_method',
+        'supplier_emission_factor',
         'supporting_docs',
         'is_offset',
         'notes',

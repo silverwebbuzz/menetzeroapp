@@ -390,6 +390,8 @@ class QuickInputController extends Controller
                 'entry_date' => $request->entry_date,
                 'emission_factor_id' => $emissionFactor->id,
                 'gwp_version_used' => $emissionFactor->gwp_version ?? 'AR6',
+                'calculation_method' => $emissionFactor->calculation_method ?? null, // Save calculation method from emission factor
+                'supplier_emission_factor' => $request->input('supplier_emission_factor') ? (float) $request->input('supplier_emission_factor') : null, // Save supplier factor if provided
                 'additional_data' => !empty($additionalData) ? $additionalData : null,
                 'notes' => $notes,
                 'created_by' => $user->id,
@@ -657,6 +659,8 @@ class QuickInputController extends Controller
                 'entry_date' => $request->entry_date,
                 'emission_factor_id' => $emissionFactor->id,
                 'gwp_version_used' => $emissionFactor->gwp_version ?? 'AR6',
+                'calculation_method' => $emissionFactor->calculation_method ?? null, // Save calculation method from emission factor
+                'supplier_emission_factor' => $request->input('supplier_emission_factor') ? (float) $request->input('supplier_emission_factor') : null, // Save supplier factor if provided
                 'additional_data' => !empty($additionalData) ? $additionalData : null,
                 'notes' => $request->input('comments') ?? $request->input('notes') ?? null,
                 'updated_by' => $user->id,
