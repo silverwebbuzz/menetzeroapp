@@ -353,9 +353,13 @@ class QuickInputController extends Controller
             }
             
             // Create measurement_data record
+            // Note: field_name and field_value are required by the database schema for backward compatibility
+            // For Quick Input entries, we use 'quick_input' as field_name
             $measurementData = MeasurementData::create([
                 'measurement_id' => $measurement->id,
                 'emission_source_id' => $emissionSource->id,
+                'field_name' => 'quick_input', // Required field for backward compatibility
+                'field_value' => (string) $quantity, // Store quantity as field_value for backward compatibility
                 'quantity' => $quantity,
                 'unit' => $unit,
                 'calculated_co2e' => $co2e,
@@ -606,20 +610,26 @@ class QuickInputController extends Controller
             }
             
             // Update entry
-            $entry->update([
+            // Ensure field_name and field_value are set (required for backward compatibility)
+            $updateData = [
                 'measurement_id' => $measurement->id,
+                'field_name' => $entry->field_name ?? 'quick_input', // Preserve existing or set default
+                'field_value' => (string) $request->quantity, // Update field_value with new quantity
                 'quantity' => $request->quantity,
                 'unit' => $request->unit,
-                'calculated_co2e' => $calculation['co2e'],
-                'co2_emissions' => $calculation['co2'] ?? null,
-                'ch4_emissions' => $calculation['ch4'] ?? null,
-                'n2o_emissions' => $calculation['n2o'] ?? null,
+                'calculated_co2e' => $calculation['co2e'] ?? $calculation['total_co2e'] ?? 0,
+                'co2_emissions' => isset($calculation['co2']) && is_numeric($calculation['co2']) ? $calculation['co2'] : null,
+                'ch4_emissions' => isset($calculation['ch4']) && is_numeric($calculation['ch4']) ? $calculation['ch4'] : null,
+                'n2o_emissions' => isset($calculation['n2o']) && is_numeric($calculation['n2o']) ? $calculation['n2o'] : null,
                 'entry_date' => $request->entry_date,
                 'emission_factor_id' => $emissionFactor->id,
                 'gwp_version_used' => $emissionFactor->gwp_version ?? 'AR6',
-                'additional_data' => !empty($additionalData) ? json_encode($additionalData) : null,
-                'notes' => $request->notes ?? null,
-            ]);
+                'additional_data' => !empty($additionalData) ? $additionalData : null,
+                'notes' => $request->input('comments') ?? $request->input('notes') ?? null,
+                'updated_by' => $user->id,
+            ];
+            
+            $entry->update($updateData);
             
             // Update measurement totals (both old and new measurements)
             $this->measurementService->updateMeasurementTotals($entry->measurement_id);

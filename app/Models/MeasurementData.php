@@ -12,6 +12,8 @@ class MeasurementData extends Model
     protected $fillable = [
         'measurement_id',
         'emission_source_id',
+        'field_name',
+        'field_value',
         'quantity',
         'unit',
         'calculated_co2e',
