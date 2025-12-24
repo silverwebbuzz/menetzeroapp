@@ -11,7 +11,12 @@
 <div class="max-w-4xl mx-auto">
     <!-- Header -->
     <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-900">{{ $userFriendlyName ?? $emissionSource->name }}</h1>
+        <h1 class="text-3xl font-bold text-gray-900">
+            @if($editEntry)
+                <span class="text-purple-600">Edit:</span> 
+            @endif
+            {{ $userFriendlyName ?? $emissionSource->name }}
+        </h1>
         @if($emissionSource->instructions)
             <p class="mt-2 text-gray-600">{{ $emissionSource->instructions }}</p>
         @endif
@@ -61,14 +66,21 @@
     </form>
 
     @if($selectedLocationId && $selectedFiscalYear && $measurement)
-    <!-- Entry Form -->
-    <form method="POST" action="{{ route('quick-input.store', ['scope' => $scope, 'slug' => $slug]) }}" 
+    <!-- Entry Form (Handles both Add and Edit) -->
+    <form method="POST" 
+          action="{{ $editEntry ? route('quick-input.update', $editEntry->id) : route('quick-input.store', ['scope' => $scope, 'slug' => $slug]) }}" 
           class="bg-white rounded-lg shadow p-6 mb-6"
           data-source-id="{{ $emissionSource->id }}">
         @csrf
+        @if($editEntry)
+            @method('PUT')
+        @endif
         <input type="hidden" name="emission_source_id" value="{{ $emissionSource->id }}">
         <input type="hidden" name="location_id" value="{{ $selectedLocationId }}">
         <input type="hidden" name="fiscal_year" value="{{ $selectedFiscalYear }}">
+        @if($editEntry)
+            <input type="hidden" name="edit_entry_id" value="{{ $editEntry->id }}">
+        @endif
 
         <!-- Main Input Fields -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -91,9 +103,9 @@
                             @if(is_array($options))
                                 @foreach($options as $option)
                                     @if(is_array($option))
-                                        <option value="{{ $option['value'] ?? $option }}" {{ old('unit_of_measure') == ($option['value'] ?? $option) ? 'selected' : '' }}>{{ $option['label'] ?? $option['value'] ?? $option }}</option>
+                                        <option value="{{ $option['value'] ?? $option }}" {{ old('unit_of_measure', $editEntry->unit ?? '') == ($option['value'] ?? $option) ? 'selected' : '' }}>{{ $option['label'] ?? $option['value'] ?? $option }}</option>
                                     @else
-                                        <option value="{{ $option }}" {{ old('unit_of_measure') == $option ? 'selected' : '' }}>{{ $option }}</option>
+                                        <option value="{{ $option }}" {{ old('unit_of_measure', $editEntry->unit ?? '') == $option ? 'selected' : '' }}>{{ $option }}</option>
                                     @endif
                                 @endforeach
                             @endif
@@ -112,10 +124,10 @@
                         <option value="">Select Unit</option>
                         @if(!empty($availableUnits))
                             @foreach($availableUnits as $unit)
-                                <option value="{{ $unit }}" {{ old('unit', $emissionSource->default_unit) == $unit ? 'selected' : '' }}>{{ $unit }}</option>
+                                <option value="{{ $unit }}" {{ old('unit', $editEntry->unit ?? $emissionSource->default_unit) == $unit ? 'selected' : '' }}>{{ $unit }}</option>
                             @endforeach
                         @else
-                            <option value="{{ $emissionSource->default_unit ?? 'unit' }}" selected>{{ $emissionSource->default_unit ?? 'unit' }}</option>
+                            <option value="{{ $emissionSource->default_unit ?? 'unit' }}" {{ old('unit', $editEntry->unit ?? '') == ($emissionSource->default_unit ?? 'unit') ? 'selected' : '' }}>{{ $emissionSource->default_unit ?? 'unit' }}</option>
                         @endif
                     </select>
                     @error('unit')
@@ -133,7 +145,7 @@
                     <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">
                         {{ $amountField->field_label ?? 'Amount' }} *
                     </label>
-                    <input type="number" name="amount" id="amount" step="0.01" value="{{ old('amount') }}" min="0" required
+                    <input type="number" name="amount" id="amount" step="0.01" value="{{ old('amount', $editEntry->quantity ?? '') }}" min="0" required
                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
                            placeholder="Enter amount">
                     @error('amount')
@@ -161,7 +173,7 @@
         <!-- Entry Date -->
         <div class="mb-6">
             <label for="entry_date" class="block text-sm font-medium text-gray-700 mb-1">Entry Date *</label>
-            <input type="date" name="entry_date" id="entry_date" value="{{ old('entry_date', date('Y-m-d')) }}" required
+            <input type="date" name="entry_date" id="entry_date" value="{{ old('entry_date', $editEntry && $editEntry->entry_date ? $editEntry->entry_date->format('Y-m-d') : date('Y-m-d')) }}" required
                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
             @error('entry_date')
                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -170,6 +182,12 @@
 
         <!-- Dynamic Form Fields (Optional Additional Information) -->
         @php
+            // Get additional data from edit entry if available
+            $editAdditionalData = [];
+            if ($editEntry && $editEntry->additional_data) {
+                $editAdditionalData = is_string($editEntry->additional_data) ? json_decode($editEntry->additional_data, true) : ($editEntry->additional_data ?? []);
+            }
+            
             // Filter and deduplicate fields - only show unique field names
             $seenFieldNames = [];
             $additionalFields = $formFields->filter(function($field) use (&$seenFieldNames) {
@@ -206,9 +224,9 @@
                                         @if(is_array($options))
                                             @foreach($options as $option)
                                                 @if(is_array($option))
-                                                    <option value="{{ $option['value'] ?? $option }}" {{ old($field->field_name) == ($option['value'] ?? $option) ? 'selected' : '' }}>{{ $option['label'] ?? $option['value'] ?? $option }}</option>
+                                                    <option value="{{ $option['value'] ?? $option }}" {{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') == ($option['value'] ?? $option) ? 'selected' : '' }}>{{ $option['label'] ?? $option['value'] ?? $option }}</option>
                                                 @else
-                                                    <option value="{{ $option }}" {{ old($field->field_name) == $option ? 'selected' : '' }}>{{ $option }}</option>
+                                                    <option value="{{ $option }}" {{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') == $option ? 'selected' : '' }}>{{ $option }}</option>
                                                 @endif
                                             @endforeach
                                         @endif
@@ -216,10 +234,10 @@
                                 </select>
                             @elseif($field->field_type === 'textarea')
                                 <textarea name="{{ $field->field_name }}" id="{{ $field->field_name }}" rows="3"
-                                          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">{{ old($field->field_name) }}</textarea>
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}</textarea>
                             @else
                                 <input type="{{ $field->field_type }}" name="{{ $field->field_name }}" id="{{ $field->field_name }}"
-                                       value="{{ old($field->field_name) }}"
+                                       value="{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}"
                                        placeholder="{{ $field->field_placeholder ?? '' }}"
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
                             @endif
@@ -240,7 +258,7 @@
                             </label>
                             <textarea name="comments" id="comments" rows="3"
                                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
-                                      placeholder="{{ $commentsField->field_placeholder ?? 'Add any additional notes...' }}">{{ old('comments') }}</textarea>
+                                      placeholder="{{ $commentsField->field_placeholder ?? 'Add any additional notes...' }}">{{ old('comments', $editEntry->notes ?? '') }}</textarea>
                             @if($commentsField->help_text)
                                 <p class="mt-1 text-xs text-gray-500">{{ $commentsField->help_text }}</p>
                             @endif
@@ -258,7 +276,7 @@
             <div class="mb-6">
                 <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Comments</label>
                 <textarea name="notes" id="notes" rows="3"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">{{ old('notes') }}</textarea>
+                          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">{{ old('notes', $editEntry->notes ?? '') }}</textarea>
             </div>
         @endif
 
@@ -274,11 +292,16 @@
 
         <!-- Submit Buttons -->
         <div class="flex items-center justify-end space-x-4">
+            @if($editEntry)
+                <a href="{{ route('quick-input.show', ['scope' => $scope, 'slug' => $slug, 'location_id' => $selectedLocationId, 'fiscal_year' => $selectedFiscalYear]) }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                    Cancel
+                </a>
+            @endif
             <button type="button" id="calculate-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                 Calculate
             </button>
             <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
-                Calculate & Add to Footprint
+                {{ $editEntry ? 'Update Entry' : 'Calculate & Add to Footprint' }}
             </button>
         </div>
     </form>
@@ -335,7 +358,11 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div class="flex items-center justify-end space-x-2">
-                                        <a href="{{ route('quick-input.edit', $entry->id) }}" class="text-indigo-600 hover:text-indigo-900" title="Edit">
+                                        @php
+                                            $entryScopeNumber = str_replace('Scope ', '', $entry->scope);
+                                            $entrySlug = $entry->emissionSource->quick_input_slug ?? '';
+                                        @endphp
+                                        <a href="{{ route('quick-input.show', ['scope' => $entryScopeNumber, 'slug' => $entrySlug, 'edit' => $entry->id, 'location_id' => $entry->measurement->location_id, 'fiscal_year' => $entry->measurement->fiscal_year]) }}" class="text-indigo-600 hover:text-indigo-900" title="Edit">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                             </svg>

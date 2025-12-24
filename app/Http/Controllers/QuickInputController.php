@@ -191,9 +191,28 @@ class QuickInputController extends Controller
             ->pluck('fiscal_year')
             ->toArray();
         
-        // Get selected location and year from request or session
-        $selectedLocationId = $request->input('location_id', session('quick_input.location_id'));
-        $selectedFiscalYear = $request->input('fiscal_year', session('quick_input.fiscal_year'));
+        // Check if we're editing an existing entry
+        $editEntry = null;
+        $editEntryId = $request->input('edit');
+        if ($editEntryId) {
+            $editEntry = MeasurementData::with(['measurement.location', 'emissionSource'])
+                ->whereHas('measurement.location', function($q) use ($company) {
+                    $q->where('company_id', $company->id);
+                })
+                ->where('id', $editEntryId)
+                ->where('emission_source_id', $emissionSource->id)
+                ->first();
+            
+            if ($editEntry) {
+                // Pre-select location and year from the entry being edited
+                $selectedLocationId = $editEntry->measurement->location_id;
+                $selectedFiscalYear = $editEntry->measurement->fiscal_year;
+            }
+        }
+        
+        // Get selected location and year from request, edit entry, or session
+        $selectedLocationId = $request->input('location_id', $editEntry ? $editEntry->measurement->location_id : session('quick_input.location_id'));
+        $selectedFiscalYear = $request->input('fiscal_year', $editEntry ? $editEntry->measurement->fiscal_year : session('quick_input.fiscal_year'));
         
         $measurement = null;
         $existingEntries = collect();
@@ -232,7 +251,8 @@ class QuickInputController extends Controller
             'selectedFiscalYear',
             'measurement',
             'existingEntries',
-            'yearsWithMeasurements'
+            'yearsWithMeasurements',
+            'editEntry'
         ));
     }
     
@@ -490,7 +510,7 @@ class QuickInputController extends Controller
     }
 
     /**
-     * Show edit form for an entry
+     * Show edit form for an entry (redirects to show page with edit parameter)
      */
     public function edit($id)
     {
@@ -510,33 +530,17 @@ class QuickInputController extends Controller
             ->findOrFail($id);
         
         $emissionSource = $entry->emissionSource;
-        $formFields = $this->formBuilder->buildForm($emissionSource->id);
-        $userFriendlyName = $this->calculationService->getUserFriendlyName(
-            $emissionSource->id,
-            $company->industry_category_id ?? null
-        );
-        
-        $locations = Location::where('company_id', $company->id)
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get();
-        
-        $availableUnits = $this->calculationService->getAvailableUnits($emissionSource->id);
-        
-        // Parse scope to get number
         $scope = str_replace('Scope ', '', $entry->scope);
         $slug = $emissionSource->quick_input_slug;
         
-        return view('quick-input.edit', compact(
-            'entry',
-            'emissionSource',
-            'formFields',
-            'userFriendlyName',
-            'locations',
-            'availableUnits',
-            'scope',
-            'slug'
-        ));
+        // Redirect to show page with edit parameter
+        return redirect()->route('quick-input.show', [
+            'scope' => $scope,
+            'slug' => $slug,
+            'edit' => $id,
+            'location_id' => $entry->measurement->location_id,
+            'fiscal_year' => $entry->measurement->fiscal_year
+        ]);
     }
 
     /**

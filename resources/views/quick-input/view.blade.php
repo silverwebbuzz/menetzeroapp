@@ -12,7 +12,11 @@
             <p class="mt-2 text-gray-600">View detailed information about this emission entry.</p>
         </div>
         <div class="flex space-x-3">
-            <a href="{{ route('quick-input.edit', $entry->id) }}" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+            @php
+                $scopeNumber = str_replace('Scope ', '', $entry->scope);
+                $slug = $entry->emissionSource->quick_input_slug ?? '';
+            @endphp
+            <a href="{{ route('quick-input.show', ['scope' => $scopeNumber, 'slug' => $slug, 'edit' => $entry->id, 'location_id' => $entry->measurement->location_id, 'fiscal_year' => $entry->measurement->fiscal_year]) }}" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                 Edit
             </a>
             <form action="{{ route('quick-input.destroy', $entry->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this entry?');">
