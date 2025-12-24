@@ -102,10 +102,39 @@
                     <dt class="text-sm font-medium text-gray-500">GWP Version Used</dt>
                     <dd class="mt-1 text-sm text-gray-900">{{ $entry->gwp_version_used ?? 'AR6' }}</dd>
                 </div>
-                @if($entry->emission_factor_id)
+                @if($entry->emissionFactor)
                 <div>
-                    <dt class="text-sm font-medium text-gray-500">Emission Factor ID</dt>
-                    <dd class="mt-1 text-sm text-gray-900">#{{ $entry->emission_factor_id }}</dd>
+                    <dt class="text-sm font-medium text-gray-500">Calculation Method</dt>
+                    <dd class="mt-1 text-sm text-gray-900">
+                        {{ $entry->emissionFactor->calculation_method ?? $entry->calculation_method ?? 'N/A' }}
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Emission Factor</dt>
+                    <dd class="mt-1 text-sm text-gray-900">
+                        {{ number_format($entry->emissionFactor->factor_value ?? 0, 6) }} 
+                        {{ $entry->emissionFactor->unit ?? $entry->unit ?? '' }} 
+                        @if($entry->emissionFactor->source_reference)
+                            <span class="text-gray-500">({{ $entry->emissionFactor->source_reference }})</span>
+                        @endif
+                    </dd>
+                </div>
+                @if($entry->emissionFactor->source_standard)
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Source Standard</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $entry->emissionFactor->source_standard }}</dd>
+                </div>
+                @endif
+                @if($entry->emissionFactor->region)
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Region</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $entry->emissionFactor->region }}</dd>
+                </div>
+                @endif
+                @elseif($entry->emission_factor_id)
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Calculation Method</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $entry->calculation_method ?? 'N/A' }}</dd>
                 </div>
                 @endif
             </dl>

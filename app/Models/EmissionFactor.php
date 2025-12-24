@@ -21,6 +21,19 @@ class EmissionFactor extends Model
         'is_active',
         'description',
         'calculation_formula',
+        'source_standard',
+        'source_reference',
+        'gwp_version',
+        'fuel_type',
+        'fuel_category',
+        'vehicle_type',
+        'vehicle_size',
+        'co2_factor',
+        'ch4_factor',
+        'n2o_factor',
+        'total_co2e_factor',
+        'is_default',
+        'priority',
     ];
 
     protected $casts = [

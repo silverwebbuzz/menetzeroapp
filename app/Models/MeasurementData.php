@@ -64,6 +64,14 @@ class MeasurementData extends Model
     {
         return $this->belongsTo(EmissionSourceMaster::class, 'emission_source_id');
     }
+    
+    /**
+     * Get the emission factor used for this data
+     */
+    public function emissionFactor()
+    {
+        return $this->belongsTo(EmissionFactor::class, 'emission_factor_id');
+    }
 
     /**
      * Get all data for a specific measurement and emission source

@@ -509,7 +509,7 @@ class QuickInputController extends Controller
             abort(403, 'No active company found.');
         }
         
-        $entry = MeasurementData::with(['measurement.location', 'emissionSource'])
+        $entry = MeasurementData::with(['measurement.location', 'emissionSource', 'emissionFactor'])
             ->whereHas('measurement.location', function($q) use ($company) {
                 $q->where('company_id', $company->id);
             })
