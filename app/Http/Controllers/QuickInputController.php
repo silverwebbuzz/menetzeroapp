@@ -328,11 +328,11 @@ class QuickInputController extends Controller
             $quantity = $request->input('amount') ?? $request->input('quantity');
             $unit = $request->input('unit_of_measure') ?? $request->input('unit');
             
-            // Prepare conditions for factor selection (include fuel_category, fuel_type, etc.)
+            // Prepare conditions for factor selection (include fuel_category, fuel_type, energy_type, etc.)
             $conditions = [
                 'region' => $request->input('region', 'UAE'),
                 'fuel_category' => $request->input('fuel_category'),
-                'fuel_type' => $request->input('fuel_type'),
+                'fuel_type' => $request->input('fuel_type') ?: $request->input('energy_type'), // For Heat/Steam/Cooling, energy_type maps to fuel_type
                 'unit' => $unit,
             ];
             
@@ -375,7 +375,7 @@ class QuickInputController extends Controller
             $formFields = EmissionSourceFormField::where('emission_source_id', $emissionSource->id)->get();
             foreach ($formFields as $field) {
                 // Skip main fields that are stored directly or in dedicated columns
-                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments', 'fuel_category', 'fuel_type'])) {
+                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments', 'fuel_category', 'fuel_type', 'energy_type'])) {
                     continue;
                 }
                 if ($request->has($field->field_name) && $request->input($field->field_name) !== null && $request->input($field->field_name) !== '') {
@@ -418,11 +418,18 @@ class QuickInputController extends Controller
                 'created_by' => $user->id,
             ]);
             
-            // Store fuel_category in additional_data if provided (since there's no dedicated column)
+            // Store fuel_category and energy_type in additional_data if provided (since there's no dedicated column)
+            $additionalDataToUpdate = [];
             if ($request->input('fuel_category')) {
-                $additionalDataWithCategory = $measurementData->additional_data ?? [];
-                $additionalDataWithCategory['fuel_category'] = $request->input('fuel_category');
-                $measurementData->update(['additional_data' => $additionalDataWithCategory]);
+                $additionalDataToUpdate['fuel_category'] = $request->input('fuel_category');
+            }
+            if ($request->input('energy_type')) {
+                $additionalDataToUpdate['energy_type'] = $request->input('energy_type');
+            }
+            if (!empty($additionalDataToUpdate)) {
+                $existingAdditionalData = $measurementData->additional_data ?? [];
+                $mergedAdditionalData = array_merge($existingAdditionalData, $additionalDataToUpdate);
+                $measurementData->update(['additional_data' => $mergedAdditionalData]);
             }
             
             // Update measurement totals
@@ -473,11 +480,11 @@ class QuickInputController extends Controller
             
             $emissionSource = EmissionSourceMaster::findOrFail($request->emission_source_id);
             
-            // Prepare conditions for factor selection (include fuel_category, fuel_type, etc.)
+            // Prepare conditions for factor selection (include fuel_category, fuel_type, energy_type, etc.)
             $conditions = [
                 'region' => $request->input('region', 'UAE'),
                 'fuel_category' => $request->input('fuel_category'),
-                'fuel_type' => $request->input('fuel_type'),
+                'fuel_type' => $request->input('fuel_type') ?: $request->input('energy_type'), // For Heat/Steam/Cooling, energy_type maps to fuel_type
                 'unit' => $request->input('unit') ?? $request->input('unit_of_measure'),
             ];
             
@@ -653,11 +660,11 @@ class QuickInputController extends Controller
             $quantity = $request->input('amount') ?? $request->input('quantity');
             $unit = $request->input('unit_of_measure') ?? $request->input('unit');
             
-            // Prepare conditions for factor selection (include fuel_category, fuel_type, etc.)
+            // Prepare conditions for factor selection (include fuel_category, fuel_type, energy_type, etc.)
             $conditions = [
                 'region' => $request->input('region', 'UAE'),
                 'fuel_category' => $request->input('fuel_category'),
-                'fuel_type' => $request->input('fuel_type'),
+                'fuel_type' => $request->input('fuel_type') ?: $request->input('energy_type'), // For Heat/Steam/Cooling, energy_type maps to fuel_type
                 'unit' => $unit,
             ];
             

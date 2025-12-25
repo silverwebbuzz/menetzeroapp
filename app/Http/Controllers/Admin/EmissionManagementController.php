@@ -149,6 +149,8 @@ class EmissionManagementController extends Controller
             'n2o_factor' => 'nullable|numeric',
             'total_co2e_factor' => 'nullable|numeric',
             'gwp_version' => 'nullable|string',
+            'fuel_category' => 'nullable|string|max:100',
+            'fuel_type' => 'nullable|string|max:100',
         ]);
 
         EmissionFactor::create($request->all());
@@ -178,6 +180,8 @@ class EmissionManagementController extends Controller
             'n2o_factor' => 'nullable|numeric',
             'total_co2e_factor' => 'nullable|numeric',
             'gwp_version' => 'nullable|string',
+            'fuel_category' => 'nullable|string|max:100',
+            'fuel_type' => 'nullable|string|max:100',
         ]);
 
         $factor->update($request->all());

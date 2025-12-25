@@ -37,6 +37,8 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Source</th>
+                        <th class="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Fuel Category</th>
+                        <th class="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Fuel Type</th>
                         <th class="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Factor Value</th>
                         <th class="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Unit</th>
                         <th class="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Region</th>
@@ -48,6 +50,20 @@
                     @forelse ($factors as $factor)
                         <tr>
                             <td class="px-4 py-2 text-gray-900">{{ $factor->emissionSource->name ?? 'N/A' }}</td>
+                            <td class="px-4 py-2 text-gray-500">
+                                @if($factor->fuel_category)
+                                    <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">{{ $factor->fuel_category }}</span>
+                                @else
+                                    <span class="text-gray-400">—</span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-2 text-gray-500">
+                                @if($factor->fuel_type)
+                                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">{{ $factor->fuel_type }}</span>
+                                @else
+                                    <span class="text-gray-400">—</span>
+                                @endif
+                            </td>
                             <td class="px-4 py-2 text-gray-500">{{ number_format($factor->factor_value, 6) }}</td>
                             <td class="px-4 py-2 text-gray-500">{{ $factor->unit }}</td>
                             <td class="px-4 py-2 text-gray-500">{{ $factor->region ?? '—' }}</td>
@@ -65,7 +81,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 py-4 text-center text-gray-500">
+                            <td colspan="8" class="px-4 py-4 text-center text-gray-500">
                                 No emission factors found.
                             </td>
                         </tr>

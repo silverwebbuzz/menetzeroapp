@@ -80,6 +80,22 @@
                         <option value="AR4" {{ old('gwp_version') == 'AR4' ? 'selected' : '' }}>AR4</option>
                     </select>
                 </div>
+
+                <div>
+                    <label for="fuel_category" class="block text-sm font-medium text-gray-700 mb-1">Fuel Category</label>
+                    <input type="text" name="fuel_category" id="fuel_category" value="{{ old('fuel_category') }}"
+                           placeholder="e.g. Gaseous fuels, Liquid fuels, Solid fuels, Biofuel, Biomass, Biogas"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+                    <p class="mt-1 text-xs text-gray-500">Used for Fuel sources (Stationary Combustion)</p>
+                </div>
+
+                <div>
+                    <label for="fuel_type" class="block text-sm font-medium text-gray-700 mb-1">Fuel Type / Energy Type</label>
+                    <input type="text" name="fuel_type" id="fuel_type" value="{{ old('fuel_type') }}"
+                           placeholder="e.g. Natural gas, Diesel, Petrol, Heat, Steam, Cooling"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+                    <p class="mt-1 text-xs text-gray-500">Used for Fuel sources or Heat/Steam/Cooling to distinguish types</p>
+                </div>
             </div>
 
             <div class="mt-6 flex items-center justify-end space-x-4">

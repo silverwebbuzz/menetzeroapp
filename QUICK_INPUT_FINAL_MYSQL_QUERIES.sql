@@ -443,25 +443,85 @@ VALUES
 -- Natural Gas - tonnes
 (52, 2575.748063, 'tonnes', 'DEFRA 2024 Conversion Factors (Tier 1)', 'UAE', 2024, NULL, 1, 'CO2e emission factor for natural gas in tonnes. Multi-gas calculation using DEFRA 2024 factors.', NULL, 'Natural gas', 'Gaseous', 2570.420000, 3.852800, 1.191610, 2575.748063, 'DEFRA', 'DEFRA 2024 Conversion Factors', 'AR6', 0, 70);
 
--- 4.2 Insert Emission Factors for Electricity (emission_source_id 57)
+-- 4.2 Insert Emission Factors for Electricity
+-- Uses subquery to get emission_source_id dynamically
 INSERT INTO `emission_factors` 
 (`emission_source_id`, `factor_value`, `unit`, `calculation_method`, `region`, `valid_from`, `valid_to`, `is_active`, `description`, `calculation_formula`, `source_standard`, `source_reference`, `gwp_version`, `is_default`, `priority`) 
-VALUES
--- Electricity - UAE (DEWA) - Default
-(57, 0.404100, 'kWh', 'UAE Grid Emission Factor (Tier 2)', 'UAE', 2024, NULL, 1, 'CO2e emission factor for purchased electricity from UAE grid (DEWA).', NULL, 'UAE', 'UAE ele. (DEWA)', 'AR6', 1, 100),
+SELECT 
+  es.id,
+  ef_data.factor_value,
+  ef_data.unit,
+  ef_data.calculation_method,
+  ef_data.region,
+  ef_data.valid_from,
+  ef_data.valid_to,
+  ef_data.is_active,
+  ef_data.description,
+  ef_data.calculation_formula,
+  ef_data.source_standard,
+  ef_data.source_reference,
+  ef_data.gwp_version,
+  ef_data.is_default,
+  ef_data.priority
+FROM `emission_sources_master` es
+CROSS JOIN (
+  SELECT 0.404100 as factor_value, 'kWh' as unit, 'UAE Grid Emission Factor (Tier 2)' as calculation_method, 'UAE' as region, 2024 as valid_from, NULL as valid_to, 1 as is_active, 'CO2e emission factor for purchased electricity from UAE grid (DEWA).' as description, NULL as calculation_formula, 'UAE' as source_standard, 'UAE ele. (DEWA)' as source_reference, 'AR6' as gwp_version, 1 as is_default, 100 as priority
+  UNION ALL
+  SELECT 0.495000, 'kWh', 'MOCCAE Grid Emission Factor (Tier 2)', 'UAE', 2024, NULL, 1, 'CO2e emission factor for purchased electricity from UAE grid (MOCCAE).', NULL, 'MOCCAE', 'MOCCAE', 'AR6', 0, 90
+) ef_data
+WHERE es.quick_input_slug = 'electricity'
+ON DUPLICATE KEY UPDATE 
+  `factor_value` = VALUES(`factor_value`),
+  `calculation_method` = VALUES(`calculation_method`);
 
--- Electricity - MOCCAE
-(57, 0.495000, 'kWh', 'MOCCAE Grid Emission Factor (Tier 2)', 'UAE', 2024, NULL, 1, 'CO2e emission factor for purchased electricity from UAE grid (MOCCAE).', NULL, 'MOCCAE', 'MOCCAE', 'AR6', 0, 90);
-
--- 4.3 Insert Emission Factors for Heat, Steam & Cooling (emission_source_id 58)
+-- 4.3 Insert Emission Factors for Heat, Steam & Cooling
+-- Uses subquery to get emission_source_id dynamically
+-- Note: Heat, Steam, and Cooling have different emission factors
+-- Using fuel_type field to distinguish: 'Heat', 'Steam', 'Cooling'
 INSERT INTO `emission_factors` 
-(`emission_source_id`, `factor_value`, `unit`, `calculation_method`, `region`, `valid_from`, `valid_to`, `is_active`, `description`, `calculation_formula`, `source_standard`, `source_reference`, `gwp_version`, `is_default`, `priority`) 
-VALUES
--- Heat, Steam & Cooling - USEPA (Default)
-(58, 0.226300, 'kWh', 'USEPA District Heating & Cooling (Tier 2)', 'UAE', 2024, NULL, 1, 'CO2e emission factor for purchased heat, steam, and cooling energy.', NULL, 'USEPA', 'USEPA', 'AR6', 1, 100),
-
--- Heat, Steam & Cooling - USEPA (Alternative)
-(58, 0.226543, 'kWh', 'USEPA District Heating & Cooling (Tier 2)', 'UAE', 2024, NULL, 1, 'CO2e emission factor for purchased heat, steam, and cooling energy (alternative factor).', NULL, 'USEPA', 'USEPA', 'AR6', 0, 90);
+(`emission_source_id`, `factor_value`, `unit`, `calculation_method`, `region`, `valid_from`, `valid_to`, `is_active`, `description`, `calculation_formula`, `source_standard`, `source_reference`, `gwp_version`, `is_default`, `priority`, `fuel_type`) 
+SELECT 
+  es.id,
+  ef_data.factor_value,
+  ef_data.unit,
+  ef_data.calculation_method,
+  ef_data.region,
+  ef_data.valid_from,
+  ef_data.valid_to,
+  ef_data.is_active,
+  ef_data.description,
+  ef_data.calculation_formula,
+  ef_data.source_standard,
+  ef_data.source_reference,
+  ef_data.gwp_version,
+  ef_data.is_default,
+  ef_data.priority,
+  ef_data.fuel_type
+FROM `emission_sources_master` es
+CROSS JOIN (
+  -- Heat (District Heating) - Default
+  SELECT 0.226300 as factor_value, 'kWh' as unit, 'USEPA District Heating (Tier 2)' as calculation_method, 'UAE' as region, 2024 as valid_from, NULL as valid_to, 1 as is_active, 'CO2e emission factor for purchased heat (district heating).' as description, NULL as calculation_formula, 'USEPA' as source_standard, 'USEPA District Heating' as source_reference, 'AR6' as gwp_version, 1 as is_default, 100 as priority, 'Heat' as fuel_type
+  UNION ALL
+  -- Steam - Default
+  SELECT 0.250000 as factor_value, 'kWh' as unit, 'USEPA Steam Generation (Tier 2)' as calculation_method, 'UAE' as region, 2024 as valid_from, NULL as valid_to, 1 as is_active, 'CO2e emission factor for purchased steam energy.' as description, NULL as calculation_formula, 'USEPA' as source_standard, 'USEPA Steam' as source_reference, 'AR6' as gwp_version, 1 as is_default, 100 as priority, 'Steam' as fuel_type
+  UNION ALL
+  -- Cooling (District Cooling) - Default
+  SELECT 0.226300 as factor_value, 'kWh' as unit, 'USEPA District Cooling (Tier 2)' as calculation_method, 'UAE' as region, 2024 as valid_from, NULL as valid_to, 1 as is_active, 'CO2e emission factor for purchased cooling (district cooling).' as description, NULL as calculation_formula, 'USEPA' as source_standard, 'USEPA District Cooling' as source_reference, 'AR6' as gwp_version, 1 as is_default, 100 as priority, 'Cooling' as fuel_type
+  UNION ALL
+  -- Heat - Alternative
+  SELECT 0.226543 as factor_value, 'kWh' as unit, 'USEPA District Heating (Tier 2)' as calculation_method, 'UAE' as region, 2024 as valid_from, NULL as valid_to, 1 as is_active, 'CO2e emission factor for purchased heat (alternative factor).' as description, NULL as calculation_formula, 'USEPA' as source_standard, 'USEPA District Heating' as source_reference, 'AR6' as gwp_version, 0 as is_default, 90 as priority, 'Heat' as fuel_type
+  UNION ALL
+  -- Steam - Alternative
+  SELECT 0.275000 as factor_value, 'kWh' as unit, 'USEPA Steam Generation (Tier 2)' as calculation_method, 'UAE' as region, 2024 as valid_from, NULL as valid_to, 1 as is_active, 'CO2e emission factor for purchased steam (alternative factor).' as description, NULL as calculation_formula, 'USEPA' as source_standard, 'USEPA Steam' as source_reference, 'AR6' as gwp_version, 0 as is_default, 90 as priority, 'Steam' as fuel_type
+  UNION ALL
+  -- Cooling - Alternative
+  SELECT 0.226543 as factor_value, 'kWh' as unit, 'USEPA District Cooling (Tier 2)' as calculation_method, 'UAE' as region, 2024 as valid_from, NULL as valid_to, 1 as is_active, 'CO2e emission factor for purchased cooling (alternative factor).' as description, NULL as calculation_formula, 'USEPA' as source_standard, 'USEPA District Cooling' as source_reference, 'AR6' as gwp_version, 0 as is_default, 90 as priority, 'Cooling' as fuel_type
+) ef_data
+WHERE es.quick_input_slug = 'heat-steam-cooling'
+ON DUPLICATE KEY UPDATE 
+  `factor_value` = VALUES(`factor_value`),
+  `calculation_method` = VALUES(`calculation_method`),
+  `fuel_type` = VALUES(`fuel_type`);
 
 -- 4.4 Insert Emission Factors for Fuel (Stationary Combustion)
 -- IMPORTANT: See FUEL_EMISSION_FACTORS_DATA.sql for complete Fuel emission factors data
@@ -798,6 +858,198 @@ SELECT
   'Additional comments or notes'
 FROM `emission_sources_master` es
 WHERE es.quick_input_slug = 'fuel'
+LIMIT 1
+ON DUPLICATE KEY UPDATE 
+  `help_text` = VALUES(`help_text`);
+
+-- ============================================================================
+-- PART 9: INSERT FORM FIELDS FOR ELECTRICITY (Scope 2)
+-- ============================================================================
+
+-- 9.1 Unit of Measure (kWh)
+INSERT INTO `emission_source_form_fields` 
+(`emission_source_id`, `field_name`, `field_type`, `field_label`, `field_placeholder`, 
+ `field_options`, `is_required`, `field_order`, `help_text`)
+SELECT 
+  es.id,
+  'unit_of_measure',
+  'select',
+  'Unit of Measure',
+  'Select an option',
+  JSON_ARRAY(
+    JSON_OBJECT('value', 'kWh', 'label', 'kWh')
+  ),
+  1,
+  1,
+  'Select the unit of measure for electricity consumption'
+FROM `emission_sources_master` es
+WHERE es.quick_input_slug = 'electricity'
+LIMIT 1
+ON DUPLICATE KEY UPDATE 
+  `field_options` = VALUES(`field_options`);
+
+-- 9.2 Amount (Number input)
+INSERT INTO `emission_source_form_fields` 
+(`emission_source_id`, `field_name`, `field_type`, `field_label`, `field_placeholder`, 
+ `is_required`, `field_order`, `help_text`, `validation_rules`)
+SELECT 
+  es.id,
+  'amount',
+  'number',
+  'Amount',
+  'Enter amount',
+  1,
+  2,
+  'Amount of electricity used in kWh',
+  JSON_OBJECT('min', 0, 'step', '0.01')
+FROM `emission_sources_master` es
+WHERE es.quick_input_slug = 'electricity'
+LIMIT 1
+ON DUPLICATE KEY UPDATE 
+  `validation_rules` = VALUES(`validation_rules`);
+
+-- 9.3 Link field (Additional Data)
+INSERT INTO `emission_source_form_fields` 
+(`emission_source_id`, `field_name`, `field_type`, `field_label`, `field_placeholder`, 
+ `is_required`, `field_order`, `help_text`)
+SELECT 
+  es.id,
+  'link',
+  'text',
+  'Link',
+  'e.g. Sharepoint or Google Dr...',
+  0,
+  3,
+  'Link to supporting documents'
+FROM `emission_sources_master` es
+WHERE es.quick_input_slug = 'electricity'
+LIMIT 1
+ON DUPLICATE KEY UPDATE 
+  `help_text` = VALUES(`help_text`);
+
+-- 9.4 Comments field (Additional Data)
+INSERT INTO `emission_source_form_fields` 
+(`emission_source_id`, `field_name`, `field_type`, `field_label`, `field_placeholder`, 
+ `is_required`, `field_order`, `help_text`)
+SELECT 
+  es.id,
+  'comments',
+  'textarea',
+  'Comments',
+  'Add any additional notes...',
+  0,
+  4,
+  'Additional comments or notes'
+FROM `emission_sources_master` es
+WHERE es.quick_input_slug = 'electricity'
+LIMIT 1
+ON DUPLICATE KEY UPDATE 
+  `help_text` = VALUES(`help_text`);
+
+-- ============================================================================
+-- PART 10: INSERT FORM FIELDS FOR HEAT, STEAM & COOLING (Scope 2)
+-- ============================================================================
+
+-- 10.1 Energy Type (Heat, Steam, or Cooling) - First field, required
+INSERT INTO `emission_source_form_fields` 
+(`emission_source_id`, `field_name`, `field_type`, `field_label`, `field_placeholder`, 
+ `field_options`, `is_required`, `field_order`, `help_text`)
+SELECT 
+  es.id,
+  'energy_type',
+  'select',
+  'Energy Type',
+  'Select an option',
+  JSON_ARRAY(
+    JSON_OBJECT('value', 'Heat', 'label', 'Heat (District Heating)'),
+    JSON_OBJECT('value', 'Steam', 'label', 'Steam'),
+    JSON_OBJECT('value', 'Cooling', 'label', 'Cooling (District Cooling)')
+  ),
+  1,
+  1,
+  'Select the type of energy: Heat, Steam, or Cooling'
+FROM `emission_sources_master` es
+WHERE es.quick_input_slug = 'heat-steam-cooling'
+LIMIT 1
+ON DUPLICATE KEY UPDATE 
+  `field_options` = VALUES(`field_options`);
+
+-- 10.2 Unit of Measure (kWh)
+INSERT INTO `emission_source_form_fields` 
+(`emission_source_id`, `field_name`, `field_type`, `field_label`, `field_placeholder`, 
+ `field_options`, `is_required`, `field_order`, `help_text`)
+SELECT 
+  es.id,
+  'unit_of_measure',
+  'select',
+  'Unit of Measure',
+  'Select an option',
+  JSON_ARRAY(
+    JSON_OBJECT('value', 'kWh', 'label', 'kWh')
+  ),
+  1,
+  2,
+  'Select the unit of measure for energy consumption'
+FROM `emission_sources_master` es
+WHERE es.quick_input_slug = 'heat-steam-cooling'
+LIMIT 1
+ON DUPLICATE KEY UPDATE 
+  `field_options` = VALUES(`field_options`);
+
+-- 10.3 Amount (Number input)
+INSERT INTO `emission_source_form_fields` 
+(`emission_source_id`, `field_name`, `field_type`, `field_label`, `field_placeholder`, 
+ `is_required`, `field_order`, `help_text`, `validation_rules`)
+SELECT 
+  es.id,
+  'amount',
+  'number',
+  'Amount',
+  'Enter amount',
+  1,
+  3,
+  'Amount of energy used in kWh',
+  JSON_OBJECT('min', 0, 'step', '0.01')
+FROM `emission_sources_master` es
+WHERE es.quick_input_slug = 'heat-steam-cooling'
+LIMIT 1
+ON DUPLICATE KEY UPDATE 
+  `validation_rules` = VALUES(`validation_rules`);
+
+-- 10.4 Link field (Additional Data)
+INSERT INTO `emission_source_form_fields` 
+(`emission_source_id`, `field_name`, `field_type`, `field_label`, `field_placeholder`, 
+ `is_required`, `field_order`, `help_text`)
+SELECT 
+  es.id,
+  'link',
+  'text',
+  'Link',
+  'e.g. Sharepoint or Google Dr...',
+  0,
+  3,
+  'Link to supporting documents'
+FROM `emission_sources_master` es
+WHERE es.quick_input_slug = 'heat-steam-cooling'
+LIMIT 1
+ON DUPLICATE KEY UPDATE 
+  `help_text` = VALUES(`help_text`);
+
+-- 10.5 Comments field (Additional Data)
+INSERT INTO `emission_source_form_fields` 
+(`emission_source_id`, `field_name`, `field_type`, `field_label`, `field_placeholder`, 
+ `is_required`, `field_order`, `help_text`)
+SELECT 
+  es.id,
+  'comments',
+  'textarea',
+  'Comments',
+  'Add any additional notes...',
+  0,
+  4,
+  'Additional comments or notes'
+FROM `emission_sources_master` es
+WHERE es.quick_input_slug = 'heat-steam-cooling'
 LIMIT 1
 ON DUPLICATE KEY UPDATE 
   `help_text` = VALUES(`help_text`);
