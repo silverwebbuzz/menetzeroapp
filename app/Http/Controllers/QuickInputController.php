@@ -332,7 +332,7 @@ class QuickInputController extends Controller
             $conditions = [
                 'region' => $request->input('region', 'UAE'),
                 'fuel_category' => $request->input('fuel_category'),
-                'fuel_type' => $request->input('fuel_type') ?: $request->input('energy_type'), // For Heat/Steam/Cooling, energy_type maps to fuel_type
+                'fuel_type' => $request->input('fuel_type') ?: $request->input('energy_type') ?: $request->input('refrigerant_type'), // For Heat/Steam/Cooling, energy_type maps to fuel_type; for Refrigerants, refrigerant_type maps to fuel_type
                 'unit' => $unit,
             ];
             
@@ -375,7 +375,7 @@ class QuickInputController extends Controller
             $formFields = EmissionSourceFormField::where('emission_source_id', $emissionSource->id)->get();
             foreach ($formFields as $field) {
                 // Skip main fields that are stored directly or in dedicated columns
-                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments', 'fuel_category', 'fuel_type', 'energy_type'])) {
+                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments', 'fuel_category', 'fuel_type', 'energy_type', 'refrigerant_type'])) {
                     continue;
                 }
                 if ($request->has($field->field_name) && $request->input($field->field_name) !== null && $request->input($field->field_name) !== '') {
@@ -412,19 +412,25 @@ class QuickInputController extends Controller
                 'gwp_version_used' => $emissionFactor->gwp_version ?? 'AR6',
                 'calculation_method' => $emissionFactor->calculation_method ?? null, // Save calculation method from emission factor
                 'supplier_emission_factor' => $request->input('supplier_emission_factor') ? (float) $request->input('supplier_emission_factor') : null, // Save supplier factor if provided
-                'fuel_type' => $request->input('fuel_type') ?: $request->input('energy_type'), // Save fuel_type (for Fuel) or energy_type (for Heat/Steam/Cooling) as fuel_type
+                'fuel_type' => $request->input('fuel_type') ?: $request->input('energy_type') ?: $request->input('refrigerant_type'), // Save fuel_type (for Fuel), energy_type (for Heat/Steam/Cooling), or refrigerant_type (for Refrigerants) as fuel_type
                 'additional_data' => !empty($additionalData) ? $additionalData : null,
                 'notes' => $notes,
                 'created_by' => $user->id,
             ]);
             
-            // Store fuel_category and energy_type in additional_data if provided (since there's no dedicated column)
+            // Store fuel_category, energy_type, and refrigerant_type in additional_data if provided
             $additionalDataToUpdate = [];
             if ($request->input('fuel_category')) {
                 $additionalDataToUpdate['fuel_category'] = $request->input('fuel_category');
             }
             if ($request->input('energy_type')) {
                 $additionalDataToUpdate['energy_type'] = $request->input('energy_type');
+            }
+            if ($request->input('refrigerant_type')) {
+                $additionalDataToUpdate['refrigerant_type'] = $request->input('refrigerant_type');
+            }
+            if ($request->input('refrigerant_type')) {
+                $additionalDataToUpdate['refrigerant_type'] = $request->input('refrigerant_type');
             }
             if (!empty($additionalDataToUpdate)) {
                 $existingAdditionalData = $measurementData->additional_data ?? [];
@@ -484,7 +490,7 @@ class QuickInputController extends Controller
             $conditions = [
                 'region' => $request->input('region', 'UAE'),
                 'fuel_category' => $request->input('fuel_category'),
-                'fuel_type' => $request->input('fuel_type') ?: $request->input('energy_type'), // For Heat/Steam/Cooling, energy_type maps to fuel_type
+                'fuel_type' => $request->input('fuel_type') ?: $request->input('energy_type') ?: $request->input('refrigerant_type'), // For Heat/Steam/Cooling, energy_type maps to fuel_type; for Refrigerants, refrigerant_type maps to fuel_type
                 'unit' => $request->input('unit') ?? $request->input('unit_of_measure'),
             ];
             
@@ -682,7 +688,7 @@ class QuickInputController extends Controller
             $conditions = [
                 'region' => $request->input('region', 'UAE'),
                 'fuel_category' => $request->input('fuel_category'),
-                'fuel_type' => $request->input('fuel_type') ?: $request->input('energy_type'), // For Heat/Steam/Cooling, energy_type maps to fuel_type
+                'fuel_type' => $request->input('fuel_type') ?: $request->input('energy_type') ?: $request->input('refrigerant_type'), // For Heat/Steam/Cooling, energy_type maps to fuel_type; for Refrigerants, refrigerant_type maps to fuel_type
                 'unit' => $unit,
             ];
             
@@ -708,7 +714,7 @@ class QuickInputController extends Controller
             $formFields = $this->formBuilder->buildForm($emissionSource->id);
             foreach ($formFields as $field) {
                 // Skip main fields that are stored directly
-                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments', 'fuel_category', 'fuel_type', 'energy_type'])) {
+                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments', 'fuel_category', 'fuel_type', 'energy_type', 'refrigerant_type'])) {
                     continue;
                 }
                 if ($request->has($field->field_name) && $request->input($field->field_name) !== null && $request->input($field->field_name) !== '') {
@@ -733,7 +739,7 @@ class QuickInputController extends Controller
                 'gwp_version_used' => $emissionFactor->gwp_version ?? 'AR6',
                 'calculation_method' => $emissionFactor->calculation_method ?? null, // Save calculation method from emission factor
                 'supplier_emission_factor' => $request->input('supplier_emission_factor') ? (float) $request->input('supplier_emission_factor') : null, // Save supplier factor if provided
-                'fuel_type' => $request->input('fuel_type') ?: $request->input('energy_type'), // Save fuel_type (for Fuel) or energy_type (for Heat/Steam/Cooling) as fuel_type
+                'fuel_type' => $request->input('fuel_type') ?: $request->input('energy_type') ?: $request->input('refrigerant_type'), // Save fuel_type (for Fuel), energy_type (for Heat/Steam/Cooling), or refrigerant_type (for Refrigerants) as fuel_type
                 'additional_data' => !empty($additionalData) ? $additionalData : null,
                 'notes' => $request->input('comments') ?? $request->input('notes') ?? null,
                 'updated_by' => $user->id,
@@ -748,6 +754,9 @@ class QuickInputController extends Controller
             }
             if ($request->input('energy_type')) {
                 $additionalDataToUpdate['energy_type'] = $request->input('energy_type');
+            }
+            if ($request->input('refrigerant_type')) {
+                $additionalDataToUpdate['refrigerant_type'] = $request->input('refrigerant_type');
             }
             if (!empty($additionalDataToUpdate)) {
                 $existingAdditionalData = $entry->additional_data ?? [];

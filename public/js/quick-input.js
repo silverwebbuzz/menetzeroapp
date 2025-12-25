@@ -237,6 +237,7 @@
                 fuel_category: document.getElementById('fuel_category')?.value,
                 fuel_type: document.getElementById('fuel_type')?.value,
                 energy_type: document.getElementById('energy_type')?.value, // For Heat/Steam/Cooling
+                refrigerant_type: document.getElementById('refrigerant_type')?.value, // For Refrigerants
                 region: document.getElementById('region')?.value || 'UAE',
             })
         })
