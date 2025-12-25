@@ -323,10 +323,10 @@
             
             let html = '<h4 class="text-sm font-medium text-green-800 mb-2">Calculation Result</h4>';
             html += '<div class="text-sm text-green-700">';
-            html += '<p class="mb-1"><strong>CO2e:</strong> ' + parseFloat(calculation.co2e || calculation.total_co2e || 0).toFixed(2) + ' kg</p>';
+            html += '<p class="mb-1"><strong>CO2e:</strong> ' + parseFloat(calculation.co2e || calculation.total_co2e || 0).toFixed(6) + ' kg</p>';
             
             if (calculation.co2 !== null && calculation.co2 !== undefined) {
-                html += '<p class="mb-1"><strong>CO2:</strong> ' + parseFloat(calculation.co2).toFixed(2) + ' kg</p>';
+                html += '<p class="mb-1"><strong>CO2:</strong> ' + parseFloat(calculation.co2).toFixed(6) + ' kg</p>';
             }
             if (calculation.ch4 !== null && calculation.ch4 !== undefined) {
                 html += '<p class="mb-1"><strong>CH4:</strong> ' + parseFloat(calculation.ch4).toFixed(6) + ' kg</p>';
@@ -337,7 +337,11 @@
             
             if (factor) {
                 html += '<p class="mt-2 text-xs text-green-600">';
-                html += 'Using factor: ' + (factor.region || 'Default') + ' (' + (factor.source_standard || 'Standard') + ')';
+                html += '<strong>Emission Factor:</strong> ' + (factor.factor_value ? parseFloat(factor.factor_value).toFixed(6) : 'N/A') + ' kg CO2e/' + (factor.unit || 'unit');
+                if (factor.fuel_type) {
+                    html += ' <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 ml-2">' + factor.fuel_type + '</span>';
+                }
+                html += ' (' + (factor.region || 'Default') + ' - ' + (factor.source_standard || 'Standard') + ')';
                 html += '</p>';
             }
             
