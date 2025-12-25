@@ -56,7 +56,14 @@ class EmissionCalculationService
         }
 
         // Filter by region if provided
-        if (!empty($conditions['region'])) {
+        // Note: For refrigerants (fugitive emissions), GWP values are global, so region filter is less strict
+        $isFugitiveEmission = false;
+        $emissionSource = \App\Models\EmissionSourceMaster::find($emissionSourceId);
+        if ($emissionSource && $emissionSource->emission_type === 'fugitive') {
+            $isFugitiveEmission = true;
+        }
+        
+        if (!empty($conditions['region']) && !$isFugitiveEmission) {
             $factorQuery->where('region', $conditions['region']);
         }
 

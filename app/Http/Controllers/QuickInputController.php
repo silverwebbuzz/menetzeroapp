@@ -329,8 +329,10 @@ class QuickInputController extends Controller
             $unit = $request->input('unit_of_measure') ?? $request->input('unit');
             
             // Prepare conditions for factor selection (include fuel_category, fuel_type, energy_type, etc.)
+            // For refrigerants (fugitive emissions), use 'Global' as region since GWP values are global
+            $defaultRegion = ($emissionSource->emission_type === 'fugitive') ? 'Global' : 'UAE';
             $conditions = [
-                'region' => $request->input('region', 'UAE'),
+                'region' => $request->input('region', $defaultRegion),
                 'fuel_category' => $request->input('fuel_category'),
                 'fuel_type' => $request->input('fuel_type') ?: $request->input('energy_type') ?: $request->input('refrigerant_type'), // For Heat/Steam/Cooling, energy_type maps to fuel_type; for Refrigerants, refrigerant_type maps to fuel_type
                 'unit' => $unit,
@@ -487,8 +489,10 @@ class QuickInputController extends Controller
             $emissionSource = EmissionSourceMaster::findOrFail($request->emission_source_id);
             
             // Prepare conditions for factor selection (include fuel_category, fuel_type, energy_type, etc.)
+            // For refrigerants (fugitive emissions), use 'Global' as region since GWP values are global
+            $defaultRegion = ($emissionSource->emission_type === 'fugitive') ? 'Global' : 'UAE';
             $conditions = [
-                'region' => $request->input('region', 'UAE'),
+                'region' => $request->input('region', $defaultRegion),
                 'fuel_category' => $request->input('fuel_category'),
                 'fuel_type' => $request->input('fuel_type') ?: $request->input('energy_type') ?: $request->input('refrigerant_type'), // For Heat/Steam/Cooling, energy_type maps to fuel_type; for Refrigerants, refrigerant_type maps to fuel_type
                 'unit' => $request->input('unit') ?? $request->input('unit_of_measure'),
@@ -685,8 +689,10 @@ class QuickInputController extends Controller
             $unit = $request->input('unit_of_measure') ?? $request->input('unit');
             
             // Prepare conditions for factor selection (include fuel_category, fuel_type, energy_type, etc.)
+            // For refrigerants (fugitive emissions), use 'Global' as region since GWP values are global
+            $defaultRegion = ($emissionSource->emission_type === 'fugitive') ? 'Global' : 'UAE';
             $conditions = [
-                'region' => $request->input('region', 'UAE'),
+                'region' => $request->input('region', $defaultRegion),
                 'fuel_category' => $request->input('fuel_category'),
                 'fuel_type' => $request->input('fuel_type') ?: $request->input('energy_type') ?: $request->input('refrigerant_type'), // For Heat/Steam/Cooling, energy_type maps to fuel_type; for Refrigerants, refrigerant_type maps to fuel_type
                 'unit' => $unit,
