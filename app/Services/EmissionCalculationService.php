@@ -50,19 +50,24 @@ class EmissionCalculationService
             $factorQuery->where('fuel_type', $conditions['fuel_type']);
         }
 
-        // Filter by unit if provided
-        if (!empty($conditions['unit'])) {
-            $factorQuery->where('unit', $conditions['unit']);
-        }
-
-        // Filter by region if provided
-        // Note: For refrigerants (fugitive emissions), GWP values are global, so region filter is less strict
+        // Check if this is a fugitive emission (refrigerants) - GWP values are global and unit conversion is handled separately
         $isFugitiveEmission = false;
         $emissionSource = \App\Models\EmissionSourceMaster::find($emissionSourceId);
         if ($emissionSource && $emissionSource->emission_type === 'fugitive') {
             $isFugitiveEmission = true;
         }
-        
+
+        // Filter by unit if provided
+        // For fugitive emissions (refrigerants), skip unit filtering since:
+        // 1. All refrigerant factors use 'kg' as base unit
+        // 2. Unit conversion is handled in calculateCO2e method
+        // 3. We just need to match by fuel_type (refrigerant type)
+        if (!empty($conditions['unit']) && !$isFugitiveEmission) {
+            $factorQuery->where('unit', $conditions['unit']);
+        }
+
+        // Filter by region if provided
+        // Note: For refrigerants (fugitive emissions), GWP values are global, so region filter is less strict
         if (!empty($conditions['region']) && !$isFugitiveEmission) {
             $factorQuery->where('region', $conditions['region']);
         }

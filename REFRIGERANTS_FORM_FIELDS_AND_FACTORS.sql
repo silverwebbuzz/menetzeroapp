@@ -210,3 +210,21 @@ ON DUPLICATE KEY UPDATE
   `calculation_method` = VALUES(`calculation_method`),
   `fuel_type` = VALUES(`fuel_type`);
 
+-- ============================================================================
+-- PART 13: INSERT UNIT CONVERSIONS FOR REFRIGERANTS
+-- ============================================================================
+-- Add unit conversions for refrigerants (tonnes to kg, g to kg)
+-- These are standard mass conversions, not refrigerant-specific
+
+INSERT INTO `emission_unit_conversions` (`from_unit`, `to_unit`, `conversion_factor`, `fuel_type`, `region`, `notes`, `is_active`) VALUES
+-- Standard mass conversions (applicable to all refrigerants)
+('tonnes', 'kg', 1000.0, NULL, NULL, 'Standard conversion: 1 tonne = 1000 kg', 1),
+('kg', 'tonnes', 0.001, NULL, NULL, 'Standard conversion: 1 kg = 0.001 tonnes', 1),
+('g', 'kg', 0.001, NULL, NULL, 'Standard conversion: 1 g = 0.001 kg', 1),
+('kg', 'g', 1000.0, NULL, NULL, 'Standard conversion: 1 kg = 1000 g', 1),
+('tonnes', 'g', 1000000.0, NULL, NULL, 'Standard conversion: 1 tonne = 1,000,000 g', 1),
+('g', 'tonnes', 0.000001, NULL, NULL, 'Standard conversion: 1 g = 0.000001 tonnes', 1)
+ON DUPLICATE KEY UPDATE 
+  `conversion_factor` = VALUES(`conversion_factor`),
+  `notes` = VALUES(`notes`);
+

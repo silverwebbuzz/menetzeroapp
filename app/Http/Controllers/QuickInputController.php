@@ -505,13 +505,28 @@ class QuickInputController extends Controller
             );
             
             if (!$emissionFactor) {
+                // Debug: Check what factors exist for this source
+                $availableFactors = \App\Models\EmissionFactor::where('emission_source_id', $emissionSource->id)
+                    ->where('is_active', true)
+                    ->get(['id', 'fuel_type', 'unit', 'region', 'factor_value']);
+                
                 \Log::warning('No emission factor found', [
                     'emission_source_id' => $emissionSource->id,
-                    'conditions' => $conditions
+                    'emission_source_name' => $emissionSource->name,
+                    'emission_type' => $emissionSource->emission_type,
+                    'conditions' => $conditions,
+                    'available_factors' => $availableFactors->toArray(),
+                    'request_data' => $request->all()
                 ]);
+                
                 return response()->json([
                     'success' => false,
-                    'message' => 'No suitable emission factor found for the selected criteria.'
+                    'message' => 'No suitable emission factor found for the selected criteria.',
+                    'debug' => [
+                        'conditions' => $conditions,
+                        'available_factors_count' => $availableFactors->count(),
+                        'emission_type' => $emissionSource->emission_type
+                    ]
                 ], 400);
             }
             
