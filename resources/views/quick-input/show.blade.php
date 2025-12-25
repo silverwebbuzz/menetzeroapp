@@ -446,8 +446,42 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     {{ $entry->entry_date ? $entry->entry_date->format('Y-m-d') : 'N/A' }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {{ $entry->emissionSource->name ?? 'N/A' }}
+                                <td class="px-6 py-4 text-sm text-gray-900">
+                                    <div>
+                                        <div class="font-medium">{{ $entry->emissionSource->name ?? 'N/A' }}</div>
+                                        @php
+                                            // Get type information from entry
+                                            $additionalData = [];
+                                            if ($entry->additional_data) {
+                                                $additionalData = is_string($entry->additional_data) ? json_decode($entry->additional_data, true) : ($entry->additional_data ?? []);
+                                            }
+                                            
+                                            $energyType = $additionalData['energy_type'] ?? null;
+                                            $fuelCategory = $entry->fuel_category ?? ($additionalData['fuel_category'] ?? null);
+                                            $fuelType = $entry->fuel_type ?? null;
+                                            
+                                            // Determine what to display
+                                            $typeInfo = null;
+                                            if ($energyType) {
+                                                // For Heat/Steam/Cooling
+                                                $typeInfo = 'Type: ' . $energyType;
+                                            } elseif ($fuelCategory && $fuelType) {
+                                                // For Fuel sources: show category -> type
+                                                $typeInfo = 'Type: ' . $fuelCategory . ' → ' . $fuelType;
+                                            } elseif ($fuelType) {
+                                                // Just fuel type if no category
+                                                $typeInfo = 'Type: ' . $fuelType;
+                                            } elseif ($fuelCategory) {
+                                                // Just category if no type
+                                                $typeInfo = 'Type: ' . $fuelCategory;
+                                            }
+                                        @endphp
+                                        @if($typeInfo)
+                                            <div class="text-xs text-gray-500 mt-1">
+                                                {{ $typeInfo }}
+                                            </div>
+                                        @endif
+                                    </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {{ $entry->measurement->location->name ?? 'N/A' }}

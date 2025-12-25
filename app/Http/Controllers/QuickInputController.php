@@ -495,11 +495,26 @@ class QuickInputController extends Controller
             );
             
             if (!$emissionFactor) {
+                \Log::warning('No emission factor found', [
+                    'emission_source_id' => $emissionSource->id,
+                    'conditions' => $conditions
+                ]);
                 return response()->json([
                     'success' => false,
                     'message' => 'No suitable emission factor found for the selected criteria.'
                 ], 400);
             }
+            
+            // Debug: Log selected factor details
+            \Log::info('Emission Factor Selected for Calculation', [
+                'factor_id' => $emissionFactor->id,
+                'factor_value' => $emissionFactor->factor_value,
+                'total_co2e_factor' => $emissionFactor->total_co2e_factor,
+                'fuel_type' => $emissionFactor->fuel_type,
+                'fuel_category' => $emissionFactor->fuel_category,
+                'unit' => $emissionFactor->unit,
+                'conditions' => $conditions
+            ]);
             
             // Get quantity (handle both 'amount' and 'quantity' fields)
             $quantity = $request->input('quantity') ?? $request->input('amount');
@@ -517,9 +532,12 @@ class QuickInputController extends Controller
                 'calculation' => $calculation,
                 'factor' => [
                     'id' => $emissionFactor->id,
+                    'factor_value' => $emissionFactor->factor_value ?? $emissionFactor->total_co2e_factor ?? 0,
                     'unit' => $emissionFactor->unit ?? '',
                     'region' => $emissionFactor->region ?? '',
                     'source_standard' => $emissionFactor->source_standard ?? '',
+                    'fuel_type' => $emissionFactor->fuel_type ?? '',
+                    'fuel_category' => $emissionFactor->fuel_category ?? '',
                 ]
             ]);
         } catch (\Exception $e) {

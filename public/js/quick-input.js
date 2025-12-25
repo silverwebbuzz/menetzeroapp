@@ -236,6 +236,7 @@
                 // Include other form fields that might affect factor selection
                 fuel_category: document.getElementById('fuel_category')?.value,
                 fuel_type: document.getElementById('fuel_type')?.value,
+                energy_type: document.getElementById('energy_type')?.value, // For Heat/Steam/Cooling
                 region: document.getElementById('region')?.value || 'UAE',
             })
         })
@@ -280,10 +281,12 @@
             
             // Build HTML content
             let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
-            html += '<div><strong>CO2e:</strong> <span class="text-lg font-bold text-green-700">' + parseFloat(calculation.co2e || calculation.total_co2e || 0).toFixed(2) + ' kg</span></div>';
+            // Display CO2e with full precision (6 decimals) for accuracy
+            const co2eValue = parseFloat(calculation.co2e || calculation.total_co2e || 0);
+            html += '<div><strong>CO2e:</strong> <span class="text-lg font-bold text-green-700">' + co2eValue.toFixed(6) + ' kg</span></div>';
             
             if (calculation.co2 !== null && calculation.co2 !== undefined) {
-                html += '<div><strong>CO2:</strong> ' + parseFloat(calculation.co2).toFixed(2) + ' kg</div>';
+                html += '<div><strong>CO2:</strong> ' + parseFloat(calculation.co2).toFixed(6) + ' kg</div>';
             }
             if (calculation.ch4 !== null && calculation.ch4 !== undefined) {
                 html += '<div><strong>CH4:</strong> ' + parseFloat(calculation.ch4).toFixed(6) + ' kg</div>';
@@ -294,7 +297,11 @@
             
             if (factor) {
                 html += '<div class="md:col-span-2 text-xs text-gray-600 mt-2">';
-                html += '<strong>Emission Factor:</strong> ' + (factor.region || 'Default') + ' (' + (factor.source_standard || 'Standard') + ')';
+                html += '<strong>Emission Factor:</strong> ' + (factor.factor_value ? parseFloat(factor.factor_value).toFixed(6) : 'N/A') + ' kg CO2e/' + (factor.unit || 'unit');
+                if (factor.fuel_type) {
+                    html += ' <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 ml-2">' + factor.fuel_type + '</span>';
+                }
+                html += ' (' + (factor.region || 'Default') + ' - ' + (factor.source_standard || 'Standard') + ')';
                 html += '</div>';
             }
             

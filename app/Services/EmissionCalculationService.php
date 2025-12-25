@@ -120,17 +120,24 @@ class EmissionCalculationService
 
         // If factor has separate gas factors, calculate multi-gas
         if ($factor->co2_factor || $factor->ch4_factor || $factor->n2o_factor) {
-            $co2 = $convertedQuantity * ($factor->co2_factor ?? 0);
-            $ch4 = $convertedQuantity * ($factor->ch4_factor ?? 0);
-            $n2o = $convertedQuantity * ($factor->n2o_factor ?? 0);
+            // Use exact factor values with full precision (no rounding until final result)
+            $co2Factor = is_string($factor->co2_factor) ? (float) $factor->co2_factor : (float) ($factor->co2_factor ?? 0);
+            $ch4Factor = is_string($factor->ch4_factor) ? (float) $factor->ch4_factor : (float) ($factor->ch4_factor ?? 0);
+            $n2oFactor = is_string($factor->n2o_factor) ? (float) $factor->n2o_factor : (float) ($factor->n2o_factor ?? 0);
+            
+            $co2 = (float) $convertedQuantity * $co2Factor;
+            $ch4 = (float) $convertedQuantity * $ch4Factor;
+            $n2o = (float) $convertedQuantity * $n2oFactor;
 
             // Get GWP values
             $gwpValues = $this->getGwpValues($gwpVersion);
             $gwpCh4 = $gwpValues['CH4_FOSSIL'] ?? 27.2;
             $gwpN2O = $gwpValues['N2O'] ?? 273;
 
+            // Calculate CO2e with full precision
             $co2e = $co2 + ($ch4 * $gwpCh4) + ($n2o * $gwpN2O);
 
+            // Round only the final results to 6 decimal places for display/storage
             return [
                 'co2e' => round($co2e, 6),
                 'co2' => round($co2, 6),
@@ -140,9 +147,13 @@ class EmissionCalculationService
         }
 
         // Single gas factor
+        // Use exact factor value with full precision (no rounding until final result)
         $factorValue = $factor->total_co2e_factor ?? $factor->factor_value;
-        $co2e = $convertedQuantity * $factorValue;
+        // Ensure we're using the exact decimal value from database
+        $factorValue = is_string($factorValue) ? (float) $factorValue : (float) $factorValue;
+        $co2e = (float) $convertedQuantity * $factorValue;
 
+        // Round only the final result to 6 decimal places for display/storage
         return [
             'co2e' => round($co2e, 6),
             'co2' => null,
