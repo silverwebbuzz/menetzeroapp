@@ -157,11 +157,12 @@ class EmissionCalculationService
             $co2e = $co2 + ($ch4 * $gwpCh4) + ($n2o * $gwpN2O);
 
             // Round only the final results to 6 decimal places for display/storage
+            // Format as strings to preserve precision in JSON
             return [
-                'co2e' => round($co2e, 6),
-                'co2' => round($co2, 6),
-                'ch4' => round($ch4, 6),
-                'n2o' => round($n2o, 6),
+                'co2e' => number_format(round($co2e, 6), 6, '.', ''),
+                'co2' => number_format(round($co2, 6), 6, '.', ''),
+                'ch4' => number_format(round($ch4, 6), 6, '.', ''),
+                'n2o' => number_format(round($n2o, 6), 6, '.', ''),
             ];
         }
 
@@ -173,8 +174,9 @@ class EmissionCalculationService
         $co2e = (float) $convertedQuantity * $factorValue;
 
         // Round only the final result to 6 decimal places for display/storage
+        // Format as string to preserve precision in JSON
         return [
-            'co2e' => round($co2e, 6),
+            'co2e' => number_format(round($co2e, 6), 6, '.', ''),
             'co2' => null,
             'ch4' => null,
             'n2o' => null,

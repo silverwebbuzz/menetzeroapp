@@ -282,17 +282,22 @@
             // Build HTML content
             let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
             // Display CO2e with full precision (6 decimals) for accuracy
-            const co2eValue = parseFloat(calculation.co2e || calculation.total_co2e || 0);
-            html += '<div><strong>CO2e:</strong> <span class="text-lg font-bold text-green-700">' + co2eValue.toFixed(6) + ' kg</span></div>';
+            // Value comes as string from backend to preserve precision
+            const co2eValue = calculation.co2e || calculation.total_co2e || '0';
+            const co2eNum = parseFloat(co2eValue);
+            html += '<div><strong>CO2e:</strong> <span class="text-lg font-bold text-green-700">' + co2eNum.toFixed(6) + ' kg</span></div>';
             
             if (calculation.co2 !== null && calculation.co2 !== undefined) {
-                html += '<div><strong>CO2:</strong> ' + parseFloat(calculation.co2).toFixed(6) + ' kg</div>';
+                const co2Num = typeof calculation.co2 === 'string' ? parseFloat(calculation.co2) : calculation.co2;
+                html += '<div><strong>CO2:</strong> ' + co2Num.toFixed(6) + ' kg</div>';
             }
             if (calculation.ch4 !== null && calculation.ch4 !== undefined) {
-                html += '<div><strong>CH4:</strong> ' + parseFloat(calculation.ch4).toFixed(6) + ' kg</div>';
+                const ch4Num = typeof calculation.ch4 === 'string' ? parseFloat(calculation.ch4) : calculation.ch4;
+                html += '<div><strong>CH4:</strong> ' + ch4Num.toFixed(6) + ' kg</div>';
             }
             if (calculation.n2o !== null && calculation.n2o !== undefined) {
-                html += '<div><strong>N2O:</strong> ' + parseFloat(calculation.n2o).toFixed(6) + ' kg</div>';
+                const n2oNum = typeof calculation.n2o === 'string' ? parseFloat(calculation.n2o) : calculation.n2o;
+                html += '<div><strong>N2O:</strong> ' + n2oNum.toFixed(6) + ' kg</div>';
             }
             
             if (factor) {
@@ -323,16 +328,21 @@
             
             let html = '<h4 class="text-sm font-medium text-green-800 mb-2">Calculation Result</h4>';
             html += '<div class="text-sm text-green-700">';
-            html += '<p class="mb-1"><strong>CO2e:</strong> ' + parseFloat(calculation.co2e || calculation.total_co2e || 0).toFixed(6) + ' kg</p>';
+            const co2eValueFallback = calculation.co2e || calculation.total_co2e || '0';
+            const co2eNumFallback = typeof co2eValueFallback === 'string' ? parseFloat(co2eValueFallback) : co2eValueFallback;
+            html += '<p class="mb-1"><strong>CO2e:</strong> ' + co2eNumFallback.toFixed(6) + ' kg</p>';
             
             if (calculation.co2 !== null && calculation.co2 !== undefined) {
-                html += '<p class="mb-1"><strong>CO2:</strong> ' + parseFloat(calculation.co2).toFixed(6) + ' kg</p>';
+                const co2Num = typeof calculation.co2 === 'string' ? parseFloat(calculation.co2) : calculation.co2;
+                html += '<p class="mb-1"><strong>CO2:</strong> ' + co2Num.toFixed(6) + ' kg</p>';
             }
             if (calculation.ch4 !== null && calculation.ch4 !== undefined) {
-                html += '<p class="mb-1"><strong>CH4:</strong> ' + parseFloat(calculation.ch4).toFixed(6) + ' kg</p>';
+                const ch4Num = typeof calculation.ch4 === 'string' ? parseFloat(calculation.ch4) : calculation.ch4;
+                html += '<p class="mb-1"><strong>CH4:</strong> ' + ch4Num.toFixed(6) + ' kg</p>';
             }
             if (calculation.n2o !== null && calculation.n2o !== undefined) {
-                html += '<p class="mb-1"><strong>N2O:</strong> ' + parseFloat(calculation.n2o).toFixed(6) + ' kg</p>';
+                const n2oNum = typeof calculation.n2o === 'string' ? parseFloat(calculation.n2o) : calculation.n2o;
+                html += '<p class="mb-1"><strong>N2O:</strong> ' + n2oNum.toFixed(6) + ' kg</p>';
             }
             
             if (factor) {
