@@ -412,7 +412,7 @@ class QuickInputController extends Controller
                 'gwp_version_used' => $emissionFactor->gwp_version ?? 'AR6',
                 'calculation_method' => $emissionFactor->calculation_method ?? null, // Save calculation method from emission factor
                 'supplier_emission_factor' => $request->input('supplier_emission_factor') ? (float) $request->input('supplier_emission_factor') : null, // Save supplier factor if provided
-                'fuel_type' => $request->input('fuel_type'), // Save fuel_type if provided
+                'fuel_type' => $request->input('fuel_type') ?: $request->input('energy_type'), // Save fuel_type (for Fuel) or energy_type (for Heat/Steam/Cooling) as fuel_type
                 'additional_data' => !empty($additionalData) ? $additionalData : null,
                 'notes' => $notes,
                 'created_by' => $user->id,
@@ -708,7 +708,7 @@ class QuickInputController extends Controller
             $formFields = $this->formBuilder->buildForm($emissionSource->id);
             foreach ($formFields as $field) {
                 // Skip main fields that are stored directly
-                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments'])) {
+                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments', 'fuel_category', 'fuel_type', 'energy_type'])) {
                     continue;
                 }
                 if ($request->has($field->field_name) && $request->input($field->field_name) !== null && $request->input($field->field_name) !== '') {
@@ -733,12 +733,27 @@ class QuickInputController extends Controller
                 'gwp_version_used' => $emissionFactor->gwp_version ?? 'AR6',
                 'calculation_method' => $emissionFactor->calculation_method ?? null, // Save calculation method from emission factor
                 'supplier_emission_factor' => $request->input('supplier_emission_factor') ? (float) $request->input('supplier_emission_factor') : null, // Save supplier factor if provided
+                'fuel_type' => $request->input('fuel_type') ?: $request->input('energy_type'), // Save fuel_type (for Fuel) or energy_type (for Heat/Steam/Cooling) as fuel_type
                 'additional_data' => !empty($additionalData) ? $additionalData : null,
                 'notes' => $request->input('comments') ?? $request->input('notes') ?? null,
                 'updated_by' => $user->id,
             ];
             
             $entry->update($updateData);
+            
+            // Store fuel_category and energy_type in additional_data if provided
+            $additionalDataToUpdate = [];
+            if ($request->input('fuel_category')) {
+                $additionalDataToUpdate['fuel_category'] = $request->input('fuel_category');
+            }
+            if ($request->input('energy_type')) {
+                $additionalDataToUpdate['energy_type'] = $request->input('energy_type');
+            }
+            if (!empty($additionalDataToUpdate)) {
+                $existingAdditionalData = $entry->additional_data ?? [];
+                $mergedAdditionalData = array_merge($existingAdditionalData, $additionalDataToUpdate);
+                $entry->update(['additional_data' => $mergedAdditionalData]);
+            }
             
             // Update measurement totals (both old and new measurements)
             $this->measurementService->updateMeasurementTotals($entry->measurement_id);

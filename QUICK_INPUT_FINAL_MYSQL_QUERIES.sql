@@ -502,8 +502,8 @@ CROSS JOIN (
   -- Heat (District Heating) - Default
   SELECT 0.226300 as factor_value, 'kWh' as unit, 'USEPA District Heating (Tier 2)' as calculation_method, 'UAE' as region, 2024 as valid_from, NULL as valid_to, 1 as is_active, 'CO2e emission factor for purchased heat (district heating).' as description, NULL as calculation_formula, 'USEPA' as source_standard, 'USEPA District Heating' as source_reference, 'AR6' as gwp_version, 1 as is_default, 100 as priority, 'Heat' as fuel_type
   UNION ALL
-  -- Steam - Default
-  SELECT 0.250000 as factor_value, 'kWh' as unit, 'USEPA Steam Generation (Tier 2)' as calculation_method, 'UAE' as region, 2024 as valid_from, NULL as valid_to, 1 as is_active, 'CO2e emission factor for purchased steam energy.' as description, NULL as calculation_formula, 'USEPA' as source_standard, 'USEPA Steam' as source_reference, 'AR6' as gwp_version, 1 as is_default, 100 as priority, 'Steam' as fuel_type
+  -- Steam - Default (using 0.275000 as per user requirement)
+  SELECT 0.275000 as factor_value, 'kWh' as unit, 'USEPA Steam Generation (Tier 2)' as calculation_method, 'UAE' as region, 2024 as valid_from, NULL as valid_to, 1 as is_active, 'CO2e emission factor for purchased steam energy.' as description, NULL as calculation_formula, 'USEPA' as source_standard, 'USEPA Steam' as source_reference, 'AR6' as gwp_version, 1 as is_default, 100 as priority, 'Steam' as fuel_type
   UNION ALL
   -- Cooling (District Cooling) - Default
   SELECT 0.226300 as factor_value, 'kWh' as unit, 'USEPA District Cooling (Tier 2)' as calculation_method, 'UAE' as region, 2024 as valid_from, NULL as valid_to, 1 as is_active, 'CO2e emission factor for purchased cooling (district cooling).' as description, NULL as calculation_formula, 'USEPA' as source_standard, 'USEPA District Cooling' as source_reference, 'AR6' as gwp_version, 1 as is_default, 100 as priority, 'Cooling' as fuel_type
@@ -511,8 +511,8 @@ CROSS JOIN (
   -- Heat - Alternative
   SELECT 0.226543 as factor_value, 'kWh' as unit, 'USEPA District Heating (Tier 2)' as calculation_method, 'UAE' as region, 2024 as valid_from, NULL as valid_to, 1 as is_active, 'CO2e emission factor for purchased heat (alternative factor).' as description, NULL as calculation_formula, 'USEPA' as source_standard, 'USEPA District Heating' as source_reference, 'AR6' as gwp_version, 0 as is_default, 90 as priority, 'Heat' as fuel_type
   UNION ALL
-  -- Steam - Alternative
-  SELECT 0.275000 as factor_value, 'kWh' as unit, 'USEPA Steam Generation (Tier 2)' as calculation_method, 'UAE' as region, 2024 as valid_from, NULL as valid_to, 1 as is_active, 'CO2e emission factor for purchased steam (alternative factor).' as description, NULL as calculation_formula, 'USEPA' as source_standard, 'USEPA Steam' as source_reference, 'AR6' as gwp_version, 0 as is_default, 90 as priority, 'Steam' as fuel_type
+  -- Steam - Alternative (keeping 0.250000 as alternative)
+  SELECT 0.250000 as factor_value, 'kWh' as unit, 'USEPA Steam Generation (Tier 2)' as calculation_method, 'UAE' as region, 2024 as valid_from, NULL as valid_to, 1 as is_active, 'CO2e emission factor for purchased steam (alternative factor).' as description, NULL as calculation_formula, 'USEPA' as source_standard, 'USEPA Steam' as source_reference, 'AR6' as gwp_version, 0 as is_default, 90 as priority, 'Steam' as fuel_type
   UNION ALL
   -- Cooling - Alternative
   SELECT 0.226543 as factor_value, 'kWh' as unit, 'USEPA District Cooling (Tier 2)' as calculation_method, 'UAE' as region, 2024 as valid_from, NULL as valid_to, 1 as is_active, 'CO2e emission factor for purchased cooling (alternative factor).' as description, NULL as calculation_formula, 'USEPA' as source_standard, 'USEPA District Cooling' as source_reference, 'AR6' as gwp_version, 0 as is_default, 90 as priority, 'Cooling' as fuel_type

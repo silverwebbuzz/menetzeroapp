@@ -45,7 +45,7 @@ class EmissionCalculationService
             $factorQuery->where('fuel_category', $conditions['fuel_category']);
         }
 
-        // Filter by fuel_type if provided
+        // Filter by fuel_type if provided (this is critical for Heat/Steam/Cooling and Fuel types)
         if (!empty($conditions['fuel_type'])) {
             $factorQuery->where('fuel_type', $conditions['fuel_type']);
         }
@@ -60,7 +60,26 @@ class EmissionCalculationService
             $factorQuery->where('region', $conditions['region']);
         }
 
-        // Try to get default factor first
+        // IMPORTANT: When fuel_type is specified, prioritize exact match over is_default
+        // This ensures Steam (0.275000) is selected when Steam is chosen, not Heat (0.226300)
+        if (!empty($conditions['fuel_type'])) {
+            // First try to get the factor matching fuel_type (prefer default if multiple match)
+            $matchingFactor = (clone $factorQuery)
+                ->where('is_default', true)
+                ->first();
+            
+            if ($matchingFactor) {
+                return $matchingFactor;
+            }
+            
+            // If no default matches, get highest priority matching fuel_type
+            $matchingFactor = $factorQuery->orderBy('priority', 'desc')->first();
+            if ($matchingFactor) {
+                return $matchingFactor;
+            }
+        }
+
+        // If no fuel_type specified, try to get default factor first
         $defaultFactor = (clone $factorQuery)
             ->where('is_default', true)
             ->first();
