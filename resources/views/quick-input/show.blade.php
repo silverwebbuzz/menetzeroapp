@@ -119,7 +119,7 @@
                         $seenMainFieldNames = [];
                         $mainFields = $formFields->filter(function($field) use (&$seenMainFieldNames) {
                             // Include required fields and main input fields
-                            $isMainField = $field->is_required || in_array($field->field_name, ['fuel_category', 'fuel_type', 'unit_of_measure', 'unit', 'amount', 'quantity']);
+                            $isMainField = $field->is_required || in_array($field->field_name, ['fuel_category', 'fuel_type', 'unit_of_measure', 'unit', 'amount', 'quantity', 'distance']);
                             
                             if (!$isMainField) {
                                 return false;
@@ -205,7 +205,7 @@
                                     <input type="number" 
                                            name="{{ $field->field_name }}" 
                                            id="{{ $field->field_name }}"
-                                           value="{{ old($field->field_name, $editEntry && ($field->field_name === 'amount' || $field->field_name === 'quantity') ? $editEntry->quantity : ($editAdditionalData[$field->field_name] ?? '')) }}"
+                                           value="{{ old($field->field_name, $editEntry && ($field->field_name === 'amount' || $field->field_name === 'quantity' || $field->field_name === 'distance') ? ($editEntry->quantity ?? $editAdditionalData[$field->field_name] ?? '') : ($editAdditionalData[$field->field_name] ?? '')) }}"
                                            step="any"
                                            min="0"
                                            {{ $field->is_required ? 'required' : '' }}

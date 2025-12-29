@@ -139,7 +139,7 @@
                 e.stopPropagation();
                 const form = e.target.closest('form') || document.querySelector('form[data-source-id]');
                 if (form) {
-                    console.log('Calculate button clicked');
+                    // Removed verbose logging
                     calculateEmissions(form);
                 }
             }
