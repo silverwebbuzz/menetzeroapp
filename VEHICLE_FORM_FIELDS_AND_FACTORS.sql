@@ -150,7 +150,7 @@ SELECT
   1,
   5,
   'Distance travelled in the unit of measure specified above.',
-  'unit_of_measure',
+  NULL, -- Remove dependency - always show distance field for vehicles
   JSON_OBJECT('min', 0, 'step', 'any')
 FROM `emission_sources_master` es
 WHERE es.quick_input_slug = 'vehicle'

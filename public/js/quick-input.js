@@ -587,14 +587,32 @@
                     }
                 }
 
-                // Initial state
+                // Initial state - check immediately
                 updateVisibility();
 
                 // Update on change
                 dependsOnField.addEventListener('change', updateVisibility);
                 dependsOnField.addEventListener('input', updateVisibility);
+                
+                // Also check after a short delay to catch any pre-filled values
+                setTimeout(updateVisibility, 100);
             }
         });
+        
+        // Also check all dependent fields after a delay to ensure they're shown if their dependency is already selected
+        setTimeout(function() {
+            const allDependentFields = form.querySelectorAll('[data-depends-on]');
+            allDependentFields.forEach(fieldContainer => {
+                const dependsOnFieldName = fieldContainer.getAttribute('data-depends-on');
+                if (!dependsOnFieldName) return;
+                
+                const dependsOnField = form.querySelector(`[name="${dependsOnFieldName}"]`) || 
+                                       form.querySelector(`#${dependsOnFieldName}`);
+                if (dependsOnField && dependsOnField.value && dependsOnField.value.trim() !== '') {
+                    fieldContainer.style.display = 'flex';
+                }
+            });
+        }, 200);
     }
 
     /**
@@ -802,6 +820,15 @@
         setupFormLoadingStates();
         setupCascadingDropdowns();
         setupVehicleConditionalFields();
+        
+        // Force clear any cached console.log by overriding it temporarily
+        const originalLog = console.log;
+        console.log = function(...args) {
+            if (args[0] && typeof args[0] === 'string' && args[0].includes('Calculation inputs')) {
+                return; // Suppress this specific log
+            }
+            originalLog.apply(console, args);
+        };
         
         // Store original button text
         const submitButtons = document.querySelectorAll('button[type="submit"]');

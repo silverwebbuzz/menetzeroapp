@@ -191,11 +191,8 @@
                                 @endif
                             </div>
                         @elseif($field->field_type === 'number')
-                            <div class="flex items-center gap-4" 
-                                 @if($field->depends_on_field) 
-                                     data-depends-on="{{ $field->depends_on_field }}" 
-                                     style="display: {{ $field->depends_on_field ? 'none' : 'flex' }};"
-                                 @endif>
+                            {{-- For distance field, always show it (no conditional hiding) --}}
+                            <div class="flex items-center gap-4">
                                 <label for="{{ $field->field_name }}" class="text-sm font-medium text-gray-700 w-40">
                                     {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
                                     @if($field->is_required)
