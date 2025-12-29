@@ -121,7 +121,7 @@
                 </div>
                 
                 <!-- Main Input Fields - Horizontal Layout with aligned labels and inputs -->
-                <div class="flex-1">
+                <div class="flex-1 main-information-section">
                     @php
                         // Get additional data from edit entry if available
                         $editAdditionalData = [];
@@ -318,7 +318,7 @@
                             <h3 class="text-lg font-semibold text-gray-900 mb-1">Additional Data</h3>
                             <p class="text-sm text-gray-500">Optional supplementary information</p>
                         </div>
-                        <div class="flex-1">
+                        <div class="flex-1 additional-data-section">
                             @foreach($additionalFields as $field)
                                 <div class="form-group-horizontal">
                                     <label for="{{ $field->field_name }}" class="form-label-horizontal">
@@ -397,11 +397,13 @@
 
                 <!-- Notes field (for backward compatibility, only if comments field doesn't exist) -->
                 @if(!$commentsField)
-                    <div class="form-group-horizontal">
-                        <label for="notes" class="form-label-horizontal">Comments</label>
-                        <div class="form-input-wrapper">
-                            <textarea name="notes" id="notes" rows="3"
-                                      class="form-input form-textarea">{{ old('notes', $editEntry->notes ?? '') }}</textarea>
+                    <div class="additional-data-section">
+                        <div class="form-group-horizontal">
+                            <label for="notes" class="form-label-horizontal">Comments</label>
+                            <div class="form-input-wrapper">
+                                <textarea name="notes" id="notes" rows="3"
+                                          class="form-input form-textarea">{{ old('notes', $editEntry->notes ?? '') }}</textarea>
+                            </div>
                         </div>
                     </div>
                 @endif

@@ -13,6 +13,26 @@
     width: 100% !important;
 }
 
+/* Main Information Section - Use w-40 (15rem = 240px) for labels */
+.main-information-section .form-group-horizontal {
+    grid-template-columns: 15rem 1fr !important;
+}
+
+.main-information-section .form-label-horizontal {
+    min-width: 15rem;
+    max-width: 15rem;
+}
+
+/* Additional Data Section - Use w-20 (5rem = 80px) for labels */
+.additional-data-section .form-group-horizontal {
+    grid-template-columns: 5rem 1fr !important;
+}
+
+.additional-data-section .form-label-horizontal {
+    min-width: 5rem;
+    max-width: 5rem;
+}
+
 .form-group-horizontal:last-child {
     margin-bottom: 0 !important;
 }
