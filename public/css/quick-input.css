@@ -4,36 +4,41 @@
 
 /* Form Group Spacing - Horizontal Layout */
 .form-group-horizontal {
-    display: grid;
-    grid-template-columns: 200px 1fr;
-    gap: 1.5rem;
-    margin-bottom: 1rem;
-    align-items: start;
+    display: grid !important;
+    grid-template-columns: 200px 1fr !important;
+    gap: 1.5rem !important;
+    margin-bottom: 1rem !important;
+    align-items: start !important;
 }
 
 .form-group-horizontal:last-child {
-    margin-bottom: 0;
+    margin-bottom: 0 !important;
 }
 
-/* Form Label - Horizontal Layout */
+/* Form Label - Horizontal Layout - All labels align at top */
 .form-label-horizontal {
     font-size: 0.875rem;
     font-weight: 600;
     color: #374151;
-    padding-top: 0.625rem;
+    padding-top: 0.5rem;
     line-height: 1.5;
     text-align: left;
+    align-self: start;
+    grid-column: 1;
 }
 
-/* Form Input Wrapper */
+/* Form Input Wrapper - All inputs start at same point */
 .form-input-wrapper {
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    grid-column: 2;
 }
 
-/* Form Inputs */
+/* Form Inputs - All inputs start at same horizontal position */
 .form-input,
 .form-input-select {
-    width: 100%;
+    width: 100% !important;
     padding: 0.625rem 0.875rem;
     border: 1px solid #d1d5db;
     border-radius: 0.5rem;
@@ -42,6 +47,7 @@
     background-color: #ffffff;
     transition: all 0.2s ease-in-out;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    order: 1;
 }
 
 .form-input:focus,
@@ -78,22 +84,34 @@
     font-family: inherit;
 }
 
-/* Help Text */
+/* Help Text - Always below input, never to the right */
 .form-help-text {
-    margin-top: 0.5rem;
+    margin-top: 0.5rem !important;
     font-size: 0.75rem;
     color: #6b7280;
     line-height: 1.4;
-    display: block;
+    display: block !important;
+    width: 100% !important;
+    order: 2;
 }
 
-/* Error Text */
+/* Error Text - Always below input */
 .form-error-text {
-    margin-top: 0.5rem;
+    margin-top: 0.5rem !important;
     font-size: 0.875rem;
     color: #dc2626;
     font-weight: 500;
-    display: block;
+    display: block !important;
+    width: 100% !important;
+    order: 3;
+}
+
+/* Ensure inputs come first in order and take full width */
+.form-input,
+.form-input-select,
+.form-textarea {
+    order: 1;
+    width: 100% !important;
 }
 
 /* Form enhancements */
