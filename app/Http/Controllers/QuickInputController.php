@@ -331,10 +331,20 @@ class QuickInputController extends Controller
             // Prepare conditions for factor selection (include fuel_category, fuel_type, energy_type, etc.)
             // For refrigerants (fugitive emissions), use 'Global' as region since GWP values are global
             $defaultRegion = ($emissionSource->emission_type === 'fugitive') ? 'Global' : 'UAE';
+            
+            // Handle process emissions - use process_type as fuel_type
+            $processType = $request->input('process_type');
+            $fuelType = $request->input('fuel_type');
+            if ($emissionSource->quick_input_slug === 'process' && $processType) {
+                $fuelType = $processType;
+            } else {
+                $fuelType = $fuelType ?: $request->input('energy_type') ?: $request->input('refrigerant_type');
+            }
+            
             $conditions = [
                 'region' => $request->input('region', $defaultRegion),
                 'fuel_category' => $request->input('fuel_category'),
-                'fuel_type' => $request->input('fuel_type') ?: $request->input('energy_type') ?: $request->input('refrigerant_type'), // For Heat/Steam/Cooling, energy_type maps to fuel_type; for Refrigerants, refrigerant_type maps to fuel_type
+                'fuel_type' => $fuelType,
                 'unit' => $unit,
             ];
             
@@ -377,7 +387,7 @@ class QuickInputController extends Controller
             $formFields = EmissionSourceFormField::where('emission_source_id', $emissionSource->id)->get();
             foreach ($formFields as $field) {
                 // Skip main fields that are stored directly or in dedicated columns
-                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments', 'fuel_category', 'fuel_type', 'energy_type', 'refrigerant_type'])) {
+                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments', 'fuel_category', 'fuel_type', 'energy_type', 'refrigerant_type', 'process_type'])) {
                     continue;
                 }
                 if ($request->has($field->field_name) && $request->input($field->field_name) !== null && $request->input($field->field_name) !== '') {
@@ -504,6 +514,9 @@ class QuickInputController extends Controller
             // For vehicles: use vehicle_fuel_type and vehicle_size
             if ($emissionSource->quick_input_slug === 'vehicle') {
                 $fuelType = $vehicleFuelType; // Use vehicle_fuel_type as fuel_type
+            } elseif ($emissionSource->quick_input_slug === 'process') {
+                // For process emissions, use process_type as fuel_type
+                $fuelType = $request->input('process_type');
             } else {
                 // For other sources, use standard mapping
                 $fuelType = $fuelType ?: $request->input('energy_type') ?: $request->input('refrigerant_type');
@@ -726,10 +739,20 @@ class QuickInputController extends Controller
             // Prepare conditions for factor selection (include fuel_category, fuel_type, energy_type, etc.)
             // For refrigerants (fugitive emissions), use 'Global' as region since GWP values are global
             $defaultRegion = ($emissionSource->emission_type === 'fugitive') ? 'Global' : 'UAE';
+            
+            // Handle process emissions - use process_type as fuel_type
+            $processType = $request->input('process_type');
+            $fuelType = $request->input('fuel_type');
+            if ($emissionSource->quick_input_slug === 'process' && $processType) {
+                $fuelType = $processType;
+            } else {
+                $fuelType = $fuelType ?: $request->input('energy_type') ?: $request->input('refrigerant_type');
+            }
+            
             $conditions = [
                 'region' => $request->input('region', $defaultRegion),
                 'fuel_category' => $request->input('fuel_category'),
-                'fuel_type' => $request->input('fuel_type') ?: $request->input('energy_type') ?: $request->input('refrigerant_type'), // For Heat/Steam/Cooling, energy_type maps to fuel_type; for Refrigerants, refrigerant_type maps to fuel_type
+                'fuel_type' => $fuelType,
                 'unit' => $unit,
             ];
             
@@ -755,7 +778,7 @@ class QuickInputController extends Controller
             $formFields = $this->formBuilder->buildForm($emissionSource->id);
             foreach ($formFields as $field) {
                 // Skip main fields that are stored directly
-                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments', 'fuel_category', 'fuel_type', 'energy_type', 'refrigerant_type'])) {
+                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments', 'fuel_category', 'fuel_type', 'energy_type', 'refrigerant_type', 'process_type'])) {
                     continue;
                 }
                 if ($request->has($field->field_name) && $request->input($field->field_name) !== null && $request->input($field->field_name) !== '') {
@@ -1039,6 +1062,14 @@ class QuickInputController extends Controller
             $vehicleFuelType = $request->input('vehicle_fuel_type');
             if ($vehicleFuelType) {
                 return $vehicleFuelType;
+            }
+        }
+        
+        // Handle process emissions - use process_type as fuel_type
+        if ($emissionSource->quick_input_slug === 'process') {
+            $processType = $request->input('process_type');
+            if ($processType) {
+                return $processType;
             }
         }
         

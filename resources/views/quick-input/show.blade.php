@@ -108,10 +108,11 @@
                             $editAdditionalData = is_string($editEntry->additional_data) ? json_decode($editEntry->additional_data, true) : ($editEntry->additional_data ?? []);
                         }
                         
-                        // Get fuel_category, fuel_type, and unit from edit entry
+                        // Get fuel_category, fuel_type, unit, and process_type from edit entry
                         $editFuelCategory = $editEntry ? ($editAdditionalData['fuel_category'] ?? null) : null;
                         $editFuelType = $editEntry ? ($editEntry->fuel_type ?? null) : null;
                         $editUnit = $editEntry ? ($editEntry->unit ?? null) : null;
+                        $editProcessType = $editEntry ? ($editEntry->fuel_type ?? null) : null; // For process emissions, fuel_type stores process_type
                         
                         // Get main fields (required fields that are not in Additional Data section)
                         // These are fields like fuel_category, fuel_type, unit_of_measure, amount, quantity
@@ -119,7 +120,7 @@
                         $seenMainFieldNames = [];
                         $mainFields = $formFields->filter(function($field) use (&$seenMainFieldNames) {
                             // Include required fields and main input fields
-                            $isMainField = $field->is_required || in_array($field->field_name, ['fuel_category', 'fuel_type', 'unit_of_measure', 'unit', 'amount', 'quantity', 'distance']);
+                            $isMainField = $field->is_required || in_array($field->field_name, ['fuel_category', 'fuel_type', 'unit_of_measure', 'unit', 'amount', 'quantity', 'distance', 'process_type']);
                             
                             if (!$isMainField) {
                                 return false;
@@ -165,6 +166,8 @@
                                                             $fieldValue = $editFuelCategory;
                                                         } elseif ($field->field_name === 'fuel_type') {
                                                             $fieldValue = $editFuelType;
+                                                        } elseif ($field->field_name === 'process_type') {
+                                                            $fieldValue = $editProcessType;
                                                         } elseif ($field->field_name === 'unit_of_measure' || $field->field_name === 'unit') {
                                                             $fieldValue = $editUnit;
                                                         } else {
@@ -552,6 +555,7 @@
     @if($editEntry)
         <input type="hidden" id="fuel_category_initial_value" value="{{ $editFuelCategory ?? '' }}">
         <input type="hidden" id="fuel_type_initial_value" value="{{ $editFuelType ?? '' }}">
+        <input type="hidden" id="process_type_initial_value" value="{{ $editProcessType ?? '' }}">
         <input type="hidden" id="unit_of_measure_initial_value" value="{{ $editUnit ?? '' }}">
         <input type="hidden" id="unit_initial_value" value="{{ $editUnit ?? '' }}">
     @endif

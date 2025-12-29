@@ -275,6 +275,7 @@
             vehicle_type: document.getElementById('vehicle_size')?.value, // Vehicle size for distance-based calculation
             energy_type: document.getElementById('energy_type')?.value, // For Heat/Steam/Cooling
             refrigerant_type: document.getElementById('refrigerant_type')?.value, // For Refrigerants
+            process_type: document.getElementById('process_type')?.value, // For Process Emissions
             region: document.getElementById('region')?.value || 'UAE',
         };
         
