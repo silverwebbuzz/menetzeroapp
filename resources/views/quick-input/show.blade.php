@@ -114,14 +114,14 @@
         <!-- Split Layout: Main Form (Left) and Additional Data (Right) -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <!-- Left Side: Main Form Fields (50%) -->
-            <div class="space-y-6">
-                <div class="mb-6">
+            <div>
+                <div class="mb-4">
                     <h3 class="text-lg font-semibold text-gray-900 mb-1">Main Information</h3>
                     <p class="text-sm text-gray-500">Enter the primary emission data</p>
                 </div>
                 
-                <!-- Main Input Fields - Vertical Layout - Professional Design -->
-                <div class="space-y-6">
+                <!-- Main Input Fields - Horizontal Layout with aligned labels and inputs -->
+                <div>
                     @php
                         // Get additional data from edit entry if available
                         $editAdditionalData = [];
@@ -286,7 +286,7 @@
             </div>
 
             <!-- Right Side: Additional Data (50%) -->
-            <div class="space-y-6">
+            <div>
                 @php
                     // Get additional data from edit entry if available
                     $editAdditionalData = [];
@@ -314,11 +314,11 @@
                 @endphp
                 @if($additionalFields->count() > 0 || $commentsField)
                     <div>
-                        <div class="mb-6">
+                        <div class="mb-4">
                             <h3 class="text-lg font-semibold text-gray-900 mb-1">Additional Data</h3>
                             <p class="text-sm text-gray-500">Optional supplementary information</p>
                         </div>
-                        <div class="space-y-0">
+                        <div>
                             @foreach($additionalFields as $field)
                                 <div class="form-group-horizontal">
                                     <label for="{{ $field->field_name }}" class="form-label-horizontal">
