@@ -414,7 +414,7 @@ class QuickInputController extends Controller
                 'gwp_version_used' => $emissionFactor->gwp_version ?? 'AR6',
                 'calculation_method' => $emissionFactor->calculation_method ?? null, // Save calculation method from emission factor
                 'supplier_emission_factor' => $request->input('supplier_emission_factor') ? (float) $request->input('supplier_emission_factor') : null, // Save supplier factor if provided
-                'fuel_type' => $request->input('fuel_type') ?: $request->input('energy_type') ?: $request->input('refrigerant_type'), // Save fuel_type (for Fuel), energy_type (for Heat/Steam/Cooling), or refrigerant_type (for Refrigerants) as fuel_type
+                'fuel_type' => $this->determineFuelType($request, $emissionSource), // Determine fuel_type based on source type
                 'additional_data' => !empty($additionalData) ? $additionalData : null,
                 'notes' => $notes,
                 'created_by' => $user->id,
@@ -491,10 +491,33 @@ class QuickInputController extends Controller
             // Prepare conditions for factor selection (include fuel_category, fuel_type, energy_type, etc.)
             // For refrigerants (fugitive emissions), use 'Global' as region since GWP values are global
             $defaultRegion = ($emissionSource->emission_type === 'fugitive') ? 'Global' : 'UAE';
+            
+            // Handle vehicle-specific fields
+            $fuelType = $request->input('fuel_type');
+            $vehicleFuelType = $request->input('vehicle_fuel_type');
+            $vehicleType = $request->input('vehicle_type');
+            $fuelOrVehicleType = $request->input('fuel_or_vehicle_type');
+            
+            // For vehicles: if fuel_or_vehicle_type is provided, use it appropriately
+            if ($emissionSource->quick_input_slug === 'vehicle') {
+                // If vehicle_fuel_type is set, user doesn't know fuel amount (distance-based)
+                if ($vehicleFuelType && $fuelOrVehicleType) {
+                    $fuelType = $vehicleFuelType; // Use vehicle_fuel_type as fuel_type
+                    $vehicleType = $fuelOrVehicleType; // Use fuel_or_vehicle_type as vehicle_type (size)
+                } elseif ($fuelOrVehicleType) {
+                    // User knows fuel amount (fuel-based)
+                    $fuelType = $fuelOrVehicleType; // Use fuel_or_vehicle_type as fuel_type
+                }
+            } else {
+                // For other sources, use standard mapping
+                $fuelType = $fuelType ?: $request->input('energy_type') ?: $request->input('refrigerant_type');
+            }
+            
             $conditions = [
                 'region' => $request->input('region', $defaultRegion),
                 'fuel_category' => $request->input('fuel_category'),
-                'fuel_type' => $request->input('fuel_type') ?: $request->input('energy_type') ?: $request->input('refrigerant_type'), // For Heat/Steam/Cooling, energy_type maps to fuel_type; for Refrigerants, refrigerant_type maps to fuel_type
+                'fuel_type' => $fuelType,
+                'vehicle_type' => $vehicleType, // For distance-based vehicle calculations
                 'unit' => $request->input('unit') ?? $request->input('unit_of_measure'),
             ];
             
@@ -542,7 +565,8 @@ class QuickInputController extends Controller
             ]);
             
             // Get quantity (handle both 'amount' and 'quantity' fields)
-            $quantity = $request->input('quantity') ?? $request->input('amount');
+            // For vehicles, quantity can be 'amount' (fuel-based) or 'distance' (distance-based)
+            $quantity = $request->input('quantity') ?? $request->input('amount') ?? $request->input('distance');
             $unit = $request->input('unit') ?? $request->input('unit_of_measure');
             
             // Calculate CO2e
@@ -760,7 +784,7 @@ class QuickInputController extends Controller
                 'gwp_version_used' => $emissionFactor->gwp_version ?? 'AR6',
                 'calculation_method' => $emissionFactor->calculation_method ?? null, // Save calculation method from emission factor
                 'supplier_emission_factor' => $request->input('supplier_emission_factor') ? (float) $request->input('supplier_emission_factor') : null, // Save supplier factor if provided
-                'fuel_type' => $request->input('fuel_type') ?: $request->input('energy_type') ?: $request->input('refrigerant_type'), // Save fuel_type (for Fuel), energy_type (for Heat/Steam/Cooling), or refrigerant_type (for Refrigerants) as fuel_type
+                'fuel_type' => $this->determineFuelType($request, $emissionSource), // Determine fuel_type based on source type
                 'additional_data' => !empty($additionalData) ? $additionalData : null,
                 'notes' => $request->input('comments') ?? $request->input('notes') ?? null,
                 'updated_by' => $user->id,
@@ -1007,6 +1031,31 @@ class QuickInputController extends Controller
                 'message' => 'Failed to fetch fuel types'
             ], 500);
         }
+    }
+
+    /**
+     * Determine fuel_type based on request and emission source
+     */
+    private function determineFuelType(Request $request, EmissionSourceMaster $emissionSource)
+    {
+        // Handle vehicle-specific fields
+        if ($emissionSource->quick_input_slug === 'vehicle') {
+            $knowFuelAmount = $request->input('know_fuel_amount');
+            $vehicleFuelType = $request->input('vehicle_fuel_type');
+            $fuelOrVehicleType = $request->input('fuel_or_vehicle_type');
+            
+            // If know_fuel_amount = 'No', use vehicle_fuel_type
+            if ($knowFuelAmount === 'No' && $vehicleFuelType) {
+                return $vehicleFuelType;
+            }
+            // If know_fuel_amount = 'Yes', use fuel_or_vehicle_type as fuel_type
+            elseif ($knowFuelAmount === 'Yes' && $fuelOrVehicleType) {
+                return $fuelOrVehicleType;
+            }
+        }
+        
+        // For other sources, use standard mapping
+        return $request->input('fuel_type') ?: $request->input('energy_type') ?: $request->input('refrigerant_type');
     }
 
     /**

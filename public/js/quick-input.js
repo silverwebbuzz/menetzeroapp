@@ -235,7 +235,9 @@
                 unit: unit,
                 // Include other form fields that might affect factor selection
                 fuel_category: document.getElementById('fuel_category')?.value,
-                fuel_type: document.getElementById('fuel_type')?.value,
+                fuel_type: document.getElementById('fuel_type')?.value || document.getElementById('fuel_or_vehicle_type')?.value, // For vehicles, use fuel_or_vehicle_type
+                vehicle_fuel_type: document.getElementById('vehicle_fuel_type')?.value, // For vehicles when distance-based
+                vehicle_type: document.getElementById('fuel_or_vehicle_type')?.value, // Vehicle size when distance-based
                 energy_type: document.getElementById('energy_type')?.value, // For Heat/Steam/Cooling
                 refrigerant_type: document.getElementById('refrigerant_type')?.value, // For Refrigerants
                 region: document.getElementById('region')?.value || 'UAE',
@@ -504,6 +506,160 @@
     }
 
     /**
+     * Setup conditional fields for Vehicle form
+     */
+    function setupVehicleConditionalFields() {
+        const form = document.querySelector('form[data-source-id]');
+        if (!form) return;
+
+        const emissionSourceId = form.dataset.sourceId;
+        const emissionSourceSlug = form.dataset.sourceSlug || getEmissionSourceSlugFromUrl();
+        
+        // Only setup for vehicle form
+        if (emissionSourceSlug !== 'vehicle') return;
+
+        const knowFuelAmountSelect = document.getElementById('know_fuel_amount');
+        const fuelOrVehicleTypeSelect = document.getElementById('fuel_or_vehicle_type');
+        const vehicleFuelTypeSelect = document.getElementById('vehicle_fuel_type');
+        const unitSelect = document.getElementById('unit_of_measure');
+        const distanceField = document.querySelector('[name="distance"]');
+        const amountField = document.querySelector('[name="amount"]');
+        const distanceContainer = distanceField ? distanceField.closest('.flex, div') : null;
+        const amountContainer = amountField ? amountField.closest('.flex, div') : null;
+
+        if (!knowFuelAmountSelect) return;
+
+        // Define options for each scenario
+        const fuelTypeOptions = [
+            { value: 'Petrol (average biofuel blend)', label: 'Petrol (average biofuel blend)' },
+            { value: 'Diesel (average biofuel blend)', label: 'Diesel (average biofuel blend)' }
+        ];
+
+        const vehicleSizeOptions = [
+            { value: 'Small car', label: 'Small car' },
+            { value: 'Medium car', label: 'Medium car' },
+            { value: 'Large car', label: 'Large car' },
+            { value: 'Average car', label: 'Average car' },
+            { value: 'Small Motorbike', label: 'Small Motorbike' },
+            { value: 'Medium Motorbike', label: 'Medium Motorbike' },
+            { value: 'Large Motorbike', label: 'Large Motorbike' },
+            { value: 'Average Motorbike', label: 'Average Motorbike' }
+        ];
+
+        const fuelUnitOptions = [
+            { value: 'litres', label: 'litres' },
+            { value: 'tonnes', label: 'tonnes' }
+        ];
+
+        const distanceUnitOptions = [
+            { value: 'km', label: 'km' },
+            { value: 'miles', label: 'miles' }
+        ];
+
+        function updateFields() {
+            const knowFuelAmount = knowFuelAmountSelect.value;
+            
+            if (knowFuelAmount === 'Yes') {
+                // Show fuel type options
+                if (fuelOrVehicleTypeSelect) {
+                    fuelOrVehicleTypeSelect.innerHTML = '<option value="">Select an option</option>';
+                    fuelTypeOptions.forEach(opt => {
+                        const option = document.createElement('option');
+                        option.value = opt.value;
+                        option.textContent = opt.label;
+                        fuelOrVehicleTypeSelect.appendChild(option);
+                    });
+                }
+                
+                // Show fuel unit options
+                if (unitSelect) {
+                    unitSelect.innerHTML = '<option value="">Select an option</option>';
+                    fuelUnitOptions.forEach(opt => {
+                        const option = document.createElement('option');
+                        option.value = opt.value;
+                        option.textContent = opt.label;
+                        unitSelect.appendChild(option);
+                    });
+                }
+                
+                // Show amount field, hide distance and vehicle fuel type
+                if (amountContainer) amountContainer.style.display = '';
+                if (distanceContainer) distanceContainer.style.display = 'none';
+                if (vehicleFuelTypeSelect) {
+                    const container = vehicleFuelTypeSelect.closest('.flex, div');
+                    if (container) container.style.display = 'none';
+                }
+                
+                // Clear distance and vehicle fuel type
+                if (distanceField) distanceField.value = '';
+                if (vehicleFuelTypeSelect) vehicleFuelTypeSelect.value = '';
+                
+            } else if (knowFuelAmount === 'No') {
+                // Show vehicle size options
+                if (fuelOrVehicleTypeSelect) {
+                    fuelOrVehicleTypeSelect.innerHTML = '<option value="">Select an option</option>';
+                    vehicleSizeOptions.forEach(opt => {
+                        const option = document.createElement('option');
+                        option.value = opt.value;
+                        option.textContent = opt.label;
+                        fuelOrVehicleTypeSelect.appendChild(option);
+                    });
+                }
+                
+                // Show distance unit options
+                if (unitSelect) {
+                    unitSelect.innerHTML = '<option value="">Select an option</option>';
+                    distanceUnitOptions.forEach(opt => {
+                        const option = document.createElement('option');
+                        option.value = opt.value;
+                        option.textContent = opt.label;
+                        unitSelect.appendChild(option);
+                    });
+                }
+                
+                // Show distance and vehicle fuel type, hide amount
+                if (distanceContainer) distanceContainer.style.display = '';
+                if (amountContainer) amountContainer.style.display = 'none';
+                if (vehicleFuelTypeSelect) {
+                    const container = vehicleFuelTypeSelect.closest('.flex, div');
+                    if (container) container.style.display = '';
+                }
+                
+                // Clear amount
+                if (amountField) amountField.value = '';
+            } else {
+                // Reset everything when no selection
+                if (fuelOrVehicleTypeSelect) fuelOrVehicleTypeSelect.innerHTML = '<option value="">Select an option</option>';
+                if (unitSelect) unitSelect.innerHTML = '<option value="">Select an option</option>';
+                if (distanceContainer) distanceContainer.style.display = 'none';
+                if (amountContainer) amountContainer.style.display = 'none';
+                if (vehicleFuelTypeSelect) {
+                    const container = vehicleFuelTypeSelect.closest('.flex, div');
+                    if (container) container.style.display = 'none';
+                }
+            }
+        }
+
+        // Attach change handler
+        if (!knowFuelAmountSelect.dataset.handlerAttached) {
+            knowFuelAmountSelect.dataset.handlerAttached = 'true';
+            knowFuelAmountSelect.addEventListener('change', updateFields);
+            
+            // Initialize on page load
+            updateFields();
+        }
+    }
+
+    /**
+     * Get emission source slug from URL
+     */
+    function getEmissionSourceSlugFromUrl() {
+        const path = window.location.pathname;
+        const match = path.match(/\/quick-input\/\d+\/([^\/]+)/);
+        return match ? match[1] : null;
+    }
+
+    /**
      * Setup cascading dropdowns for Fuel and other sources
      */
     function setupCascadingDropdowns() {
@@ -721,6 +877,7 @@
         setupDeleteConfirmations();
         setupFormLoadingStates();
         setupCascadingDropdowns();
+        setupVehicleConditionalFields();
         
         // Store original button text
         const submitButtons = document.querySelectorAll('button[type="submit"]');
@@ -732,11 +889,13 @@
         setTimeout(function() {
             console.log('Quick Input: Retrying setup after 500ms');
             setupCascadingDropdowns();
+            setupVehicleConditionalFields();
         }, 500);
         
         setTimeout(function() {
             console.log('Quick Input: Retrying setup after 1500ms');
             setupCascadingDropdowns();
+            setupVehicleConditionalFields();
         }, 1500);
         
         // Watch for form appearance

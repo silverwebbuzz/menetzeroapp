@@ -49,6 +49,11 @@ class EmissionCalculationService
         if (!empty($conditions['fuel_type'])) {
             $factorQuery->where('fuel_type', $conditions['fuel_type']);
         }
+        
+        // Filter by vehicle_type if provided (for distance-based vehicle calculations)
+        if (!empty($conditions['vehicle_type'])) {
+            $factorQuery->where('vehicle_type', $conditions['vehicle_type']);
+        }
 
         // Check if this is a fugitive emission (refrigerants) - GWP values are global and unit conversion is handled separately
         $isFugitiveEmission = false;
