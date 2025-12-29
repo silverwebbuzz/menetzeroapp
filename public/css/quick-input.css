@@ -1,10 +1,27 @@
 /**
- * Quick Input Styles
+ * Quick Input Styles - Professional Design
  */
 
 /* Form enhancements */
 .quick-input-form {
     position: relative;
+}
+
+/* Form Group Spacing */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+/* Input Focus States */
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
 }
 
 /* Loading state */
@@ -103,6 +120,10 @@
     .quick-input-form {
         padding: 1rem;
     }
+    
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
 }
 
 /* Action buttons in table */
@@ -188,3 +209,53 @@ form[data-submitting="true"] {
     animation: slideIn 0.3s ease-out;
 }
 
+/* Select dropdown styling */
+select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+    appearance: none;
+}
+
+/* Number input styling */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    opacity: 1;
+    height: auto;
+}
+
+/* Smooth transitions for all interactive elements */
+input,
+select,
+textarea,
+button {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Table improvements */
+table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+thead th {
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+/* Button improvements */
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}

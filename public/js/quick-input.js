@@ -570,10 +570,15 @@
         if (!form) return;
 
         // Setup conditional field visibility based on depends_on_field
-        const dependentFields = form.querySelectorAll('[data-depends-on]');
-        dependentFields.forEach(fieldContainer => {
-            const dependsOnFieldName = fieldContainer.getAttribute('data-depends-on');
+        // Find all fields (select/input) with data-depends-on attribute
+        const dependentFields = form.querySelectorAll('select[data-depends-on], input[data-depends-on]');
+        dependentFields.forEach(field => {
+            const dependsOnFieldName = field.getAttribute('data-depends-on');
             if (!dependsOnFieldName) return;
+
+            // Find the parent form-group container
+            const formGroup = field.closest('.form-group');
+            if (!formGroup) return;
 
             const dependsOnField = form.querySelector(`[name="${dependsOnFieldName}"]`) || 
                                    form.querySelector(`#${dependsOnFieldName}`);
@@ -582,9 +587,9 @@
                 // Show/hide based on whether the dependent field has a value
                 function updateVisibility() {
                     if (dependsOnField.value && dependsOnField.value.trim() !== '') {
-                        fieldContainer.style.display = 'flex';
+                        formGroup.style.display = 'block';
                     } else {
-                        fieldContainer.style.display = 'none';
+                        formGroup.style.display = 'none';
                     }
                 }
 
@@ -602,15 +607,18 @@
         
         // Also check all dependent fields after a delay to ensure they're shown if their dependency is already selected
         setTimeout(function() {
-            const allDependentFields = form.querySelectorAll('[data-depends-on]');
-            allDependentFields.forEach(fieldContainer => {
-                const dependsOnFieldName = fieldContainer.getAttribute('data-depends-on');
+            const allDependentFields = form.querySelectorAll('select[data-depends-on], input[data-depends-on]');
+            allDependentFields.forEach(field => {
+                const dependsOnFieldName = field.getAttribute('data-depends-on');
                 if (!dependsOnFieldName) return;
+                
+                const formGroup = field.closest('.form-group');
+                if (!formGroup) return;
                 
                 const dependsOnField = form.querySelector(`[name="${dependsOnFieldName}"]`) || 
                                        form.querySelector(`#${dependsOnFieldName}`);
                 if (dependsOnField && dependsOnField.value && dependsOnField.value.trim() !== '') {
-                    fieldContainer.style.display = 'flex';
+                    formGroup.style.display = 'block';
                 }
             });
         }, 200);

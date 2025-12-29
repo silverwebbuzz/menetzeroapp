@@ -10,77 +10,95 @@
 @section('content')
 <div class="max-w-7xl mx-auto">
     <!-- Header -->
-    <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-900">
-            @if($editEntry)
-                <span class="text-purple-600">Edit:</span> 
-            @endif
-            {{ $userFriendlyName ?? $emissionSource->name }}
-        </h1>
-        
-        @php
-            $instructions = $industryLabel->user_friendly_description ?? $emissionSource->instructions ?? null;
-        @endphp
-        @if($instructions)
-            <p class="mt-2 text-gray-600">{{ $instructions }}</p>
-        @endif
+    <div class="mb-8">
+        <div class="flex items-start justify-between mb-4">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                    @if($editEntry)
+                        <span class="text-purple-600">Edit:</span> 
+                    @endif
+                    {{ $userFriendlyName ?? $emissionSource->name }}
+                </h1>
+                @php
+                    $instructions = $industryLabel->user_friendly_description ?? $emissionSource->instructions ?? null;
+                @endphp
+                @if($instructions)
+                    <p class="text-base text-gray-600 leading-relaxed">{{ $instructions }}</p>
+                @endif
+            </div>
+        </div>
         
         @if(isset($industryLabel) && $industryLabel && $industryLabel->common_equipment)
-            <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
-                <p class="text-sm font-medium text-blue-900 mb-1">Common Equipment:</p>
+            <div class="mt-4 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-lg shadow-sm">
+                <p class="text-sm font-semibold text-blue-900 mb-1">Common Equipment:</p>
                 <p class="text-sm text-blue-800">{{ $industryLabel->common_equipment }}</p>
             </div>
         @endif
         
         @if(isset($industryLabel) && $industryLabel && $industryLabel->typical_units)
-            <div class="mt-2 text-sm text-gray-500">
-                <span class="font-medium">Typical Units:</span> {{ $industryLabel->typical_units }}
+            <div class="mt-3 inline-flex items-center px-3 py-1.5 bg-gray-100 rounded-lg text-sm text-gray-700">
+                <span class="font-semibold mr-2">Typical Units:</span>
+                <span>{{ $industryLabel->typical_units }}</span>
             </div>
         @endif
     </div>
 
     @if($errors->any())
-        <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-            <ul class="list-disc list-inside">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+        <div class="mb-6 bg-red-50 border-l-4 border-red-500 text-red-700 px-5 py-4 rounded-lg shadow-sm" role="alert">
+            <div class="flex items-start">
+                <svg class="w-5 h-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                </svg>
+                <div class="flex-1">
+                    <h3 class="text-sm font-semibold mb-2">Please correct the following errors:</h3>
+                    <ul class="list-disc list-inside text-sm space-y-1">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
         </div>
     @endif
 
-    <!-- Year and Location Selection Form - Single Line -->
-    <form method="GET" action="{{ route('quick-input.show', ['scope' => $scope, 'slug' => $slug]) }}" class="bg-white rounded-lg shadow p-4 mb-6">
-        <div class="flex items-center gap-4">
-            <label for="fiscal_year" class="text-sm font-medium text-gray-700">Year *</label>
-            <select name="fiscal_year" id="fiscal_year" required
-                    class="w-24 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                <option value="">Select</option>
-                @if(isset($yearsWithMeasurements) && count($yearsWithMeasurements) > 0)
-                    @foreach($yearsWithMeasurements as $year)
-                        <option value="{{ $year }}" {{ ($selectedFiscalYear ?? request('fiscal_year')) == $year ? 'selected' : '' }}>{{ $year }}</option>
+    <!-- Year and Location Selection Form - Professional Design -->
+    <form method="GET" action="{{ route('quick-input.show', ['scope' => $scope, 'slug' => $slug]) }}" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+        <div class="flex flex-wrap items-end gap-4">
+            <div class="flex-1 min-w-[200px]">
+                <label for="fiscal_year" class="block text-sm font-semibold text-gray-700 mb-2">Year <span class="text-red-500">*</span></label>
+                <select name="fiscal_year" id="fiscal_year" required
+                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
+                    <option value="">Select Year</option>
+                    @if(isset($yearsWithMeasurements) && count($yearsWithMeasurements) > 0)
+                        @foreach($yearsWithMeasurements as $year)
+                            <option value="{{ $year }}" {{ ($selectedFiscalYear ?? request('fiscal_year')) == $year ? 'selected' : '' }}>{{ $year }}</option>
+                        @endforeach
+                    @endif
+                </select>
+            </div>
+            <div class="flex-1 min-w-[200px]">
+                <label for="location_id" class="block text-sm font-semibold text-gray-700 mb-2">Location <span class="text-red-500">*</span></label>
+                <select name="location_id" id="location_id" required
+                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
+                    <option value="">Select Location</option>
+                    @foreach($locations as $location)
+                        <option value="{{ $location->id }}" {{ ($selectedLocationId ?? request('location_id')) == $location->id ? 'selected' : '' }}>{{ $location->name }}</option>
                     @endforeach
-                @endif
-            </select>
-            <label for="location_id" class="text-sm font-medium text-gray-700 ml-4">Location *</label>
-            <select name="location_id" id="location_id" required
-                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                <option value="">Select Location</option>
-                @foreach($locations as $location)
-                    <option value="{{ $location->id }}" {{ ($selectedLocationId ?? request('location_id')) == $location->id ? 'selected' : '' }}>{{ $location->name }}</option>
-                @endforeach
-            </select>
-            <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 whitespace-nowrap">
-                Select
-            </button>
+                </select>
+            </div>
+            <div class="flex-shrink-0">
+                <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-medium rounded-lg shadow-md hover:from-purple-700 hover:to-purple-800 hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap">
+                    Select
+                </button>
+            </div>
         </div>
     </form>
 
     @if($selectedLocationId && $selectedFiscalYear && $measurement)
-    <!-- Entry Form (Handles both Add and Edit) - Split Layout: 50% Form, 50% Additional Data -->
+    <!-- Entry Form (Handles both Add and Edit) - Professional Design -->
     <form method="POST" 
           action="{{ $editEntry ? route('quick-input.update', $editEntry->id) : route('quick-input.store', ['scope' => $scope, 'slug' => $slug]) }}" 
-          class="bg-white rounded-lg shadow p-6 mb-6"
+          class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8"
           data-source-id="{{ $emissionSource->id }}">
         @csrf
         @if($editEntry)
@@ -94,13 +112,16 @@
         @endif
 
         <!-- Split Layout: Main Form (Left) and Additional Data (Right) -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <!-- Left Side: Main Form Fields (50%) -->
             <div class="space-y-6">
-                <h3 class="text-lg font-medium text-gray-900 border-b pb-2">Main Information</h3>
+                <div class="pb-4 border-b border-gray-200">
+                    <h3 class="text-xl font-bold text-gray-900">Main Information</h3>
+                    <p class="text-sm text-gray-500 mt-1">Enter the primary emission data</p>
+                </div>
                 
-                <!-- Main Input Fields - Horizontal Layout - Render all required fields dynamically -->
-                <div class="space-y-4">
+                <!-- Main Input Fields - Vertical Layout - Professional Design -->
+                <div class="space-y-6">
                     @php
                         // Get additional data from edit entry if available
                         $editAdditionalData = [];
@@ -138,8 +159,8 @@
                     
                     @foreach($mainFields as $field)
                         @if($field->field_type === 'select')
-                            <div class="flex items-center gap-4">
-                                <label for="{{ $field->field_name }}" class="text-sm font-medium text-gray-700 w-40">
+                            <div class="form-group">
+                                <label for="{{ $field->field_name }}" class="block text-sm font-semibold text-gray-700 mb-2">
                                     {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
                                     @if($field->is_required)
                                         <span class="text-red-500">*</span>
@@ -150,7 +171,7 @@
                                         data-field-name="{{ $field->field_name }}"
                                         data-depends-on="{{ $field->depends_on_field ?? '' }}"
                                         {{ $field->is_required ? 'required' : '' }}
-                                        class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 dynamic-select">
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 dynamic-select">
                                     <option value="">Select an option</option>
                                     @if($field->field_options)
                                         @php
@@ -186,76 +207,72 @@
                                         @endif
                                     @endif
                                 </select>
-                                @error($field->field_name)
-                                    <p class="text-sm text-red-600">{{ $message }}</p>
-                                @enderror
                                 @if($field->help_text)
-                                    <p class="text-xs text-gray-500 mt-1">{{ $field->help_text }}</p>
+                                    <p class="mt-2 text-xs text-gray-500 leading-relaxed">{{ $field->help_text }}</p>
                                 @endif
+                                @error($field->field_name)
+                                    <p class="mt-2 text-sm text-red-600 font-medium">{{ $message }}</p>
+                                @enderror
                             </div>
                         @elseif($field->field_type === 'number')
                             {{-- For distance field, always show it (no conditional hiding) --}}
-                            <div class="flex items-center gap-4">
-                                <label for="{{ $field->field_name }}" class="text-sm font-medium text-gray-700 w-40">
+                            <div class="form-group">
+                                <label for="{{ $field->field_name }}" class="block text-sm font-semibold text-gray-700 mb-2">
                                     {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
                                     @if($field->is_required)
                                         <span class="text-red-500">*</span>
                                     @endif
                                 </label>
-                                <div class="flex-1">
-                                    @php
-                                        $validationRules = is_array($field->validation_rules) ? $field->validation_rules : (is_string($field->validation_rules) ? json_decode($field->validation_rules, true) : []);
-                                    @endphp
-                                    <input type="number" 
-                                           name="{{ $field->field_name }}" 
-                                           id="{{ $field->field_name }}"
-                                           value="{{ old($field->field_name, $editEntry && ($field->field_name === 'amount' || $field->field_name === 'quantity' || $field->field_name === 'distance') ? ($editEntry->quantity ?? $editAdditionalData[$field->field_name] ?? '') : ($editAdditionalData[$field->field_name] ?? '')) }}"
-                                           step="any"
-                                           min="0"
-                                           {{ $field->is_required ? 'required' : '' }}
-                                           placeholder="{{ $field->field_placeholder ?? 'Enter ' . strtolower($field->field_label ?? $field->field_name) }}"
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                                    @error($field->field_name)
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                    @if($field->help_text)
-                                        <p class="mt-1 text-xs text-gray-500">{{ $field->help_text }}</p>
-                                    @endif
-                                </div>
+                                @php
+                                    $validationRules = is_array($field->validation_rules) ? $field->validation_rules : (is_string($field->validation_rules) ? json_decode($field->validation_rules, true) : []);
+                                @endphp
+                                <input type="number" 
+                                       name="{{ $field->field_name }}" 
+                                       id="{{ $field->field_name }}"
+                                       value="{{ old($field->field_name, $editEntry && ($field->field_name === 'amount' || $field->field_name === 'quantity' || $field->field_name === 'distance') ? ($editEntry->quantity ?? $editAdditionalData[$field->field_name] ?? '') : ($editAdditionalData[$field->field_name] ?? '')) }}"
+                                       step="any"
+                                       min="0"
+                                       {{ $field->is_required ? 'required' : '' }}
+                                       placeholder="{{ $field->field_placeholder ?? 'Enter ' . strtolower($field->field_label ?? $field->field_name) }}"
+                                       class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
+                                @if($field->help_text)
+                                    <p class="mt-2 text-xs text-gray-500 leading-relaxed">{{ $field->help_text }}</p>
+                                @endif
+                                @error($field->field_name)
+                                    <p class="mt-2 text-sm text-red-600 font-medium">{{ $message }}</p>
+                                @enderror
                             </div>
                         @else
                             <!-- Text, textarea, etc. -->
-                            <div class="flex items-center gap-4">
-                                <label for="{{ $field->field_name }}" class="text-sm font-medium text-gray-700 w-40">
+                            <div class="form-group">
+                                <label for="{{ $field->field_name }}" class="block text-sm font-semibold text-gray-700 mb-2">
                                     {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
                                     @if($field->is_required)
                                         <span class="text-red-500">*</span>
                                     @endif
                                 </label>
-                                <div class="flex-1">
-                                    @if($field->field_type === 'textarea')
-                                        <textarea name="{{ $field->field_name }}" 
-                                                  id="{{ $field->field_name }}"
-                                                  rows="3"
-                                                  {{ $field->is_required ? 'required' : '' }}
-                                                  placeholder="{{ $field->field_placeholder ?? '' }}"
-                                                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}</textarea>
-                                    @else
-                                        <input type="{{ $field->field_type }}" 
-                                               name="{{ $field->field_name }}" 
-                                               id="{{ $field->field_name }}"
-                                               value="{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}"
-                                               {{ $field->is_required ? 'required' : '' }}
-                                               placeholder="{{ $field->field_placeholder ?? '' }}"
-                                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                                    @endif
-                                    @error($field->field_name)
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                    @if($field->help_text)
-                                        <p class="mt-1 text-xs text-gray-500">{{ $field->help_text }}</p>
-                                    @endif
-                                </div>
+                                @if($field->field_type === 'textarea')
+                                    <textarea name="{{ $field->field_name }}" 
+                                              id="{{ $field->field_name }}"
+                                              rows="4"
+                                              {{ $field->is_required ? 'required' : '' }}
+                                              placeholder="{{ $field->field_placeholder ?? '' }}"
+                                              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 resize-y">{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}</textarea>
+                                @else
+                                    <input type="{{ $field->field_type }}" 
+                                           name="{{ $field->field_name }}" 
+                                           id="{{ $field->field_name }}"
+                                           value="{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}"
+                                           {{ $field->is_required ? 'required' : '' }}
+                                           placeholder="{{ $field->field_placeholder ?? '' }}"
+                                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
+                                @endif
+                                @if($field->help_text)
+                                    <p class="mt-2 text-xs text-gray-500 leading-relaxed">{{ $field->help_text }}</p>
+                                @endif
+                                @error($field->field_name)
+                                    <p class="mt-2 text-sm text-red-600 font-medium">{{ $message }}</p>
+                                @enderror
                             </div>
                         @endif
                     @endforeach
@@ -291,69 +308,68 @@
                 @endphp
                 @if($additionalFields->count() > 0 || $commentsField)
                     <div>
-                        <h3 class="text-lg font-medium text-gray-900 border-b pb-2 mb-4">Additional Data</h3>
-                        <div class="space-y-4">
+                        <div class="pb-4 border-b border-gray-200 mb-6">
+                            <h3 class="text-xl font-bold text-gray-900">Additional Data</h3>
+                            <p class="text-sm text-gray-500 mt-1">Optional supplementary information</p>
+                        </div>
+                        <div class="space-y-6">
                             @foreach($additionalFields as $field)
-                                <div class="flex items-start gap-4">
-                                    <label for="{{ $field->field_name }}" class="text-sm font-medium text-gray-700 w-40 pt-2">
+                                <div class="form-group">
+                                    <label for="{{ $field->field_name }}" class="block text-sm font-semibold text-gray-700 mb-2">
                                         {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
                                     </label>
-                                    <div class="flex-1">
-                                        @if($field->field_type === 'select')
-                                            <select name="{{ $field->field_name }}" id="{{ $field->field_name }}"
-                                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                                                <option value="">Select {{ $field->field_label ?? $field->field_name }}</option>
-                                                @if($field->field_options)
-                                                    @php
-                                                        $options = is_array($field->field_options) ? $field->field_options : json_decode($field->field_options, true);
-                                                    @endphp
-                                                    @if(is_array($options))
-                                                        @foreach($options as $option)
-                                                            @if(is_array($option))
-                                                                <option value="{{ $option['value'] ?? $option }}" {{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') == ($option['value'] ?? $option) ? 'selected' : '' }}>{{ $option['label'] ?? $option['value'] ?? $option }}</option>
-                                                            @else
-                                                                <option value="{{ $option }}" {{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') == $option ? 'selected' : '' }}>{{ $option }}</option>
-                                                            @endif
-                                                        @endforeach
-                                                    @endif
+                                    @if($field->field_type === 'select')
+                                        <select name="{{ $field->field_name }}" id="{{ $field->field_name }}"
+                                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
+                                            <option value="">Select {{ $field->field_label ?? $field->field_name }}</option>
+                                            @if($field->field_options)
+                                                @php
+                                                    $options = is_array($field->field_options) ? $field->field_options : json_decode($field->field_options, true);
+                                                @endphp
+                                                @if(is_array($options))
+                                                    @foreach($options as $option)
+                                                        @if(is_array($option))
+                                                            <option value="{{ $option['value'] ?? $option }}" {{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') == ($option['value'] ?? $option) ? 'selected' : '' }}>{{ $option['label'] ?? $option['value'] ?? $option }}</option>
+                                                        @else
+                                                            <option value="{{ $option }}" {{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') == $option ? 'selected' : '' }}>{{ $option }}</option>
+                                                        @endif
+                                                    @endforeach
                                                 @endif
-                                            </select>
-                                        @elseif($field->field_type === 'textarea')
-                                            <textarea name="{{ $field->field_name }}" id="{{ $field->field_name }}" rows="3"
-                                                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}</textarea>
-                                        @else
-                                            <input type="{{ $field->field_type }}" name="{{ $field->field_name }}" id="{{ $field->field_name }}"
-                                                   value="{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}"
-                                                   placeholder="{{ $field->field_placeholder ?? '' }}"
-                                                   class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                                        @endif
-                                        @if($field->help_text)
-                                            <p class="mt-1 text-xs text-gray-500">{{ $field->help_text }}</p>
-                                        @endif
-                                        @error($field->field_name)
-                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                    </div>
+                                            @endif
+                                        </select>
+                                    @elseif($field->field_type === 'textarea')
+                                        <textarea name="{{ $field->field_name }}" id="{{ $field->field_name }}" rows="4"
+                                                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 resize-y">{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}</textarea>
+                                    @else
+                                        <input type="{{ $field->field_type }}" name="{{ $field->field_name }}" id="{{ $field->field_name }}"
+                                               value="{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}"
+                                               placeholder="{{ $field->field_placeholder ?? '' }}"
+                                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
+                                    @endif
+                                    @if($field->help_text)
+                                        <p class="mt-2 text-xs text-gray-500 leading-relaxed">{{ $field->help_text }}</p>
+                                    @endif
+                                    @error($field->field_name)
+                                        <p class="mt-2 text-sm text-red-600 font-medium">{{ $message }}</p>
+                                    @enderror
                                 </div>
                             @endforeach
                             
                             @if($commentsField)
                                 <!-- Comments field -->
-                                <div class="flex items-start gap-4">
-                                    <label for="comments" class="text-sm font-medium text-gray-700 w-40 pt-2">
+                                <div class="form-group">
+                                    <label for="comments" class="block text-sm font-semibold text-gray-700 mb-2">
                                         {{ $commentsField->field_label ?? 'Comments' }}
                                     </label>
-                                    <div class="flex-1">
-                                        <textarea name="comments" id="comments" rows="3"
-                                                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
-                                                  placeholder="{{ $commentsField->field_placeholder ?? 'Add any additional notes...' }}">{{ old('comments', $editEntry->notes ?? '') }}</textarea>
-                                        @if($commentsField->help_text)
-                                            <p class="mt-1 text-xs text-gray-500">{{ $commentsField->help_text }}</p>
-                                        @endif
-                                        @error('comments')
-                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                    </div>
+                                    <textarea name="comments" id="comments" rows="4"
+                                              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 resize-y"
+                                              placeholder="{{ $commentsField->field_placeholder ?? 'Add any additional notes...' }}">{{ old('comments', $editEntry->notes ?? '') }}</textarea>
+                                    @if($commentsField->help_text)
+                                        <p class="mt-2 text-xs text-gray-500 leading-relaxed">{{ $commentsField->help_text }}</p>
+                                    @endif
+                                    @error('comments')
+                                        <p class="mt-2 text-sm text-red-600 font-medium">{{ $message }}</p>
+                                    @enderror
                                 </div>
                             @endif
                         </div>
@@ -361,59 +377,66 @@
                 @else
                     <!-- If no additional fields, show placeholder -->
                     <div>
-                        <h3 class="text-lg font-medium text-gray-900 border-b pb-2 mb-4">Additional Data</h3>
+                        <div class="pb-4 border-b border-gray-200 mb-6">
+                            <h3 class="text-xl font-bold text-gray-900">Additional Data</h3>
+                            <p class="text-sm text-gray-500 mt-1">Optional supplementary information</p>
+                        </div>
                         <p class="text-sm text-gray-500">No additional fields configured for this emission source.</p>
                     </div>
                 @endif
 
                 <!-- Notes field (for backward compatibility, only if comments field doesn't exist) -->
                 @if(!$commentsField)
-                    <div class="flex items-start gap-4">
-                        <label for="notes" class="text-sm font-medium text-gray-700 w-40 pt-2">Comments</label>
-                        <div class="flex-1">
-                            <textarea name="notes" id="notes" rows="3"
-                                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">{{ old('notes', $editEntry->notes ?? '') }}</textarea>
-                        </div>
+                    <div class="form-group">
+                        <label for="notes" class="block text-sm font-semibold text-gray-700 mb-2">Comments</label>
+                        <textarea name="notes" id="notes" rows="4"
+                                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 resize-y">{{ old('notes', $editEntry->notes ?? '') }}</textarea>
                     </div>
                 @endif
             </div>
         </div>
 
         <!-- Calculation Preview Section - Below Additional Data -->
-        <div id="calculation-preview" class="mb-6 hidden">
-            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                <h3 class="text-sm font-medium text-green-900 mb-2">Calculation Preview</h3>
-                <div id="preview-content" class="text-sm text-green-800">
+        <div id="calculation-preview" class="mb-8 hidden">
+            <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6 shadow-sm">
+                <h3 class="text-base font-bold text-green-900 mb-3 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Calculation Preview
+                </h3>
+                <div id="preview-content" class="text-sm text-green-800 leading-relaxed">
                     <!-- Preview content will be inserted here by JavaScript -->
                 </div>
             </div>
         </div>
 
         <!-- Submit Buttons -->
-        <div class="flex items-center justify-end space-x-4">
+        <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-200">
             @if($editEntry)
-                <a href="{{ route('quick-input.show', ['scope' => $scope, 'slug' => $slug, 'location_id' => $selectedLocationId, 'fiscal_year' => $selectedFiscalYear]) }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                <a href="{{ route('quick-input.show', ['scope' => $scope, 'slug' => $slug, 'location_id' => $selectedLocationId, 'fiscal_year' => $selectedFiscalYear]) }}" class="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-400 transition-all duration-200">
                     Cancel
                 </a>
             @endif
-            <button type="button" id="calculate-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+            <button type="button" id="calculate-btn" class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg shadow-md hover:from-blue-700 hover:to-blue-800 hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200">
                 Calculate
             </button>
-            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+            <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-white font-medium rounded-lg shadow-md hover:from-green-700 hover:to-green-800 hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200">
                 {{ $editEntry ? 'Update Entry' : 'Calculate & Add to Footprint' }}
             </button>
         </div>
     </form>
     @else
-    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
-        <div class="flex">
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 rounded-lg shadow-sm p-5 mb-8">
+        <div class="flex items-start">
             <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <svg class="h-6 w-6 text-yellow-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                     <path fill-rule="evenodd" d="M8.485 3.493a.75.75 0 00-1.47 0L1.485 16.493a.75.75 0 00.659 1.007h15.712a.75.75 0 00.659-1.007L8.485 3.493zM12 10a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm-1.5 3a.75.75 0 100 1.5.75.75 0 000-1.5z" clip-rule="evenodd" />
                 </svg>
             </div>
-            <div class="ml-3">
-                <p class="text-sm text-yellow-800">
+            <div class="ml-4">
+                <h3 class="text-sm font-semibold text-yellow-800 mb-1">Action Required</h3>
+                <p class="text-sm text-yellow-700">
                     Please select a <strong>Fiscal Year</strong> and <strong>Location</strong> above to start entering data.
                 </p>
             </div>
@@ -423,9 +446,9 @@
 
     <!-- Existing Entries Section -->
     @if($measurement)
-        <div class="mt-8 bg-white rounded-lg shadow overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-                <h2 class="text-lg font-semibold text-gray-900">Results</h2>
+        <div class="mt-8 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+                <h2 class="text-xl font-bold text-gray-900">Results</h2>
                 <p class="text-sm text-gray-600 mt-1">All entries for {{ $userFriendlyName ?? $emissionSource->name }} - {{ $measurement->location->name ?? 'N/A' }} ({{ $selectedFiscalYear }})</p>
             </div>
             @if($existingEntries->count() > 0)
