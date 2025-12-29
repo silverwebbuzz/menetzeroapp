@@ -201,16 +201,29 @@
         // Removed verbose logging
         // For vehicles, use distance; for others, use quantity or amount
         // Try multiple ways to find the distance field
-        const distanceField = document.querySelector('input[name="distance"]') || 
-                              document.querySelector('#distance') || 
-                              document.getElementById('distance');
+        let distanceField = document.querySelector('input[name="distance"]') || 
+                            document.getElementById('distance') ||
+                            form?.querySelector('input#distance') ||
+                            form?.querySelector('input[name="distance"]');
+        
+        // If still not found, search all number inputs in the form
+        if (!distanceField && form) {
+            const allInputs = form.querySelectorAll('input[type="number"]');
+            for (let input of allInputs) {
+                if (input.name === 'distance' || input.id === 'distance') {
+                    distanceField = input;
+                    break;
+                }
+            }
+        }
+        
         const distance = distanceField?.value?.trim();
         
         // Try multiple ways to find quantity/amount fields
-        const quantityField = document.querySelector('input[name="quantity"]') || 
-                               document.querySelector('input[name="amount"]') ||
-                               document.getElementById('quantity') || 
-                               document.getElementById('amount');
+        let quantityField = document.querySelector('input[name="quantity"]') || 
+                            document.querySelector('input[name="amount"]') ||
+                            document.getElementById('quantity') || 
+                            document.getElementById('amount');
         const quantity = quantityField?.value?.trim();
         
         const unitField = document.getElementById('unit') || document.getElementById('unit_of_measure');
