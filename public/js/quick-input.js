@@ -562,19 +562,39 @@
 
     /**
      * Setup conditional fields for Vehicle form
-     * Simplified: Only uses vehicle size selection (distance-based)
+     * Show/hide fields based on depends_on_field
      */
     function setupVehicleConditionalFields() {
         const form = document.querySelector('form[data-source-id]');
         if (!form) return;
 
-        const emissionSourceSlug = form.dataset.sourceSlug || getEmissionSourceSlugFromUrl();
-        
-        // Only setup for vehicle form
-        if (emissionSourceSlug !== 'vehicle') return;
+        // Setup conditional field visibility based on depends_on_field
+        const dependentFields = form.querySelectorAll('[data-depends-on]');
+        dependentFields.forEach(fieldContainer => {
+            const dependsOnFieldName = fieldContainer.getAttribute('data-depends-on');
+            if (!dependsOnFieldName) return;
 
-        // No conditional logic needed - form is simplified to only use vehicle size
-        // All fields are always visible: vehicle_size -> vehicle_fuel_type -> unit_of_measure -> distance
+            const dependsOnField = form.querySelector(`[name="${dependsOnFieldName}"]`) || 
+                                   form.querySelector(`#${dependsOnFieldName}`);
+            
+            if (dependsOnField) {
+                // Show/hide based on whether the dependent field has a value
+                function updateVisibility() {
+                    if (dependsOnField.value && dependsOnField.value.trim() !== '') {
+                        fieldContainer.style.display = 'flex';
+                    } else {
+                        fieldContainer.style.display = 'none';
+                    }
+                }
+
+                // Initial state
+                updateVisibility();
+
+                // Update on change
+                dependsOnField.addEventListener('change', updateVisibility);
+                dependsOnField.addEventListener('input', updateVisibility);
+            }
+        });
     }
 
     /**
