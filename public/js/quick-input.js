@@ -576,8 +576,8 @@
             const dependsOnFieldName = field.getAttribute('data-depends-on');
             if (!dependsOnFieldName) return;
 
-            // Find the parent form-group container
-            const formGroup = field.closest('.form-group');
+            // Find the parent form-group container (support both .form-group-horizontal and .form-group)
+            const formGroup = field.closest('.form-group-horizontal') || field.closest('.form-group');
             if (!formGroup) return;
 
             const dependsOnField = form.querySelector(`[name="${dependsOnFieldName}"]`) || 
@@ -587,7 +587,7 @@
                 // Show/hide based on whether the dependent field has a value
                 function updateVisibility() {
                     if (dependsOnField.value && dependsOnField.value.trim() !== '') {
-                        formGroup.style.display = 'block';
+                        formGroup.style.display = formGroup.classList.contains('form-group-horizontal') ? 'flex' : 'block';
                     } else {
                         formGroup.style.display = 'none';
                     }
@@ -612,13 +612,13 @@
                 const dependsOnFieldName = field.getAttribute('data-depends-on');
                 if (!dependsOnFieldName) return;
                 
-                const formGroup = field.closest('.form-group');
+                const formGroup = field.closest('.form-group-horizontal') || field.closest('.form-group');
                 if (!formGroup) return;
                 
                 const dependsOnField = form.querySelector(`[name="${dependsOnFieldName}"]`) || 
                                        form.querySelector(`#${dependsOnFieldName}`);
                 if (dependsOnField && dependsOnField.value && dependsOnField.value.trim() !== '') {
-                    formGroup.style.display = 'block';
+                    formGroup.style.display = formGroup.classList.contains('form-group-horizontal') ? 'flex' : 'block';
                 }
             });
         }, 200);

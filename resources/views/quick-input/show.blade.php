@@ -115,9 +115,9 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <!-- Left Side: Main Form Fields (50%) -->
             <div class="space-y-6">
-                <div class="pb-4 border-b border-gray-200">
-                    <h3 class="text-xl font-bold text-gray-900">Main Information</h3>
-                    <p class="text-sm text-gray-500 mt-1">Enter the primary emission data</p>
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-1">Main Information</h3>
+                    <p class="text-sm text-gray-500">Enter the primary emission data</p>
                 </div>
                 
                 <!-- Main Input Fields - Vertical Layout - Professional Design -->
@@ -159,20 +159,21 @@
                     
                     @foreach($mainFields as $field)
                         @if($field->field_type === 'select')
-                            <div class="form-group">
-                                <label for="{{ $field->field_name }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <div class="form-group-horizontal">
+                                <label for="{{ $field->field_name }}" class="form-label-horizontal">
                                     {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
                                     @if($field->is_required)
                                         <span class="text-red-500">*</span>
                                     @endif
                                 </label>
-                                <select name="{{ $field->field_name }}" 
-                                        id="{{ $field->field_name }}" 
-                                        data-field-name="{{ $field->field_name }}"
-                                        data-depends-on="{{ $field->depends_on_field ?? '' }}"
-                                        {{ $field->is_required ? 'required' : '' }}
-                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 dynamic-select">
-                                    <option value="">Select an option</option>
+                                <div class="form-input-wrapper">
+                                    <select name="{{ $field->field_name }}" 
+                                            id="{{ $field->field_name }}" 
+                                            data-field-name="{{ $field->field_name }}"
+                                            data-depends-on="{{ $field->depends_on_field ?? '' }}"
+                                            {{ $field->is_required ? 'required' : '' }}
+                                            class="form-input-select">
+                                        <option value="">Select an option</option>
                                     @if($field->field_options)
                                         @php
                                             $options = is_array($field->field_options) ? $field->field_options : json_decode($field->field_options, true);
@@ -206,73 +207,78 @@
                                             @endforeach
                                         @endif
                                     @endif
-                                </select>
-                                @if($field->help_text)
-                                    <p class="mt-2 text-xs text-gray-500 leading-relaxed">{{ $field->help_text }}</p>
-                                @endif
-                                @error($field->field_name)
-                                    <p class="mt-2 text-sm text-red-600 font-medium">{{ $message }}</p>
-                                @enderror
+                                    </select>
+                                    @if($field->help_text)
+                                        <p class="form-help-text">{{ $field->help_text }}</p>
+                                    @endif
+                                    @error($field->field_name)
+                                        <p class="form-error-text">{{ $message }}</p>
+                                    @enderror
+                                </div>
                             </div>
                         @elseif($field->field_type === 'number')
                             {{-- For distance field, always show it (no conditional hiding) --}}
-                            <div class="form-group">
-                                <label for="{{ $field->field_name }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <div class="form-group-horizontal">
+                                <label for="{{ $field->field_name }}" class="form-label-horizontal">
                                     {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
                                     @if($field->is_required)
                                         <span class="text-red-500">*</span>
                                     @endif
                                 </label>
-                                @php
-                                    $validationRules = is_array($field->validation_rules) ? $field->validation_rules : (is_string($field->validation_rules) ? json_decode($field->validation_rules, true) : []);
-                                @endphp
-                                <input type="number" 
-                                       name="{{ $field->field_name }}" 
-                                       id="{{ $field->field_name }}"
-                                       value="{{ old($field->field_name, $editEntry && ($field->field_name === 'amount' || $field->field_name === 'quantity' || $field->field_name === 'distance') ? ($editEntry->quantity ?? $editAdditionalData[$field->field_name] ?? '') : ($editAdditionalData[$field->field_name] ?? '')) }}"
-                                       step="any"
-                                       min="0"
-                                       {{ $field->is_required ? 'required' : '' }}
-                                       placeholder="{{ $field->field_placeholder ?? 'Enter ' . strtolower($field->field_label ?? $field->field_name) }}"
-                                       class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
-                                @if($field->help_text)
-                                    <p class="mt-2 text-xs text-gray-500 leading-relaxed">{{ $field->help_text }}</p>
-                                @endif
-                                @error($field->field_name)
-                                    <p class="mt-2 text-sm text-red-600 font-medium">{{ $message }}</p>
-                                @enderror
+                                <div class="form-input-wrapper">
+                                    @php
+                                        $validationRules = is_array($field->validation_rules) ? $field->validation_rules : (is_string($field->validation_rules) ? json_decode($field->validation_rules, true) : []);
+                                    @endphp
+                                    <input type="number" 
+                                           name="{{ $field->field_name }}" 
+                                           id="{{ $field->field_name }}"
+                                           value="{{ old($field->field_name, $editEntry && ($field->field_name === 'amount' || $field->field_name === 'quantity' || $field->field_name === 'distance') ? ($editEntry->quantity ?? $editAdditionalData[$field->field_name] ?? '') : ($editAdditionalData[$field->field_name] ?? '')) }}"
+                                           step="any"
+                                           min="0"
+                                           {{ $field->is_required ? 'required' : '' }}
+                                           placeholder="{{ $field->field_placeholder ?? 'Enter ' . strtolower($field->field_label ?? $field->field_name) }}"
+                                           class="form-input">
+                                    @if($field->help_text)
+                                        <p class="form-help-text">{{ $field->help_text }}</p>
+                                    @endif
+                                    @error($field->field_name)
+                                        <p class="form-error-text">{{ $message }}</p>
+                                    @enderror
+                                </div>
                             </div>
                         @else
                             <!-- Text, textarea, etc. -->
-                            <div class="form-group">
-                                <label for="{{ $field->field_name }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                            <div class="form-group-horizontal">
+                                <label for="{{ $field->field_name }}" class="form-label-horizontal">
                                     {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
                                     @if($field->is_required)
                                         <span class="text-red-500">*</span>
                                     @endif
                                 </label>
-                                @if($field->field_type === 'textarea')
-                                    <textarea name="{{ $field->field_name }}" 
-                                              id="{{ $field->field_name }}"
-                                              rows="4"
-                                              {{ $field->is_required ? 'required' : '' }}
-                                              placeholder="{{ $field->field_placeholder ?? '' }}"
-                                              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 resize-y">{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}</textarea>
-                                @else
-                                    <input type="{{ $field->field_type }}" 
-                                           name="{{ $field->field_name }}" 
-                                           id="{{ $field->field_name }}"
-                                           value="{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}"
-                                           {{ $field->is_required ? 'required' : '' }}
-                                           placeholder="{{ $field->field_placeholder ?? '' }}"
-                                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
-                                @endif
-                                @if($field->help_text)
-                                    <p class="mt-2 text-xs text-gray-500 leading-relaxed">{{ $field->help_text }}</p>
-                                @endif
-                                @error($field->field_name)
-                                    <p class="mt-2 text-sm text-red-600 font-medium">{{ $message }}</p>
-                                @enderror
+                                <div class="form-input-wrapper">
+                                    @if($field->field_type === 'textarea')
+                                        <textarea name="{{ $field->field_name }}" 
+                                                  id="{{ $field->field_name }}"
+                                                  rows="3"
+                                                  {{ $field->is_required ? 'required' : '' }}
+                                                  placeholder="{{ $field->field_placeholder ?? '' }}"
+                                                  class="form-input form-textarea">{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}</textarea>
+                                    @else
+                                        <input type="{{ $field->field_type }}" 
+                                               name="{{ $field->field_name }}" 
+                                               id="{{ $field->field_name }}"
+                                               value="{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}"
+                                               {{ $field->is_required ? 'required' : '' }}
+                                               placeholder="{{ $field->field_placeholder ?? '' }}"
+                                               class="form-input">
+                                    @endif
+                                    @if($field->help_text)
+                                        <p class="form-help-text">{{ $field->help_text }}</p>
+                                    @endif
+                                    @error($field->field_name)
+                                        <p class="form-error-text">{{ $message }}</p>
+                                    @enderror
+                                </div>
                             </div>
                         @endif
                     @endforeach
@@ -308,68 +314,72 @@
                 @endphp
                 @if($additionalFields->count() > 0 || $commentsField)
                     <div>
-                        <div class="pb-4 border-b border-gray-200 mb-6">
-                            <h3 class="text-xl font-bold text-gray-900">Additional Data</h3>
-                            <p class="text-sm text-gray-500 mt-1">Optional supplementary information</p>
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-1">Additional Data</h3>
+                            <p class="text-sm text-gray-500">Optional supplementary information</p>
                         </div>
-                        <div class="space-y-6">
+                        <div class="space-y-0">
                             @foreach($additionalFields as $field)
-                                <div class="form-group">
-                                    <label for="{{ $field->field_name }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                                <div class="form-group-horizontal">
+                                    <label for="{{ $field->field_name }}" class="form-label-horizontal">
                                         {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
                                     </label>
-                                    @if($field->field_type === 'select')
-                                        <select name="{{ $field->field_name }}" id="{{ $field->field_name }}"
-                                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
-                                            <option value="">Select {{ $field->field_label ?? $field->field_name }}</option>
-                                            @if($field->field_options)
-                                                @php
-                                                    $options = is_array($field->field_options) ? $field->field_options : json_decode($field->field_options, true);
-                                                @endphp
-                                                @if(is_array($options))
-                                                    @foreach($options as $option)
-                                                        @if(is_array($option))
-                                                            <option value="{{ $option['value'] ?? $option }}" {{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') == ($option['value'] ?? $option) ? 'selected' : '' }}>{{ $option['label'] ?? $option['value'] ?? $option }}</option>
-                                                        @else
-                                                            <option value="{{ $option }}" {{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') == $option ? 'selected' : '' }}>{{ $option }}</option>
-                                                        @endif
-                                                    @endforeach
+                                    <div class="form-input-wrapper">
+                                        @if($field->field_type === 'select')
+                                            <select name="{{ $field->field_name }}" id="{{ $field->field_name }}"
+                                                    class="form-input-select">
+                                                <option value="">Select {{ $field->field_label ?? $field->field_name }}</option>
+                                                @if($field->field_options)
+                                                    @php
+                                                        $options = is_array($field->field_options) ? $field->field_options : json_decode($field->field_options, true);
+                                                    @endphp
+                                                    @if(is_array($options))
+                                                        @foreach($options as $option)
+                                                            @if(is_array($option))
+                                                                <option value="{{ $option['value'] ?? $option }}" {{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') == ($option['value'] ?? $option) ? 'selected' : '' }}>{{ $option['label'] ?? $option['value'] ?? $option }}</option>
+                                                            @else
+                                                                <option value="{{ $option }}" {{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') == $option ? 'selected' : '' }}>{{ $option }}</option>
+                                                            @endif
+                                                        @endforeach
+                                                    @endif
                                                 @endif
-                                            @endif
-                                        </select>
-                                    @elseif($field->field_type === 'textarea')
-                                        <textarea name="{{ $field->field_name }}" id="{{ $field->field_name }}" rows="4"
-                                                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 resize-y">{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}</textarea>
-                                    @else
-                                        <input type="{{ $field->field_type }}" name="{{ $field->field_name }}" id="{{ $field->field_name }}"
-                                               value="{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}"
-                                               placeholder="{{ $field->field_placeholder ?? '' }}"
-                                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
-                                    @endif
-                                    @if($field->help_text)
-                                        <p class="mt-2 text-xs text-gray-500 leading-relaxed">{{ $field->help_text }}</p>
-                                    @endif
-                                    @error($field->field_name)
-                                        <p class="mt-2 text-sm text-red-600 font-medium">{{ $message }}</p>
-                                    @enderror
+                                            </select>
+                                        @elseif($field->field_type === 'textarea')
+                                            <textarea name="{{ $field->field_name }}" id="{{ $field->field_name }}" rows="3"
+                                                      class="form-input form-textarea">{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}</textarea>
+                                        @else
+                                            <input type="{{ $field->field_type }}" name="{{ $field->field_name }}" id="{{ $field->field_name }}"
+                                                   value="{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}"
+                                                   placeholder="{{ $field->field_placeholder ?? '' }}"
+                                                   class="form-input">
+                                        @endif
+                                        @if($field->help_text)
+                                            <p class="form-help-text">{{ $field->help_text }}</p>
+                                        @endif
+                                        @error($field->field_name)
+                                            <p class="form-error-text">{{ $message }}</p>
+                                        @enderror
+                                    </div>
                                 </div>
                             @endforeach
                             
                             @if($commentsField)
                                 <!-- Comments field -->
-                                <div class="form-group">
-                                    <label for="comments" class="block text-sm font-semibold text-gray-700 mb-2">
+                                <div class="form-group-horizontal">
+                                    <label for="comments" class="form-label-horizontal">
                                         {{ $commentsField->field_label ?? 'Comments' }}
                                     </label>
-                                    <textarea name="comments" id="comments" rows="4"
-                                              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 resize-y"
-                                              placeholder="{{ $commentsField->field_placeholder ?? 'Add any additional notes...' }}">{{ old('comments', $editEntry->notes ?? '') }}</textarea>
-                                    @if($commentsField->help_text)
-                                        <p class="mt-2 text-xs text-gray-500 leading-relaxed">{{ $commentsField->help_text }}</p>
-                                    @endif
-                                    @error('comments')
-                                        <p class="mt-2 text-sm text-red-600 font-medium">{{ $message }}</p>
-                                    @enderror
+                                    <div class="form-input-wrapper">
+                                        <textarea name="comments" id="comments" rows="3"
+                                                  class="form-input form-textarea"
+                                                  placeholder="{{ $commentsField->field_placeholder ?? 'Add any additional notes...' }}">{{ old('comments', $editEntry->notes ?? '') }}</textarea>
+                                        @if($commentsField->help_text)
+                                            <p class="form-help-text">{{ $commentsField->help_text }}</p>
+                                        @endif
+                                        @error('comments')
+                                            <p class="form-error-text">{{ $message }}</p>
+                                        @enderror
+                                    </div>
                                 </div>
                             @endif
                         </div>
@@ -387,10 +397,12 @@
 
                 <!-- Notes field (for backward compatibility, only if comments field doesn't exist) -->
                 @if(!$commentsField)
-                    <div class="form-group">
-                        <label for="notes" class="block text-sm font-semibold text-gray-700 mb-2">Comments</label>
-                        <textarea name="notes" id="notes" rows="4"
-                                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 resize-y">{{ old('notes', $editEntry->notes ?? '') }}</textarea>
+                    <div class="form-group-horizontal">
+                        <label for="notes" class="form-label-horizontal">Comments</label>
+                        <div class="form-input-wrapper">
+                            <textarea name="notes" id="notes" rows="3"
+                                      class="form-input form-textarea">{{ old('notes', $editEntry->notes ?? '') }}</textarea>
+                        </div>
                     </div>
                 @endif
             </div>
