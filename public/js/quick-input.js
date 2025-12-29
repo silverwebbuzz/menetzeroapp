@@ -198,22 +198,46 @@
      * Calculate emissions via AJAX
      */
     function calculateEmissions(form) {
-        console.log('calculateEmissions called', { form: !!form });
+        // Removed verbose logging
         // For vehicles, use distance; for others, use quantity or amount
-        const distanceField = document.querySelector('[name="distance"]');
-        const distance = distanceField?.value;
-        const quantity = document.getElementById('quantity')?.value || document.getElementById('amount')?.value;
-        const unit = document.getElementById('unit')?.value || document.getElementById('unit_of_measure')?.value;
+        // Try multiple ways to find the distance field
+        const distanceField = document.querySelector('input[name="distance"]') || 
+                              document.querySelector('#distance') || 
+                              document.getElementById('distance');
+        const distance = distanceField?.value?.trim();
+        
+        // Try multiple ways to find quantity/amount fields
+        const quantityField = document.querySelector('input[name="quantity"]') || 
+                               document.querySelector('input[name="amount"]') ||
+                               document.getElementById('quantity') || 
+                               document.getElementById('amount');
+        const quantity = quantityField?.value?.trim();
+        
+        const unitField = document.getElementById('unit') || document.getElementById('unit_of_measure');
+        const unit = unitField?.value?.trim();
         const emissionSourceId = form?.dataset?.sourceId || document.querySelector('input[name="emission_source_id"]')?.value || getEmissionSourceIdFromUrl();
 
         // Determine the actual value to use (distance for vehicles, quantity/amount for others)
         const valueToUse = distance || quantity;
 
-        console.log('Calculation inputs:', { quantity, distance, valueToUse, unit, emissionSourceId });
+        // Removed verbose logging - only show errors to user
 
-        if (!valueToUse || !unit || !emissionSourceId) {
-            const fieldName = distance ? 'distance' : 'quantity';
-            showError(`Please enter ${fieldName} and select unit before calculating.`);
+        // More specific error messages
+        if (!valueToUse && !unit && !emissionSourceId) {
+            showError('Please enter distance/quantity, select unit, and ensure emission source is set before calculating.');
+            return;
+        }
+        if (!valueToUse) {
+            const fieldName = distanceField ? 'distance' : 'quantity/amount';
+            showError(`Please enter ${fieldName} before calculating.`);
+            return;
+        }
+        if (!unit) {
+            showError('Please select unit before calculating.');
+            return;
+        }
+        if (!emissionSourceId) {
+            showError('Emission source ID not found. Please refresh the page and try again.');
             return;
         }
 
@@ -228,6 +252,29 @@
         // Get CSRF token
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
 
+        // Build request body
+        const requestBody = {
+            emission_source_id: emissionSourceId,
+            unit: unit,
+            // Include other form fields that might affect factor selection
+            fuel_category: document.getElementById('fuel_category')?.value,
+            fuel_type: document.getElementById('fuel_type')?.value || document.getElementById('vehicle_fuel_type')?.value, // For vehicles, use vehicle_fuel_type
+            vehicle_type: document.getElementById('vehicle_size')?.value, // Vehicle size for distance-based calculation
+            energy_type: document.getElementById('energy_type')?.value, // For Heat/Steam/Cooling
+            refrigerant_type: document.getElementById('refrigerant_type')?.value, // For Refrigerants
+            region: document.getElementById('region')?.value || 'UAE',
+        };
+        
+        // Add quantity or distance based on what's available
+        if (distance) {
+            requestBody.distance = parseFloat(distance);
+            requestBody.quantity = parseFloat(distance); // Also send as quantity for compatibility
+        } else if (quantity) {
+            requestBody.quantity = parseFloat(quantity);
+        }
+        
+            // Removed verbose logging
+
         // Make AJAX request
         fetch('/api/quick-input/calculate', {
             method: 'POST',
@@ -236,19 +283,7 @@
                 'X-CSRF-TOKEN': csrfToken,
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({
-                emission_source_id: emissionSourceId,
-                quantity: valueToUse ? parseFloat(valueToUse) : null,
-                distance: distance ? parseFloat(distance) : null, // For vehicles
-                unit: unit,
-                // Include other form fields that might affect factor selection
-                fuel_category: document.getElementById('fuel_category')?.value,
-                fuel_type: document.getElementById('fuel_type')?.value || document.getElementById('vehicle_fuel_type')?.value, // For vehicles, use vehicle_fuel_type
-                vehicle_type: document.getElementById('vehicle_size')?.value, // Vehicle size for distance-based calculation
-                energy_type: document.getElementById('energy_type')?.value, // For Heat/Steam/Cooling
-                refrigerant_type: document.getElementById('refrigerant_type')?.value, // For Refrigerants
-                region: document.getElementById('region')?.value || 'UAE',
-            })
+            body: JSON.stringify(requestBody)
         })
         .then(response => {
             if (!response.ok) {
@@ -527,7 +562,6 @@
 
         // No conditional logic needed - form is simplified to only use vehicle size
         // All fields are always visible: vehicle_size -> vehicle_fuel_type -> unit_of_measure -> distance
-        console.log('Quick Input: Vehicle form - simplified (no conditional logic)');
     }
 
     /**
@@ -545,7 +579,6 @@
     function setupCascadingDropdowns() {
         const form = document.querySelector('form[data-source-id]');
         if (!form) {
-            console.log('Quick Input: Form with data-source-id not found');
             return;
         }
 
@@ -555,25 +588,16 @@
             return;
         }
 
-        console.log('Quick Input: Setting up cascading dropdowns for source ID:', emissionSourceId);
-
+        // Removed verbose logging - only log errors
         const fuelCategorySelect = document.getElementById('fuel_category');
         const fuelTypeSelect = document.getElementById('fuel_type');
         const unitSelect = document.getElementById('unit_of_measure') || document.getElementById('unit');
 
-        console.log('Quick Input: Found elements:', {
-            fuelCategory: !!fuelCategorySelect,
-            fuelType: !!fuelTypeSelect,
-            unit: !!unitSelect
-        });
-
         // Handle fuel_category change -> update fuel_type
         if (fuelCategorySelect && !fuelCategorySelect.dataset.handlerAttached) {
             fuelCategorySelect.dataset.handlerAttached = 'true';
-            console.log('Quick Input: Attaching handler to fuel_category');
             fuelCategorySelect.addEventListener('change', function() {
                 const category = this.value;
-                console.log('Quick Input: fuel_category changed to:', category);
                 if (category && fuelTypeSelect) {
                     loadFuelTypes(emissionSourceId, category, fuelTypeSelect);
                     // Clear unit options when category changes
@@ -588,11 +612,8 @@
             // If editing and fuel_category has a value, load fuel types
             const initialFuelCategory = document.getElementById('fuel_category_initial_value')?.value;
             if (initialFuelCategory && fuelCategorySelect.value === initialFuelCategory && fuelTypeSelect) {
-                console.log('Quick Input: Loading initial fuel types for category:', initialFuelCategory);
                 loadFuelTypes(emissionSourceId, initialFuelCategory, fuelTypeSelect, document.getElementById('fuel_type_initial_value')?.value);
             }
-        } else if (fuelCategorySelect) {
-            console.log('Quick Input: fuel_category handler already attached');
         }
 
         // Handle fuel_type change -> update unit_of_measure
@@ -612,7 +633,6 @@
             const initialFuelType = document.getElementById('fuel_type_initial_value')?.value;
             if (initialFuelType && fuelTypeSelect.value === initialFuelType && unitSelect) {
                 const fuelCategory = fuelCategorySelect ? fuelCategorySelect.value : null;
-                console.log('Quick Input: Loading initial units for fuel type:', initialFuelType);
                 loadUnits(emissionSourceId, initialFuelType, fuelCategory, unitSelect, document.getElementById('unit_of_measure_initial_value')?.value || document.getElementById('unit_initial_value')?.value);
             }
         }
@@ -634,7 +654,6 @@
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
 
         const url = `/api/quick-input/fuel-types/${sourceId}?fuel_category=${encodeURIComponent(category)}`;
-        console.log('Quick Input: Loading fuel types from:', url);
 
         fetch(url, {
             method: 'GET',
@@ -644,7 +663,6 @@
             }
         })
         .then(response => {
-            console.log('Quick Input: Fuel types response status:', response.status);
             if (!response.ok) {
                 return response.json().then(err => {
                     throw new Error(err.message || `HTTP error! status: ${response.status}`);
@@ -653,7 +671,6 @@
             return response.json();
         })
         .then(data => {
-            console.log('Quick Input: Fuel types data:', data);
             selectElement.innerHTML = '<option value="">Select an option</option>';
             if (data.success && data.fuel_types && data.fuel_types.length > 0) {
                 data.fuel_types.forEach(fuelType => {
@@ -665,7 +682,6 @@
                     }
                     selectElement.appendChild(option);
                 });
-                console.log('Quick Input: Loaded', data.fuel_types.length, 'fuel types');
                 // If we have an initial value and it wasn't selected, try to select it
                 if (currentValue && selectElement.value !== currentValue) {
                     selectElement.value = currentValue;
@@ -702,8 +718,6 @@
             url += `&fuel_category=${encodeURIComponent(fuelCategory)}`;
         }
 
-        console.log('Quick Input: Loading units from:', url);
-
         fetch(url, {
             method: 'GET',
             headers: {
@@ -712,7 +726,6 @@
             }
         })
         .then(response => {
-            console.log('Quick Input: Units response status:', response.status);
             if (!response.ok) {
                 return response.json().then(err => {
                     throw new Error(err.message || `HTTP error! status: ${response.status}`);
@@ -721,7 +734,6 @@
             return response.json();
         })
         .then(data => {
-            console.log('Quick Input: Units data:', data);
             selectElement.innerHTML = '<option value="">Select an option</option>';
             if (data.success && data.units && data.units.length > 0) {
                 data.units.forEach(unit => {
@@ -733,7 +745,6 @@
                     }
                     selectElement.appendChild(option);
                 });
-                console.log('Quick Input: Loaded', data.units.length, 'units');
                 // If we have a current value and it wasn't selected, try to select it
                 if (currentValue && selectElement.value !== currentValue) {
                     selectElement.value = currentValue;
@@ -753,7 +764,7 @@
 
     // Initialize additional features
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('Quick Input: DOM loaded, initializing features');
+        // Removed verbose logging
         setupDeleteConfirmations();
         setupFormLoadingStates();
         setupCascadingDropdowns();
@@ -767,13 +778,11 @@
         
         // Also setup cascading dropdowns after delays (for conditionally rendered forms)
         setTimeout(function() {
-            console.log('Quick Input: Retrying setup after 500ms');
             setupCascadingDropdowns();
             setupVehicleConditionalFields();
         }, 500);
         
         setTimeout(function() {
-            console.log('Quick Input: Retrying setup after 1500ms');
             setupCascadingDropdowns();
             setupVehicleConditionalFields();
         }, 1500);
@@ -782,7 +791,6 @@
         const observer = new MutationObserver(function(mutations) {
             const form = document.querySelector('form[data-source-id]');
             if (form) {
-                console.log('Quick Input: Form detected in DOM changes, setting up cascading dropdowns');
                 setupCascadingDropdowns();
             }
         });
