@@ -482,9 +482,13 @@ class QuickInputController extends Controller
         try {
             $request->validate([
                 'emission_source_id' => 'required|exists:emission_sources_master,id',
-                'quantity' => 'required|numeric|min:0',
+                'quantity' => 'required_without:distance|numeric|min:0',
+                'distance' => 'required_without:quantity|numeric|min:0',
                 'unit' => 'required|string',
             ]);
+            
+            // For vehicles, use distance if provided, otherwise use quantity
+            $quantity = $request->input('distance') ?? $request->input('quantity');
             
             $emissionSource = EmissionSourceMaster::findOrFail($request->emission_source_id);
             
@@ -492,22 +496,14 @@ class QuickInputController extends Controller
             // For refrigerants (fugitive emissions), use 'Global' as region since GWP values are global
             $defaultRegion = ($emissionSource->emission_type === 'fugitive') ? 'Global' : 'UAE';
             
-            // Handle vehicle-specific fields
+            // Handle vehicle-specific fields (simplified: only distance-based)
             $fuelType = $request->input('fuel_type');
             $vehicleFuelType = $request->input('vehicle_fuel_type');
-            $vehicleType = $request->input('vehicle_type');
-            $fuelOrVehicleType = $request->input('fuel_or_vehicle_type');
+            $vehicleType = $request->input('vehicle_size'); // Use vehicle_size field
             
-            // For vehicles: if fuel_or_vehicle_type is provided, use it appropriately
+            // For vehicles: use vehicle_fuel_type and vehicle_size
             if ($emissionSource->quick_input_slug === 'vehicle') {
-                // If vehicle_fuel_type is set, user doesn't know fuel amount (distance-based)
-                if ($vehicleFuelType && $fuelOrVehicleType) {
-                    $fuelType = $vehicleFuelType; // Use vehicle_fuel_type as fuel_type
-                    $vehicleType = $fuelOrVehicleType; // Use fuel_or_vehicle_type as vehicle_type (size)
-                } elseif ($fuelOrVehicleType) {
-                    // User knows fuel amount (fuel-based)
-                    $fuelType = $fuelOrVehicleType; // Use fuel_or_vehicle_type as fuel_type
-                }
+                $fuelType = $vehicleFuelType; // Use vehicle_fuel_type as fuel_type
             } else {
                 // For other sources, use standard mapping
                 $fuelType = $fuelType ?: $request->input('energy_type') ?: $request->input('refrigerant_type');
@@ -1038,19 +1034,11 @@ class QuickInputController extends Controller
      */
     private function determineFuelType(Request $request, EmissionSourceMaster $emissionSource)
     {
-        // Handle vehicle-specific fields
+        // Handle vehicle-specific fields (simplified: only distance-based)
         if ($emissionSource->quick_input_slug === 'vehicle') {
-            $knowFuelAmount = $request->input('know_fuel_amount');
             $vehicleFuelType = $request->input('vehicle_fuel_type');
-            $fuelOrVehicleType = $request->input('fuel_or_vehicle_type');
-            
-            // If know_fuel_amount = 'No', use vehicle_fuel_type
-            if ($knowFuelAmount === 'No' && $vehicleFuelType) {
+            if ($vehicleFuelType) {
                 return $vehicleFuelType;
-            }
-            // If know_fuel_amount = 'Yes', use fuel_or_vehicle_type as fuel_type
-            elseif ($knowFuelAmount === 'Yes' && $fuelOrVehicleType) {
-                return $fuelOrVehicleType;
             }
         }
         
