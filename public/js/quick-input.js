@@ -200,15 +200,20 @@
     function calculateEmissions(form) {
         console.log('calculateEmissions called', { form: !!form });
         // For vehicles, use distance; for others, use quantity or amount
-        const distance = document.querySelector('[name="distance"]')?.value;
-        const quantity = document.getElementById('quantity')?.value || document.getElementById('amount')?.value || distance;
+        const distanceField = document.querySelector('[name="distance"]');
+        const distance = distanceField?.value;
+        const quantity = document.getElementById('quantity')?.value || document.getElementById('amount')?.value;
         const unit = document.getElementById('unit')?.value || document.getElementById('unit_of_measure')?.value;
         const emissionSourceId = form?.dataset?.sourceId || document.querySelector('input[name="emission_source_id"]')?.value || getEmissionSourceIdFromUrl();
 
-        console.log('Calculation inputs:', { quantity, distance, unit, emissionSourceId });
+        // Determine the actual value to use (distance for vehicles, quantity/amount for others)
+        const valueToUse = distance || quantity;
 
-        if (!quantity || !unit || !emissionSourceId) {
-            showError('Please enter quantity/distance and select unit before calculating.');
+        console.log('Calculation inputs:', { quantity, distance, valueToUse, unit, emissionSourceId });
+
+        if (!valueToUse || !unit || !emissionSourceId) {
+            const fieldName = distance ? 'distance' : 'quantity';
+            showError(`Please enter ${fieldName} and select unit before calculating.`);
             return;
         }
 
@@ -233,7 +238,7 @@
             },
             body: JSON.stringify({
                 emission_source_id: emissionSourceId,
-                quantity: distance ? parseFloat(distance) : parseFloat(quantity),
+                quantity: valueToUse ? parseFloat(valueToUse) : null,
                 distance: distance ? parseFloat(distance) : null, // For vehicles
                 unit: unit,
                 // Include other form fields that might affect factor selection
