@@ -320,19 +320,34 @@ class User extends Authenticatable
         }
 
         try {
-            $userCompanyRole = $this->companyRoles()
-                ->where('is_active', true)
-                ->whereNull('company_custom_role_id')
-                ->first();
-            
-            if ($userCompanyRole) {
-                return Company::find($userCompanyRole->company_id);
+            // Check if table exists
+            if (\Illuminate\Support\Facades\Schema::hasTable('user_company_roles')) {
+                $userCompanyRole = $this->companyRoles()
+                    ->where('is_active', true)
+                    ->whereNull('company_custom_role_id')
+                    ->first();
+                
+                if ($userCompanyRole) {
+                    return Company::find($userCompanyRole->company_id);
+                }
             }
         } catch (\Exception $e) {
-            // If tables don't exist yet, fall back to company_id
+            // If tables don't exist yet or query fails, fall back to company_id
+            \Log::warning('Error in getOwnedCompany, using fallback', [
+                'user_id' => $this->id,
+                'error' => $e->getMessage()
+            ]);
         }
         
-        // Fallback: Internal user's company (backward compatibility)
+        // Fallback: If user has company_id set, they own that company
+        if ($this->company_id) {
+            $company = Company::find($this->company_id);
+            if ($company) {
+                return $company;
+            }
+        }
+        
+        // Final fallback: Internal user's company relationship
         return $this->company;
     }
 
@@ -443,7 +458,20 @@ class User extends Authenticatable
             ]);
         }
         
-        // Fallback: Internal user's company (backward compatibility)
+        // Fallback: Check if user has company_id set (backward compatibility)
+        // This handles cases where user_company_roles table doesn't exist or entry wasn't created
+        if ($this->company_id) {
+            $fallbackCompany = Company::find($this->company_id);
+            if ($fallbackCompany) {
+                \Log::info('Using fallback company from company_id', [
+                    'user_id' => $this->id,
+                    'company_id' => $this->company_id
+                ]);
+                return $fallbackCompany;
+            }
+        }
+        
+        // Final fallback: Internal user's company relationship
         return $this->company;
     }
 
@@ -517,14 +545,22 @@ class User extends Authenticatable
     public function ownsCompany()
     {
         try {
-            return $this->companyRoles()
-                ->where('is_active', true)
-                ->whereNull('company_custom_role_id')
-                ->exists();
+            // Check if table exists
+            if (\Illuminate\Support\Facades\Schema::hasTable('user_company_roles')) {
+                $hasRole = $this->companyRoles()
+                    ->where('is_active', true)
+                    ->whereNull('company_custom_role_id')
+                    ->exists();
+                if ($hasRole) {
+                    return true;
+                }
+            }
         } catch (\Exception $e) {
-            // Fallback: check company_id
-            return !empty($this->company_id);
+            // If tables don't exist or query fails, fall back to company_id
         }
+        
+        // Fallback: check company_id
+        return !empty($this->company_id);
     }
 
     /**

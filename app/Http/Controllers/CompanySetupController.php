@@ -157,18 +157,27 @@ class CompanySetupController extends Controller
                     'trace' => $e->getTraceAsString()
                 ]);
                 
-                // Don't silently fail - only fallback if it's a table doesn't exist error
-                if (strpos($e->getMessage(), "doesn't exist") !== false || 
-                    strpos($e->getMessage(), "not found") !== false ||
-                    strpos($e->getMessage(), "Unknown table") !== false) {
-                    // Table doesn't exist yet, fallback to old method
+                // Check if table exists, if not create it or use fallback
+                if (!\Illuminate\Support\Facades\Schema::hasTable('user_company_roles')) {
+                    // Table doesn't exist - try to create it via migration or use fallback
+                    \Log::warning('user_company_roles table does not exist, using fallback method');
                     $user->update([
                         'company_id' => $company->id,
                         'role' => 'company_admin',
                     ]);
                 } else {
-                    // Re-throw other errors so we can see what's wrong
-                    throw $e;
+                    // Table exists but creation failed - this is a real error
+                    // Still set company_id as fallback so user can access
+                    $user->update([
+                        'company_id' => $company->id,
+                        'role' => 'company_admin',
+                    ]);
+                    \Log::error('UserCompanyRole creation failed but table exists', [
+                        'error' => $e->getMessage(),
+                        'user_id' => $user->id,
+                        'company_id' => $company->id
+                    ]);
+                    // Don't throw - allow user to continue with fallback
                 }
             }
         }
