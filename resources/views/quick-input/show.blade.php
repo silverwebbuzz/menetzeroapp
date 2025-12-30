@@ -8,7 +8,7 @@
 @endpush
 
 @section('content')
-<div class="max-w-7xl mx-auto">
+<div class="w-full">
     <!-- Header -->
     <div class="mb-8">
         <div class="flex items-start justify-between mb-4">
@@ -111,8 +111,8 @@
             <input type="hidden" name="edit_entry_id" value="{{ $editEntry->id }}">
         @endif
 
-        <!-- Split Layout: Main Form (Left) and Additional Data (Right) -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <!-- Split Layout: Main Form (Left 60%) and Additional Data (Right 40%) -->
+        <div class="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-8 mb-8">
             <!-- Left Side: Main Form Fields (50%) -->
             <div class="flex flex-col">
                 <div class="mb-4">
@@ -160,12 +160,17 @@
                     @foreach($mainFields as $field)
                         @if($field->field_type === 'select')
                             <div class="form-group-horizontal">
-                                <label for="{{ $field->field_name }}" class="form-label-horizontal">
-                                    {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
-                                    @if($field->is_required)
-                                        <span class="text-red-500">*</span>
+                                <div class="form-label-wrapper">
+                                    <label for="{{ $field->field_name }}" class="form-label-horizontal">
+                                        {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
+                                        @if($field->is_required)
+                                            <span class="text-red-500">*</span>
+                                        @endif
+                                    </label>
+                                    @if($field->help_text)
+                                        <p class="form-help-text-under-label">{{ $field->help_text }}</p>
                                     @endif
-                                </label>
+                                </div>
                                 <div class="form-input-wrapper">
                                     <select name="{{ $field->field_name }}" 
                                             id="{{ $field->field_name }}" 
@@ -208,9 +213,6 @@
                                         @endif
                                     @endif
                                     </select>
-                                    @if($field->help_text)
-                                        <p class="form-help-text">{{ $field->help_text }}</p>
-                                    @endif
                                     @error($field->field_name)
                                         <p class="form-error-text">{{ $message }}</p>
                                     @enderror
@@ -219,12 +221,17 @@
                         @elseif($field->field_type === 'number')
                             {{-- For distance field, always show it (no conditional hiding) --}}
                             <div class="form-group-horizontal">
-                                <label for="{{ $field->field_name }}" class="form-label-horizontal">
-                                    {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
-                                    @if($field->is_required)
-                                        <span class="text-red-500">*</span>
+                                <div class="form-label-wrapper">
+                                    <label for="{{ $field->field_name }}" class="form-label-horizontal">
+                                        {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
+                                        @if($field->is_required)
+                                            <span class="text-red-500">*</span>
+                                        @endif
+                                    </label>
+                                    @if($field->help_text)
+                                        <p class="form-help-text-under-label">{{ $field->help_text }}</p>
                                     @endif
-                                </label>
+                                </div>
                                 <div class="form-input-wrapper">
                                     @php
                                         $validationRules = is_array($field->validation_rules) ? $field->validation_rules : (is_string($field->validation_rules) ? json_decode($field->validation_rules, true) : []);
@@ -238,9 +245,6 @@
                                            {{ $field->is_required ? 'required' : '' }}
                                            placeholder="{{ $field->field_placeholder ?? 'Enter ' . strtolower($field->field_label ?? $field->field_name) }}"
                                            class="form-input">
-                                    @if($field->help_text)
-                                        <p class="form-help-text">{{ $field->help_text }}</p>
-                                    @endif
                                     @error($field->field_name)
                                         <p class="form-error-text">{{ $message }}</p>
                                     @enderror
@@ -249,12 +253,17 @@
                         @else
                             <!-- Text, textarea, etc. -->
                             <div class="form-group-horizontal">
-                                <label for="{{ $field->field_name }}" class="form-label-horizontal">
-                                    {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
-                                    @if($field->is_required)
-                                        <span class="text-red-500">*</span>
+                                <div class="form-label-wrapper">
+                                    <label for="{{ $field->field_name }}" class="form-label-horizontal">
+                                        {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
+                                        @if($field->is_required)
+                                            <span class="text-red-500">*</span>
+                                        @endif
+                                    </label>
+                                    @if($field->help_text)
+                                        <p class="form-help-text-under-label">{{ $field->help_text }}</p>
                                     @endif
-                                </label>
+                                </div>
                                 <div class="form-input-wrapper">
                                     @if($field->field_type === 'textarea')
                                         <textarea name="{{ $field->field_name }}" 
@@ -271,9 +280,6 @@
                                                {{ $field->is_required ? 'required' : '' }}
                                                placeholder="{{ $field->field_placeholder ?? '' }}"
                                                class="form-input">
-                                    @endif
-                                    @if($field->help_text)
-                                        <p class="form-help-text">{{ $field->help_text }}</p>
                                     @endif
                                     @error($field->field_name)
                                         <p class="form-error-text">{{ $message }}</p>

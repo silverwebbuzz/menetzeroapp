@@ -25,14 +25,17 @@
     width: 100% !important;
 }
 
-/* Main Information Section - Use w-40 (15rem = 240px) for labels */
+/* Main Information Section - 60% for labels, 40% for inputs */
 .main-information-section .form-group-horizontal {
-    grid-template-columns: 15rem 1fr !important;
+    grid-template-columns: 60% 40% !important;
 }
 
-.main-information-section .form-label-horizontal {
-    min-width: 15rem;
-    max-width: 15rem;
+.main-information-section .form-label-wrapper {
+    grid-column: 1;
+}
+
+.main-information-section .form-input-wrapper {
+    grid-column: 2;
 }
 
 /* Additional Data Section - Use w-20 (5rem = 80px) for labels */
@@ -49,6 +52,14 @@
     margin-bottom: 0 !important;
 }
 
+/* Form Label Wrapper - Contains label and help text */
+.form-label-wrapper {
+    display: flex;
+    flex-direction: column;
+    grid-column: 1;
+    min-width: 0;
+}
+
 /* Form Label - Horizontal Layout - All labels align at top */
 .form-label-horizontal {
     font-size: 0.875rem;
@@ -58,9 +69,17 @@
     line-height: 1.5;
     text-align: left;
     align-self: start;
-    grid-column: 1;
-    min-width: 200px;
-    max-width: 200px;
+    margin-bottom: 0;
+}
+
+/* Help Text Under Label - Appears below label in Main Information */
+.form-help-text-under-label {
+    margin-top: 0.25rem !important;
+    font-size: 0.75rem;
+    color: #6b7280;
+    line-height: 1.4;
+    display: block !important;
+    width: 100% !important;
 }
 
 /* Form Input Wrapper - All inputs start at same point */
@@ -247,10 +266,12 @@
 }
 
 /* Ensure section titles and form fields align properly */
+.grid.grid-cols-1.lg\:grid-cols-\[60\%_40\%\].gap-8,
 .grid.grid-cols-1.lg\:grid-cols-2.gap-8 {
     align-items: start;
 }
 
+.grid.grid-cols-1.lg\:grid-cols-\[60\%_40\%\].gap-8 > div,
 .grid.grid-cols-1.lg\:grid-cols-2.gap-8 > div {
     display: flex;
     flex-direction: column;
@@ -258,6 +279,7 @@
 }
 
 /* Ensure title sections have consistent height and alignment */
+.grid.grid-cols-1.lg\:grid-cols-\[60\%_40\%\].gap-8 > div > div.mb-4:first-child,
 .grid.grid-cols-1.lg\:grid-cols-2.gap-8 > div > div.mb-4:first-child {
     margin-bottom: 1rem;
     min-height: 3.5rem;
@@ -267,7 +289,9 @@
 }
 
 /* Ensure form field containers align properly */
+.grid.grid-cols-1.lg\:grid-cols-\[60\%_40\%\].gap-8 > div > div.flex-1,
 .grid.grid-cols-1.lg\:grid-cols-2.gap-8 > div > div.flex-1,
+.grid.grid-cols-1.lg\:grid-cols-\[60\%_40\%\].gap-8 > div > div:not(.mb-4):not(.flex):not(.form-group-horizontal),
 .grid.grid-cols-1.lg\:grid-cols-2.gap-8 > div > div:not(.mb-4):not(.flex):not(.form-group-horizontal) {
     width: 100%;
 }
@@ -275,14 +299,26 @@
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .form-group-horizontal {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
         gap: 0.75rem;
+    }
+    
+    .form-label-wrapper {
+        grid-column: 1;
+    }
+    
+    .form-input-wrapper {
+        grid-column: 1;
     }
     
     .form-label-horizontal {
         padding-top: 0;
         min-width: auto;
         max-width: none;
+    }
+    
+    .main-information-section .form-group-horizontal {
+        grid-template-columns: 1fr !important;
     }
 }
 
