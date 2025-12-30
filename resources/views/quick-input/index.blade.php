@@ -42,8 +42,8 @@
                     $scopeNumber = str_replace('Scope ', '', $source->scope);
                 @endphp
                 <a href="{{ route('quick-input.show', ['scope' => $scopeNumber, 'slug' => $source->quick_input_slug]) }}" 
-                   class="flex-shrink-0 bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow min-w-[180px]">
-                    <div class="flex flex-col items-center text-center">
+                   class="flex-shrink-0 bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow w-[180px] h-[160px] flex flex-col items-center justify-center">
+                    <div class="flex flex-col items-center text-center w-full">
                         <!-- Icon -->
                         <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
                             @php
@@ -100,7 +100,23 @@
                             @endif
                         </div>
                         <!-- Name -->
-                        <h3 class="font-semibold text-gray-900">{{ $source->name }}</h3>
+                        @php
+                            $name = $source->name ?? '';
+                            $mainText = $name;
+                            $bracketText = '';
+                            
+                            // Extract text in brackets
+                            if (preg_match('/^(.+?)\s*\((.+?)\)$/', $name, $matches)) {
+                                $mainText = trim($matches[1]);
+                                $bracketText = trim($matches[2]);
+                            }
+                        @endphp
+                        <div class="w-full">
+                            <div class="font-semibold text-gray-900" style="font-size: 0.87rem;">{{ $mainText }}</div>
+                            @if($bracketText)
+                                <div class="text-gray-600 mt-1" style="font-size: 0.70rem;">({{ $bracketText }})</div>
+                            @endif
+                        </div>
                     </div>
                 </a>
             @endforeach
