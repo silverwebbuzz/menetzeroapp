@@ -48,19 +48,25 @@ class DashboardController extends Controller
             // Check if user has any company access (owned or staff)
             $hasAnyCompany = $user->ownsCompany() || $user->isStaffInAnyCompany();
             
+            // Check if user is a company_admin without a company (new registration)
+            // They should be allowed to create a company, not see "No Company Access"
+            $isNewCompanyAdmin = $user->role === 'company_admin' && !$hasAnyCompany;
+            
             // Debug logging
             \Log::info('Dashboard - No active company found', [
                 'user_id' => $user->id,
                 'user_email' => $user->email,
+                'user_role' => $user->role,
                 'owns_company' => $user->ownsCompany(),
                 'is_staff_in_any' => $user->isStaffInAnyCompany(),
                 'has_any_company' => $hasAnyCompany,
+                'is_new_company_admin' => $isNewCompanyAdmin,
                 'company_roles_count' => $user->companyRoles()->where('is_active', true)->count(),
                 'staff_companies_count' => $user->getStaffCompanies()->count(),
             ]);
             
-            if (!$hasAnyCompany) {
-                // User has no company access - show message
+            if (!$hasAnyCompany && !$isNewCompanyAdmin) {
+                // User has no company access and is not a new company_admin - show message
                 return view('dashboard.no-company-access');
             }
             
