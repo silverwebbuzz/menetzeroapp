@@ -1,6 +1,18 @@
 /**
  * Quick Input Styles - Clean Professional Design
+ * Using Poppins font family
  */
+
+/* Apply Poppins font to all form elements */
+.form-group-horizontal,
+.form-label-horizontal,
+.form-input,
+.form-input-select,
+.form-textarea,
+.form-help-text,
+.form-error-text {
+    font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+}
 
 /* Form Group Spacing - Horizontal Layout */
 .form-group-horizontal {
