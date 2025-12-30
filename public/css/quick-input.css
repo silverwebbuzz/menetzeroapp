@@ -14,20 +14,43 @@
     font-family: 'Poppins', system-ui, -apple-system, sans-serif;
 }
 
+/* Prevent overflow issues */
+.w-full {
+    box-sizing: border-box !important;
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+/* Ensure grid containers don't overflow */
+.grid {
+    box-sizing: border-box !important;
+    max-width: 100% !important;
+}
+
+/* Form container overflow prevention */
+form[data-source-id] {
+    box-sizing: border-box !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+}
+
 /* Form Group Spacing - Horizontal Layout */
 .form-group-horizontal {
     display: grid !important;
     grid-template-columns: 200px 1fr !important;
-    gap: 1.5rem !important;
+    gap: 1rem !important;
     margin-bottom: 1rem !important;
     align-items: start !important;
     align-content: start !important;
     width: 100% !important;
+    box-sizing: border-box !important;
 }
 
 /* Main Information Section - 60% for labels, 40% for inputs */
 .main-information-section .form-group-horizontal {
     grid-template-columns: 60% 40% !important;
+    gap: 1rem !important;
+    max-width: 100% !important;
 }
 
 .main-information-section .form-label-wrapper {
@@ -41,6 +64,8 @@
 /* Additional Data Section - Use w-20 (5rem = 80px) for labels */
 .additional-data-section .form-group-horizontal {
     grid-template-columns: 5rem 1fr !important;
+    gap: 1rem !important;
+    max-width: 100% !important;
 }
 
 .additional-data-section .form-label-horizontal {
@@ -58,6 +83,9 @@
     flex-direction: column;
     grid-column: 1;
     min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 /* Form Label - Horizontal Layout - All labels align at top */
@@ -85,9 +113,12 @@
 /* Form Input Wrapper - All inputs start at same point */
 .form-input-wrapper {
     min-width: 0;
+    max-width: 100%;
     display: flex;
     flex-direction: column;
     grid-column: 2;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 /* Form Inputs - All inputs start at same horizontal position */

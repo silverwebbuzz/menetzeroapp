@@ -4,7 +4,7 @@
 @section('page-title', 'Roles & Users')
 
 @section('content')
-<div class="max-w-7xl mx-auto">
+<div class="w-full">
     <!-- Roles List Section -->
     <div class="mb-12">
         <div class="mb-6">

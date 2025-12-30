@@ -4,7 +4,7 @@
 @section('page-title', 'Edit Emission Data')
 
 @section('content')
-<div class="max-w-7xl mx-auto">
+<div class="w-full">
     <!-- Header -->
     <div class="mb-6">
         <div class="flex items-center justify-between">

@@ -4,7 +4,7 @@
 @section('page-title', 'Quick Input Entries')
 
 @section('content')
-<div class="max-w-7xl mx-auto">
+<div class="w-full">
     <!-- Header -->
     <div class="mb-6">
         <h1 class="text-3xl font-bold text-gray-900">Input data</h1>

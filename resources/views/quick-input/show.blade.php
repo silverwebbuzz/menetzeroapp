@@ -8,7 +8,7 @@
 @endpush
 
 @section('content')
-<div class="w-full">
+<div class="w-full" style="box-sizing: border-box; max-width: 100%;">
     <!-- Header -->
     <div class="mb-8">
         <div class="flex items-start justify-between mb-4">
@@ -98,7 +98,7 @@
     <!-- Entry Form (Handles both Add and Edit) - Professional Design -->
     <form method="POST" 
           action="{{ $editEntry ? route('quick-input.update', $editEntry->id) : route('quick-input.store', ['scope' => $scope, 'slug' => $slug]) }}" 
-          class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8"
+          class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8"
           data-source-id="{{ $emissionSource->id }}">
         @csrf
         @if($editEntry)
@@ -112,7 +112,7 @@
         @endif
 
         <!-- Split Layout: Main Form (Left 60%) and Additional Data (Right 40%) -->
-        <div class="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-8 mb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-6 mb-8">
             <!-- Left Side: Main Form Fields (50%) -->
             <div class="flex flex-col">
                 <div class="mb-4">

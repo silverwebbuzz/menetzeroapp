@@ -4,7 +4,7 @@
 @section('page-title', 'Measurement Details')
 
 @section('content')
-<div class="max-w-7xl mx-auto">
+<div class="w-full">
     <!-- Header with Measurement Info -->
     <div class="mb-8">
         <div class="flex justify-between items-start">

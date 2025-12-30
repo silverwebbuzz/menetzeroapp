@@ -4,7 +4,7 @@
 @section('page-title', 'Payment History')
 
 @section('content')
-<div class="max-w-7xl mx-auto">
+<div class="w-full">
     <!-- Header -->
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900">Payment History</h1>

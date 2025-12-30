@@ -70,13 +70,13 @@
         .nav-link { 
             display: flex; 
             align-items: center; 
-            padding: 0.75rem 1.5rem; 
-            font-size: 0.875rem; 
-            font-weight: 500; 
+            padding: 0.50rem 0.5rem; 
+            font-size: 0.9rem; 
+            font-weight: 600; 
             border-radius: 0.5rem; 
-            margin: 0.25rem 1rem; 
+            margin: 0.25rem 0.5rem; 
             transition: all 0.15s ease-in-out; 
-            color: #6b7280; 
+            color: #333; 
             text-decoration: none; 
         }
         .nav-link:hover { 
@@ -121,6 +121,10 @@
         }
         .content-area { 
             padding: 2rem; 
+            box-sizing: border-box;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
         }
         
         /* Button Styles */
@@ -312,7 +316,7 @@
                           </div>
                 </div>
                 
-                <nav class="mt-8 px-4 flex-1 flex flex-col">
+                <nav class="mt-2 px-4 flex-1 flex flex-col">
             @php
                 $user = auth('web')->user();
                 // Check for active company (works for both owners and staff members)
