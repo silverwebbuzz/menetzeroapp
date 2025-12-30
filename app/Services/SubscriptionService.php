@@ -171,8 +171,7 @@ class SubscriptionService
                     ->count();
                     
             case 'documents':
-                return \App\Models\DocumentUpload::where('company_id', $companyId)
-                    ->count();
+                return 0;
                     
             default:
                 return 0;
