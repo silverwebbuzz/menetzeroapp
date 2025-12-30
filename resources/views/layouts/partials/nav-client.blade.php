@@ -29,13 +29,6 @@
         $user->hasModulePermission('measurements', 'view', $companyId)
     ));
     
-    // Documents permissions: documents.upload, upload_documents, or module 'documents' with action 'view' or 'upload'
-    $canViewDocuments = $isAdmin || ($hasCompany && (
-        $user->hasPermission('documents.upload', $companyId) ||
-        $user->hasPermission('upload_documents', $companyId) ||
-        $user->hasModulePermission('documents', 'view', $companyId) ||
-        $user->hasModulePermission('documents', 'upload', $companyId)
-    ));
     
     // Reports permissions: reports.view, reports.*, or module 'reports' with action 'view'
     $canViewReports = $isAdmin || ($hasCompany && (
@@ -228,36 +221,6 @@
 </div>
 @endif
 
-@if($canViewDocuments)
-<!-- AI Smart Uploads Section -->
-<div class="mt-6 mb-2">
-    <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3">
-        AI Smart Uploads
-    </div>
-</div>
-
-<a href="{{ route('document-uploads.index') }}" class="nav-link {{ request()->routeIs('document-uploads.*') ? 'active' : '' }}">
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-    </svg>
-    Upload Bills
-</a>
-
-<a href="{{ route('document-uploads.index', ['status' => 'extracted']) }}" class="nav-link">
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-    </svg>
-    View Extracted Data
-</a>
-
-<a href="{{ route('document-uploads.index', ['status' => 'approved']) }}" class="nav-link">
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-    </svg>
-    Approved Items
-</a>
-@endif
 
 @if($canViewReports)
 <!-- Reports and Profile Section -->

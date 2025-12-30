@@ -12,7 +12,6 @@ use App\Http\Controllers\EmissionBoundaryController;
 use App\Http\Controllers\MeasurementController;
 use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\DocumentUploadController;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -159,24 +158,6 @@ Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client'])->
         Route::get('/fuel-categories/{sourceId}', [\App\Http\Controllers\QuickInputController::class, 'getFuelCategories'])->name('fuel-categories');
         Route::get('/fuel-types/{sourceId}', [\App\Http\Controllers\QuickInputController::class, 'getFuelTypes'])->name('fuel-types');
         Route::get('/units/{sourceId}', [\App\Http\Controllers\QuickInputController::class, 'getUnits'])->name('units');
-    });
-    
-    // Document Upload routes (AI Smart Uploads)
-    Route::prefix('document-uploads')->name('document-uploads.')->group(function () {
-        Route::get('/', [DocumentUploadController::class, 'index'])->name('index');
-        Route::get('/create', [DocumentUploadController::class, 'create'])->name('create');
-        Route::post('/', [DocumentUploadController::class, 'store'])->name('store');
-        Route::get('/{document}', [DocumentUploadController::class, 'show'])->name('show');
-        Route::get('/{document}/edit', [DocumentUploadController::class, 'edit'])->name('edit');
-        Route::put('/{document}', [DocumentUploadController::class, 'update'])->name('update');
-        Route::post('/{document}/approve', [DocumentUploadController::class, 'approve'])->name('approve');
-        Route::post('/{document}/reject', [DocumentUploadController::class, 'reject'])->name('reject');
-        Route::delete('/{document}', [DocumentUploadController::class, 'destroy'])->name('destroy');
-        Route::post('/{document}/retry-ocr', [DocumentUploadController::class, 'retryOcr'])->name('retry-ocr');
-        Route::get('/{document}/field-mapping', [DocumentUploadController::class, 'showFieldMapping'])->name('field-mapping');
-        Route::put('/{document}/field-mapping', [DocumentUploadController::class, 'updateFieldMapping'])->name('update-field-mapping');
-        Route::get('/{document}/assign-scope', [DocumentUploadController::class, 'showScopeAssignment'])->name('assign-scope');
-        Route::put('/{document}/assign-scope', [DocumentUploadController::class, 'updateScopeAssignment'])->name('update-assign-scope');
     });
     
     // Reports routes
