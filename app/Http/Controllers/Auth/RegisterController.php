@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Company;
+use App\Mail\WelcomeEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class RegisterController extends Controller
 {
@@ -39,6 +41,14 @@ class RegisterController extends Controller
             'role' => 'company_admin', // Client registration = company_admin
             'is_active' => true,
         ]);
+
+        // Send welcome email
+        try {
+            Mail::to($user->email)->send(new WelcomeEmail($user));
+        } catch (\Exception $e) {
+            // Log the error but don't fail registration if email fails
+            \Log::error('Failed to send welcome email: ' . $e->getMessage());
+        }
 
         Auth::guard('web')->login($user);
 

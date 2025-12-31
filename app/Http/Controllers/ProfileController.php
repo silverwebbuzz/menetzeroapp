@@ -6,8 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Company;
 use App\Models\MasterIndustryCategory;
+use App\Mail\PasswordChangedEmail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class ProfileController extends Controller
 {
@@ -88,6 +90,14 @@ class ProfileController extends Controller
         $user->update([
             'password' => Hash::make($request->new_password),
         ]);
+
+        // Send password changed email notification
+        try {
+            Mail::to($user->email)->send(new PasswordChangedEmail($user));
+        } catch (\Exception $e) {
+            // Log the error but don't fail password update if email fails
+            \Log::error('Failed to send password changed email: ' . $e->getMessage());
+        }
 
         return back()->with('success', 'Password updated successfully!');
     }

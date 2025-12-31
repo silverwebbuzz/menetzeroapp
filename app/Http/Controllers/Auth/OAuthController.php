@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Mail\WelcomeEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
 
@@ -79,6 +81,14 @@ class OAuthController extends Controller
                 'role' => 'company_admin', // Client registration = company_admin
                 'is_active' => true,
             ]);
+            
+            // Send welcome email
+            try {
+                Mail::to($newUser->email)->send(new WelcomeEmail($newUser));
+            } catch (\Exception $e) {
+                // Log the error but don't fail registration if email fails
+                Log::error('Failed to send welcome email: ' . $e->getMessage());
+            }
             
             Auth::guard('web')->login($newUser, true);
             
