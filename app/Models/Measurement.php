@@ -122,33 +122,33 @@ class Measurement extends Model
     /**
      * Get total CO2e for this measurement (calculated directly)
      */
-    public function getTotalCo2eAttribute()
-    {
-        $totalCo2e = 0;
+    // public function getTotalCo2eAttribute()
+    // {
+    //     $totalCo2e = 0;
         
-        // Get all measurement data grouped by emission source
-        $measurementData = $this->measurementData()
-            ->with('emissionSource')
-            ->get()
-            ->groupBy('emission_source_id');
+    //     // Get all measurement data grouped by emission source
+    //     $measurementData = $this->measurementData()
+    //         ->with('emissionSource')
+    //         ->get()
+    //         ->groupBy('emission_source_id');
         
-        foreach ($measurementData as $emissionSourceId => $data) {
-            // Get quantity from the data
-            $quantityData = $data->where('field_name', 'quantity')->first();
-            if ($quantityData) {
-                $quantity = (float) $quantityData->field_value;
+    //     foreach ($measurementData as $emissionSourceId => $data) {
+    //         // Get quantity from the data
+    //         $quantityData = $data->where('field_name', 'quantity')->first();
+    //         if ($quantityData) {
+    //             $quantity = (float) $quantityData->field_value;
                 
-                // Get emission factor for this source
-                $emissionFactor = \App\Models\EmissionFactor::getBestFactor($emissionSourceId, 'UAE', $this->fiscal_year);
-                if ($emissionFactor) {
-                    $co2e = $quantity * $emissionFactor->factor_value;
-                    $totalCo2e += round($co2e, 6);
-                }
-            }
-        }
+    //             // Get emission factor for this source
+    //             $emissionFactor = \App\Models\EmissionFactor::getBestFactor($emissionSourceId, 'UAE', $this->fiscal_year);
+    //             if ($emissionFactor) {
+    //                 $co2e = $quantity * $emissionFactor->factor_value;
+    //                 $totalCo2e += round($co2e, 6);
+    //             }
+    //         }
+    //     }
         
-        return round($totalCo2e, 6);
-    }
+    //     return round($totalCo2e, 6);
+    // }
 
     /**
      * Get CO2e by scope (calculated directly)

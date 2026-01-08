@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ReportController;
+use App\Models\Report;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\HomeController;
@@ -158,13 +160,18 @@ Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client'])->
         Route::get('/fuel-categories/{sourceId}', [\App\Http\Controllers\QuickInputController::class, 'getFuelCategories'])->name('fuel-categories');
         Route::get('/fuel-types/{sourceId}', [\App\Http\Controllers\QuickInputController::class, 'getFuelTypes'])->name('fuel-types');
         Route::get('/units/{sourceId}', [\App\Http\Controllers\QuickInputController::class, 'getUnits'])->name('units');
+        Route::get('/vehicle-types/{sourceId}', [\App\Http\Controllers\QuickInputController::class, 'getVehicleTypes'])->name('vehicle-types');
+        Route::get('/vehicle-fuel-types/{sourceId}', [\App\Http\Controllers\QuickInputController::class, 'getVehicleFuelTypes'])->name('vehicle-fuel-types');
+        Route::get('/vehicle-uoms/{sourceId}', [\App\Http\Controllers\QuickInputController::class, 'getVehicleUoms'])->name('vehicle-uoms');
+        Route::get('/get-vehicle-form-fields', [\App\Http\Controllers\QuickInputController::class, 'getFormFieldsForVehicle'])->name('vehicle-form-fields');
     });
     
     // Reports routes
     Route::prefix('reports')->name('reports.')->group(function () {
-        Route::get('/', function () {
-            return view('reports.index');
-        })->name('index');
+        Route::get('/', [ReportController::class, 'index'])->name('index');
+        Route::get('/show', [ReportController::class, 'show'])->name('show');
+        Route::get('/export/excel', [ReportController::class, 'exportExcel'])->name('export.excel');
+        Route::get('/export/pdf', [ReportController::class, 'exportPDF'])->name('export.pdf');
     });
     
     // Role Management routes - EXPLICIT NAMES for client

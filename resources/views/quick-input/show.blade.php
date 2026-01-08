@@ -607,5 +607,5 @@
 @endsection
 
 @push('scripts')
-<script src="/public/js/quick-input.js?v={{ time() }}"></script>
+<script src="{{ asset('js/quick-input.js')}}?v={{ time() }}"></script>
 @endpush

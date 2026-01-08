@@ -37,132 +37,132 @@ class QuickInputController extends Controller
     public function index(Request $request)
     {
         $this->requirePermission('measurements.view', null, ['measurements.*', 'manage_measurements']);
-        
+
         $user = Auth::user();
         $company = $user->getActiveCompany();
-        
+
         if (!$company) {
             abort(403, 'No active company found.');
         }
-        
+
         // Get all measurement_data entries for user's company
         $query = MeasurementData::with(['measurement.location', 'emissionSource'])
-            ->whereHas('measurement', function($q) use ($company) {
-                $q->whereHas('location', function($locQuery) use ($company) {
+            ->whereHas('measurement', function ($q) use ($company) {
+                $q->whereHas('location', function ($locQuery) use ($company) {
                     $locQuery->where('company_id', $company->id);
                 });
             });
-        
+
         // Apply filters
         if ($request->filled('scope')) {
             $query->where('scope', $request->scope);
         }
-        
+
         if ($request->filled('location_id')) {
-            $query->whereHas('measurement', function($q) use ($request) {
+            $query->whereHas('measurement', function ($q) use ($request) {
                 $q->where('location_id', $request->location_id);
             });
         }
-        
+
         if ($request->filled('fiscal_year')) {
-            $query->whereHas('measurement', function($q) use ($request) {
+            $query->whereHas('measurement', function ($q) use ($request) {
                 $q->where('fiscal_year', $request->fiscal_year);
             });
         }
-        
+
         if ($request->filled('source_id')) {
             $query->where('emission_source_id', $request->source_id);
         }
-        
+
         $entries = $query->orderBy('entry_date', 'desc')
             ->orderBy('created_at', 'desc')
             ->paginate(50);
-        
+
         // Get locations for filter dropdown
         $locations = Location::where('company_id', $company->id)
             ->where('is_active', true)
             ->orderBy('name')
             ->get();
-        
+
         // Get only years that have entries
-        $yearsWithEntries = MeasurementData::whereHas('measurement', function($q) use ($company) {
-                $q->whereHas('location', function($locQuery) use ($company) {
-                    $locQuery->where('company_id', $company->id);
-                });
-            })
+        $yearsWithEntries = MeasurementData::whereHas('measurement', function ($q) use ($company) {
+            $q->whereHas('location', function ($locQuery) use ($company) {
+                $locQuery->where('company_id', $company->id);
+            });
+        })
             ->join('measurements', 'measurement_data.measurement_id', '=', 'measurements.id')
             ->select('measurements.fiscal_year')
             ->distinct()
             ->orderBy('measurements.fiscal_year', 'desc')
             ->pluck('fiscal_year')
             ->toArray();
-        
+
         // Get emission sources with entry counts
         $sources = EmissionSourceMaster::where('is_quick_input', true)
             ->orderBy('scope')
             ->orderBy('quick_input_order')
             ->get()
-            ->map(function($source) use ($company, $request) {
+            ->map(function ($source) use ($company, $request) {
                 // Count entries for this source
                 $entryCountQuery = MeasurementData::where('emission_source_id', $source->id)
-                    ->whereHas('measurement', function($q) use ($company) {
-                        $q->whereHas('location', function($locQuery) use ($company) {
-                            $locQuery->where('company_id', $company->id);
-                        });
+                    ->whereHas('measurement', function ($q) use ($company) {
+                    $q->whereHas('location', function ($locQuery) use ($company) {
+                        $locQuery->where('company_id', $company->id);
                     });
-                
+                });
+
                 // Apply same filters as main query
                 if ($request->filled('scope')) {
                     $entryCountQuery->where('scope', $request->scope);
                 }
                 if ($request->filled('location_id')) {
-                    $entryCountQuery->whereHas('measurement', function($q) use ($request) {
+                    $entryCountQuery->whereHas('measurement', function ($q) use ($request) {
                         $q->where('location_id', $request->location_id);
                     });
                 }
                 if ($request->filled('fiscal_year')) {
-                    $entryCountQuery->whereHas('measurement', function($q) use ($request) {
+                    $entryCountQuery->whereHas('measurement', function ($q) use ($request) {
                         $q->where('fiscal_year', $request->fiscal_year);
                     });
                 }
-                
+
                 $entryCount = $entryCountQuery->count();
-                
+
                 // Get expected entry count (could be from a config or default to 1)
                 $expectedCount = 1; // Default, can be customized per source if needed
-                
+    
                 $source->entry_count = $entryCount;
                 $source->expected_count = $expectedCount;
-                
+
                 return $source;
             });
-        
+
         // Calculate summary statistics
         $summary = $this->measurementService->calculateSummary($company->id, $request->all());
-        
+
         return view('quick-input.index', compact('entries', 'locations', 'sources', 'summary', 'yearsWithEntries'));
     }
-    
+
     /**
      * Show Quick Input form for a specific emission source
      */
     public function show($scope, $slug, Request $request)
     {
         $this->requirePermission('measurements.add', null, ['measurements.*', 'manage_measurements']);
-        
+
         $user = Auth::user();
         $company = $user->getActiveCompany();
-        
+
         if (!$company) {
             abort(403, 'No active company found.');
         }
-        
+
         // Get emission source by slug
         $emissionSource = EmissionSourceMaster::where('quick_input_slug', $slug)
             ->where('scope', 'Scope ' . $scope)
             ->where('is_quick_input', true)
             ->firstOrFail();
-        
+
         // Get form fields
         $formFields = $this->formBuilder->buildForm($emissionSource->id);
         
@@ -171,71 +171,71 @@ class QuickInputController extends Controller
             $emissionSource->id,
             $company->industry_category_id ?? null
         );
-        
+
         // Get full industry label for additional details (description, equipment, etc.)
         $industryLabel = $this->calculationService->getIndustryLabel(
             $emissionSource->id,
             $company->industry_category_id ?? null
         );
-        
+
         // Get available locations
         $locations = Location::where('company_id', $company->id)
             ->where('is_active', true)
             ->orderBy('name')
             ->get();
-        
+
         // Get available units from emission factors
         $availableUnits = $this->calculationService->getAvailableUnits($emissionSource->id);
-        
+
         // Get years from measurements table for this company
-        $yearsWithMeasurements = Measurement::whereHas('location', function($q) use ($company) {
-                $q->where('company_id', $company->id);
-            })
+        $yearsWithMeasurements = Measurement::whereHas('location', function ($q) use ($company) {
+            $q->where('company_id', $company->id);
+        })
             ->select('fiscal_year')
             ->distinct()
             ->orderBy('fiscal_year', 'desc')
             ->pluck('fiscal_year')
             ->toArray();
-        
+
         // Check if we're editing an existing entry
         $editEntry = null;
         $editEntryId = $request->input('edit');
         if ($editEntryId) {
             $editEntry = MeasurementData::with(['measurement.location', 'emissionSource'])
-                ->whereHas('measurement.location', function($q) use ($company) {
+                ->whereHas('measurement.location', function ($q) use ($company) {
                     $q->where('company_id', $company->id);
                 })
                 ->where('id', $editEntryId)
                 ->where('emission_source_id', $emissionSource->id)
                 ->first();
-            
+
             if ($editEntry) {
                 // Pre-select location and year from the entry being edited
                 $selectedLocationId = $editEntry->measurement->location_id;
                 $selectedFiscalYear = $editEntry->measurement->fiscal_year;
             }
         }
-        
+       
         // Get selected location and year from request, edit entry, or session
         $selectedLocationId = $request->input('location_id', $editEntry ? $editEntry->measurement->location_id : session('quick_input.location_id'));
         $selectedFiscalYear = $request->input('fiscal_year', $editEntry ? $editEntry->measurement->fiscal_year : session('quick_input.fiscal_year'));
-        
+
         $measurement = null;
         $existingEntries = collect();
-        
+
         if ($selectedLocationId && $selectedFiscalYear) {
             $measurement = $this->measurementService->getOrCreateMeasurement($selectedLocationId, $selectedFiscalYear);
             // Load location relationship
             $measurement->load('location');
-            
+
             session(['quick_input.location_id' => $selectedLocationId, 'quick_input.fiscal_year' => $selectedFiscalYear]);
-            
+
             // Get all measurement IDs for this location and fiscal year
             $measurementIds = Measurement::where('location_id', $selectedLocationId)
                 ->where('fiscal_year', $selectedFiscalYear)
                 ->pluck('id')
                 ->toArray();
-            
+
             // Get existing entries for this emission source from all measurements matching location and year
             $existingEntries = MeasurementData::with(['emissionSource', 'measurement.location'])
                 ->whereIn('measurement_id', $measurementIds)
@@ -244,7 +244,7 @@ class QuickInputController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->get();
         }
-        
+
         return view('quick-input.show', compact(
             'emissionSource',
             'formFields',
@@ -261,42 +261,200 @@ class QuickInputController extends Controller
             'editEntry'
         ));
     }
-    
+
+    public function getFormFieldsForVehicle(Request $request)
+    {
+        
+        $knowAmountOfFuel = $request->input('knowAmountOfFuel');
+
+        if ($knowAmountOfFuel == "true") {
+            $fieldNames = [
+                'vehicle_fuel_type',
+                'unit_of_measure',
+                'distance'
+            ];
+        } else {
+            $fieldNames = [
+                'vehicle_category',
+                'vehicle_type',
+                'vehicle_fuel_type',
+                'unit_of_measure',
+                'distance'
+            ];
+        }
+
+        $fields = EmissionSourceFormField::where('emission_source_id', 54)
+            ->whereIn('field_name', $fieldNames)
+            ->orderBy('field_order')
+            ->get();
+        
+        if(isset($request->edit) && $request->edit != null && $request->edit > 0) {
+            $data = MeasurementData::where('id', $request->edit)->first();
+        }
+
+        $html = '';
+
+        foreach ($fields as $field) {
+
+            if($knowAmountOfFuel == "true" && $field->field_label == 'Distance'){
+                $field->field_label = 'Amount';
+                $field->help_text = 'Amount of fuel used in the unit of measure specified above';
+               $field->field_placeholder = 'Enter the amount of fuel used';
+            }
+        // normalize options safely
+        $options = [];
+        if ($field->field_type === 'select') {
+            
+            if (is_array($field->field_options)) {
+                $options = $field->field_options;
+            } elseif (is_string($field->field_options)) {
+                $options = json_decode($field->field_options, true) ?? [];
+            }
+        }
+
+        $html .= '<div class="form-group-horizontal">';
+
+        /* ---------- LABEL + HELP TEXT ---------- */
+        $html .= '<div class="form-label-wrapper">';
+        $html .= '<label for="'.e($field->field_name).'" class="form-label-horizontal">';
+        $html .= e($field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)));
+
+        if ($field->is_required) {
+            $html .= ' <span class="text-red-500">*</span>';
+        }
+
+        $html .= '</label>';
+
+        if (!empty($field->help_text)) {
+            $html .= '<p class="form-help-text-under-label">'.e($field->help_text).'</p>';
+        }
+
+        $html .= '</div>'; // label wrapper
+
+        /* ---------- INPUT WRAPPER ---------- */
+        $html .= '<div class="form-input-wrapper">';
+
+        /* ---------- SELECT ---------- */
+        if ($field->field_type === 'select') {
+
+            $html .= '<select name="'.e($field->field_name).'" '
+                . 'id="'.e($field->field_name).'" '
+                . 'data-field-name="'.e($field->field_name).'" '
+                . 'data-depends-on="'.e($field->depends_on_field ?? '').'" '
+                . ($field->is_required ? 'required ' : '')
+                . 'class="form-input-select">';
+
+            $html .= '<option value="">Select an option</option>';
+
+            if($knowAmountOfFuel == "true") {
+                if($field->field_name == 'vehicle_fuel_type'){
+                    $options = [
+                        ['value' => 'Diesel (average biofuel blend)', 'label' => 'Diesel (average biofuel blend)'],
+                        ['value' => 'Petrol (average biofuel blend)', 'label' => 'Petrol (average biofuel blend)'],
+                    ];
+                }
+                if($field->field_name == 'unit_of_measure'){
+                    $options = [
+                        ['value' => 'litres', 'label' => 'litres'],
+                        ['value' => 'tonnes', 'label' => 'tonnes'],
+                    ];
+                }
+                
+            }
+            foreach ($options as $option) {
+                $value = is_array($option) ? ($option['value'] ?? '') : $option;
+                $label = is_array($option) ? ($option['label'] ?? $value) : $option;
+                // if($field->field_name == 'vehicle_fuel_type' && $knowAmountOfFuel == "true" && !in_array($value,['Diesel','Petrol'])) {
+                //     continue;
+                // }
+                // dd($data->vehicle_fuel_type);
+                if(isset($data) && $data != null && $data->fuel_type == $value && $field->field_name == 'vehicle_fuel_type') {
+                    $html .= '<option value="'.e($value).'" selected>'.e($label).'</option>';
+                }else if(isset($data) && $data != null && $data->unit == $value && $field->field_name == 'unit_of_measure') {
+                    $html .= '<option value="'.e($value).'" selected>'.e($label).'</option>';
+                }else{
+                    $html .= '<option value="'.e($value).'">'.e($label).'</option>';
+                }
+            }
+
+            $html .= '</select>';
+        }
+
+        /* ---------- NUMBER ---------- */
+        elseif ($field->field_type === 'number') {
+
+            $html .= '<input type="number" '
+                . 'name="'.e($field->field_name).'" '
+                . 'id="'.e($field->field_name).'" '
+                . 'step="any" min="0" '
+                . ($field->is_required ? 'required ' : '')
+                . 'placeholder="'.e($field->field_placeholder ?? 'Enter '.strtolower($field->field_label ?? $field->field_name)).'" '
+                . 'class="form-input" value="'.(isset($data) && $data != null && $data->quantity ? $data->quantity : '').'">';
+        }
+
+        /* ---------- TEXT / TEXTAREA ---------- */
+        else {
+
+            if ($field->field_type === 'textarea') {
+                $html .= '<textarea name="'.e($field->field_name).'" '
+                    . 'id="'.e($field->field_name).'" '
+                    . 'rows="3" '
+                    . ($field->is_required ? 'required ' : '')
+                    . 'placeholder="'.e($field->field_placeholder ?? '').'" '
+                    . 'class="form-input form-textarea"></textarea>';
+            } else {
+                $html .= '<input type="'.e($field->field_type).'" '
+                    . 'name="'.e($field->field_name).'" '
+                    . 'id="'.e($field->field_name).'" '
+                    . ($field->is_required ? 'required ' : '')
+                    . 'placeholder="'.e($field->field_placeholder ?? '').'" '
+                    . 'class="form-input">';
+            }
+        }
+
+        $html .= '</div>'; // input wrapper
+        $html .= '</div>'; // form-group-horizontal
+    }
+
+    return response()->json([
+        'html' => $html
+    ]);
+    }
+
     /**
      * Store a new Quick Input entry
      */
     public function store(Request $request, $scope, $slug)
     {
         $this->requirePermission('measurements.add', null, ['measurements.*', 'manage_measurements']);
-        
+
         $user = Auth::user();
         $company = $user->getActiveCompany();
-        
+
         if (!$company) {
             abort(403, 'No active company found.');
         }
-        
+
         // Get emission source
         $emissionSource = EmissionSourceMaster::where('quick_input_slug', $slug)
             ->where('scope', 'Scope ' . $scope)
             ->where('is_quick_input', true)
             ->firstOrFail();
-        
+
         // Validate basic required fields
         $validationRules = [
             'location_id' => 'required|exists:locations,id',
             'fiscal_year' => 'required|integer|min:2000|max:2100',
         ];
-        
+
         // Check if form uses 'amount' or 'quantity'
         $formFields = EmissionSourceFormField::where('emission_source_id', $emissionSource->id)->get();
-        $hasAmountField = $formFields->contains(function($field) {
+        $hasAmountField = $formFields->contains(function ($field) {
             return $field->field_name === 'amount';
         });
-        $hasUnitOfMeasure = $formFields->contains(function($field) {
+        $hasUnitOfMeasure = $formFields->contains(function ($field) {
             return $field->field_name === 'unit_of_measure';
         });
-        
         if ($hasAmountField) {
             $validationRules['amount'] = 'required|numeric|min:0';
             if ($hasUnitOfMeasure) {
@@ -305,17 +463,21 @@ class QuickInputController extends Controller
                 $validationRules['unit'] = 'required|string';
             }
         } else {
-            $validationRules['quantity'] = 'required|numeric|min:0';
-            $validationRules['unit'] = 'required|string';
+            if ($hasUnitOfMeasure) {
+                $validationRules['unit_of_measure'] = 'required|string';
+            } else {
+                $validationRules['quantity'] = 'required|numeric|min:0';
+                $validationRules['unit'] = 'required|string';
+            }
         }
-        
+
         $request->validate($validationRules);
-        
+
         // Verify location belongs to company
         $location = Location::where('id', $request->location_id)
             ->where('company_id', $company->id)
             ->firstOrFail();
-        
+
         DB::beginTransaction();
         try {
             // Get or create measurement record
@@ -323,48 +485,51 @@ class QuickInputController extends Controller
                 $request->location_id,
                 $request->fiscal_year
             );
-            
+
             // Get quantity and unit from request (handle both 'amount' and 'quantity' fields)
-            $quantity = $request->input('amount') ?? $request->input('quantity');
+            $quantity = ($request->input('amount') ?? $request->input('quantity')) ?? $request->input('distance');
             $unit = $request->input('unit_of_measure') ?? $request->input('unit');
-            
+
             // Prepare conditions for factor selection (include fuel_category, fuel_type, energy_type, etc.)
             // For refrigerants (fugitive emissions), use 'Global' as region since GWP values are global
-            $defaultRegion = ($emissionSource->emission_type === 'fugitive') ? 'Global' : 'UAE';
-            
+            // $defaultRegion = ($emissionSource->emission_type === 'fugitive') ? 'Global' : 'UAE';
+            $defaultRegion = 'UAE';
+
             // Handle process emissions - use process_type as fuel_type
             $processType = $request->input('process_type');
-            $fuelType = $request->input('fuel_type');
+            $fuelType = $request->input('fuel_type') ?? $request->input('vehicle_fuel_type');
             if ($emissionSource->quick_input_slug === 'process' && $processType) {
                 $fuelType = $processType;
             } else {
                 $fuelType = $fuelType ?: $request->input('energy_type') ?: $request->input('refrigerant_type');
             }
-            
+
             $conditions = [
                 'region' => $request->input('region', $defaultRegion),
                 'fuel_category' => $request->input('fuel_category'),
                 'fuel_type' => $fuelType,
                 'unit' => $unit,
+                'vehicle_category' => $request->input('vehicle_category'),
+                'vehicle_type' => $request->input('vehicle_type'),
             ];
-            
+
             // Select emission factor
             $emissionFactor = $this->calculationService->selectEmissionFactor(
                 $emissionSource->id,
                 $conditions
             );
-            
             if (!$emissionFactor) {
+                dd($emissionFactor);
                 return back()->withErrors(['quantity' => 'No suitable emission factor found for the selected criteria. Please contact support.'])->withInput();
             }
-            
+
             // Debug: Log emission factor details
             \Log::info('Emission Factor Selected', [
                 'factor_id' => $emissionFactor->id,
                 'calculation_method' => $emissionFactor->calculation_method,
                 'has_calculation_method' => !empty($emissionFactor->calculation_method),
             ]);
-            
+
             // Calculate CO2e
             try {
                 $calculation = $this->calculationService->calculateCO2e(
@@ -372,7 +537,7 @@ class QuickInputController extends Controller
                     $emissionFactor,
                     $unit
                 );
-                
+
                 // Ensure calculation returns expected structure
                 if (!is_array($calculation)) {
                     throw new \Exception('Calculation service returned invalid result');
@@ -381,7 +546,7 @@ class QuickInputController extends Controller
                 \Log::error('Calculation error in store: ' . $calcError->getMessage());
                 return back()->withErrors(['quantity' => 'Error calculating CO2e: ' . $calcError->getMessage()])->withInput();
             }
-            
+
             // Prepare additional data (form field values)
             $additionalData = [];
             $formFields = EmissionSourceFormField::where('emission_source_id', $emissionSource->id)->get();
@@ -394,16 +559,16 @@ class QuickInputController extends Controller
                     $additionalData[$field->field_name] = $request->input($field->field_name);
                 }
             }
-            
+
             // Get notes/comments (handle both 'comments' from form fields and 'notes' for backward compatibility)
             $notes = $request->input('comments') ?? $request->input('notes') ?? null;
-            
+
             // Ensure calculation result has the expected structure
             $co2e = $calculation['co2e'] ?? $calculation['total_co2e'] ?? 0;
             if (!is_numeric($co2e)) {
                 $co2e = 0;
             }
-            
+
             // Create measurement_data record
             // Note: field_name and field_value are required by the database schema for backward compatibility
             // For Quick Input entries, we use 'quick_input' as field_name
@@ -429,7 +594,7 @@ class QuickInputController extends Controller
                 'notes' => $notes,
                 'created_by' => $user->id,
             ]);
-            
+
             // Store fuel_category, energy_type, and refrigerant_type in additional_data if provided
             $additionalDataToUpdate = [];
             if ($request->input('fuel_category')) {
@@ -449,15 +614,15 @@ class QuickInputController extends Controller
                 $mergedAdditionalData = array_merge($existingAdditionalData, $additionalDataToUpdate);
                 $measurementData->update(['additional_data' => $mergedAdditionalData]);
             }
-            
+
             // Update measurement totals
             $this->measurementService->updateMeasurementTotals($measurement->id);
-            
+
             DB::commit();
-            
+
             return redirect()->route('quick-input.index')
                 ->with('success', 'Emission data added successfully!');
-                
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
             return back()->withErrors($e->errors())->withInput();
@@ -471,19 +636,19 @@ class QuickInputController extends Controller
                 'request_data' => $request->except(['_token', '_method']),
                 'emission_source_id' => $emissionSource->id ?? null,
             ]);
-            
+
             // Return more detailed error in development, generic in production
-            $errorMessage = config('app.debug') 
+            $errorMessage = config('app.debug')
                 ? 'Error: ' . $e->getMessage() . ' (Line: ' . $e->getLine() . ')'
                 : 'An unexpected error occurred while saving. Please try again or contact support if the problem persists.';
-            
+
             return back()
                 ->withErrors(['error' => $errorMessage])
                 ->withInput()
                 ->with('error', 'Failed to save entry. Please check your inputs and try again.');
         }
     }
-    
+
     /**
      * Calculate CO2e emissions (AJAX endpoint)
      */
@@ -496,21 +661,21 @@ class QuickInputController extends Controller
                 'distance' => 'required_without:quantity|numeric|min:0',
                 'unit' => 'required|string',
             ]);
-            
+
             // For vehicles, use distance if provided, otherwise use quantity
             $quantity = $request->input('distance') ?? $request->input('quantity');
-            
+
             $emissionSource = EmissionSourceMaster::findOrFail($request->emission_source_id);
-            
+
             // Prepare conditions for factor selection (include fuel_category, fuel_type, energy_type, etc.)
             // For refrigerants (fugitive emissions), use 'Global' as region since GWP values are global
             $defaultRegion = ($emissionSource->emission_type === 'fugitive') ? 'Global' : 'UAE';
-            
+
             // Handle vehicle-specific fields (simplified: only distance-based)
             $fuelType = $request->input('fuel_type');
             $vehicleFuelType = $request->input('vehicle_fuel_type');
-            $vehicleType = $request->input('vehicle_size'); // Use vehicle_size field
-            
+            $vehicleType = $request->input('vehicle_type'); // Use vehicle_size field
+
             // For vehicles: use vehicle_fuel_type and vehicle_size
             if ($emissionSource->quick_input_slug === 'vehicle') {
                 $fuelType = $vehicleFuelType; // Use vehicle_fuel_type as fuel_type
@@ -521,27 +686,27 @@ class QuickInputController extends Controller
                 // For other sources, use standard mapping
                 $fuelType = $fuelType ?: $request->input('energy_type') ?: $request->input('refrigerant_type');
             }
-            
+
             $conditions = [
                 'region' => $request->input('region', $defaultRegion),
                 'fuel_category' => $request->input('fuel_category'),
                 'fuel_type' => $fuelType,
                 'vehicle_type' => $vehicleType, // For distance-based vehicle calculations
+                'vehicle_category' => $request->input('vehicle_category'), // For distance-based vehicle calculations
                 'unit' => $request->input('unit') ?? $request->input('unit_of_measure'),
             ];
-            
+
             // Select emission factor
             $emissionFactor = $this->calculationService->selectEmissionFactor(
                 $emissionSource->id,
                 $conditions
             );
-            
             if (!$emissionFactor) {
                 // Debug: Check what factors exist for this source
                 $availableFactors = \App\Models\EmissionFactor::where('emission_source_id', $emissionSource->id)
                     ->where('is_active', true)
                     ->get(['id', 'fuel_type', 'unit', 'region', 'factor_value']);
-                
+
                 \Log::warning('No emission factor found', [
                     'emission_source_id' => $emissionSource->id,
                     'emission_source_name' => $emissionSource->name,
@@ -561,7 +726,7 @@ class QuickInputController extends Controller
                     ]
                 ], 400);
             }
-            
+
             // Debug: Log selected factor details
             \Log::info('Emission Factor Selected for Calculation', [
                 'factor_id' => $emissionFactor->id,
@@ -572,19 +737,19 @@ class QuickInputController extends Controller
                 'unit' => $emissionFactor->unit,
                 'conditions' => $conditions
             ]);
-            
+
             // Get quantity (handle both 'amount' and 'quantity' fields)
             // For vehicles, quantity can be 'amount' (fuel-based) or 'distance' (distance-based)
             $quantity = $request->input('quantity') ?? $request->input('amount') ?? $request->input('distance');
             $unit = $request->input('unit') ?? $request->input('unit_of_measure');
-            
+
             // Calculate CO2e
             $calculation = $this->calculationService->calculateCO2e(
                 $quantity,
                 $emissionFactor,
                 $unit
             );
-            
+
             return response()->json([
                 'success' => true,
                 'calculation' => $calculation,
@@ -603,7 +768,7 @@ class QuickInputController extends Controller
                 'trace' => $e->getTraceAsString(),
                 'request' => $request->all()
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => config('app.debug') ? $e->getMessage() : 'Calculation failed. Please try again.'
@@ -617,20 +782,20 @@ class QuickInputController extends Controller
     public function view($id)
     {
         $this->requirePermission('measurements.view', null, ['measurements.*', 'manage_measurements']);
-        
+
         $user = Auth::user();
         $company = $user->getActiveCompany();
-        
+
         if (!$company) {
             abort(403, 'No active company found.');
         }
-        
+
         $entry = MeasurementData::with(['measurement.location', 'emissionSource', 'emissionFactor'])
-            ->whereHas('measurement.location', function($q) use ($company) {
+            ->whereHas('measurement.location', function ($q) use ($company) {
                 $q->where('company_id', $company->id);
             })
             ->findOrFail($id);
-        
+
         return view('quick-input.view', compact('entry'));
     }
 
@@ -640,24 +805,24 @@ class QuickInputController extends Controller
     public function edit($id)
     {
         $this->requirePermission('measurements.edit', null, ['measurements.*', 'manage_measurements']);
-        
+
         $user = Auth::user();
         $company = $user->getActiveCompany();
-        
+
         if (!$company) {
             abort(403, 'No active company found.');
         }
-        
+
         $entry = MeasurementData::with(['measurement.location', 'emissionSource'])
-            ->whereHas('measurement.location', function($q) use ($company) {
+            ->whereHas('measurement.location', function ($q) use ($company) {
                 $q->where('company_id', $company->id);
             })
             ->findOrFail($id);
-        
+
         $emissionSource = $entry->emissionSource;
         $scope = str_replace('Scope ', '', $entry->scope);
         $slug = $emissionSource->quick_input_slug;
-        
+
         // Redirect to show page with edit parameter
         return redirect()->route('quick-input.show', [
             'scope' => $scope,
@@ -674,37 +839,37 @@ class QuickInputController extends Controller
     public function update(Request $request, $id)
     {
         $this->requirePermission('measurements.edit', null, ['measurements.*', 'manage_measurements']);
-        
+
         $user = Auth::user();
         $company = $user->getActiveCompany();
-        
+
         if (!$company) {
             abort(403, 'No active company found.');
         }
-        
+
         $entry = MeasurementData::with(['measurement.location', 'emissionSource'])
-            ->whereHas('measurement.location', function($q) use ($company) {
+            ->whereHas('measurement.location', function ($q) use ($company) {
                 $q->where('company_id', $company->id);
             })
             ->findOrFail($id);
-        
+
         $emissionSource = $entry->emissionSource;
-        
+
         // Check if form uses 'amount' or 'quantity'
         $formFields = EmissionSourceFormField::where('emission_source_id', $emissionSource->id)->get();
-        $hasAmountField = $formFields->contains(function($field) {
+        $hasAmountField = $formFields->contains(function ($field) {
             return $field->field_name === 'amount';
         });
-        $hasUnitOfMeasure = $formFields->contains(function($field) {
+        $hasUnitOfMeasure = $formFields->contains(function ($field) {
             return $field->field_name === 'unit_of_measure';
         });
-        
+
         // Validate
         $validationRules = [
             'location_id' => 'required|exists:locations,id',
             'fiscal_year' => 'required|integer|min:2000|max:2100',
         ];
-        
+
         if ($hasAmountField) {
             $validationRules['amount'] = 'required|numeric|min:0';
             if ($hasUnitOfMeasure) {
@@ -713,17 +878,21 @@ class QuickInputController extends Controller
                 $validationRules['unit'] = 'required|string';
             }
         } else {
-            $validationRules['quantity'] = 'required|numeric|min:0';
-            $validationRules['unit'] = 'required|string';
+            if ($hasUnitOfMeasure) {
+                $validationRules['unit_of_measure'] = 'required|string';
+            } else {
+                $validationRules['quantity'] = 'required|numeric|min:0';
+                $validationRules['unit'] = 'required|string';
+            }
         }
-        
+
         $request->validate($validationRules);
-        
+
         // Verify location belongs to company
         $location = Location::where('id', $request->location_id)
             ->where('company_id', $company->id)
             ->firstOrFail();
-        
+
         DB::beginTransaction();
         try {
             // Get or create measurement record (might be different location/year)
@@ -731,48 +900,48 @@ class QuickInputController extends Controller
                 $request->location_id,
                 $request->fiscal_year
             );
-            
             // Get quantity and unit from request (handle both 'amount' and 'quantity' fields)
-            $quantity = $request->input('amount') ?? $request->input('quantity');
+            $quantity = ($request->input('amount') ?? $request->input('quantity')) ?? $request->input('distance');
             $unit = $request->input('unit_of_measure') ?? $request->input('unit');
-            
+
             // Prepare conditions for factor selection (include fuel_category, fuel_type, energy_type, etc.)
             // For refrigerants (fugitive emissions), use 'Global' as region since GWP values are global
             $defaultRegion = ($emissionSource->emission_type === 'fugitive') ? 'Global' : 'UAE';
-            
+
             // Handle process emissions - use process_type as fuel_type
             $processType = $request->input('process_type');
-            $fuelType = $request->input('fuel_type');
+            $fuelType = $request->input('fuel_type') ?? $request->input('vehicle_fuel_type');
             if ($emissionSource->quick_input_slug === 'process' && $processType) {
                 $fuelType = $processType;
             } else {
                 $fuelType = $fuelType ?: $request->input('energy_type') ?: $request->input('refrigerant_type');
             }
-            
+
             $conditions = [
                 'region' => $request->input('region', $defaultRegion),
                 'fuel_category' => $request->input('fuel_category'),
                 'fuel_type' => $fuelType,
                 'unit' => $unit,
+                'vehicle_category' => $request->input('vehicle_category'),
+                'vehicle_type' => $request->input('vehicle_type'),
             ];
-            
+
             // Select emission factor
             $emissionFactor = $this->calculationService->selectEmissionFactor(
                 $emissionSource->id,
                 $conditions
             );
-            
+
             if (!$emissionFactor) {
                 return back()->withErrors(['quantity' => 'No suitable emission factor found for the selected criteria.'])->withInput();
             }
-            
             // Calculate CO2e
             $calculation = $this->calculationService->calculateCO2e(
                 $quantity,
                 $emissionFactor,
                 $unit
             );
-            
+
             // Prepare additional data
             $additionalData = [];
             $formFields = $this->formBuilder->buildForm($emissionSource->id);
@@ -785,7 +954,7 @@ class QuickInputController extends Controller
                     $additionalData[$field->field_name] = $request->input($field->field_name);
                 }
             }
-            
+
             // Update entry
             // Ensure field_name and field_value are set (required for backward compatibility)
             $updateData = [
@@ -808,9 +977,9 @@ class QuickInputController extends Controller
                 'notes' => $request->input('comments') ?? $request->input('notes') ?? null,
                 'updated_by' => $user->id,
             ];
-            
+
             $entry->update($updateData);
-            
+
             // Store fuel_category and energy_type in additional_data if provided
             $additionalDataToUpdate = [];
             if ($request->input('fuel_category')) {
@@ -827,18 +996,18 @@ class QuickInputController extends Controller
                 $mergedAdditionalData = array_merge($existingAdditionalData, $additionalDataToUpdate);
                 $entry->update(['additional_data' => $mergedAdditionalData]);
             }
-            
+
             // Update measurement totals (both old and new measurements)
             $this->measurementService->updateMeasurementTotals($entry->measurement_id);
             if ($entry->measurement_id != $measurement->id) {
                 $this->measurementService->updateMeasurementTotals($measurement->id);
             }
-            
+
             DB::commit();
-            
+
             return redirect()->route('quick-input.index')
                 ->with('success', 'Entry updated successfully!');
-                
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
             return back()->withErrors($e->errors())->withInput();
@@ -863,34 +1032,34 @@ class QuickInputController extends Controller
     public function destroy($id)
     {
         $this->requirePermission('measurements.delete', null, ['measurements.*', 'manage_measurements']);
-        
+
         $user = Auth::user();
         $company = $user->getActiveCompany();
-        
+
         if (!$company) {
             abort(403, 'No active company found.');
         }
-        
+
         $entry = MeasurementData::with('measurement.location')
-            ->whereHas('measurement.location', function($q) use ($company) {
+            ->whereHas('measurement.location', function ($q) use ($company) {
                 $q->where('company_id', $company->id);
             })
             ->findOrFail($id);
-        
+
         $measurementId = $entry->measurement_id;
-        
+
         DB::beginTransaction();
         try {
             $entry->delete();
-            
+
             // Update measurement totals
             $this->measurementService->updateMeasurementTotals($measurementId);
-            
+
             DB::commit();
-            
+
             return redirect()->route('quick-input.index')
                 ->with('success', 'Entry deleted successfully!');
-                
+
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Quick Input Delete Error: ' . $e->getMessage(), [
@@ -910,47 +1079,47 @@ class QuickInputController extends Controller
     public function export(Request $request)
     {
         $this->requirePermission('measurements.view', null, ['measurements.*', 'manage_measurements']);
-        
+
         $user = Auth::user();
         $company = $user->getActiveCompany();
-        
+
         if (!$company) {
             abort(403, 'No active company found.');
         }
-        
+
         // Get entries with same filters as index
         $query = MeasurementData::with(['measurement.location', 'emissionSource'])
-            ->whereHas('measurement.location', function($q) use ($company) {
+            ->whereHas('measurement.location', function ($q) use ($company) {
                 $q->where('company_id', $company->id);
             });
-        
+
         // Apply filters
         if ($request->filled('scope')) {
             $query->where('scope', $request->scope);
         }
         if ($request->filled('location_id')) {
-            $query->whereHas('measurement', function($q) use ($request) {
+            $query->whereHas('measurement', function ($q) use ($request) {
                 $q->where('location_id', $request->location_id);
             });
         }
         if ($request->filled('fiscal_year')) {
-            $query->whereHas('measurement', function($q) use ($request) {
+            $query->whereHas('measurement', function ($q) use ($request) {
                 $q->where('fiscal_year', $request->fiscal_year);
             });
         }
-        
+
         $entries = $query->orderBy('entry_date', 'desc')->get();
-        
+
         // Generate CSV
         $filename = 'quick-input-entries-' . date('Y-m-d') . '.csv';
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
         ];
-        
-        $callback = function() use ($entries) {
+
+        $callback = function () use ($entries) {
             $file = fopen('php://output', 'w');
-            
+
             // Header row
             fputcsv($file, [
                 'Date',
@@ -966,7 +1135,7 @@ class QuickInputController extends Controller
                 'Scope',
                 'Notes'
             ]);
-            
+
             // Data rows
             foreach ($entries as $entry) {
                 fputcsv($file, [
@@ -984,10 +1153,10 @@ class QuickInputController extends Controller
                     $entry->notes ?? '',
                 ]);
             }
-            
+
             fclose($file);
         };
-        
+
         return response()->stream($callback, 200, $headers);
     }
 
@@ -1052,6 +1221,103 @@ class QuickInputController extends Controller
         }
     }
 
+    public function getVehicleTypes($sourceId, Request $request)
+    {
+        try {
+            $query = EmissionFactor::where('emission_source_id', $sourceId)
+                ->where('is_active', true)
+                ->whereNotNull('vehicle_type');
+
+            if ($request->has('vehicle_category') && $request->vehicle_category) {
+                $query->where('vehicle_category', $request->vehicle_category);
+            }
+
+            $fuelTypes = $query->select('vehicle_type')
+                ->distinct()
+                // ->orderBy('vehicle_type')
+                ->pluck('vehicle_type')
+                ->toArray();
+
+            return response()->json([
+                'success' => true,
+                'vehicle_types' => $fuelTypes
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Get Fuel Types Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch fuel types'
+            ], 500);
+        }
+    }
+
+    public function getVehicleFuelTypes($sourceId, Request $request)
+    {
+        try {
+            $query = EmissionFactor::where('emission_source_id', operator: $sourceId)
+                ->where('is_active', true)
+                ->whereNotNull('fuel_type');
+
+            if ($request->has('vehicle_category') && $request->vehicle_category) {
+                $query->where('vehicle_category', $request->vehicle_category);
+            }
+
+            if ($request->has('vehicle_type') && $request->vehicle_type) {
+                $query->where('vehicle_type', $request->vehicle_type);
+            }
+
+            $fuelTypes = $query->select('fuel_type')
+                ->distinct()
+                ->orderBy('fuel_type')
+                ->pluck('fuel_type')
+                ->toArray();
+
+            return response()->json([
+                'success' => true,
+                'fuel_types' => $fuelTypes
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Get Fuel Types Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch fuel types'
+            ], 500);
+        }
+    }
+
+    public function getVehicleUoms($sourceId, Request $request)
+    {
+        try {
+            $query = EmissionFactor::where('emission_source_id', operator: $sourceId)
+                ->where('is_active', true)
+                ->whereNotNull('unit');
+
+            if ($request->has('vehicle_category') && $request->vehicle_category) {
+                $query->where('vehicle_category', $request->vehicle_category);
+            }
+
+            if ($request->has('vehicle_type') && $request->vehicle_type) {
+                $query->where('vehicle_type', $request->vehicle_type);
+            }
+
+            $fuelTypes = $query->select('unit')
+                ->distinct()
+                ->orderBy('unit')
+                ->pluck('unit')
+                ->toArray();
+
+            return response()->json([
+                'success' => true,
+                'units' => $fuelTypes
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Get Fuel Types Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch fuel types'
+            ], 500);
+        }
+    }
     /**
      * Determine fuel_type based on request and emission source
      */
@@ -1064,7 +1330,7 @@ class QuickInputController extends Controller
                 return $vehicleFuelType;
             }
         }
-        
+
         // Handle process emissions - use process_type as fuel_type
         if ($emissionSource->quick_input_slug === 'process') {
             $processType = $request->input('process_type');
@@ -1072,7 +1338,7 @@ class QuickInputController extends Controller
                 return $processType;
             }
         }
-        
+
         // For other sources, use standard mapping
         return $request->input('fuel_type') ?: $request->input('energy_type') ?: $request->input('refrigerant_type');
     }
@@ -1113,6 +1379,6 @@ class QuickInputController extends Controller
             ], 500);
         }
     }
-    
+
 }
 

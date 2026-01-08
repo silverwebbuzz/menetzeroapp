@@ -135,10 +135,10 @@ class Location extends Model
                 'fiscal_year_start' => $location->fiscal_year_start
             ]);
             
-            if ($location->measurement_frequency && $location->fiscal_year_start) {
-                $service = app(MeasurementPeriodService::class);
-                $service->syncMeasurementPeriods($location, auth()->id());
-            }
+            // if ($location->measurement_frequency && $location->fiscal_year_start) {
+            //     $service = app(MeasurementPeriodService::class);
+            //     $service->syncMeasurementPeriods($location, auth()->id());
+            // }
         });
 
             // Re-enabled - now handled manually in controller

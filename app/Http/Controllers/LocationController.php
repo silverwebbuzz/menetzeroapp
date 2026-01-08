@@ -230,6 +230,10 @@ class LocationController extends Controller
                     'measurement_frequency' => $request->measurement_frequency ?? 'Annually',
                 ]);
                 
+                 if ($location->measurement_frequency && $location->fiscal_year_start) {
+                    $service = app(\App\Services\MeasurementPeriodService::class);
+                    $service->syncMeasurementPeriods($location, $user->id);
+                }
                 // Clear session after final step
                 session()->forget('location_id');
                 return redirect()->route('locations.index')->with('success', 'Location created successfully!');
@@ -315,9 +319,9 @@ class LocationController extends Controller
             ]);
 
             // Check if measurement settings changed and sync measurements
-            if ($oldFrequency !== $location->measurement_frequency || 
-                $oldReportingPeriod !== $location->reporting_period || 
-                $oldFiscalYearStart !== $location->fiscal_year_start) {
+            if ($oldFrequency != $location->measurement_frequency || 
+                $oldReportingPeriod != $location->reporting_period || 
+                $oldFiscalYearStart != $location->fiscal_year_start) {
                 
                 \Log::info('Measurement settings changed, syncing measurements');
                 

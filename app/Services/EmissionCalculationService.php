@@ -51,29 +51,34 @@ class EmissionCalculationService
         }
         
         // Filter by vehicle_type if provided (for distance-based vehicle calculations)
+        if (!empty($conditions['vehicle_category'])) {
+            $factorQuery->where('vehicle_category', $conditions['vehicle_category']);
+        }
         if (!empty($conditions['vehicle_type'])) {
             $factorQuery->where('vehicle_type', $conditions['vehicle_type']);
         }
+        
 
         // Check if this is a fugitive emission (refrigerants) - GWP values are global and unit conversion is handled separately
-        $isFugitiveEmission = false;
-        $emissionSource = \App\Models\EmissionSourceMaster::find($emissionSourceId);
-        if ($emissionSource && $emissionSource->emission_type === 'fugitive') {
-            $isFugitiveEmission = true;
-        }
+        // $isFugitiveEmission = false;
+        // $emissionSource = \App\Models\EmissionSourceMaster::find($emissionSourceId);
+
+        // if ($emissionSource && $emissionSource->emission_type === 'fugitive') {
+        //     $isFugitiveEmission = true;
+        // }
 
         // Filter by unit if provided
         // For fugitive emissions (refrigerants), skip unit filtering since:
         // 1. All refrigerant factors use 'kg' as base unit
         // 2. Unit conversion is handled in calculateCO2e method
         // 3. We just need to match by fuel_type (refrigerant type)
-        if (!empty($conditions['unit']) && !$isFugitiveEmission) {
+        if (!empty($conditions['unit'])) {
             $factorQuery->where('unit', $conditions['unit']);
         }
 
         // Filter by region if provided
         // Note: For refrigerants (fugitive emissions), GWP values are global, so region filter is less strict
-        if (!empty($conditions['region']) && !$isFugitiveEmission) {
+        if (!empty($conditions['region'])) {
             $factorQuery->where('region', $conditions['region']);
         }
 
@@ -153,17 +158,19 @@ class EmissionCalculationService
         if ($userUnit && $userUnit !== $factor->unit) {
             $convertedQuantity = $this->convertUnit($quantity, $userUnit, $factor->unit);
         }
-
+        
         // If factor has separate gas factors, calculate multi-gas
         if ($factor->co2_factor || $factor->ch4_factor || $factor->n2o_factor) {
             // Use exact factor values with full precision (no rounding until final result)
             $co2Factor = is_string($factor->co2_factor) ? (float) $factor->co2_factor : (float) ($factor->co2_factor ?? 0);
             $ch4Factor = is_string($factor->ch4_factor) ? (float) $factor->ch4_factor : (float) ($factor->ch4_factor ?? 0);
             $n2oFactor = is_string($factor->n2o_factor) ? (float) $factor->n2o_factor : (float) ($factor->n2o_factor ?? 0);
+            $co2eFactor = is_string($factor->total_co2e_factor) ? (float) $factor->total_co2e_factor : (float) ($factor->total_co2e_factor ?? 0);
             
             $co2 = (float) $convertedQuantity * $co2Factor;
             $ch4 = (float) $convertedQuantity * $ch4Factor;
             $n2o = (float) $convertedQuantity * $n2oFactor;
+            $co2e = (float) $convertedQuantity * $co2eFactor;
 
             // Get GWP values
             $gwpValues = $this->getGwpValues($gwpVersion);
@@ -171,8 +178,8 @@ class EmissionCalculationService
             $gwpN2O = $gwpValues['N2O'] ?? 273;
 
             // Calculate CO2e with full precision
-            $co2e = $co2 + ($ch4 * $gwpCh4) + ($n2o * $gwpN2O);
-
+            // $co2e = $co2 + ($ch4 * $gwpCh4) + ($n2o * $gwpN2O);
+           
             // Round only the final results to 6 decimal places for display/storage
             // Format as strings to preserve precision in JSON
             return [
