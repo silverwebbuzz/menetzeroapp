@@ -100,7 +100,11 @@
                                 'fiscal_year' => $selectedFiscalYear ?? request('fiscal_year'),
                                 'location_id' => $selectedLocationId ?? request('location_id'),
                             ]) }}"
-                                class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
+                                class="inline-flex items-center justify-center gap-2 px-6 py-3 
+               bg-gradient-to-r from-purple-600 to-purple-700 
+               text-white font-semibold rounded-lg shadow-sm 
+               hover:from-purple-700 hover:to-purple-800 hover:shadow-md
+               transition-all duration-200">
                                 Export to Excel
                             </a>
 
