@@ -312,7 +312,7 @@
             });
 
             // Optional: open first accordion by default
-            if (headers.length > 0) headers[0].click();
+            // if (headers.length > 0) headers[0].click();
         });
 
         @if (isset($measurement) && $measurement)
