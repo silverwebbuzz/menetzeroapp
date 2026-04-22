@@ -18,3 +18,7 @@ yarn-error.log
 /.vscode
 .DS_Store
 .DS_Store
+
+# Ignore all SQL dumps and markdown files (documentation is local-only)
+*.sql
+*.md

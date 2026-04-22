@@ -165,7 +165,7 @@ class RoleManagementController extends Controller
      */
     public function destroy(CompanyCustomRole $role)
     {
-        $this->requirePermission('manage_settings');
+        $this->requirePermission('roles_permissions', 'delete');
         
         $company = Auth::user()->getActiveCompany();
         if (!$company || $role->company_id !== $company->id) {

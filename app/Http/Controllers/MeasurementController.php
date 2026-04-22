@@ -369,7 +369,7 @@ class MeasurementController extends Controller
      */
     public function calculateSource(Measurement $measurement, $sourceId)
     {
-        $this->requirePermission('measurements.create', null, ['measurements.edit', 'measurements.*', 'manage_measurements']);
+        $this->requirePermission('measurements.add', null, ['measurements.edit', 'measurements.*', 'manage_measurements']);
         
         $user = Auth::user();
         $company = $user->getActiveCompany();
@@ -395,7 +395,7 @@ class MeasurementController extends Controller
      */
     public function storeSourceData(Request $request, Measurement $measurement, $sourceId)
     {
-        $this->requirePermission('measurements.create', null, ['measurements.edit', 'measurements.*', 'manage_measurements']);
+        $this->requirePermission('measurements.add', null, ['measurements.edit', 'measurements.*', 'manage_measurements']);
         
         $user = Auth::user();
         
@@ -595,7 +595,7 @@ class MeasurementController extends Controller
      */
     public function deleteSourceData(Measurement $measurement, $sourceId)
     {
-        $this->requirePermission('measurements.delete', ['measurements.edit', 'measurements.*', 'manage_measurements']);
+        $this->requirePermission('measurements.delete', null, ['measurements.edit', 'measurements.*', 'manage_measurements']);
         
         $user = Auth::user();
         

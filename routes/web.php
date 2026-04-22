@@ -50,7 +50,9 @@ Route::post('/login', function (\Illuminate\Http\Request $request) {
     return back()->withErrors(['email' => 'The provided credentials do not match our records.'])->onlyInput('email');
 })->name('login.post');
 
-// Authentication routes - Partner
+// Authentication routes - Partner (DISABLED: partner guard not configured in config/auth.php
+// and Partner\* controllers do not exist. Re-enable after wiring the partner guard and controllers.)
+/*
 Route::get('/partner/register', [RegisterController::class, 'showRegistrationForm'])->name('partner.register');
 Route::post('/partner/register', [RegisterController::class, 'register']);
 
@@ -72,6 +74,7 @@ Route::post('/partner/login', function (\Illuminate\Http\Request $request) {
 
     return back()->withErrors(['email' => 'The provided credentials do not match our records.'])->onlyInput('email');
 })->name('partner.login.post');
+*/
 
 Route::post('/logout', function () {
     // Logout from web guard
@@ -246,16 +249,22 @@ Route::get('/api/subcategories', function(Request $request) {
     }
 });
 
-// Partner Routes - Use partner guard
+// Partner Routes (DISABLED: partner guard not configured in config/auth.php,
+// Partner\ExternalClientController and Partner\SubscriptionController do not exist,
+// and checkCompanyType middleware currently only supports 'client' type.
+// Re-enable after: (1) adding 'partner' guard in config/auth.php,
+//                  (2) creating the missing controllers,
+//                  (3) extending CheckCompanyType middleware to handle 'partner'.)
+/*
 Route::prefix('partner')->middleware(['auth:partner', 'setActiveCompany', 'checkCompanyType:partner'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('partner.dashboard');
-    
+
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'index'])->name('partner.profile');
     Route::post('/profile/personal', [ProfileController::class, 'updatePersonal'])->name('partner.profile.update.personal');
     Route::post('/profile/company', [ProfileController::class, 'updateCompany'])->name('partner.profile.update.company');
     Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('partner.profile.update.password');
-    
+
     // External Client Management
     Route::resource('clients', \App\Http\Controllers\Partner\ExternalClientController::class)->names([
         'index' => 'partner.clients.index',
@@ -266,14 +275,14 @@ Route::prefix('partner')->middleware(['auth:partner', 'setActiveCompany', 'check
         'update' => 'partner.clients.update',
         'destroy' => 'partner.clients.destroy',
     ]);
-    
+
     // Reports routes
     Route::prefix('reports')->name('reports.')->group(function () {
         Route::get('/', function () {
             return view('reports.index');
         })->name('index');
     });
-    
+
     // Role Management routes - EXPLICIT NAMES for partner
     Route::resource('roles', \App\Http\Controllers\RoleManagementController::class)->except(['show'])->names([
         'index' => 'partner.roles.index',
@@ -283,7 +292,7 @@ Route::prefix('partner')->middleware(['auth:partner', 'setActiveCompany', 'check
         'update' => 'partner.roles.update',
         'destroy' => 'partner.roles.destroy',
     ]);
-    
+
     // Staff Management routes - Redirect to roles page (combined view)
     Route::prefix('staff')->name('partner.staff.')->group(function () {
         Route::get('/', function() { return redirect()->route('partner.roles.index'); })->name('index');
@@ -294,7 +303,7 @@ Route::prefix('partner')->middleware(['auth:partner', 'setActiveCompany', 'check
         Route::delete('/{access}', [\App\Http\Controllers\StaffManagementController::class, 'destroy'])->name('destroy');
         Route::delete('/invitations/{invitation}', [\App\Http\Controllers\StaffManagementController::class, 'cancelInvitation'])->name('cancel-invitation');
     });
-    
+
     // Subscription & Billing routes for partner
     Route::prefix('subscriptions')->name('partner.subscriptions.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Partner\SubscriptionController::class, 'index'])->name('index');
@@ -306,6 +315,7 @@ Route::prefix('partner')->middleware(['auth:partner', 'setActiveCompany', 'check
         Route::post('/cancel', [\App\Http\Controllers\Partner\SubscriptionController::class, 'cancel'])->name('cancel');
     });
 });
+*/
 
 // Admin Authentication Routes (Public - outside middleware)
 Route::prefix('admin')->name('admin.')->group(function () {

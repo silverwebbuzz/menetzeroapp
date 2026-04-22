@@ -38,50 +38,28 @@ class ForgotPasswordController extends Controller
                 return back()->withErrors(['email' => __($status)]);
             }
         } catch (\Exception $e) {
-            // If SMTP is not configured, show the reset link directly
-            if (strpos($e->getMessage(), 'SMTP') !== false || 
-                strpos($e->getMessage(), 'smtp') !== false ||
-                strpos($e->getMessage(), 'getaddrinfo') !== false ||
-                strpos($e->getMessage(), 'Connection could not be established') !== false) {
-                
-                // Get the user
-                $user = User::where('email', $request->email)->first();
-                
-                if (!$user) {
-                    return back()->withErrors(['email' => 'We could not find a user with that email address.']);
-                }
+            \Log::error('Password reset email failed', [
+                'email' => $request->email,
+                'error' => $e->getMessage(),
+            ]);
 
-                // Create password reset token manually
-                $token = Password::createToken($user);
-                
-                // Generate reset URL
-                $resetUrl = route('password.reset', ['token' => $token, 'email' => $user->email]);
-                
-                // Redirect to success page with reset link
-                return redirect()->route('password.reset-success')
-                    ->with('resetUrl', $resetUrl)
-                    ->with('email', $user->email);
-            }
-            
-            // Other errors
-            return back()->withErrors(['email' => 'An error occurred. Please try again later.']);
+            return back()->withErrors(['email' => 'We were unable to send the reset email. Please try again later.']);
         }
     }
 
     /**
-     * Show password reset success page with link (when SMTP not configured)
+     * Show password reset success page.
      */
     public function resetSuccess()
     {
-        $resetUrl = session('resetUrl');
         $email = session('email');
-        
-        if (!$resetUrl || !$email) {
+
+        if (!$email) {
             return redirect()->route('password.request')
                 ->with('error', 'Invalid reset request.');
         }
-        
-        return view('auth.password-reset-success', compact('resetUrl', 'email'));
+
+        return view('auth.password-reset-success', compact('email'));
     }
 
     /**

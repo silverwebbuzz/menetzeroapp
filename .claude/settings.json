@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -c \"CREATE TABLE \\\\`subscriptions\\\\`\" \"/Users/apple/Silverwebbuzz/menetzeroapp/silverwebbuzz_in_menetzero\\(5\\).sql\")",
+      "Read(//Users/apple/Silverwebbuzz/menetzeroapp/**)"
+    ]
+  }
+}

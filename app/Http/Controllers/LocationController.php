@@ -59,7 +59,7 @@ class LocationController extends Controller
 
     public function create()
     {
-        $this->requirePermission('locations.*', ['manage_locations']);
+        $this->requirePermission('locations.*', null, ['manage_locations']);
         
         $user = Auth::user();
         $company = $user->getActiveCompany();
@@ -73,7 +73,7 @@ class LocationController extends Controller
 
     public function store(Request $request)
     {
-        $this->requirePermission('locations.*', ['manage_locations']);
+        $this->requirePermission('locations.*', null, ['manage_locations']);
         
         $user = Auth::user();
         $company = $user->getActiveCompany();
