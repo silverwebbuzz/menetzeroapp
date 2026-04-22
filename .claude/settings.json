@@ -2,7 +2,14 @@
   "permissions": {
     "allow": [
       "Bash(grep -c \"CREATE TABLE \\\\`subscriptions\\\\`\" \"/Users/apple/Silverwebbuzz/menetzeroapp/silverwebbuzz_in_menetzero\\(5\\).sql\")",
-      "Read(//Users/apple/Silverwebbuzz/menetzeroapp/**)"
+      "Read(//Users/apple/Silverwebbuzz/menetzeroapp/**)",
+      "Bash(grep -A100 \"INSERT INTO \\\\`migrations\\\\`\" \"/Users/apple/Silverwebbuzz/menetzeroapp/silverwebbuzz_in_menetzero\\(5\\).sql\")",
+      "Read(//tmp/**)",
+      "Bash(grep -A50 \"INSERT INTO \\\\`migrations\\\\`\" \"/Users/apple/Silverwebbuzz/menetzeroapp/silverwebbuzz_in_menetzero\\(5\\).sql\")",
+      "Read(//private/tmp/**)"
+    ],
+    "additionalDirectories": [
+      "/private/tmp"
     ]
   }
 }
