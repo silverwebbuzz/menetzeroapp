@@ -26,11 +26,17 @@
 
 body {
     font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+    font-weight: 400;
     color: var(--ink);
     background-color: var(--canvas);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
+
+/* Poppins weights — ensure real weights are used, not synthetic */
+h1, h2, h3, h4, h5, h6 { font-family: 'Poppins', sans-serif; font-weight: 600; }
+strong, b { font-weight: 600; }
 
 *:focus-visible {
     outline: 2px solid var(--brand);
@@ -86,13 +92,13 @@ body {
 .nav-link {
     display: flex;
     align-items: center;
-    padding: 0.55rem 0.75rem;
+    padding: 0.5rem 0.5rem;
     font-size: 0.9rem;
-    font-weight: 500;
+    font-weight: 600;
     border-radius: 0.5rem;
-    margin: 0.125rem 0.5rem;
+    margin: 0.25rem 0.5rem;
     transition: background-color 0.15s ease, color 0.15s ease;
-    color: #374151;
+    color: #333;
     text-decoration: none;
 }
 
@@ -104,7 +110,6 @@ body {
 .nav-link.active {
     background-color: var(--brand);
     color: #ffffff;
-    font-weight: 600;
 }
 
 .nav-link svg {
@@ -132,7 +137,7 @@ body {
 .header {
     background-color: var(--surface);
     border-bottom: 1px solid var(--line);
-    padding: 0.75rem 1.5rem;
+    padding: 1rem 2rem;
     min-height: var(--header-height);
     position: sticky;
     top: 0;
@@ -144,7 +149,7 @@ body {
 
 .page-title {
     color: var(--ink);
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     font-weight: 600;
     margin: 0;
     line-height: 1.2;
@@ -152,11 +157,10 @@ body {
 
 .content-area {
     flex: 1;
-    padding: 1.5rem;
+    padding: 2rem;
     width: 100%;
-    max-width: 1400px;
-    margin: 0 auto;
     box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 /* ------------------------------------------------------------------ */
@@ -349,14 +353,20 @@ body {
     .mobile-menu-btn { display: inline-flex; align-items: center; }
 }
 
+/* Medium tablets and below */
+@media (max-width: 768px) {
+    .header { padding: 1rem; }
+    .content-area { padding: 1rem; }
+    .page-title { font-size: 1.25rem; }
+}
+
 /* Phone and below */
 @media (max-width: 640px) {
     .sidebar { width: min(85vw, 320px); }
-    .header { padding: 0.5rem 1rem; }
-    .content-area { padding: 1rem; }
-    .page-title { font-size: 1.125rem; }
+    .header { padding: 0.75rem 1rem; }
+    .content-area { padding: 0.75rem; }
 
-    .btn { padding: 0.5rem 1rem; font-size: 0.8125rem; }
+    .btn { padding: 0.5rem 1rem; font-size: 0.875rem; }
     .btn svg { width: 1rem; height: 1rem; }
 
     .header-btn-label { display: none; }
