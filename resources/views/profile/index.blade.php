@@ -5,72 +5,90 @@
 
 @section('content')
 <style>
-    .tab-button { 
-        padding: 0.75rem 1.5rem; 
-        border-radius: 0.5rem; 
-        font-weight: 500; 
-        transition: all 0.2s; 
+    .tab-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.875rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: background-color 0.15s, color 0.15s, border-color 0.15s;
         border: 1px solid transparent;
+        cursor: pointer;
+        white-space: nowrap;
     }
-    .tab-button.active { 
-        background: #10b981; 
-        color: white; 
-        border-color: #10b981;
+    .tab-button svg { width: 1rem; height: 1rem; }
+    .tab-button.active {
+        background: var(--brand-soft);
+        color: var(--brand-darker);
+        border-color: var(--brand-softer);
+        font-weight: 600;
     }
-    .tab-button.inactive { 
-        background: #f8fafc; 
-        color: #6b7280; 
-        border-color: #e5e7eb;
+    .tab-button.inactive {
+        background: transparent;
+        color: var(--ink-muted);
+        border-color: transparent;
     }
-    .tab-button.inactive:hover { 
-        background: #f1f5f9; 
-        color: #374151;
+    .tab-button.inactive:hover {
+        background: var(--canvas-deep);
+        color: var(--ink);
     }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 </style>
 
-<div class="max-w-6xl mx-auto">
-    <!-- Profile Header -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-        <div class="flex items-center space-x-4">
-            <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center">
-                <span class="text-2xl font-semibold text-emerald-700">{{ substr($user->name, 0, 1) }}</span>
+<div class="page-header">
+    <div>
+        <h1>My Profile</h1>
+        <p>Manage your personal details, company information and security settings.</p>
+    </div>
+</div>
+
+{{-- Profile summary card --}}
+<div class="card mb-5">
+    <div class="card-body">
+        <div class="flex items-center gap-4 flex-wrap">
+            <div class="w-14 h-14 rounded-full bg-brand-soft border border-brand-100 flex items-center justify-center flex-shrink-0">
+                <span class="text-xl font-semibold text-brand-darker">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
             </div>
-            <div>
-                <h2 class="text-2xl font-semibold text-gray-900">{{ $user->name }}</h2>
-                <p class="text-gray-600">{{ $user->email }}</p>
-                <p class="text-sm text-gray-500">{{ $user->designation ?? 'No designation set' }}</p>
-                @if($company)
-                    <p class="text-sm text-emerald-600 font-medium">{{ $company->name }}</p>
-                @else
-                    <p class="text-sm text-amber-600 font-medium">No company associated</p>
-                @endif
+            <div class="min-w-0 flex-1">
+                <div class="text-lg font-semibold text-slate-900 truncate">{{ $user->name }}</div>
+                <div class="text-sm text-slate-500 truncate">{{ $user->email }}</div>
+                <div class="flex items-center gap-2 mt-1 flex-wrap">
+                    <span class="text-xs text-slate-500">{{ $user->designation ?? 'No designation' }}</span>
+                    @if($company)
+                        <span class="badge badge-brand badge-dot">{{ $company->name }}</span>
+                    @else
+                        <span class="badge badge-warning badge-dot">No company</span>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Tabs Navigation -->
-    <div class="flex space-x-2 mb-6">
-        <button onclick="showTab('personal')" id="personal-tab" class="tab-button active">
-            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-            </svg>
-            Personal Information
-        </button>
-        <button onclick="showTab('company')" id="company-tab" class="tab-button inactive">
-            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-            </svg>
-            Company Information
-        </button>
-        <button onclick="showTab('password')" id="password-tab" class="tab-button inactive">
-            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
-            </svg>
-            Change Password
-        </button>
-    </div>
+{{-- Tabs --}}
+<div class="flex gap-1 mb-5 flex-wrap" role="tablist">
+    <button onclick="showTab('personal')" id="personal-tab" class="tab-button active" type="button">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+        </svg>
+        Personal
+    </button>
+    <button onclick="showTab('company')" id="company-tab" class="tab-button inactive" type="button">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+        </svg>
+        Company
+    </button>
+    <button onclick="showTab('password')" id="password-tab" class="tab-button inactive" type="button">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+        </svg>
+        Password
+    </button>
+</div>
 
     <!-- Personal Information Tab -->
     <div id="personal-content" class="tab-content active">

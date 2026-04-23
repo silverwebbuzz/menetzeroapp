@@ -298,235 +298,249 @@
         </div>
     </div>
 @else
-    <!-- Dashboard Content - Show ONLY when company is added -->
-<div class="space-y-8">
-    <!-- Header with Quick Actions -->
-        <div class="mb-8">
-            <div class="mb-4">
-                <h2 class="text-2xl font-semibold" style="color: #111827;">Dashboard</h2>
-                <p class="text-sm" style="color: #6b7280;">Welcome back, {{ auth()->user()->name }}</p>
+    {{-- Dashboard Content --}}
+    <div class="page-header">
+        <div>
+            <h1>Welcome back, {{ auth()->user()->name }}</h1>
+            <p>Here's a snapshot of your carbon footprint performance and what needs attention.</p>
         </div>
-            <div class="flex flex-wrap gap-3">
-                <a href="{{ route('locations.index') }}" class="btn btn-primary">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-                    <span class="hidden sm:inline">Manage Locations</span>
-                    <span class="sm:hidden">Locations</span>
+        <div class="page-header-actions">
+            <a href="{{ route('locations.index') }}" class="btn btn-secondary">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                Locations
             </a>
-                <a href="{{ route('measurements.index') }}" class="btn btn-outline">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    <span class="hidden sm:inline">Manage Reports</span>
-                    <span class="sm:hidden">Reports</span>
+            <a href="{{ route('measurements.index') }}" class="btn btn-secondary">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3v18h18"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 14l4-4 4 4 5-7"/></svg>
+                Measurements
             </a>
-                <button onclick="generateReport()" class="btn btn-outline">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    <span class="hidden sm:inline">Generate Report</span>
-                    <span class="sm:hidden">Generate</span>
-            </button>
+            <a href="{{ route('reports.index') }}" class="btn btn-primary">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                View Reports
+            </a>
         </div>
     </div>
 
-    <!-- KPI Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        <!-- Total Emissions -->
-        <div class="p-6 rounded-2xl text-white shadow-sm" style="background:linear-gradient(90deg, #26A69A 0%, #1f8e86 100%); border:1px solid rgba(38,166,154,.25)">
-            <div class="flex items-start justify-between">
-                <p class="text-sm/5 opacity-90">Total Emissions</p>
-                <span class="text-white/80">🌿</span>
-            </div>
-                <div class="mt-2 text-3xl font-semibold">{{ number_format($kpis['total_emissions'] ?? 0, 2) }} kg CO₂e</div>
-            <p class="mt-1 text-xs/5 opacity-90">
-                    @if(($kpis['monthly_change'] ?? 0) > 0)
-                        <span class="text-red-200">↗ {{ $kpis['monthly_change'] ?? 0 }}%</span> from last month
-                    @elseif(($kpis['monthly_change'] ?? 0) < 0)
-                        <span class="text-green-200">↘ {{ abs($kpis['monthly_change'] ?? 0) }}%</span> from last month
+    {{-- KPI Stat Cards --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+        <div class="stat-card" style="background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%); border-color: var(--brand-dark); color: white;">
+            <div class="stat-card-label" style="color: rgba(255,255,255,0.85);">Total Emissions</div>
+            <div class="stat-card-value" style="color: white;">{{ number_format($kpis['total_emissions'] ?? 0, 2) }}<span style="font-size: 0.75rem; font-weight: 500; margin-left: 0.25rem; opacity: 0.85;">kg CO₂e</span></div>
+            <div class="stat-card-delta" style="color: rgba(255,255,255,0.9);">
+                @if(($kpis['monthly_change'] ?? 0) > 0)
+                    ↗ {{ $kpis['monthly_change'] ?? 0 }}% vs last month
+                @elseif(($kpis['monthly_change'] ?? 0) < 0)
+                    ↘ {{ abs($kpis['monthly_change'] ?? 0) }}% vs last month
                 @else
-                    <span class="text-white/70">No change</span> from last month
+                    No change vs last month
                 @endif
-            </p>
+            </div>
         </div>
 
-        <!-- Scope 1 -->
-        <div class="p-6 rounded-2xl bg-white shadow-sm border border-gray-100">
-            <div class="flex items-start justify-between"><p class="text-sm/5 text-gray-600">Scope 1 Emissions</p><span class="text-rose-500">📈</span></div>
-                <div class="mt-2 text-2xl font-semibold text-gray-900">{{ number_format($kpis['scope1_total'] ?? 0, 2) }} kg CO₂e</div>
-            <p class="mt-1 text-xs/5 text-rose-600">Direct emissions</p>
+        <div class="stat-card">
+            <div class="stat-card-label">Scope 1</div>
+            <div class="stat-card-value">{{ number_format($kpis['scope1_total'] ?? 0, 2) }}<span class="text-slate-400 text-xs font-medium ml-1">kg CO₂e</span></div>
+            <div class="stat-card-delta">Direct emissions</div>
         </div>
 
-        <!-- Scope 2 -->
-        <div class="p-6 rounded-2xl bg-white shadow-sm border border-gray-100">
-            <div class="flex items-start justify-between"><p class="text-sm/5 text-gray-600">Scope 2 Emissions</p><span class="text-amber-500">⚡</span></div>
-                <div class="mt-2 text-2xl font-semibold text-gray-900">{{ number_format($kpis['scope2_total'] ?? 0, 2) }} kg CO₂e</div>
-            <p class="mt-1 text-xs/5 text-emerald-600">Purchased energy</p>
+        <div class="stat-card">
+            <div class="stat-card-label">Scope 2</div>
+            <div class="stat-card-value">{{ number_format($kpis['scope2_total'] ?? 0, 2) }}<span class="text-slate-400 text-xs font-medium ml-1">kg CO₂e</span></div>
+            <div class="stat-card-delta">Purchased energy</div>
         </div>
 
-        <!-- Scope 3 -->
-        <div class="p-6 rounded-2xl bg-white shadow-sm border border-gray-100">
-            <div class="flex items-start justify-between"><p class="text-sm/5 text-gray-600">Scope 3 Emissions</p><span class="text-purple-500">🌐</span></div>
-                <div class="mt-2 text-2xl font-semibold text-gray-900">{{ number_format($kpis['scope3_total'] ?? 0, 2) }} kg CO₂e</div>
-            <p class="mt-1 text-xs/5 text-purple-600">Other indirect</p>
+        <div class="stat-card">
+            <div class="stat-card-label">Scope 3</div>
+            <div class="stat-card-value">{{ number_format($kpis['scope3_total'] ?? 0, 2) }}<span class="text-slate-400 text-xs font-medium ml-1">kg CO₂e</span></div>
+            <div class="stat-card-delta">Other indirect</div>
         </div>
     </div>
 
-    <!-- UAE Net Zero Progress -->
-        <div class="card p-6">
-        <div class="flex items-center justify-between mb-4">
-            <div>
-                <h3 class="text-lg font-semibold text-blue-900">UAE Net Zero 2050 Progress</h3>
-                <p class="text-sm text-blue-700">Track your progress towards carbon neutrality</p>
-            </div>
-            <div class="text-right">
-                    <div class="text-2xl font-bold text-blue-900">{{ $netZeroProgress['progress'] ?? 0 }}%</div>
-                    <div class="text-sm text-blue-600">{{ $netZeroProgress['years_remaining'] ?? 25 }} years remaining</div>
+    {{-- UAE Net Zero Progress --}}
+    <div class="card mb-5">
+        <div class="card-body">
+            <div class="flex items-start justify-between gap-4 mb-4 flex-wrap">
+                <div>
+                    <h3 class="text-slate-900 font-semibold">UAE Net Zero 2050 Progress</h3>
+                    <p class="text-sm text-slate-500 mt-0.5">Track your progress towards carbon neutrality</p>
                 </div>
-        </div>
-        
-        <div class="w-full bg-brand-100 rounded-full h-2.5 mb-4">
-            <div class="bg-brand h-2.5 rounded-full transition-all duration-500"
-                    style="width: {{ $netZeroProgress['progress'] ?? 0 }}%"></div>
-        </div>
-        
-        <div class="grid grid-cols-3 gap-4 text-sm">
-            <div class="text-center">
-                    <div class="font-semibold text-blue-900">{{ $netZeroProgress['current'] ?? 0 }} tCO₂e</div>
-                <div class="text-blue-600">Current</div>
+                <div class="text-right">
+                    <div class="text-2xl font-bold text-brand-dark leading-none">{{ $netZeroProgress['progress'] ?? 0 }}%</div>
+                    <div class="text-xs text-slate-500 mt-1">{{ $netZeroProgress['years_remaining'] ?? 25 }} years remaining</div>
+                </div>
             </div>
-            <div class="text-center">
-                    <div class="font-semibold text-blue-900">{{ $netZeroProgress['baseline'] ?? 1000 }} tCO₂e</div>
-                <div class="text-blue-600">Baseline</div>
+            <div class="w-full bg-brand-100 rounded-full h-2 mb-4">
+                <div class="bg-brand h-2 rounded-full transition-all duration-500"
+                     style="width: {{ $netZeroProgress['progress'] ?? 0 }}%"></div>
             </div>
-            <div class="text-center">
-                    <div class="font-semibold text-blue-900">{{ $netZeroProgress['target'] ?? 0 }} tCO₂e</div>
-                <div class="text-blue-600">Target 2050</div>
+            <div class="grid grid-cols-3 gap-4 text-sm pt-3 border-t border-slate-100">
+                <div>
+                    <div class="text-xs uppercase tracking-wider text-slate-500 font-medium mb-1">Current</div>
+                    <div class="font-semibold text-slate-900">{{ $netZeroProgress['current'] ?? 0 }} <span class="text-slate-400 text-xs font-medium">tCO₂e</span></div>
+                </div>
+                <div>
+                    <div class="text-xs uppercase tracking-wider text-slate-500 font-medium mb-1">Baseline</div>
+                    <div class="font-semibold text-slate-900">{{ $netZeroProgress['baseline'] ?? 1000 }} <span class="text-slate-400 text-xs font-medium">tCO₂e</span></div>
+                </div>
+                <div>
+                    <div class="text-xs uppercase tracking-wider text-slate-500 font-medium mb-1">Target 2050</div>
+                    <div class="font-semibold text-slate-900">{{ $netZeroProgress['target'] ?? 0 }} <span class="text-slate-400 text-xs font-medium">tCO₂e</span></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Charts Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        <!-- Monthly Emissions Trend -->
-        <div class="card p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Monthly Emissions Trend</h3>
-            <div class="h-64">
+    {{-- Charts --}}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title">Monthly Emissions Trend</h3>
+                    <p class="card-subtitle">Total CO₂e over the last period</p>
+                </div>
+            </div>
+            <div class="card-body">
+                <div style="height: 16rem;">
                     <canvas id="monthlyEmissionsChart"></canvas>
                 </div>
+            </div>
         </div>
 
-        <!-- Emissions by Scope -->
-        <div class="card p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Emissions by Scope</h3>
-            <div class="h-64">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title">Emissions by Scope</h3>
+                    <p class="card-subtitle">Share of total emissions per scope</p>
+                </div>
+            </div>
+            <div class="card-body">
+                <div style="height: 16rem;">
                     <canvas id="emissionsByScopeChart"></canvas>
                 </div>
-        </div>
-    </div>
-
-    <!-- Top Emission Sources & Recent Activity -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        <!-- Top Emission Sources -->
-        <div class="card p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Top Emission Sources</h3>
-            <div class="space-y-3">
-                @forelse($topSources as $source)
-                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
-                            <div class="font-medium text-gray-900">{{ $source['location'] }}</div>
-                            <div class="text-sm text-gray-500">{{ $source['period'] }} • {{ ucfirst($source['status']) }}</div>
-                        </div>
-                        <div class="text-right">
-                            <div class="font-semibold text-gray-900">{{ number_format($source['emissions'], 2) }} kg CO₂e</div>
-                            <div class="text-xs text-gray-500">
-                                S1: {{ number_format($source['scope1'], 0) }} | 
-                                S2: {{ number_format($source['scope2'], 0) }} | 
-                                S3: {{ number_format($source['scope3'], 0) }}
-                            </div>
-                        </div>
-                    </div>
-                @empty
-                        <!-- Empty state when no data exists -->
-                        <div class="text-center py-8">
-                            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                                </svg>
-                            </div>
-                            <h3 class="text-lg font-medium text-gray-900 mb-2">No emission sources yet</h3>
-                            <p class="text-sm text-gray-500 mb-4">Start by adding locations and creating your first measurement.</p>
-                            <a href="{{ route('locations.index') }}" class="inline-flex items-center px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                        </svg>
-                                Add Your First Location
-                            </a>
-                    </div>
-                @endforelse
-            </div>
-        </div>
-
-        <!-- Recent Activity -->
-        <div class="card p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
-                <div class="space-y-4">
-                @forelse($recentActivity as $activity)
-                    <div class="flex items-center space-x-3">
-                        <div class="flex-shrink-0">
-                                    <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                                        <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                                        </svg>
-                                    </div>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-gray-900">{{ $activity->location->name ?? 'Unknown Location' }}</p>
-                            <p class="text-sm text-gray-500">{{ $activity->created_at->format('M d, Y') }} • {{ number_format($activity->total_co2e ?? 0, 2) }} kg CO₂e</p>
-                        </div>
-                        <div class="flex-shrink-0">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                @if($activity->status === 'draft') bg-amber-100 text-amber-800
-                                @elseif($activity->status === 'submitted') bg-green-100 text-green-800
-                                @else bg-purple-100 text-purple-800
-                                @endif">
-                                {{ ucfirst($activity->status) }}
-                            </span>
-                        </div>
-                    </div>
-                @empty
-                        <!-- Empty state when no activity exists -->
-                        <div class="text-center py-8">
-                            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                            </div>
-                            <h3 class="text-lg font-medium text-gray-900 mb-2">No recent activity</h3>
-                            <p class="text-sm text-gray-500 mb-4">Your measurement activities will appear here.</p>
-                            <a href="{{ route('measurements.index') }}" class="inline-flex items-center px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                </svg>
-                                Create First Measurement
-                            </a>
-                    </div>
-                @endforelse
             </div>
         </div>
     </div>
 
-    <!-- Reports Summary -->
-    <div class="card p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Reports Summary</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="bg-blue-50 p-4 rounded-lg text-center">
-                    <p class="text-sm text-blue-700">Total Reports</p>
-                    <p class="text-2xl font-bold text-blue-900">{{ $kpis['reports_count'] ?? 0 }}</p>
+    {{-- Top Sources + Recent Activity --}}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title">Top Emission Sources</h3>
+                    <p class="card-subtitle">Locations contributing most to your footprint</p>
                 </div>
-                <div class="bg-amber-50 p-4 rounded-lg text-center">
-                    <p class="text-sm text-amber-700">Draft Reports</p>
-                    <p class="text-2xl font-bold text-amber-900">{{ $kpis['draft_reports'] ?? 0 }}</p>
             </div>
-                <div class="bg-green-50 p-4 rounded-lg text-center">
-                    <p class="text-sm text-green-700">Submitted Reports</p>
-                    <p class="text-2xl font-bold text-green-900">{{ $kpis['submitted_reports'] ?? 0 }}</p>
+            <div class="card-body">
+                <div class="space-y-2">
+                    @forelse($topSources as $source)
+                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100 gap-3">
+                            <div class="min-w-0">
+                                <div class="font-medium text-slate-900 truncate">{{ $source['location'] }}</div>
+                                <div class="text-xs text-slate-500 mt-0.5">{{ $source['period'] }} · {{ ucfirst($source['status']) }}</div>
+                            </div>
+                            <div class="text-right flex-shrink-0">
+                                <div class="font-semibold text-slate-900">{{ number_format($source['emissions'], 2) }} <span class="text-slate-400 text-xs font-medium">kg CO₂e</span></div>
+                                <div class="text-xs text-slate-500 mt-0.5">
+                                    S1 {{ number_format($source['scope1'], 0) }} · S2 {{ number_format($source['scope2'], 0) }} · S3 {{ number_format($source['scope3'], 0) }}
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center py-8">
+                            <div class="w-12 h-12 bg-brand-soft rounded-full flex items-center justify-center mx-auto mb-3 border border-brand-100">
+                                <svg class="w-5 h-5 text-brand-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3v18h18"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 14l4-4 4 4 5-7"/>
+                                </svg>
+                            </div>
+                            <div class="font-semibold text-slate-900 mb-1">No emission sources yet</div>
+                            <p class="text-xs text-slate-500 mb-4">Start by adding locations and creating your first measurement.</p>
+                            <a href="{{ route('locations.index') }}" class="btn btn-primary btn-sm">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                                Add your first location
+                            </a>
+                        </div>
+                    @endforelse
+                </div>
             </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title">Recent Activity</h3>
+                    <p class="card-subtitle">Latest measurements submitted</p>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="space-y-2">
+                    @forelse($recentActivity as $activity)
+                        <div class="flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 transition-colors">
+                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-brand-soft border border-brand-100 flex items-center justify-center">
+                                <svg class="w-4 h-4 text-brand-dark" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-medium text-slate-900 truncate">{{ $activity->location->name ?? 'Unknown Location' }}</div>
+                                <div class="text-xs text-slate-500">{{ $activity->created_at->format('M d, Y') }} · {{ number_format($activity->total_co2e ?? 0, 2) }} kg CO₂e</div>
+                            </div>
+                            <div class="flex-shrink-0">
+                                @if($activity->status === 'draft')
+                                    <span class="badge badge-warning">Draft</span>
+                                @elseif($activity->status === 'submitted')
+                                    <span class="badge badge-info">Submitted</span>
+                                @elseif($activity->status === 'verified')
+                                    <span class="badge badge-success">Verified</span>
+                                @else
+                                    <span class="badge badge-neutral">{{ ucfirst($activity->status) }}</span>
+                                @endif
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center py-8">
+                            <div class="w-12 h-12 bg-brand-soft rounded-full flex items-center justify-center mx-auto mb-3 border border-brand-100">
+                                <svg class="w-5 h-5 text-brand-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <div class="font-semibold text-slate-900 mb-1">No recent activity</div>
+                            <p class="text-xs text-slate-500 mb-4">Your measurement activities will appear here.</p>
+                            <a href="{{ route('measurements.index') }}" class="btn btn-primary btn-sm">
+                                Create first measurement
+                            </a>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Reports Summary --}}
+    <div class="card">
+        <div class="card-header">
+            <div>
+                <h3 class="card-title">Reports Summary</h3>
+                <p class="card-subtitle">Status of your carbon disclosure reports</p>
+            </div>
+            <a href="{{ route('reports.index') }}" class="btn btn-ghost btn-sm">
+                View reports
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="stat-card">
+                    <div class="stat-card-label">Total Reports</div>
+                    <div class="stat-card-value">{{ $kpis['reports_count'] ?? 0 }}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Draft Reports</div>
+                    <div class="stat-card-value">{{ $kpis['draft_reports'] ?? 0 }}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Submitted Reports</div>
+                    <div class="stat-card-value">{{ $kpis['submitted_reports'] ?? 0 }}</div>
+                </div>
             </div>
         </div>
     </div>
@@ -590,8 +604,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         {{ $kpis['scope2_total'] ?? 0 }},
                         {{ $kpis['scope3_total'] ?? 0 }}
                     ],
-                    backgroundColor: ['#EF4444', '#F59E0B', '#8B5CF6'],
-            borderWidth: 0
+                    backgroundColor: ['#10b981', '#34d399', '#6ee7b7'],
+                    borderColor: '#ffffff',
+                    borderWidth: 2
         }]
     },
     options: {

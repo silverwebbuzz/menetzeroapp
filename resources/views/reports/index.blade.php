@@ -25,53 +25,58 @@
 @endpush
 
 @section('content')
-    <form method="GET" action="{{ route('reports.show') }}"
-        class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-        <div class="flex flex-wrap items-end gap-4">
-            <div class="flex-1 min-w-[200px]">
-                <label for="fiscal_year" class="block text-sm font-semibold text-gray-700 mb-2">Year <span
-                        class="text-red-500">*</span></label>
-                <select name="fiscal_year" id="fiscal_year" required
-                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
-                    <option value="">Select Year</option>
-                    @if (isset($fiscalYears) && count($fiscalYears) > 0)
-                        @foreach ($fiscalYears as $year)
-                            <option value="{{ $year }}"
-                                {{ ($selectedFiscalYear ?? request('fiscal_year')) == $year ? 'selected' : '' }}>
-                                {{ $year }}</option>
-                        @endforeach
-                    @endif
-                </select>
-            </div>
-            <div class="flex-1 min-w-[200px]">
-                <label for="location_id" class="block text-sm font-semibold text-gray-700 mb-2">Location <span
-                        class="text-red-500">*</span></label>
-                <select name="location_id" id="location_id" required
-                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200">
-                    <option value="">Select Location</option>
-                    @foreach ($locations as $location)
-                        <option value="{{ $location->id }}"
-                            {{ ($selectedLocationId ?? request('location_id')) == $location->id ? 'selected' : '' }}>
-                            {{ $location->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="flex-shrink-0">
-                <button type="submit" class="btn btn-primary">
-                    Generate report
-                </button>
-            </div>
+    <div class="page-header">
+        <div>
+            <h1>Reports</h1>
+            <p>Generate your carbon footprint report for a specific location and fiscal year. Export to Excel or PDF.</p>
         </div>
-    </form>
+    </div>
+
+    <div class="card mb-5">
+        <div class="card-body">
+            <form method="GET" action="{{ route('reports.show') }}" class="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3 items-end">
+                <div>
+                    <label for="fiscal_year" class="form-label">Fiscal Year <span class="required">*</span></label>
+                    <select name="fiscal_year" id="fiscal_year" required class="form-select">
+                        <option value="">Select year…</option>
+                        @if (isset($fiscalYears) && count($fiscalYears) > 0)
+                            @foreach ($fiscalYears as $year)
+                                <option value="{{ $year }}"
+                                    {{ ($selectedFiscalYear ?? request('fiscal_year')) == $year ? 'selected' : '' }}>
+                                    {{ $year }}</option>
+                            @endforeach
+                        @endif
+                    </select>
+                </div>
+                <div>
+                    <label for="location_id" class="form-label">Location <span class="required">*</span></label>
+                    <select name="location_id" id="location_id" required class="form-select">
+                        <option value="">Select location…</option>
+                        @foreach ($locations as $location)
+                            <option value="{{ $location->id }}"
+                                {{ ($selectedLocationId ?? request('location_id')) == $location->id ? 'selected' : '' }}>
+                                {{ $location->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-primary">
+                        Generate report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     @if (isset($measurement) && $measurement)
-        <div class="grid grid-cols-1 gap-6">
+        <div class="space-y-5">
             <div class="card">
-                <div class="card-body p-6">
-                    <h2 class="text-xl font-semibold mb-4">The Scope Chart</h2>
-
-                    <!-- Toggle Buttons -->
-                    <div class="flex gap-2 mb-6">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Breakdown Chart</h2>
+                        <p class="card-subtitle">Visualise emissions by scope or by source.</p>
+                    </div>
+                    <div class="flex gap-2">
                         <button id="btnScope" class="btn btn-primary btn-sm">
                             By Scope
                         </button>
@@ -79,10 +84,10 @@
                             By Emission Source
                         </button>
                     </div>
-
-                    <!-- Chart -->
+                </div>
+                <div class="card-body">
                     <div class="flex justify-center">
-                        <div class="w-[420px]">
+                        <div class="w-full max-w-md">
                             <canvas id="analysisPieChart"></canvas>
                         </div>
                     </div>
@@ -90,32 +95,28 @@
             </div>
 
             <div class="card">
-                <div class="card-body p-6">
-                    <div class="flex justify-between mb-2">
-                        <h2 class="text-xl font-semibold mb-4">Results Breakdown</h2>
-                        <div class="mb-4">
-                            <a href="{{ route('reports.export.excel', [
-                                'fiscal_year' => $selectedFiscalYear ?? request('fiscal_year'),
-                                'location_id' => $selectedLocationId ?? request('location_id'),
-                            ]) }}" class="btn btn-primary">
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                                </svg>
-                                Export to Excel
-                            </a>
-
-                        </div>
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Results Breakdown</h2>
+                        <p class="card-subtitle">Click each scope to expand its emission sources.</p>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full border border-gray-200 rounded-lg">
-                            <thead class="bg-gray-100">
+                    <a href="{{ route('reports.export.excel', [
+                        'fiscal_year' => $selectedFiscalYear ?? request('fiscal_year'),
+                        'location_id' => $selectedLocationId ?? request('location_id'),
+                    ]) }}" class="btn btn-primary btn-sm">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                        Export Excel
+                    </a>
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    <div class="table-wrap">
+                        <table class="table" style="margin: 0;">
+                            <thead>
                                 <tr>
-                                    <th class="px-4 py-2 text-left font-semibold text-lg">
-                                        Name
-                                    </th>
-                                    <th class="px-4 py-2 text-right font-semibold text-lg">
-                                        Results (tCO₂e)
-                                    </th>
+                                    <th>Name</th>
+                                    <th class="text-right">Results (tCO₂e)</th>
                                 </tr>
                             </thead>
                             @php
@@ -124,35 +125,34 @@
                             <tbody id="scopeAccordion">
                                 @foreach ($resultsBreakdown as $index => $scope)
                                     {{-- Accordion Header (Scope row) --}}
-                                    <tr class="border-t font-semibold cursor-pointer bg-gray-50 accordion-header"
-                                        data-target="scope-panel-{{ $index }}">
-                                        <td class="px-4 py-5 text-600 flex items-center gap-2">
-                                            <span
-                                                class="accordion-icon inline-flex items-center transition-transform duration-300">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-gray-600"
-                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                                    stroke-width="2">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                                                </svg>
-                                            </span>
-
-                                            {{ $scope['name'] }}
+                                    <tr class="accordion-header cursor-pointer" data-target="scope-panel-{{ $index }}"
+                                        style="background: var(--canvas); font-weight: 600;">
+                                        <td style="padding: 0.875rem 1rem;">
+                                            <div class="flex items-center gap-2">
+                                                <span class="accordion-icon inline-flex items-center" style="transition: transform 0.3s;">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-500"
+                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                                                    </svg>
+                                                </span>
+                                                <span class="text-slate-900">{{ $scope['name'] }}</span>
+                                            </div>
                                         </td>
-                                        <td class="px-4 py-5 text-right text-gray-900">
+                                        <td class="text-right" style="padding: 0.875rem 1rem; font-weight: 600; color: var(--ink);">
                                             {{ number_format($scope['value'], 2) }}
                                         </td>
                                     </tr>
 
                                     {{-- Accordion Body (Children) --}}
                                     <tr id="scope-panel-{{ $index }}" class="accordion-body hidden">
-                                        <td colspan="2" class="p-0">
+                                        <td colspan="2" style="padding: 0; background: var(--surface);">
                                             <table class="w-full">
                                                 @foreach ($scope['children'] as $child)
-                                                    <tr class="border-t">
-                                                        <td class="px-4 py-5 pl-10 text-gray-700">
+                                                    <tr>
+                                                        <td style="padding: 0.625rem 1rem 0.625rem 3rem; color: var(--ink-muted); border-top: 1px solid var(--line);">
                                                             {{ $child['name'] }}
                                                         </td>
-                                                        <td class="px-4 py-5 text-right text-gray-700">
+                                                        <td class="text-right" style="padding: 0.625rem 1rem; color: var(--ink-muted); border-top: 1px solid var(--line);">
                                                             {{ number_format($child['value'], 2) }}
                                                         </td>
                                                     </tr>
@@ -161,116 +161,75 @@
                                         </td>
                                     </tr>
                                     @if ($loop->last)
-                                        <tr>
-                                            <td colspan="2" class="p-0">
-                                                <table class="w-full">
-                                                    <tr class="border-t">
-                                                        <td class="px-4 py-2 pl-10 font-semibold text-xl">
-                                                            Total
-                                                        </td>
-                                                        <td class="px-4 py-2 text-right font-semibold text-xl">
-                                                            {{ number_format($total, 2) }}
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
+                                        <tr style="background: var(--brand-soft);">
+                                            <td style="padding: 0.875rem 1rem; font-weight: 700; color: var(--ink); border-top: 2px solid var(--brand);">Total</td>
+                                            <td class="text-right" style="padding: 0.875rem 1rem; font-weight: 700; color: var(--brand-darker); border-top: 2px solid var(--brand);">{{ number_format($total, 2) }}</td>
                                         </tr>
                                     @endif
                                 @endforeach
                             </tbody>
-
                         </table>
                     </div>
                 </div>
             </div>
 
+            {{-- Emissions Summary + Offset --}}
             <div class="card">
-                <div class="card-body p-6">
-                    <div class="flex justify-between mb-2">
-                        <h2 class="text-xl font-semibold mb-4">Emissions Summary</h2>
-                        <div class="flex flex-col sm:flex-row sm:justify-end mb-4">
-                            <a href="{{ route('reports.export.pdf', [
-                                'fiscal_year' => $selectedFiscalYear ?? request('fiscal_year'),
-                                'location_id' => $selectedLocationId ?? request('location_id'),
-                            ]) }}"
-                                class="inline-flex items-center justify-center gap-2 px-6 py-3 
-               bg-gradient-to-r from-purple-600 to-purple-700 
-               text-white font-semibold rounded-lg shadow-sm 
-               hover:from-purple-700 hover:to-purple-800 hover:shadow-md
-               transition-all duration-200">
-
-                                {{-- PDF Icon --}}
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M12 8v8m4-4H8m8-6H8a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V6a2 2 0 00-2-2z" />
-                                </svg>
-
-                                Download PDF Report
-                            </a>
-                        </div>
-
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Emissions Summary</h2>
+                        <p class="card-subtitle">Totals by scope and offset options.</p>
                     </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-                        {{-- LEFT: Summary Table --}}
-                        <div class="lg:col-span-2 overflow-x-auto">
-                            <table class="w-full border border-gray-200 rounded-lg">
-                                <tbody>
-                                    @foreach ($resultsBreakdown as $scope)
-                                        <tr class="bg-gray-50 border-b">
-                                            <td class="px-5 py-4 font-semibold text-gray-800">
-                                                {{ $scope['name'] }}
-                                            </td>
-                                            <td class="px-5 py-4 text-right">
-                                                <span class="font-semibold text-gray-900">
-                                                    {{ number_format($scope['value'], 2) }}
-                                                </span>
-                                                <span class="text-sm font-semibold">
-                                                    tCO<sub>2</sub>e
-                                                </span>
+                    <a href="{{ route('reports.export.pdf', [
+                        'fiscal_year' => $selectedFiscalYear ?? request('fiscal_year'),
+                        'location_id' => $selectedLocationId ?? request('location_id'),
+                    ]) }}" class="btn btn-secondary btn-sm">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m-3-3l3 3 3-3M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1"/>
+                        </svg>
+                        Download PDF
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
+                        {{-- Summary Table --}}
+                        <div class="lg:col-span-2">
+                            <div class="border border-slate-200 rounded-lg overflow-hidden">
+                                <table class="w-full">
+                                    <tbody>
+                                        @foreach ($resultsBreakdown as $scope)
+                                            <tr style="border-bottom: 1px solid var(--line);">
+                                                <td style="padding: 0.75rem 1rem; font-weight: 500; color: var(--ink);">{{ $scope['name'] }}</td>
+                                                <td class="text-right" style="padding: 0.75rem 1rem;">
+                                                    <span class="font-semibold text-slate-900">{{ number_format($scope['value'], 2) }}</span>
+                                                    <span class="text-xs font-medium text-slate-400 ml-1">tCO₂e</span>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                        <tr style="background: var(--canvas);">
+                                            <td style="padding: 0.875rem 1rem; font-weight: 700; color: var(--ink);">Total</td>
+                                            <td class="text-right" style="padding: 0.875rem 1rem;">
+                                                <span class="font-bold text-slate-900 text-lg">{{ number_format($total, 2) }}</span>
+                                                <span class="text-xs font-medium text-slate-400 ml-1">tCO₂e</span>
                                             </td>
                                         </tr>
-                                    @endforeach
-
-                                    <tr class="bg-gray-100">
-                                        <td class="px-5 py-4 font-bold text-lg">
-                                            Total
-                                        </td>
-                                        <td class="px-5 py-4 text-right font-bold text-lg">
-                                            {{ number_format($total, 2) }}
-                                            <span class="text-sm font-semibold">
-                                                tCO<sub>2</sub>e
-                                            </span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
-                        {{-- RIGHT: Total Offset Card --}}
-                        <div
-                            class="bg-gradient-to-br from-purple-50 to-white border border-purple-200 rounded-xl p-6 shadow-sm">
-                            <p class="text-lg font-semibold mb-2">
-                                Total Emissions to Offset
-                            </p>
-
-                            <p class="text-3xl font-bold text-purple-700 leading-tight">
-                                {{ number_format($total, 2) }}
-                            </p>
-
-                            <p class="font-semibold mb-6">
-                                tCO<sub>2</sub>e
-                            </p>
-
-                            <button
-                                class="w-full px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg shadow hover:bg-purple-700 hover:shadow-md transition-all duration-200">
+                        {{-- Offset Card --}}
+                        <div class="rounded-lg p-5 border" style="background: linear-gradient(135deg, var(--brand-soft) 0%, #ffffff 100%); border-color: var(--brand-softer);">
+                            <div class="text-xs uppercase tracking-wider text-brand-dark font-semibold mb-2">Total Emissions to Offset</div>
+                            <div class="text-3xl font-bold text-brand-darker leading-none">{{ number_format($total, 2) }}</div>
+                            <div class="text-xs font-medium text-slate-500 mt-1 mb-4">tCO₂e</div>
+                            <button class="btn btn-primary w-full">
                                 Offset Now
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
     @endif
 @endsection
