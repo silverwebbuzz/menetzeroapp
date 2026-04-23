@@ -57,9 +57,8 @@
                 </select>
             </div>
             <div class="flex-shrink-0">
-                <button type="submit"
-                    class="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-medium rounded-lg shadow-md hover:from-purple-700 hover:to-purple-800 hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 whitespace-nowrap">
-                    Select
+                <button type="submit" class="btn btn-primary">
+                    Generate report
                 </button>
             </div>
         </div>
@@ -73,12 +72,11 @@
 
                     <!-- Toggle Buttons -->
                     <div class="flex gap-2 mb-6">
-                        <button id="btnScope" class="px-4 py-2 bg-green-500 text-white rounded">
-                            Scope
+                        <button id="btnScope" class="btn btn-primary btn-sm">
+                            By Scope
                         </button>
-
-                        <button id="btnEmission" class="px-4 py-2 border rounded">
-                            Emissions Source
+                        <button id="btnEmission" class="btn btn-secondary btn-sm">
+                            By Emission Source
                         </button>
                     </div>
 
@@ -99,12 +97,10 @@
                             <a href="{{ route('reports.export.excel', [
                                 'fiscal_year' => $selectedFiscalYear ?? request('fiscal_year'),
                                 'location_id' => $selectedLocationId ?? request('location_id'),
-                            ]) }}"
-                                class="inline-flex items-center justify-center gap-2 px-6 py-3 
-               bg-gradient-to-r from-purple-600 to-purple-700 
-               text-white font-semibold rounded-lg shadow-sm 
-               hover:from-purple-700 hover:to-purple-800 hover:shadow-md
-               transition-all duration-200">
+                            ]) }}" class="btn btn-primary">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                </svg>
                                 Export to Excel
                             </a>
 

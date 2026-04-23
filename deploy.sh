@@ -146,6 +146,21 @@ find . -type d -exec chmod 755 {} \; || true
 find . -type f -exec chmod 644 {} \; || true
 chmod -R 775 storage bootstrap/cache || true
 chmod 644 .htaccess public/.htaccess 2>/dev/null || true
+chmod +x deploy.sh artisan 2>/dev/null || true
+
+# Chown cache directories back to the site owner. If this script is run as
+# root, artisan will have created root-owned files in storage/framework and
+# bootstrap/cache — those would then be unwritable by PHP-FPM (which runs
+# as the site user). We detect the site user from the parent directory
+# owner and hand everything back to them.
+if [ "$(id -u)" = "0" ]; then
+    SITE_USER="$(stat -c '%U' "$SCRIPT_DIR")"
+    SITE_GROUP="$(stat -c '%G' "$SCRIPT_DIR")"
+    if [ -n "$SITE_USER" ] && [ "$SITE_USER" != "root" ]; then
+        echo "Chowning storage + bootstrap/cache to ${SITE_USER}:${SITE_GROUP}..."
+        chown -R "${SITE_USER}:${SITE_GROUP}" storage bootstrap/cache || true
+    fi
+fi
 
 echo "Deployment completed successfully!"
 echo "Your application is ready at: https://app.menetzero.com"

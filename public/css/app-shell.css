@@ -765,3 +765,55 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
     body { background: #ffffff !important; }
     .card { border: 1px solid #cbd5e1 !important; box-shadow: none !important; }
 }
+
+/* ===================================================================== */
+/* Phase-2 universal polish — catches common inline patterns              */
+/* Rewrite legacy inline buttons to look like design-system buttons       */
+/* without touching every template.                                       */
+/* ===================================================================== */
+
+/* Any anchor/button that carries inline "bg-*-600 text-white rounded-lg"
+   pattern gets smoother shadows + tighter radius */
+a[class*="bg-orange-"][class*="text-white"],
+button[class*="bg-orange-"][class*="text-white"],
+a[class*="bg-purple-"][class*="text-white"],
+button[class*="bg-purple-"][class*="text-white"],
+a[class*="bg-violet-"][class*="text-white"],
+button[class*="bg-violet-"][class*="text-white"],
+a[class*="bg-indigo-"][class*="text-white"],
+button[class*="bg-indigo-"][class*="text-white"] {
+    box-shadow: var(--shadow-xs);
+    transition: background-color 0.15s var(--easing), box-shadow 0.15s;
+}
+
+/* Gradient legacy buttons -> flat brand */
+.bg-gradient-to-r.from-orange-50 { background: var(--brand-soft) !important; }
+.bg-gradient-to-r.from-orange-50.to-orange-100 { background: var(--brand-soft) !important; }
+.bg-gradient-to-r.from-emerald-50.to-teal-50 { background: var(--brand-soft) !important; }
+.bg-gradient-to-r.from-emerald-600.to-emerald-500 { background: var(--brand) !important; }
+
+/* Polish native-class cards that aren't using our .card */
+.bg-white.rounded-xl.shadow-sm {
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+/* Native-class tables on pages not using .table */
+table.min-w-full thead th {
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.04em !important;
+    color: var(--ink-muted) !important;
+    background: var(--canvas) !important;
+}
+
+table.min-w-full tbody tr { transition: background-color 0.1s; }
+table.min-w-full tbody tr:hover { background-color: var(--canvas); }
+
+/* Status badge helpers from Measurements page */
+.bg-blue-100.text-blue-800     { background: var(--info-soft) !important; color: #075985 !important; }
+.bg-green-100.text-green-800   { background: var(--success-soft) !important; color: #065f46 !important; }
+.bg-yellow-100.text-yellow-800 { background: var(--warning-soft) !important; color: #92400e !important; }
+.bg-red-100.text-red-800       { background: var(--danger-soft) !important; color: #991b1b !important; }
+.bg-gray-100.text-gray-800     { background: var(--canvas-deep) !important; color: var(--ink-muted) !important; }

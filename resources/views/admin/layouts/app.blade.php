@@ -19,10 +19,11 @@
                 extend: {
                     colors: {
                         brand: { DEFAULT: BRAND[500], dark: BRAND[600], soft: BRAND[50], ...BRAND },
-                        // Historic purple usage across admin views now maps to brand
+                        // Historic off-brand accents now map to brand emerald
                         purple: BRAND,
                         violet: BRAND,
                         indigo: BRAND,
+                        orange: BRAND,
                     },
                     fontFamily: { sans: ['Inter', 'Poppins', 'system-ui', 'sans-serif'] },
                 },
@@ -33,68 +34,74 @@
     <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}">
     @stack('head')
 </head>
-<body class="min-h-screen bg-slate-50">
-    <div class="min-h-screen" x-data="{ sidebarOpen: false }">
+<body class="bg-slate-50">
+    <div class="app-shell" x-data="{ sidebarOpen: false }">
         {{-- Mobile overlay --}}
-        <div x-show="sidebarOpen"
-             x-transition.opacity
+        <div class="mobile-overlay"
+             :class="{ 'is-open': sidebarOpen }"
              @click="sidebarOpen = false"
-             class="lg:hidden fixed inset-0 bg-gray-900/50 z-30"
-             style="display: none;"></div>
+             aria-hidden="true"></div>
 
         {{-- Sidebar --}}
-        <aside class="fixed lg:static inset-y-0 left-0 w-72 bg-white border-r border-gray-200 flex flex-col z-40 transform transition-transform duration-200 lg:translate-x-0"
-               :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
-            <div class="h-16 flex items-center px-4 border-b border-gray-200">
-                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2">
-                    <img src="{{ asset('images/menetzero.svg') }}" alt="MENetZero" class="h-8 w-auto">
-                    <div class="flex flex-col">
-                        <span class="text-sm font-semibold text-gray-900">MIDDLE EAST NET Zero</span>
-                        <span class="text-xs text-admin font-medium">Super Admin</span>
+        <aside class="sidebar"
+               :class="{ 'is-open': sidebarOpen }"
+               @keydown.escape.window="sidebarOpen = false">
+            <div class="sidebar-header">
+                <a href="{{ route('admin.dashboard') }}" class="brand-logo">
+                    <img src="{{ asset('images/menetzero.svg') }}" alt="MENetZero">
+                    <div class="flex flex-col leading-tight">
+                        <span class="text-[13px] font-semibold text-slate-900">MIDDLE EAST NET Zero</span>
+                        <span class="text-[11px] font-medium text-brand-dark uppercase tracking-wider">Super Admin</span>
                     </div>
                 </a>
             </div>
 
-            <nav class="flex-1 overflow-y-auto py-4">
+            <nav class="flex-1 overflow-y-auto py-2">
                 @include('admin.partials.nav')
             </nav>
 
-            <div class="border-t border-gray-200 p-4 text-xs text-gray-500">
-                <div class="flex items-center justify-between gap-2">
-                    <span class="truncate">
-                        @php $admin = auth('admin')->user(); @endphp
-                        {{ $admin?->name ?? 'Admin' }}
-                    </span>
-                    <form method="POST" action="{{ route('admin.logout') }}">
-                        @csrf
-                        <button type="submit" class="text-xs text-red-600 hover:text-red-700 whitespace-nowrap">
-                            Logout
-                        </button>
-                    </form>
-                </div>
+            <div class="sidebar-footer">
+                @php $admin = auth('admin')->user(); @endphp
+                <span class="truncate">{{ $admin?->name ?? 'Admin' }}</span>
+                <form method="POST" action="{{ route('admin.logout') }}">
+                    @csrf
+                    <button type="submit" class="text-red-600 hover:text-red-700 whitespace-nowrap font-medium">
+                        Logout
+                    </button>
+                </form>
             </div>
         </aside>
 
         {{-- Main content --}}
-        <main class="lg:ml-72 min-h-screen flex flex-col">
-            <header class="sticky top-0 z-20 h-16 bg-white border-b border-gray-200 flex items-center px-4 sm:px-6 shadow-sm">
+        <div class="main-content">
+            <header class="header">
                 <button type="button"
+                        class="mobile-menu-btn"
                         @click="sidebarOpen = !sidebarOpen"
-                        class="lg:hidden p-2 -ml-2 mr-2 rounded-md hover:bg-gray-100"
+                        :aria-expanded="sidebarOpen"
                         aria-label="Toggle navigation">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
                 </button>
-                <h1 class="text-base sm:text-lg font-semibold text-gray-900 truncate">
-                    @yield('page-title', 'Admin Dashboard')
-                </h1>
+                <h1 class="page-title truncate">@yield('page-title', 'Admin Dashboard')</h1>
             </header>
 
-            <section class="flex-1 p-4 sm:p-6">
+            <main class="content-area">
+                @if(session('success') || session('error'))
+                    <div class="flash-stack">
+                        @if(session('success'))
+                            <div class="alert alert-success">{{ session('success') }}</div>
+                        @endif
+                        @if(session('error'))
+                            <div class="alert alert-danger">{{ session('error') }}</div>
+                        @endif
+                    </div>
+                @endif
+
                 @yield('content')
-            </section>
-        </main>
+            </main>
+        </div>
     </div>
 
     @stack('scripts')

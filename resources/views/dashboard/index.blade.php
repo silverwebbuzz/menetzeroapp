@@ -380,8 +380,8 @@
                 </div>
         </div>
         
-        <div class="w-full bg-blue-200 rounded-full h-3 mb-4">
-            <div class="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full transition-all duration-500" 
+        <div class="w-full bg-brand-100 rounded-full h-2.5 mb-4">
+            <div class="bg-brand h-2.5 rounded-full transition-all duration-500"
                     style="width: {{ $netZeroProgress['progress'] ?? 0 }}%"></div>
         </div>
         

@@ -36,10 +36,11 @@
                 extend: {
                     colors: {
                         brand: { DEFAULT: BRAND[500], dark: BRAND[600], soft: BRAND[50], ...BRAND },
-                        // Re-map the historic purple/violet/indigo usage to brand
+                        // Re-map historic non-brand accents to brand
                         purple: BRAND,
                         violet: BRAND,
                         indigo: BRAND,
+                        orange: BRAND,
                     },
                     fontFamily: {
                         sans: ['Inter', 'Poppins', 'system-ui', 'sans-serif'],
