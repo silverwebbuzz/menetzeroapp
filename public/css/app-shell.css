@@ -138,14 +138,16 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
 /* Sidebar nav                                                            */
 /* ===================================================================== */
 
-.nav-section { padding: 1rem 0.75rem 0.25rem; }
+.nav-section { padding: 1rem 0.5rem 0.25rem; }
+.nav-section:first-child { padding-top: 0.5rem; }
 .nav-section-title {
     font-size: 0.6875rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--ink-subtle);
-    padding: 0 0.625rem 0.375rem;
+    letter-spacing: 0.08em;
+    color: var(--ink-muted);
+    padding: 0 0.75rem 0.5rem;
+    line-height: 1.2;
 }
 
 .nav-link {
@@ -153,7 +155,7 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
     display: flex;
     align-items: center;
     gap: 0.625rem;
-    padding: 0.5rem 0.625rem;
+    padding: 0.5rem 0.75rem;
     font-size: 0.875rem;
     font-weight: 500;
     border-radius: var(--radius);
@@ -176,10 +178,13 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
     font-weight: 600;
 }
 
+/* Brand bar indicator: sits on the sidebar's left edge, visible only when
+   the nav-section has enough left padding for it to appear. Hidden in
+   collapsed layouts. */
 .nav-link.active::before {
     content: '';
     position: absolute;
-    left: -0.75rem;
+    left: -0.5rem;
     top: 0.375rem;
     bottom: 0.375rem;
     width: 3px;
@@ -449,13 +454,24 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1.25rem;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
     flex-wrap: wrap;
 }
+.page-header > div:first-child { min-width: 0; flex: 1 1 20rem; }
 .page-header h1 { margin-bottom: 0.25rem; }
-.page-header p { color: var(--ink-muted); font-size: 0.875rem; margin: 0; max-width: 42rem; }
-.page-header-actions { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+.page-header p { color: var(--ink-muted); font-size: 0.875rem; margin: 0; max-width: 48rem; line-height: 1.5; }
+.page-header-actions { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; flex-wrap: wrap; }
+
+/* Row action buttons — never let them crush themselves */
+.row-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.375rem;
+    flex-wrap: nowrap;
+}
+.row-actions.flex-wrap { flex-wrap: wrap; }
 
 /* Section heading within a page */
 .section-heading {
@@ -594,8 +610,7 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
 .table .cell-muted { color: var(--ink-muted); }
 .table .cell-strong { font-weight: 500; color: var(--ink); }
 
-/* Row actions */
-.row-actions { display: flex; align-items: center; justify-content: flex-end; gap: 0.25rem; }
+/* (row-actions defined earlier in this file) */
 
 /* ===================================================================== */
 /* Badges                                                                 */

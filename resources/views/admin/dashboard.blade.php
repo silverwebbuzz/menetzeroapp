@@ -4,98 +4,82 @@
 @section('page-title', 'Super Admin Dashboard')
 
 @section('content')
-    <div class="max-w-6xl mx-auto py-6">
-        <div class="mb-8">
-            <h1 class="text-2xl font-bold text-gray-900">Super Admin Dashboard</h1>
-            <p class="mt-2 text-sm text-gray-600">
-                Overview of companies, users, and subscriptions across the MENetZero platform.
-            </p>
+    <div class="page-header">
+        <div>
+            <h1>Super Admin Dashboard</h1>
+            <p>Overview of companies, users, and subscriptions across the MENetZero platform.</p>
         </div>
-
-        @isset($stats)
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-                <div class="bg-white shadow rounded-lg p-4">
-                    <div class="text-sm text-gray-500">Total Companies</div>
-                    <div class="mt-2 text-2xl font-semibold text-gray-900">
-                        {{ number_format($stats['total_companies'] ?? 0) }}
-                    </div>
-                </div>
-
-                <div class="bg-white shadow rounded-lg p-4">
-                    <div class="text-sm text-gray-500">Client Companies</div>
-                    <div class="mt-2 text-2xl font-semibold text-gray-900">
-                        {{ number_format($stats['total_clients'] ?? 0) }}
-                    </div>
-                </div>
-
-                <div class="bg-white shadow rounded-lg p-4">
-                    <div class="text-sm text-gray-500">Total Users</div>
-                    <div class="mt-2 text-2xl font-semibold text-gray-900">
-                        {{ number_format($stats['total_users'] ?? 0) }}
-                    </div>
-                </div>
-
-                <div class="bg-white shadow rounded-lg p-4">
-                    <div class="text-sm text-gray-500">Active Client Subscriptions</div>
-                    <div class="mt-2 text-2xl font-semibold text-gray-900">
-                        {{ number_format($stats['active_client_subscriptions'] ?? 0) }}
-                    </div>
-                </div>
-            </div>
-        @endisset
-
-        @isset($recentCompanies)
-            <div class="bg-white shadow rounded-lg">
-                <div class="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-                    <h2 class="text-lg font-medium text-gray-900">Recent Companies</h2>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Name
-                                </th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Email
-                                </th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Type
-                                </th>
-                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Created At
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            @forelse($recentCompanies as $company)
-                                <tr>
-                                    <td class="px-4 py-2 text-sm text-gray-900">
-                                        {{ $company->name }}
-                                    </td>
-                                    <td class="px-4 py-2 text-sm text-gray-500">
-                                        {{ $company->email }}
-                                    </td>
-                                    <td class="px-4 py-2 text-sm text-gray-500">
-                                        {{ $company->company_type ?? 'client' }}
-                                    </td>
-                                    <td class="px-4 py-2 text-sm text-gray-500">
-                                        {{ optional($company->created_at)->format('Y-m-d') }}
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="px-4 py-4 text-sm text-gray-500 text-center">
-                                        No companies found yet.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        @endisset
     </div>
+
+    @isset($stats)
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+            <div class="stat-card">
+                <div class="stat-card-label">Total Companies</div>
+                <div class="stat-card-value">{{ number_format($stats['total_companies'] ?? 0) }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-label">Client Companies</div>
+                <div class="stat-card-value">{{ number_format($stats['total_clients'] ?? 0) }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-label">Total Users</div>
+                <div class="stat-card-value">{{ number_format($stats['total_users'] ?? 0) }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-label">Active Subscriptions</div>
+                <div class="stat-card-value">{{ number_format($stats['active_client_subscriptions'] ?? 0) }}</div>
+            </div>
+        </div>
+    @endisset
+
+    @isset($recentCompanies)
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title">Recent Companies</h2>
+                    <p class="card-subtitle">Latest organisations to join the platform.</p>
+                </div>
+                <a href="{{ route('admin.companies.index') }}" class="btn btn-ghost btn-sm">
+                    View all
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Type</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($recentCompanies as $company)
+                            <tr>
+                                <td class="cell-strong">{{ $company->name }}</td>
+                                <td class="cell-muted">{{ $company->email }}</td>
+                                <td>
+                                    @if(($company->company_type ?? 'client') === 'partner')
+                                        <span class="badge badge-info badge-dot">Partner</span>
+                                    @else
+                                        <span class="badge badge-brand badge-dot">Client</span>
+                                    @endif
+                                </td>
+                                <td class="cell-muted">{{ optional($company->created_at)->format('d M Y') ?? '—' }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="text-center py-6 cell-muted">No companies found yet.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    @endisset
 @endsection
 
 

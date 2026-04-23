@@ -46,14 +46,11 @@
         <aside class="sidebar"
                :class="{ 'is-open': sidebarOpen }"
                @keydown.escape.window="sidebarOpen = false">
-            <div class="sidebar-header">
+            <div class="sidebar-header" style="flex-direction: column; align-items: flex-start; gap: 0.125rem; padding-top: 0.75rem; padding-bottom: 0.75rem; height: auto; min-height: var(--header-height);">
                 <a href="{{ route('admin.dashboard') }}" class="brand-logo">
                     <img src="{{ asset('images/menetzero.svg') }}" alt="MENetZero">
-                    <div class="flex flex-col leading-tight">
-                        <span class="text-[13px] font-semibold text-slate-900">MIDDLE EAST NET Zero</span>
-                        <span class="text-[11px] font-medium text-brand-dark uppercase tracking-wider">Super Admin</span>
-                    </div>
                 </a>
+                <span class="text-[10px] font-semibold text-brand-dark uppercase tracking-widest pl-1">Super Admin</span>
             </div>
 
             <nav class="flex-1 overflow-y-auto py-2">

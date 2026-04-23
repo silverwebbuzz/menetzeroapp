@@ -10,40 +10,40 @@
         <p>Add every location your business operated from during the period. This should cover everything under your operational control.</p>
     </div>
     <div class="page-header-actions">
-        <a href="{{ route('locations.create') }}" class="btn btn-primary">
+        <a href="{{ route('locations.create') }}" class="btn btn-primary" style="white-space: nowrap;">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
             </svg>
-            Add location
+            Add Location
         </a>
     </div>
 </div>
 
 <div class="card mb-5">
     <div class="card-body">
-        <form method="GET" class="form-row-3">
-            <div class="form-group" style="margin-bottom: 0;">
+        <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+            <div class="md:col-span-2">
                 <label class="form-label">Search</label>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name" class="form-control">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name…" class="form-control">
             </div>
-            <div class="form-group" style="margin-bottom: 0;">
+            <div>
                 <label class="form-label">Filter</label>
                 <select name="filter" class="form-select">
-                    <option value="">All</option>
-                    <option value="active" {{ request('filter') == 'active' ? 'selected' : '' }}>Active</option>
-                    <option value="inactive" {{ request('filter') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                    <option value="">All locations</option>
+                    <option value="active" {{ request('filter') == 'active' ? 'selected' : '' }}>Active only</option>
+                    <option value="inactive" {{ request('filter') == 'inactive' ? 'selected' : '' }}>Inactive only</option>
                     <option value="head_office" {{ request('filter') == 'head_office' ? 'selected' : '' }}>Head office</option>
                 </select>
             </div>
-            <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label">Sort by</label>
+            <div>
+                <label class="form-label">Sort</label>
                 <select name="sort" class="form-select">
                     <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Name (A–Z)</option>
                     <option value="created" {{ request('sort') == 'created' ? 'selected' : '' }}>Recently created</option>
                     <option value="staff" {{ request('sort') == 'staff' ? 'selected' : '' }}>Staff count</option>
                 </select>
             </div>
-            <div class="md:col-span-3" style="display: flex; gap: 0.5rem;">
+            <div class="md:col-span-4 flex gap-2">
                 <button type="submit" class="btn btn-primary btn-sm">Apply filters</button>
                 <a href="{{ route('locations.index') }}" class="btn btn-ghost btn-sm">Clear</a>
             </div>
@@ -57,12 +57,12 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Location</th>
+                        <th style="min-width: 20rem;">Location</th>
                         <th>Type</th>
                         <th>Staff</th>
                         <th>Fiscal year</th>
                         <th>Status</th>
-                        <th class="text-right">Actions</th>
+                        <th class="text-right" style="min-width: 14rem;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -70,7 +70,7 @@
                         <tr>
                             <td>
                                 <div class="flex items-start gap-3">
-                                    <div class="w-9 h-9 rounded-md bg-brand-soft text-brand-darker flex items-center justify-center flex-shrink-0 font-semibold text-sm border border-brand-100">
+                                    <div class="flex-shrink-0 w-9 h-9 rounded-md bg-brand-soft text-brand-dark flex items-center justify-center font-semibold border border-brand-100">
                                         @if($location->country === 'UAE' || $location->country === 'United Arab Emirates')
                                             🇦🇪
                                         @else
@@ -81,19 +81,19 @@
                                         @endif
                                     </div>
                                     <div class="min-w-0">
-                                        <div class="cell-strong flex items-center gap-2">
-                                            {{ $location->name }}
+                                        <div class="cell-strong flex items-center gap-2 flex-wrap">
+                                            <span>{{ $location->name }}</span>
                                             @if($location->is_head_office)
-                                                <span class="badge badge-brand">Head office</span>
+                                                <span class="badge badge-brand">Head Office</span>
                                             @endif
                                         </div>
-                                        <div class="text-xs text-slate-500 truncate">{{ $location->full_address }}</div>
+                                        <div class="text-xs text-slate-500 mt-0.5" style="word-break: break-word;">{{ $location->full_address }}</div>
                                     </div>
                                 </div>
                             </td>
-                            <td class="cell-muted">{{ $location->location_type ?? '—' }}</td>
+                            <td class="cell-muted whitespace-nowrap">{{ $location->location_type ?? '—' }}</td>
                             <td class="cell-muted">{{ $location->staff_count ?? '—' }}</td>
-                            <td class="cell-muted">{{ $location->fiscal_year_start ?? '—' }}</td>
+                            <td class="cell-muted whitespace-nowrap">{{ $location->fiscal_year_start ?? '—' }}</td>
                             <td>
                                 @if($location->is_active)
                                     <span class="badge badge-success badge-dot">Active</span>
@@ -102,26 +102,32 @@
                                 @endif
                             </td>
                             <td>
-                                <div class="row-actions">
-                                    <form method="POST" action="{{ route('locations.toggle-head-office', $location) }}" class="inline">
-                                        @csrf
-                                        <button type="submit" class="btn btn-ghost btn-xs" title="{{ $location->is_head_office ? 'Unset head office' : 'Mark as head office' }}">
-                                            {{ $location->is_head_office ? 'Unset HQ' : 'Make HQ' }}
-                                        </button>
-                                    </form>
-                                    <form method="POST" action="{{ route('locations.toggle-status', $location) }}" class="inline">
-                                        @csrf
-                                        <button type="submit" class="btn btn-ghost btn-xs">
-                                            {{ $location->is_active ? 'Deactivate' : 'Activate' }}
-                                        </button>
-                                    </form>
+                                <div class="row-actions flex-wrap">
                                     <a href="{{ route('locations.edit', $location) }}" class="btn btn-secondary btn-xs">Edit</a>
                                     <a href="{{ route('emission-boundaries.index', $location) }}" class="btn btn-primary btn-xs">
                                         Boundaries
-                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                        </svg>
                                     </a>
+                                    <div class="relative" x-data="{ open: false }" @click.away="open = false">
+                                        <button type="button" class="btn btn-ghost btn-xs" @click="open = !open" aria-label="More actions">
+                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 1rem; height: 1rem;">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01"/>
+                                            </svg>
+                                        </button>
+                                        <div x-show="open" x-transition class="dropdown-menu" style="display: none; min-width: 12rem;">
+                                            <form method="POST" action="{{ route('locations.toggle-head-office', $location) }}">
+                                                @csrf
+                                                <button type="submit" class="dropdown-item">
+                                                    {{ $location->is_head_office ? 'Unset head office' : 'Mark as head office' }}
+                                                </button>
+                                            </form>
+                                            <form method="POST" action="{{ route('locations.toggle-status', $location) }}">
+                                                @csrf
+                                                <button type="submit" class="dropdown-item">
+                                                    {{ $location->is_active ? 'Deactivate' : 'Activate' }}
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
