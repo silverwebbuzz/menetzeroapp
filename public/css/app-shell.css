@@ -242,13 +242,16 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
     gap: 0.75rem;
 }
 
+/* Sticky header title — acts as a breadcrumb-style label, subtle so it
+   doesn't compete with the page's in-content <h1>. Pages that have no
+   in-content <h1> still show this as their only heading. */
 .page-title {
-    color: var(--ink);
-    font-size: 1rem;
-    font-weight: 600;
+    color: var(--ink-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
     margin: 0;
     line-height: 1.3;
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
 }
 
 .content-area {
@@ -832,3 +835,110 @@ table.min-w-full tbody tr:hover { background-color: var(--canvas); }
 .bg-yellow-100.text-yellow-800 { background: var(--warning-soft) !important; color: #92400e !important; }
 .bg-red-100.text-red-800       { background: var(--danger-soft) !important; color: #991b1b !important; }
 .bg-gray-100.text-gray-800     { background: var(--canvas-deep) !important; color: var(--ink-muted) !important; }
+
+/* ===================================================================== */
+/* Universal button normalization                                         */
+/* Catches the various inline button patterns scattered across views      */
+/* (from before the design system existed) and gives them consistent      */
+/* shape, padding, font, and hover behavior. Does NOT touch colour —     */
+/* colour is handled by the existing Tailwind brand aliases and the       */
+/* .btn-* classes.                                                        */
+/* ===================================================================== */
+
+/* Any <a> or <button> inside the main content area that looks like it's
+   trying to be a button (has padding + rounded + either a colour bg or
+   a border) gets the design-system shape. */
+.content-area a[class*="px-"][class*="py-"][class*="rounded"],
+.content-area button[class*="px-"][class*="py-"][class*="rounded"]:not(.mobile-menu-btn):not([role="tab"]) {
+    font-family: inherit;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    line-height: 1.25 !important;
+    border-radius: var(--radius-md) !important;
+    transition: background-color 0.15s var(--easing), border-color 0.15s, box-shadow 0.15s, color 0.15s !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    box-shadow: var(--shadow-xs);
+}
+
+/* Normalise the common "px-4 py-2" and "px-6 py-3" recipes to one sane
+   padding. Bigger ones stay bigger. */
+.content-area a[class*="px-3"][class*="py-1"]:not(.btn),
+.content-area button[class*="px-3"][class*="py-1"]:not(.btn) {
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.8125rem !important;
+}
+
+.content-area a[class*="px-4"][class*="py-2"]:not(.btn),
+.content-area button[class*="px-4"][class*="py-2"]:not(.btn) {
+    padding: 0.5rem 1rem !important;
+}
+
+.content-area a[class*="px-6"][class*="py-2"]:not(.btn),
+.content-area a[class*="px-6"][class*="py-3"]:not(.btn),
+.content-area button[class*="px-6"][class*="py-2"]:not(.btn),
+.content-area button[class*="px-6"][class*="py-3"]:not(.btn) {
+    padding: 0.5625rem 1rem !important;
+}
+
+/* Kill the transform-on-hover-lift trick — feels dated, causes jitter */
+.content-area a[class*="hover:-translate"]:hover,
+.content-area button[class*="hover:-translate"]:hover,
+.content-area a[class*="transform"]:hover,
+.content-area button[class*="transform"]:hover {
+    transform: none !important;
+}
+
+/* Any inline "bg-gradient-to-r" on a button/link becomes flat brand */
+.content-area a.bg-gradient-to-r,
+.content-area button.bg-gradient-to-r {
+    background-image: none !important;
+}
+
+/* Smooth out the over-rounded (rounded-full, rounded-2xl) pills to the
+   design-system radius, unless they're actual badges. */
+.content-area a.rounded-2xl:not(.badge),
+.content-area button.rounded-2xl:not(.badge),
+.content-area a.rounded-xl:not(.card):not(.badge),
+.content-area button.rounded-xl:not(.card):not(.badge) {
+    border-radius: var(--radius-md) !important;
+}
+
+/* Tables that use raw <th>/<td> padding utilities get better breathing
+   room without breaking layout. */
+.content-area table.min-w-full tbody td {
+    color: var(--ink) !important;
+}
+
+/* Raw card pattern used on many pages: bg-white + rounded + border */
+.content-area div.bg-white.rounded-lg,
+.content-area div.bg-white.rounded-xl {
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-xs);
+}
+
+/* Inline "shadow-md" / "shadow-lg" on non-card elements — soften */
+.content-area a.shadow-md,
+.content-area a.shadow-lg,
+.content-area button.shadow-md,
+.content-area button.shadow-lg {
+    box-shadow: var(--shadow-xs) !important;
+}
+.content-area a.shadow-md:hover,
+.content-area a.shadow-lg:hover,
+.content-area button.shadow-md:hover,
+.content-area button.shadow-lg:hover {
+    box-shadow: var(--shadow-sm) !important;
+}
+
+/* Heading scale normalisation — pages use text-3xl / text-2xl freely,
+   which makes headings huge. Clamp to our scale. */
+.content-area h1.text-3xl,
+.content-area h1.text-4xl { font-size: 1.5rem !important; font-weight: 700 !important; letter-spacing: -0.02em !important; }
+.content-area h2.text-2xl { font-size: 1.25rem !important; font-weight: 600 !important; }
+.content-area h3.text-xl,
+.content-area h3.text-lg { font-size: 1.0625rem !important; font-weight: 600 !important; }
+
+/* Description text under headings — consistent muted */
+.content-area h1 + p,
+.content-area h1.mb-2 + p { color: var(--ink-muted) !important; font-size: 0.875rem !important; }
