@@ -11,23 +11,38 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Tailwind CDN with brand theme extension -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
+        // Brand palette. We alias purple/violet/indigo to the brand colour so that
+        // legacy templates that used purple/indigo classes automatically pick up
+        // the correct MenetZero teal/emerald. Same for blue accents in buttons.
+        const BRAND = {
+            50:  '#ecfdf5',
+            100: '#d1fae5',
+            200: '#a7f3d0',
+            300: '#6ee7b7',
+            400: '#34d399',
+            500: '#10b981',
+            600: '#059669',
+            700: '#047857',
+            800: '#065f46',
+            900: '#064e3b',
+        };
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            DEFAULT: '#0ea5a3',
-                            dark: '#0d9488',
-                            soft: '#e6f7f7',
-                        },
+                        brand: { DEFAULT: BRAND[500], dark: BRAND[600], soft: BRAND[50], ...BRAND },
+                        // Re-map the historic purple/violet/indigo usage to brand
+                        purple: BRAND,
+                        violet: BRAND,
+                        indigo: BRAND,
                     },
                     fontFamily: {
-                        sans: ['Poppins', 'system-ui', 'sans-serif'],
+                        sans: ['Inter', 'Poppins', 'system-ui', 'sans-serif'],
                     },
                 },
             },

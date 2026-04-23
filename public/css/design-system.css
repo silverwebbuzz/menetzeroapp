@@ -6,12 +6,12 @@
    CSS CUSTOM PROPERTIES (DESIGN TOKENS)
    ======================================== */
 :root {
-  /* Brand Colors */
-  --brand-primary: #0ea5a3;        /* Teal - Primary brand color */
-  --brand-primary-dark: #0d9488;   /* Darker teal for hover states */
-  --brand-primary-light: #14b8a6;  /* Lighter teal for accents */
-  --brand-secondary: #10b981;      /* Emerald - Secondary brand color */
-  --brand-secondary-dark: #059669; /* Darker emerald */
+  /* Brand Colors (2026 refresh: emerald primary) */
+  --brand-primary: #10b981;        /* Emerald — Primary brand color */
+  --brand-primary-dark: #059669;   /* Darker emerald for hover states */
+  --brand-primary-light: #34d399;  /* Lighter emerald for accents */
+  --brand-secondary: #0ea5a3;      /* Teal — Secondary/legacy brand color */
+  --brand-secondary-dark: #0d9488; /* Darker teal */
   
   /* Neutral Colors */
   --gray-50: #f9fafb;
@@ -45,7 +45,7 @@
   --info-light: #dbeafe;
   
   /* Typography */
-  --font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-family: 'Inter', 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-size-xs: 0.75rem;    /* 12px */
   --font-size-sm: 0.875rem;   /* 14px */
   --font-size-base: 1rem;     /* 16px */

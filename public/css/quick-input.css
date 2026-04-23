@@ -476,3 +476,165 @@ button:disabled {
     cursor: not-allowed;
     transform: none !important;
 }
+
+/* =================================================================== */
+/* MenetZero design-system overrides (2026-04)                           */
+/* These rules apply the app-shell brand + Inter font to Quick Input     */
+/* without touching the form logic in the Blade template.                */
+/* =================================================================== */
+
+.form-group-horizontal,
+.form-label-horizontal,
+.form-input,
+.form-input-select,
+.form-textarea,
+.form-help-text,
+.form-error-text {
+    font-family: 'Inter', 'Poppins', system-ui, -apple-system, sans-serif !important;
+}
+
+/* Labels — weight + colour to match design system */
+.form-label-horizontal {
+    font-size: 0.8125rem !important;
+    font-weight: 500 !important;
+    color: #0f172a !important;
+    padding-top: 0.5rem !important;
+}
+
+/* Help text */
+.form-help-text-under-label,
+.form-help-text {
+    color: #64748b !important;
+    font-size: 0.75rem !important;
+}
+
+/* Inputs + selects + textareas */
+.form-input,
+.form-input-select,
+.form-textarea,
+input[type="text"].form-input,
+input[type="number"].form-input,
+input[type="email"].form-input,
+input[type="url"].form-input,
+textarea.form-input,
+select.form-input-select {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 0.5rem !important;
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.875rem !important;
+    line-height: 1.4 !important;
+    color: #0f172a !important;
+    box-shadow: 0 1px 2px 0 rgb(15 23 42 / 0.04) !important;
+    transition: border-color 0.12s, box-shadow 0.12s !important;
+}
+
+.form-input:hover,
+.form-input-select:hover,
+.form-textarea:hover {
+    border-color: #94a3b8 !important;
+}
+
+.form-input:focus,
+.form-input-select:focus,
+.form-textarea:focus {
+    border-color: #10b981 !important;
+    box-shadow: 0 0 0 3px rgb(16 185 129 / 0.15) !important;
+    outline: none !important;
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
+.form-error-text {
+    color: #dc2626 !important;
+    font-size: 0.75rem !important;
+    margin-top: 0.375rem !important;
+}
+
+/* Remove the purple gradient on ALL buttons in quick-input forms */
+.bg-gradient-to-r,
+button.bg-gradient-to-r,
+.from-purple-600,
+.to-purple-700 {
+    background-image: none !important;
+    background: #10b981 !important;
+}
+
+/* Action buttons inside quick-input forms — unify as brand buttons */
+form[data-source-id] button[type="submit"],
+form[data-source-id] button.btn-primary,
+form .bg-purple-600, form .bg-purple-700,
+form .bg-violet-600, form .bg-violet-700,
+form .bg-indigo-600, form .bg-indigo-700,
+form .bg-blue-600, form .bg-blue-700 {
+    background: #10b981 !important;
+    background-image: none !important;
+    color: #ffffff !important;
+    border-color: #10b981 !important;
+    box-shadow: 0 1px 2px 0 rgb(15 23 42 / 0.04) !important;
+    transform: none !important;
+}
+
+form[data-source-id] button[type="submit"]:hover,
+form[data-source-id] button.btn-primary:hover,
+form .bg-purple-600:hover, form .bg-purple-700:hover,
+form .bg-violet-600:hover, form .bg-violet-700:hover,
+form .bg-indigo-600:hover, form .bg-indigo-700:hover,
+form .bg-blue-600:hover, form .bg-blue-700:hover {
+    background: #059669 !important;
+    border-color: #059669 !important;
+    transform: none !important;
+    box-shadow: 0 1px 3px 0 rgb(15 23 42 / 0.06), 0 1px 2px 0 rgb(15 23 42 / 0.04) !important;
+}
+
+/* Green calc buttons — keep but standardise to brand */
+form .bg-green-600, form .bg-green-700, form .bg-emerald-600, form .bg-emerald-700 {
+    background: #10b981 !important;
+    border-color: #10b981 !important;
+}
+
+form .bg-green-600:hover, form .bg-green-700:hover,
+form .bg-emerald-600:hover, form .bg-emerald-700:hover {
+    background: #059669 !important;
+    border-color: #059669 !important;
+}
+
+/* Left-side Scope 1 / 2 / 3 accordion selected item — already teal, tighten */
+.nav-link.active { letter-spacing: -0.005em; }
+
+/* Card shadows — lighter, more modern */
+.shadow-sm, .shadow-md, .shadow {
+    box-shadow: 0 1px 3px 0 rgb(15 23 42 / 0.06), 0 1px 2px 0 rgb(15 23 42 / 0.04) !important;
+}
+
+/* Section headers inside quick-input */
+.main-information-section h3,
+.additional-data-section h3,
+form[data-source-id] h3 {
+    font-size: 0.9375rem !important;
+    font-weight: 600 !important;
+    color: #0f172a !important;
+    letter-spacing: -0.005em !important;
+}
+
+.main-information-section p,
+.additional-data-section p {
+    color: #64748b !important;
+    font-size: 0.8125rem !important;
+}
+
+/* Number input spinner polish */
+input[type="number"].form-input {
+    -moz-appearance: textfield;
+}
+
+/* Hero heading on Quick Input page */
+.content-area > div > .mb-8 > div > h1,
+form[method="GET"] + form[method="POST"] + div > h1 {
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
+}
