@@ -36,82 +36,85 @@ class EmissionCalculationService
             }
         }
 
-        // If no rule matches, try to find factor matching conditions directly
-        $factorQuery = EmissionFactor::where('emission_source_id', $emissionSourceId)
+        // If no rule matches, fall back to direct query on the factors table.
+        //
+        // Strategy: build a set of filters from strongest to weakest, then attempt
+        // matches progressively relaxing them until a factor is found.
+        //   1. Match all provided conditions.
+        //   2. If empty, drop `region`.
+        //   3. If still empty, drop `unit`.
+        //   4. If still empty, keep only emission_source_id + fuel_type (or fuel_category / vehicle_type).
+        //
+        // This handles the common case where a form passes a `unit_of_measure` label
+        // that doesn't exactly match what's stored on the factor row, or where the
+        // region isn't tagged on the factor.
+        $base = EmissionFactor::where('emission_source_id', $emissionSourceId)
             ->where('is_active', true);
 
-        // Filter by fuel_category if provided
-        if (!empty($conditions['fuel_category'])) {
-            $factorQuery->where('fuel_category', $conditions['fuel_category']);
-        }
+        $applyCoreFilters = function ($q) use ($conditions) {
+            if (!empty($conditions['fuel_category'])) {
+                $q->where('fuel_category', $conditions['fuel_category']);
+            }
+            if (!empty($conditions['fuel_type'])) {
+                $q->where('fuel_type', $conditions['fuel_type']);
+            }
+            if (!empty($conditions['vehicle_category'])) {
+                $q->where('vehicle_category', $conditions['vehicle_category']);
+            }
+            if (!empty($conditions['vehicle_type'])) {
+                $q->where('vehicle_type', $conditions['vehicle_type']);
+            }
+        };
 
-        // Filter by fuel_type if provided (this is critical for Heat/Steam/Cooling and Fuel types)
-        if (!empty($conditions['fuel_type'])) {
-            $factorQuery->where('fuel_type', $conditions['fuel_type']);
-        }
-        
-        // Filter by vehicle_type if provided (for distance-based vehicle calculations)
-        if (!empty($conditions['vehicle_category'])) {
-            $factorQuery->where('vehicle_category', $conditions['vehicle_category']);
-        }
-        if (!empty($conditions['vehicle_type'])) {
-            $factorQuery->where('vehicle_type', $conditions['vehicle_type']);
-        }
-        
-
-        // Check if this is a fugitive emission (refrigerants) - GWP values are global and unit conversion is handled separately
-        // $isFugitiveEmission = false;
-        // $emissionSource = \App\Models\EmissionSourceMaster::find($emissionSourceId);
-
-        // if ($emissionSource && $emissionSource->emission_type === 'fugitive') {
-        //     $isFugitiveEmission = true;
-        // }
-
-        // Filter by unit if provided
-        // For fugitive emissions (refrigerants), skip unit filtering since:
-        // 1. All refrigerant factors use 'kg' as base unit
-        // 2. Unit conversion is handled in calculateCO2e method
-        // 3. We just need to match by fuel_type (refrigerant type)
+        // Attempt 1: all filters including unit and region
+        $q1 = (clone $base);
+        $applyCoreFilters($q1);
         if (!empty($conditions['unit'])) {
-            $factorQuery->where('unit', $conditions['unit']);
+            $q1->where('unit', $conditions['unit']);
         }
-
-        // Filter by region if provided
-        // Note: For refrigerants (fugitive emissions), GWP values are global, so region filter is less strict
         if (!empty($conditions['region'])) {
-            $factorQuery->where('region', $conditions['region']);
+            $q1->where('region', $conditions['region']);
+        }
+        $factor = $this->pickBestFactor($q1);
+        if ($factor) {
+            return $factor;
         }
 
-        // IMPORTANT: When fuel_type is specified, prioritize exact match over is_default
-        // This ensures Steam (0.275000) is selected when Steam is chosen, not Heat (0.226300)
-        if (!empty($conditions['fuel_type'])) {
-            // First try to get the factor matching fuel_type (prefer default if multiple match)
-            $matchingFactor = (clone $factorQuery)
-                ->where('is_default', true)
-                ->first();
-            
-            if ($matchingFactor) {
-                return $matchingFactor;
-            }
-            
-            // If no default matches, get highest priority matching fuel_type
-            $matchingFactor = $factorQuery->orderBy('priority', 'desc')->first();
-            if ($matchingFactor) {
-                return $matchingFactor;
-            }
+        // Attempt 2: drop region
+        $q2 = (clone $base);
+        $applyCoreFilters($q2);
+        if (!empty($conditions['unit'])) {
+            $q2->where('unit', $conditions['unit']);
+        }
+        $factor = $this->pickBestFactor($q2);
+        if ($factor) {
+            return $factor;
         }
 
-        // If no fuel_type specified, try to get default factor first
-        $defaultFactor = (clone $factorQuery)
-            ->where('is_default', true)
-            ->first();
-
-        if ($defaultFactor) {
-            return $defaultFactor;
+        // Attempt 3: drop unit too (common when form sends label like "kg (kilograms)")
+        $q3 = (clone $base);
+        $applyCoreFilters($q3);
+        $factor = $this->pickBestFactor($q3);
+        if ($factor) {
+            return $factor;
         }
 
-        // Fallback: get most common factor (highest priority) matching conditions
-        return $factorQuery->orderBy('priority', 'desc')->first();
+        // Last resort: any active factor for this source (is_default preferred)
+        return (clone $base)->where('is_default', true)->first()
+            ?? (clone $base)->orderBy('priority', 'desc')->first();
+    }
+
+    /**
+     * Given a factor query, return the best match:
+     * is_default first, then highest priority.
+     */
+    private function pickBestFactor($query)
+    {
+        $default = (clone $query)->where('is_default', true)->first();
+        if ($default) {
+            return $default;
+        }
+        return $query->orderBy('priority', 'desc')->first();
     }
 
     /**

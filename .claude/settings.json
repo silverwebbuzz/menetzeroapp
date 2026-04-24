@@ -14,7 +14,12 @@
       "Bash(awk '/function determineFuelType/,/^    }$/' /Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/QuickInputController.php)",
       "Bash(sed -n '494,497p' /Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/QuickInputController.php)",
       "Bash(grep -c 'refrigerant_type'\\\\''\\\\] = $request->input\\('\\\\''refrigerant_type'\\\\''\\)' /Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/QuickInputController.php)",
-      "Bash(grep -n '$quantity = $request->input' /Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/QuickInputController.php)"
+      "Bash(grep -n '$quantity = $request->input' /Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/QuickInputController.php)",
+      "Bash(awk '/CREATE TABLE `emission_factors`/,/ENGINE=InnoDB/' \"/Users/apple/Silverwebbuzz/menetzeroapp/silverwebbuzz_in_menetzero\\(5\\).sql\")",
+      "Bash(grep -E '^\\\\s*`')",
+      "Bash(awk \"/INSERT INTO \\\\`emission_sources_master\\\\`/,/^\\);?$/\" \"/Users/apple/Silverwebbuzz/menetzeroapp/silverwebbuzz_in_menetzero\\(5\\).sql\")",
+      "Bash(grep \"INSERT INTO \\\\`measurement_data\\\\`\" -A1000 \"/Users/apple/Silverwebbuzz/menetzeroapp/silverwebbuzz_in_menetzero\\(5\\).sql\")",
+      "Bash(grep \"INSERT INTO \\\\`measurement_data\\\\`\" -A200 \"/Users/apple/Silverwebbuzz/menetzeroapp/silverwebbuzz_in_menetzero\\(5\\).sql\")"
     ],
     "additionalDirectories": [
       "/private/tmp"

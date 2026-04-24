@@ -491,9 +491,9 @@ class QuickInputController extends Controller
             $unit = $request->input('unit_of_measure') ?? $request->input('unit');
 
             // Prepare conditions for factor selection.
-            // Refrigerants / fugitive emissions use 'Global' region (GWP values are global,
-            // and UAE-specific refrigerant factors don't exist). Everything else defaults to UAE.
-            $defaultRegion = ($emissionSource->emission_type === 'fugitive') ? 'Global' : 'UAE';
+            // The EmissionCalculationService::selectEmissionFactor() method now falls back
+            // gracefully if region doesn't match, so we just pass UAE as the default.
+            $defaultRegion = 'UAE';
 
             // Handle process emissions - use process_type as fuel_type
             $processType = $request->input('process_type');
@@ -670,7 +670,7 @@ class QuickInputController extends Controller
 
             // Prepare conditions for factor selection (include fuel_category, fuel_type, energy_type, etc.)
             // For refrigerants (fugitive emissions), use 'Global' as region since GWP values are global
-            $defaultRegion = ($emissionSource->emission_type === 'fugitive') ? 'Global' : 'UAE';
+            $defaultRegion = 'UAE';  // Service layer falls back gracefully if no match
 
             // Handle vehicle-specific fields (simplified: only distance-based)
             $fuelType = $request->input('fuel_type');
@@ -907,7 +907,7 @@ class QuickInputController extends Controller
 
             // Prepare conditions for factor selection (include fuel_category, fuel_type, energy_type, etc.)
             // For refrigerants (fugitive emissions), use 'Global' as region since GWP values are global
-            $defaultRegion = ($emissionSource->emission_type === 'fugitive') ? 'Global' : 'UAE';
+            $defaultRegion = 'UAE';  // Service layer falls back gracefully if no match
 
             // Handle process emissions - use process_type as fuel_type
             $processType = $request->input('process_type');
