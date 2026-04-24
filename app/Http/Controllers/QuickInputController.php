@@ -490,10 +490,10 @@ class QuickInputController extends Controller
             $quantity = ($request->input('amount') ?? $request->input('quantity')) ?? $request->input('distance');
             $unit = $request->input('unit_of_measure') ?? $request->input('unit');
 
-            // Prepare conditions for factor selection (include fuel_category, fuel_type, energy_type, etc.)
-            // For refrigerants (fugitive emissions), use 'Global' as region since GWP values are global
-            // $defaultRegion = ($emissionSource->emission_type === 'fugitive') ? 'Global' : 'UAE';
-            $defaultRegion = 'UAE';
+            // Prepare conditions for factor selection.
+            // Refrigerants / fugitive emissions use 'Global' region (GWP values are global,
+            // and UAE-specific refrigerant factors don't exist). Everything else defaults to UAE.
+            $defaultRegion = ($emissionSource->emission_type === 'fugitive') ? 'Global' : 'UAE';
 
             // Handle process emissions - use process_type as fuel_type
             $processType = $request->input('process_type');
@@ -519,8 +519,15 @@ class QuickInputController extends Controller
                 $conditions
             );
             if (!$emissionFactor) {
-                dd($emissionFactor);
-                return back()->withErrors(['quantity' => 'No suitable emission factor found for the selected criteria. Please contact support.'])->withInput();
+                \Log::warning('Quick Input: no emission factor found on store', [
+                    'emission_source_id' => $emissionSource->id,
+                    'emission_source_name' => $emissionSource->name,
+                    'emission_type' => $emissionSource->emission_type,
+                    'conditions' => $conditions,
+                ]);
+                return back()
+                    ->withErrors(['quantity' => 'No suitable emission factor found for the selected criteria. Please contact support.'])
+                    ->withInput();
             }
 
             // Debug: Log emission factor details
@@ -606,9 +613,6 @@ class QuickInputController extends Controller
             if ($request->input('refrigerant_type')) {
                 $additionalDataToUpdate['refrigerant_type'] = $request->input('refrigerant_type');
             }
-            if ($request->input('refrigerant_type')) {
-                $additionalDataToUpdate['refrigerant_type'] = $request->input('refrigerant_type');
-            }
             if (!empty($additionalDataToUpdate)) {
                 $existingAdditionalData = $measurementData->additional_data ?? [];
                 $mergedAdditionalData = array_merge($existingAdditionalData, $additionalDataToUpdate);
@@ -661,9 +665,6 @@ class QuickInputController extends Controller
                 'distance' => 'required_without:quantity|numeric|min:0',
                 'unit' => 'required|string',
             ]);
-
-            // For vehicles, use distance if provided, otherwise use quantity
-            $quantity = $request->input('distance') ?? $request->input('quantity');
 
             $emissionSource = EmissionSourceMaster::findOrFail($request->emission_source_id);
 
