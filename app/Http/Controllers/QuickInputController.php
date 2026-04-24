@@ -624,8 +624,14 @@ class QuickInputController extends Controller
 
             DB::commit();
 
-            return redirect()->route('quick-input.index')
-                ->with('success', 'Emission data added successfully!');
+            // Stay on the same form so the user can keep adding entries for this
+            // source; the newly saved entry will now appear in the Results list below.
+            return redirect()->route('quick-input.show', [
+                'scope' => $scope,
+                'slug' => $slug,
+                'location_id' => $request->location_id,
+                'fiscal_year' => $request->fiscal_year,
+            ])->with('success', 'Emission data added successfully!');
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
@@ -1006,8 +1012,17 @@ class QuickInputController extends Controller
 
             DB::commit();
 
-            return redirect()->route('quick-input.index')
-                ->with('success', 'Entry updated successfully!');
+            // Stay on the same form so the user sees the updated entry in the
+            // Results list below. Derive scope + slug from the entry itself.
+            $scopeNumber = str_replace('Scope ', '', $entry->scope);
+            $slug = $entry->emissionSource->quick_input_slug;
+
+            return redirect()->route('quick-input.show', [
+                'scope' => $scopeNumber,
+                'slug' => $slug,
+                'location_id' => $request->location_id,
+                'fiscal_year' => $request->fiscal_year,
+            ])->with('success', 'Entry updated successfully!');
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
@@ -1058,8 +1073,8 @@ class QuickInputController extends Controller
 
             DB::commit();
 
-            return redirect()->route('quick-input.index')
-                ->with('success', 'Entry deleted successfully!');
+            // Stay on whichever page the user deleted from (entries list OR the source form)
+            return back()->with('success', 'Entry deleted successfully!');
 
         } catch (\Exception $e) {
             DB::rollBack();
