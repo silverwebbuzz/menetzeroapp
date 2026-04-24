@@ -8,7 +8,9 @@
       "Bash(grep -A50 \"INSERT INTO \\\\`migrations\\\\`\" \"/Users/apple/Silverwebbuzz/menetzeroapp/silverwebbuzz_in_menetzero\\(5\\).sql\")",
       "Read(//private/tmp/**)",
       "Bash(git add *)",
-      "Bash(git reset *)"
+      "Bash(git reset *)",
+      "Bash(sed -i '' 's|class=\"px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition\"|class=\"btn btn-primary\"|g' /Users/apple/Silverwebbuzz/menetzeroapp/resources/views/profile/index.blade.php)",
+      "Bash(sed -i '' 's|class=\"inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition\"|class=\"btn btn-primary\"|g' /Users/apple/Silverwebbuzz/menetzeroapp/resources/views/profile/index.blade.php)"
     ],
     "additionalDirectories": [
       "/private/tmp"
