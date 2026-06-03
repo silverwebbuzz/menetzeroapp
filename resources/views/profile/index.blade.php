@@ -208,8 +208,34 @@
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h3 class="text-lg font-semibold text-gray-900 mb-6">Company Information</h3>
                 
-                <form method="POST" action="{{ route('profile.update.company') }}" class="space-y-6">
+                <form method="POST" action="{{ route('profile.update.company') }}" enctype="multipart/form-data" class="space-y-6">
                     @csrf
+
+                    {{-- Company logo --}}
+                    <div class="border-b pb-6">
+                        <h4 class="text-md font-semibold text-gray-900 mb-2">Company Logo</h4>
+                        <p class="text-sm text-gray-500 mb-4">Upload your logo to appear on PDF GHG inventory reports. PNG or JPG recommended (max 2 MB).</p>
+                        <div class="flex items-center gap-5 flex-wrap">
+                            <div class="w-24 h-24 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden flex-shrink-0">
+                                @if($company->logo_url)
+                                    <img src="{{ $company->logo_url }}" alt="{{ $company->name }} logo" class="max-w-full max-h-full object-contain">
+                                @else
+                                    <span class="text-2xl font-bold text-emerald-700">{{ strtoupper(substr($company->name, 0, 1)) }}</span>
+                                @endif
+                            </div>
+                            <div class="space-y-3">
+                                <input type="file" name="company_logo" accept="image/jpeg,image/png,image/webp"
+                                       class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+                                @error('company_logo')<p class="text-sm text-red-600">{{ $message }}</p>@enderror
+                                @if($company->logo_path)
+                                    <label class="inline-flex items-center gap-2 text-sm text-gray-600">
+                                        <input type="checkbox" name="remove_logo" value="1" class="rounded border-gray-300 text-emerald-600">
+                                        Remove current logo
+                                    </label>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
                     
                     <!-- Basic Company Info -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -227,6 +227,46 @@
             border-top: 1px solid #e5e7eb;
             padding-top: 4px;
         }
+
+        .cover-logos {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+        }
+
+        .cover-logos td {
+            vertical-align: middle;
+            padding: 0;
+        }
+
+        .cover-logos .logo-left { text-align: left; width: 50%; }
+        .cover-logos .logo-right { text-align: right; width: 50%; }
+
+        .cover-logos img {
+            max-height: 52px;
+            max-width: 180px;
+        }
+
+        .platform-wordmark {
+            font-size: 11px;
+            font-weight: bold;
+            color: #059669;
+            letter-spacing: 0.3px;
+        }
+
+        .mode-badge {
+            display: inline-block;
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #bbf7d0;
+            font-size: 8px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            padding: 3px 8px;
+            border-radius: 3px;
+            margin-top: 6px;
+        }
     </style>
 </head>
 <body>
@@ -234,16 +274,46 @@
 @php
     $location = $report['location'];
     $methodology = $report['methodology'];
+    $moccaeOnly = $report['moccae_only'] ?? false;
+    $displayTotal = $report['display_total_tonnes'];
     $totalTonnes = $report['total_tonnes'];
     $scopeTonnes = $report['scope_tonnes'];
+    $scope1 = $scopeTonnes['Scope 1'] ?? 0;
+    $scope2 = $scopeTonnes['Scope 2'] ?? 0;
 @endphp
 
 <div class="brand-bar"></div>
 
 {{-- Cover / Header --}}
 <div class="report-header">
+    <table class="cover-logos">
+        <tr>
+            <td class="logo-left">
+                @if(!empty($companyLogo))
+                    <img src="{{ $companyLogo }}" alt="{{ $company->name }}">
+                @else
+                    <div class="meta-value" style="font-size: 14px;">{{ $company->name }}</div>
+                @endif
+            </td>
+            <td class="logo-right">
+                @if(!empty($platformLogo))
+                    <img src="{{ $platformLogo }}" alt="MENetZero">
+                @else
+                    <div class="platform-wordmark">MENetZero</div>
+                @endif
+            </td>
+        </tr>
+    </table>
+
     <p class="report-title">Greenhouse Gas (GHG) Inventory Report</p>
-    <p class="report-subtitle">Scope 1 &amp; 2 emissions summary — UAE corporate reporting format</p>
+    <p class="report-subtitle">
+        @if($moccaeOnly)
+            MOCCAE Scope 1 &amp; 2 inventory — UAE mandatory reporting format
+        @else
+            Full GHG inventory summary — all scopes included
+        @endif
+    </p>
+    <span class="mode-badge">{{ $report['export_mode_label'] ?? ($moccaeOnly ? 'MOCCAE Scope 1 & 2' : 'Full inventory') }}</span>
 
     <table class="meta-grid">
         <tr>
@@ -286,12 +356,12 @@
     <tr>
         <td class="kpi-cell">
             <div class="kpi-label">Scope 1</div>
-            <div class="kpi-value">{{ number_format($scopeTonnes['Scope 1'], 2) }}</div>
+            <div class="kpi-value">{{ number_format($scope1, 2) }}</div>
             <div class="kpi-unit">tCO₂e (direct)</div>
         </td>
         <td class="kpi-cell">
             <div class="kpi-label">Scope 2</div>
-            <div class="kpi-value">{{ number_format($scopeTonnes['Scope 2'], 2) }}</div>
+            <div class="kpi-value">{{ number_format($scope2, 2) }}</div>
             <div class="kpi-unit">tCO₂e (energy)</div>
         </td>
         <td class="kpi-cell highlight">
@@ -299,11 +369,13 @@
             <div class="kpi-value">{{ number_format($report['scope_12_tonnes'], 2) }}</div>
             <div class="kpi-unit">tCO₂e (MOCCAE reporting total)</div>
         </td>
+        @if(!$moccaeOnly)
         <td class="kpi-cell">
             <div class="kpi-label">Total (all scopes)</div>
             <div class="kpi-value">{{ number_format($totalTonnes, 2) }}</div>
             <div class="kpi-unit">tCO₂e</div>
         </td>
+        @endif
     </tr>
 </table>
 
@@ -334,33 +406,35 @@
         <tr>
             <td>Scope 1</td>
             <td>Direct emissions (fuel combustion, refrigerants, owned vehicles)</td>
-            <td class="num">{{ number_format($scopeTonnes['Scope 1'], 2) }}</td>
+            <td class="num">{{ number_format($scope1, 2) }}</td>
             <td class="num">{{ $pct[0] ?? 0 }}%</td>
         </tr>
         <tr>
             <td>Scope 2</td>
             <td>Indirect emissions from purchased electricity (location-based)</td>
-            <td class="num">{{ number_format($scopeTonnes['Scope 2'], 2) }}</td>
+            <td class="num">{{ number_format($scope2, 2) }}</td>
             <td class="num">{{ $pct[1] ?? 0 }}%</td>
         </tr>
-        @if($report['has_scope_3'] || $scopeTonnes['Scope 3'] > 0)
+        @if(!$moccaeOnly && ($report['has_scope_3'] || ($scopeTonnes['Scope 3'] ?? 0) > 0))
         <tr>
             <td>Scope 3</td>
             <td>Other indirect emissions (value chain)</td>
-            <td class="num">{{ number_format($scopeTonnes['Scope 3'], 2) }}</td>
+            <td class="num">{{ number_format($scopeTonnes['Scope 3'] ?? 0, 2) }}</td>
             <td class="num">{{ $pct[2] ?? 0 }}%</td>
         </tr>
         @endif
-        <tr class="subtotal-row">
+        <tr class="{{ $moccaeOnly ? 'total-row' : 'subtotal-row' }}">
             <td colspan="2">Scope 1 + Scope 2 (UAE mandatory reporting)</td>
             <td class="num">{{ number_format($report['scope_12_tonnes'], 2) }}</td>
-            <td class="num">—</td>
+            <td class="num">{{ $moccaeOnly ? '100' : '—' }}%</td>
         </tr>
+        @if(!$moccaeOnly)
         <tr class="total-row">
             <td colspan="2">Grand total (all scopes)</td>
             <td class="num">{{ number_format($totalTonnes, 2) }}</td>
             <td class="num">100%</td>
         </tr>
+        @endif
     </tbody>
 </table>
 
@@ -399,8 +473,8 @@
             @endif
         @endforeach
         <tr class="total-row">
-            <td colspan="2">Total</td>
-            <td class="num">{{ number_format($totalTonnes, 2) }}</td>
+            <td colspan="2">Total{{ $moccaeOnly ? ' (Scope 1 + 2)' : '' }}</td>
+            <td class="num">{{ number_format($displayTotal, 2) }}</td>
         </tr>
     </tbody>
 </table>

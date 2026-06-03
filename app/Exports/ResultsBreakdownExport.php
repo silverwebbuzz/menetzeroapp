@@ -10,16 +10,18 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 class ResultsBreakdownExport implements FromCollection, WithHeadings, WithStyles
 {
     protected $resultsBreakdown;
+    protected $grandTotal;
 
-    public function __construct($resultsBreakdown)
+    public function __construct($resultsBreakdown, ?float $grandTotal = null)
     {
         $this->resultsBreakdown = $resultsBreakdown;
+        $this->grandTotal = $grandTotal;
     }
 
     public function collection()
     {
         $data = collect();
-        $grandTotal = 0;
+        $grandTotal = $this->grandTotal ?? 0;
 
         foreach ($this->resultsBreakdown as $scope) {
             $scopeTonnes = $scope['tonnes'] ?? ($scope['value'] ?? 0);
@@ -31,7 +33,9 @@ class ResultsBreakdownExport implements FromCollection, WithHeadings, WithStyles
                 'Results (tCO₂e)' => number_format($scopeTonnes, 2, '.', ''),
             ]);
 
-            $grandTotal += $scopeTonnes;
+            if ($this->grandTotal === null) {
+                $grandTotal += $scopeTonnes;
+            }
 
             // Children rows
             foreach ($scope['children'] as $child) {

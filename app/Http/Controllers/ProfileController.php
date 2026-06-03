@@ -10,6 +10,7 @@ use App\Mail\PasswordChangedEmail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -124,6 +125,8 @@ class ProfileController extends Controller
             'contact_person' => 'nullable|string|max:255',
             'license_no' => 'nullable|string|max:100',
             'emirate' => 'nullable|string|max:100',
+            'company_logo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
+            'remove_logo' => 'nullable|boolean',
         ]);
 
         $company = $user->getActiveCompany();
@@ -145,6 +148,20 @@ class ProfileController extends Controller
             'license_no' => $request->license_no,
             'emirate' => $request->emirate,
         ]);
+
+        if ($request->boolean('remove_logo') && $company->logo_path) {
+            Storage::disk('public')->delete($company->logo_path);
+            $company->update(['logo_path' => null]);
+        }
+
+        if ($request->hasFile('company_logo')) {
+            if ($company->logo_path) {
+                Storage::disk('public')->delete($company->logo_path);
+            }
+
+            $path = $request->file('company_logo')->store('company-logos/' . $company->id, 'public');
+            $company->update(['logo_path' => $path]);
+        }
 
         return back()->with('success', 'Company information updated successfully!');
     }

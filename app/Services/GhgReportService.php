@@ -170,4 +170,66 @@ class GhgReportService
             'disclaimer' => 'This inventory summary is prepared using MENetZero for internal reporting and as a working draft for MOCCAE IEQT submission. Official legal submission must be completed at mrv.ae using the Integrated Emissions Quantification Tool (IEQT).',
         ];
     }
+
+    /**
+     * Restrict report output to Scope 1 & 2 for MOCCAE / IEQT submission format.
+     */
+    public function applyMoccaeOnly(array $report): array
+    {
+        $scope12Kg = $report['scope_12_kg'];
+        $scope12Tonnes = $report['scope_12_tonnes'];
+
+        $scope1Kg = $report['scope_kg']['Scope 1'];
+        $scope2Kg = $report['scope_kg']['Scope 2'];
+
+        $report['moccae_only'] = true;
+        $report['export_mode_label'] = 'MOCCAE Scope 1 & 2';
+        $report['display_total_tonnes'] = $scope12Tonnes;
+        $report['display_total_kg'] = $scope12Kg;
+
+        $report['results_breakdown'] = array_values(array_filter(
+            $report['results_breakdown'],
+            fn ($scope) => in_array($scope['name'], ['Scope 1', 'Scope 2'], true)
+        ));
+
+        $report['activity_register'] = $report['activity_register']
+            ->filter(fn ($row) => in_array($row['scope'], ['Scope 1', 'Scope 2'], true))
+            ->values();
+
+        $report['emission_source_data'] = $report['emission_source_data']
+            ->filter(fn ($row) => in_array($row['scope'], ['Scope 1', 'Scope 2'], true))
+            ->values();
+
+        $report['scope_tonnes'] = [
+            'Scope 1' => self::kgToTonnes($scope1Kg),
+            'Scope 2' => self::kgToTonnes($scope2Kg),
+        ];
+
+        $report['scope_percentages'] = $scope12Kg > 0
+            ? [
+                round(($scope1Kg / $scope12Kg) * 100, 1),
+                round(($scope2Kg / $scope12Kg) * 100, 1),
+            ]
+            : [0, 0];
+
+        $report['scope_raw_tonnes'] = [
+            number_format(self::kgToTonnes($scope1Kg), 2),
+            number_format(self::kgToTonnes($scope2Kg), 2),
+        ];
+
+        $report['entry_count'] = $report['activity_register']->count();
+        $report['has_scope_3'] = false;
+
+        return $report;
+    }
+
+    public function finalizeReport(array $report, bool $moccaeOnly = false): array
+    {
+        $report['moccae_only'] = $moccaeOnly;
+        $report['export_mode_label'] = $moccaeOnly ? 'MOCCAE Scope 1 & 2' : 'Full inventory (all scopes)';
+        $report['display_total_tonnes'] = $moccaeOnly ? $report['scope_12_tonnes'] : $report['total_tonnes'];
+        $report['display_total_kg'] = $moccaeOnly ? $report['scope_12_kg'] : $report['total_kg'];
+
+        return $moccaeOnly ? $this->applyMoccaeOnly($report) : $report;
+    }
 }

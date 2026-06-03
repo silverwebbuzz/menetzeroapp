@@ -117,68 +117,87 @@
 
     <div class="card mb-5">
         <div class="card-body">
-            <form method="GET" action="{{ route('reports.show') }}" class="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3 items-end">
-                <div>
-                    <label for="fiscal_year" class="form-label">Fiscal Year <span class="required">*</span></label>
-                    <select name="fiscal_year" id="fiscal_year" required class="form-select">
-                        <option value="">Select year…</option>
-                        @if (isset($fiscalYears) && count($fiscalYears) > 0)
-                            @foreach ($fiscalYears as $year)
-                                <option value="{{ $year }}"
-                                    {{ ($selectedFiscalYear ?? request('fiscal_year')) == $year ? 'selected' : '' }}>
-                                    {{ $year }}</option>
+            <form method="GET" action="{{ route('reports.show') }}" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3 items-end">
+                    <div>
+                        <label for="fiscal_year" class="form-label">Fiscal Year <span class="required">*</span></label>
+                        <select name="fiscal_year" id="fiscal_year" required class="form-select">
+                            <option value="">Select year…</option>
+                            @if (isset($fiscalYears) && count($fiscalYears) > 0)
+                                @foreach ($fiscalYears as $year)
+                                    <option value="{{ $year }}"
+                                        {{ ($selectedFiscalYear ?? request('fiscal_year')) == $year ? 'selected' : '' }}>
+                                        {{ $year }}</option>
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
+                    <div>
+                        <label for="location_id" class="form-label">Location <span class="required">*</span></label>
+                        <select name="location_id" id="location_id" required class="form-select">
+                            <option value="">Select location…</option>
+                            @foreach ($locations as $location)
+                                <option value="{{ $location->id }}"
+                                    {{ ($selectedLocationId ?? request('location_id')) == $location->id ? 'selected' : '' }}>
+                                    {{ $location->name }}</option>
                             @endforeach
-                        @endif
-                    </select>
+                        </select>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary">
+                            Generate report
+                        </button>
+                    </div>
                 </div>
-                <div>
-                    <label for="location_id" class="form-label">Location <span class="required">*</span></label>
-                    <select name="location_id" id="location_id" required class="form-select">
-                        <option value="">Select location…</option>
-                        @foreach ($locations as $location)
-                            <option value="{{ $location->id }}"
-                                {{ ($selectedLocationId ?? request('location_id')) == $location->id ? 'selected' : '' }}>
-                                {{ $location->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <button type="submit" class="btn btn-primary">
-                        Generate report
-                    </button>
-                </div>
+                <label class="inline-flex items-start gap-2 text-sm text-slate-600 cursor-pointer">
+                    <input type="checkbox" name="moccae_only" value="1" class="mt-0.5 rounded border-gray-300 text-emerald-600"
+                        {{ ($moccaeOnly ?? request('moccae_only')) ? 'checked' : '' }}>
+                    <span>
+                        <span class="font-medium text-slate-800">MOCCAE format (Scope 1 &amp; 2 only)</span>
+                        <span class="block text-xs text-slate-500 mt-0.5">Excludes Scope 3 — use for UAE IEQT submission preparation and official reporting exports.</span>
+                    </span>
+                </label>
             </form>
         </div>
     </div>
 
     @if (isset($measurement) && $measurement && isset($report))
         @php
+            $moccaeOnly = $moccaeOnly ?? ($report['moccae_only'] ?? false);
+            $displayTotal = $report['display_total_tonnes'];
             $totalTonnes = $report['total_tonnes'];
             $scopeTonnes = $report['scope_tonnes'];
             $resultsBreakdown = $report['results_breakdown'];
+            $exportParams = array_filter([
+                'fiscal_year' => $selectedFiscalYear ?? request('fiscal_year'),
+                'location_id' => $selectedLocationId ?? request('location_id'),
+                'moccae_only' => $moccaeOnly ? 1 : null,
+            ]);
         @endphp
 
         {{-- Report header --}}
         <div class="card mb-5">
             <div class="card-header">
-                <div>
-                    <h2 class="card-title">GHG Inventory Summary</h2>
-                    <p class="card-subtitle">{{ $company->name ?? '' }} — {{ $report['location']->name ?? '' }}</p>
+                <div class="flex items-center gap-4">
+                    @if($company->logo_url ?? false)
+                        <img src="{{ $company->logo_url }}" alt="{{ $company->name }}" class="h-12 w-auto object-contain">
+                    @endif
+                    <div>
+                        <h2 class="card-title">GHG Inventory Summary</h2>
+                        <p class="card-subtitle">{{ $company->name ?? '' }} — {{ $report['location']->name ?? '' }}</p>
+                        <span class="inline-block mt-1 text-xs font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full {{ $moccaeOnly ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600' }}">
+                            {{ $report['export_mode_label'] }}
+                        </span>
+                    </div>
                 </div>
                 <div class="flex gap-2 flex-wrap">
-                    <a href="{{ route('reports.export.pdf', [
-                        'fiscal_year' => $selectedFiscalYear ?? request('fiscal_year'),
-                        'location_id' => $selectedLocationId ?? request('location_id'),
-                    ]) }}" class="btn btn-primary btn-sm">
+                    <a href="{{ route('reports.export.pdf', $exportParams) }}" class="btn btn-primary btn-sm">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m-3-3l3 3 3-3M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1"/>
                         </svg>
                         Download PDF
                     </a>
-                    <a href="{{ route('reports.export.excel', [
-                        'fiscal_year' => $selectedFiscalYear ?? request('fiscal_year'),
-                        'location_id' => $selectedLocationId ?? request('location_id'),
-                    ]) }}" class="btn btn-secondary btn-sm">
+                    <a href="{{ route('reports.export.excel', $exportParams) }}" class="btn btn-secondary btn-sm">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                         </svg>
@@ -206,15 +225,15 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="grid grid-cols-2 lg:grid-cols-{{ $moccaeOnly ? '3' : '4' }} gap-4">
                     <div class="report-kpi">
                         <div class="kpi-label">Scope 1</div>
-                        <div class="kpi-value">{{ number_format($scopeTonnes['Scope 1'], 2) }}</div>
+                        <div class="kpi-value">{{ number_format($scopeTonnes['Scope 1'] ?? 0, 2) }}</div>
                         <div class="kpi-unit">tCO₂e direct</div>
                     </div>
                     <div class="report-kpi">
                         <div class="kpi-label">Scope 2</div>
-                        <div class="kpi-value">{{ number_format($scopeTonnes['Scope 2'], 2) }}</div>
+                        <div class="kpi-value">{{ number_format($scopeTonnes['Scope 2'] ?? 0, 2) }}</div>
                         <div class="kpi-unit">tCO₂e energy</div>
                     </div>
                     <div class="report-kpi highlight">
@@ -222,12 +241,20 @@
                         <div class="kpi-value">{{ number_format($report['scope_12_tonnes'], 2) }}</div>
                         <div class="kpi-unit">tCO₂e MOCCAE total</div>
                     </div>
+                    @if(!$moccaeOnly)
                     <div class="report-kpi">
                         <div class="kpi-label">Grand total</div>
                         <div class="kpi-value">{{ number_format($totalTonnes, 2) }}</div>
                         <div class="kpi-unit">tCO₂e all scopes</div>
                     </div>
+                    @endif
                 </div>
+
+                @if(empty($company->logo_path))
+                    <p class="text-sm text-slate-500">
+                        Tip: <a href="{{ route('client.profile') }}" class="text-emerald-700 underline font-medium">Upload your company logo</a> in Profile → Company to include it on PDF reports.
+                    </p>
+                @endif
 
                 <div class="moccae-notice">
                     <strong>UAE official submission:</strong> {{ $report['methodology']['disclaimer'] }}
@@ -321,8 +348,10 @@
                                     @endif
                                 @endforeach
                                 <tr style="background: var(--brand-soft);">
-                                    <td style="padding: 0.875rem 1rem; font-weight: 700; color: var(--ink); border-top: 2px solid var(--brand);">Total</td>
-                                    <td class="text-right" style="padding: 0.875rem 1rem; font-weight: 700; color: var(--brand-darker); border-top: 2px solid var(--brand);">{{ number_format($totalTonnes, 2) }}</td>
+                                    <td style="padding: 0.875rem 1rem; font-weight: 700; color: var(--ink); border-top: 2px solid var(--brand);">
+                                        Total{{ $moccaeOnly ? ' (Scope 1 + 2)' : '' }}
+                                    </td>
+                                    <td class="text-right" style="padding: 0.875rem 1rem; font-weight: 700; color: var(--brand-darker); border-top: 2px solid var(--brand);">{{ number_format($displayTotal, 2) }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -457,10 +486,10 @@
             const ctx = document.getElementById('analysisPieChart');
 
             const scopeData = {
-                labels: ['Scope 1', 'Scope 2', 'Scope 3'],
+                labels: @json($moccaeOnly ? ['Scope 1', 'Scope 2'] : ['Scope 1', 'Scope 2', 'Scope 3']),
                 values: @json($scopePercentages),
                 raw: @json($scopeRawValues),
-                colors: ['#059669', '#0284c7', '#9333ea']
+                colors: @json($moccaeOnly ? ['#059669', '#0284c7'] : ['#059669', '#0284c7', '#9333ea'])
             };
 
             const emissionSourceData = {

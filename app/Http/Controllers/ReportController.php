@@ -62,11 +62,14 @@ class ReportController extends Controller
         }
 
         $report = $this->reportService->build($measurement);
+        $moccaeOnly = $request->boolean('moccae_only');
+        $report = $this->reportService->finalizeReport($report, $moccaeOnly);
 
         return view('reports.index', array_merge(
             compact('locations', 'fiscalYears', 'measurement', 'company'),
             [
                 'report' => $report,
+                'moccaeOnly' => $moccaeOnly,
                 'selectedFiscalYear' => $request->fiscal_year,
                 'selectedLocationId' => $request->location_id,
                 // Legacy keys for chart script
@@ -86,11 +89,15 @@ class ReportController extends Controller
         }
 
         $measurement = $this->findMeasurement($request, $company->id);
-        $report = $this->reportService->build($measurement);
+        $moccaeOnly = $request->boolean('moccae_only');
+        $report = $this->reportService->finalizeReport(
+            $this->reportService->build($measurement),
+            $moccaeOnly
+        );
 
         return Excel::download(
-            new ResultsBreakdownExport($report['results_breakdown']),
-            $this->reportFilename($measurement, 'xlsx')
+            new ResultsBreakdownExport($report['results_breakdown'], $report['display_total_tonnes']),
+            $this->reportFilename($measurement, 'xlsx', $moccaeOnly)
         );
     }
 
@@ -103,7 +110,11 @@ class ReportController extends Controller
         }
 
         $measurement = $this->findMeasurement($request, $company->id);
-        $report = $this->reportService->build($measurement);
+        $moccaeOnly = $request->boolean('moccae_only');
+        $report = $this->reportService->finalizeReport(
+            $this->reportService->build($measurement),
+            $moccaeOnly
+        );
 
         $scopeChart = $this->buildScopeChart($report);
         $sourceChart = $this->buildSourceChart($report);
@@ -113,13 +124,15 @@ class ReportController extends Controller
             'report' => $report,
             'scopeChart' => $scopeChart,
             'sourceChart' => $sourceChart,
+            'companyLogo' => $company->logoDataUri(),
+            'platformLogo' => $this->platformLogoDataUri(),
         ])->setPaper('a4', 'portrait')->setOptions([
             'isHtml5ParserEnabled' => true,
             'isRemoteEnabled' => true,
             'defaultFont' => 'dejavu sans',
         ]);
 
-        return $pdf->download($this->reportFilename($measurement, 'pdf'));
+        return $pdf->download($this->reportFilename($measurement, 'pdf', $moccaeOnly));
     }
 
     protected function findMeasurement(Request $request, int $companyId): Measurement
@@ -131,10 +144,12 @@ class ReportController extends Controller
             ->firstOrFail();
     }
 
-    protected function reportFilename(Measurement $measurement, string $ext): string
+    protected function reportFilename(Measurement $measurement, string $ext, bool $moccaeOnly = false): string
     {
         $location = preg_replace('/[^a-z0-9]+/i', '-', strtolower($measurement->location->name ?? 'location'));
-        return "ghg-inventory-{$measurement->fiscal_year}-{$location}.{$ext}";
+        $prefix = $moccaeOnly ? 'ghg-inventory-moccae' : 'ghg-inventory';
+
+        return "{$prefix}-{$measurement->fiscal_year}-{$location}.{$ext}";
     }
 
     protected function buildScopeChart(array $report): ?string
@@ -199,5 +214,25 @@ class ReportController extends Controller
     private function generateChartUrl(array $config): string
     {
         return 'https://quickchart.io/chart?c=' . urlencode(json_encode($config)) . '&w=500&h=280';
+    }
+
+    protected function platformLogoDataUri(): ?string
+    {
+        $candidates = [
+            public_path('images/menetzero.png'),
+            public_path('images/menetzero.jpg'),
+        ];
+
+        foreach ($candidates as $path) {
+            if (!is_file($path)) {
+                continue;
+            }
+
+            $mime = mime_content_type($path) ?: 'image/png';
+
+            return 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($path));
+        }
+
+        return null;
     }
 }

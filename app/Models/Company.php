@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Company extends Model
@@ -12,7 +13,7 @@ class Company extends Model
 
     protected $fillable = [
         'name', 'slug', 'email', 'phone',
-        'address', 'city', 'state', 'country', 'postal_code', 'website',
+        'address', 'city', 'state', 'country', 'postal_code', 'website', 'logo_path',
         'description', 'industry', 'business_subcategory', 'employee_count', 'annual_revenue', 'is_active', 'settings',
         // UAE additions
         'emirate', 'sector', 'license_no', 'contact_person',
@@ -162,5 +163,28 @@ class Company extends Model
     public function getRouteKeyName()
     {
         return 'slug';
+    }
+
+    public function getLogoUrlAttribute(): ?string
+    {
+        if (!$this->logo_path) {
+            return null;
+        }
+
+        return Storage::disk('public')->url($this->logo_path);
+    }
+
+    /** Base64 data URI for embedding in PDF exports (DomPDF). */
+    public function logoDataUri(): ?string
+    {
+        if (!$this->logo_path || !Storage::disk('public')->exists($this->logo_path)) {
+            return null;
+        }
+
+        $mime = Storage::disk('public')->mimeType($this->logo_path) ?: 'image/png';
+
+        return 'data:' . $mime . ';base64,' . base64_encode(
+            Storage::disk('public')->get($this->logo_path)
+        );
     }
 }
