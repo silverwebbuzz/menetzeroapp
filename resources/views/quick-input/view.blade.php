@@ -77,8 +77,8 @@
         <div class="px-6 py-4">
             <dl class="space-y-4">
                 <div class="flex items-center border-b border-gray-100 pb-3">
-                    <dt class="text-sm font-medium text-gray-500 w-1/3">Total CO2e</dt>
-                    <dd class="text-2xl font-bold text-purple-600 flex-1">{{ number_format($entry->calculated_co2e, 2) }} kg</dd>
+                    <dt class="text-sm font-medium text-gray-500 w-1/3">Total Emissions</dt>
+                    <dd class="text-2xl font-bold text-purple-600 flex-1">{{ co2e_t($entry->calculated_co2e, 4) }} <span class="text-sm font-medium text-gray-500">tCO₂e</span></dd>
                 </div>
                 @if($entry->co2_emissions !== null)
                 <div class="flex items-center border-b border-gray-100 pb-3">

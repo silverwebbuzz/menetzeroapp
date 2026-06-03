@@ -258,16 +258,16 @@
                         <div class="text-xl font-bold">{{ number_format($emissionFactor->factor_value, 6) }}</div>
                     </div>
                     <div>
-                        <div class="text-sm text-teal-100">New CO2e</div>
+                        <div class="text-sm text-teal-100">New tCO₂e</div>
                         <div class="text-2xl font-bold" id="preview-co2e">
                             @if($existingData && $existingData->has('quantity'))
                                 @php
                                     $quantity = $existingData['quantity']->field_value ?? 0;
                                     $co2e = $quantity * $emissionFactor->factor_value;
                                 @endphp
-                                {{ number_format($co2e, 2) }}t
+                                {{ co2e_t($co2e, 4) }} tCO₂e
                             @else
-                                0.00t
+                                0.0000 tCO₂e
                             @endif
                         </div>
                     </div>
@@ -319,10 +319,11 @@ document.addEventListener('DOMContentLoaded', function() {
         function updatePreview() {
             if (quantityInput && previewQuantity && previewCo2e) {
                 const quantity = parseFloat(quantityInput.value) || 0;
-                const co2e = quantity * emissionFactor;
+                const co2eKg = quantity * emissionFactor;
+                const co2eTonnes = co2eKg / 1000;
                 
                 previewQuantity.textContent = quantity.toFixed(2);
-                previewCo2e.textContent = co2e.toFixed(2) + 't';
+                previewCo2e.textContent = co2eTonnes.toFixed(4) + ' tCO₂e';
             }
         }
         

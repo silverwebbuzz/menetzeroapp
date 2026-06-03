@@ -87,7 +87,7 @@
                     </div>
                     <div class="text-right flex-shrink-0">
                         <div class="text-xs uppercase tracking-wider text-slate-500 font-medium">Total CO₂e</div>
-                        <div class="font-semibold text-brand-dark">{{ number_format($yearGroups->flatten()->sum('total_co2e'), 2) }} <span class="text-xs font-medium text-slate-400">kg</span></div>
+                        <div class="font-semibold text-brand-dark">{{ co2e_t($yearGroups->flatten()->sum('total_co2e')) }} <span class="text-xs font-medium text-slate-400">tCO₂e</span></div>
                     </div>
                 </div>
 
@@ -100,7 +100,7 @@
                                     <h3 class="text-sm font-semibold text-slate-900">Fiscal Year {{ $year }}</h3>
                                     <div class="flex items-center gap-4 text-xs text-slate-500">
                                         <span>{{ $yearMeasurements->count() }} measurement(s)</span>
-                                        <span class="text-brand-dark font-medium">{{ number_format($yearMeasurements->sum('total_co2e'), 2) }} kg CO₂e</span>
+                                        <span class="text-brand-dark font-medium">{{ co2e_t($yearMeasurements->sum('total_co2e')) }} tCO₂e</span>
                                     </div>
                                 </div>
 
@@ -126,7 +126,7 @@
                                             @endswitch
                                             <div class="text-right">
                                                 <div class="text-xs uppercase tracking-wider text-slate-500 font-medium">CO₂e</div>
-                                                <div class="text-sm font-semibold text-slate-900">{{ number_format($measurement->total_co2e, 2) }} <span class="text-xs font-medium text-slate-400">kg</span></div>
+                                                <div class="text-sm font-semibold text-slate-900">{{ co2e_t($measurement->total_co2e) }} <span class="text-xs font-medium text-slate-400">tCO₂e</span></div>
                                             </div>
                                         </div>
 

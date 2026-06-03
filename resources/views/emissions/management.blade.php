@@ -149,7 +149,7 @@
                                             {{ $emission->reporting_year }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ number_format($emission->grand_total ?? 0, 2) }} kg CO₂e
+                                            {{ co2e_t($emission->grand_total ?? 0) }} tCO₂e
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             @switch($emission->status)

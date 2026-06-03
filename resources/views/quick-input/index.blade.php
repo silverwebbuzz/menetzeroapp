@@ -206,16 +206,16 @@
             <p class="text-2xl font-bold text-gray-900 mt-2">{{ number_format($summary->total_entries ?? 0) }}</p>
         </div>
         <div class="bg-white rounded-lg shadow p-6">
-            <h3 class="text-sm font-medium text-gray-500">Total CO2e</h3>
-            <p class="text-2xl font-bold text-gray-900 mt-2">{{ number_format($summary->total_co2e ?? 0, 2) }} kg</p>
+            <h3 class="text-sm font-medium text-gray-500">Total Emissions</h3>
+            <p class="text-2xl font-bold text-gray-900 mt-2">{{ co2e_t($summary->total_co2e ?? 0) }} <span class="text-sm font-normal text-gray-500">tCO₂e</span></p>
         </div>
         <div class="bg-white rounded-lg shadow p-6">
             <h3 class="text-sm font-medium text-gray-500">Scope 1</h3>
-            <p class="text-2xl font-bold text-gray-900 mt-2">{{ number_format($summary->scope_1_co2e ?? 0, 2) }} kg</p>
+            <p class="text-2xl font-bold text-gray-900 mt-2">{{ co2e_t($summary->scope_1_co2e ?? 0) }} <span class="text-sm font-normal text-gray-500">tCO₂e</span></p>
         </div>
         <div class="bg-white rounded-lg shadow p-6">
             <h3 class="text-sm font-medium text-gray-500">Scope 2</h3>
-            <p class="text-2xl font-bold text-gray-900 mt-2">{{ number_format($summary->scope_2_co2e ?? 0, 2) }} kg</p>
+            <p class="text-2xl font-bold text-gray-900 mt-2">{{ co2e_t($summary->scope_2_co2e ?? 0) }} <span class="text-sm font-normal text-gray-500">tCO₂e</span></p>
         </div>
     </div>
     @endif
@@ -281,7 +281,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CO2e (kg)</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">tCO₂e</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Scope</th>
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
@@ -342,7 +342,7 @@
                                 {{ $entry->unit }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {{ number_format($entry->calculated_co2e, 2) }}
+                                {{ co2e_t($entry->calculated_co2e, 4) }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">{{ $entry->scope }}</span>

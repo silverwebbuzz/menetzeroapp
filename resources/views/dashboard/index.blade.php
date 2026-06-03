@@ -324,7 +324,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
         <div class="stat-card" style="background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%); border-color: var(--brand-dark); color: white;">
             <div class="stat-card-label" style="color: rgba(255,255,255,0.85);">Total Emissions</div>
-            <div class="stat-card-value" style="color: white;">{{ number_format($kpis['total_emissions'] ?? 0, 2) }}<span style="font-size: 0.75rem; font-weight: 500; margin-left: 0.25rem; opacity: 0.85;">kg CO₂e</span></div>
+            <div class="stat-card-value" style="color: white;">{{ co2e_t($kpis['total_emissions'] ?? 0) }}<span style="font-size: 0.75rem; font-weight: 500; margin-left: 0.25rem; opacity: 0.85;">tCO₂e</span></div>
             <div class="stat-card-delta" style="color: rgba(255,255,255,0.9);">
                 @if(($kpis['monthly_change'] ?? 0) > 0)
                     ↗ {{ $kpis['monthly_change'] ?? 0 }}% vs last month
@@ -338,19 +338,19 @@
 
         <div class="stat-card">
             <div class="stat-card-label">Scope 1</div>
-            <div class="stat-card-value">{{ number_format($kpis['scope1_total'] ?? 0, 2) }}<span class="text-slate-400 text-xs font-medium ml-1">kg CO₂e</span></div>
+            <div class="stat-card-value">{{ co2e_t($kpis['scope1_total'] ?? 0) }}<span class="text-slate-400 text-xs font-medium ml-1">tCO₂e</span></div>
             <div class="stat-card-delta">Direct emissions</div>
         </div>
 
         <div class="stat-card">
             <div class="stat-card-label">Scope 2</div>
-            <div class="stat-card-value">{{ number_format($kpis['scope2_total'] ?? 0, 2) }}<span class="text-slate-400 text-xs font-medium ml-1">kg CO₂e</span></div>
+            <div class="stat-card-value">{{ co2e_t($kpis['scope2_total'] ?? 0) }}<span class="text-slate-400 text-xs font-medium ml-1">tCO₂e</span></div>
             <div class="stat-card-delta">Purchased energy</div>
         </div>
 
         <div class="stat-card">
             <div class="stat-card-label">Scope 3</div>
-            <div class="stat-card-value">{{ number_format($kpis['scope3_total'] ?? 0, 2) }}<span class="text-slate-400 text-xs font-medium ml-1">kg CO₂e</span></div>
+            <div class="stat-card-value">{{ co2e_t($kpis['scope3_total'] ?? 0) }}<span class="text-slate-400 text-xs font-medium ml-1">tCO₂e</span></div>
             <div class="stat-card-delta">Other indirect</div>
         </div>
     </div>
@@ -438,9 +438,9 @@
                                 <div class="text-xs text-slate-500 mt-0.5">{{ $source['period'] }} · {{ ucfirst($source['status']) }}</div>
                             </div>
                             <div class="text-right flex-shrink-0">
-                                <div class="font-semibold text-slate-900">{{ number_format($source['emissions'], 2) }} <span class="text-slate-400 text-xs font-medium">kg CO₂e</span></div>
+                                <div class="font-semibold text-slate-900">{{ co2e_t($source['emissions']) }} <span class="text-slate-400 text-xs font-medium">tCO₂e</span></div>
                                 <div class="text-xs text-slate-500 mt-0.5">
-                                    S1 {{ number_format($source['scope1'], 0) }} · S2 {{ number_format($source['scope2'], 0) }} · S3 {{ number_format($source['scope3'], 0) }}
+                                    S1 {{ co2e_t($source['scope1']) }} · S2 {{ co2e_t($source['scope2']) }} · S3 {{ co2e_t($source['scope3']) }}
                                 </div>
                             </div>
                         </div>
@@ -482,7 +482,7 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="text-sm font-medium text-slate-900 truncate">{{ $activity->location->name ?? 'Unknown Location' }}</div>
-                                <div class="text-xs text-slate-500">{{ $activity->created_at->format('M d, Y') }} · {{ number_format($activity->total_co2e ?? 0, 2) }} kg CO₂e</div>
+                                <div class="text-xs text-slate-500">{{ $activity->created_at->format('M d, Y') }} · {{ co2e_t($activity->total_co2e ?? 0) }} tCO₂e</div>
                             </div>
                             <div class="flex-shrink-0">
                                 @if($activity->status === 'draft')
@@ -558,8 +558,8 @@ document.addEventListener('DOMContentLoaded', function() {
     data: {
                 labels: {!! json_encode($chartData['monthly_labels'] ?? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']) !!},
         datasets: [{
-                    label: 'Total Emissions',
-                    data: {!! json_encode($chartData['monthly_emissions'] ?? [0, 0, 0, 0, 0, 0]) !!},
+                    label: 'Total Emissions (tCO₂e)',
+                    data: {!! json_encode(collect($chartData['monthly_emissions'] ?? [])->map(fn ($v) => co2e_tonne($v))->values()->all()) !!},
             borderColor: '#26A69A',
             backgroundColor: 'rgba(38, 166, 154, 0.1)',
                     tension: 0.4,
@@ -599,11 +599,11 @@ document.addEventListener('DOMContentLoaded', function() {
     data: {
                 labels: ['Scope 1', 'Scope 2', 'Scope 3'],
         datasets: [{
-                    data: [
-                        {{ $kpis['scope1_total'] ?? 0 }},
-                        {{ $kpis['scope2_total'] ?? 0 }},
-                        {{ $kpis['scope3_total'] ?? 0 }}
-                    ],
+                    data: {!! json_encode([
+                        co2e_tonne($kpis['scope1_total'] ?? 0),
+                        co2e_tonne($kpis['scope2_total'] ?? 0),
+                        co2e_tonne($kpis['scope3_total'] ?? 0),
+                    ]) !!},
                     backgroundColor: ['#10b981', '#34d399', '#6ee7b7'],
                     borderColor: '#ffffff',
                     borderWidth: 2

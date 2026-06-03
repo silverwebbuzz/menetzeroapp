@@ -33,8 +33,8 @@
                     <h4 class="text-sm font-medium text-amber-800">Scope 1</h4>
                     <span class="text-xs text-amber-600">Direct Emissions</span>
                 </div>
-                <p class="text-2xl font-bold text-amber-900">{{ number_format($emissionSource->scope1_total ?? 0, 2) }}</p>
-                <p class="text-xs text-amber-600">kg CO₂e</p>
+                <p class="text-2xl font-bold text-amber-900">{{ co2e_t($emissionSource->scope1_total ?? 0) }}</p>
+                <p class="text-xs text-amber-600">tCO₂e</p>
             </div>
 
             <!-- Scope 2 -->
@@ -43,8 +43,8 @@
                     <h4 class="text-sm font-medium text-green-800">Scope 2</h4>
                     <span class="text-xs text-green-600">Purchased Energy</span>
                 </div>
-                <p class="text-2xl font-bold text-green-900">{{ number_format($emissionSource->scope2_total ?? 0, 2) }}</p>
-                <p class="text-xs text-green-600">kg CO₂e</p>
+                <p class="text-2xl font-bold text-green-900">{{ co2e_t($emissionSource->scope2_total ?? 0) }}</p>
+                <p class="text-xs text-green-600">tCO₂e</p>
             </div>
 
             <!-- Scope 3 -->
@@ -53,8 +53,8 @@
                     <h4 class="text-sm font-medium text-purple-800">Scope 3</h4>
                     <span class="text-xs text-purple-600">Other Indirect</span>
                 </div>
-                <p class="text-2xl font-bold text-purple-900">{{ number_format($emissionSource->scope3_total ?? 0, 2) }}</p>
-                <p class="text-xs text-purple-600">kg CO₂e</p>
+                <p class="text-2xl font-bold text-purple-900">{{ co2e_t($emissionSource->scope3_total ?? 0) }}</p>
+                <p class="text-xs text-purple-600">tCO₂e</p>
             </div>
         </div>
 
@@ -63,8 +63,8 @@
             <div class="flex items-center justify-between">
                 <h4 class="text-lg font-semibold text-gray-900">Total Emissions</h4>
                 <div class="text-right">
-                    <p class="text-3xl font-bold text-gray-900">{{ number_format($emissionSource->grand_total ?? 0, 2) }}</p>
-                    <p class="text-sm text-gray-600">kg CO₂e</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ co2e_t($emissionSource->grand_total ?? 0) }}</p>
+                    <p class="text-sm text-gray-600">tCO₂e</p>
                 </div>
             </div>
         </div>
@@ -103,7 +103,7 @@
                 @if($emissionSource->other_emissions)
                     <div class="flex justify-between">
                         <span class="text-amber-700">Other:</span>
-                        <span class="text-amber-900">{{ number_format($emissionSource->other_emissions, 2) }} kg CO₂e</span>
+                        <span class="text-amber-900">{{ co2e_t($emissionSource->other_emissions) }} tCO₂e</span>
                     </div>
                 @endif
             </div>
@@ -159,7 +159,7 @@
                 @if($emissionSource->purchased_goods)
                     <div class="flex justify-between">
                         <span class="text-purple-700">Purchased Goods:</span>
-                        <span class="text-purple-900">{{ number_format($emissionSource->purchased_goods, 2) }} kg CO₂e</span>
+                        <span class="text-purple-900">{{ co2e_t($emissionSource->purchased_goods) }} tCO₂e</span>
                     </div>
                 @endif
             </div>

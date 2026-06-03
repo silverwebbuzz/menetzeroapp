@@ -314,8 +314,8 @@
                         <div class="text-2xl font-bold">{{ number_format($emissionFactor->factor_value, 6) }}</div>
                     </div>
                     <div>
-                        <div class="text-sm text-teal-100">Total CO2e</div>
-                        <div class="text-3xl font-bold" id="preview-co2e">0.00t</div>
+                        <div class="text-sm text-teal-100">Total tCO₂e</div>
+                        <div class="text-3xl font-bold" id="preview-co2e">0.0000 tCO₂e</div>
                     </div>
                 </div>
             </div>
@@ -348,10 +348,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         function updatePreview() {
             const quantity = parseFloat(quantityInput.value) || 0;
-            const co2e = quantity * emissionFactor;
+            const co2eKg = quantity * emissionFactor;
+            const co2eTonnes = co2eKg / 1000;
             
             previewQuantity.textContent = quantity.toFixed(2);
-            previewCo2e.textContent = co2e.toFixed(2) + 't';
+            previewCo2e.textContent = co2eTonnes.toFixed(4) + ' tCO₂e';
         }
         
         quantityInput.addEventListener('input', updatePreview);

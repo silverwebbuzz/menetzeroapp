@@ -106,9 +106,9 @@
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Total Emissions</h3>
                 <div class="text-3xl font-bold text-emerald-600">
-                    {{ number_format($emission->grand_total ?? 0, 2) }}
+                    {{ co2e_t($emission->grand_total ?? 0) }}
                 </div>
-                <p class="text-sm text-gray-600">kg CO₂e</p>
+                <p class="text-sm text-gray-600">tCO₂e</p>
             </div>
         </div>
 
@@ -118,7 +118,7 @@
             <div class="bg-amber-50 border border-amber-200 rounded-lg p-6">
                 <h3 class="text-lg font-semibold text-amber-800 mb-4">Scope 1: Direct Emissions</h3>
                 <div class="text-2xl font-bold text-amber-900 mb-4">
-                    {{ number_format($emission->scope1_total ?? 0, 2) }} kg CO₂e
+                    {{ co2e_t($emission->scope1_total ?? 0) }} tCO₂e
                 </div>
                 <div class="space-y-2 text-sm">
                     @if($emission->diesel_litres)
@@ -148,7 +148,7 @@
                     @if($emission->other_emissions)
                         <div class="flex justify-between">
                             <span class="text-amber-700">Other:</span>
-                            <span class="text-amber-900">{{ number_format($emission->other_emissions, 2) }} kg CO₂e</span>
+                            <span class="text-amber-900">{{ co2e_t($emission->other_emissions) }} tCO₂e</span>
                         </div>
                     @endif
                 </div>
@@ -158,7 +158,7 @@
             <div class="bg-green-50 border border-green-200 rounded-lg p-6">
                 <h3 class="text-lg font-semibold text-green-800 mb-4">Scope 2: Purchased Energy</h3>
                 <div class="text-2xl font-bold text-green-900 mb-4">
-                    {{ number_format($emission->scope2_total ?? 0, 2) }} kg CO₂e
+                    {{ co2e_t($emission->scope2_total ?? 0) }} tCO₂e
                 </div>
                 <div class="space-y-2 text-sm">
                     @if($emission->electricity_kwh)
@@ -180,7 +180,7 @@
             <div class="bg-purple-50 border border-purple-200 rounded-lg p-6">
                 <h3 class="text-lg font-semibold text-purple-800 mb-4">Scope 3: Other Indirect</h3>
                 <div class="text-2xl font-bold text-purple-900 mb-4">
-                    {{ number_format($emission->scope3_total ?? 0, 2) }} kg CO₂e
+                    {{ co2e_t($emission->scope3_total ?? 0) }} tCO₂e
                 </div>
                 <div class="space-y-2 text-sm">
                     @if($emission->business_travel_flights_km)
@@ -210,7 +210,7 @@
                     @if($emission->purchased_goods)
                         <div class="flex justify-between">
                             <span class="text-purple-700">Purchased Goods:</span>
-                            <span class="text-purple-900">{{ number_format($emission->purchased_goods, 2) }} kg CO₂e</span>
+                            <span class="text-purple-900">{{ co2e_t($emission->purchased_goods) }} tCO₂e</span>
                         </div>
                     @endif
                 </div>
@@ -282,6 +282,10 @@ function hideBreakdown() {
     document.getElementById('breakdownModal').classList.add('hidden');
 }
 
+function formatCo2eT(kg, decimals = 4) {
+    return ((parseFloat(kg) || 0) / 1000).toFixed(decimals) + ' tCO₂e';
+}
+
 function displayBreakdown(breakdown, totals) {
     let html = '<div class="space-y-4">';
     
@@ -308,7 +312,7 @@ function displayBreakdown(breakdown, totals) {
                 html += `<div class="flex justify-between items-center py-2 border-b border-gray-100">`;
                 html += `<div>`;
                 html += `<span class="font-medium text-gray-700">${item.key.replace('_', ' ').toUpperCase()}</span><br>`;
-                html += `<span class="text-sm text-gray-500">${item.quantity} ${item.unit} × ${item.factor} = ${item.co2e.toFixed(2)} kg CO₂e</span>`;
+                html += `<span class="text-sm text-gray-500">${item.quantity} ${item.unit} × ${item.factor} = ${formatCo2eT(item.co2e)}</span>`;
                 html += `</div>`;
                 html += `</div>`;
             });
@@ -322,10 +326,10 @@ function displayBreakdown(breakdown, totals) {
     html += '<div class="bg-gray-50 rounded-lg p-4 mt-4">';
     html += '<h4 class="font-semibold text-gray-900 mb-3">Totals</h4>';
     html += '<div class="grid grid-cols-2 gap-4">';
-    html += `<div><span class="text-sm text-gray-600">Scope 1:</span> <span class="font-medium">${totals.scope1.toFixed(2)} kg CO₂e</span></div>`;
-    html += `<div><span class="text-sm text-gray-600">Scope 2:</span> <span class="font-medium">${totals.scope2.toFixed(2)} kg CO₂e</span></div>`;
-    html += `<div><span class="text-sm text-gray-600">Scope 3:</span> <span class="font-medium">${totals.scope3.toFixed(2)} kg CO₂e</span></div>`;
-    html += `<div><span class="text-sm text-gray-600">Total:</span> <span class="font-bold text-lg">${totals.grand_total.toFixed(2)} kg CO₂e</span></div>`;
+    html += `<div><span class="text-sm text-gray-600">Scope 1:</span> <span class="font-medium">${formatCo2eT(totals.scope1, 2)}</span></div>`;
+    html += `<div><span class="text-sm text-gray-600">Scope 2:</span> <span class="font-medium">${formatCo2eT(totals.scope2, 2)}</span></div>`;
+    html += `<div><span class="text-sm text-gray-600">Scope 3:</span> <span class="font-medium">${formatCo2eT(totals.scope3, 2)}</span></div>`;
+    html += `<div><span class="text-sm text-gray-600">Total:</span> <span class="font-bold text-lg">${formatCo2eT(totals.grand_total, 2)}</span></div>`;
     html += '</div>';
     html += '</div>';
     

@@ -8,6 +8,7 @@ use App\Models\Company;
 use App\Models\Facility;
 use App\Models\Measurement;
 use App\Models\MasterIndustryCategory;
+use App\Services\GhgReportService;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -296,7 +297,7 @@ class DashboardController extends Controller
                 
             $monthlyData->put($monthKey, [
                 'label' => $monthLabel,
-                'emissions' => round($monthlyEmissions, 2)
+                'emissions' => round($monthlyEmissions, 2),
             ]);
         }
 
@@ -304,7 +305,7 @@ class DashboardController extends Controller
         $monthlyLabels = $monthlyData->pluck('label')->toArray();
         $monthlyEmissions = $monthlyData->pluck('emissions')->toArray();
 
-        // Emissions by scope
+        // Emissions by scope (stored kg — converted to tCO₂e in views/charts)
         $scopeBreakdown = [
             'Scope 1' => $measurements->sum('scope_1_co2e') ?? 0,
             'Scope 2' => $measurements->sum('scope_2_co2e') ?? 0,
@@ -314,9 +315,7 @@ class DashboardController extends Controller
         // Top locations
         $locationBreakdown = $measurements
             ->groupBy('location.name')
-            ->map(function($group) {
-                return $group->sum('total_co2e');
-            })
+            ->map(fn ($group) => $group->sum('total_co2e'))
             ->sortDesc()
             ->take(5);
 
@@ -333,7 +332,7 @@ class DashboardController extends Controller
         // UAE Net Zero 2050 target: Assume baseline of 1000 tonnes CO2e per company
         $baseline = 1000; // tonnes CO2e
         $target = 0; // Net zero
-        $current = $totalEmissions / 1000; // Convert kg to tonnes
+        $current = GhgReportService::kgToTonnes($totalEmissions);
         
         $progress = max(0, min(100, (($baseline - $current) / $baseline) * 100));
         
