@@ -151,6 +151,31 @@ class QuickInputController extends Controller
     }
 
     /**
+     * Layman-friendly Scope 1 & 2 data help guide (what to enter, units, where to find UAE bills).
+     */
+    public function helpGuide()
+    {
+        $this->requirePermission('measurements.view', null, ['measurements.*', 'manage_measurements']);
+
+        $user = Auth::user();
+        $company = $user->getActiveCompany();
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+
+        $intro = \App\Data\Scope12HelpGuide::intro();
+        $categories = \App\Data\Scope12HelpGuide::categories();
+        $columns = \App\Data\Scope12HelpGuide::columnHelp();
+
+        $locations = Location::where('company_id', $company->id)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->pluck('name');
+
+        return view('quick-input.help-guide', compact('intro', 'categories', 'columns', 'locations'));
+    }
+
+    /**
      * Show Quick Input form for a specific emission source
      */
     public function show($scope, $slug, Request $request)

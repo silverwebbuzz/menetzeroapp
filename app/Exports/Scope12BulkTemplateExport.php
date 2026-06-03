@@ -15,6 +15,7 @@ class Scope12BulkTemplateExport implements WithMultipleSheets
     {
         $sheets = [
             new Scope12InstructionsSheet(),
+            new Scope12DataGuideSheet(),
             new Scope12DataSheet('Data Entry', []),
             new Scope12DataSheet('Examples', Scope12BulkImportService::sampleRows()),
             new Scope12ReferenceSheet(),

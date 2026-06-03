@@ -6,9 +6,16 @@
 @section('content')
 <div class="w-full">
     <!-- Header -->
-    <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-900">Input data</h1>
-        <p class="mt-2 text-gray-600">View and manage your emission data entries.</p>
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Input data</h1>
+            <p class="mt-2 text-gray-600">View and manage your emission data entries.</p>
+        </div>
+        <a href="{{ route('quick-input.help-guide') }}"
+           class="inline-flex items-center px-4 py-2 text-sm font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 whitespace-nowrap">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Scope 1 &amp; 2 Help Guide
+        </a>
     </div>
 
     @if(session('success'))
@@ -45,18 +52,23 @@
     @endif
 
     <!-- Bulk Import — Scope 1 & 2 -->
-    <div class="mb-8 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-6">
+    <div id="bulk-import" class="mb-8 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-6">
         <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
             <div class="flex-1">
                 <h2 class="text-xl font-bold text-gray-900 mb-2">Bulk import — Scope 1 &amp; 2</h2>
                 <p class="text-gray-600 text-sm mb-3">
-                    Not sure how to fill each form? Download our template, add your data in Excel or CSV, then upload once —
-                    no need to enter row by row.
+                    First time? Read the <a href="{{ route('quick-input.help-guide') }}" class="text-emerald-700 font-semibold underline hover:text-emerald-900">Scope 1 &amp; 2 Help Guide</a> first —
+                    it explains every field, which unit to use, and where to find numbers on DEWA bills, fuel receipts, etc.
                 </p>
+                <a href="{{ route('quick-input.help-guide') }}"
+                   class="inline-flex items-center mb-4 px-4 py-2.5 bg-white border-2 border-emerald-500 text-emerald-800 text-sm font-semibold rounded-lg hover:bg-emerald-50 transition-colors shadow-sm">
+                    <svg class="w-5 h-5 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Open Help Guide — what data do I need?
+                </a>
                 <ul class="text-sm text-gray-600 space-y-1 list-disc list-inside">
-                    <li><strong>Excel (recommended)</strong> — Instructions, blank sheet, examples, and your location names in one file</li>
+                    <li><strong>Excel (recommended)</strong> — Instructions, Data Guide, examples, blank sheet, your locations</li>
                     <li><strong>CSV</strong> — Blank template or sample file with dummy data</li>
-                    <li>One row = one activity (electricity bill, diesel, vehicle km, refrigerant top-up, etc.)</li>
+                    <li>One row = one bill (e.g. January DEWA invoice)</li>
                 </ul>
             </div>
             <div class="flex flex-col gap-2 min-w-[220px]">

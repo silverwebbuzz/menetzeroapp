@@ -107,6 +107,8 @@ class Scope12BulkImportService
             ['3. Open "Examples" — see one sample row per activity type (all Scope 1 & 2 categories covered).'],
             ['4. Fill the "Data Entry" sheet — copy/adapt examples, one row per bill or activity.'],
             ['5. Upload from MENetZero → Input Data → Bulk Import.'],
+            ['6. For full explanations (where to find each number on UAE bills), open:'],
+            ['   MENetZero → Input Data → "Scope 1 & 2 Help Guide" (in the app)'],
             [''],
             ['WHERE UAE CLIENTS FIND THE NUMBERS'],
             ['• Electricity (Scope 2) — Total kWh on DEWA, ADDC, or SEWA bill. Set region = Dubai / Abu Dhabi / UAE'],
@@ -516,7 +518,7 @@ class Scope12BulkImportService
 
         foreach ($sheets as $title => $rows) {
             $lower = strtolower($title);
-            if (in_array($lower, ['instructions', 'reference', 'your locations', 'examples'], true)) {
+            if (in_array($lower, ['instructions', 'reference', 'your locations', 'examples', 'data guide'], true)) {
                 continue;
             }
             if (!empty($rows)) {
