@@ -22,21 +22,24 @@ class ResultsBreakdownExport implements FromCollection, WithHeadings, WithStyles
         $grandTotal = 0;
 
         foreach ($this->resultsBreakdown as $scope) {
+            $scopeTonnes = $scope['tonnes'] ?? ($scope['value'] ?? 0);
+
             // Scope row
             $data->push([
                 'Scope Name' => $scope['name'],
                 'Emission Source' => null,
-                'Results (tCO₂e)' => number_format($scope['value'], 2, '.', ''),
+                'Results (tCO₂e)' => number_format($scopeTonnes, 2, '.', ''),
             ]);
 
-            $grandTotal += $scope['value'];
+            $grandTotal += $scopeTonnes;
 
             // Children rows
             foreach ($scope['children'] as $child) {
+                $childTonnes = $child['tonnes'] ?? ($child['value'] ?? 0);
                 $data->push([
                     'Scope Name' => null,
                     'Emission Source' => $child['name'],
-                    'Results (tCO₂e)' => number_format($child['value'], 2, '.', ''),
+                    'Results (tCO₂e)' => number_format($childTonnes, 2, '.', ''),
                 ]);
             }
         }

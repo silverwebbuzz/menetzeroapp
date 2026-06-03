@@ -1,166 +1,477 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Emissions Report</title>
-
+    <title>GHG Inventory Report — {{ $company->name }}</title>
     <style>
+        @page { margin: 28mm 18mm 22mm 18mm; }
+
+        * { box-sizing: border-box; }
+
         body {
             font-family: DejaVu Sans, sans-serif;
-            font-size: 12px;
-            color: #333;
-            margin: 30px;
+            font-size: 10px;
+            color: #1f2937;
+            line-height: 1.45;
         }
 
-        h1 {
+        .brand-bar {
+            height: 4px;
+            background: #059669;
+            margin-bottom: 14px;
+        }
+
+        .report-header {
+            border-bottom: 2px solid #059669;
+            padding-bottom: 12px;
+            margin-bottom: 18px;
+        }
+
+        .report-title {
             font-size: 20px;
-            margin-bottom: 5px;
+            font-weight: bold;
+            color: #065f46;
+            margin: 0 0 4px 0;
+        }
+
+        .report-subtitle {
+            font-size: 11px;
+            color: #6b7280;
+            margin: 0;
+        }
+
+        .meta-grid {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        .meta-grid td {
+            padding: 4px 8px 4px 0;
+            vertical-align: top;
+            width: 50%;
+        }
+
+        .meta-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: #9ca3af;
+            font-weight: bold;
+        }
+
+        .meta-value {
+            font-size: 11px;
+            color: #111827;
+            font-weight: bold;
         }
 
         h2 {
-            font-size: 16px;
-            margin-top: 30px;
-            margin-bottom: 10px;
+            font-size: 13px;
+            color: #065f46;
+            border-bottom: 1px solid #d1fae5;
+            padding-bottom: 4px;
+            margin: 22px 0 10px 0;
         }
 
-        .text-muted {
-            color: #666;
+        h3 {
+            font-size: 11px;
+            color: #374151;
+            margin: 14px 0 6px 0;
         }
 
-        .header {
-            border-bottom: 2px solid #6b46c1;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
+        .kpi-row {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 8px 0;
+            margin: 0 -8px 16px -8px;
         }
 
-        .summary-box {
-            background: #f7f5ff;
-            border: 1px solid #d6ccff;
-            padding: 15px;
-            margin-bottom: 20px;
+        .kpi-cell {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 4px;
+            padding: 10px 12px;
+            text-align: center;
+            width: 25%;
         }
 
-        table {
+        .kpi-cell.highlight {
+            background: #ecfdf5;
+            border-color: #059669;
+        }
+
+        .kpi-label {
+            font-size: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6b7280;
+            font-weight: bold;
+        }
+
+        .kpi-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #059669;
+            margin-top: 2px;
+        }
+
+        .kpi-unit {
+            font-size: 9px;
+            color: #6b7280;
+        }
+
+        table.data-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            margin-top: 6px;
         }
 
-        th, td {
-            padding: 8px 10px;
-            border: 1px solid #ddd;
+        table.data-table th,
+        table.data-table td {
+            padding: 6px 8px;
+            border: 1px solid #e5e7eb;
+            vertical-align: top;
         }
 
-        th {
-            background: #f1f1f1;
-            text-align: left;
+        table.data-table th {
+            background: #f3f4f6;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #374151;
+            font-weight: bold;
         }
 
-        .text-right {
+        table.data-table td.num {
             text-align: right;
+            white-space: nowrap;
         }
 
-        .scope-row {
-            background: #fafafa;
+        tr.scope-row td {
+            background: #f9fafb;
             font-weight: bold;
         }
 
-        .total-row {
-            background: #e9e9ff;
+        tr.total-row td {
+            background: #ecfdf5;
+            font-weight: bold;
+            border-top: 2px solid #059669;
+        }
+
+        tr.subtotal-row td {
+            background: #f0fdf4;
             font-weight: bold;
         }
+
+        .chart-wrap {
+            text-align: center;
+            margin: 10px 0 14px 0;
+        }
+
+        .chart-wrap img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .two-col {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .two-col td {
+            width: 50%;
+            vertical-align: top;
+            padding-right: 10px;
+        }
+
+        .notice-box {
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-left: 4px solid #f59e0b;
+            padding: 10px 12px;
+            margin-top: 14px;
+            font-size: 9px;
+            color: #78350f;
+        }
+
+        .methodology-box {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            padding: 10px 12px;
+            margin-top: 8px;
+            font-size: 9px;
+        }
+
+        .methodology-box ul {
+            margin: 4px 0 0 0;
+            padding-left: 16px;
+        }
+
+        .methodology-box li {
+            margin-bottom: 3px;
+        }
+
+        .text-muted { color: #6b7280; }
+        .text-small { font-size: 8px; }
+        .page-break { page-break-before: always; }
 
         footer {
             position: fixed;
-            bottom: -20px;
+            bottom: -14mm;
             left: 0;
             right: 0;
             text-align: center;
-            font-size: 10px;
-            color: #888;
+            font-size: 8px;
+            color: #9ca3af;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 4px;
         }
     </style>
 </head>
-
 <body>
 
-    {{-- HEADER --}}
-    <div class="header">
-        <h1>Carbon Emissions Report</h1>
-        <p class="text-muted">
-            {{ $company->name }} |
-            Fiscal Year: {{ $measurement->fiscal_year }}
-        </p>
-    </div>
+@php
+    $location = $report['location'];
+    $methodology = $report['methodology'];
+    $totalTonnes = $report['total_tonnes'];
+    $scopeTonnes = $report['scope_tonnes'];
+@endphp
 
-    {{-- SUMMARY --}}
-    <div class="summary-box">
-        <strong>Total Emissions:</strong>
-        <span style="font-size:16px;">
-            {{ number_format($total, 2) }} tCO<sub>2</sub>e
-        </span>
-    </div>
+<div class="brand-bar"></div>
 
-    {{-- SCOPE SUMMARY --}}
-    <h2>Scope Summary</h2>
-    <div style="text-align:center; margin:20px 0;">
-        <img src="{{ $scopeChart }}" width="600" alt="Scope Chart">
+{{-- Cover / Header --}}
+<div class="report-header">
+    <p class="report-title">Greenhouse Gas (GHG) Inventory Report</p>
+    <p class="report-subtitle">Scope 1 &amp; 2 emissions summary — UAE corporate reporting format</p>
+
+    <table class="meta-grid">
+        <tr>
+            <td>
+                <div class="meta-label">Organisation</div>
+                <div class="meta-value">{{ $company->name }}</div>
+            </td>
+            <td>
+                <div class="meta-label">Reporting location</div>
+                <div class="meta-value">{{ $location->name ?? '—' }}</div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="meta-label">Reporting period</div>
+                <div class="meta-value">{{ $report['reporting_period'] }}</div>
+            </td>
+            <td>
+                <div class="meta-label">Report generated</div>
+                <div class="meta-value">{{ now()->format('d M Y') }}</div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="meta-label">Inventory status</div>
+                <div class="meta-value">{{ ucfirst($report['measurement']->status ?? 'draft') }}</div>
+            </td>
+            <td>
+                <div class="meta-label">Data entries</div>
+                <div class="meta-value">{{ $report['entry_count'] }} activity records</div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+{{-- Executive Summary --}}
+<h2>1. Executive Summary</h2>
+
+<table class="kpi-row">
+    <tr>
+        <td class="kpi-cell">
+            <div class="kpi-label">Scope 1</div>
+            <div class="kpi-value">{{ number_format($scopeTonnes['Scope 1'], 2) }}</div>
+            <div class="kpi-unit">tCO₂e (direct)</div>
+        </td>
+        <td class="kpi-cell">
+            <div class="kpi-label">Scope 2</div>
+            <div class="kpi-value">{{ number_format($scopeTonnes['Scope 2'], 2) }}</div>
+            <div class="kpi-unit">tCO₂e (energy)</div>
+        </td>
+        <td class="kpi-cell highlight">
+            <div class="kpi-label">Scope 1 + 2</div>
+            <div class="kpi-value">{{ number_format($report['scope_12_tonnes'], 2) }}</div>
+            <div class="kpi-unit">tCO₂e (MOCCAE reporting total)</div>
+        </td>
+        <td class="kpi-cell">
+            <div class="kpi-label">Total (all scopes)</div>
+            <div class="kpi-value">{{ number_format($totalTonnes, 2) }}</div>
+            <div class="kpi-unit">tCO₂e</div>
+        </td>
+    </tr>
+</table>
+
+<p class="text-muted text-small">
+    All emissions are expressed in metric tonnes of carbon dioxide equivalent (tCO₂e), converted from kg CO₂e stored in the inventory system (÷ 1,000).
+</p>
+
+{{-- Scope Summary --}}
+<h2>2. Emissions by Scope</h2>
+
+@if($scopeChart)
+    <div class="chart-wrap">
+        <img src="{{ $scopeChart }}" width="420" alt="Emissions by scope">
     </div>
-    <table>
+@endif
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Scope</th>
+            <th>Description</th>
+            <th class="num">Emissions (tCO₂e)</th>
+            <th class="num">Share (%)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @php $pct = $report['scope_percentages']; @endphp
+        <tr>
+            <td>Scope 1</td>
+            <td>Direct emissions (fuel combustion, refrigerants, owned vehicles)</td>
+            <td class="num">{{ number_format($scopeTonnes['Scope 1'], 2) }}</td>
+            <td class="num">{{ $pct[0] ?? 0 }}%</td>
+        </tr>
+        <tr>
+            <td>Scope 2</td>
+            <td>Indirect emissions from purchased electricity (location-based)</td>
+            <td class="num">{{ number_format($scopeTonnes['Scope 2'], 2) }}</td>
+            <td class="num">{{ $pct[1] ?? 0 }}%</td>
+        </tr>
+        @if($report['has_scope_3'] || $scopeTonnes['Scope 3'] > 0)
+        <tr>
+            <td>Scope 3</td>
+            <td>Other indirect emissions (value chain)</td>
+            <td class="num">{{ number_format($scopeTonnes['Scope 3'], 2) }}</td>
+            <td class="num">{{ $pct[2] ?? 0 }}%</td>
+        </tr>
+        @endif
+        <tr class="subtotal-row">
+            <td colspan="2">Scope 1 + Scope 2 (UAE mandatory reporting)</td>
+            <td class="num">{{ number_format($report['scope_12_tonnes'], 2) }}</td>
+            <td class="num">—</td>
+        </tr>
+        <tr class="total-row">
+            <td colspan="2">Grand total (all scopes)</td>
+            <td class="num">{{ number_format($totalTonnes, 2) }}</td>
+            <td class="num">100%</td>
+        </tr>
+    </tbody>
+</table>
+
+{{-- Breakdown by source --}}
+<h2>3. Emissions by Source Category</h2>
+
+@if($sourceChart)
+    <div class="chart-wrap">
+        <img src="{{ $sourceChart }}" width="480" alt="Emissions by source">
+    </div>
+@endif
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Scope</th>
+            <th>Emission source</th>
+            <th class="num">Emissions (tCO₂e)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($report['results_breakdown'] as $scope)
+            @if($scope['tonnes'] > 0 || $scope['name'] !== 'Scope 3')
+            <tr class="scope-row">
+                <td>{{ $scope['name'] }}</td>
+                <td>—</td>
+                <td class="num">{{ number_format($scope['tonnes'], 2) }}</td>
+            </tr>
+            @foreach($scope['children'] as $child)
+            <tr>
+                <td></td>
+                <td style="padding-left: 16px;">{{ $child['name'] }}</td>
+                <td class="num">{{ number_format($child['tonnes'], 2) }}</td>
+            </tr>
+            @endforeach
+            @endif
+        @endforeach
+        <tr class="total-row">
+            <td colspan="2">Total</td>
+            <td class="num">{{ number_format($totalTonnes, 2) }}</td>
+        </tr>
+    </tbody>
+</table>
+
+{{-- Activity register --}}
+<div class="page-break"></div>
+<h2>4. Activity Data Register</h2>
+<p class="text-muted text-small" style="margin-bottom: 8px;">
+    Detailed record of each activity entry used to calculate the inventory. Quantities, emission factors, and methodology are shown per line item.
+</p>
+
+@if($report['activity_register']->isEmpty())
+    <p class="text-muted">No activity data recorded for this reporting period.</p>
+@else
+    <table class="data-table">
         <thead>
             <tr>
+                <th>Date</th>
                 <th>Scope</th>
-                <th class="text-right">Emissions (tCO₂e)</th>
+                <th>Source / Activity</th>
+                <th class="num">Quantity</th>
+                <th>Unit</th>
+                <th class="num">Factor</th>
+                <th>Methodology</th>
+                <th class="num">tCO₂e</th>
             </tr>
         </thead>
         <tbody>
-            @foreach ($scopes as $scope => $value)
-                <tr>
-                    <td>{{ $scope }}</td>
-                    <td class="text-right">{{ number_format($value, 2) }}</td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
-
-    {{-- DETAILED BREAKDOWN --}}
-    <h2>Results Breakdown</h2>
-    <div style="text-align:center;">
-        <img src="{{ $emissionSourceChart }}" width="600">
-    </div>
-    <table>
-        <thead>
+            @foreach($report['activity_register'] as $row)
             <tr>
-                <th>Name</th>
-                <th class="text-right">Emissions (tCO₂e)</th>
+                <td>{{ $row['entry_date'] }}</td>
+                <td>{{ $row['scope'] }}</td>
+                <td>
+                    <strong>{{ $row['source'] }}</strong>
+                    @if($row['activity'] !== $row['source'])
+                        <br><span class="text-muted">{{ $row['activity'] }}</span>
+                    @endif
+                </td>
+                <td class="num">{{ $row['quantity'] }}</td>
+                <td>{{ $row['unit'] }}</td>
+                <td class="num">{{ $row['factor_value'] }}<br><span class="text-muted text-small">{{ $row['factor_unit'] }}</span></td>
+                <td class="text-small">{{ $row['methodology'] }}<br><span class="text-muted">{{ $row['reference'] }}</span></td>
+                <td class="num">{{ number_format($row['tonnes'], 4) }}</td>
             </tr>
-        </thead>
-        <tbody>
-            @foreach ($resultsBreakdown as $scope)
-                <tr class="scope-row">
-                    <td>{{ $scope['name'] }}</td>
-                    <td class="text-right">{{ number_format($scope['value'], 2) }}</td>
-                </tr>
-
-                @foreach ($scope['children'] as $child)
-                    <tr>
-                        <td style="padding-left:20px;">{{ $child['name'] }}</td>
-                        <td class="text-right">{{ number_format($child['value'], 2) }}</td>
-                    </tr>
-                @endforeach
             @endforeach
-
-            <tr class="total-row">
-                <td>Total</td>
-                <td class="text-right">{{ number_format($total, 2) }}</td>
-            </tr>
         </tbody>
     </table>
+@endif
 
-    {{-- FOOTER --}}
-    <footer>
-        Generated on {{ now()->format('d M Y') }} | © {{ date('Y') }} {{ $company->name }}
-    </footer>
+{{-- Methodology --}}
+<h2>5. Methodology &amp; Reporting Notes</h2>
+
+<div class="methodology-box">
+    <strong>Calculation framework</strong>
+    <ul>
+        <li><strong>Standard:</strong> {{ $methodology['framework'] }}</li>
+        <li><strong>Emission factors:</strong> {{ $methodology['factors'] }}</li>
+        <li><strong>Scopes included:</strong> {{ $methodology['scopes'] }}</li>
+        <li><strong>GWP values:</strong> {{ $methodology['gwp'] }}</li>
+    </ul>
+</div>
+
+<div class="notice-box">
+    <strong>UAE legal submission:</strong> {{ $methodology['disclaimer'] }}
+    For official MOCCAE reporting, register at <strong>mrv.ae</strong> and submit your inventory through the Integrated Emissions Quantification Tool (IEQT).
+</div>
+
+<footer>
+    GHG Inventory Report — {{ $company->name }} — {{ $report['reporting_period'] }}
+    &nbsp;|&nbsp; Prepared with MENetZero &nbsp;|&nbsp; {{ now()->format('d M Y H:i') }} UTC
+</footer>
 
 </body>
 </html>

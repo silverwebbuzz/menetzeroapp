@@ -3,19 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Measurement;
-use App\Models\MeasurementData;
+use App\Exports\ResultsBreakdownExport;
+use App\Services\GhgReportService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use App\Exports\ResultsBreakdownExport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
 {
-    /**
-     * Show report filter form
-     */
+    public function __construct(
+        protected GhgReportService $reportService
+    ) {}
+
     public function index()
     {
         $user = Auth::user();
@@ -25,260 +25,179 @@ class ReportController extends Controller
             abort(403, 'No active company found.');
         }
 
-        // Fetch locations and fiscal years
         $locations = $company->locations()->with('measurements')->get();
         $fiscalYears = $locations->pluck('measurements')->flatten()
             ->pluck('fiscal_year')
             ->unique()
+            ->sortDesc()
             ->values();
 
         return view('reports.index', compact('locations', 'fiscalYears'));
     }
 
-    /**
-     * Show report results
-     */
     public function show(Request $request)
     {
         $user = Auth::user();
         $company = $user->getActiveCompany();
-        if (!$company)
+        if (!$company) {
             abort(403, 'No active company found.');
+        }
 
         $locations = $company->locations()->with('measurements')->get();
         $fiscalYears = $locations->pluck('measurements')->flatten()
             ->pluck('fiscal_year')
             ->unique()
+            ->sortDesc()
             ->values();
 
-        // Get selected measurement
-        $measurement = Measurement::where('fiscal_year', $request->fiscal_year)
+        $measurement = Measurement::with('location')
+            ->where('fiscal_year', $request->fiscal_year)
             ->where('location_id', $request->location_id)
+            ->whereHas('location', fn ($q) => $q->where('company_id', $company->id))
             ->first();
 
         if (!$measurement) {
-            return view('reports.index', compact('locations', 'fiscalYears'));
+            return view('reports.index', compact('locations', 'fiscalYears'))
+                ->with('error', 'No emission data found for this location and year. Enter data in Input Data first.');
         }
 
-        // Scope totals
-        $total = $measurement->total_co2e ?? 0;
-        $scopes = [
-            'Scope 1' => $measurement->scope_1_co2e ?? 0,
-            'Scope 2' => $measurement->scope_2_co2e ?? 0,
-            'Scope 3' => $measurement->scope_3_co2e ?? 0,
-        ];
+        $report = $this->reportService->build($measurement);
 
-        $scopeRawValues = array_map(fn($v) => number_format($v, 2), array_values($scopes));
-        $scopePercentages = array_map(fn($v) => $total > 0 ? round(($v / $total) * 100, 2) : 0, array_values($scopes));
-
-        // Emission source chart
-        $emissionSourceData = MeasurementData::with('emissionSource:id,name')
-            ->select('emission_source_id', DB::raw('SUM(calculated_co2e) as total_co2e'))
-            ->where('measurement_id', $measurement->id)
-            ->groupBy('emission_source_id')
-            ->get()
-            ->map(function ($row) use ($total) {
-                return [
-                    'label' => $row->emissionSource->name,
-                    'raw' => round($row->total_co2e, 2),
-                    'percent' => $total > 0 ? round(($row->total_co2e / $total) * 100, 2) : 0,
-                ];
-            })->values();
-
-        // Results breakdown table
-        $resultsBreakdown = $this->buildResultsBreakdown($measurement);
-
-        return view('reports.index', compact(
-            'locations',
-            'fiscalYears',
-            'measurement',
-            'scopeRawValues',
-            'scopePercentages',
-            'emissionSourceData',
-            'resultsBreakdown'
+        return view('reports.index', array_merge(
+            compact('locations', 'fiscalYears', 'measurement', 'company'),
+            [
+                'report' => $report,
+                'selectedFiscalYear' => $request->fiscal_year,
+                'selectedLocationId' => $request->location_id,
+                // Legacy keys for chart script
+                'scopePercentages' => $report['scope_percentages'],
+                'scopeRawValues' => $report['scope_raw_tonnes'],
+                'emissionSourceData' => $report['emission_source_data'],
+                'resultsBreakdown' => $report['results_breakdown'],
+            ]
         ));
     }
 
-    /**
-     * Export Results Breakdown to Excel
-     */
     public function exportExcel(Request $request)
     {
-        $user = Auth::user();
-        $company = $user->getActiveCompany();
-        if (!$company)
-            abort(403, 'No active company found.');
-
-        // Get selected measurement
-        $measurement = Measurement::where('fiscal_year', $request->fiscal_year)
-            ->where('location_id', $request->location_id)
-            ->firstOrFail();
-
-        $resultsBreakdown = $this->buildResultsBreakdown($measurement);
-
-        return Excel::download(new ResultsBreakdownExport($resultsBreakdown), 'results_breakdown.xlsx');
-    }
-
-    /**
-     * Build results breakdown array for table or export
-     */
-    private function buildResultsBreakdown(Measurement $measurement): array
-    {
-        $breakdownByScope = MeasurementData::with('emissionSource:id,name,scope')
-            ->select('emission_source_id', DB::raw('SUM(calculated_co2e) as total_co2e'))
-            ->where('measurement_id', $measurement->id)
-            ->groupBy('emission_source_id')
-            ->get()
-            ->groupBy(fn($row) => $row->emissionSource->scope);
-
-        $resultsBreakdown = [];
-
-        foreach (['Scope 1', 'Scope 2', 'Scope 3'] as $scope) {
-            $children = [];
-            $scopeTotal = 0;
-
-            foreach ($breakdownByScope[$scope] ?? [] as $row) {
-                $children[] = [
-                    'name' => $row->emissionSource->name,
-                    'value' => round($row->total_co2e, 2),
-                ];
-                $scopeTotal += $row->total_co2e;
-            }
-
-            $resultsBreakdown[] = [
-                'name' => $scope,
-                'value' => round($scopeTotal, 2),
-                'children' => $children
-            ];
+        $company = Auth::user()->getActiveCompany();
+        if (!$company) {
+            abort(403);
         }
 
-        return $resultsBreakdown;
+        $measurement = $this->findMeasurement($request, $company->id);
+        $report = $this->reportService->build($measurement);
+
+        return Excel::download(
+            new ResultsBreakdownExport($report['results_breakdown']),
+            $this->reportFilename($measurement, 'xlsx')
+        );
     }
 
     public function exportPDF(Request $request)
     {
         $user = Auth::user();
         $company = $user->getActiveCompany();
-        if (!$company)
+        if (!$company) {
             abort(403);
+        }
 
-        $measurement = Measurement::where('fiscal_year', $request->fiscal_year)
-            ->where('location_id', $request->location_id)
-            ->firstOrFail();
+        $measurement = $this->findMeasurement($request, $company->id);
+        $report = $this->reportService->build($measurement);
 
-        $resultsBreakdown = $this->buildResultsBreakdown($measurement);
+        $scopeChart = $this->buildScopeChart($report);
+        $sourceChart = $this->buildSourceChart($report);
 
-        $total = $measurement->total_co2e ?? 0;
-
-        $scopes = [
-            'Scope 1' => $measurement->scope_1_co2e ?? 0,
-            'Scope 2' => $measurement->scope_2_co2e ?? 0,
-            'Scope 3' => $measurement->scope_3_co2e ?? 0,
-        ];
-
-        /** -------------------------------
-         *  Scope Pie Chart
-         * ------------------------------- */
-        $scopeChart = $this->generateChartUrl([
-            'type' => 'pie',
-            'data' => [
-                'labels' => array_keys($scopes),
-                'datasets' => [
-                    [
-                        'data' => array_values($scopes),
-                        'backgroundColor' => ['#3FAE91', '#FFA726', '#9C6ADE'],
-                    ]
-                ]
-            ],
-            'options' => [
-                'plugins' => [
-                    'legend' => ['display' => false],
-                    'tooltip' => ['enabled' => false],
-                    'datalabels' => ['display' => false],
-                ],
-            ]
+        $pdf = Pdf::loadView('reports.pdf', [
+            'company' => $company,
+            'report' => $report,
+            'scopeChart' => $scopeChart,
+            'sourceChart' => $sourceChart,
+        ])->setPaper('a4', 'portrait')->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+            'defaultFont' => 'dejavu sans',
         ]);
 
-        /** -------------------------------
-         *  Emission Source Pie Chart
-         * ------------------------------- */
-        $emissionSourceRows = MeasurementData::with('emissionSource:id,name')
-            ->select('emission_source_id', DB::raw('SUM(calculated_co2e) as total_co2e'))
-            ->where('measurement_id', $measurement->id)
-            ->groupBy('emission_source_id')
-            ->get();
+        return $pdf->download($this->reportFilename($measurement, 'pdf'));
+    }
 
-        $emissionSourceLabels = [];
-        $emissionSourceValues = [];
+    protected function findMeasurement(Request $request, int $companyId): Measurement
+    {
+        return Measurement::with('location')
+            ->where('fiscal_year', $request->fiscal_year)
+            ->where('location_id', $request->location_id)
+            ->whereHas('location', fn ($q) => $q->where('company_id', $companyId))
+            ->firstOrFail();
+    }
 
-        foreach ($emissionSourceRows as $row) {
-            if ($row->emissionSource && $row->total_co2e > 0) {
-                $emissionSourceLabels[] = $row->emissionSource->name;
-                $emissionSourceValues[] = round($row->total_co2e, 2);
+    protected function reportFilename(Measurement $measurement, string $ext): string
+    {
+        $location = preg_replace('/[^a-z0-9]+/i', '-', strtolower($measurement->location->name ?? 'location'));
+        return "ghg-inventory-{$measurement->fiscal_year}-{$location}.{$ext}";
+    }
+
+    protected function buildScopeChart(array $report): ?string
+    {
+        $labels = [];
+        $values = [];
+        $colors = ['#059669', '#0284c7', '#9333ea'];
+
+        foreach ($report['scope_tonnes'] as $scope => $tonnes) {
+            if ($tonnes <= 0 && $scope === 'Scope 3' && !$report['has_scope_3']) {
+                continue;
+            }
+            if ($tonnes > 0 || $scope !== 'Scope 3') {
+                $labels[] = $scope;
+                $values[] = $tonnes;
             }
         }
 
-        $emissionSourceChart = null;
-
-        if (!empty($emissionSourceValues)) {
-            $emissionSourceChart = $this->generateChartUrl([
-                'type' => 'pie',
-                'data' => [
-                    'labels' => $emissionSourceLabels,
-                    'datasets' => [
-                        [
-                            'data' => $emissionSourceValues,
-                            'backgroundColor' => [
-                                '#42A5F5',
-                                '#66BB6A',
-                                '#FFA726',
-                                '#AB47BC',
-                                '#EC407A',
-                                '#26C6DA',
-                            ],
-                        ]
-                    ]
-                ],
-                'options' => [
-                    'plugins' => [
-                        'legend' => ['display' => false],
-                        'tooltip' => ['enabled' => false],
-                        'datalabels' => ['display' => false],
-                    ],
-                ]
-            ]);
+        if (array_sum($values) <= 0) {
+            return null;
         }
 
-        // return view('reports.pdf', compact(
-        //     'measurement',
-        //     'resultsBreakdown',
-        //     'total',
-        //     'scopes',
-        //     'company',
-        //     'scopeChart',
-        //     'emissionSourceChart'
-        // ));
-        $pdf = Pdf::loadView('reports.pdf', compact(
-            'measurement',
-            'resultsBreakdown',
-            'total',
-            'scopes',
-            'company',
-            'scopeChart',
-            'emissionSourceChart'
-        ))->setPaper('a4')->setOptions([
-                    'isHtml5ParserEnabled' => true,
-                    'isRemoteEnabled' => true,
-                    'defaultFont' => 'dejavu sans',
-                ]);
+        return $this->generateChartUrl([
+            'type' => 'doughnut',
+            'data' => [
+                'labels' => $labels,
+                'datasets' => [[
+                    'data' => $values,
+                    'backgroundColor' => array_slice($colors, 0, count($values)),
+                ]],
+            ],
+            'options' => [
+                'plugins' => ['legend' => ['position' => 'bottom', 'labels' => ['font' => ['size' => 11]]]],
+            ],
+        ]);
+    }
 
-        return $pdf->download('emissions-report.pdf');
+    protected function buildSourceChart(array $report): ?string
+    {
+        $sources = $report['emission_source_data']->filter(fn ($s) => $s['tonnes'] > 0);
+        if ($sources->isEmpty()) {
+            return null;
+        }
+
+        return $this->generateChartUrl([
+            'type' => 'bar',
+            'data' => [
+                'labels' => $sources->pluck('label')->take(8)->values()->all(),
+                'datasets' => [[
+                    'label' => 'tCO2e',
+                    'data' => $sources->pluck('tonnes')->take(8)->values()->all(),
+                    'backgroundColor' => '#059669',
+                ]],
+            ],
+            'options' => [
+                'plugins' => ['legend' => ['display' => false]],
+                'scales' => ['y' => ['beginAtZero' => true]],
+            ],
+        ]);
     }
 
     private function generateChartUrl(array $config): string
     {
-        $baseUrl = 'https://quickchart.io/chart';
-        return $baseUrl . '?c=' . urlencode(json_encode($config));
+        return 'https://quickchart.io/chart?c=' . urlencode(json_encode($config)) . '&w=500&h=280';
     }
-
 }
