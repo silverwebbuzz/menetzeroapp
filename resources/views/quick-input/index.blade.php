@@ -33,6 +33,69 @@
         </div>
     @endif
 
+    @if(session('import_errors') && count(session('import_errors')) > 0)
+        <div class="mb-4 bg-amber-50 border border-amber-300 text-amber-900 px-4 py-3 rounded relative" role="alert">
+            <p class="font-semibold mb-2">Import row errors:</p>
+            <ul class="list-disc list-inside text-sm max-h-40 overflow-y-auto">
+                @foreach(session('import_errors') as $importError)
+                    <li>{{ $importError }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <!-- Bulk Import — Scope 1 & 2 -->
+    <div class="mb-8 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-6">
+        <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+            <div class="flex-1">
+                <h2 class="text-xl font-bold text-gray-900 mb-2">Bulk import — Scope 1 &amp; 2</h2>
+                <p class="text-gray-600 text-sm mb-3">
+                    Not sure how to fill each form? Download our template, add your data in Excel or CSV, then upload once —
+                    no need to enter row by row.
+                </p>
+                <ul class="text-sm text-gray-600 space-y-1 list-disc list-inside">
+                    <li><strong>Excel (recommended)</strong> — Instructions, blank sheet, examples, and your location names in one file</li>
+                    <li><strong>CSV</strong> — Blank template or sample file with dummy data</li>
+                    <li>One row = one activity (electricity bill, diesel, vehicle km, refrigerant top-up, etc.)</li>
+                </ul>
+            </div>
+            <div class="flex flex-col gap-2 min-w-[220px]">
+                <a href="{{ route('quick-input.bulk-import.template', ['format' => 'xlsx']) }}"
+                   class="inline-flex items-center justify-center px-4 py-2.5 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    Download Excel template
+                </a>
+                <a href="{{ route('quick-input.bulk-import.template', ['format' => 'csv', 'variant' => 'blank']) }}"
+                   class="inline-flex items-center justify-center px-4 py-2.5 bg-white border border-emerald-300 text-emerald-800 text-sm font-medium rounded-lg hover:bg-emerald-50 transition-colors">
+                    Download blank CSV
+                </a>
+                <a href="{{ route('quick-input.bulk-import.template', ['format' => 'csv', 'variant' => 'sample']) }}"
+                   class="inline-flex items-center justify-center px-4 py-2.5 bg-white border border-emerald-300 text-emerald-800 text-sm font-medium rounded-lg hover:bg-emerald-50 transition-colors">
+                    Download sample CSV (with examples)
+                </a>
+            </div>
+        </div>
+
+        <form action="{{ route('quick-input.bulk-import.import') }}" method="POST" enctype="multipart/form-data" class="mt-6 pt-6 border-t border-emerald-200">
+            @csrf
+            <div class="flex flex-col sm:flex-row sm:items-end gap-4">
+                <div class="flex-1">
+                    <label for="import_file" class="block text-sm font-medium text-gray-700 mb-1">Upload completed file</label>
+                    <input type="file" name="import_file" id="import_file" accept=".xlsx,.xls,.csv,.txt" required
+                           class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-emerald-100 file:text-emerald-800 file:font-medium hover:file:bg-emerald-200">
+                    <p class="mt-1 text-xs text-gray-500">Excel (.xlsx) or CSV — max 5 MB. Use the <strong>Data Entry</strong> sheet for Excel uploads.</p>
+                </div>
+                @if(!empty($canAddEntries))
+                <button type="submit" class="px-6 py-2.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 whitespace-nowrap">
+                    Upload &amp; import
+                </button>
+                @else
+                <p class="text-sm text-gray-500 italic">You need add permission to upload data.</p>
+                @endif
+            </div>
+        </form>
+    </div>
+
     <!-- Input Forms - Horizontal Cards -->
     <div class="mb-8">
         <h2 class="text-xl font-bold text-gray-900 mb-4">Input Forms</h2>

@@ -149,6 +149,8 @@ Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client'])->
     Route::prefix('quick-input')->name('quick-input.')->group(function () {
         Route::get('/entries', [\App\Http\Controllers\QuickInputController::class, 'index'])->name('index');
         Route::get('/entries/export', [\App\Http\Controllers\QuickInputController::class, 'export'])->name('export');
+        Route::get('/bulk-import/template', [\App\Http\Controllers\Scope12BulkImportController::class, 'downloadTemplate'])->name('bulk-import.template');
+        Route::post('/bulk-import', [\App\Http\Controllers\Scope12BulkImportController::class, 'import'])->name('bulk-import.import');
         Route::get('/entries/{id}', [\App\Http\Controllers\QuickInputController::class, 'view'])->name('view');
         Route::get('/entries/{id}/edit', [\App\Http\Controllers\QuickInputController::class, 'edit'])->name('edit');
         Route::put('/entries/{id}', [\App\Http\Controllers\QuickInputController::class, 'update'])->name('update');

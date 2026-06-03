@@ -140,7 +140,14 @@ class QuickInputController extends Controller
         // Calculate summary statistics
         $summary = $this->measurementService->calculateSummary($company->id, $request->all());
 
-        return view('quick-input.index', compact('entries', 'locations', 'sources', 'summary', 'yearsWithEntries'));
+        $canAddEntries = $user->isAdmin()
+            || $user->isCompanyAdmin($company->id)
+            || $user->hasPermission('measurements.add', $company->id)
+            || $user->hasPermission('measurements.*', $company->id)
+            || $user->hasPermission('manage_measurements', $company->id)
+            || $user->hasModulePermission('measurements', 'add', $company->id);
+
+        return view('quick-input.index', compact('entries', 'locations', 'sources', 'summary', 'yearsWithEntries', 'canAddEntries'));
     }
 
     /**
