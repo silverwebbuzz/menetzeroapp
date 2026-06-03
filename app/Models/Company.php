@@ -171,7 +171,7 @@ class Company extends Model
             return null;
         }
 
-        return Storage::disk('public')->url($this->logo_path);
+        return asset('storage/' . ltrim($this->logo_path, '/'));
     }
 
     /** Base64 data URI for embedding in PDF exports (DomPDF). */

@@ -225,7 +225,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 lg:grid-cols-{{ $moccaeOnly ? '3' : '4' }} gap-4">
+                <div class="grid grid-cols-2 gap-4 {{ ($moccaeOnly ?? false) ? 'lg:grid-cols-3' : 'lg:grid-cols-4' }}">
                     <div class="report-kpi">
                         <div class="kpi-label">Scope 1</div>
                         <div class="kpi-value">{{ number_format($scopeTonnes['Scope 1'] ?? 0, 2) }}</div>
@@ -482,21 +482,21 @@
             });
         });
 
-        @if (isset($measurement) && $measurement && isset($report))
+        @if (isset($measurement) && $measurement && isset($report) && isset($chartPayload))
             const ctx = document.getElementById('analysisPieChart');
 
             const scopeData = {
-                labels: @json($moccaeOnly ? ['Scope 1', 'Scope 2'] : ['Scope 1', 'Scope 2', 'Scope 3']),
-                values: @json($scopePercentages),
-                raw: @json($scopeRawValues),
-                colors: @json($moccaeOnly ? ['#059669', '#0284c7'] : ['#059669', '#0284c7', '#9333ea'])
+                labels: @json($chartPayload['scopeLabels']),
+                values: @json($chartPayload['scopePercentages']),
+                raw: @json($chartPayload['scopeRawValues']),
+                colors: @json($chartPayload['scopeColors'])
             };
 
             const emissionSourceData = {
-                labels: @json($emissionSourceData->pluck('label')),
-                values: @json($emissionSourceData->pluck('percent')),
-                raw: @json($emissionSourceData->map(fn($s) => number_format($s['tonnes'], 2))->values()),
-                colors: ['#059669', '#0ea5a3', '#0284c7', '#6366f1', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6']
+                labels: @json($chartPayload['sourceLabels']),
+                values: @json($chartPayload['sourcePercents']),
+                raw: @json($chartPayload['sourceRawTonnes']),
+                colors: @json($chartPayload['sourceColors'])
             };
 
             let chart = new Chart(ctx, {

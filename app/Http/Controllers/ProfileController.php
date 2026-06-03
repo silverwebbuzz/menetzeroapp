@@ -10,6 +10,7 @@ use App\Mail\PasswordChangedEmail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
@@ -108,14 +109,15 @@ class ProfileController extends Controller
         // Get user from web guard
         $user = Auth::guard('web')->user();
         
-        if (!$user->company_id) {
-            return back()->withErrors(['company' => 'No company associated with this account.']);
+        $company = $user->getActiveCompany();
+        if (!$company) {
+            return back()->withErrors(['company' => 'No active company found for this account.']);
         }
 
         $request->validate([
             'company_name' => 'required|string|max:255',
             'business_email' => 'nullable|email|max:255',
-            'business_website' => 'nullable|url|max:255',
+            'business_website' => 'nullable|string|max:255',
             'business_address' => 'nullable|string|max:500',
             'country' => 'nullable|string|max:100',
             'sector' => 'nullable|string|max:255',
@@ -128,11 +130,6 @@ class ProfileController extends Controller
             'company_logo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
             'remove_logo' => 'nullable|boolean',
         ]);
-
-        $company = $user->getActiveCompany();
-        if (!$company) {
-            return back()->withErrors(['company' => 'No active company found.']);
-        }
 
         $company->update([
             'name' => $request->company_name,
@@ -149,18 +146,26 @@ class ProfileController extends Controller
             'emirate' => $request->emirate,
         ]);
 
-        if ($request->boolean('remove_logo') && $company->logo_path) {
-            Storage::disk('public')->delete($company->logo_path);
-            $company->update(['logo_path' => null]);
-        }
-
-        if ($request->hasFile('company_logo')) {
-            if ($company->logo_path) {
+        if (!Schema::hasColumn('companies', 'logo_path')) {
+            if ($request->hasFile('company_logo') || $request->boolean('remove_logo')) {
+                return back()->withErrors([
+                    'company_logo' => 'Logo upload is not available yet. Please run database migrations on the server (php artisan migrate).',
+                ]);
+            }
+        } else {
+            if ($request->boolean('remove_logo') && $company->logo_path) {
                 Storage::disk('public')->delete($company->logo_path);
+                $company->update(['logo_path' => null]);
             }
 
-            $path = $request->file('company_logo')->store('company-logos/' . $company->id, 'public');
-            $company->update(['logo_path' => $path]);
+            if ($request->hasFile('company_logo')) {
+                if ($company->logo_path) {
+                    Storage::disk('public')->delete($company->logo_path);
+                }
+
+                $path = $request->file('company_logo')->store('company-logos/' . $company->id, 'public');
+                $company->update(['logo_path' => $path]);
+            }
         }
 
         return back()->with('success', 'Company information updated successfully!');

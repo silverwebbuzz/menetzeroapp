@@ -207,6 +207,13 @@
         @if($company)
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h3 class="text-lg font-semibold text-gray-900 mb-6">Company Information</h3>
+
+                @error('company')
+                    <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ $message }}</div>
+                @enderror
+                @if(session('success'))
+                    <div class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{{ session('success') }}</div>
+                @endif
                 
                 <form method="POST" action="{{ route('profile.update.company') }}" enctype="multipart/form-data" class="space-y-6">
                     @csrf

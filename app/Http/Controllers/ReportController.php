@@ -65,16 +65,16 @@ class ReportController extends Controller
         $moccaeOnly = $request->boolean('moccae_only');
         $report = $this->reportService->finalizeReport($report, $moccaeOnly);
 
+        $chartPayload = $this->buildChartPayload($report, $moccaeOnly);
+
         return view('reports.index', array_merge(
             compact('locations', 'fiscalYears', 'measurement', 'company'),
             [
                 'report' => $report,
                 'moccaeOnly' => $moccaeOnly,
+                'chartPayload' => $chartPayload,
                 'selectedFiscalYear' => $request->fiscal_year,
                 'selectedLocationId' => $request->location_id,
-                // Legacy keys for chart script
-                'scopePercentages' => $report['scope_percentages'],
-                'scopeRawValues' => $report['scope_raw_tonnes'],
                 'emissionSourceData' => $report['emission_source_data'],
                 'resultsBreakdown' => $report['results_breakdown'],
             ]
@@ -214,6 +214,29 @@ class ReportController extends Controller
     private function generateChartUrl(array $config): string
     {
         return 'https://quickchart.io/chart?c=' . urlencode(json_encode($config)) . '&w=500&h=280';
+    }
+
+    protected function buildChartPayload(array $report, bool $moccaeOnly): array
+    {
+        $sources = $report['emission_source_data'];
+
+        return [
+            'scopeLabels' => $moccaeOnly
+                ? ['Scope 1', 'Scope 2']
+                : ['Scope 1', 'Scope 2', 'Scope 3'],
+            'scopeColors' => $moccaeOnly
+                ? ['#059669', '#0284c7']
+                : ['#059669', '#0284c7', '#9333ea'],
+            'scopePercentages' => array_values($report['scope_percentages']),
+            'scopeRawValues' => array_values($report['scope_raw_tonnes']),
+            'sourceLabels' => $sources->pluck('label')->values()->all(),
+            'sourcePercents' => $sources->pluck('percent')->values()->all(),
+            'sourceRawTonnes' => $sources
+                ->map(fn ($row) => number_format($row['tonnes'], 2))
+                ->values()
+                ->all(),
+            'sourceColors' => ['#059669', '#0ea5a3', '#0284c7', '#6366f1', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6'],
+        ];
     }
 
     protected function platformLogoDataUri(): ?string
