@@ -48,6 +48,22 @@
             'flights'           => 'plane',
             'public-transport'  => 'bus',
             'home-workers'      => 'home',
+            // Scope 3 — 15 GHG Protocol categories
+            'purchased-goods'       => 'card',
+            'capital-goods'         => 'cog',
+            'fuel-energy-related'   => 'bolt',
+            'upstream-transport'    => 'truck',
+            'waste-operations'      => 'droplet',
+            'business-travel'       => 'plane',
+            'employee-commuting'    => 'bus',
+            'upstream-leased'       => 'home',
+            'downstream-transport'  => 'truck',
+            'processing-sold'       => 'cog',
+            'use-sold'              => 'bolt',
+            'end-of-life'           => 'droplet',
+            'downstream-leased'     => 'home',
+            'franchises'            => 'shield',
+            'investments'           => 'chart',
             default             => 'dot',
         };
     };
@@ -199,24 +215,14 @@
                     </svg>
                 </button>
                 <div x-show="scope3Open" x-transition.origin.top class="ml-5 space-y-0.5 border-l border-slate-200 pl-2 mb-2">
-                    <a href="{{ route('quick-input.show', ['scope' => 3, 'slug' => 'flights']) }}"
-                       class="nav-link text-[0.8125rem] {{ $currentScope == 3 && $currentSlug == 'flights' ? 'active' : '' }}"
-                       style="padding-top:0.375rem;padding-bottom:0.375rem;">
-                        {!! $svg('plane') !!}
-                        Flights
-                    </a>
-                    <a href="{{ route('quick-input.show', ['scope' => 3, 'slug' => 'public-transport']) }}"
-                       class="nav-link text-[0.8125rem] {{ $currentScope == 3 && $currentSlug == 'public-transport' ? 'active' : '' }}"
-                       style="padding-top:0.375rem;padding-bottom:0.375rem;">
-                        {!! $svg('bus') !!}
-                        Public Transport
-                    </a>
-                    <a href="{{ route('quick-input.show', ['scope' => 3, 'slug' => 'home-workers']) }}"
-                       class="nav-link text-[0.8125rem] {{ $currentScope == 3 && $currentSlug == 'home-workers' ? 'active' : '' }}"
-                       style="padding-top:0.375rem;padding-bottom:0.375rem;">
-                        {!! $svg('home') !!}
-                        Home Workers
-                    </a>
+                    @foreach($scope3Sources as $source)
+                        <a href="{{ route('quick-input.show', ['scope' => 3, 'slug' => $source->quick_input_slug]) }}"
+                           class="nav-link text-[0.8125rem] {{ $currentScope == 3 && $currentSlug == $source->quick_input_slug ? 'active' : '' }}"
+                           style="padding-top:0.375rem;padding-bottom:0.375rem;">
+                            {!! $svg($sourceIcon($source->quick_input_slug)) !!}
+                            {{ $source->name }}
+                        </a>
+                    @endforeach
                 </div>
             </div>
         </div>

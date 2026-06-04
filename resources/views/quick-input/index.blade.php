@@ -108,15 +108,33 @@
         </form>
     </div>
 
-    <!-- Input Forms - Horizontal Cards -->
+    <!-- Input Forms - Grouped by Scope -->
     <div class="mb-8">
         <h2 class="text-xl font-bold text-gray-900 mb-4">Input Forms</h2>
-        <div class="flex flex-wrap gap-4 overflow-x-auto pb-4">
-            @foreach($sources as $source)
-                @php
-                    $scopeNumber = str_replace('Scope ', '', $source->scope);
-                @endphp
-                <a href="{{ route('quick-input.show', ['scope' => $scopeNumber, 'slug' => $source->quick_input_slug]) }}" 
+        @php
+            // Group the (already ordered) sources by their scope so we can render
+            // a labelled section for Scope 1, 2 and 3.
+            $sourcesByScope = collect($sources)->groupBy('scope');
+            $scopeSections = [
+                'Scope 1' => ['title' => 'Scope 1 — Direct Emissions', 'subtitle' => 'Emissions from sources you own or control'],
+                'Scope 2' => ['title' => 'Scope 2 — Purchased Energy', 'subtitle' => 'Emissions from purchased electricity, heat, steam & cooling'],
+                'Scope 3' => ['title' => 'Scope 3 — Value Chain', 'subtitle' => 'Indirect emissions across your value chain (15 GHG Protocol categories)'],
+            ];
+        @endphp
+        @foreach($scopeSections as $scopeKey => $meta)
+            @php $scopeSources = $sourcesByScope->get($scopeKey, collect()); @endphp
+            @if($scopeSources->isNotEmpty())
+                <div class="mb-6">
+                    <div class="flex items-baseline gap-3 mb-3">
+                        <h3 class="text-base font-bold text-gray-800">{{ $meta['title'] }}</h3>
+                        <span class="text-xs text-gray-500">{{ $meta['subtitle'] }}</span>
+                    </div>
+                    <div class="flex flex-wrap gap-4 pb-2">
+                        @foreach($scopeSources as $source)
+                            @php
+                                $scopeNumber = str_replace('Scope ', '', $source->scope);
+                            @endphp
+                            <a href="{{ route('quick-input.show', ['scope' => $scopeNumber, 'slug' => $source->quick_input_slug]) }}"
                    class="flex-shrink-0 bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow w-[180px] h-[160px] flex flex-col items-center justify-center">
                     <div class="flex flex-col items-center text-center w-full">
                         <!-- Icon -->
@@ -194,8 +212,11 @@
                         </div>
                     </div>
                 </a>
-            @endforeach
-        </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+        @endforeach
     </div>
 
     <!-- Summary Cards -->
