@@ -479,6 +479,43 @@
     </tbody>
 </table>
 
+{{-- Scope 3 category breakdown (GHG Protocol 15 categories) --}}
+@if(!$moccaeOnly && isset($report['scope_3_categories']) && $report['scope_3_categories']->isNotEmpty())
+    @php $scope3Total = $report['scope_3_categories']->sum('tonnes'); @endphp
+    <h2 style="margin-top: 18px;">3a. Scope 3 by Value-Chain Category</h2>
+    <p class="text-muted text-small" style="margin-bottom: 8px;">
+        Scope 3 emissions grouped by GHG Protocol value-chain category. The data-quality column shows
+        whether each category was calculated from physical activity data (higher quality) or spend-based
+        intensity factors (screening estimate).
+    </p>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>GHG Protocol category</th>
+                <th class="num">Emissions (tCO₂e)</th>
+                <th class="num">% of Scope 3</th>
+                <th>Data quality</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($report['scope_3_categories'] as $cat)
+            <tr>
+                <td>{{ $cat['category'] }}</td>
+                <td class="num">{{ number_format($cat['tonnes'], 2) }}</td>
+                <td class="num">{{ $scope3Total > 0 ? number_format(($cat['tonnes'] / $scope3Total) * 100, 1) : '0.0' }}%</td>
+                <td>{{ $cat['data_quality'] }}</td>
+            </tr>
+            @endforeach
+            <tr class="total-row">
+                <td>Total Scope 3</td>
+                <td class="num">{{ number_format($scope3Total, 2) }}</td>
+                <td class="num">100.0%</td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+@endif
+
 {{-- Activity register --}}
 <div class="page-break"></div>
 <h2>4. Activity Data Register</h2>
@@ -536,6 +573,25 @@
         <li><strong>GWP values:</strong> {{ $methodology['gwp'] }}</li>
     </ul>
 </div>
+
+@if(!$moccaeOnly && isset($report['scope_3_categories']) && $report['scope_3_categories']->isNotEmpty())
+    @php
+        $s3Total = $report['scope_3_categories']->sum('tonnes');
+        // "Mixed" categories are counted as activity for the headline share, since they contain at least some activity data.
+        $s3Activity = $report['scope_3_categories']->whereIn('data_quality', ['Activity-based', 'Mixed'])->sum('tonnes');
+        $s3Spend = $report['scope_3_categories']->where('data_quality', 'Spend-based')->sum('tonnes');
+        $actPct = $s3Total > 0 ? round(($s3Activity / $s3Total) * 100, 1) : 0;
+        $spendPct = $s3Total > 0 ? round(($s3Spend / $s3Total) * 100, 1) : 0;
+    @endphp
+    <div class="methodology-box">
+        <strong>Scope 3 data quality</strong>
+        <ul>
+            <li><strong>Activity-based data:</strong> {{ $actPct }}% of Scope 3 emissions (physical units — distance, energy, weight). Higher quality.</li>
+            <li><strong>Spend-based data:</strong> {{ $spendPct }}% of Scope 3 emissions (EEIO / PCAF intensity factors applied to expenditure). Screening estimate.</li>
+            <li><strong>Improvement note:</strong> Where practical, replace spend-based categories with supplier-specific or activity data to raise inventory quality in future reporting periods.</li>
+        </ul>
+    </div>
+@endif
 
 <div class="notice-box">
     <strong>UAE legal submission:</strong> {{ $methodology['disclaimer'] }}

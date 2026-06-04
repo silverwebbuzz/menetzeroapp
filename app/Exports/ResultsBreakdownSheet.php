@@ -1,0 +1,146 @@
+<?php
+
+namespace App\Exports;
+
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithTitle;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+
+/**
+ * Sheet 1 — results breakdown by scope and emission source.
+ * (Extracted unchanged from the original single-sheet ResultsBreakdownExport.)
+ */
+class ResultsBreakdownSheet implements FromCollection, WithHeadings, WithStyles, WithTitle
+{
+    protected $resultsBreakdown;
+    protected $grandTotal;
+
+    public function __construct($resultsBreakdown, ?float $grandTotal = null)
+    {
+        $this->resultsBreakdown = $resultsBreakdown;
+        $this->grandTotal = $grandTotal;
+    }
+
+    public function title(): string
+    {
+        return 'Results Breakdown';
+    }
+
+    public function collection()
+    {
+        $data = collect();
+        $grandTotal = $this->grandTotal ?? 0;
+
+        foreach ($this->resultsBreakdown as $scope) {
+            $scopeTonnes = $scope['tonnes'] ?? ($scope['value'] ?? 0);
+
+            // Scope row
+            $data->push([
+                'Scope Name' => $scope['name'],
+                'Emission Source' => null,
+                'Results (tCO₂e)' => number_format($scopeTonnes, 2, '.', ''),
+            ]);
+
+            if ($this->grandTotal === null) {
+                $grandTotal += $scopeTonnes;
+            }
+
+            // Children rows
+            foreach ($scope['children'] as $child) {
+                $childTonnes = $child['tonnes'] ?? ($child['value'] ?? 0);
+                $data->push([
+                    'Scope Name' => null,
+                    'Emission Source' => $child['name'],
+                    'Results (tCO₂e)' => number_format($childTonnes, 2, '.', ''),
+                ]);
+            }
+        }
+
+        // Total row
+        $data->push([
+            'Scope Name' => 'Total',
+            'Emission Source' => null,
+            'Results (tCO₂e)' => number_format($grandTotal, 2, '.', ''),
+        ]);
+
+        return $data;
+    }
+
+    public function headings(): array
+    {
+        return ['Scope Name', 'Emission Source', 'Results (tCO₂e)'];
+    }
+
+    public function styles(Worksheet $sheet)
+    {
+        $highestRow = $sheet->getHighestRow();
+
+        // Header row style
+        $sheet->getStyle('A1:C1')->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'color' => ['rgb' => '000000'],
+                'size' => 12,
+            ],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'D9D9D9'], // Light gray
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN],
+            ],
+        ]);
+
+        // Loop through all rows
+        for ($row = 2; $row <= $highestRow; $row++) {
+            $scopeName = $sheet->getCell('A' . $row)->getValue();
+
+            if ($scopeName && $scopeName !== 'Total') {
+                // Scope rows: subtle gray fill
+                $sheet->getStyle('A' . $row . ':C' . $row)->applyFromArray([
+                    'font' => ['bold' => true, 'color' => ['rgb' => '000000']],
+                    'fill' => [
+                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'startColor' => ['rgb' => 'F2F2F2'],
+                    ],
+                    'borders' => [
+                        'allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN],
+                    ],
+                ]);
+            } elseif (!$scopeName) {
+                // Child rows: plain white background
+                $sheet->getStyle('A' . $row . ':C' . $row)->applyFromArray([
+                    'borders' => [
+                        'allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN],
+                    ],
+                ]);
+            } elseif ($scopeName === 'Total') {
+                // Total row: light gray fill and bold
+                $sheet->getStyle('A' . $row . ':C' . $row)->applyFromArray([
+                    'font' => ['bold' => true, 'color' => ['rgb' => '000000']],
+                    'fill' => [
+                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'startColor' => ['rgb' => 'D9D9D9'],
+                    ],
+                    'borders' => [
+                        'allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN],
+                    ],
+                ]);
+            }
+
+            // Right-align the Results column for readability
+            $sheet->getStyle('C' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        }
+
+        // Adjust column widths
+        foreach (range('A', 'C') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+    }
+}

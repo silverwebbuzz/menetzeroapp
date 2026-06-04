@@ -96,7 +96,11 @@ class ReportController extends Controller
         );
 
         return Excel::download(
-            new ResultsBreakdownExport($report['results_breakdown'], $report['display_total_tonnes']),
+            new ResultsBreakdownExport(
+                $report['results_breakdown'],
+                $report['display_total_tonnes'],
+                $report['scope_3_categories'] ?? collect()
+            ),
             $this->reportFilename($measurement, 'xlsx', $moccaeOnly)
         );
     }

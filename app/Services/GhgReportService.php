@@ -79,8 +79,72 @@ class GhgReportService
             'emission_source_data' => $emissionSourceData,
             'methodology' => $this->methodologyStatement(),
             'has_scope_3' => $scopeKg['Scope 3'] > 0,
+            'scope_3_categories' => $this->buildScope3Categories($measurement),
             'entry_count' => $activityRegister->count(),
         ];
+    }
+
+    /**
+     * Scope 3 broken down by GHG Protocol category (source subcategory, e.g. "Cat 6 – Business Travel"),
+     * with a data-quality flag per line (activity-based vs spend-based).
+     *
+     * Data quality is inferred from the emission factor: spend-based factors are priced per
+     * currency (unit = AED) or use modelled EEIO/PCAF intensities (source_standard = Custom);
+     * everything else is treated as activity-based (physical units, DEFRA/IPCC/UAE factors).
+     */
+    public function buildScope3Categories(Measurement $measurement)
+    {
+        $rows = MeasurementData::with(['emissionSource:id,name,scope,subcategory', 'emissionFactor:id,unit,source_standard'])
+            ->where('measurement_id', $measurement->id)
+            ->where('scope', 'Scope 3')
+            ->where('calculated_co2e', '>', 0)
+            ->get();
+
+        if ($rows->isEmpty()) {
+            return collect();
+        }
+
+        $categories = $rows->groupBy(fn ($row) => optional($row->emissionSource)->subcategory
+                ?: (optional($row->emissionSource)->name ?? 'Other'))
+            ->map(function ($group, $categoryName) {
+                $kg = (float) $group->sum('calculated_co2e');
+
+                // A category is "spend-based" if every contributing entry uses a spend/modelled factor.
+                $hasActivity = $group->contains(fn ($row) => !$this->isSpendBasedFactor($row->emissionFactor));
+                $hasSpend = $group->contains(fn ($row) => $this->isSpendBasedFactor($row->emissionFactor));
+                $quality = $hasActivity && $hasSpend ? 'Mixed' : ($hasActivity ? 'Activity-based' : 'Spend-based');
+
+                return [
+                    'category' => $categoryName,
+                    'kg' => $kg,
+                    'tonnes' => self::kgToTonnes($kg),
+                    'data_quality' => $quality,
+                    'entry_count' => $group->count(),
+                ];
+            })
+            ->filter(fn ($row) => $row['kg'] > 0)
+            ->sortByDesc('kg')
+            ->values();
+
+        return $categories;
+    }
+
+    /**
+     * Detect a spend-based / modelled emission factor.
+     */
+    private function isSpendBasedFactor($factor): bool
+    {
+        if (!$factor) {
+            return false;
+        }
+
+        $unit = strtolower(trim((string) $factor->unit));
+        if (in_array($unit, ['aed', 'usd', '$', 'per aed', 'per usd'], true)) {
+            return true;
+        }
+
+        // EEIO (EXIOBASE) and PCAF intensities are stored as Custom.
+        return strtoupper((string) $factor->source_standard) === 'CUSTOM';
     }
 
     public function buildResultsBreakdown(Measurement $measurement): array
@@ -219,6 +283,7 @@ class GhgReportService
 
         $report['entry_count'] = $report['activity_register']->count();
         $report['has_scope_3'] = false;
+        $report['scope_3_categories'] = collect();
 
         return $report;
     }
