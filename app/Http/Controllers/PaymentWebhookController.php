@@ -116,7 +116,9 @@ class PaymentWebhookController extends Controller
         } catch (\Throwable $e) {
             Log::error('Webhook subscription activation failed', [
                 'transaction_id' => $transaction->id,
+                'refs' => $refs,
                 'error' => $e->getMessage(),
+                'file' => $e->getFile() . ':' . $e->getLine(),
             ]);
         }
     }

@@ -338,8 +338,23 @@ class SubscriptionController extends Controller
         try {
             $this->subscriptionService->completeTransaction($transaction, $gatewayRefs);
         } catch (\Throwable $e) {
-            return redirect()->route('subscriptions.upgrade')
-                ->with('error', 'Payment received but the subscription could not be activated. Please contact support.');
+            \Illuminate\Support\Facades\Log::error('Subscription activation failed after payment', [
+                'transaction_id' => $transaction->id,
+                'company_id' => $transaction->company_id,
+                'reference' => $reference,
+                'gateway_refs' => $gatewayRefs,
+                'metadata' => $transaction->metadata,
+                'exception' => $e->getMessage(),
+                'file' => $e->getFile() . ':' . $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            $message = 'Payment received but the subscription could not be activated. Please contact support.';
+            if (config('app.debug')) {
+                $message .= ' [debug: ' . $e->getMessage() . ' @ ' . basename($e->getFile()) . ':' . $e->getLine() . ']';
+            }
+
+            return redirect()->route('subscriptions.upgrade')->with('error', $message);
         }
 
         $planName = optional(SubscriptionPlan::find($transaction->metadata['plan_id'] ?? null))->plan_name ?? 'subscription';
