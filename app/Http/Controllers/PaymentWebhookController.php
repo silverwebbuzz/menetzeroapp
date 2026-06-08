@@ -94,15 +94,26 @@ class PaymentWebhookController extends Controller
 
         $payload = $request->json()->all();
         $orderId = $payload['data']['order']['order_id'] ?? null;
+        $type = $payload['type'] ?? null;
+        $paymentStatus = $payload['data']['payment']['payment_status'] ?? null;
 
         if ($orderId) {
             $transaction = PaymentTransaction::where('metadata->cashfree_order_id', $orderId)->first();
-            if ($transaction) {
-                // Confirm with the orders API before activating.
-                $status = $this->paymentService->getCashfreeOrderStatus($gateway, $orderId);
-                if ($status === 'PAID') {
-                    $this->activate($transaction, ['cashfree_order_id' => $orderId, 'source' => 'webhook']);
+
+            if ($transaction && $transaction->status !== 'completed') {
+                $success = $type === 'PAYMENT_SUCCESS_WEBHOOK' || $paymentStatus === 'SUCCESS';
+
+                if ($success) {
+                    // Confirm with the orders API before activating.
+                    if ($this->paymentService->getCashfreeOrderStatus($gateway, $orderId) === 'PAID') {
+                        $this->activate($transaction, ['cashfree_order_id' => $orderId, 'source' => 'webhook']);
+                    }
+                } elseif (in_array($paymentStatus, ['USER_DROPPED', 'CANCELLED'], true)) {
+                    $transaction->update(['status' => 'cancelled']);
+                } elseif ($paymentStatus === 'FAILED' || $type === 'PAYMENT_FAILED_WEBHOOK') {
+                    $transaction->update(['status' => 'failed']);
                 }
+                // PENDING and other transient states: leave as-is and wait.
             }
         }
 

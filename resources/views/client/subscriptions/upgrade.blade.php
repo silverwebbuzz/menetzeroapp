@@ -17,11 +17,25 @@
         'highlight' => false,
     ];
 @endphp
+@php $displayCurrency = \App\Services\CurrencyService::displayCurrency(); @endphp
 <div class="max-w-6xl mx-auto">
     <!-- Header -->
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">Choose your plan</h1>
-        <p class="mt-2 text-gray-600">Scope 1 &amp; 2 carbon accounting. Prices in AED (billed annually).</p>
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Choose your plan</h1>
+            <p class="mt-2 text-gray-600">
+                Scope 1 &amp; 2 carbon accounting. Prices shown in {{ $displayCurrency }} (billed annually).
+                @if($displayCurrency !== 'INR')
+                    <span class="text-gray-400">Charged in INR (₹) at checkout.</span>
+                @endif
+            </p>
+        </div>
+        <div class="inline-flex items-center rounded-lg border border-gray-200 overflow-hidden text-sm self-start">
+            <a href="{{ route('currency.switch', 'AED') }}"
+               class="px-3 py-1.5 {{ $displayCurrency === 'AED' ? 'bg-orange-600 text-white' : 'text-gray-600 hover:bg-gray-50' }}">AED</a>
+            <a href="{{ route('currency.switch', 'INR') }}"
+               class="px-3 py-1.5 {{ $displayCurrency === 'INR' ? 'bg-orange-600 text-white' : 'text-gray-600 hover:bg-gray-50' }}">INR (₹)</a>
+        </div>
     </div>
 
     <!-- Current Plan Info -->

@@ -127,7 +127,65 @@ class PaymentService
         return $response->json('order_status');
     }
 
+    /**
+     * Status of the latest payment attempt for a Cashfree order. Lets us tell
+     * apart PENDING vs USER_DROPPED vs FAILED when the order is not yet PAID.
+     *
+     * @return string|null SUCCESS|FAILED|PENDING|USER_DROPPED|CANCELLED|... or null
+     */
+    public function getCashfreePaymentStatus(PaymentGateway $gw, string $orderId): ?string
+    {
+        $response = Http::withHeaders($this->cashfreeHeaders($gw))
+            ->acceptJson()
+            ->get($this->cashfreeBaseUrl($gw) . '/orders/' . $orderId . '/payments');
+
+        if ($response->failed()) {
+            Log::error('Cashfree payments fetch failed', ['order' => $orderId, 'body' => $response->body()]);
+            return null;
+        }
+
+        $payments = $response->json();
+        if (!is_array($payments) || empty($payments)) {
+            return null; // No attempt recorded yet.
+        }
+
+        // The API returns attempts newest-first; the first SUCCESS wins, else
+        // fall back to the most recent attempt's status.
+        foreach ($payments as $payment) {
+            if (($payment['payment_status'] ?? null) === 'SUCCESS') {
+                return 'SUCCESS';
+            }
+        }
+
+        return $payments[0]['payment_status'] ?? null;
+    }
+
     /* ===================== Helpers ===================== */
+
+    /**
+     * Normalise a phone into the 10-digit form Cashfree expects. Returns null
+     * when no usable number can be derived so callers can pick a fallback.
+     */
+    public static function normalizePhone(?string $phone): ?string
+    {
+        $digits = preg_replace('/\D+/', '', (string) $phone);
+
+        if ($digits === '') {
+            return null;
+        }
+
+        // Drop a leading country code / zero so we keep the last 10 digits.
+        if (strlen($digits) > 10) {
+            $digits = substr($digits, -10);
+        }
+
+        // Reject obviously invalid numbers (all zeros, too short).
+        if (strlen($digits) < 10 || preg_match('/^0+$/', $digits)) {
+            return null;
+        }
+
+        return $digits;
+    }
 
     private function extractError(?array $body, string $fallback): string
     {

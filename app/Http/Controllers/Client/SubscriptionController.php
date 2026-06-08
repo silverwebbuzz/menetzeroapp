@@ -189,6 +189,13 @@ class SubscriptionController extends Controller
             } else {
                 $cfOrderId = 'txn_' . $transaction->id . '_' . Str::lower(Str::random(6));
                 $returnUrl = route('subscriptions.payment.cashfree') . '?order_id={order_id}';
+
+                // Cashfree needs a valid 10-digit phone and a non-empty name/email.
+                $phone = PaymentService::normalizePhone($user->phone ?? null)
+                    ?? PaymentService::normalizePhone($company->phone ?? null)
+                    ?? PaymentService::normalizePhone(\App\Models\SiteSetting::get('support_phone'))
+                    ?? '9999999999';
+
                 $order = $this->paymentService->createCashfreeOrder(
                     $gateway,
                     $cfOrderId,
@@ -196,9 +203,9 @@ class SubscriptionController extends Controller
                     $transaction->currency,
                     [
                         'id' => 'cust_' . $company->id,
-                        'name' => $user->name ?? $company->name,
-                        'email' => $user->email ?? '',
-                        'phone' => $user->phone ?? '0000000000',
+                        'name' => $user->name ?: $company->name,
+                        'email' => $user->email ?: ($company->email ?: 'billing@menetzero.com'),
+                        'phone' => $phone,
                     ],
                     $returnUrl
                 );
@@ -319,15 +326,45 @@ class SubscriptionController extends Controller
         }
 
         $gateway = PaymentGateway::forGateway('cashfree');
-        $status = $gateway ? $this->paymentService->getCashfreeOrderStatus($gateway, $orderId) : null;
-
-        if ($status !== 'PAID') {
-            $transaction->update(['status' => 'failed']);
-            return redirect()->route('subscriptions.upgrade')
-                ->with('error', 'Payment not completed (status: ' . ($status ?? 'unknown') . ').');
+        if (!$gateway) {
+            return redirect()->route('subscriptions.upgrade')->with('error', 'Payment method unavailable.');
         }
 
-        return $this->completePaidSubscription($transaction, ['cashfree_order_id' => $orderId], $orderId);
+        $orderStatus = $this->paymentService->getCashfreeOrderStatus($gateway, $orderId);
+
+        // Order is settled — activate immediately.
+        if ($orderStatus === 'PAID') {
+            return $this->completePaidSubscription($transaction, ['cashfree_order_id' => $orderId], $orderId);
+        }
+
+        // Not PAID yet: inspect the latest payment attempt to decide what to tell
+        // the customer (pending / dropped / failed).
+        $paymentStatus = $this->paymentService->getCashfreePaymentStatus($gateway, $orderId);
+
+        if ($paymentStatus === 'SUCCESS') {
+            // Payment captured but order not flipped to PAID yet — safe to activate.
+            return $this->completePaidSubscription($transaction, ['cashfree_order_id' => $orderId], $orderId);
+        }
+
+        // Still processing — leave the transaction pending and let the webhook
+        // activate it once the bank confirms. Do NOT mark it failed.
+        if ($paymentStatus === 'PENDING' || ($orderStatus === 'ACTIVE' && $paymentStatus === null)) {
+            $transaction->update(['status' => 'pending']);
+            return redirect()->route('subscriptions.index')
+                ->with('info', 'Your payment is being processed. We\'ll activate your plan automatically once your bank confirms it — please don\'t pay again.');
+        }
+
+        // Customer abandoned the payment page.
+        if (in_array($paymentStatus, ['USER_DROPPED', 'CANCELLED'], true)) {
+            $transaction->update(['status' => 'cancelled']);
+            return redirect()->route('subscriptions.upgrade')
+                ->with('error', 'Payment was cancelled. You can try again whenever you\'re ready — you were not charged.');
+        }
+
+        // FAILED / EXPIRED / TERMINATED / anything else.
+        $transaction->update(['status' => 'failed']);
+        return redirect()->route('subscriptions.upgrade')
+            ->with('error', 'Payment failed (status: ' . ($paymentStatus ?? $orderStatus ?? 'unknown') . '). You were not charged. Please try again.');
     }
 
     /**
