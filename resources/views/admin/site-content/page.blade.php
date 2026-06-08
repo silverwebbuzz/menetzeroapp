@@ -22,7 +22,7 @@
                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 font-mono text-sm">{{ old('body', $page->body) }}</textarea>
                 <p class="mt-1 text-xs text-gray-500">
                     You can use HTML (<code>&lt;h2&gt;</code>, <code>&lt;p&gt;</code>, <code>&lt;ul&gt;&lt;li&gt;</code>) and these auto-filled tokens:
-                    <code>{{ '{{company_legal_name}}' }}</code>, <code>{{ '{{brand_name}}' }}</code>, <code>{{ '{{support_email}}' }}</code>, <code>{{ '{{support_phone}}' }}</code>.
+                    @verbatim<code>{{company_legal_name}}</code>, <code>{{brand_name}}</code>, <code>{{support_email}}</code>, <code>{{support_phone}}</code>@endverbatim.
                 </p>
             </div>
 
