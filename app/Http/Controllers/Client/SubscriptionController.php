@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Services\SubscriptionService;
 use App\Models\SubscriptionPlan;
 use App\Models\ClientSubscription;
+use App\Data\SubscriptionPlanMatrix;
 use Illuminate\Support\Facades\Auth;
 
 class SubscriptionController extends Controller
@@ -74,9 +75,25 @@ class SubscriptionController extends Controller
         $availablePlans = SubscriptionPlan::where('plan_category', 'client')
             ->where('is_active', true)
             ->orderBy('sort_order')
-            ->get();
+            ->get()
+            ->keyBy('plan_code');
 
-        return view('client.subscriptions.upgrade', compact('currentSubscription', 'availablePlans', 'company'));
+        $planMeta = SubscriptionPlanMatrix::plans();
+        $comparisonColumns = SubscriptionPlanMatrix::columns();
+        $featureRows = SubscriptionPlanMatrix::featureRows();
+        $scope3AddOns = SubscriptionPlanMatrix::scope3AddOns();
+        $packages = SubscriptionPlanMatrix::packages();
+
+        return view('client.subscriptions.upgrade', compact(
+            'currentSubscription',
+            'availablePlans',
+            'company',
+            'planMeta',
+            'comparisonColumns',
+            'featureRows',
+            'scope3AddOns',
+            'packages'
+        ));
     }
 
     /**
