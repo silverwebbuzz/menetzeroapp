@@ -48,7 +48,10 @@
       "Bash(grep -oE \"\\\\\\(\\([0-9]{4}\\),\\(6[2-9]|7[0-6]\\),'unit_of_measure'\" documentation/scope3_uae_setup.sql)",
       "Bash(grep -oE \"emission_source_id\\\\` IN \\\\\\([0-9,]+\\\\\\)\" documentation/scope3_uae_unit_dependency_patch.sql)",
       "WebFetch(domain:www.gov.uk)",
-      "Bash(grep -n 'subcategory\\\\|category\\\\|scope\\\\|protected $fillable\\\\|protected $casts' app/Models/EmissionSourceMaster.php)"
+      "Bash(grep -n 'subcategory\\\\|category\\\\|scope\\\\|protected $fillable\\\\|protected $casts' app/Models/EmissionSourceMaster.php)",
+      "Bash(awk 'NR>=1')",
+      "Bash(awk 'NR>=100 && NR<=181 && /middleware|->group\\\\\\(function|prefix/' routes/web.php)",
+      "Bash(awk 'NR>=255 && NR<=288 && /middleware|->group\\\\\\(function|prefix/' routes/web.php)"
     ],
     "additionalDirectories": [
       "/private/tmp"

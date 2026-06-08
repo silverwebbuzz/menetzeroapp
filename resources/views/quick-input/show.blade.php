@@ -95,6 +95,33 @@
     </form>
 
     @if($selectedLocationId && $selectedFiscalYear && $measurement)
+    @if(($scope3LimitReached ?? false) && !$editEntry)
+    <!-- Scope 3 free-plan limit reached: prompt to upgrade instead of showing the add form -->
+    <div class="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-xl shadow-sm p-6 mb-8">
+        <div class="flex items-start gap-4">
+            <div class="flex-shrink-0 w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-lg font-bold text-gray-900 mb-1">Upgrade to add more Scope 3 records</h3>
+                <p class="text-sm text-gray-600 mb-4">
+                    Your current plan allows only <strong>{{ $scope3Limit }}</strong> record per Scope 3 form.
+                    You've already added the maximum for <strong>{{ $userFriendlyName ?? $emissionSource->name }}</strong>.
+                    Upgrade your plan to unlock unlimited Scope 3 entries.
+                </p>
+                <a href="{{ route('subscriptions.upgrade') }}"
+                   class="inline-flex items-center px-5 py-2.5 bg-purple-600 text-white text-sm font-semibold rounded-lg hover:bg-purple-700 transition-colors shadow-sm">
+                    View upgrade plans
+                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+    @else
     <!-- Entry Form (Handles both Add and Edit) - Professional Design -->
     <form method="POST" 
           action="{{ $editEntry ? route('quick-input.update', $editEntry->id) : route('quick-input.store', ['scope' => $scope, 'slug' => $slug]) }}" 
@@ -452,6 +479,7 @@
             </button>
         </div>
     </form>
+    @endif
     @else
     <div class="bg-yellow-50 border-l-4 border-yellow-400 rounded-lg shadow-sm p-5 mb-8">
         <div class="flex items-start">

@@ -11,6 +11,7 @@ use App\Models\EmissionSourceFormField;
 use App\Services\EmissionCalculationService;
 use App\Services\MeasurementService;
 use App\Services\QuickInputFormBuilder;
+use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,15 +22,18 @@ class QuickInputController extends Controller
     protected $calculationService;
     protected $measurementService;
     protected $formBuilder;
+    protected $subscriptionService;
 
     public function __construct(
         EmissionCalculationService $calculationService,
         MeasurementService $measurementService,
-        QuickInputFormBuilder $formBuilder
+        QuickInputFormBuilder $formBuilder,
+        SubscriptionService $subscriptionService
     ) {
         $this->calculationService = $calculationService;
         $this->measurementService = $measurementService;
         $this->formBuilder = $formBuilder;
+        $this->subscriptionService = $subscriptionService;
     }
     /**
      * Display a listing of Quick Input entries
@@ -277,6 +281,16 @@ class QuickInputController extends Controller
                 ->get();
         }
 
+        // Scope 3 free-plan limit info (used to show an upgrade prompt instead of the
+        // add form once the per-form record limit is reached).
+        $scope3Limit = -1;
+        $scope3LimitReached = false;
+        if ($emissionSource->scope === 'Scope 3') {
+            $scope3Check = $this->subscriptionService->canAddScope3Record($company->id, $emissionSource->id);
+            $scope3Limit = $scope3Check['limit'];
+            $scope3LimitReached = !$scope3Check['allowed'];
+        }
+
         return view('quick-input.show', compact(
             'emissionSource',
             'formFields',
@@ -290,7 +304,9 @@ class QuickInputController extends Controller
             'measurement',
             'existingEntries',
             'yearsWithMeasurements',
-            'editEntry'
+            'editEntry',
+            'scope3Limit',
+            'scope3LimitReached'
         ));
     }
 
@@ -472,6 +488,16 @@ class QuickInputController extends Controller
             ->where('scope', 'Scope ' . $scope)
             ->where('is_quick_input', true)
             ->firstOrFail();
+
+        // Enforce Scope 3 per-form record limit (free plan allows 1 record per form).
+        // Scope 1 & 2 are unlimited; only new records are gated (edits go through update()).
+        if ($emissionSource->scope === 'Scope 3') {
+            $scope3Check = $this->subscriptionService->canAddScope3Record($company->id, $emissionSource->id);
+            if (!$scope3Check['allowed']) {
+                return redirect()->route('subscriptions.upgrade')
+                    ->with('error', $scope3Check['message']);
+            }
+        }
 
         // Validate basic required fields
         $validationRules = [

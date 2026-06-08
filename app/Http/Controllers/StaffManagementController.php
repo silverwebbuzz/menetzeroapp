@@ -180,7 +180,8 @@ class StaffManagementController extends Controller
 
             $limitCheck = $this->subscriptionService->canPerformAction($company->id, 'users', 1);
             if (!$limitCheck['allowed']) {
-                return back()->withErrors(['email' => $limitCheck['message']])->withInput();
+                return redirect()->route('subscriptions.upgrade')
+                    ->with('error', $limitCheck['message']);
             }
 
             try {

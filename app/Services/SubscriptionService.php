@@ -127,6 +127,79 @@ class SubscriptionService
     }
 
     /**
+     * Number of records a company may add per Scope 3 form (emission source).
+     *
+     * Free plans (and companies without an active subscription) are limited to a
+     * single record per Scope 3 form. Any paid plan is unlimited unless the plan
+     * explicitly defines a `scope3_records_per_form` limit.
+     *
+     * @return int  The per-form limit, or -1 for unlimited.
+     */
+    public function getScope3FormRecordLimit($companyId)
+    {
+        $subscription = $this->getActiveSubscription($companyId, 'client');
+
+        // No active subscription => treat as free (most restrictive).
+        if (!$subscription || !$subscription->plan) {
+            return 1;
+        }
+
+        $plan = $subscription->plan;
+        $limits = $plan->limits ?? [];
+
+        // Explicit plan limit always wins.
+        if (is_array($limits)
+            && array_key_exists('scope3_records_per_form', $limits)
+            && $limits['scope3_records_per_form'] !== null) {
+            return (int) $limits['scope3_records_per_form'];
+        }
+
+        // Fallback: free plan (price 0 or "free" code) => 1, otherwise unlimited.
+        $isFreePlan = ((float) $plan->price_annual) <= 0
+            || stripos((string) $plan->plan_code, 'free') !== false;
+
+        return $isFreePlan ? 1 : -1;
+    }
+
+    /**
+     * Count how many records the company already has for a Scope 3 form.
+     */
+    public function getScope3FormRecordCount($companyId, $emissionSourceId)
+    {
+        return \App\Models\MeasurementData::where('emission_source_id', $emissionSourceId)
+            ->whereHas('measurement.location', function ($query) use ($companyId) {
+                $query->where('company_id', $companyId);
+            })
+            ->count();
+    }
+
+    /**
+     * Determine whether the company can add another record to a Scope 3 form.
+     */
+    public function canAddScope3Record($companyId, $emissionSourceId)
+    {
+        $limit = $this->getScope3FormRecordLimit($companyId);
+
+        if ($limit === -1) {
+            return ['allowed' => true, 'message' => null, 'limit' => -1, 'used' => 0];
+        }
+
+        $used = $this->getScope3FormRecordCount($companyId, $emissionSourceId);
+
+        if (($used + 1) > $limit) {
+            return [
+                'allowed' => false,
+                'limit' => $limit,
+                'used' => $used,
+                'message' => "Your current plan allows only {$limit} record per Scope 3 form. "
+                    . "Please upgrade your plan to add more Scope 3 entries.",
+            ];
+        }
+
+        return ['allowed' => true, 'message' => null, 'limit' => $limit, 'used' => $used];
+    }
+
+    /**
      * Get current usage for a resource type.
      */
     public function getCurrentUsage($companyId, $resourceType)

@@ -100,10 +100,12 @@ class LocationController extends Controller
             'measurement_frequency' => 'nullable|string|max:20',
         ]);
 
-        // Check location limit before creating
+        // Check location limit before creating. When the plan limit is hit we send the
+        // user to the upgrade page so they can pick a paid plan with more locations.
         $limitCheck = $this->subscriptionService->canPerformAction($company->id, 'locations', 1);
         if (!$limitCheck['allowed']) {
-            return back()->withErrors(['name' => $limitCheck['message']])->withInput();
+            return redirect()->route('subscriptions.upgrade')
+                ->with('error', $limitCheck['message']);
         }
 
         // Check if this is the first location for the company
@@ -162,7 +164,11 @@ class LocationController extends Controller
             // Check location limit before creating
             $limitCheck = $this->subscriptionService->canPerformAction($company->id, 'locations', 1);
             if (!$limitCheck['allowed']) {
-                return response()->json(['success' => false, 'error' => $limitCheck['message']], 422);
+                return response()->json([
+                    'success' => false,
+                    'error' => $limitCheck['message'],
+                    'upgrade_url' => route('subscriptions.upgrade'),
+                ], 422);
             }
 
             // Check if this is the first location for the company
