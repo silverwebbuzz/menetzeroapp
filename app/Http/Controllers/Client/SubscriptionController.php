@@ -68,11 +68,16 @@ class SubscriptionController extends Controller
             ? $this->subscriptionService->getDowngradeWarnings($company->id, $scheduledPlan)
             : [];
 
+        $isPaidPlan = $this->subscriptionService->isPaidSubscription($subscription);
+        $cancellationScheduled = $this->subscriptionService->isCancellationScheduled($subscription);
+
         return view('client.subscriptions.current-plan', compact(
             'subscription',
             'company',
             'scheduledPlan',
-            'scheduledDowngradeWarnings'
+            'scheduledDowngradeWarnings',
+            'isPaidPlan',
+            'cancellationScheduled'
         ));
     }
 
@@ -553,7 +558,17 @@ class SubscriptionController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('client.subscriptions.billing', compact('subscription', 'company', 'paymentHistory', 'billingMethods'));
+        $isPaidPlan = $this->subscriptionService->isPaidSubscription($subscription);
+        $cancellationScheduled = $this->subscriptionService->isCancellationScheduled($subscription);
+
+        return view('client.subscriptions.billing', compact(
+            'subscription',
+            'company',
+            'paymentHistory',
+            'billingMethods',
+            'isPaidPlan',
+            'cancellationScheduled'
+        ));
     }
 
     /**
@@ -572,7 +587,8 @@ class SubscriptionController extends Controller
     }
 
     /**
-     * Cancel subscription.
+     * Schedule cancellation at the end of the current paid term.
+     * Free plans have nothing to cancel. Paid plans stay active until expiry.
      */
     public function cancel(Request $request)
     {
@@ -583,16 +599,51 @@ class SubscriptionController extends Controller
         }
 
         $subscription = $this->subscriptionService->getActiveSubscription($company->id, 'client');
-        
+
         if (!$subscription) {
             return back()->with('error', 'No active subscription found.');
         }
 
-        $subscription->update(['auto_renew' => false]);
-        $this->subscriptionService->transitionSubscriptionStatus($subscription, 'cancelled');
+        if (!$this->subscriptionService->isPaidSubscription($subscription)) {
+            return back()->with('info', 'You are on the Free plan — there is nothing to cancel. Your access continues at no charge.');
+        }
+
+        if ($this->subscriptionService->isCancellationScheduled($subscription)) {
+            return back()->with('info', 'Cancellation is already scheduled for '
+                . $subscription->expires_at->format('F d, Y') . '.');
+        }
+
+        $this->subscriptionService->scheduleCancellation($subscription);
 
         return redirect()->route('subscriptions.current-plan')
-            ->with('success', 'Subscription cancelled successfully.');
+            ->with('success', 'Cancellation scheduled. Your '
+                . ($subscription->plan->plan_name ?? 'paid')
+                . ' plan stays fully active until '
+                . $subscription->expires_at->format('F d, Y')
+                . ' and will not renew after that.');
+    }
+
+    /**
+     * Undo a scheduled end-of-term cancellation.
+     */
+    public function resume(Request $request)
+    {
+        $company = Auth::user()->getActiveCompany();
+        if (!$company || !$company->isClient()) {
+            return redirect()->route('client.dashboard')->with('error', 'Access denied.');
+        }
+
+        $subscription = $this->subscriptionService->getActiveSubscription($company->id, 'client');
+
+        if (!$subscription || !$this->subscriptionService->isCancellationScheduled($subscription)) {
+            return back()->with('error', 'No scheduled cancellation to resume.');
+        }
+
+        $this->subscriptionService->resumeSubscription($subscription);
+
+        return redirect()->route('subscriptions.current-plan')
+            ->with('success', 'Cancellation withdrawn. Your plan will continue and you will be reminded to renew before '
+                . $subscription->expires_at->format('F d, Y') . '.');
     }
 
     /**

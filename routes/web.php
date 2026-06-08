@@ -224,6 +224,7 @@ Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client'])->
         Route::get('/billing', [\App\Http\Controllers\Client\SubscriptionController::class, 'billing'])->name('billing');
         Route::get('/payment-history', [\App\Http\Controllers\Client\SubscriptionController::class, 'paymentHistory'])->name('payment-history');
         Route::post('/cancel', [\App\Http\Controllers\Client\SubscriptionController::class, 'cancel'])->name('cancel');
+        Route::post('/resume', [\App\Http\Controllers\Client\SubscriptionController::class, 'resume'])->name('resume');
         
         // Billing Methods routes
         Route::post('/billing-methods', [\App\Http\Controllers\Client\SubscriptionController::class, 'storeBillingMethod'])->name('billing-methods.store');

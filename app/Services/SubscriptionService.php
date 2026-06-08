@@ -224,6 +224,52 @@ class SubscriptionService
         return $planId ? SubscriptionPlan::find($planId) : null;
     }
 
+    public function isPaidSubscription(ClientSubscription $subscription): bool
+    {
+        return $subscription->plan && (float) $subscription->plan->price_annual > 0;
+    }
+
+    public function isCancellationScheduled(ClientSubscription $subscription): bool
+    {
+        return !empty($subscription->metadata['cancel_at_period_end']);
+    }
+
+    /**
+     * Request cancellation at the end of the paid term. Access continues until
+     * expires_at; the plan will not renew.
+     */
+    public function scheduleCancellation(ClientSubscription $subscription): ClientSubscription
+    {
+        $metadata = $subscription->metadata ?? [];
+        $metadata['cancel_at_period_end'] = true;
+        $metadata['cancel_requested_at'] = now()->toIso8601String();
+        $metadata['cancel_effective_at'] = $subscription->expires_at->toIso8601String();
+        unset($metadata['renewal_plan_id'], $metadata['renewal_plan_name'], $metadata['renewal_scheduled_at']);
+
+        $subscription->update([
+            'auto_renew' => false,
+            'metadata' => $metadata,
+        ]);
+
+        return $subscription->fresh();
+    }
+
+    /**
+     * Undo a scheduled end-of-term cancellation and re-enable renewal reminders.
+     */
+    public function resumeSubscription(ClientSubscription $subscription): ClientSubscription
+    {
+        $metadata = $subscription->metadata ?? [];
+        unset($metadata['cancel_at_period_end'], $metadata['cancel_requested_at'], $metadata['cancel_effective_at']);
+
+        $subscription->update([
+            'auto_renew' => true,
+            'metadata' => $metadata,
+        ]);
+
+        return $subscription->fresh();
+    }
+
     /**
      * Subscribe a client to a plan.
      */
@@ -257,8 +303,15 @@ class SubscriptionService
             $existing?->metadata ?? [],
             is_array($data['metadata'] ?? null) ? $data['metadata'] : []
         );
-        // Upgrading clears any scheduled downgrade and starts a fresh term.
-        unset($metadata['renewal_plan_id'], $metadata['renewal_plan_name'], $metadata['renewal_scheduled_at']);
+        // Upgrading clears any scheduled downgrade/cancellation and starts a fresh term.
+        unset(
+            $metadata['renewal_plan_id'],
+            $metadata['renewal_plan_name'],
+            $metadata['renewal_scheduled_at'],
+            $metadata['cancel_at_period_end'],
+            $metadata['cancel_requested_at'],
+            $metadata['cancel_effective_at']
+        );
 
         if ($existing && !$preserveExpiry) {
             $metadata['upgraded_at'] = now()->toIso8601String();

@@ -31,12 +31,24 @@
                     {{ $subscription->status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
                     {{ ucfirst($subscription->status) }}
                 </span>
-                @if($subscription->auto_renew)
+                @if(!empty($cancellationScheduled))
+                <span class="ml-2 px-3 py-1 rounded-full text-sm font-semibold bg-red-100 text-red-800">
+                    Cancels {{ $subscription->expires_at->format('M d, Y') }}
+                </span>
+                @elseif($subscription->auto_renew)
                 <span class="ml-2 px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800">
                     Renewal reminder enabled
                 </span>
                 @endif
             </div>
+
+            @if(!empty($cancellationScheduled))
+            <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+                <strong>Cancellation scheduled:</strong>
+                Your {{ $subscription->plan->plan_name }} plan remains <strong>fully active until
+                {{ $subscription->expires_at->format('F d, Y') }}</strong>. It will not renew after that date.
+            </div>
+            @endif
 
             @if(!empty($scheduledPlan))
             <div class="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
@@ -117,11 +129,18 @@
                 <a href="{{ route('subscriptions.billing') }}" class="px-6 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
                     Billing Info
                 </a>
-                @if($subscription->auto_renew)
-                <form action="{{ route('subscriptions.cancel') }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to cancel your subscription?')">
+                @if(!empty($isPaidPlan) && empty($cancellationScheduled))
+                <form action="{{ route('subscriptions.cancel') }}" method="POST" class="inline" onsubmit="return confirm('Your plan will stay active until {{ $subscription->expires_at->format('F d, Y') }} and will not renew after that. Continue?')">
                     @csrf
                     <button type="submit" class="px-6 py-2 bg-white border border-red-300 text-red-600 rounded-lg hover:bg-red-50">
-                        Cancel Subscription
+                        Cancel at renewal
+                    </button>
+                </form>
+                @elseif(!empty($cancellationScheduled))
+                <form action="{{ route('subscriptions.resume') }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="px-6 py-2 bg-white border border-green-300 text-green-700 rounded-lg hover:bg-green-50">
+                        Keep my plan (undo cancel)
                     </button>
                 </form>
                 @endif

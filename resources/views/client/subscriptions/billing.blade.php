@@ -73,11 +73,19 @@
                     <a href="{{ route('subscriptions.upgrade') }}" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                         Upgrade Plan
                     </a>
-                    @if($subscription->auto_renew)
+                    @if(!empty($cancellationScheduled))
+                        <span class="text-sm text-red-700">Cancels on {{ $subscription->expires_at->format('F d, Y') }} — access continues until then.</span>
+                        <form action="{{ route('subscriptions.resume') }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit" class="px-6 py-2 bg-white border border-green-300 text-green-700 rounded-lg hover:bg-green-50">
+                                Keep my plan
+                            </button>
+                        </form>
+                    @elseif(!empty($isPaidPlan))
                         <form action="{{ route('subscriptions.cancel') }}" method="POST" class="inline">
                             @csrf
-                            <button type="submit" class="px-6 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50" onclick="return confirm('Are you sure you want to cancel auto-renewal?')">
-                                Cancel Auto-Renewal
+                            <button type="submit" class="px-6 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50" onclick="return confirm('Your plan stays active until {{ $subscription->expires_at->format('F d, Y') }} and will not renew after that. Continue?')">
+                                Cancel at renewal
                             </button>
                         </form>
                     @endif
