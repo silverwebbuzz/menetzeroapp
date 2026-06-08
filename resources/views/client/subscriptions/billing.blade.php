@@ -48,7 +48,11 @@
                     <div>
                         <label class="text-sm font-medium text-gray-500">Amount</label>
                         <p class="text-lg font-semibold text-gray-900">
-                            {{ $subscription->plan->currency ?? 'AED' }} {{ number_format($subscription->plan->price_annual ?? 0, 2) }}
+                            @if(!empty($isComplimentary))
+                                <span class="text-purple-700">Complimentary</span>
+                            @else
+                                {{ $subscription->plan->currency ?? 'AED' }} {{ number_format($subscription->plan->price_annual ?? 0, 2) }}
+                            @endif
                         </p>
                     </div>
                     <div>
@@ -68,6 +72,12 @@
                         </p>
                     </div>
                 </div>
+
+                @if(!empty($provisionLabel))
+                <div class="mb-4 rounded-lg border border-purple-200 bg-purple-50 px-4 py-3 text-sm text-purple-900">
+                    {{ $provisionLabel }}. No payment is required for this access period.
+                </div>
+                @endif
 
                 <div class="flex items-center gap-4">
                     <a href="{{ route('subscriptions.upgrade') }}" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
@@ -304,7 +314,13 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
                     </svg>
                     <p class="mt-2 text-sm text-gray-500">No transactions found.</p>
-                    <p class="text-xs text-gray-400 mt-1">All payment transactions will appear here.</p>
+                    <p class="text-xs text-gray-400 mt-1">
+                        @if(!empty($isComplimentary))
+                            Your plan was provided at no charge — there is no payment history for this period.
+                        @else
+                            All payment transactions will appear here.
+                        @endif
+                    </p>
                 </div>
                 @endif
             </div>

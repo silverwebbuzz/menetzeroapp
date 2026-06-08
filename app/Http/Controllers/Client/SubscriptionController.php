@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\SubscriptionService;
 use App\Services\PaymentService;
+use App\Services\CouponService;
 use App\Models\SubscriptionPlan;
 use App\Models\ClientSubscription;
 use App\Models\PaymentGateway;
@@ -18,11 +19,16 @@ class SubscriptionController extends Controller
 {
     protected $subscriptionService;
     protected $paymentService;
+    protected $couponService;
 
-    public function __construct(SubscriptionService $subscriptionService, PaymentService $paymentService)
-    {
+    public function __construct(
+        SubscriptionService $subscriptionService,
+        PaymentService $paymentService,
+        CouponService $couponService
+    ) {
         $this->subscriptionService = $subscriptionService;
         $this->paymentService = $paymentService;
+        $this->couponService = $couponService;
     }
 
     /**
@@ -70,6 +76,8 @@ class SubscriptionController extends Controller
 
         $isPaidPlan = $this->subscriptionService->isPaidSubscription($subscription);
         $cancellationScheduled = $this->subscriptionService->isCancellationScheduled($subscription);
+        $isComplimentary = $this->subscriptionService->isComplimentary($subscription);
+        $provisionLabel = $this->subscriptionService->getProvisionLabel($subscription);
 
         return view('client.subscriptions.current-plan', compact(
             'subscription',
@@ -77,7 +85,9 @@ class SubscriptionController extends Controller
             'scheduledPlan',
             'scheduledDowngradeWarnings',
             'isPaidPlan',
-            'cancellationScheduled'
+            'cancellationScheduled',
+            'isComplimentary',
+            'provisionLabel'
         ));
     }
 
@@ -235,6 +245,54 @@ class SubscriptionController extends Controller
             ];
         }
 
+        $couponMeta = [];
+        $couponCode = trim((string) $request->input('coupon_code', ''));
+
+        if ($couponCode !== '') {
+            try {
+                $applied = $this->couponService->validateForCheckout(
+                    $couponCode,
+                    $company->id,
+                    $plan,
+                    $charge['amount'],
+                    $charge['currency']
+                );
+
+                if ($applied['is_free']) {
+                    $subscription = $this->subscriptionService->activateWithCoupon(
+                        $company->id,
+                        $plan->id,
+                        [
+                            'coupon_code' => $applied['coupon']->code,
+                            'coupon_id' => $applied['coupon']->id,
+                        ],
+                        $change['preserve_expiry']
+                    );
+
+                    $this->couponService->recordRedemption(
+                        $applied['coupon'],
+                        $company->id,
+                        $applied['discount'],
+                        $charge['currency'],
+                        $subscription
+                    );
+
+                    return redirect()->route('subscriptions.current-plan')
+                        ->with('success', 'Coupon applied — your ' . $plan->plan_name . ' plan is now active!');
+                }
+
+                $couponMeta = [
+                    'coupon_id' => $applied['coupon']->id,
+                    'coupon_code' => $applied['coupon']->code,
+                    'discount_applied' => $applied['discount'],
+                    'original_amount' => $charge['amount'] + $applied['discount'],
+                ];
+                $charge['amount'] = $applied['final_amount'];
+            } catch (\RuntimeException $e) {
+                return back()->withErrors(['coupon_code' => $e->getMessage()])->withInput();
+            }
+        }
+
         if ($charge['amount'] <= 0) {
             return redirect()->route('subscriptions.upgrade')
                 ->with('error', 'This plan is not available for online payment yet. Please contact support.');
@@ -252,13 +310,13 @@ class SubscriptionController extends Controller
             'status' => 'pending',
             'payment_method' => $gateway->gateway,
             'description' => $description,
-            'metadata' => [
+            'metadata' => array_merge([
                 'plan_id' => $plan->id,
                 'auto_renew' => $request->has('auto_renew'),
                 'change_type' => $change['type'],
                 'preserve_expiry' => $change['preserve_expiry'],
                 'from_plan_id' => $currentSubscription?->subscription_plan_id,
-            ],
+            ], $couponMeta),
         ]);
 
         try {
@@ -560,6 +618,8 @@ class SubscriptionController extends Controller
 
         $isPaidPlan = $this->subscriptionService->isPaidSubscription($subscription);
         $cancellationScheduled = $this->subscriptionService->isCancellationScheduled($subscription);
+        $isComplimentary = $this->subscriptionService->isComplimentary($subscription);
+        $provisionLabel = $this->subscriptionService->getProvisionLabel($subscription);
 
         return view('client.subscriptions.billing', compact(
             'subscription',
@@ -567,7 +627,9 @@ class SubscriptionController extends Controller
             'paymentHistory',
             'billingMethods',
             'isPaidPlan',
-            'cancellationScheduled'
+            'cancellationScheduled',
+            'isComplimentary',
+            'provisionLabel'
         ));
     }
 

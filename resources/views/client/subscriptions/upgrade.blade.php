@@ -171,6 +171,13 @@
                     </label>
                 </div>
 
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Coupon code <span class="text-gray-400 font-normal">(optional)</span></label>
+                    <input type="text" name="coupon_code" value="{{ old('coupon_code') }}" placeholder="e.g. LAUNCH50"
+                           class="w-full max-w-xs border border-gray-300 rounded-lg px-3 py-2 text-sm uppercase">
+                    @error('coupon_code')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+
                 {{-- Payment method (only needed for upgrades / new paid plans) --}}
                 <div id="payment-method-section">
                     <p class="text-sm font-medium text-gray-700 mb-2">Payment method <span class="text-gray-400 font-normal">(for upgrades &amp; new plans)</span></p>

@@ -354,6 +354,15 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
         // Companies Management
         Route::get('/companies', [\App\Http\Controllers\Admin\SuperAdminController::class, 'companies'])->name('companies.index');
         Route::get('/companies/{id}', [\App\Http\Controllers\Admin\SuperAdminController::class, 'showCompany'])->name('companies.show');
+        Route::post('/companies/{company}/grant-subscription', [\App\Http\Controllers\Admin\CompanySubscriptionController::class, 'grant'])->name('companies.grant-subscription');
+
+        // Campaign coupons
+        Route::get('/coupons', [\App\Http\Controllers\Admin\CouponController::class, 'index'])->name('coupons.index');
+        Route::get('/coupons/create', [\App\Http\Controllers\Admin\CouponController::class, 'create'])->name('coupons.create');
+        Route::post('/coupons', [\App\Http\Controllers\Admin\CouponController::class, 'store'])->name('coupons.store');
+        Route::get('/coupons/{coupon}/edit', [\App\Http\Controllers\Admin\CouponController::class, 'edit'])->name('coupons.edit');
+        Route::put('/coupons/{coupon}', [\App\Http\Controllers\Admin\CouponController::class, 'update'])->name('coupons.update');
+        Route::delete('/coupons/{coupon}', [\App\Http\Controllers\Admin\CouponController::class, 'destroy'])->name('coupons.destroy');
         
         // Subscription Plans Management
         Route::get('/subscription-plans', [\App\Http\Controllers\Admin\SuperAdminController::class, 'subscriptionPlans'])->name('subscription-plans');

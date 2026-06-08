@@ -20,10 +20,21 @@
                     <p class="text-gray-600 mt-1">{{ $subscription->plan->description ?? '' }}</p>
                 </div>
                 <div class="text-right">
-                    <div class="text-3xl font-bold text-gray-900">{{ number_format($subscription->plan->price_annual ?? 0, 0) }}</div>
-                    <div class="text-gray-600">per year</div>
+                    @if(!empty($isComplimentary))
+                        <div class="text-lg font-bold text-purple-700">Complimentary</div>
+                        <div class="text-gray-500 text-sm">No charge</div>
+                    @else
+                        <div class="text-3xl font-bold text-gray-900">{{ number_format($subscription->plan->price_annual ?? 0, 0) }}</div>
+                        <div class="text-gray-600">per year</div>
+                    @endif
                 </div>
             </div>
+
+            @if(!empty($provisionLabel))
+            <div class="mb-6 rounded-lg border border-purple-200 bg-purple-50 px-4 py-3 text-sm text-purple-900">
+                {{ $provisionLabel }}
+            </div>
+            @endif
 
             <!-- Status Badge -->
             <div class="mb-6">

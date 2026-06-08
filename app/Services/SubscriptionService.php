@@ -46,6 +46,20 @@ class SubscriptionService
             'metadata' => $metadata,
         ]);
 
+        if (!empty($metadata['coupon_id'])) {
+            $coupon = \App\Models\SubscriptionCoupon::find($metadata['coupon_id']);
+            if ($coupon) {
+                app(\App\Services\CouponService::class)->recordRedemption(
+                    $coupon,
+                    $transaction->company_id,
+                    (float) ($metadata['discount_applied'] ?? 0),
+                    $transaction->currency,
+                    $subscription,
+                    $transaction
+                );
+            }
+        }
+
         return $subscription;
     }
 
@@ -224,9 +238,92 @@ class SubscriptionService
         return $planId ? SubscriptionPlan::find($planId) : null;
     }
 
+    /**
+     * True when the customer paid through a gateway (not admin grant or coupon).
+     */
     public function isPaidSubscription(ClientSubscription $subscription): bool
     {
+        if ($this->isComplimentary($subscription)) {
+            return false;
+        }
+
         return $subscription->plan && (float) $subscription->plan->price_annual > 0;
+    }
+
+    /**
+     * Admin-granted or 100%-off campaign access — full plan features, no billing.
+     */
+    public function isComplimentary(ClientSubscription $subscription): bool
+    {
+        $type = $subscription->metadata['provision_type'] ?? null;
+
+        return in_array($type, ['admin_comp', 'coupon'], true);
+    }
+
+    public function getProvisionLabel(ClientSubscription $subscription): ?string
+    {
+        $type = $subscription->metadata['provision_type'] ?? null;
+
+        if ($type === 'admin_comp') {
+            $note = $subscription->metadata['provision_note'] ?? null;
+
+            return $note
+                ? 'Complimentary — ' . $note
+                : 'Complimentary — provided by MenetZero';
+        }
+
+        if ($type === 'coupon') {
+            $code = $subscription->metadata['coupon_code'] ?? 'Campaign';
+
+            return 'Campaign offer (' . $code . ')';
+        }
+
+        return null;
+    }
+
+    /**
+     * Grant a paid-tier plan to a company at no charge (admin special cases).
+     */
+    public function grantComplimentary(
+        int $companyId,
+        int $planId,
+        $expiresAt,
+        ?string $note,
+        ?int $adminUserId = null
+    ): ClientSubscription {
+        return $this->subscribeClient($companyId, $planId, [
+            'billing_cycle' => 'annual',
+            'payment_method' => 'admin_comp',
+            'auto_renew' => false,
+            'started_at' => now(),
+            'expires_at' => $expiresAt,
+            'metadata' => [
+                'provision_type' => 'admin_comp',
+                'provision_note' => $note,
+                'granted_by' => $adminUserId,
+                'granted_at' => now()->toIso8601String(),
+            ],
+        ]);
+    }
+
+    /**
+     * Activate via a 100%-off coupon (no payment gateway).
+     */
+    public function activateWithCoupon(
+        int $companyId,
+        int $planId,
+        array $couponMeta,
+        bool $preserveExpiry = false
+    ): ClientSubscription {
+        return $this->subscribeClient($companyId, $planId, [
+            'billing_cycle' => 'annual',
+            'payment_method' => 'coupon',
+            'auto_renew' => false,
+            'preserve_expiry' => $preserveExpiry,
+            'metadata' => array_merge($couponMeta, [
+                'provision_type' => 'coupon',
+            ]),
+        ]);
     }
 
     public function isCancellationScheduled(ClientSubscription $subscription): bool
@@ -287,7 +384,10 @@ class SubscriptionService
 
         $preserveExpiry = (bool) ($data['preserve_expiry'] ?? false);
 
-        if ($preserveExpiry && $existing) {
+        if (!empty($data['expires_at'])) {
+            $startedAt = isset($data['started_at']) ? Carbon::parse($data['started_at']) : now();
+            $expiresAt = Carbon::parse($data['expires_at']);
+        } elseif ($preserveExpiry && $existing) {
             $startedAt = $existing->started_at;
             $expiresAt = $existing->expires_at;
         } else {

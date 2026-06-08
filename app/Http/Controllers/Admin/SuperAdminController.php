@@ -82,7 +82,13 @@ class SuperAdminController extends Controller
             'featureFlags',
         ])->findOrFail($id);
 
-        return view('admin.companies.show', compact('company'));
+        $grantPlans = SubscriptionPlan::where('plan_category', 'client')
+            ->where('is_active', true)
+            ->where('price_annual', '>', 0)
+            ->orderBy('sort_order')
+            ->get();
+
+        return view('admin.companies.show', compact('company', 'grantPlans'));
     }
 
     /**

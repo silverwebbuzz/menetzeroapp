@@ -30,6 +30,13 @@
         </svg>
         Users
     </a>
+    <a href="{{ route('admin.coupons.index') }}" class="nav-link {{ $isActive('admin.coupons') ? 'active' : '' }}">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M7 7h.01M7 3h5c1.99 0 3 1.343 3 3v1M7 7v10a2 2 0 002 2h6a2 2 0 002-2V7M7 7H5a2 2 0 00-2 2v1m12-6h2a2 2 0 012 2v1"/>
+        </svg>
+        Coupons
+    </a>
     <a href="{{ route('admin.subscription-plans') }}" class="nav-link {{ $isActive('admin.subscription-plans') ? 'active' : '' }}">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
