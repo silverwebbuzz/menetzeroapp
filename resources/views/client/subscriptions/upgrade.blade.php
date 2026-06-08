@@ -37,10 +37,29 @@
 
     <!-- Current Plan Info -->
     @if($currentSubscription)
-    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 space-y-1">
         <p class="text-sm text-gray-700">
             <strong>Current Plan:</strong> {{ $currentSubscription->plan->plan_name }}
             (Expires: {{ $currentSubscription->expires_at->format('F d, Y') }})
+        </p>
+        @php
+            $scheduled = app(\App\Services\SubscriptionService::class)->getScheduledRenewalPlan($currentSubscription);
+            $scheduledWarnings = $scheduled
+                ? app(\App\Services\SubscriptionService::class)->getDowngradeWarnings($company->id, $scheduled)
+                : [];
+        @endphp
+        @if($scheduled)
+            <p class="text-sm text-amber-800">
+                <strong>Scheduled at renewal:</strong> {{ $scheduled->plan_name }}
+                (on {{ $currentSubscription->expires_at->format('F d, Y') }})
+            </p>
+            @foreach($scheduledWarnings as $warning)
+                <p class="text-sm text-red-700">⚠ {{ $warning }}</p>
+            @endforeach
+        @endif
+        <p class="text-xs text-gray-500">
+            <strong>Upgrades:</strong> unused time on your current plan is credited toward a <em>full year</em> of the new plan (prevents short-term upgrade abuse).
+            <strong>Downgrades:</strong> take effect at renewal — no refund for unused time.
         </p>
     </div>
     @endif
@@ -56,6 +75,8 @@
                     $meta = $code === 'client_free' ? $freeMeta : ($planMeta[$code] ?? null);
                     if (!$plan || !$meta) { continue; }
                     $isCurrent = $currentSubscription && $currentSubscription->subscription_plan_id == $plan->id;
+                    $change = $planChanges[$code] ?? null;
+                    $warnings = $downgradeWarnings[$code] ?? [];
                 @endphp
                 <div class="relative bg-white rounded-xl border-2 {{ $meta['highlight'] ? 'border-orange-400' : ($isCurrent ? 'border-blue-400' : 'border-gray-200') }} p-5 flex flex-col">
                     @if($meta['highlight'])
@@ -86,6 +107,24 @@
                     <div class="mb-4">
                         <div class="text-2xl font-extrabold text-gray-900">{{ $priceText }}</div>
                         <div class="text-xs text-gray-500">{{ $priceSub }}</div>
+                        @if($change && !$isCurrent && $change['type'] === 'upgrade' && $change['requires_payment'])
+                            <div class="text-xs text-emerald-700 mt-1 font-medium">
+                                Pay {{ \App\Services\CurrencyService::format($change['charge_amount'], $change['charge_currency']) }} now
+                                @if(($change['credit_amount'] ?? 0) > 0)
+                                    <span class="text-gray-500">(credit {{ \App\Services\CurrencyService::format($change['credit_amount'], $change['charge_currency']) }} applied)</span>
+                                @endif
+                            </div>
+                            <div class="text-[11px] text-gray-400 mt-0.5">Full 1-year term from upgrade date</div>
+                        @elseif($change && !$isCurrent && in_array($change['type'], ['downgrade', 'downgrade_to_free']))
+                            <div class="text-xs text-amber-700 mt-1">At renewal — no charge now</div>
+                        @endif
+                        @if(!empty($warnings))
+                            <div class="mt-2 rounded border border-red-200 bg-red-50 px-2 py-1.5 text-[11px] text-red-800">
+                                @foreach($warnings as $warning)
+                                    <p>⚠ {{ $warning }}</p>
+                                @endforeach
+                            </div>
+                        @endif
                     </div>
 
                     <div class="mt-auto">
@@ -99,9 +138,17 @@
                                 Contact Sales
                             </a>
                         @else
-                            <label class="flex items-center justify-center gap-2 w-full px-4 py-2 border-2 border-orange-500 text-orange-700 rounded-lg hover:bg-orange-50 cursor-pointer text-sm font-medium transition">
+                            <label class="flex items-center justify-center gap-2 w-full px-4 py-2 border-2 {{ in_array($change['type'] ?? '', ['downgrade', 'downgrade_to_free']) ? 'border-amber-400 text-amber-800 hover:bg-amber-50' : 'border-orange-500 text-orange-700 hover:bg-orange-50' }} rounded-lg cursor-pointer text-sm font-medium transition">
                                 <input type="radio" name="plan_id" value="{{ $plan->id }}" class="text-orange-600 focus:ring-orange-500">
-                                <span>Select {{ $meta['name'] }}</span>
+                                <span>
+                                    @if(($change['type'] ?? '') === 'upgrade')
+                                        Upgrade to {{ $meta['name'] }}
+                                    @elseif(in_array($change['type'] ?? '', ['downgrade', 'downgrade_to_free']))
+                                        Downgrade to {{ $meta['name'] }}
+                                    @else
+                                        Select {{ $meta['name'] }}
+                                    @endif
+                                </span>
                             </label>
                         @endif
                     </div>
@@ -124,9 +171,9 @@
                     </label>
                 </div>
 
-                {{-- Payment method (only needed for paid plans) --}}
-                <div>
-                    <p class="text-sm font-medium text-gray-700 mb-2">Payment method <span class="text-gray-400 font-normal">(for paid plans)</span></p>
+                {{-- Payment method (only needed for upgrades / new paid plans) --}}
+                <div id="payment-method-section">
+                    <p class="text-sm font-medium text-gray-700 mb-2">Payment method <span class="text-gray-400 font-normal">(for upgrades &amp; new plans)</span></p>
                     @if($enabledGateways->isEmpty())
                         <p class="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
                             Online payment isn't configured yet. You can switch to the Free plan, or contact sales for paid plans.

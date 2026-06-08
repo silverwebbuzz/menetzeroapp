@@ -33,10 +33,26 @@
                 </span>
                 @if($subscription->auto_renew)
                 <span class="ml-2 px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800">
-                    Auto-renewal enabled
+                    Renewal reminder enabled
                 </span>
                 @endif
             </div>
+
+            @if(!empty($scheduledPlan))
+            <div class="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                <strong>Scheduled change at renewal:</strong>
+                Your plan will switch to <strong>{{ $scheduledPlan->plan_name }}</strong> on
+                {{ $subscription->expires_at->format('F d, Y') }}.
+                Until then you keep all {{ $subscription->plan->plan_name }} features.
+                @if(!empty($scheduledDowngradeWarnings))
+                    <div class="mt-2 space-y-1 text-red-800">
+                        @foreach($scheduledDowngradeWarnings as $warning)
+                            <p>⚠ {{ $warning }}</p>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+            @endif
 
             <!-- Subscription Dates -->
             <div class="grid grid-cols-2 gap-4 mb-6">

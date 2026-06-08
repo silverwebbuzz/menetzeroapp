@@ -32,7 +32,11 @@ class SubscriptionService
             'billing_cycle' => 'annual',
             'payment_method' => $transaction->payment_method,
             'auto_renew' => (bool) ($metadata['auto_renew'] ?? false),
-            'metadata' => $gatewayRefs,
+            'preserve_expiry' => (bool) ($metadata['preserve_expiry'] ?? false),
+            'metadata' => array_merge($gatewayRefs, array_filter([
+                'change_type' => $metadata['change_type'] ?? null,
+                'from_plan_id' => $metadata['from_plan_id'] ?? null,
+            ])),
         ]);
 
         $transaction->update([
@@ -46,22 +50,220 @@ class SubscriptionService
     }
 
     /**
+     * Compare the target plan with the company's active subscription.
+     *
+     * @return array{
+     *   type: string,
+     *   requires_payment: bool,
+     *   charge_amount: float,
+     *   charge_currency: string,
+     *   preserve_expiry: bool,
+     *   message: string,
+     *   days_remaining: int,
+     *   credit_amount: float
+     * }
+     */
+    public function resolvePlanChange(?ClientSubscription $current, SubscriptionPlan $target, string $chargeCurrency = 'INR'): array
+    {
+        $chargeCurrency = strtoupper($chargeCurrency);
+
+        if (!$current || !$current->plan) {
+            $amount = $this->planPriceInCurrency($target, $chargeCurrency);
+
+            return [
+                'type' => 'new',
+                'requires_payment' => $amount > 0,
+                'charge_amount' => $amount,
+                'charge_currency' => $chargeCurrency,
+                'preserve_expiry' => false,
+                'message' => 'Start a new annual subscription.',
+                'days_remaining' => 0,
+                'credit_amount' => 0,
+            ];
+        }
+
+        if ((int) $current->subscription_plan_id === (int) $target->id) {
+            return [
+                'type' => 'same',
+                'requires_payment' => false,
+                'charge_amount' => 0,
+                'charge_currency' => $chargeCurrency,
+                'preserve_expiry' => true,
+                'message' => 'This is already your current plan.',
+                'days_remaining' => max(0, (int) now()->diffInDays($current->expires_at, false)),
+                'credit_amount' => 0,
+            ];
+        }
+
+        $currentPlan = $current->plan;
+        $currentTier = (int) $currentPlan->sort_order;
+        $targetTier = (int) $target->sort_order;
+        $daysRemaining = max(0, (int) now()->diffInDays($current->expires_at, false));
+
+        // Downgrade (or move to Free): keep current plan until expiry, switch at renewal.
+        if ($targetTier < $currentTier || (float) $target->price_annual <= 0) {
+            return [
+                'type' => (float) $target->price_annual <= 0 ? 'downgrade_to_free' : 'downgrade',
+                'requires_payment' => false,
+                'charge_amount' => 0,
+                'charge_currency' => $chargeCurrency,
+                'preserve_expiry' => true,
+                'message' => "Your {$currentPlan->plan_name} plan stays active until "
+                    . $current->expires_at->format('F d, Y')
+                    . ". {$target->plan_name} will apply when you renew — no refund for unused time.",
+                'days_remaining' => $daysRemaining,
+                'credit_amount' => 0,
+            ];
+        }
+
+        // Upgrade or lateral move to higher/equal paid tier.
+        $currentPrice = $this->planPriceInCurrency($currentPlan, $chargeCurrency);
+        $targetPrice = $this->planPriceInCurrency($target, $chargeCurrency);
+
+        if ($currentPrice <= 0) {
+            // Free → paid: full annual price, new 1-year term.
+            return [
+                'type' => 'upgrade',
+                'requires_payment' => $targetPrice > 0,
+                'charge_amount' => $targetPrice,
+                'charge_currency' => $chargeCurrency,
+                'preserve_expiry' => false,
+                'message' => 'Pay the annual price to activate your new plan.',
+                'days_remaining' => $daysRemaining,
+                'credit_amount' => 0,
+            ];
+        }
+
+        // Paid → higher paid: credit unused time toward a FULL year of the new plan.
+        // Prevents "upgrade for 2 months during compliance, pay almost nothing" abuse.
+        $totalDays = max(1, (int) $current->started_at->diffInDays($current->expires_at));
+        $ratio = min(1, $daysRemaining / $totalDays);
+        $unusedCredit = round($currentPrice * $ratio, 2);
+        $upgradeCharge = max(0, round($targetPrice - $unusedCredit, 2));
+
+        $creditLabel = \App\Services\CurrencyService::format($unusedCredit, $chargeCurrency);
+        $chargeLabel = \App\Services\CurrencyService::format($upgradeCharge, $chargeCurrency);
+
+        return [
+            'type' => 'upgrade',
+            'requires_payment' => $upgradeCharge > 0,
+            'charge_amount' => $upgradeCharge,
+            'charge_currency' => $chargeCurrency,
+            'preserve_expiry' => false,
+            'credit_amount' => $unusedCredit,
+            'message' => $upgradeCharge > 0
+                ? "Your unused {$currentPlan->plan_name} time ({$daysRemaining} days, credit {$creditLabel}) "
+                    . "is applied toward a full year of {$target->plan_name}. "
+                    . "You pay {$chargeLabel} today and your new 1-year term starts now."
+                : 'Your plan will be upgraded immediately at no extra charge.',
+            'days_remaining' => $daysRemaining,
+        ];
+    }
+
+    /**
+     * Warnings when downgrading would leave the company over the target plan limits.
+     *
+     * @return list<string>
+     */
+    public function getDowngradeWarnings($companyId, SubscriptionPlan $targetPlan): array
+    {
+        $warnings = [];
+        $limits = $targetPlan->limits ?? [];
+        $labels = [
+            'locations' => 'locations / branches',
+            'users' => 'users',
+        ];
+
+        foreach ($labels as $resource => $label) {
+            $limit = $limits[$resource] ?? null;
+
+            if ($limit === null || (int) $limit === -1) {
+                continue;
+            }
+
+            $used = $this->getCurrentUsage($companyId, $resource);
+
+            if ($used > (int) $limit) {
+                $warnings[] = "You currently have {$used} {$label}, but {$targetPlan->plan_name} allows {$limit}. "
+                    . "Please reduce usage before your renewal date or the downgrade cannot take effect.";
+            }
+        }
+
+        return $warnings;
+    }
+
+    /**
+     * Schedule a downgrade to take effect at the current term end (no refund).
+     */
+    public function scheduleDowngrade(ClientSubscription $subscription, SubscriptionPlan $targetPlan): ClientSubscription
+    {
+        $metadata = $subscription->metadata ?? [];
+        $metadata['renewal_plan_id'] = $targetPlan->id;
+        $metadata['renewal_plan_name'] = $targetPlan->plan_name;
+        $metadata['renewal_scheduled_at'] = $subscription->expires_at->toIso8601String();
+
+        $subscription->update(['metadata' => $metadata]);
+
+        return $subscription->fresh();
+    }
+
+    /**
+     * Clear a previously scheduled downgrade (e.g. customer upgrades instead).
+     */
+    public function clearScheduledDowngrade(ClientSubscription $subscription): void
+    {
+        $metadata = $subscription->metadata ?? [];
+        unset($metadata['renewal_plan_id'], $metadata['renewal_plan_name'], $metadata['renewal_scheduled_at']);
+        $subscription->update(['metadata' => $metadata]);
+    }
+
+    public function getScheduledRenewalPlan(ClientSubscription $subscription): ?SubscriptionPlan
+    {
+        $planId = $subscription->metadata['renewal_plan_id'] ?? null;
+
+        return $planId ? SubscriptionPlan::find($planId) : null;
+    }
+
+    /**
      * Subscribe a client to a plan.
      */
     public function subscribeClient($companyId, $planId, $data = [])
     {
         $plan = SubscriptionPlan::findOrFail($planId);
-        
+
         if ($plan->plan_category !== 'client') {
             throw new \Exception('Plan is not for clients');
         }
 
-        $startedAt = $data['started_at'] ?? now();
-        $billingCycle = $data['billing_cycle'] ?? 'annual';
+        $existing = ClientSubscription::where('company_id', $companyId)
+            ->where('status', 'active')
+            ->first();
 
-        $expiresAt = $billingCycle === 'annual'
-            ? Carbon::parse($startedAt)->addYear()
-            : Carbon::parse($startedAt)->addMonth();
+        $preserveExpiry = (bool) ($data['preserve_expiry'] ?? false);
+
+        if ($preserveExpiry && $existing) {
+            $startedAt = $existing->started_at;
+            $expiresAt = $existing->expires_at;
+        } else {
+            $startedAt = $data['started_at'] ?? now();
+            $billingCycle = $data['billing_cycle'] ?? 'annual';
+            $expiresAt = $billingCycle === 'annual'
+                ? Carbon::parse($startedAt)->addYear()
+                : Carbon::parse($startedAt)->addMonth();
+        }
+
+        $billingCycle = $data['billing_cycle'] ?? 'annual';
+        $metadata = array_merge(
+            $existing?->metadata ?? [],
+            is_array($data['metadata'] ?? null) ? $data['metadata'] : []
+        );
+        // Upgrading clears any scheduled downgrade and starts a fresh term.
+        unset($metadata['renewal_plan_id'], $metadata['renewal_plan_name'], $metadata['renewal_scheduled_at']);
+
+        if ($existing && !$preserveExpiry) {
+            $metadata['upgraded_at'] = now()->toIso8601String();
+            $metadata['upgraded_from_plan_id'] = $existing->subscription_plan_id;
+        }
 
         $payload = [
             'subscription_plan_id' => $planId,
@@ -73,15 +275,8 @@ class SubscriptionService
             'payment_method' => $data['payment_method'] ?? null,
             'stripe_subscription_id' => $data['stripe_subscription_id'] ?? null,
             'stripe_customer_id' => $data['stripe_customer_id'] ?? null,
-            'metadata' => $data['metadata'] ?? null,
+            'metadata' => $metadata,
         ];
-
-        // Upgrade in place when an active row already exists. The legacy DB index
-        // `company_active_subscription` is UNIQUE on (company_id, status), so we
-        // cannot cancel-then-create — only one "cancelled" row is allowed per company.
-        $existing = ClientSubscription::where('company_id', $companyId)
-            ->where('status', 'active')
-            ->first();
 
         if ($existing) {
             $existing->update($payload);
@@ -90,6 +285,13 @@ class SubscriptionService
         }
 
         return ClientSubscription::create(array_merge($payload, ['company_id' => $companyId]));
+    }
+
+    private function planPriceInCurrency(SubscriptionPlan $plan, string $currency): float
+    {
+        return strtoupper($currency) === 'AED'
+            ? (float) $plan->price_annual
+            : (float) $plan->price_inr;
     }
 
     /**

@@ -63,7 +63,17 @@ class SubscriptionController extends Controller
                 ->with('info', 'You do not have an active subscription. Please choose a plan.');
         }
 
-        return view('client.subscriptions.current-plan', compact('subscription', 'company'));
+        $scheduledPlan = $this->subscriptionService->getScheduledRenewalPlan($subscription);
+        $scheduledDowngradeWarnings = $scheduledPlan
+            ? $this->subscriptionService->getDowngradeWarnings($company->id, $scheduledPlan)
+            : [];
+
+        return view('client.subscriptions.current-plan', compact(
+            'subscription',
+            'company',
+            'scheduledPlan',
+            'scheduledDowngradeWarnings'
+        ));
     }
 
     /**
@@ -89,6 +99,24 @@ class SubscriptionController extends Controller
         $featureRows = SubscriptionPlanMatrix::featureRows();
         $scope3AddOns = SubscriptionPlanMatrix::scope3AddOns();
         $enabledGateways = PaymentGateway::enabled();
+        $displayCurrency = \App\Services\CurrencyService::displayCurrency();
+
+        $planChanges = [];
+        $downgradeWarnings = [];
+        foreach ($availablePlans as $code => $availablePlan) {
+            $planChanges[$code] = $this->subscriptionService->resolvePlanChange(
+                $currentSubscription,
+                $availablePlan,
+                $displayCurrency
+            );
+
+            if (in_array($planChanges[$code]['type'], ['downgrade', 'downgrade_to_free'], true)) {
+                $downgradeWarnings[$code] = $this->subscriptionService->getDowngradeWarnings(
+                    $company->id,
+                    $availablePlan
+                );
+            }
+        }
 
         return view('client.subscriptions.upgrade', compact(
             'currentSubscription',
@@ -98,7 +126,10 @@ class SubscriptionController extends Controller
             'comparisonColumns',
             'featureRows',
             'scope3AddOns',
-            'enabledGateways'
+            'enabledGateways',
+            'planChanges',
+            'downgradeWarnings',
+            'displayCurrency'
         ));
     }
 
@@ -124,23 +155,55 @@ class SubscriptionController extends Controller
             return back()->withErrors(['plan_id' => 'Invalid plan selected.'])->withInput();
         }
 
-        // Free plan (or zero-priced): no payment required, activate now.
-        if ((float) $plan->price_annual <= 0) {
+        $currentSubscription = $this->subscriptionService->getActiveSubscription($company->id, 'client');
+        $displayCurrency = \App\Services\CurrencyService::displayCurrency();
+        $change = $this->subscriptionService->resolvePlanChange($currentSubscription, $plan, $displayCurrency);
+
+        if ($change['type'] === 'same') {
+            return redirect()->route('subscriptions.upgrade')
+                ->with('info', $change['message']);
+        }
+
+        // Downgrade: schedule at renewal — no payment, no immediate limit reduction.
+        if (in_array($change['type'], ['downgrade', 'downgrade_to_free'], true)) {
+            if (!$currentSubscription) {
+                return redirect()->route('subscriptions.upgrade')->with('error', 'No active subscription to change.');
+            }
+
             try {
-                $this->subscriptionService->subscribeClient($company->id, $plan->id, [
-                    'billing_cycle' => 'annual',
-                    'payment_method' => 'free',
-                    'auto_renew' => $request->has('auto_renew'),
-                ]);
+                $this->subscriptionService->scheduleDowngrade($currentSubscription, $plan);
+
+                $message = $change['message'];
+                $warnings = $this->subscriptionService->getDowngradeWarnings($company->id, $plan);
+                if (!empty($warnings)) {
+                    $message .= ' ' . implode(' ', $warnings);
+                }
 
                 return redirect()->route('subscriptions.current-plan')
-                    ->with('success', 'Subscription updated successfully!');
+                    ->with('success', $message);
             } catch (\Exception $e) {
                 return back()->withErrors(['error' => $e->getMessage()])->withInput();
             }
         }
 
-        // Paid plan: a payment gateway must be selected and configured.
+        // Upgrade with zero prorated amount — apply immediately without payment.
+        if ($change['type'] === 'upgrade' && !$change['requires_payment']) {
+            try {
+                $this->subscriptionService->subscribeClient($company->id, $plan->id, [
+                    'billing_cycle' => 'annual',
+                    'payment_method' => $currentSubscription?->payment_method ?? 'free',
+                    'auto_renew' => $request->has('auto_renew'),
+                    'preserve_expiry' => $change['preserve_expiry'],
+                ]);
+
+                return redirect()->route('subscriptions.current-plan')
+                    ->with('success', 'Plan upgraded successfully!');
+            } catch (\Exception $e) {
+                return back()->withErrors(['error' => $e->getMessage()])->withInput();
+            }
+        }
+
+        // Paid change: payment gateway required.
         $request->validate([
             'gateway' => 'required|in:razorpay,cashfree',
         ]);
@@ -151,22 +214,31 @@ class SubscriptionController extends Controller
                 ->with('error', 'The selected payment method is not available right now. Please try another.');
         }
 
-        // Cashfree: match the currency the customer picked (AED or INR).
-        // Razorpay: INR only — Indian gateway does not support AED orders.
-        $charge = \App\Services\CurrencyService::chargeAmount($plan);
+        $charge = [
+            'currency' => $change['charge_currency'],
+            'amount' => (float) $change['charge_amount'],
+            'display_currency' => $displayCurrency,
+        ];
+
+        // Razorpay: INR only — recalculate in INR.
         if ($gateway->gateway === 'razorpay') {
+            $inrChange = $this->subscriptionService->resolvePlanChange($currentSubscription, $plan, 'INR');
             $charge = [
                 'currency' => 'INR',
-                'amount' => (float) $plan->price_inr,
-                'display_currency' => $charge['display_currency'] ?? 'INR',
+                'amount' => (float) $inrChange['charge_amount'],
+                'display_currency' => $displayCurrency,
             ];
         }
+
         if ($charge['amount'] <= 0) {
             return redirect()->route('subscriptions.upgrade')
                 ->with('error', 'This plan is not available for online payment yet. Please contact support.');
         }
 
-        // Create a pending transaction we can reconcile after the gateway returns.
+        $description = $change['type'] === 'upgrade' && $currentSubscription
+            ? 'Plan upgrade: ' . ($currentSubscription->plan->plan_name ?? '') . ' → ' . $plan->plan_name
+            : 'Subscription: ' . $plan->plan_name . ' (annual)';
+
         $transaction = PaymentTransaction::create([
             'company_id' => $company->id,
             'transaction_type' => 'subscription',
@@ -174,10 +246,13 @@ class SubscriptionController extends Controller
             'currency' => $charge['currency'],
             'status' => 'pending',
             'payment_method' => $gateway->gateway,
-            'description' => 'Subscription: ' . $plan->plan_name . ' (annual)',
+            'description' => $description,
             'metadata' => [
                 'plan_id' => $plan->id,
                 'auto_renew' => $request->has('auto_renew'),
+                'change_type' => $change['type'],
+                'preserve_expiry' => $change['preserve_expiry'],
+                'from_plan_id' => $currentSubscription?->subscription_plan_id,
             ],
         ]);
 
