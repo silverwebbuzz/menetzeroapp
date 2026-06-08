@@ -22,15 +22,15 @@ return new class extends Migration
 
         $now = now();
         $defaults = [
-            'company_legal_name' => 'Middle East Net Zero',
-            'brand_name' => 'MENetZero',
+            'company_legal_name' => 'Silver Webbuzz Private Limited',
+            'brand_name' => 'MeNetZero',
             'support_email' => 'support@menetzero.com',
             'sales_email' => 'sales@menetzero.com',
-            'support_phone' => '+971 4 000 0000',
-            'address_line' => 'Business Bay',
-            'city' => 'Dubai',
-            'country' => 'United Arab Emirates',
-            'business_hours' => 'Sunday – Thursday, 9:00 AM to 6:00 PM (GST)',
+            'support_phone' => '+91 9998010029',
+            'address_line' => '',
+            'city' => '',
+            'country' => 'India',
+            'business_hours' => 'Monday – Saturday, 10:00 AM to 7:00 PM (IST)',
             'default_currency' => 'AED',
             'currency_auto_detect' => '1',
         ];

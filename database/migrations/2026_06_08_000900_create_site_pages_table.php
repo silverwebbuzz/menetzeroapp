@@ -50,7 +50,7 @@ return new class extends Migration
                 'slug' => 'contact',
                 'title' => 'Contact Us',
                 'body' => <<<'HTML'
-<p>We'd love to hear from you. Whether you have a question about our plans, billing, a technical issue, or anything else, our team is ready to help.</p>
+<p>{{brand_name}} is a brand owned and operated by {{company_legal_name}}. Whether you have a question about our plans, billing, a technical issue, or anything else, our team is ready to help.</p>
 <p>The fastest way to reach us is by email. We aim to respond to all enquiries within one business day.</p>
 HTML,
             ],
@@ -61,7 +61,7 @@ HTML,
 <p><em>Last updated: this page is maintained by {{company_legal_name}}.</em></p>
 
 <h2>1. Introduction</h2>
-<p>These Terms &amp; Conditions ("Terms") govern your access to and use of the {{brand_name}} carbon accounting platform and related services (the "Service") provided by {{company_legal_name}} ("we", "us", "our"). By creating an account or purchasing a subscription, you agree to these Terms.</p>
+<p>{{brand_name}} is a brand owned and operated by {{company_legal_name}} ("we", "us", "our"). These Terms &amp; Conditions ("Terms") govern your access to and use of the {{brand_name}} carbon accounting platform and related services (the "Service"). By creating an account or purchasing a subscription, you agree to these Terms.</p>
 
 <h2>2. The Service</h2>
 <p>{{brand_name}} provides software for measuring, tracking and reporting greenhouse gas emissions (Scope 1, Scope 2 and, as an add-on, Scope 3). Features available to you depend on the subscription plan you select.</p>
@@ -97,7 +97,7 @@ HTML,
                 'slug' => 'refunds',
                 'title' => 'Refunds & Cancellations',
                 'body' => <<<'HTML'
-<p><em>This Refund &amp; Cancellation Policy applies to all subscriptions purchased from {{company_legal_name}} ({{brand_name}}).</em></p>
+<p><em>This Refund &amp; Cancellation Policy applies to all subscriptions purchased from {{brand_name}}, a brand owned and operated by {{company_legal_name}}.</em></p>
 
 <h2>1. Subscription Cancellation</h2>
 <p>You may cancel the auto-renewal of your subscription at any time from your account under <strong>Billing → My Subscription</strong>. When you cancel, your plan remains active until the end of the current billing period, after which it will not renew. You will not be charged again once auto-renewal is cancelled.</p>
@@ -123,7 +123,7 @@ HTML,
                 'slug' => 'privacy',
                 'title' => 'Privacy Policy',
                 'body' => <<<'HTML'
-<p><em>{{company_legal_name}} ({{brand_name}}) is committed to protecting your privacy.</em></p>
+<p><em>{{company_legal_name}}, which owns and operates the {{brand_name}} platform, is committed to protecting your privacy.</em></p>
 
 <h2>1. Information We Collect</h2>
 <p>We collect information you provide when you register and use the Service, including your name, email, company details, and the emissions/activity data you enter. We also collect limited technical data such as log and usage information.</p>
