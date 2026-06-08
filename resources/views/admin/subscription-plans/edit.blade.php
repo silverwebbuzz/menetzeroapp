@@ -58,15 +58,10 @@
                 </div>
 
                 <div>
-                    <label for="billing_cycle" class="block text-sm font-medium text-gray-700 mb-1">Billing Cycle *</label>
-                    <select name="billing_cycle" id="billing_cycle" required
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
-                        <option value="annual" {{ old('billing_cycle', $plan->billing_cycle) == 'annual' ? 'selected' : '' }}>Annual</option>
-                        <option value="monthly" {{ old('billing_cycle', $plan->billing_cycle) == 'monthly' ? 'selected' : '' }}>Monthly</option>
-                    </select>
-                    @error('billing_cycle')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Billing Cycle</label>
+                    <input type="text" value="Annual" disabled
+                           class="w-full px-3 py-2 border border-gray-200 bg-gray-50 text-gray-500 rounded-lg">
+                    <p class="mt-1 text-xs text-gray-500">All plans are annual only.</p>
                 </div>
 
                 <div>

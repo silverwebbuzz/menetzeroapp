@@ -343,6 +343,23 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
         Route::put('/subscription-plans/{id}', [\App\Http\Controllers\Admin\SuperAdminController::class, 'updateSubscriptionPlan'])->name('subscription-plans.update');
         Route::delete('/subscription-plans/{id}', [\App\Http\Controllers\Admin\SuperAdminController::class, 'destroySubscriptionPlan'])->name('subscription-plans.destroy');
         
+        // Pricing Page Content Management (comparison table + Scope 3 add-ons)
+        Route::prefix('pricing')->name('pricing.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\PricingContentController::class, 'index'])->name('index');
+
+            Route::get('/feature-rows/create', [\App\Http\Controllers\Admin\PricingContentController::class, 'createFeatureRow'])->name('feature-rows.create');
+            Route::post('/feature-rows', [\App\Http\Controllers\Admin\PricingContentController::class, 'storeFeatureRow'])->name('feature-rows.store');
+            Route::get('/feature-rows/{id}/edit', [\App\Http\Controllers\Admin\PricingContentController::class, 'editFeatureRow'])->name('feature-rows.edit');
+            Route::put('/feature-rows/{id}', [\App\Http\Controllers\Admin\PricingContentController::class, 'updateFeatureRow'])->name('feature-rows.update');
+            Route::delete('/feature-rows/{id}', [\App\Http\Controllers\Admin\PricingContentController::class, 'destroyFeatureRow'])->name('feature-rows.destroy');
+
+            Route::get('/addons/create', [\App\Http\Controllers\Admin\PricingContentController::class, 'createAddon'])->name('addons.create');
+            Route::post('/addons', [\App\Http\Controllers\Admin\PricingContentController::class, 'storeAddon'])->name('addons.store');
+            Route::get('/addons/{id}/edit', [\App\Http\Controllers\Admin\PricingContentController::class, 'editAddon'])->name('addons.edit');
+            Route::put('/addons/{id}', [\App\Http\Controllers\Admin\PricingContentController::class, 'updateAddon'])->name('addons.update');
+            Route::delete('/addons/{id}', [\App\Http\Controllers\Admin\PricingContentController::class, 'destroyAddon'])->name('addons.destroy');
+        });
+
         // Role Templates Management
         Route::get('/role-templates', [\App\Http\Controllers\Admin\SuperAdminController::class, 'roleTemplates'])->name('role-templates');
         Route::get('/role-templates/create', [\App\Http\Controllers\Admin\SuperAdminController::class, 'createRoleTemplate'])->name('role-templates.create');

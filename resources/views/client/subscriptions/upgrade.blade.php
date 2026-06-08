@@ -54,12 +54,25 @@
                         <span class="absolute -top-3 right-4 bg-blue-500 text-white text-[11px] font-semibold px-3 py-1 rounded-full">CURRENT</span>
                     @endif
 
-                    <h3 class="text-lg font-bold text-gray-900">{{ $meta['name'] }}</h3>
+                    @php
+                        $isCustom = !empty($meta['is_custom']);
+                        if ($isCustom) {
+                            $priceText = 'Custom';
+                            $priceSub = 'Contact sales for pricing';
+                        } elseif ((float) $plan->price_annual <= 0) {
+                            $priceText = ($plan->currency ?? 'AED') . ' 0';
+                            $priceSub = 'Free forever';
+                        } else {
+                            $priceText = ($plan->currency ?? 'AED') . ' ' . number_format($plan->price_annual, 0);
+                            $priceSub = 'per year';
+                        }
+                    @endphp
+                    <h3 class="text-lg font-bold text-gray-900">{{ $plan->plan_name ?? $meta['name'] }}</h3>
                     <p class="text-xs text-gray-500 mb-3 min-h-[2rem]">{{ $meta['tagline'] }}</p>
 
                     <div class="mb-4">
-                        <div class="text-2xl font-extrabold text-gray-900">{{ $meta['price_display'] }}</div>
-                        <div class="text-xs text-gray-500">{{ $meta['price_sub'] }}</div>
+                        <div class="text-2xl font-extrabold text-gray-900">{{ $priceText }}</div>
+                        <div class="text-xs text-gray-500">{{ $priceSub }}</div>
                     </div>
 
                     <div class="mt-auto">
@@ -87,31 +100,19 @@
             <p class="text-red-600 text-sm mb-4">{{ $message }}</p>
         @enderror
 
-        <!-- Billing options + submit (only relevant for selectable plans) -->
+        <!-- Submit (annual billing only) -->
         <div class="bg-white rounded-xl border border-gray-200 p-6 mb-10">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-3">Billing Cycle</label>
-                    <div class="space-y-2">
-                        <label class="flex items-center">
-                            <input type="radio" name="billing_cycle" value="annual" checked class="mr-2 text-orange-600 focus:ring-orange-500">
-                            <span class="text-gray-700 text-sm">Annual (recommended)</span>
-                        </label>
-                        <label class="flex items-center">
-                            <input type="radio" name="billing_cycle" value="monthly" class="mr-2 text-orange-600 focus:ring-orange-500">
-                            <span class="text-gray-700 text-sm">Monthly</span>
-                        </label>
-                    </div>
-                </div>
-                <div class="flex flex-col justify-between">
-                    <label class="flex items-center mb-4">
+                    <p class="text-sm font-medium text-gray-700">Billed annually</p>
+                    <label class="flex items-center mt-2">
                         <input type="checkbox" name="auto_renew" value="1" checked class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
-                        <span class="ml-2 text-gray-700 text-sm">Enable auto-renewal</span>
+                        <span class="ml-2 text-gray-600 text-sm">Auto-renew each year (uncheck to cancel after this year)</span>
                     </label>
-                    <div class="flex items-center justify-end gap-3">
-                        <a href="{{ route('subscriptions.index') }}" class="px-5 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">Cancel</a>
-                        <button type="submit" class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 text-sm font-medium">Confirm plan</button>
-                    </div>
+                </div>
+                <div class="flex items-center justify-end gap-3">
+                    <a href="{{ route('subscriptions.index') }}" class="px-5 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">Cancel</a>
+                    <button type="submit" class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 text-sm font-medium">Confirm plan</button>
                 </div>
             </div>
         </div>
@@ -129,7 +130,7 @@
                     <tr class="border-b border-gray-200 bg-gray-50">
                         <th class="text-left font-semibold text-gray-700 px-5 py-3 w-1/3">Feature</th>
                         @foreach($comparisonColumns as $code)
-                            <th class="text-center font-semibold text-gray-700 px-5 py-3">{{ $planMeta[$code]['name'] }}</th>
+                            <th class="text-center font-semibold text-gray-700 px-5 py-3">{{ $availablePlans[$code]->plan_name ?? $planMeta[$code]['name'] }}</th>
                         @endforeach
                     </tr>
                 </thead>
@@ -163,11 +164,11 @@
 
     <!-- Scope 3 Add-On -->
     <div class="mb-12">
-        <div class="flex items-center gap-3 mb-1">
-            <h2 class="text-2xl font-bold text-gray-900">Scope 3 Add-On</h2>
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs font-semibold">Coming soon</span>
-        </div>
-        <p class="text-sm text-gray-500 mb-4">Scope 3 (value-chain) emissions are offered as a separate service — not bundled into standard plans.</p>
+        <h2 class="text-2xl font-bold text-gray-900 mb-1">Scope 3 Add-On</h2>
+        <p class="text-sm text-gray-500 mb-4">
+            Scope 3 (value-chain) emissions are offered as a separate service — not bundled into standard plans.
+            Items marked <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-medium">Coming soon</span> are on the roadmap.
+        </p>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
             @foreach($scope3AddOns as $addon)
                 <div class="bg-white rounded-xl border border-gray-200 p-5 flex flex-col">
@@ -175,41 +176,29 @@
                     <div class="text-sm font-semibold text-emerald-700 mb-3">{{ $addon['price_display'] }}</div>
                     <ul class="space-y-1.5 text-sm text-gray-600 flex-1">
                         @foreach($addon['includes'] as $item)
-                            <li class="flex items-start">
-                                <svg class="w-4 h-4 text-emerald-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                                {{ $item }}
+                            <li class="flex items-start {{ !empty($item['soon']) ? 'text-gray-400' : '' }}">
+                                @if(!empty($item['soon']))
+                                    <svg class="w-4 h-4 text-gray-300 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                @else
+                                    <svg class="w-4 h-4 text-emerald-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                                @endif
+                                <span>
+                                    {{ $item['label'] }}
+                                    @if(!empty($item['soon']))
+                                        <span class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-medium">Coming soon</span>
+                                    @endif
+                                </span>
                             </li>
                         @endforeach
                     </ul>
-                    <button type="button" disabled class="mt-4 w-full px-4 py-2 bg-gray-100 text-gray-500 rounded-lg cursor-not-allowed text-sm font-medium">
-                        Coming soon
-                    </button>
+                    <a href="mailto:sales@menetzero.com?subject=Scope%203%20Add-On%20enquiry"
+                       class="mt-4 block w-full text-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 text-sm font-medium">
+                        Contact Sales
+                    </a>
                 </div>
             @endforeach
         </div>
     </div>
 
-    <!-- Packages summary -->
-    <div class="mb-6">
-        <h2 class="text-2xl font-bold text-gray-900 mb-4">Packages at a glance</h2>
-        <div class="overflow-x-auto bg-white rounded-xl border border-gray-200">
-            <table class="min-w-full text-sm">
-                <thead>
-                    <tr class="border-b border-gray-200 bg-gray-50">
-                        <th class="text-left font-semibold text-gray-700 px-5 py-3">Package</th>
-                        <th class="text-right font-semibold text-gray-700 px-5 py-3">Price</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                    @foreach($packages as $pkg)
-                        <tr>
-                            <td class="px-5 py-3 text-gray-800 font-medium">{{ $pkg['package'] }}</td>
-                            <td class="px-5 py-3 text-right text-gray-700">{{ $pkg['price'] }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    </div>
 </div>
 @endsection

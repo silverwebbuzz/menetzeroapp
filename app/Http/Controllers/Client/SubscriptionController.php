@@ -82,7 +82,6 @@ class SubscriptionController extends Controller
         $comparisonColumns = SubscriptionPlanMatrix::columns();
         $featureRows = SubscriptionPlanMatrix::featureRows();
         $scope3AddOns = SubscriptionPlanMatrix::scope3AddOns();
-        $packages = SubscriptionPlanMatrix::packages();
 
         return view('client.subscriptions.upgrade', compact(
             'currentSubscription',
@@ -91,8 +90,7 @@ class SubscriptionController extends Controller
             'planMeta',
             'comparisonColumns',
             'featureRows',
-            'scope3AddOns',
-            'packages'
+            'scope3AddOns'
         ));
     }
 
@@ -109,7 +107,6 @@ class SubscriptionController extends Controller
 
         $request->validate([
             'plan_id' => 'required|exists:subscription_plans,id',
-            'billing_cycle' => 'required|in:annual,monthly',
         ]);
 
         $plan = SubscriptionPlan::findOrFail($request->plan_id);
@@ -119,8 +116,9 @@ class SubscriptionController extends Controller
         }
 
         try {
+            // Annual billing only — monthly is not offered.
             $this->subscriptionService->subscribeClient($company->id, $plan->id, [
-                'billing_cycle' => $request->billing_cycle,
+                'billing_cycle' => 'annual',
                 'payment_method' => $request->payment_method ?? 'manual',
                 'auto_renew' => $request->has('auto_renew'),
             ]);

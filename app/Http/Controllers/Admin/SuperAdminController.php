@@ -108,13 +108,20 @@ class SuperAdminController extends Controller
      */
     public function storeSubscriptionPlan(Request $request)
     {
+        // Accept features/limits from JSON textareas and force annual billing.
+        $request->merge([
+            'features' => $this->normalizeJsonArray($request->input('features')),
+            'limits' => $this->normalizeJsonArray($request->input('limits')),
+            'billing_cycle' => 'annual',
+        ]);
+
         $request->validate([
             'plan_code' => 'required|string|max:50|unique:subscription_plans,plan_code',
             'plan_name' => 'required|string|max:255',
             'plan_category' => 'required|in:client',
             'price_annual' => 'required|numeric|min:0',
             'currency' => 'required|string|max:3',
-            'billing_cycle' => 'required|in:annual,monthly',
+            'billing_cycle' => 'required|in:annual',
             'description' => 'nullable|string',
             'features' => 'nullable|array',
             'limits' => 'nullable|array',
@@ -126,7 +133,7 @@ class SuperAdminController extends Controller
             'plan_category' => $request->plan_category,
             'price_annual' => $request->price_annual,
             'currency' => $request->currency,
-            'billing_cycle' => $request->billing_cycle,
+            'billing_cycle' => 'annual',
             'description' => $request->description,
             'features' => $request->features ?? [],
             'limits' => $request->limits ?? [],
@@ -154,13 +161,20 @@ class SuperAdminController extends Controller
     {
         $plan = SubscriptionPlan::findOrFail($id);
 
+        // Accept features/limits from JSON textareas and force annual billing.
+        $request->merge([
+            'features' => $this->normalizeJsonArray($request->input('features')),
+            'limits' => $this->normalizeJsonArray($request->input('limits')),
+            'billing_cycle' => 'annual',
+        ]);
+
         $request->validate([
             'plan_code' => 'required|string|max:50|unique:subscription_plans,plan_code,' . $id,
             'plan_name' => 'required|string|max:255',
             'plan_category' => 'required|in:client',
             'price_annual' => 'required|numeric|min:0',
             'currency' => 'required|string|max:3',
-            'billing_cycle' => 'required|in:annual,monthly',
+            'billing_cycle' => 'required|in:annual',
             'description' => 'nullable|string',
             'features' => 'nullable|array',
             'limits' => 'nullable|array',
@@ -172,7 +186,7 @@ class SuperAdminController extends Controller
             'plan_category' => $request->plan_category,
             'price_annual' => $request->price_annual,
             'currency' => $request->currency,
-            'billing_cycle' => $request->billing_cycle,
+            'billing_cycle' => 'annual',
             'description' => $request->description,
             'features' => $request->features ?? [],
             'limits' => $request->limits ?? [],
@@ -201,6 +215,23 @@ class SuperAdminController extends Controller
 
         return redirect()->route('admin.subscription-plans')
             ->with('success', 'Subscription plan deleted successfully');
+    }
+
+    /**
+     * Normalize a features/limits value coming from the admin form. The form
+     * sends a JSON string (textarea); decode it to an array so validation and
+     * the JSON column both receive an array.
+     */
+    private function normalizeJsonArray($value): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+        if (is_string($value) && trim($value) !== '') {
+            $decoded = json_decode($value, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+        return [];
     }
 
     /**

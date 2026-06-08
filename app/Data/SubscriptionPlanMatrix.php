@@ -65,11 +65,30 @@ class SubscriptionPlanMatrix
     }
 
     /**
-     * The feature comparison rows.
+     * The feature comparison rows. Reads admin-managed rows from the DB and
+     * falls back to the built-in defaults if the table is empty/missing.
      *
      * @return array<int, array<string, mixed>>
      */
     public static function featureRows(): array
+    {
+        try {
+            $rows = \App\Models\PlanFeatureRow::where('is_active', true)
+                ->orderBy('sort_order')->orderBy('id')->get();
+            if ($rows->isNotEmpty()) {
+                return $rows->map->toMatrixRow()->all();
+            }
+        } catch (\Throwable $e) {
+            // Table not migrated yet — use defaults below.
+        }
+
+        return self::defaultFeatureRows();
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private static function defaultFeatureRows(): array
     {
         return [
             ['label' => 'Users', 'coming_soon' => false, 'cells' => [
@@ -140,63 +159,75 @@ class SubscriptionPlanMatrix
 
     /**
      * Scope 3 is sold as a separate add-on, not bundled into standard plans.
-     * Shown as "Coming soon" until purchasable add-on billing is built.
+     *
+     * The core Scope 3 engine (15 GHG Protocol categories, calculation and the
+     * Scope 3 report) is built, so "Lite" items are live. Advanced supplier /
+     * AI / data-quality features are still on the roadmap (`soon => true`).
+     *
+     * Each `includes` item: ['label' => string, 'soon' => bool].
+     *
+     * Reads admin-managed add-ons from the DB and falls back to the built-in
+     * defaults if the table is empty/missing.
      *
      * @return array<int, array<string, mixed>>
      */
     public static function scope3AddOns(): array
+    {
+        try {
+            $addons = \App\Models\Scope3Addon::where('is_active', true)
+                ->orderBy('sort_order')->orderBy('id')->get();
+            if ($addons->isNotEmpty()) {
+                return $addons->map->toMatrixAddon()->all();
+            }
+        } catch (\Throwable $e) {
+            // Table not migrated yet — use defaults below.
+        }
+
+        return self::defaultScope3AddOns();
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private static function defaultScope3AddOns(): array
     {
         return [
             [
                 'name' => 'Scope 3 Lite (Spend Based)',
                 'price_display' => 'AED 10,000 – 15,000 / year',
                 'includes' => [
-                    'Purchased Goods & Services',
-                    'Business Travel',
-                    'Employee Commuting',
-                    'Waste',
-                    'Basic Scope 3 Report',
+                    ['label' => 'Purchased Goods & Services', 'soon' => false],
+                    ['label' => 'Business Travel', 'soon' => false],
+                    ['label' => 'Employee Commuting', 'soon' => false],
+                    ['label' => 'Waste', 'soon' => false],
+                    ['label' => 'Basic Scope 3 Report', 'soon' => false],
                 ],
             ],
             [
                 'name' => 'Scope 3 Standard',
                 'price_display' => 'AED 20,000 – 40,000 / year',
                 'includes' => [
-                    'Everything in Lite',
-                    'Supplier Mapping',
-                    'Missing Data Analysis',
-                    'Data Quality Scoring',
-                    'AI Recommendations',
-                    'Annual Review',
+                    ['label' => 'Everything in Lite', 'soon' => false],
+                    ['label' => 'Supplier Mapping', 'soon' => true],
+                    ['label' => 'Missing Data Analysis', 'soon' => true],
+                    ['label' => 'Data Quality Scoring', 'soon' => true],
+                    ['label' => 'AI Recommendations', 'soon' => true],
+                    ['label' => 'Annual Review', 'soon' => true],
                 ],
             ],
             [
                 'name' => 'Scope 3 Advanced — Supplier Engagement',
                 'price_display' => 'AED 50,000 – 100,000+ / year',
                 'includes' => [
-                    'Supplier Portal',
-                    'Supplier Questionnaires',
-                    'Activity-Based Calculations',
-                    'Multi-country Suppliers',
-                    'Audit Support',
-                    'ESG Consulting Support',
+                    ['label' => 'Supplier Portal', 'soon' => true],
+                    ['label' => 'Supplier Questionnaires', 'soon' => true],
+                    ['label' => 'Activity-Based Calculations', 'soon' => true],
+                    ['label' => 'Multi-country Suppliers', 'soon' => true],
+                    ['label' => 'Audit Support', 'soon' => true],
+                    ['label' => 'ESG Consulting Support', 'soon' => true],
                 ],
             ],
         ];
     }
 
-    /**
-     * Bottom-of-page summary of headline packages / services.
-     *
-     * @return array<int, array<string, string>>
-     */
-    public static function packages(): array
-    {
-        return [
-            ['package' => 'Scope 1 & 2 SaaS', 'price' => 'USD 990 / year'],
-            ['package' => 'Setup Fee', 'price' => 'USD 500 (one-time)'],
-            ['package' => 'Scope 3 Add-On', 'price' => 'AED 15,000+'],
-            ['package' => 'Full Carbon Reporting Service', 'price' => 'AED 25,000 – 75,000 / year'],
-        ];
-    }
 }
