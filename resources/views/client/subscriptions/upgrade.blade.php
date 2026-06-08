@@ -24,10 +24,7 @@
         <div>
             <h1 class="text-3xl font-bold text-gray-900">Choose your plan</h1>
             <p class="mt-2 text-gray-600">
-                Scope 1 &amp; 2 carbon accounting. Prices shown in {{ $displayCurrency }} (billed annually).
-                @if($displayCurrency !== 'INR')
-                    <span class="text-gray-400">Charged in INR (₹) at checkout.</span>
-                @endif
+                Scope 1 &amp; 2 carbon accounting. Prices shown in {{ $displayCurrency }} (billed annually, one-time payment).
             </p>
         </div>
         <div class="inline-flex items-center rounded-lg border border-gray-200 overflow-hidden text-sm self-start">
@@ -123,7 +120,7 @@
                     <p class="text-sm font-medium text-gray-700">Billed annually</p>
                     <label class="flex items-center mt-2">
                         <input type="checkbox" name="auto_renew" value="1" checked class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
-                        <span class="ml-2 text-gray-600 text-sm">Auto-renew each year (uncheck to cancel after this year)</span>
+                        <span class="ml-2 text-gray-600 text-sm">Remind me to renew next year (one-time payment each year — no card mandate)</span>
                     </label>
                 </div>
 
@@ -148,7 +145,13 @@
                             @endforeach
                         </div>
                         @error('gateway')<p class="text-red-600 text-sm mt-1">{{ $message }}</p>@enderror
-                        <p class="text-xs text-gray-400 mt-2">Payments are processed securely in INR (₹). The exact amount is shown on the payment screen.</p>
+                        <p class="text-xs text-gray-400 mt-2">
+                            @if($displayCurrency === 'AED')
+                                Checkout opens in <strong>AED</strong> (same as prices above). UAE/international cards supported; UPI &amp; NetBanking are India-only.
+                            @else
+                                Checkout opens in <strong>INR (₹)</strong>. The exact amount is shown on the payment screen.
+                            @endif
+                        </p>
                     @endif
                 </div>
 

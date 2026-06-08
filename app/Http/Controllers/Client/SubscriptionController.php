@@ -151,8 +151,16 @@ class SubscriptionController extends Controller
                 ->with('error', 'The selected payment method is not available right now. Please try another.');
         }
 
-        // Razorpay/Cashfree settle in INR, so we always charge the INR price.
+        // Cashfree: match the currency the customer picked (AED or INR).
+        // Razorpay: INR only — Indian gateway does not support AED orders.
         $charge = \App\Services\CurrencyService::chargeAmount($plan);
+        if ($gateway->gateway === 'razorpay') {
+            $charge = [
+                'currency' => 'INR',
+                'amount' => (float) $plan->price_inr,
+                'display_currency' => $charge['display_currency'] ?? 'INR',
+            ];
+        }
         if ($charge['amount'] <= 0) {
             return redirect()->route('subscriptions.upgrade')
                 ->with('error', 'This plan is not available for online payment yet. Please contact support.');

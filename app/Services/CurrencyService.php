@@ -61,13 +61,30 @@ class CurrencyService
     }
 
     /**
-     * Amount actually charged via the gateway. Razorpay/Cashfree settle in INR.
+     * Amount sent to the payment gateway. Matches the visitor's display currency
+     * so Cashfree/Razorpay checkout shows the same currency they picked on our
+     * site (AED or INR). Settlement to your bank is still in INR per gateway
+     * rules; AED orders use Cashfree International / Pay Native.
      *
-     * @return array{currency:string, amount:float}
+     * @return array{currency:string, amount:float, display_currency:string}
      */
-    public static function chargeAmount(SubscriptionPlan $plan): array
+    public static function chargeAmount(SubscriptionPlan $plan, ?string $displayCurrency = null): array
     {
-        return ['currency' => 'INR', 'amount' => (float) $plan->price_inr];
+        $displayCurrency = strtoupper($displayCurrency ?: self::displayCurrency());
+
+        if ($displayCurrency === 'AED') {
+            return [
+                'currency' => 'AED',
+                'amount' => (float) $plan->price_annual,
+                'display_currency' => 'AED',
+            ];
+        }
+
+        return [
+            'currency' => 'INR',
+            'amount' => (float) $plan->price_inr,
+            'display_currency' => 'INR',
+        ];
     }
 
     /**

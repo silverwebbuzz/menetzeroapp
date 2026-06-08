@@ -13,13 +13,22 @@
         <h1 class="text-2xl font-bold text-gray-900 mb-1">Complete your payment</h1>
         <p class="text-gray-600 text-sm mb-6">You're subscribing to the <strong>{{ $plan->plan_name ?? 'selected' }}</strong> plan (annual).</p>
 
+        @php
+            $chargeSymbol = \App\Services\CurrencyService::symbol($transaction->currency);
+            $chargeLabel = $chargeSymbol . ' ' . number_format((float) $transaction->amount, 0);
+        @endphp
         <div class="bg-gray-50 rounded-lg p-5 mb-6">
-            <div class="text-3xl font-extrabold text-gray-900">{{ $transaction->currency }} {{ number_format($transaction->amount, 0) }}</div>
-            <div class="text-xs text-gray-500 mt-1">Billed annually via {{ $gateway->label }}</div>
+            <div class="text-3xl font-extrabold text-gray-900">{{ $chargeLabel }}</div>
+            <div class="text-xs text-gray-500 mt-1">Annual plan · billed once via {{ $gateway->label }}</div>
+            @if($transaction->currency === 'AED')
+                <p class="text-xs text-gray-400 mt-2">Cashfree will charge in AED. Your account receives settlement in INR per Cashfree international rules.</p>
+            @else
+                <p class="text-xs text-gray-400 mt-2">Charged in Indian Rupees (INR).</p>
+            @endif
         </div>
 
         <button id="payBtn" class="w-full px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-medium">
-            Pay {{ $transaction->currency }} {{ number_format($transaction->amount, 0) }}
+            Pay {{ $chargeLabel }}
         </button>
         <p class="mt-4 text-xs text-gray-400">
             Payment is processed securely by {{ $gateway->label }}. Don't close this window.
