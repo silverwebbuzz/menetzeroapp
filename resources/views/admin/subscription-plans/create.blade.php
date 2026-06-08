@@ -39,10 +39,20 @@
                 </div>
 
                 <div>
-                    <label for="price_annual" class="block text-sm font-medium text-gray-700 mb-1">Annual Price *</label>
+                    <label for="price_annual" class="block text-sm font-medium text-gray-700 mb-1">Annual Price (AED) *</label>
                     <input type="number" name="price_annual" id="price_annual" value="{{ old('price_annual') }}" step="0.01" min="0" required
                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
                     @error('price_annual')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="price_inr" class="block text-sm font-medium text-gray-700 mb-1">Annual Price (INR ₹)</label>
+                    <input type="number" name="price_inr" id="price_inr" value="{{ old('price_inr') }}" step="0.01" min="0"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+                    <p class="mt-1 text-xs text-gray-500">Amount charged via Razorpay/Cashfree (settled in INR).</p>
+                    @error('price_inr')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>

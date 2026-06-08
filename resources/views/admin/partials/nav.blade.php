@@ -53,6 +53,13 @@
         </svg>
         Payment Gateways
     </a>
+    <a href="{{ route('admin.site-content.index') }}" class="nav-link {{ $isActive('admin.site-content') ? 'active' : '' }}">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 6h16M4 10h16M4 14h10M4 18h10"/>
+        </svg>
+        Site Content
+    </a>
     <a href="{{ route('admin.role-templates') }}" class="nav-link {{ $isActive('admin.role-templates') ? 'active' : '' }}">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

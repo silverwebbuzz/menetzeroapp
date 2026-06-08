@@ -14,6 +14,7 @@ class SubscriptionPlan extends Model
         'plan_name',
         'plan_category',
         'price_annual',
+        'price_inr',
         'currency',
         'billing_cycle',
         'is_active',
@@ -26,6 +27,7 @@ class SubscriptionPlan extends Model
     protected $casts = [
         'is_active' => 'boolean',
         'price_annual' => 'decimal:2',
+        'price_inr' => 'decimal:2',
         'features' => 'array',
         'limits' => 'array',
     ];

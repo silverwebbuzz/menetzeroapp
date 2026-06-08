@@ -18,6 +18,14 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// Public marketing + policy pages (required for payment gateway whitelisting)
+Route::get('/pricing', [\App\Http\Controllers\PageController::class, 'pricing'])->name('pricing');
+Route::get('/contact', [\App\Http\Controllers\PageController::class, 'contact'])->name('contact');
+Route::get('/terms', [\App\Http\Controllers\PageController::class, 'show'])->defaults('slug', 'terms')->name('terms');
+Route::get('/refunds', [\App\Http\Controllers\PageController::class, 'show'])->defaults('slug', 'refunds')->name('refunds');
+Route::get('/privacy', [\App\Http\Controllers\PageController::class, 'show'])->defaults('slug', 'privacy')->name('privacy');
+Route::get('/currency/{code}', [\App\Http\Controllers\PageController::class, 'switchCurrency'])->name('currency.switch');
+
 // Authentication routes - Client
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
@@ -374,6 +382,12 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
         // Payment Gateway Settings (Razorpay / Cashfree credentials)
         Route::get('/payment-gateways', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'index'])->name('payment-gateways.index');
         Route::put('/payment-gateways/{id}', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'update'])->name('payment-gateways.update');
+
+        // Site Content (company/contact details, currency, policy pages)
+        Route::get('/site-content', [\App\Http\Controllers\Admin\SiteContentController::class, 'index'])->name('site-content.index');
+        Route::put('/site-content/settings', [\App\Http\Controllers\Admin\SiteContentController::class, 'updateSettings'])->name('site-content.settings');
+        Route::get('/site-content/pages/{id}/edit', [\App\Http\Controllers\Admin\SiteContentController::class, 'editPage'])->name('site-content.pages.edit');
+        Route::put('/site-content/pages/{id}', [\App\Http\Controllers\Admin\SiteContentController::class, 'updatePage'])->name('site-content.pages.update');
 
         // Role Templates Management
         Route::get('/role-templates', [\App\Http\Controllers\Admin\SuperAdminController::class, 'roleTemplates'])->name('role-templates');

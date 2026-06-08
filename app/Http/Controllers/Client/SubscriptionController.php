@@ -151,12 +151,19 @@ class SubscriptionController extends Controller
                 ->with('error', 'The selected payment method is not available right now. Please try another.');
         }
 
+        // Razorpay/Cashfree settle in INR, so we always charge the INR price.
+        $charge = \App\Services\CurrencyService::chargeAmount($plan);
+        if ($charge['amount'] <= 0) {
+            return redirect()->route('subscriptions.upgrade')
+                ->with('error', 'This plan is not available for online payment yet. Please contact support.');
+        }
+
         // Create a pending transaction we can reconcile after the gateway returns.
         $transaction = PaymentTransaction::create([
             'company_id' => $company->id,
             'transaction_type' => 'subscription',
-            'amount' => $plan->price_annual,
-            'currency' => $plan->currency ?? 'AED',
+            'amount' => $charge['amount'],
+            'currency' => $charge['currency'],
             'status' => 'pending',
             'payment_method' => $gateway->gateway,
             'description' => 'Subscription: ' . $plan->plan_name . ' (annual)',
@@ -173,7 +180,7 @@ class SubscriptionController extends Controller
             if ($gateway->gateway === 'razorpay') {
                 $order = $this->paymentService->createRazorpayOrder(
                     $gateway,
-                    $plan->price_annual,
+                    $transaction->amount,
                     $transaction->currency,
                     'txn_' . $transaction->id,
                     ['plan' => $plan->plan_code, 'company_id' => (string) $company->id]
@@ -185,7 +192,7 @@ class SubscriptionController extends Controller
                 $order = $this->paymentService->createCashfreeOrder(
                     $gateway,
                     $cfOrderId,
-                    $plan->price_annual,
+                    $transaction->amount,
                     $transaction->currency,
                     [
                         'id' => 'cust_' . $company->id,

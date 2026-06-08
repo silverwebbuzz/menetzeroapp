@@ -55,15 +55,17 @@
                     @endif
 
                     @php
+                        $cur = \App\Services\CurrencyService::displayCurrency();
                         $isCustom = !empty($meta['is_custom']);
                         if ($isCustom) {
                             $priceText = 'Custom';
                             $priceSub = 'Contact sales for pricing';
                         } elseif ((float) $plan->price_annual <= 0) {
-                            $priceText = ($plan->currency ?? 'AED') . ' 0';
+                            $priceText = \App\Services\CurrencyService::format(0, $cur);
                             $priceSub = 'Free forever';
                         } else {
-                            $priceText = ($plan->currency ?? 'AED') . ' ' . number_format($plan->price_annual, 0);
+                            $disp = \App\Services\CurrencyService::displayPrice($plan, $cur);
+                            $priceText = \App\Services\CurrencyService::format($disp['amount'], $cur);
                             $priceSub = 'per year';
                         }
                     @endphp
@@ -132,6 +134,7 @@
                             @endforeach
                         </div>
                         @error('gateway')<p class="text-red-600 text-sm mt-1">{{ $message }}</p>@enderror
+                        <p class="text-xs text-gray-400 mt-2">Payments are processed securely in INR (₹). The exact amount is shown on the payment screen.</p>
                     @endif
                 </div>
 
