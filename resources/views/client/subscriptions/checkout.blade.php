@@ -9,6 +9,15 @@
     $amountMinor = (int) round(((float) $transaction->amount) * 100);
 @endphp
 <div class="max-w-lg mx-auto">
+    @if(session('info'))
+        <div class="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">{{ session('info') }}</div>
+    @endif
+    @if(!empty($meta['charged_in_inr_fallback']))
+        <div class="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            Prices on our site are shown in {{ $meta['display_currency'] ?? 'AED' }}, but Cashfree has not enabled that currency on our account yet.
+            You will pay the INR equivalent below.
+        </div>
+    @endif
     <div class="bg-white rounded-xl border border-gray-200 p-8 text-center">
         <h1 class="text-2xl font-bold text-gray-900 mb-1">Complete your payment</h1>
         <p class="text-gray-600 text-sm mb-6">You're subscribing to the <strong>{{ $plan->plan_name ?? 'selected' }}</strong> plan (annual).</p>

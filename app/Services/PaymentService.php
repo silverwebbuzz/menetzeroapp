@@ -187,6 +187,19 @@ class PaymentService
         return $digits;
     }
 
+    /**
+     * Cashfree returns this when order_currency (e.g. AED) is requested but not
+     * yet approved on the merchant account.
+     */
+    public function isCashfreeCurrencyDisabledError(string $message): bool
+    {
+        $msg = strtolower($message);
+
+        return str_contains($msg, 'currency not enabled')
+            || str_contains($msg, 'currency is not enabled')
+            || str_contains($msg, 'order_currency');
+    }
+
     private function extractError(?array $body, string $fallback): string
     {
         if (is_array($body)) {

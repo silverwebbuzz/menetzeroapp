@@ -204,19 +204,51 @@ class SubscriptionController extends Controller
                     ?? PaymentService::normalizePhone(\App\Models\SiteSetting::get('support_phone'))
                     ?? '9999999999';
 
-                $order = $this->paymentService->createCashfreeOrder(
-                    $gateway,
-                    $cfOrderId,
-                    $transaction->amount,
-                    $transaction->currency,
-                    [
-                        'id' => 'cust_' . $company->id,
-                        'name' => $user->name ?: $company->name,
-                        'email' => $user->email ?: ($company->email ?: 'billing@menetzero.com'),
-                        'phone' => $phone,
-                    ],
-                    $returnUrl
-                );
+                $customer = [
+                    'id' => 'cust_' . $company->id,
+                    'name' => $user->name ?: $company->name,
+                    'email' => $user->email ?: ($company->email ?: 'billing@menetzero.com'),
+                    'phone' => $phone,
+                ];
+
+                try {
+                    $order = $this->paymentService->createCashfreeOrder(
+                        $gateway,
+                        $cfOrderId,
+                        $transaction->amount,
+                        $transaction->currency,
+                        $customer,
+                        $returnUrl
+                    );
+                } catch (\RuntimeException $e) {
+                    // AED (or other currency) not approved on Cashfree yet — fall back
+                    // to INR so payments still work while merchant activation is pending.
+                    if ($transaction->currency !== 'INR'
+                        && $this->paymentService->isCashfreeCurrencyDisabledError($e->getMessage())) {
+                        $inrAmount = (float) $plan->price_inr;
+                        $transaction->update(['amount' => $inrAmount, 'currency' => 'INR']);
+                        $metadata['charged_in_inr_fallback'] = true;
+                        $metadata['display_currency'] = $charge['display_currency'] ?? 'AED';
+
+                        $order = $this->paymentService->createCashfreeOrder(
+                            $gateway,
+                            $cfOrderId,
+                            $inrAmount,
+                            'INR',
+                            $customer,
+                            $returnUrl
+                        );
+
+                        session()->flash(
+                            'info',
+                            'AED checkout is being activated on Cashfree (pending approval). '
+                            . 'You will be charged the INR equivalent (₹' . number_format($inrAmount, 0) . ') for now.'
+                        );
+                    } else {
+                        throw $e;
+                    }
+                }
+
                 $metadata['cashfree_order_id'] = $cfOrderId;
                 $metadata['cashfree_payment_session_id'] = $order['payment_session_id'] ?? null;
             }

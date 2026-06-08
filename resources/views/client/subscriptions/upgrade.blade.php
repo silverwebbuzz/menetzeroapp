@@ -147,7 +147,7 @@
                         @error('gateway')<p class="text-red-600 text-sm mt-1">{{ $message }}</p>@enderror
                         <p class="text-xs text-gray-400 mt-2">
                             @if($displayCurrency === 'AED')
-                                Checkout opens in <strong>AED</strong> (same as prices above). UAE/international cards supported; UPI &amp; NetBanking are India-only.
+                                Checkout opens in <strong>AED</strong> when enabled on Cashfree. While AED activation is pending, you will be charged the <strong>INR (₹) equivalent</strong> automatically. UAE/international cards supported; UPI &amp; NetBanking are India-only.
                             @else
                                 Checkout opens in <strong>INR (₹)</strong>. The exact amount is shown on the payment screen.
                             @endif
