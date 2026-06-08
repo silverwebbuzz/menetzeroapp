@@ -5,10 +5,46 @@ namespace App\Services;
 use App\Models\Company;
 use App\Models\SubscriptionPlan;
 use App\Models\ClientSubscription;
+use App\Models\PaymentTransaction;
 use Carbon\Carbon;
 
 class SubscriptionService
 {
+    /**
+     * Activate a subscription from a paid transaction. Idempotent: if the
+     * transaction is already completed it just returns the existing
+     * subscription. Used by both the checkout return handlers and webhooks.
+     */
+    public function completeTransaction(PaymentTransaction $transaction, array $gatewayRefs = [])
+    {
+        if ($transaction->status === 'completed') {
+            return ClientSubscription::find($transaction->subscription_id);
+        }
+
+        $metadata = array_merge($transaction->metadata ?? [], $gatewayRefs);
+        $planId = $metadata['plan_id'] ?? null;
+
+        if (!$planId) {
+            throw new \RuntimeException('Transaction is missing the plan reference.');
+        }
+
+        $subscription = $this->subscribeClient($transaction->company_id, $planId, [
+            'billing_cycle' => 'annual',
+            'payment_method' => $transaction->payment_method,
+            'auto_renew' => (bool) ($metadata['auto_renew'] ?? false),
+            'metadata' => $gatewayRefs,
+        ]);
+
+        $transaction->update([
+            'status' => 'completed',
+            'subscription_id' => $subscription->id,
+            'paid_at' => now(),
+            'metadata' => $metadata,
+        ]);
+
+        return $subscription;
+    }
+
     /**
      * Subscribe a client to a plan.
      */

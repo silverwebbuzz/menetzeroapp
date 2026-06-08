@@ -102,7 +102,7 @@
 
         <!-- Submit (annual billing only) -->
         <div class="bg-white rounded-xl border border-gray-200 p-6 mb-10">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="flex flex-col gap-5">
                 <div>
                     <p class="text-sm font-medium text-gray-700">Billed annually</p>
                     <label class="flex items-center mt-2">
@@ -110,9 +110,34 @@
                         <span class="ml-2 text-gray-600 text-sm">Auto-renew each year (uncheck to cancel after this year)</span>
                     </label>
                 </div>
-                <div class="flex items-center justify-end gap-3">
+
+                {{-- Payment method (only needed for paid plans) --}}
+                <div>
+                    <p class="text-sm font-medium text-gray-700 mb-2">Payment method <span class="text-gray-400 font-normal">(for paid plans)</span></p>
+                    @if($enabledGateways->isEmpty())
+                        <p class="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                            Online payment isn't configured yet. You can switch to the Free plan, or contact sales for paid plans.
+                        </p>
+                    @else
+                        <div class="flex flex-wrap gap-3">
+                            @foreach($enabledGateways as $i => $gw)
+                                <label class="flex items-center gap-2 px-4 py-2 border rounded-lg cursor-pointer hover:bg-gray-50 text-sm">
+                                    <input type="radio" name="gateway" value="{{ $gw->gateway }}" {{ $i === 0 ? 'checked' : '' }}
+                                           class="text-orange-600 focus:ring-orange-500">
+                                    <span class="font-medium text-gray-800">{{ $gw->label }}</span>
+                                    @if(!$gw->isLive())
+                                        <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800">Test</span>
+                                    @endif
+                                </label>
+                            @endforeach
+                        </div>
+                        @error('gateway')<p class="text-red-600 text-sm mt-1">{{ $message }}</p>@enderror
+                    @endif
+                </div>
+
+                <div class="flex items-center justify-end gap-3 border-t border-gray-100 pt-4">
                     <a href="{{ route('subscriptions.index') }}" class="px-5 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">Cancel</a>
-                    <button type="submit" class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 text-sm font-medium">Confirm plan</button>
+                    <button type="submit" class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 text-sm font-medium">Continue</button>
                 </div>
             </div>
         </div>

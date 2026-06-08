@@ -1,0 +1,88 @@
+@extends('layouts.app')
+
+@section('title', 'Complete Payment - MenetZero')
+@section('page-title', 'Complete Payment')
+
+@section('content')
+@php
+    $meta = $transaction->metadata ?? [];
+    $amountMinor = (int) round(((float) $transaction->amount) * 100);
+@endphp
+<div class="max-w-lg mx-auto">
+    <div class="bg-white rounded-xl border border-gray-200 p-8 text-center">
+        <h1 class="text-2xl font-bold text-gray-900 mb-1">Complete your payment</h1>
+        <p class="text-gray-600 text-sm mb-6">You're subscribing to the <strong>{{ $plan->plan_name ?? 'selected' }}</strong> plan (annual).</p>
+
+        <div class="bg-gray-50 rounded-lg p-5 mb-6">
+            <div class="text-3xl font-extrabold text-gray-900">{{ $transaction->currency }} {{ number_format($transaction->amount, 0) }}</div>
+            <div class="text-xs text-gray-500 mt-1">Billed annually via {{ $gateway->label }}</div>
+        </div>
+
+        <button id="payBtn" class="w-full px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-medium">
+            Pay {{ $transaction->currency }} {{ number_format($transaction->amount, 0) }}
+        </button>
+        <p class="mt-4 text-xs text-gray-400">
+            Payment is processed securely by {{ $gateway->label }}. Don't close this window.
+        </p>
+        <a href="{{ route('subscriptions.upgrade') }}" class="mt-4 inline-block text-sm text-gray-500 hover:text-gray-700">Cancel and go back</a>
+    </div>
+
+    @if($gateway->gateway === 'razorpay')
+        <form id="razorpayForm" method="POST" action="{{ route('subscriptions.payment.razorpay') }}" class="hidden">
+            @csrf
+            <input type="hidden" name="transaction_id" value="{{ $transaction->id }}">
+            <input type="hidden" name="razorpay_payment_id" id="rzp_payment_id">
+            <input type="hidden" name="razorpay_order_id" id="rzp_order_id">
+            <input type="hidden" name="razorpay_signature" id="rzp_signature">
+        </form>
+    @endif
+</div>
+
+@if($gateway->gateway === 'razorpay')
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    (function () {
+        var options = {
+            key: @json($gateway->key_id),
+            amount: @json($amountMinor),
+            currency: @json($transaction->currency),
+            order_id: @json($meta['razorpay_order_id'] ?? ''),
+            name: @json(config('app.name', 'MenetZero')),
+            description: @json('Subscription: ' . ($plan->plan_name ?? '')),
+            prefill: {
+                name: @json($user->name ?? ''),
+                email: @json($user->email ?? '')
+            },
+            theme: { color: '#ea580c' },
+            handler: function (response) {
+                document.getElementById('rzp_payment_id').value = response.razorpay_payment_id;
+                document.getElementById('rzp_order_id').value = response.razorpay_order_id;
+                document.getElementById('rzp_signature').value = response.razorpay_signature;
+                document.getElementById('razorpayForm').submit();
+            },
+            modal: {
+                ondismiss: function () { /* user closed the popup; stay on page */ }
+            }
+        };
+        var rzp = new Razorpay(options);
+        document.getElementById('payBtn').addEventListener('click', function () { rzp.open(); });
+        rzp.open();
+    })();
+</script>
+@elseif($gateway->gateway === 'cashfree')
+<script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+<script>
+    (function () {
+        var cashfree = Cashfree({ mode: @json($gateway->isLive() ? 'production' : 'sandbox') });
+        function startCheckout() {
+            cashfree.checkout({
+                paymentSessionId: @json($meta['cashfree_payment_session_id'] ?? ''),
+                redirectTarget: '_self'
+            });
+        }
+        document.getElementById('payBtn').addEventListener('click', startCheckout);
+        startCheckout();
+    })();
+</script>
+@endif
+@endsection

@@ -240,6 +240,13 @@
                                     @if($transaction->invoice_number)
                                         <div class="text-xs text-gray-500 mt-1">Invoice: {{ $transaction->invoice_number }}</div>
                                     @endif
+                                    @php
+                                        $meta = $transaction->metadata ?? [];
+                                        $gatewayRef = $meta['razorpay_payment_id'] ?? $meta['cashfree_order_id'] ?? $meta['razorpay_order_id'] ?? null;
+                                    @endphp
+                                    @if($gatewayRef)
+                                        <div class="text-xs text-gray-400 mt-1">Ref: {{ $gatewayRef }}</div>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                     {{ $transaction->currency ?? 'AED' }} {{ number_format($transaction->amount ?? 0, 2) }}

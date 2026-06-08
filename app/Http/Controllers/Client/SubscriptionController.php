@@ -5,18 +5,24 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\SubscriptionService;
+use App\Services\PaymentService;
 use App\Models\SubscriptionPlan;
 use App\Models\ClientSubscription;
+use App\Models\PaymentGateway;
+use App\Models\PaymentTransaction;
 use App\Data\SubscriptionPlanMatrix;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class SubscriptionController extends Controller
 {
     protected $subscriptionService;
+    protected $paymentService;
 
-    public function __construct(SubscriptionService $subscriptionService)
+    public function __construct(SubscriptionService $subscriptionService, PaymentService $paymentService)
     {
         $this->subscriptionService = $subscriptionService;
+        $this->paymentService = $paymentService;
     }
 
     /**
@@ -53,7 +59,7 @@ class SubscriptionController extends Controller
         $subscription = $this->subscriptionService->getActiveSubscription($company->id, 'client');
         
         if (!$subscription) {
-            return redirect()->route('client.subscriptions.index')
+            return redirect()->route('subscriptions.index')
                 ->with('info', 'You do not have an active subscription. Please choose a plan.');
         }
 
@@ -82,6 +88,7 @@ class SubscriptionController extends Controller
         $comparisonColumns = SubscriptionPlanMatrix::columns();
         $featureRows = SubscriptionPlanMatrix::featureRows();
         $scope3AddOns = SubscriptionPlanMatrix::scope3AddOns();
+        $enabledGateways = PaymentGateway::enabled();
 
         return view('client.subscriptions.upgrade', compact(
             'currentSubscription',
@@ -90,12 +97,14 @@ class SubscriptionController extends Controller
             'planMeta',
             'comparisonColumns',
             'featureRows',
-            'scope3AddOns'
+            'scope3AddOns',
+            'enabledGateways'
         ));
     }
 
     /**
-     * Process subscription upgrade/change.
+     * Process subscription selection. Free plans activate immediately; paid
+     * plans are routed through the selected payment gateway.
      */
     public function processUpgrade(Request $request)
     {
@@ -110,24 +119,226 @@ class SubscriptionController extends Controller
         ]);
 
         $plan = SubscriptionPlan::findOrFail($request->plan_id);
-        
+
         if ($plan->plan_category !== 'client') {
             return back()->withErrors(['plan_id' => 'Invalid plan selected.'])->withInput();
         }
 
-        try {
-            // Annual billing only — monthly is not offered.
-            $this->subscriptionService->subscribeClient($company->id, $plan->id, [
-                'billing_cycle' => 'annual',
-                'payment_method' => $request->payment_method ?? 'manual',
-                'auto_renew' => $request->has('auto_renew'),
-            ]);
+        // Free plan (or zero-priced): no payment required, activate now.
+        if ((float) $plan->price_annual <= 0) {
+            try {
+                $this->subscriptionService->subscribeClient($company->id, $plan->id, [
+                    'billing_cycle' => 'annual',
+                    'payment_method' => 'free',
+                    'auto_renew' => $request->has('auto_renew'),
+                ]);
 
-            return redirect()->route('client.subscriptions.current-plan')
-                ->with('success', 'Subscription updated successfully!');
-        } catch (\Exception $e) {
-            return back()->withErrors(['error' => $e->getMessage()])->withInput();
+                return redirect()->route('subscriptions.current-plan')
+                    ->with('success', 'Subscription updated successfully!');
+            } catch (\Exception $e) {
+                return back()->withErrors(['error' => $e->getMessage()])->withInput();
+            }
         }
+
+        // Paid plan: a payment gateway must be selected and configured.
+        $request->validate([
+            'gateway' => 'required|in:razorpay,cashfree',
+        ]);
+
+        $gateway = PaymentGateway::forGateway($request->gateway);
+        if (!$gateway || !$gateway->is_enabled || !$gateway->isConfigured()) {
+            return redirect()->route('subscriptions.upgrade')
+                ->with('error', 'The selected payment method is not available right now. Please try another.');
+        }
+
+        // Create a pending transaction we can reconcile after the gateway returns.
+        $transaction = PaymentTransaction::create([
+            'company_id' => $company->id,
+            'transaction_type' => 'subscription',
+            'amount' => $plan->price_annual,
+            'currency' => $plan->currency ?? 'AED',
+            'status' => 'pending',
+            'payment_method' => $gateway->gateway,
+            'description' => 'Subscription: ' . $plan->plan_name . ' (annual)',
+            'metadata' => [
+                'plan_id' => $plan->id,
+                'auto_renew' => $request->has('auto_renew'),
+            ],
+        ]);
+
+        try {
+            $user = Auth::user();
+            $metadata = $transaction->metadata;
+
+            if ($gateway->gateway === 'razorpay') {
+                $order = $this->paymentService->createRazorpayOrder(
+                    $gateway,
+                    $plan->price_annual,
+                    $transaction->currency,
+                    'txn_' . $transaction->id,
+                    ['plan' => $plan->plan_code, 'company_id' => (string) $company->id]
+                );
+                $metadata['razorpay_order_id'] = $order['id'];
+            } else {
+                $cfOrderId = 'txn_' . $transaction->id . '_' . Str::lower(Str::random(6));
+                $returnUrl = route('subscriptions.payment.cashfree') . '?order_id={order_id}';
+                $order = $this->paymentService->createCashfreeOrder(
+                    $gateway,
+                    $cfOrderId,
+                    $plan->price_annual,
+                    $transaction->currency,
+                    [
+                        'id' => 'cust_' . $company->id,
+                        'name' => $user->name ?? $company->name,
+                        'email' => $user->email ?? '',
+                        'phone' => $user->phone ?? '0000000000',
+                    ],
+                    $returnUrl
+                );
+                $metadata['cashfree_order_id'] = $cfOrderId;
+                $metadata['cashfree_payment_session_id'] = $order['payment_session_id'] ?? null;
+            }
+
+            $transaction->metadata = $metadata;
+            $transaction->save();
+
+            return redirect()->route('subscriptions.checkout', $transaction->id);
+        } catch (\Throwable $e) {
+            $transaction->update(['status' => 'failed']);
+            return redirect()->route('subscriptions.upgrade')
+                ->with('error', 'Unable to start payment: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Render the gateway checkout page for a pending transaction.
+     */
+    public function checkout($id)
+    {
+        $company = Auth::user()->getActiveCompany();
+        if (!$company || !$company->isClient()) {
+            return redirect()->route('client.dashboard')->with('error', 'Access denied.');
+        }
+
+        $transaction = PaymentTransaction::where('id', $id)
+            ->where('company_id', $company->id)
+            ->firstOrFail();
+
+        if ($transaction->status !== 'pending') {
+            return redirect()->route('subscriptions.current-plan')
+                ->with('info', 'This payment has already been processed.');
+        }
+
+        $gateway = PaymentGateway::forGateway($transaction->payment_method);
+        if (!$gateway) {
+            return redirect()->route('subscriptions.upgrade')->with('error', 'Payment method unavailable.');
+        }
+
+        $plan = SubscriptionPlan::find($transaction->metadata['plan_id'] ?? null);
+        $user = Auth::user();
+
+        return view('client.subscriptions.checkout', compact('transaction', 'gateway', 'plan', 'company', 'user'));
+    }
+
+    /**
+     * Razorpay checkout success handler (posted from the checkout page JS).
+     */
+    public function razorpayCallback(Request $request)
+    {
+        $company = Auth::user()->getActiveCompany();
+        if (!$company || !$company->isClient()) {
+            return redirect()->route('client.dashboard')->with('error', 'Access denied.');
+        }
+
+        $request->validate([
+            'transaction_id' => 'required',
+            'razorpay_payment_id' => 'required|string',
+            'razorpay_order_id' => 'required|string',
+            'razorpay_signature' => 'required|string',
+        ]);
+
+        $transaction = PaymentTransaction::where('id', $request->transaction_id)
+            ->where('company_id', $company->id)
+            ->firstOrFail();
+
+        $gateway = PaymentGateway::forGateway('razorpay');
+        $valid = $gateway && $this->paymentService->verifyRazorpaySignature(
+            $gateway,
+            $request->razorpay_order_id,
+            $request->razorpay_payment_id,
+            $request->razorpay_signature
+        );
+
+        if (!$valid) {
+            $transaction->update(['status' => 'failed']);
+            return redirect()->route('subscriptions.upgrade')
+                ->with('error', 'Payment verification failed. You were not charged for a subscription change.');
+        }
+
+        return $this->completePaidSubscription($transaction, [
+            'razorpay_payment_id' => $request->razorpay_payment_id,
+            'razorpay_order_id' => $request->razorpay_order_id,
+        ], $request->razorpay_payment_id);
+    }
+
+    /**
+     * Cashfree return-URL handler. Verifies the order status server-side.
+     */
+    public function cashfreeCallback(Request $request)
+    {
+        $company = Auth::user()->getActiveCompany();
+        if (!$company || !$company->isClient()) {
+            return redirect()->route('client.dashboard')->with('error', 'Access denied.');
+        }
+
+        $orderId = (string) $request->query('order_id');
+        if ($orderId === '') {
+            return redirect()->route('subscriptions.upgrade')->with('error', 'Missing payment reference.');
+        }
+
+        // order_id is "txn_{id}_{rand}".
+        $txnId = explode('_', $orderId)[1] ?? null;
+        $transaction = PaymentTransaction::where('id', $txnId)
+            ->where('company_id', $company->id)
+            ->firstOrFail();
+
+        if (($transaction->metadata['cashfree_order_id'] ?? null) !== $orderId) {
+            return redirect()->route('subscriptions.upgrade')->with('error', 'Payment reference mismatch.');
+        }
+
+        if ($transaction->status === 'completed') {
+            return redirect()->route('subscriptions.current-plan')
+                ->with('success', 'Subscription is already active.');
+        }
+
+        $gateway = PaymentGateway::forGateway('cashfree');
+        $status = $gateway ? $this->paymentService->getCashfreeOrderStatus($gateway, $orderId) : null;
+
+        if ($status !== 'PAID') {
+            $transaction->update(['status' => 'failed']);
+            return redirect()->route('subscriptions.upgrade')
+                ->with('error', 'Payment not completed (status: ' . ($status ?? 'unknown') . ').');
+        }
+
+        return $this->completePaidSubscription($transaction, ['cashfree_order_id' => $orderId], $orderId);
+    }
+
+    /**
+     * Mark a transaction paid and activate the subscription.
+     */
+    private function completePaidSubscription(PaymentTransaction $transaction, array $gatewayRefs, ?string $reference)
+    {
+        try {
+            $this->subscriptionService->completeTransaction($transaction, $gatewayRefs);
+        } catch (\Throwable $e) {
+            return redirect()->route('subscriptions.upgrade')
+                ->with('error', 'Payment received but the subscription could not be activated. Please contact support.');
+        }
+
+        $planName = optional(SubscriptionPlan::find($transaction->metadata['plan_id'] ?? null))->plan_name ?? 'subscription';
+
+        return redirect()->route('subscriptions.current-plan')
+            ->with('success', 'Payment successful — your ' . $planName . ' plan is now active!');
     }
 
     /**
@@ -144,7 +355,7 @@ class SubscriptionController extends Controller
         $subscription = $this->subscriptionService->getActiveSubscription($company->id, 'client');
         
         if (!$subscription) {
-            return redirect()->route('client.subscriptions.index')
+            return redirect()->route('subscriptions.index')
                 ->with('info', 'You do not have an active subscription.');
         }
 
@@ -208,7 +419,7 @@ class SubscriptionController extends Controller
             'auto_renew' => false,
         ]);
 
-        return redirect()->route('client.subscriptions.current-plan')
+        return redirect()->route('subscriptions.current-plan')
             ->with('success', 'Subscription cancelled successfully.');
     }
 

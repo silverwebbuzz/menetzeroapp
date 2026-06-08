@@ -208,6 +208,11 @@ Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client'])->
         Route::get('/current-plan', [\App\Http\Controllers\Client\SubscriptionController::class, 'currentPlan'])->name('current-plan');
         Route::get('/upgrade', [\App\Http\Controllers\Client\SubscriptionController::class, 'upgrade'])->name('upgrade');
         Route::post('/upgrade', [\App\Http\Controllers\Client\SubscriptionController::class, 'processUpgrade'])->name('process-upgrade');
+
+        // Payment checkout + gateway callbacks
+        Route::get('/checkout/{id}', [\App\Http\Controllers\Client\SubscriptionController::class, 'checkout'])->name('checkout');
+        Route::post('/payment/razorpay/callback', [\App\Http\Controllers\Client\SubscriptionController::class, 'razorpayCallback'])->name('payment.razorpay');
+        Route::get('/payment/cashfree/callback', [\App\Http\Controllers\Client\SubscriptionController::class, 'cashfreeCallback'])->name('payment.cashfree');
         Route::get('/billing', [\App\Http\Controllers\Client\SubscriptionController::class, 'billing'])->name('billing');
         Route::get('/payment-history', [\App\Http\Controllers\Client\SubscriptionController::class, 'paymentHistory'])->name('payment-history');
         Route::post('/cancel', [\App\Http\Controllers\Client\SubscriptionController::class, 'cancel'])->name('cancel');
@@ -219,6 +224,12 @@ Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client'])->
         Route::post('/billing-methods/{billingMethod}/set-default', [\App\Http\Controllers\Client\SubscriptionController::class, 'setDefaultBillingMethod'])->name('billing-methods.set-default');
     });
     
+});
+
+// Payment gateway webhooks (public, signature-verified, CSRF-exempt)
+Route::prefix('webhooks/payments')->name('webhooks.payments.')->group(function () {
+    Route::post('/razorpay', [\App\Http\Controllers\PaymentWebhookController::class, 'razorpay'])->name('razorpay');
+    Route::post('/cashfree', [\App\Http\Controllers\PaymentWebhookController::class, 'cashfree'])->name('cashfree');
 });
 
 // API routes for dynamic industry category dropdowns
@@ -359,6 +370,10 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
             Route::put('/addons/{id}', [\App\Http\Controllers\Admin\PricingContentController::class, 'updateAddon'])->name('addons.update');
             Route::delete('/addons/{id}', [\App\Http\Controllers\Admin\PricingContentController::class, 'destroyAddon'])->name('addons.destroy');
         });
+
+        // Payment Gateway Settings (Razorpay / Cashfree credentials)
+        Route::get('/payment-gateways', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'index'])->name('payment-gateways.index');
+        Route::put('/payment-gateways/{id}', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'update'])->name('payment-gateways.update');
 
         // Role Templates Management
         Route::get('/role-templates', [\App\Http\Controllers\Admin\SuperAdminController::class, 'roleTemplates'])->name('role-templates');

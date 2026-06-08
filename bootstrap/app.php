@@ -17,6 +17,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'ensureSuperAdmin' => \App\Http\Middleware\EnsureSuperAdmin::class,
             'permission' => \App\Http\Middleware\CheckPermission::class,
         ]);
+
+        // Payment gateway webhooks are authenticated by signature, not CSRF.
+        $middleware->validateCsrfTokens(except: [
+            'webhooks/payments/*',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
