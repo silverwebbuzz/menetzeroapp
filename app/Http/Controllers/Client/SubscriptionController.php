@@ -513,10 +513,8 @@ class SubscriptionController extends Controller
             return back()->with('error', 'No active subscription found.');
         }
 
-        $subscription->update([
-            'status' => 'cancelled',
-            'auto_renew' => false,
-        ]);
+        $subscription->update(['auto_renew' => false]);
+        $this->subscriptionService->transitionSubscriptionStatus($subscription, 'cancelled');
 
         return redirect()->route('subscriptions.current-plan')
             ->with('success', 'Subscription cancelled successfully.');

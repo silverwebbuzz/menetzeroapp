@@ -56,20 +56,14 @@ class SubscriptionService
             throw new \Exception('Plan is not for clients');
         }
 
-        // Cancel existing active subscription
-        ClientSubscription::where('company_id', $companyId)
-            ->where('status', 'active')
-            ->update(['status' => 'cancelled']);
-
         $startedAt = $data['started_at'] ?? now();
         $billingCycle = $data['billing_cycle'] ?? 'annual';
-        
-        $expiresAt = $billingCycle === 'annual' 
+
+        $expiresAt = $billingCycle === 'annual'
             ? Carbon::parse($startedAt)->addYear()
             : Carbon::parse($startedAt)->addMonth();
 
-        return ClientSubscription::create([
-            'company_id' => $companyId,
+        $payload = [
             'subscription_plan_id' => $planId,
             'status' => 'active',
             'billing_cycle' => $billingCycle,
@@ -80,7 +74,36 @@ class SubscriptionService
             'stripe_subscription_id' => $data['stripe_subscription_id'] ?? null,
             'stripe_customer_id' => $data['stripe_customer_id'] ?? null,
             'metadata' => $data['metadata'] ?? null,
-        ]);
+        ];
+
+        // Upgrade in place when an active row already exists. The legacy DB index
+        // `company_active_subscription` is UNIQUE on (company_id, status), so we
+        // cannot cancel-then-create — only one "cancelled" row is allowed per company.
+        $existing = ClientSubscription::where('company_id', $companyId)
+            ->where('status', 'active')
+            ->first();
+
+        if ($existing) {
+            $existing->update($payload);
+
+            return $existing->fresh();
+        }
+
+        return ClientSubscription::create(array_merge($payload, ['company_id' => $companyId]));
+    }
+
+    /**
+     * Change subscription status while respecting the (company_id, status) unique
+     * index: remove any other row that already holds the target status.
+     */
+    public function transitionSubscriptionStatus(ClientSubscription $subscription, string $newStatus): void
+    {
+        ClientSubscription::where('company_id', $subscription->company_id)
+            ->where('status', $newStatus)
+            ->where('id', '!=', $subscription->id)
+            ->delete();
+
+        $subscription->update(['status' => $newStatus]);
     }
 
     /**
