@@ -43,6 +43,7 @@ Route::prefix('consultant')->name('consultant.')->group(function () {
         Route::post('/documents', [\App\Http\Controllers\Consultant\DocumentController::class, 'store'])->name('documents.store');
         Route::delete('/documents/{document}', [\App\Http\Controllers\Consultant\DocumentController::class, 'destroy'])->name('documents.destroy');
         Route::get('/intro-requests', [\App\Http\Controllers\Consultant\IntroRequestController::class, 'index'])->name('intro-requests.index');
+        Route::get('/orders', [\App\Http\Controllers\Consultant\OrderController::class, 'index'])->name('orders.index');
     });
 });
 
@@ -316,9 +317,15 @@ Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client', 'e
         Route::post('/billing-methods/{billingMethod}/set-default', [\App\Http\Controllers\Client\SubscriptionController::class, 'setDefaultBillingMethod'])->name('billing-methods.set-default');
     });
 
-    // Consultant directory (plan-gated visibility)
+    // Consultant directory (plan-gated visibility) + marketplace checkout (C10)
     Route::prefix('consultants')->name('client.consultants.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Client\ConsultantDirectoryController::class, 'index'])->name('index');
+        Route::get('/orders', [\App\Http\Controllers\Client\ConsultantMarketplaceController::class, 'orders'])->name('orders');
+        Route::get('/payment/checkout/{id}', [\App\Http\Controllers\Client\ConsultantMarketplaceController::class, 'paymentCheckout'])->name('payment.checkout');
+        Route::post('/payment/razorpay', [\App\Http\Controllers\Client\ConsultantMarketplaceController::class, 'razorpayCallback'])->name('payment.razorpay');
+        Route::get('/payment/cashfree', [\App\Http\Controllers\Client\ConsultantMarketplaceController::class, 'cashfreeCallback'])->name('payment.cashfree');
+        Route::get('/{consultant}/checkout', [\App\Http\Controllers\Client\ConsultantMarketplaceController::class, 'checkout'])->name('checkout');
+        Route::post('/{consultant}/checkout', [\App\Http\Controllers\Client\ConsultantMarketplaceController::class, 'processCheckout'])->name('checkout.process');
         Route::get('/{consultant}', [\App\Http\Controllers\Client\ConsultantDirectoryController::class, 'show'])->name('show');
         Route::post('/{consultant}/intro', [\App\Http\Controllers\Client\ConsultantDirectoryController::class, 'requestIntro'])->name('intro');
     });
@@ -471,6 +478,9 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
             Route::get('/intro-requests', [\App\Http\Controllers\Admin\ConsultantIntroRequestController::class, 'index'])->name('intro-requests');
             Route::put('/intro-requests/{introRequest}', [\App\Http\Controllers\Admin\ConsultantIntroRequestController::class, 'update'])->name('intro-requests.update');
             Route::get('/orders', [\App\Http\Controllers\Admin\ConsultantOrderController::class, 'index'])->name('orders');
+            Route::post('/orders/{order}/deliver', [\App\Http\Controllers\Admin\ConsultantOrderController::class, 'markDelivered'])->name('orders.deliver');
+            Route::post('/orders/{order}/release', [\App\Http\Controllers\Admin\ConsultantOrderController::class, 'releaseEscrow'])->name('orders.release');
+            Route::post('/orders/{order}/refund', [\App\Http\Controllers\Admin\ConsultantOrderController::class, 'refundEscrow'])->name('orders.refund');
             Route::get('/{consultant}', [\App\Http\Controllers\Admin\ConsultantController::class, 'show'])->name('show');
             Route::post('/{consultant}/approve', [\App\Http\Controllers\Admin\ConsultantController::class, 'approve'])->name('approve');
             Route::post('/{consultant}/reject', [\App\Http\Controllers\Admin\ConsultantController::class, 'reject'])->name('reject');

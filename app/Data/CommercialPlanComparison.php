@@ -178,18 +178,33 @@ class CommercialPlanComparison
     {
         return [
             [
+                'pack_type' => 'starter_consultant',
                 'name' => 'Starter + Consultant',
                 'price' => 'AED 1,000',
+                'price_aed' => 1000,
                 'description' => '~2h data review, methodology checklist, short sign-off memo.',
                 'for_plan' => 'Starter',
             ],
             [
+                'pack_type' => 'growth_consultant',
                 'name' => 'Growth + Consultant',
                 'price' => 'AED 2,000',
+                'price_aed' => 2000,
                 'description' => '~4h review including disclosure narrative and export sign-off.',
                 'for_plan' => 'Growth',
             ],
         ];
+    }
+
+    public static function consultantPackByType(string $packType): ?array
+    {
+        foreach (self::consultantAddOns() as $pack) {
+            if (($pack['pack_type'] ?? '') === $packType) {
+                return $pack;
+            }
+        }
+
+        return null;
     }
 
     /**

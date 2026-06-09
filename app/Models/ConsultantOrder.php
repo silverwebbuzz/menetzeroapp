@@ -18,8 +18,11 @@ class ConsultantOrder extends Model
         'payout_aed',
         'escrow_status',
         'order_status',
+        'payment_transaction_id',
         'payment_reference',
         'admin_notes',
+        'delivered_at',
+        'completed_at',
     ];
 
     protected function casts(): array
@@ -29,7 +32,14 @@ class ConsultantOrder extends Model
             'commission_rate' => 'decimal:4',
             'commission_aed' => 'decimal:2',
             'payout_aed' => 'decimal:2',
+            'delivered_at' => 'datetime',
+            'completed_at' => 'datetime',
         ];
+    }
+
+    public function paymentTransaction(): BelongsTo
+    {
+        return $this->belongsTo(PaymentTransaction::class, 'payment_transaction_id');
     }
 
     public function company(): BelongsTo

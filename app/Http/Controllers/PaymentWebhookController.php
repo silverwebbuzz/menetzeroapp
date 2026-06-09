@@ -123,9 +123,9 @@ class PaymentWebhookController extends Controller
     private function activate(PaymentTransaction $transaction, array $refs): void
     {
         try {
-            $this->subscriptionService->completeTransaction($transaction, $refs);
+            app(\App\Services\PaymentCompletionService::class)->complete($transaction, $refs);
         } catch (\Throwable $e) {
-            Log::error('Webhook subscription activation failed', [
+            Log::error('Webhook payment completion failed', [
                 'transaction_id' => $transaction->id,
                 'refs' => $refs,
                 'error' => $e->getMessage(),

@@ -44,15 +44,22 @@ class ConsultantDirectoryService
     /**
      * @return Collection<int, Consultant>
      */
-    public function listedConsultants(): Collection
+    public function listedConsultantsQuery()
     {
         return Consultant::query()
             ->where('status', 'approved')
             ->where('is_active', true)
             ->withCount('introRequests')
             ->orderByDesc('is_featured')
-            ->orderBy('company_name')
-            ->get();
+            ->orderBy('company_name');
+    }
+
+    /**
+     * @return Collection<int, Consultant>
+     */
+    public function listedConsultants(): Collection
+    {
+        return $this->listedConsultantsQuery()->get();
     }
 
     /**

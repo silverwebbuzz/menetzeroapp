@@ -26,15 +26,16 @@ class ConsultantDirectoryController extends Controller
         }
 
         $level = $this->directory->directoryLevel($companyId);
-        $consultants = $this->directory->listedConsultants();
-        $presented = $consultants->map(
+        $paginated = $this->directory->listedConsultantsQuery()->paginate(12);
+        $presented = $paginated->getCollection()->map(
             fn (Consultant $c) => $this->directory->presentForClient($c, $companyId)
         );
+        $paginated->setCollection($presented);
 
         return view('client.consultants.index', [
             'level' => $level,
             'partnerCount' => $this->directory->approvedCount(),
-            'consultants' => $presented,
+            'consultants' => $paginated,
             'canRequestIntro' => $this->directory->canRequestIntro($companyId),
             'consultantAddOns' => CommercialPlanComparison::consultantAddOns(),
             'directoryLabel' => $gate->consultantDirectoryLabel(),
@@ -54,6 +55,7 @@ class ConsultantDirectoryController extends Controller
             'consultant' => $presented,
             'raw' => $consultant,
             'canRequestIntro' => $this->directory->canRequestIntro($companyId),
+            'canBookPack' => $this->directory->canRequestIntro($companyId),
             'packTypes' => ConsultantOptions::PACK_TYPES,
             'consultantAddOns' => CommercialPlanComparison::consultantAddOns(),
             'level' => $this->directory->directoryLevel($companyId),

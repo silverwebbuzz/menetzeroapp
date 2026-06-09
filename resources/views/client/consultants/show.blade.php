@@ -53,9 +53,26 @@
         </dl>
     </div>
 
+    @if($canBookPack ?? false)
+        <div class="bg-teal-50 border border-teal-200 rounded-xl p-6 mt-6">
+            <h2 class="font-semibold text-gray-900 mb-2">Book a review pack</h2>
+            <p class="text-sm text-gray-600 mb-4">Pay through MenetZero — funds held in escrow until the consultant delivers your review.</p>
+            <div class="grid sm:grid-cols-2 gap-3">
+                @foreach($consultantAddOns as $addon)
+                    <a href="{{ route('client.consultants.checkout', ['consultant' => $consultant['id'], 'pack' => $addon['pack_type']]) }}"
+                       class="block bg-white border border-teal-200 rounded-lg p-4 hover:border-teal-400 transition">
+                        <div class="font-medium text-gray-900">{{ $addon['name'] }}</div>
+                        <div class="text-sm text-gray-600 mt-1">{{ $addon['description'] }}</div>
+                        <div class="text-teal-700 font-semibold mt-2">{{ $addon['price'] }}</div>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     @if($canRequestIntro)
         <div class="bg-white border border-gray-200 rounded-xl p-6 mt-6">
-            <h2 class="font-semibold text-gray-900 mb-4">Request introduction</h2>
+            <h2 class="font-semibold text-gray-900 mb-4">Request introduction (free)</h2>
             <form method="POST" action="{{ route('client.consultants.intro', $consultant['id']) }}" class="space-y-4">
                 @csrf
                 <div>

@@ -29,7 +29,7 @@
         </div>
     @endif
 
-    <div class="grid sm:grid-cols-2 gap-4 mb-8">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         @forelse($consultants as $c)
             <div class="bg-white border border-gray-200 rounded-xl p-5 {{ ($c['is_featured'] ?? false) ? 'ring-2 ring-teal-400' : '' }}">
                 @if($c['is_featured'] ?? false)
@@ -63,6 +63,10 @@
         @endforelse
     </div>
 
+    @if($consultants->hasPages())
+        <div class="mb-8">{{ $consultants->links() }}</div>
+    @endif
+
     <div class="bg-gray-50 border border-gray-200 rounded-xl p-6">
         <h2 class="font-semibold text-gray-900 mb-3">Consultant review packs</h2>
         <div class="grid sm:grid-cols-2 gap-4">
@@ -74,7 +78,10 @@
                 </div>
             @endforeach
         </div>
-        <p class="text-xs text-gray-400 mt-4">Paid packs with escrow checkout — available in marketplace Phase B.</p>
+        <p class="text-xs text-gray-400 mt-4">
+            <a href="{{ route('client.consultants.orders') }}" class="text-teal-600 hover:underline">View your consultant orders</a>
+            — payments held in escrow until delivery.
+        </p>
     </div>
 </div>
 @endsection
