@@ -28,18 +28,18 @@ class SubscriptionPlanMatrix
         return [
             'client_starter' => [
                 'name' => 'Starter',
-                'tagline' => 'For MSMEs getting started',
-                'price_display' => 'AED 3,650',
-                'price_sub' => '≈ USD 990 / year',
+                'tagline' => 'MOCCAE-ready inventory & IEQT',
+                'price_display' => 'AED 1,499',
+                'price_sub' => '/ year',
                 'is_custom' => false,
                 'selectable' => true,
                 'highlight' => false,
             ],
             'client_growth' => [
                 'name' => 'Growth',
-                'tagline' => 'For expanding businesses',
-                'price_display' => 'AED 9,150',
-                'price_sub' => '≈ USD 2,490 / year',
+                'tagline' => 'IFRS & GRI report downloads',
+                'price_display' => 'AED 2,499',
+                'price_sub' => '/ year',
                 'is_custom' => false,
                 'selectable' => true,
                 'highlight' => true,
@@ -92,10 +92,10 @@ class SubscriptionPlanMatrix
     {
         return [
             ['label' => 'Users', 'coming_soon' => false, 'cells' => [
-                'client_starter' => 'Up to 10', 'client_growth' => 'Up to 25', 'client_enterprise' => 'Unlimited',
+                'client_starter' => 'Up to 5', 'client_growth' => 'Up to 10', 'client_enterprise' => 'Unlimited',
             ]],
             ['label' => 'Locations / Branches', 'coming_soon' => false, 'cells' => [
-                'client_starter' => '2', 'client_growth' => '10', 'client_enterprise' => 'Unlimited',
+                'client_starter' => '3', 'client_growth' => '10', 'client_enterprise' => 'Unlimited',
             ]],
             ['label' => 'Scope 1 Calculation', 'coming_soon' => false, 'cells' => [
                 'client_starter' => true, 'client_growth' => true, 'client_enterprise' => true,

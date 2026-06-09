@@ -22,6 +22,7 @@ class SubscriptionPlan extends Model
         'description',
         'features',
         'limits',
+        'entitlements',
     ];
 
     protected $casts = [
@@ -30,6 +31,7 @@ class SubscriptionPlan extends Model
         'price_inr' => 'decimal:2',
         'features' => 'array',
         'limits' => 'array',
+        'entitlements' => 'array',
     ];
 
     /**
