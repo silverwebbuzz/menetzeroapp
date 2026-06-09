@@ -7,22 +7,32 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /** MySQL identifier limit is 64 chars — Laravel's auto name exceeds that. */
+    private const DISCLOSURE_UNIQUE = 'co_disc_co_fw_sec_fy_uq';
+
     public function up(): void
     {
-        Schema::create('company_disclosures', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('company_id')->constrained()->cascadeOnDelete();
-            $table->string('framework', 20)->default('ifrs_s2');
-            $table->string('section', 50);
-            $table->unsignedSmallInteger('fiscal_year');
-            $table->json('content')->nullable();
-            $table->string('status', 20)->default('draft');
-            $table->foreignId('last_edited_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->timestamps();
+        if (!Schema::hasTable('company_disclosures')) {
+            Schema::create('company_disclosures', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('company_id')->constrained()->cascadeOnDelete();
+                $table->string('framework', 20)->default('ifrs_s2');
+                $table->string('section', 50);
+                $table->unsignedSmallInteger('fiscal_year');
+                $table->json('content')->nullable();
+                $table->string('status', 20)->default('draft');
+                $table->foreignId('last_edited_by')->nullable()->constrained('users')->nullOnDelete();
+                $table->timestamps();
 
-            $table->unique(['company_id', 'framework', 'section', 'fiscal_year']);
-        });
+                $table->unique(['company_id', 'framework', 'section', 'fiscal_year'], self::DISCLOSURE_UNIQUE);
+            });
+        } elseif (!$this->indexExists('company_disclosures', self::DISCLOSURE_UNIQUE)) {
+            Schema::table('company_disclosures', function (Blueprint $table) {
+                $table->unique(['company_id', 'framework', 'section', 'fiscal_year'], self::DISCLOSURE_UNIQUE);
+            });
+        }
 
+        if (!Schema::hasTable('climate_risks')) {
         Schema::create('climate_risks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained()->cascadeOnDelete();
@@ -38,7 +48,9 @@ return new class extends Migration
             $table->string('status', 20)->default('open');
             $table->timestamps();
         });
+        }
 
+        if (!Schema::hasTable('climate_opportunities')) {
         Schema::create('climate_opportunities', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained()->cascadeOnDelete();
@@ -50,7 +62,9 @@ return new class extends Migration
             $table->text('actions')->nullable();
             $table->timestamps();
         });
+        }
 
+        if (!Schema::hasTable('reduction_targets')) {
         Schema::create('reduction_targets', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained()->cascadeOnDelete();
@@ -66,7 +80,9 @@ return new class extends Migration
             $table->string('status', 20)->default('active');
             $table->timestamps();
         });
+        }
 
+        if (!Schema::hasTable('transition_actions')) {
         Schema::create('transition_actions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('reduction_target_id')->constrained()->cascadeOnDelete();
@@ -81,8 +97,22 @@ return new class extends Migration
             $table->string('status', 20)->default('planned');
             $table->timestamps();
         });
+        }
 
         $this->enableIfrsS2OnPaidPlans();
+    }
+
+    private function indexExists(string $table, string $index): bool
+    {
+        $connection = Schema::getConnection();
+        $database = $connection->getDatabaseName();
+        $rows = $connection->select(
+            'SELECT 1 FROM information_schema.statistics
+             WHERE table_schema = ? AND table_name = ? AND index_name = ? LIMIT 1',
+            [$database, $table, $index]
+        );
+
+        return !empty($rows);
     }
 
     public function down(): void
