@@ -19,7 +19,7 @@
         $user->hasModulePermission('locations', 'view', $companyId)
     ));
 
-    $canViewMeasurements = $isAdmin || ($hasCompany && (
+    $canViewQuickInput = $isAdmin || ($hasCompany && (
         $user->hasPermission('measurements.view', $companyId) ||
         $user->hasPermission('measurements.*', $companyId) ||
         $user->hasPermission('manage_measurements', $companyId) ||
@@ -115,15 +115,9 @@
                 Locations
             </a>
         @endif
-        @if($canViewMeasurements)
-            <a href="{{ route('measurements.index') }}" class="nav-link {{ request()->routeIs('measurements.*') ? 'active' : '' }}">
-                {!! $svg('chart') !!}
-                Measurements
-            </a>
-        @endif
     </div>
 
-    @if($canViewMeasurements)
+    @if($canViewQuickInput)
         @php
             $quickInputSources = \App\Models\EmissionSourceMaster::where('is_quick_input', true)
                 ->orderBy('scope')

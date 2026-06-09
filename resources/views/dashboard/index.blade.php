@@ -309,9 +309,9 @@
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 Locations
             </a>
-            <a href="{{ route('measurements.index') }}" class="btn btn-secondary">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3v18h18"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 14l4-4 4 4 5-7"/></svg>
-                Measurements
+            <a href="{{ route('quick-input.index') }}" class="btn btn-secondary">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+                View Entries
             </a>
             <a href="{{ route('reports.index') }}" class="btn btn-primary">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -468,7 +468,7 @@
             <div class="card-header">
                 <div>
                     <h3 class="card-title">Recent Activity</h3>
-                    <p class="card-subtitle">Latest measurements submitted</p>
+                    <p class="card-subtitle">Latest emission entries</p>
                 </div>
             </div>
             <div class="card-body">
@@ -504,9 +504,9 @@
                                 </svg>
                             </div>
                             <div class="font-semibold text-slate-900 mb-1">No recent activity</div>
-                            <p class="text-xs text-slate-500 mb-4">Your measurement activities will appear here.</p>
-                            <a href="{{ route('measurements.index') }}" class="btn btn-primary btn-sm">
-                                Create first measurement
+                            <p class="text-xs text-slate-500 mb-4">Your emission entries will appear here.</p>
+                            <a href="{{ route('quick-input.index') }}" class="btn btn-primary btn-sm">
+                                Add first entry
                             </a>
                         </div>
                     @endforelse

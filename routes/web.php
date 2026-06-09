@@ -11,7 +11,6 @@ use App\Http\Controllers\CompanySetupController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\EmissionBoundaryController;
-use App\Http\Controllers\MeasurementController;
 use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 
@@ -142,17 +141,10 @@ Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client', 'e
     Route::get('/locations/{location}/emission-boundaries', [EmissionBoundaryController::class, 'index'])->name('emission-boundaries.index');
     Route::post('/locations/{location}/emission-boundaries', [EmissionBoundaryController::class, 'store'])->name('emission-boundaries.store');
     
-    // Measurements routes
-    Route::resource('measurements', MeasurementController::class)->except(['create', 'store', 'edit']);
-    Route::post('/measurements/{measurement}/submit', [MeasurementController::class, 'submit'])->name('measurements.submit');
-    
-    // Emission source calculation routes
-    Route::get('/measurements/{measurement}/sources/{source}/calculate', [MeasurementController::class, 'calculateSource'])->name('measurements.calculate-source');
-    Route::post('/measurements/{measurement}/sources/{source}/calculate', [MeasurementController::class, 'storeSourceData'])->name('measurements.store-source-data');
-    Route::get('/measurements/{measurement}/sources/{source}/edit', [MeasurementController::class, 'editSource'])->name('measurements.edit-source');
-    Route::put('/measurements/{measurement}/sources/{source}/edit', [MeasurementController::class, 'updateSourceData'])->name('measurements.update-source-data');
-    Route::delete('/measurements/{measurement}/sources/{source}', [MeasurementController::class, 'deleteSourceData'])->name('measurements.delete-source-data');
-    
+    // Legacy measurements UI removed — redirect old URLs to Quick Input
+    Route::redirect('/measurements', '/quick-input/entries');
+    Route::get('/measurements/{path}', fn () => redirect()->route('quick-input.index'))->where('path', '.*');
+
     // Quick Input routes
     Route::prefix('quick-input')->name('quick-input.')->group(function () {
         Route::get('/entries', [\App\Http\Controllers\QuickInputController::class, 'index'])->name('index');
