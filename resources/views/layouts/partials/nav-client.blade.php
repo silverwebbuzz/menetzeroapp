@@ -32,6 +32,13 @@
         $user->hasModulePermission('reports', 'view', $companyId)
     ));
 
+    $canViewDisclosures = $isAdmin || ($hasCompany && (
+        $user->hasPermission('disclosures.view', $companyId) ||
+        $user->hasPermission('disclosures.*', $companyId) ||
+        $user->hasModulePermission('disclosures', 'view', $companyId) ||
+        $canViewReports
+    ));
+
     $canViewStaff = $isAdmin || ($hasCompany && $user->hasModulePermission('staff_management', 'view', $companyId));
     $canViewRoles = $isAdmin || ($hasCompany && $user->hasModulePermission('roles_permissions', 'view', $companyId));
 
@@ -222,6 +229,16 @@
         </div>
     @endif
 
+    @if($canViewDisclosures)
+        <div class="nav-section">
+            <div class="nav-section-title">Disclosures</div>
+            <a href="{{ route('disclosures.overview') }}" class="nav-link {{ request()->routeIs('disclosures.*') ? 'active' : '' }}">
+                {!! $svg('shield') !!}
+                IFRS S2 Overview
+            </a>
+        </div>
+    @endif
+
     @if($canViewReports)
         <div class="nav-section">
             <div class="nav-section-title">Reports &amp; Compliance</div>
@@ -229,6 +246,12 @@
                 {!! $svg('doc') !!}
                 GHG Inventory
             </a>
+            @if($canViewDisclosures)
+                <a href="{{ route('disclosures.report.preview') }}" class="nav-link {{ request()->routeIs('disclosures.report.*') ? 'active' : '' }}">
+                    {!! $svg('doc') !!}
+                    IFRS S2 Report
+                </a>
+            @endif
             @if($isAdmin)
                 <a href="{{ route('settings.reporting') }}" class="nav-link {{ request()->routeIs('settings.reporting*') ? 'active' : '' }}">
                     {!! $svg('cog') !!}

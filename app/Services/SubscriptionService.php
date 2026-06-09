@@ -474,6 +474,40 @@ class SubscriptionService
     }
 
     /**
+     * IFRS S2 disclosure module — Growth, Enterprise, complimentary, or ifrs_s2 feature flag.
+     */
+    public function canAccessIfrsS2(int $companyId): array
+    {
+        $subscription = $this->getActiveSubscription($companyId, 'client');
+
+        if (!$subscription || !$subscription->plan) {
+            return [
+                'allowed' => false,
+                'message' => 'IFRS S2 disclosures require a Growth plan or higher. Please upgrade to continue.',
+            ];
+        }
+
+        if ($this->isComplimentary($subscription)) {
+            return ['allowed' => true, 'message' => null];
+        }
+
+        $planCode = $subscription->plan->plan_code ?? '';
+
+        if (in_array($planCode, ['client_growth', 'client_enterprise'], true)) {
+            return ['allowed' => true, 'message' => null];
+        }
+
+        if ($this->checkFeatureAccess($companyId, 'ifrs_s2')) {
+            return ['allowed' => true, 'message' => null];
+        }
+
+        return [
+            'allowed' => false,
+            'message' => 'IFRS S2 climate disclosures are available on the Growth and Enterprise plans.',
+        ];
+    }
+
+    /**
      * Check if feature is accessible for company.
      */
     public function checkFeatureAccess($companyId, $featureCode)
