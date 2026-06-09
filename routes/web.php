@@ -317,7 +317,7 @@ Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client', 'e
     });
 
     // Consultant directory (plan-gated visibility)
-    Route::prefix('consultants')->name('consultants.')->group(function () {
+    Route::prefix('consultants')->name('client.consultants.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Client\ConsultantDirectoryController::class, 'index'])->name('index');
         Route::get('/{consultant}', [\App\Http\Controllers\Client\ConsultantDirectoryController::class, 'show'])->name('show');
         Route::post('/{consultant}/intro', [\App\Http\Controllers\Client\ConsultantDirectoryController::class, 'requestIntro'])->name('intro');
