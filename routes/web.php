@@ -172,12 +172,17 @@ Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client', 'e
         Route::get('/get-vehicle-form-fields', [\App\Http\Controllers\QuickInputController::class, 'getFormFieldsForVehicle'])->name('vehicle-form-fields');
     });
     
+    // Company reporting methodology settings (Phase 0)
+    Route::get('/settings/reporting', [\App\Http\Controllers\CompanyReportingSettingsController::class, 'edit'])->name('settings.reporting');
+    Route::post('/settings/reporting', [\App\Http\Controllers\CompanyReportingSettingsController::class, 'update'])->name('settings.reporting.update');
+
     // Reports routes
     Route::prefix('reports')->name('reports.')->group(function () {
         Route::get('/', [ReportController::class, 'index'])->name('index');
         Route::get('/show', [ReportController::class, 'show'])->name('show');
         Route::get('/export/excel', [ReportController::class, 'exportExcel'])->name('export.excel');
         Route::get('/export/pdf', [ReportController::class, 'exportPDF'])->name('export.pdf');
+        Route::get('/export/ieqt', [\App\Http\Controllers\IeqtExportController::class, 'export'])->name('export.ieqt');
     });
     
     // Role Management routes - EXPLICIT NAMES for client

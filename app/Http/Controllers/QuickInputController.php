@@ -548,28 +548,7 @@ class QuickInputController extends Controller
             $quantity = ($request->input('amount') ?? $request->input('quantity')) ?? $request->input('distance');
             $unit = $request->input('unit_of_measure') ?? $request->input('unit');
 
-            // Prepare conditions for factor selection.
-            // The EmissionCalculationService::selectEmissionFactor() method now falls back
-            // gracefully if region doesn't match, so we just pass UAE as the default.
-            $defaultRegion = 'UAE';
-
-            // Handle process emissions - use process_type as fuel_type
-            $processType = $request->input('process_type');
-            $fuelType = $request->input('fuel_type') ?? $request->input('vehicle_fuel_type');
-            if ($emissionSource->quick_input_slug === 'process' && $processType) {
-                $fuelType = $processType;
-            } else {
-                $fuelType = $fuelType ?: $request->input('energy_type') ?: $request->input('refrigerant_type');
-            }
-
-            $conditions = [
-                'region' => $request->input('region', $defaultRegion),
-                'fuel_category' => $request->input('fuel_category'),
-                'fuel_type' => $fuelType,
-                'unit' => $unit,
-                'vehicle_category' => $request->input('vehicle_category'),
-                'vehicle_type' => $request->input('vehicle_type'),
-            ];
+            $conditions = $this->buildFactorConditions($request, $emissionSource, $unit);
 
             // Select emission factor
             $emissionFactor = $this->calculationService->selectEmissionFactor(
@@ -597,10 +576,12 @@ class QuickInputController extends Controller
 
             // Calculate CO2e
             try {
-                $calculation = $this->calculationService->calculateCO2e(
-                    $quantity,
-                    $emissionFactor,
-                    $unit
+                $calculation = $this->resolveCo2eCalculation(
+                    $request,
+                    $emissionSource,
+                    (float) $quantity,
+                    $unit,
+                    $emissionFactor
                 );
 
                 // Ensure calculation returns expected structure
@@ -617,7 +598,7 @@ class QuickInputController extends Controller
             $formFields = EmissionSourceFormField::where('emission_source_id', $emissionSource->id)->get();
             foreach ($formFields as $field) {
                 // Skip main fields that are stored directly or in dedicated columns
-                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments', 'fuel_category', 'fuel_type', 'energy_type', 'refrigerant_type', 'process_type'])) {
+                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments', 'fuel_category', 'fuel_type', 'energy_type', 'refrigerant_type', 'process_type', 'scope2_method', 'supplier_emission_factor', 'renewable_percent', 'is_biogenic'])) {
                     continue;
                 }
                 if ($request->has($field->field_name) && $request->input($field->field_name) !== null && $request->input($field->field_name) !== '') {
@@ -653,8 +634,10 @@ class QuickInputController extends Controller
                 'emission_factor_id' => $emissionFactor->id,
                 'gwp_version_used' => $emissionFactor->gwp_version ?? 'AR6',
                 'calculation_method' => $emissionFactor->calculation_method ?? null, // Save calculation method from emission factor
-                'supplier_emission_factor' => $request->input('supplier_emission_factor') ? (float) $request->input('supplier_emission_factor') : null, // Save supplier factor if provided
-                'fuel_type' => $this->determineFuelType($request, $emissionSource), // Determine fuel_type based on source type
+                'supplier_emission_factor' => $this->resolveSupplierEmissionFactor($request, $emissionSource),
+                'scope2_method' => $this->resolveScope2Method($request, $emissionSource),
+                'is_biogenic' => $request->boolean('is_biogenic'),
+                'fuel_type' => $this->determineFuelType($request, $emissionSource),
                 'additional_data' => !empty($additionalData) ? $additionalData : null,
                 'notes' => $notes,
                 'created_by' => $user->id,
@@ -732,34 +715,8 @@ class QuickInputController extends Controller
 
             $emissionSource = EmissionSourceMaster::findOrFail($request->emission_source_id);
 
-            // Prepare conditions for factor selection (include fuel_category, fuel_type, energy_type, etc.)
-            // For refrigerants (fugitive emissions), use 'Global' as region since GWP values are global
-            $defaultRegion = 'UAE';  // Service layer falls back gracefully if no match
-
-            // Handle vehicle-specific fields (simplified: only distance-based)
-            $fuelType = $request->input('fuel_type');
-            $vehicleFuelType = $request->input('vehicle_fuel_type');
-            $vehicleType = $request->input('vehicle_type'); // Use vehicle_size field
-
-            // For vehicles: use vehicle_fuel_type and vehicle_size
-            if ($emissionSource->quick_input_slug === 'vehicle') {
-                $fuelType = $vehicleFuelType; // Use vehicle_fuel_type as fuel_type
-            } elseif ($emissionSource->quick_input_slug === 'process') {
-                // For process emissions, use process_type as fuel_type
-                $fuelType = $request->input('process_type');
-            } else {
-                // For other sources, use standard mapping
-                $fuelType = $fuelType ?: $request->input('energy_type') ?: $request->input('refrigerant_type');
-            }
-
-            $conditions = [
-                'region' => $request->input('region', $defaultRegion),
-                'fuel_category' => $request->input('fuel_category'),
-                'fuel_type' => $fuelType,
-                'vehicle_type' => $vehicleType, // For distance-based vehicle calculations
-                'vehicle_category' => $request->input('vehicle_category'), // For distance-based vehicle calculations
-                'unit' => $request->input('unit') ?? $request->input('unit_of_measure'),
-            ];
+            $unit = $request->input('unit') ?? $request->input('unit_of_measure');
+            $conditions = $this->buildFactorConditions($request, $emissionSource, $unit);
 
             // Select emission factor
             $emissionFactor = $this->calculationService->selectEmissionFactor(
@@ -804,15 +761,14 @@ class QuickInputController extends Controller
             ]);
 
             // Get quantity (handle both 'amount' and 'quantity' fields)
-            // For vehicles, quantity can be 'amount' (fuel-based) or 'distance' (distance-based)
             $quantity = $request->input('quantity') ?? $request->input('amount') ?? $request->input('distance');
-            $unit = $request->input('unit') ?? $request->input('unit_of_measure');
 
-            // Calculate CO2e
-            $calculation = $this->calculationService->calculateCO2e(
-                $quantity,
-                $emissionFactor,
-                $unit
+            $calculation = $this->resolveCo2eCalculation(
+                $request,
+                $emissionSource,
+                (float) $quantity,
+                $unit,
+                $emissionFactor
             );
 
             return response()->json([
@@ -969,29 +925,8 @@ class QuickInputController extends Controller
             $quantity = ($request->input('amount') ?? $request->input('quantity')) ?? $request->input('distance');
             $unit = $request->input('unit_of_measure') ?? $request->input('unit');
 
-            // Prepare conditions for factor selection (include fuel_category, fuel_type, energy_type, etc.)
-            // For refrigerants (fugitive emissions), use 'Global' as region since GWP values are global
-            $defaultRegion = 'UAE';  // Service layer falls back gracefully if no match
+            $conditions = $this->buildFactorConditions($request, $emissionSource, $unit);
 
-            // Handle process emissions - use process_type as fuel_type
-            $processType = $request->input('process_type');
-            $fuelType = $request->input('fuel_type') ?? $request->input('vehicle_fuel_type');
-            if ($emissionSource->quick_input_slug === 'process' && $processType) {
-                $fuelType = $processType;
-            } else {
-                $fuelType = $fuelType ?: $request->input('energy_type') ?: $request->input('refrigerant_type');
-            }
-
-            $conditions = [
-                'region' => $request->input('region', $defaultRegion),
-                'fuel_category' => $request->input('fuel_category'),
-                'fuel_type' => $fuelType,
-                'unit' => $unit,
-                'vehicle_category' => $request->input('vehicle_category'),
-                'vehicle_type' => $request->input('vehicle_type'),
-            ];
-
-            // Select emission factor
             $emissionFactor = $this->calculationService->selectEmissionFactor(
                 $emissionSource->id,
                 $conditions
@@ -1000,11 +935,13 @@ class QuickInputController extends Controller
             if (!$emissionFactor) {
                 return back()->withErrors(['quantity' => 'No suitable emission factor found for the selected criteria.'])->withInput();
             }
-            // Calculate CO2e
-            $calculation = $this->calculationService->calculateCO2e(
-                $quantity,
-                $emissionFactor,
-                $unit
+
+            $calculation = $this->resolveCo2eCalculation(
+                $request,
+                $emissionSource,
+                (float) $quantity,
+                $unit,
+                $emissionFactor
             );
 
             // Prepare additional data
@@ -1012,7 +949,7 @@ class QuickInputController extends Controller
             $formFields = $this->formBuilder->buildForm($emissionSource->id);
             foreach ($formFields as $field) {
                 // Skip main fields that are stored directly
-                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments', 'fuel_category', 'fuel_type', 'energy_type', 'refrigerant_type', 'process_type'])) {
+                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments', 'fuel_category', 'fuel_type', 'energy_type', 'refrigerant_type', 'process_type', 'scope2_method', 'supplier_emission_factor', 'renewable_percent', 'is_biogenic'])) {
                     continue;
                 }
                 if ($request->has($field->field_name) && $request->input($field->field_name) !== null && $request->input($field->field_name) !== '') {
@@ -1036,8 +973,10 @@ class QuickInputController extends Controller
                 'emission_factor_id' => $emissionFactor->id,
                 'gwp_version_used' => $emissionFactor->gwp_version ?? 'AR6',
                 'calculation_method' => $emissionFactor->calculation_method ?? null, // Save calculation method from emission factor
-                'supplier_emission_factor' => $request->input('supplier_emission_factor') ? (float) $request->input('supplier_emission_factor') : null, // Save supplier factor if provided
-                'fuel_type' => $this->determineFuelType($request, $emissionSource), // Determine fuel_type based on source type
+                'supplier_emission_factor' => $this->resolveSupplierEmissionFactor($request, $emissionSource),
+                'scope2_method' => $this->resolveScope2Method($request, $emissionSource),
+                'is_biogenic' => $request->boolean('is_biogenic'),
+                'fuel_type' => $this->determineFuelType($request, $emissionSource),
                 'additional_data' => !empty($additionalData) ? $additionalData : null,
                 'notes' => $request->input('comments') ?? $request->input('notes') ?? null,
                 'updated_by' => $user->id,
@@ -1395,6 +1334,98 @@ class QuickInputController extends Controller
     /**
      * Determine fuel_type based on request and emission source
      */
+    private function resolveDefaultRegion(EmissionSourceMaster $emissionSource): string
+    {
+        if ($emissionSource->emission_type === 'fugitive') {
+            return 'Global';
+        }
+
+        if ($emissionSource->scope === 'Scope 3') {
+            return 'Global';
+        }
+
+        return 'UAE';
+    }
+
+    private function buildFactorConditions(Request $request, EmissionSourceMaster $emissionSource, ?string $unit): array
+    {
+        return [
+            'region' => $request->input('region', $this->resolveDefaultRegion($emissionSource)),
+            'fuel_category' => $request->input('fuel_category'),
+            'fuel_type' => $this->determineFuelType($request, $emissionSource),
+            'unit' => $unit ?? $request->input('unit') ?? $request->input('unit_of_measure'),
+            'vehicle_category' => $request->input('vehicle_category'),
+            'vehicle_type' => $request->input('vehicle_type'),
+        ];
+    }
+
+    /**
+     * Market-based Scope 2: use supplier-specific kg CO2e/kWh when provided.
+     */
+    private function resolveCo2eCalculation(
+        Request $request,
+        EmissionSourceMaster $emissionSource,
+        float $quantity,
+        ?string $unit,
+        EmissionFactor $emissionFactor
+    ): array {
+        $supplierFactor = $this->resolveSupplierEmissionFactor($request, $emissionSource);
+        $scope2Method = $this->resolveScope2Method($request, $emissionSource);
+
+        if ($emissionSource->quick_input_slug === 'electricity' && $scope2Method === 'market' && $supplierFactor > 0) {
+            $co2e = round($quantity * $supplierFactor, 6);
+
+            return [
+                'co2e' => number_format($co2e, 6, '.', ''),
+                'co2' => null,
+                'ch4' => null,
+                'n2o' => null,
+            ];
+        }
+
+        return $this->calculationService->calculateCO2e($quantity, $emissionFactor, $unit);
+    }
+
+    private function resolveScope2Method(Request $request, EmissionSourceMaster $emissionSource): ?string
+    {
+        if ($emissionSource->scope !== 'Scope 2') {
+            return null;
+        }
+
+        $method = $request->input('scope2_method', 'location');
+
+        return in_array($method, ['location', 'market'], true) ? $method : 'location';
+    }
+
+    private function resolveSupplierEmissionFactor(Request $request, EmissionSourceMaster $emissionSource): ?float
+    {
+        if ($emissionSource->quick_input_slug !== 'electricity') {
+            return $request->input('supplier_emission_factor')
+                ? (float) $request->input('supplier_emission_factor')
+                : null;
+        }
+
+        if ($this->resolveScope2Method($request, $emissionSource) !== 'market') {
+            return null;
+        }
+
+        $factor = $request->input('supplier_emission_factor');
+        if ($factor !== null && $factor !== '') {
+            return (float) $factor;
+        }
+
+        // Blend grid factor with zero-emission renewable share when only % is given.
+        $renewablePercent = (float) $request->input('renewable_percent', 0);
+        if ($renewablePercent > 0) {
+            $gridFactor = 0.424; // UAE default kg CO2e/kWh
+            $effective = $gridFactor * (1 - min($renewablePercent, 100) / 100);
+
+            return round($effective, 6);
+        }
+
+        return null;
+    }
+
     private function determineFuelType(Request $request, EmissionSourceMaster $emissionSource)
     {
         // Handle vehicle-specific fields (simplified: only distance-based)

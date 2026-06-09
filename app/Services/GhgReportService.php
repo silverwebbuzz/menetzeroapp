@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\CompanyReportingSetting;
 use App\Models\Measurement;
 use App\Models\MeasurementData;
 use Illuminate\Support\Facades\DB;
@@ -62,6 +63,12 @@ class GhgReportService
             fn ($v) => $totalKg > 0 ? round(($v / $totalKg) * 100, 1) : 0
         )->values()->all();
 
+        $scope2Split = $this->buildScope2Split($measurement);
+        $company = $measurement->location->company;
+        $reportingSettings = CompanyReportingSetting::where('company_id', $company->id)
+            ->where('fiscal_year', $measurement->fiscal_year)
+            ->first();
+
         return [
             'measurement' => $measurement,
             'location' => $measurement->location,
@@ -80,8 +87,101 @@ class GhgReportService
             'methodology' => $this->methodologyStatement(),
             'has_scope_3' => $scopeKg['Scope 3'] > 0,
             'scope_3_categories' => $this->buildScope3Categories($measurement),
+            'scope3_coverage_matrix' => $this->buildScope3CoverageMatrix($measurement, $reportingSettings),
+            'scope2_location_kg' => $scope2Split['location_kg'],
+            'scope2_location_tonnes' => $scope2Split['location_tonnes'],
+            'scope2_market_kg' => $scope2Split['market_kg'],
+            'scope2_market_tonnes' => $scope2Split['market_tonnes'],
+            'reporting_settings' => $reportingSettings,
+            'biogenic_kg' => $this->sumBiogenicKg($measurement),
+            'biogenic_tonnes' => self::kgToTonnes($this->sumBiogenicKg($measurement)),
             'entry_count' => $activityRegister->count(),
         ];
+    }
+
+    public function buildScope2Split(Measurement $measurement): array
+    {
+        $rows = MeasurementData::where('measurement_id', $measurement->id)
+            ->where('scope', 'Scope 2')
+            ->where('calculated_co2e', '>', 0)
+            ->get();
+
+        $locationKg = (float) $rows->where(fn ($r) => $r->scope2_method !== 'market')->sum('calculated_co2e');
+        $marketKg = (float) $rows->where(fn ($r) => $r->scope2_method === 'market')->sum('calculated_co2e');
+
+        if ($marketKg <= 0) {
+            $marketKg = $locationKg;
+        }
+
+        return [
+            'location_kg' => $locationKg,
+            'market_kg' => $marketKg,
+            'location_tonnes' => self::kgToTonnes($locationKg),
+            'market_tonnes' => self::kgToTonnes($marketKg),
+        ];
+    }
+
+    public function sumBiogenicKg(Measurement $measurement): float
+    {
+        return (float) MeasurementData::where('measurement_id', $measurement->id)
+            ->where('is_biogenic', true)
+            ->sum('calculated_co2e');
+    }
+
+    public function buildScope3CoverageMatrix(Measurement $measurement, ?CompanyReportingSetting $settings)
+    {
+        $policy = collect($settings?->scope3_category_policy ?? CompanyReportingSetting::defaultScope3Policy())
+            ->keyBy('category');
+
+        $dataBySlug = MeasurementData::with('emissionSource:id,quick_input_slug,subcategory')
+            ->where('measurement_id', $measurement->id)
+            ->where('scope', 'Scope 3')
+            ->where('calculated_co2e', '>', 0)
+            ->get()
+            ->groupBy(fn ($row) => $row->emissionSource->quick_input_slug ?? 'unknown');
+
+        $slugToCategory = [
+            'purchased-goods' => 1,
+            'capital-goods' => 2,
+            'fuel-energy-related' => 3,
+            'upstream-transport' => 4,
+            'waste-operations' => 5,
+            'business-travel' => 6,
+            'flights' => 6,
+            'employee-commuting' => 7,
+            'public-transport' => 7,
+            'home-workers' => 7,
+            'upstream-leased' => 8,
+            'downstream-transport' => 9,
+            'processing-sold' => 10,
+            'use-sold' => 11,
+            'end-of-life' => 12,
+            'downstream-leased' => 13,
+            'franchises' => 14,
+            'investments' => 15,
+        ];
+
+        $reportedCategories = [];
+        foreach ($dataBySlug as $slug => $entries) {
+            if (isset($slugToCategory[$slug])) {
+                $reportedCategories[$slugToCategory[$slug]] = true;
+            }
+        }
+
+        return collect(CompanyReportingSetting::SCOPE3_CATEGORIES)->map(function ($label, $cat) use ($policy, $reportedCategories) {
+            $row = $policy->get($cat, ['included' => false, 'reason' => null]);
+
+            return [
+                'category' => $cat,
+                'label' => $label,
+                'policy_included' => (bool) ($row['included'] ?? false),
+                'exclusion_reason' => $row['reason'] ?? null,
+                'has_data' => !empty($reportedCategories[$cat]),
+                'status' => !empty($reportedCategories[$cat])
+                    ? 'Reported'
+                    : (($row['included'] ?? false) ? 'Included — no data yet' : 'Excluded'),
+            ];
+        })->values();
     }
 
     /**
@@ -211,6 +311,8 @@ class GhgReportService
                     'kg' => (float) $row->calculated_co2e,
                     'tonnes' => self::kgToTonnes($row->calculated_co2e),
                     'notes' => $row->notes ?? '',
+                    'scope2_method' => $row->scope2_method,
+                    'is_biogenic' => (bool) $row->is_biogenic,
                 ];
             });
     }

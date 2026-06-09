@@ -224,11 +224,17 @@
 
     @if($canViewReports)
         <div class="nav-section">
-            <div class="nav-section-title">Reports &amp; Profile</div>
-            <a href="{{ route('reports.index') }}" class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">
+            <div class="nav-section-title">Reports &amp; Compliance</div>
+            <a href="{{ route('reports.index') }}" class="nav-link {{ request()->routeIs('reports.*') && !request()->routeIs('settings.reporting*') ? 'active' : '' }}">
                 {!! $svg('doc') !!}
-                Reports
+                GHG Inventory
             </a>
+            @if($isAdmin)
+                <a href="{{ route('settings.reporting') }}" class="nav-link {{ request()->routeIs('settings.reporting*') ? 'active' : '' }}">
+                    {!! $svg('cog') !!}
+                    Reporting Settings
+                </a>
+            @endif
             <a href="{{ route('client.profile') }}" class="nav-link {{ request()->routeIs('client.profile') || request()->routeIs('profile.*') ? 'active' : '' }}">
                 {!! $svg('user') !!}
                 My Profile

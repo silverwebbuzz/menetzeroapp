@@ -1,0 +1,33 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Services\IeqtExportService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class IeqtExportController extends Controller
+{
+    public function __construct(protected IeqtExportService $exportService)
+    {
+    }
+
+    public function export(Request $request)
+    {
+        $this->requirePermission('reports.view', null, ['reports.*']);
+
+        $company = Auth::user()->getActiveCompany();
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+
+        $request->validate([
+            'location_id' => 'required|exists:locations,id',
+            'fiscal_year' => 'required|integer|min:2000|max:2100',
+        ]);
+
+        $location = $company->locations()->where('id', $request->location_id)->firstOrFail();
+
+        return $this->exportService->downloadCsv($company, $location->id, (int) $request->fiscal_year);
+    }
+}
