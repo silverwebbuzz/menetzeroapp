@@ -6,6 +6,8 @@
 
 @if($fw === 'ifrs_s1')
     @include('layouts.partials.nav-disclosures-s1', ['fiscalYear' => $fy])
+@elseif($fw === 'gri')
+    @include('layouts.partials.nav-disclosures-gri', ['fiscalYear' => $fy])
 @else
     @include('layouts.partials.nav-disclosures-s2', ['fiscalYear' => $fy])
 @endif

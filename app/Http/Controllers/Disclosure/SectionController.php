@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class SectionController extends DisclosureBaseController
 {
-    private const FRAMEWORKS = ['ifrs_s2', 'ifrs_s1'];
+    private const FRAMEWORKS = ['ifrs_s2', 'ifrs_s1', 'gri'];
 
     public function __construct(
         protected DisclosureService $disclosureService,
@@ -32,6 +32,16 @@ class SectionController extends DisclosureBaseController
     public function updateS1(Request $request, string $section)
     {
         return $this->update($request, 'ifrs_s1', $section);
+    }
+
+    public function editGri(Request $request, string $section)
+    {
+        return $this->edit($request, 'gri', $section);
+    }
+
+    public function updateGri(Request $request, string $section)
+    {
+        return $this->update($request, 'gri', $section);
     }
 
     protected function edit(Request $request, string $framework, string $section)
@@ -75,12 +85,13 @@ class SectionController extends DisclosureBaseController
             $framework
         );
 
-        return $this->fiscalRedirect(
-            $framework === 'ifrs_s1' ? 'disclosures.s1.sections.edit' : 'disclosures.s2.sections.edit',
-            $fiscalYear,
-            'Disclosure section saved.',
-            ['section' => $section]
-        );
+        $route = match ($framework) {
+            'ifrs_s1' => 'disclosures.s1.sections.edit',
+            'gri' => 'disclosures.gri.sections.edit',
+            default => 'disclosures.s2.sections.edit',
+        };
+
+        return $this->fiscalRedirect($route, $fiscalYear, 'Disclosure section saved.', ['section' => $section]);
     }
 
     protected function assertFramework(string $framework): void

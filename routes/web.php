@@ -224,6 +224,21 @@ Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client', 'e
             Route::get('/report/pdf', [\App\Http\Controllers\Disclosure\IfrsS1ReportController::class, 'exportPdf'])->name('report.pdf');
         });
 
+        // GRI (Phase 3)
+        Route::prefix('gri')->name('gri.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Disclosure\OverviewController::class, 'gri'])->name('overview');
+            Route::get('/sections/{section}', [\App\Http\Controllers\Disclosure\SectionController::class, 'editGri'])->name('sections.edit');
+            Route::post('/sections/{section}', [\App\Http\Controllers\Disclosure\SectionController::class, 'updateGri'])->name('sections.update');
+
+            Route::get('/material-topics', [\App\Http\Controllers\Disclosure\MaterialTopicsController::class, 'editGri'])->name('material-topics');
+            Route::post('/material-topics', [\App\Http\Controllers\Disclosure\MaterialTopicsController::class, 'updateGri'])->name('material-topics.update');
+
+            Route::get('/report', [\App\Http\Controllers\Disclosure\GriReportController::class, 'preview'])->name('report.preview');
+            Route::get('/report/pdf', [\App\Http\Controllers\Disclosure\GriReportController::class, 'exportPdf'])->name('report.pdf');
+            Route::get('/content-index.csv', [\App\Http\Controllers\Disclosure\GriReportController::class, 'exportContentIndex'])->name('content-index');
+        });
+
+        Route::get('/esg-dashboard', [\App\Http\Controllers\Disclosure\EsgDashboardController::class, 'index'])->name('esg-dashboard');
     });
 
     // Reports routes

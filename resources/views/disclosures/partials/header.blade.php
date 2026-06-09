@@ -1,7 +1,11 @@
 @php
     $fy = $fiscalYear ?? now()->year;
     $fw = $framework ?? 'ifrs_s2';
-    $frameworkLabel = $fw === 'ifrs_s1' ? 'IFRS S1 Sustainability Disclosures' : 'IFRS S2 Climate Disclosures';
+    $frameworkLabel = match ($fw) {
+        'ifrs_s1' => 'IFRS S1 Sustainability Disclosures',
+        'gri' => 'GRI Sustainability Reporting',
+        default => 'IFRS S2 Climate Disclosures',
+    };
 @endphp
 
 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">

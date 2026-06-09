@@ -74,7 +74,15 @@ class DisclosureService
         }
 
         foreach ($config['fields'] as $key => $field) {
-            if (!empty($field['required']) && empty(trim((string) ($content[$key] ?? '')))) {
+            if (empty($field['required'])) {
+                continue;
+            }
+            $val = $content[$key] ?? '';
+            if (($field['type'] ?? '') === 'number') {
+                if ($val === '' || $val === null) {
+                    return false;
+                }
+            } elseif (empty(trim((string) $val))) {
                 return false;
             }
         }
@@ -84,9 +92,11 @@ class DisclosureService
 
     public function completeness(int $companyId, int $fiscalYear, string $framework = 'ifrs_s2'): array
     {
-        return $framework === 'ifrs_s1'
-            ? $this->completenessS1($companyId, $fiscalYear)
-            : $this->completenessS2($companyId, $fiscalYear);
+        return match ($framework) {
+            'ifrs_s1' => $this->completenessS1($companyId, $fiscalYear),
+            'gri' => $this->completenessGri($companyId, $fiscalYear),
+            default => $this->completenessS2($companyId, $fiscalYear),
+        };
     }
 
     public function completenessS2(int $companyId, int $fiscalYear): array
@@ -245,6 +255,80 @@ class DisclosureService
         }
 
         return $rows;
+    }
+
+    public function completenessGri(int $companyId, int $fiscalYear): array
+    {
+        $weights = config('disclosure.gri.completeness_weights', []);
+        $items = [];
+        $earned = 0;
+
+        foreach (['material_topics_process', 'general', 'energy', 'water', 'waste', 'social_hr', 'diversity'] as $section) {
+            $record = CompanyDisclosure::where('company_id', $companyId)
+                ->where('framework', 'gri')
+                ->where('section', $section)
+                ->where('fiscal_year', $fiscalYear)
+                ->first();
+
+            $done = $record && $record->status === 'complete';
+            $w = $weights[$section] ?? 0;
+            if ($done) {
+                $earned += $w;
+            }
+            $items[$section] = [
+                'complete' => $done,
+                'weight' => $w,
+                'label' => $this->sectionConfig('gri', $section)['title'] ?? $section,
+            ];
+        }
+
+        $materialCount = MaterialSustainabilityTopic::where('company_id', $companyId)
+            ->where('fiscal_year', $fiscalYear)
+            ->where('is_material', true)
+            ->count();
+        $materialDone = $materialCount > 0;
+        $w = $weights['material_topics'] ?? 0;
+        if ($materialDone) {
+            $earned += $w;
+        }
+        $items['material_topics'] = [
+            'complete' => $materialDone,
+            'weight' => $w,
+            'label' => 'GRI 3 Material Topics List',
+            'count' => $materialCount,
+        ];
+
+        $ghgDone = $this->hasGhgData($companyId, $fiscalYear);
+        $w = $weights['gri_305'] ?? 0;
+        if ($ghgDone) {
+            $earned += $w;
+        }
+        $items['gri_305'] = [
+            'complete' => $ghgDone,
+            'weight' => $w,
+            'label' => 'GRI 305 Emissions (auto from GHG inventory)',
+        ];
+
+        return $this->completenessResult($items, $earned, array_sum($weights));
+    }
+
+    public function hasGhgData(int $companyId, int $fiscalYear): bool
+    {
+        return \App\Models\Measurement::where('fiscal_year', $fiscalYear)
+            ->whereHas('location', fn ($q) => $q->where('company_id', $companyId))
+            ->where('total_co2e', '>', 0)
+            ->exists();
+    }
+
+    public function griSectionsContent(int $companyId, int $fiscalYear): array
+    {
+        return CompanyDisclosure::where('company_id', $companyId)
+            ->where('framework', 'gri')
+            ->where('fiscal_year', $fiscalYear)
+            ->get()
+            ->keyBy('section')
+            ->map(fn ($r) => $r->content ?? [])
+            ->all();
     }
 
     public function hasS2Data(int $companyId, int $fiscalYear): bool

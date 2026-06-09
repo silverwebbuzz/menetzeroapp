@@ -255,6 +255,14 @@
                     {!! $svg('doc') !!}
                     IFRS S1 Report
                 </a>
+                <a href="{{ route('disclosures.gri.report.preview') }}" class="nav-link {{ request()->routeIs('disclosures.gri.report.*') ? 'active' : '' }}">
+                    {!! $svg('doc') !!}
+                    GRI Report
+                </a>
+                <a href="{{ route('disclosures.esg-dashboard') }}" class="nav-link {{ request()->routeIs('disclosures.esg-dashboard') ? 'active' : '' }}">
+                    {!! $svg('chart') !!}
+                    ESG Dashboard
+                </a>
             @endif
             @if($isAdmin)
                 <a href="{{ route('settings.reporting') }}" class="nav-link {{ request()->routeIs('settings.reporting*') ? 'active' : '' }}">

@@ -528,16 +528,37 @@ class SubscriptionService
     }
 
     /**
-     * Either IFRS S1 or S2 disclosure access (for shared middleware / nav).
+     * GRI disclosure module — Growth, Enterprise, complimentary, or gri feature flag.
+     */
+    public function canAccessGri(int $companyId): array
+    {
+        $base = $this->canAccessIfrsS2($companyId);
+        if ($base['allowed']) {
+            return $base;
+        }
+
+        if ($this->checkFeatureAccess($companyId, 'gri')) {
+            return ['allowed' => true, 'message' => null];
+        }
+
+        return [
+            'allowed' => false,
+            'message' => 'GRI sustainability reporting is available on the Growth and Enterprise plans.',
+        ];
+    }
+
+    /**
+     * Either IFRS S1, S2, or GRI disclosure access (for shared middleware / nav).
      */
     public function canAccessDisclosures(int $companyId): array
     {
-        $s2 = $this->canAccessIfrsS2($companyId);
-        if ($s2['allowed']) {
-            return $s2;
+        foreach ([$this->canAccessIfrsS2($companyId), $this->canAccessIfrsS1($companyId), $this->canAccessGri($companyId)] as $access) {
+            if ($access['allowed']) {
+                return $access;
+            }
         }
 
-        return $this->canAccessIfrsS1($companyId);
+        return $this->canAccessIfrsS2($companyId);
     }
 
     /**

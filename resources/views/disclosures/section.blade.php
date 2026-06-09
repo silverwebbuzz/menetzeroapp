@@ -5,7 +5,7 @@
 
 @section('content')
 <div class="max-w-4xl mx-auto">
-    @include('disclosures.partials.header')
+    @include('disclosures.partials.header', ['framework' => $framework ?? 'ifrs_s2'])
 
     @if(session('success'))
         <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6">{{ session('success') }}</div>
@@ -25,9 +25,11 @@
         </div>
         <div class="card-body">
             @php
-                $updateRoute = ($framework ?? 'ifrs_s2') === 'ifrs_s1'
-                    ? 'disclosures.s1.sections.update'
-                    : 'disclosures.s2.sections.update';
+                $updateRoute = match ($framework ?? 'ifrs_s2') {
+                    'ifrs_s1' => 'disclosures.s1.sections.update',
+                    'gri' => 'disclosures.gri.sections.update',
+                    default => 'disclosures.s2.sections.update',
+                };
             @endphp
             <form method="POST" action="{{ route($updateRoute, ['section' => $section, 'fiscal_year' => $fiscalYear]) }}" class="space-y-5">
                 @csrf
@@ -46,6 +48,10 @@
                             <textarea name="content[{{ $key }}]" rows="4"
                                       class="w-full border border-gray-300 rounded-lg px-3 py-2"
                                       @if(!empty($field['required'])) required @endif>{{ old("content.{$key}", $content[$key] ?? '') }}</textarea>
+                        @elseif(($field['type'] ?? '') === 'number')
+                            <input type="number" step="any" name="content[{{ $key }}]" value="{{ old("content.{$key}", $content[$key] ?? '') }}"
+                                   class="w-full border border-gray-300 rounded-lg px-3 py-2"
+                                   @if(!empty($field['required'])) required @endif>
                         @elseif(($field['type'] ?? '') === 'select')
                             <select name="content[{{ $key }}]" class="w-full border border-gray-300 rounded-lg px-3 py-2"
                                     @if(!empty($field['required'])) required @endif>

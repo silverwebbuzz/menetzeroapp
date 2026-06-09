@@ -21,6 +21,7 @@ class OverviewController extends DisclosureBaseController
             'fiscalYear' => $fiscalYear,
             's2Completeness' => $this->disclosureService->completenessS2($company->id, $fiscalYear),
             's1Completeness' => $this->disclosureService->completenessS1($company->id, $fiscalYear),
+            'griCompleteness' => $this->disclosureService->completenessGri($company->id, $fiscalYear),
         ]);
     }
 
@@ -45,6 +46,18 @@ class OverviewController extends DisclosureBaseController
             'fiscalYear' => $fiscalYear,
             'framework' => 'ifrs_s1',
             'completeness' => $this->disclosureService->completenessS1($company->id, $fiscalYear),
+        ]);
+    }
+
+    public function gri(Request $request)
+    {
+        ['company' => $company, 'fiscalYear' => $fiscalYear] = $this->resolveContext($request);
+
+        return view('disclosures.gri-overview', [
+            'company' => $company,
+            'fiscalYear' => $fiscalYear,
+            'framework' => 'gri',
+            'completeness' => $this->disclosureService->completenessGri($company->id, $fiscalYear),
         ]);
     }
 }
