@@ -1,497 +1,321 @@
 @extends('layouts.app')
 
-@section('title', 'Billing - MenetZero')
-@section('page-title', 'Billing')
+@section('title', 'Plan & Billing - MenetZero')
+@section('page-title', 'Plan & Billing')
 
 @section('content')
-<div class="w-full">
-    <!-- Header -->
+<div class="w-full max-w-5xl mx-auto">
     <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-900">Billing</h1>
-        <p class="mt-2 text-gray-600">Manage your subscription, billing, and payment methods.</p>
+        <h1 class="text-3xl font-bold text-gray-900">Plan &amp; billing</h1>
+        <p class="mt-2 text-gray-600">Your subscription, usage, entitlements, and payment history.</p>
     </div>
 
-    <!-- Tabs -->
-    <div class="bg-white rounded-lg border border-gray-200 mb-6">
+    @if(session('success'))
+        <div class="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">{{ session('success') }}</div>
+    @endif
+    @if(session('info'))
+        <div class="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">{{ session('info') }}</div>
+    @endif
+    @if(session('error'))
+        <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{{ session('error') }}</div>
+    @endif
+
+    {{-- Plan header --}}
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-6">
+        <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+            <div class="flex-1">
+                <div class="flex flex-wrap items-center gap-2 mb-2">
+                    <h2 class="text-2xl font-bold text-gray-900">{{ $subscription->plan->plan_name ?? 'Free' }}</h2>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold {{ $subscription->status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700' }}">
+                        {{ ucfirst($subscription->status) }}
+                    </span>
+                    @if(!empty($cancellationScheduled))
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">
+                            Cancels {{ $subscription->expires_at->format('M d, Y') }}
+                        </span>
+                    @elseif($subscription->auto_renew)
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">Renewal reminder on</span>
+                    @endif
+                </div>
+                <p class="text-gray-600 text-sm mb-3">{{ $subscription->plan->description ?? '' }}</p>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+                    <div>
+                        <div class="text-gray-500">Renews / expires</div>
+                        <div class="font-semibold text-gray-900">{{ $subscription->expires_at->format('M d, Y') }}</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500">Days left</div>
+                        <div class="font-semibold {{ $daysRemaining < 30 ? 'text-red-600' : 'text-gray-900' }}">{{ $daysRemaining }} days</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500">Billing</div>
+                        <div class="font-semibold text-gray-900">
+                            @if(!empty($isComplimentary))
+                                Complimentary
+                            @else
+                                {{ ucfirst($subscription->billing_cycle) }} · {{ $subscription->plan->currency ?? 'AED' }} {{ number_format($subscription->plan->price_annual ?? 0, 0) }}
+                            @endif
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500">Term started</div>
+                        <div class="font-semibold text-gray-900">{{ $subscription->started_at->format('M d, Y') }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-2 lg:flex-col lg:items-stretch min-w-[200px]">
+                @php
+                    $planCode = $subscription->plan->plan_code ?? '';
+                    $showGrowthCta = in_array($planCode, ['client_free', 'client_starter'], true);
+                @endphp
+                @if($showGrowthCta)
+                    <a href="{{ route('subscriptions.upgrade') }}" class="px-4 py-2.5 bg-orange-600 text-white text-sm font-semibold rounded-lg hover:bg-orange-700 text-center">
+                        {{ $planCode === 'client_free' ? 'Upgrade to Starter' : 'Upgrade to Growth' }}
+                    </a>
+                @else
+                    <a href="{{ route('subscriptions.upgrade') }}" class="px-4 py-2.5 bg-orange-600 text-white text-sm font-semibold rounded-lg hover:bg-orange-700 text-center">
+                        Change plan
+                    </a>
+                @endif
+                <span class="px-4 py-2.5 bg-gray-100 text-gray-500 text-sm font-medium rounded-lg text-center cursor-not-allowed" title="Consultant packs — coming in Phase B">
+                    Add consultant pack
+                </span>
+                @if(!empty($cancellationScheduled))
+                    <form action="{{ route('subscriptions.resume') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="w-full px-4 py-2.5 border border-green-300 text-green-700 text-sm font-medium rounded-lg hover:bg-green-50">
+                            Keep my plan
+                        </button>
+                    </form>
+                @elseif(!empty($isPaidPlan))
+                    <form action="{{ route('subscriptions.cancel') }}" method="POST" onsubmit="return confirm('Your plan stays active until {{ $subscription->expires_at->format('F d, Y') }} and will not renew. Continue?')">
+                        @csrf
+                        <button type="submit" class="w-full px-4 py-2.5 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50">
+                            Cancel at renewal
+                        </button>
+                    </form>
+                @endif
+            </div>
+        </div>
+
+        @if(!empty($provisionLabel))
+            <div class="mt-4 rounded-lg border border-purple-200 bg-purple-50 px-4 py-3 text-sm text-purple-900">{{ $provisionLabel }}</div>
+        @endif
+
+        @if(!empty($scheduledPlan))
+            <div class="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                <strong>Scheduled at renewal:</strong> switches to {{ $scheduledPlan->plan_name }} on {{ $subscription->expires_at->format('F d, Y') }}.
+                @foreach($scheduledDowngradeWarnings ?? [] as $warning)
+                    <p class="mt-1 text-red-800">⚠ {{ $warning }}</p>
+                @endforeach
+            </div>
+        @endif
+    </div>
+
+    {{-- Usage --}}
+    <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Usage</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            @foreach($usageMeters as $key => $meter)
+                @php
+                    $limit = $meter['limit'];
+                    $used = $meter['used'];
+                    $pct = ($limit && $limit > 0) ? min(100, round(($used / $limit) * 100)) : null;
+                    $limitLabel = $limit === null ? '∞' : ($limit === 0 ? 'Locked' : $limit);
+                @endphp
+                <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="font-medium text-gray-700">{{ $meter['label'] }}</span>
+                        <span class="text-gray-900 font-semibold">{{ $used }} / {{ $limitLabel }}</span>
+                    </div>
+                    @if($pct !== null && $limit > 0)
+                        <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="h-full rounded-full {{ $pct >= 90 ? 'bg-red-500' : 'bg-emerald-500' }}" style="width: {{ $pct }}%"></div>
+                        </div>
+                    @elseif($limit === 0)
+                        <p class="text-xs text-purple-700">Available on Starter+</p>
+                    @else
+                        <p class="text-xs text-gray-500">Unlimited on your plan</p>
+                    @endif
+                </div>
+            @endforeach
+        </div>
+        <div class="mt-4 flex flex-wrap gap-2 text-xs">
+            <span class="text-gray-500 mr-1">Exports:</span>
+            @foreach($downloadEntitlements as $item)
+                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full {{ $item['allowed'] ? 'bg-emerald-50 text-emerald-800' : 'bg-gray-100 text-gray-500' }}">
+                    @if($item['allowed'])
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                    @endif
+                    {{ $item['label'] }}
+                    @if(!$item['allowed'] && $item['hint'])
+                        <span class="text-gray-400">· {{ $item['hint'] }}</span>
+                    @endif
+                </span>
+            @endforeach
+        </div>
+    </div>
+
+    {{-- Entitlements --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-3">Data &amp; operations</h3>
+            <ul class="space-y-2 text-sm">
+                @foreach($dataEntitlements as $item)
+                    <li class="flex items-center justify-between">
+                        <span class="text-gray-700">{{ $item['label'] }}</span>
+                        <span class="flex items-center gap-2">
+                            @if($item['hint'])
+                                <span class="text-xs text-gray-400">{{ $item['hint'] }}</span>
+                            @endif
+                            @if($item['allowed'])
+                                <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                            @else
+                                <span class="text-gray-300">—</span>
+                            @endif
+                        </span>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-3">Report downloads</h3>
+            <ul class="space-y-2 text-sm">
+                @foreach($downloadEntitlements as $item)
+                    <li class="flex items-center justify-between">
+                        <span class="text-gray-700">{{ $item['label'] }}</span>
+                        <span class="flex items-center gap-2">
+                            @if(!$item['allowed'] && $item['hint'])
+                                <a href="{{ route('subscriptions.upgrade') }}" class="text-xs text-orange-600 hover:underline">{{ $item['hint'] }}</a>
+                            @endif
+                            @if($item['allowed'])
+                                <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                            @else
+                                <span class="text-gray-300">—</span>
+                            @endif
+                        </span>
+                    </li>
+                @endforeach
+            </ul>
+            <p class="mt-4 text-xs text-gray-500">Disclosure PDF export requires Growth. GHG / IEQT exports require Starter.</p>
+        </div>
+    </div>
+
+    {{-- Consultant marketplace teaser --}}
+    <div class="bg-gradient-to-r from-slate-50 to-gray-100 border border-gray-200 rounded-xl p-6 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h3 class="text-lg font-semibold text-gray-900">Consultant marketplace</h3>
+            <p class="text-sm text-gray-600 mt-1">
+                Your plan: <strong>{{ $consultantDirectoryLabel }}</strong>.
+                Verified UAE partners for review and sign-off (coming soon).
+            </p>
+        </div>
+        <span class="inline-flex px-4 py-2 bg-white border border-gray-300 text-gray-500 text-sm font-medium rounded-lg cursor-not-allowed">
+            Browse partners — soon
+        </span>
+    </div>
+
+    {{-- Payment history & billing methods (tabs) --}}
+    <div class="bg-white rounded-lg border border-gray-200">
         <div class="border-b border-gray-200">
             <nav class="flex -mb-px">
-                <button onclick="showTab('subscription')" id="subscription-tab" class="tab-button active px-6 py-4 text-sm font-medium border-b-2 border-blue-500 text-blue-600">
-                    My Subscription
+                <button type="button" onclick="showTab('transactions')" id="transactions-tab" class="tab-button active px-6 py-4 text-sm font-medium border-b-2 border-blue-500 text-blue-600">
+                    Payment history
                 </button>
-                <button onclick="showTab('current-plan')" id="current-plan-tab" class="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
-                    Current Plan
-                </button>
-                <button onclick="showTab('transactions')" id="transactions-tab" class="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
-                    Transactions
-                </button>
-                <button onclick="showTab('billing-methods')" id="billing-methods-tab" class="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
-                    Billing Methods
+                <button type="button" onclick="showTab('billing-methods')" id="billing-methods-tab" class="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+                    Billing methods
                 </button>
             </nav>
         </div>
-
-        <!-- Tab Content -->
         <div class="p-6">
-            <!-- My Subscription Tab -->
-            <div id="subscription-content" class="tab-content">
-                <h2 class="text-xl font-semibold text-gray-900 mb-6">My Subscription</h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <div>
-                        <label class="text-sm font-medium text-gray-500">Plan Name</label>
-                        <p class="text-lg font-semibold text-gray-900">{{ $subscription->plan->plan_name ?? 'N/A' }}</p>
-                    </div>
-                    <div>
-                        <label class="text-sm font-medium text-gray-500">Billing Cycle</label>
-                        <p class="text-lg font-semibold text-gray-900">{{ ucfirst($subscription->billing_cycle) }}</p>
-                    </div>
-                    <div>
-                        <label class="text-sm font-medium text-gray-500">Amount</label>
-                        <p class="text-lg font-semibold text-gray-900">
-                            @if(!empty($isComplimentary))
-                                <span class="text-purple-700">Complimentary</span>
-                            @else
-                                {{ $subscription->plan->currency ?? 'AED' }} {{ number_format($subscription->plan->price_annual ?? 0, 2) }}
-                            @endif
-                        </p>
-                    </div>
-                    <div>
-                        <label class="text-sm font-medium text-gray-500">Status</label>
-                        <p class="text-lg font-semibold {{ $subscription->status === 'active' ? 'text-green-600' : 'text-gray-900' }}">
-                            {{ ucfirst($subscription->status) }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="text-sm font-medium text-gray-500">Next Billing Date</label>
-                        <p class="text-lg font-semibold text-gray-900">{{ $subscription->expires_at->format('F d, Y') }}</p>
-                    </div>
-                    <div>
-                        <label class="text-sm font-medium text-gray-500">Auto Renewal</label>
-                        <p class="text-lg font-semibold {{ $subscription->auto_renew ? 'text-green-600' : 'text-gray-900' }}">
-                            {{ $subscription->auto_renew ? 'Enabled' : 'Disabled' }}
-                        </p>
-                    </div>
-                </div>
-
-                @if(!empty($provisionLabel))
-                <div class="mb-4 rounded-lg border border-purple-200 bg-purple-50 px-4 py-3 text-sm text-purple-900">
-                    {{ $provisionLabel }}. No payment is required for this access period.
-                </div>
-                @endif
-
-                <div class="flex items-center gap-4">
-                    <a href="{{ route('subscriptions.upgrade') }}" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        Upgrade Plan
-                    </a>
-                    @if(!empty($cancellationScheduled))
-                        <span class="text-sm text-red-700">Cancels on {{ $subscription->expires_at->format('F d, Y') }} — access continues until then.</span>
-                        <form action="{{ route('subscriptions.resume') }}" method="POST" class="inline">
-                            @csrf
-                            <button type="submit" class="px-6 py-2 bg-white border border-green-300 text-green-700 rounded-lg hover:bg-green-50">
-                                Keep my plan
-                            </button>
-                        </form>
-                    @elseif(!empty($isPaidPlan))
-                        <form action="{{ route('subscriptions.cancel') }}" method="POST" class="inline">
-                            @csrf
-                            <button type="submit" class="px-6 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50" onclick="return confirm('Your plan stays active until {{ $subscription->expires_at->format('F d, Y') }} and will not renew after that. Continue?')">
-                                Cancel at renewal
-                            </button>
-                        </form>
-                    @endif
-                </div>
-            </div>
-
-            <!-- Current Plan Tab -->
-            <div id="current-plan-content" class="tab-content hidden">
-                <h2 class="text-xl font-semibold text-gray-900 mb-6">Current Plan</h2>
-                
-                <div class="bg-gray-50 rounded-lg p-6 mb-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <h3 class="text-2xl font-bold text-gray-900">{{ $subscription->plan->plan_name ?? 'Free Plan' }}</h3>
-                            <p class="text-gray-600 mt-1">{{ $subscription->plan->description ?? 'Basic plan with limited features' }}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-3xl font-bold text-gray-900">
-                                {{ $subscription->plan->currency ?? 'AED' }} {{ number_format($subscription->plan->price_annual ?? 0, 2) }}
-                            </p>
-                            <p class="text-sm text-gray-500">per {{ $subscription->billing_cycle === 'annual' ? 'year' : 'month' }}</p>
-                        </div>
-                    </div>
-
-                    <div class="border-t border-gray-200 pt-4">
-                        <h4 class="font-semibold text-gray-900 mb-3">Plan Features</h4>
-                        <ul class="space-y-2">
-                            @if($subscription->plan)
-                                @php
-                                    // Features is already cast to array in SubscriptionPlan model
-                                    $features = $subscription->plan->features ?? [];
-                                    // If it's a string, decode it; if it's already an array, use it directly
-                                    if (is_string($features)) {
-                                        $features = json_decode($features, true) ?? [];
-                                    }
-                                @endphp
-                                @if(is_array($features) && count($features) > 0)
-                                    @foreach($features as $feature)
-                                        <li class="flex items-center text-gray-700">
-                                            <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                            </svg>
-                                            {{ $feature }}
-                                        </li>
-                                    @endforeach
-                                @else
-                                    <li class="text-gray-500 text-sm">No features listed</li>
-                                @endif
-                            @endif
-                        </ul>
-                    </div>
-                </div>
-
-                <a href="{{ route('subscriptions.upgrade') }}" class="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                    Upgrade Plan
-                </a>
-            </div>
-
-            <!-- Billing Methods Tab -->
-            <div id="billing-methods-content" class="tab-content hidden">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-xl font-semibold text-gray-900">Billing Methods</h2>
-                    <button onclick="openAddBillingMethodModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                        </svg>
-                        Add New Card
-                    </button>
-                </div>
-
-                @if($billingMethods && count($billingMethods) > 0)
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    @foreach($billingMethods as $method)
-                    <div class="border border-gray-200 rounded-lg p-4">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="font-semibold text-gray-900">**** **** **** {{ $method->card_last4 ?? '0000' }}</p>
-                                <p class="text-sm text-gray-500">{{ $method->card_brand ?? 'Card' }} • Expires {{ $method->card_exp_month ?? 'MM' }}/{{ $method->card_exp_year ?? 'YYYY' }}</p>
-                                @if($method->cardholder_name)
-                                    <p class="text-xs text-gray-400 mt-1">{{ $method->cardholder_name }}</p>
-                                @endif
-                            </div>
-                            <div class="flex items-center gap-2">
-                                @if($method->is_default)
-                                    <span class="px-2 py-1 text-xs font-semibold rounded bg-blue-100 text-blue-800">Default</span>
-                                @else
-                                    <form action="{{ route('subscriptions.billing-methods.set-default', $method->id) }}" method="POST" class="inline">
-                                        @csrf
-                                        <button type="submit" class="text-xs text-blue-600 hover:text-blue-800 px-2 py-1 border border-blue-300 rounded hover:bg-blue-50" title="Set as Default">
-                                            Set Default
-                                        </button>
-                                    </form>
-                                @endif
-                                <button onclick="editBillingMethod({{ $method->id }})" class="text-blue-600 hover:text-blue-800" title="Edit">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                    </svg>
-                                </button>
-                                <form action="{{ route('subscriptions.billing-methods.destroy', $method->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this billing method?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-800" title="Delete">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                        </svg>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-                @else
-                <div class="text-center py-12 bg-gray-50 rounded-lg">
-                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-                    </svg>
-                    <p class="mt-2 text-sm text-gray-500">No billing methods added yet.</p>
-                    <button onclick="openAddBillingMethodModal()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
-                        Add Your First Card
-                    </button>
-                </div>
-                @endif
-            </div>
-
-            <!-- Transactions Tab -->
-            <div id="transactions-content" class="tab-content hidden">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-xl font-semibold text-gray-900">Payment Transactions</h2>
-                </div>
-
+            <div id="transactions-content" class="tab-content">
                 @if($paymentHistory && $paymentHistory->count() > 0)
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach($paymentHistory as $transaction)
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    <div>{{ $transaction->created_at->format('M d, Y') }}</div>
-                                    <div class="text-xs text-gray-500">{{ $transaction->created_at->format('H:i') }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                                        {{ ucfirst(str_replace('_', ' ', $transaction->transaction_type ?? 'subscription')) }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 text-sm text-gray-900">
-                                    <div>{{ $transaction->description ?? 'Payment Transaction' }}</div>
-                                    @if($transaction->invoice_number)
-                                        <div class="text-xs text-gray-500 mt-1">Invoice: {{ $transaction->invoice_number }}</div>
-                                    @endif
-                                    @php
-                                        $meta = $transaction->metadata ?? [];
-                                        $gatewayRef = $meta['razorpay_payment_id'] ?? $meta['cashfree_order_id'] ?? $meta['razorpay_order_id'] ?? null;
-                                    @endphp
-                                    @if($gatewayRef)
-                                        <div class="text-xs text-gray-400 mt-1">Ref: {{ $gatewayRef }}</div>
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    {{ $transaction->currency ?? 'AED' }} {{ number_format($transaction->amount ?? 0, 2) }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    @if($transaction->billingMethod)
-                                        {{ $transaction->billingMethod->card_brand ?? 'Card' }} •••• {{ $transaction->billingMethod->card_last4 ?? '0000' }}
-                                    @else
-                                        {{ ucfirst($transaction->payment_method ?? 'N/A') }}
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @php
-                                        $statusClass = match($transaction->status) {
-                                            'completed' => 'bg-green-100 text-green-800',
-                                            'pending' => 'bg-yellow-100 text-yellow-800',
-                                            'failed' => 'bg-red-100 text-red-800',
-                                            'refunded' => 'bg-blue-100 text-blue-800',
-                                            'cancelled' => 'bg-gray-100 text-gray-800',
-                                            default => 'bg-gray-100 text-gray-800'
-                                        };
-                                    @endphp
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass }}">
-                                        {{ ucfirst($transaction->status ?? 'Pending') }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    @if($transaction->invoice_url)
-                                        <a href="{{ $transaction->invoice_url }}" target="_blank" class="text-blue-600 hover:text-blue-800 flex items-center gap-1">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                            </svg>
-                                            Download
-                                        </a>
-                                    @else
-                                        <span class="text-gray-400">N/A</span>
-                                    @endif
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Invoice</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                @foreach($paymentHistory as $transaction)
+                                    <tr>
+                                        <td class="px-4 py-3 whitespace-nowrap">{{ $transaction->created_at->format('M d, Y') }}</td>
+                                        <td class="px-4 py-3">{{ $transaction->description ?? 'Subscription payment' }}</td>
+                                        <td class="px-4 py-3 font-medium">{{ $transaction->currency ?? 'AED' }} {{ number_format($transaction->amount ?? 0, 2) }}</td>
+                                        <td class="px-4 py-3">
+                                            <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100">{{ ucfirst($transaction->status ?? 'pending') }}</span>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            @if($transaction->invoice_url)
+                                                <a href="{{ $transaction->invoice_url }}" target="_blank" class="text-blue-600 hover:underline">Download</a>
+                                            @else
+                                                <span class="text-gray-400">—</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 @else
-                <div class="text-center py-12 bg-gray-50 rounded-lg">
-                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                    </svg>
-                    <p class="mt-2 text-sm text-gray-500">No transactions found.</p>
-                    <p class="text-xs text-gray-400 mt-1">
+                    <p class="text-sm text-gray-500 py-8 text-center">
                         @if(!empty($isComplimentary))
-                            Your plan was provided at no charge — there is no payment history for this period.
+                            No payment history — your plan is complimentary.
                         @else
-                            All payment transactions will appear here.
+                            Payment transactions will appear here after your first purchase.
                         @endif
                     </p>
+                @endif
+            </div>
+
+            <div id="billing-methods-content" class="tab-content hidden">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-gray-900">Saved cards</h3>
+                    <button type="button" onclick="openAddBillingMethodModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">Add card</button>
                 </div>
+                @if($billingMethods && $billingMethods->count() > 0)
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        @foreach($billingMethods as $method)
+                            <div class="border border-gray-200 rounded-lg p-4 flex justify-between items-center">
+                                <div>
+                                    <p class="font-semibold">•••• {{ $method->card_last4 ?? '0000' }}</p>
+                                    <p class="text-sm text-gray-500">{{ $method->card_brand ?? 'Card' }} · {{ $method->card_exp_month }}/{{ $method->card_exp_year }}</p>
+                                </div>
+                                @if($method->is_default)
+                                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Default</span>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-sm text-gray-500 py-6 text-center">No saved payment methods.</p>
                 @endif
             </div>
         </div>
     </div>
 </div>
 
-<!-- Add/Edit Billing Method Modal -->
-<div id="billingMethodModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-        <div class="mt-3">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-medium text-gray-900" id="modalTitle">Add New Card</h3>
-                <button onclick="closeBillingMethodModal()" class="text-gray-400 hover:text-gray-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-            
-            <form id="billingMethodForm" method="POST">
-                @csrf
-                <div id="formMethod" style="display: none;"></div>
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Card Number *</label>
-                    <input type="text" name="card_number" id="card_number" maxlength="19" 
-                           placeholder="1234 5678 9012 3456" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                           required>
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Cardholder Name *</label>
-                    <input type="text" name="cardholder_name" id="cardholder_name" 
-                           placeholder="John Doe" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                           required>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Expiry Month *</label>
-                        <select name="card_exp_month" id="card_exp_month" 
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                                required>
-                            <option value="">MM</option>
-                            @for($i = 1; $i <= 12; $i++)
-                                <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}">{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</option>
-                            @endfor
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Expiry Year *</label>
-                        <select name="card_exp_year" id="card_exp_year" 
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                                required>
-                            <option value="">YYYY</option>
-                            @for($i = date('Y'); $i <= date('Y') + 15; $i++)
-                                <option value="{{ $i }}">{{ $i }}</option>
-                            @endfor
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="mb-4">
-                    <label class="flex items-center">
-                        <input type="checkbox" name="is_default" id="is_default" 
-                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                        <span class="ml-2 text-sm text-gray-700">Set as default payment method</span>
-                    </label>
-                </div>
-                
-                <div class="flex items-center justify-end gap-3 mt-6">
-                    <button type="button" onclick="closeBillingMethodModal()" 
-                            class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">
-                        Cancel
-                    </button>
-                    <button type="submit" 
-                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        Save Card
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+@include('client.subscriptions.partials.billing-method-modal', ['billingMethods' => $billingMethods])
 
 <script>
 function showTab(tabName) {
-    // Hide all tab contents
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.add('hidden');
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('active', 'border-blue-500', 'text-blue-600');
+        btn.classList.add('border-transparent', 'text-gray-500');
     });
-    
-    // Remove active class from all tabs
-    document.querySelectorAll('.tab-button').forEach(button => {
-        button.classList.remove('active', 'border-blue-500', 'text-blue-600');
-        button.classList.add('border-transparent', 'text-gray-500');
-    });
-    
-    // Show selected tab content
     document.getElementById(tabName + '-content').classList.remove('hidden');
-    
-    // Add active class to selected tab
-    const activeTab = document.getElementById(tabName + '-tab');
-    activeTab.classList.add('active', 'border-blue-500', 'text-blue-600');
-    activeTab.classList.remove('border-transparent', 'text-gray-500');
+    const tab = document.getElementById(tabName + '-tab');
+    tab.classList.add('active', 'border-blue-500', 'text-blue-600');
+    tab.classList.remove('border-transparent', 'text-gray-500');
 }
-
-// Auto-open tabs if redirected
 @if(session('active_tab'))
-    document.addEventListener('DOMContentLoaded', function() {
-        showTab('{{ session('active_tab') }}');
-    });
+document.addEventListener('DOMContentLoaded', () => showTab('{{ session('active_tab') }}'));
 @endif
-
-// Format card number input
-document.getElementById('card_number')?.addEventListener('input', function(e) {
-    let value = e.target.value.replace(/\s+/g, '');
-    let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
-    e.target.value = formattedValue;
-});
-
-function openAddBillingMethodModal() {
-    document.getElementById('modalTitle').textContent = 'Add New Card';
-    document.getElementById('billingMethodForm').action = '{{ route('subscriptions.billing-methods.store') }}';
-    document.getElementById('formMethod').innerHTML = '';
-    document.getElementById('billingMethodForm').reset();
-    document.getElementById('billingMethodModal').classList.remove('hidden');
-}
-
-function editBillingMethod(methodId) {
-    // For now, just show a message that edit will be implemented
-    // You can fetch the billing method data via AJAX and populate the form
-    alert('Edit functionality will be enhanced to load card details. For now, please delete and add a new card.');
-}
-
-function closeBillingMethodModal() {
-    document.getElementById('billingMethodModal').classList.add('hidden');
-    document.getElementById('billingMethodForm').reset();
-}
-
-function deleteBillingMethod(methodId) {
-    if (confirm('Are you sure you want to delete this billing method?')) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/subscriptions/billing-methods/${methodId}`;
-        
-        const csrfToken = document.createElement('input');
-        csrfToken.type = 'hidden';
-        csrfToken.name = '_token';
-        csrfToken.value = '{{ csrf_token() }}';
-        form.appendChild(csrfToken);
-        
-        const methodField = document.createElement('input');
-        methodField.type = 'hidden';
-        methodField.name = '_method';
-        methodField.value = 'DELETE';
-        form.appendChild(methodField);
-        
-        document.body.appendChild(form);
-        form.submit();
-    }
-}
-
-// Close modal on outside click
-document.getElementById('billingMethodModal')?.addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeBillingMethodModal();
-    }
-});
 </script>
 @endsection

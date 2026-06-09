@@ -11,7 +11,9 @@ use App\Models\SubscriptionPlan;
 use App\Models\ClientSubscription;
 use App\Models\PaymentGateway;
 use App\Models\PaymentTransaction;
+use App\Data\CommercialPlanComparison;
 use App\Data\SubscriptionPlanMatrix;
+use App\Support\PlanGate;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -56,39 +58,7 @@ class SubscriptionController extends Controller
      */
     public function currentPlan()
     {
-        $company = Auth::user()->getActiveCompany();
-        if (!$company || !$company->isClient()) {
-            return redirect()->route('client.dashboard')
-                ->with('error', 'Access denied.');
-        }
-
-        $subscription = $this->subscriptionService->getActiveSubscription($company->id, 'client');
-        
-        if (!$subscription) {
-            return redirect()->route('subscriptions.index')
-                ->with('info', 'You do not have an active subscription. Please choose a plan.');
-        }
-
-        $scheduledPlan = $this->subscriptionService->getScheduledRenewalPlan($subscription);
-        $scheduledDowngradeWarnings = $scheduledPlan
-            ? $this->subscriptionService->getDowngradeWarnings($company->id, $scheduledPlan)
-            : [];
-
-        $isPaidPlan = $this->subscriptionService->isPaidSubscription($subscription);
-        $cancellationScheduled = $this->subscriptionService->isCancellationScheduled($subscription);
-        $isComplimentary = $this->subscriptionService->isComplimentary($subscription);
-        $provisionLabel = $this->subscriptionService->getProvisionLabel($subscription);
-
-        return view('client.subscriptions.current-plan', compact(
-            'subscription',
-            'company',
-            'scheduledPlan',
-            'scheduledDowngradeWarnings',
-            'isPaidPlan',
-            'cancellationScheduled',
-            'isComplimentary',
-            'provisionLabel'
-        ));
+        return redirect()->route('subscriptions.billing');
     }
 
     /**
@@ -110,9 +80,11 @@ class SubscriptionController extends Controller
             ->keyBy('plan_code');
 
         $planMeta = SubscriptionPlanMatrix::plans();
-        $comparisonColumns = SubscriptionPlanMatrix::columns();
-        $featureRows = SubscriptionPlanMatrix::featureRows();
-        $scope3AddOns = SubscriptionPlanMatrix::scope3AddOns();
+        $comparisonColumns = CommercialPlanComparison::PLAN_COLUMNS;
+        $comparisonLabels = CommercialPlanComparison::planLabels();
+        $operationsRows = CommercialPlanComparison::operationsRows();
+        $downloadRows = CommercialPlanComparison::downloadRows();
+        $consultantAddOns = CommercialPlanComparison::consultantAddOns();
         $enabledGateways = PaymentGateway::enabled();
         $displayCurrency = \App\Services\CurrencyService::displayCurrency();
 
@@ -139,8 +111,10 @@ class SubscriptionController extends Controller
             'company',
             'planMeta',
             'comparisonColumns',
-            'featureRows',
-            'scope3AddOns',
+            'comparisonLabels',
+            'operationsRows',
+            'downloadRows',
+            'consultantAddOns',
             'enabledGateways',
             'planChanges',
             'downgradeWarnings',
@@ -194,7 +168,7 @@ class SubscriptionController extends Controller
                     $message .= ' ' . implode(' ', $warnings);
                 }
 
-                return redirect()->route('subscriptions.current-plan')
+                return redirect()->route('subscriptions.billing')
                     ->with('success', $message);
             } catch (\Exception $e) {
                 return back()->withErrors(['error' => $e->getMessage()])->withInput();
@@ -211,7 +185,7 @@ class SubscriptionController extends Controller
                     'preserve_expiry' => $change['preserve_expiry'],
                 ]);
 
-                return redirect()->route('subscriptions.current-plan')
+                return redirect()->route('subscriptions.billing')
                     ->with('success', 'Plan upgraded successfully!');
             } catch (\Exception $e) {
                 return back()->withErrors(['error' => $e->getMessage()])->withInput();
@@ -277,7 +251,7 @@ class SubscriptionController extends Controller
                         $subscription
                     );
 
-                    return redirect()->route('subscriptions.current-plan')
+                    return redirect()->route('subscriptions.billing')
                         ->with('success', 'Coupon applied — your ' . $plan->plan_name . ' plan is now active!');
                 }
 
@@ -417,7 +391,7 @@ class SubscriptionController extends Controller
             ->firstOrFail();
 
         if ($transaction->status !== 'pending') {
-            return redirect()->route('subscriptions.current-plan')
+            return redirect()->route('subscriptions.billing')
                 ->with('info', 'This payment has already been processed.');
         }
 
@@ -499,7 +473,7 @@ class SubscriptionController extends Controller
         }
 
         if ($transaction->status === 'completed') {
-            return redirect()->route('subscriptions.current-plan')
+            return redirect()->route('subscriptions.billing')
                 ->with('success', 'Subscription is already active.');
         }
 
@@ -574,7 +548,7 @@ class SubscriptionController extends Controller
 
         $planName = optional(SubscriptionPlan::find($transaction->metadata['plan_id'] ?? null))->plan_name ?? 'subscription';
 
-        return redirect()->route('subscriptions.current-plan')
+        return redirect()->route('subscriptions.billing')
             ->with('success', 'Payment successful — your ' . $planName . ' plan is now active!');
     }
 
@@ -616,20 +590,40 @@ class SubscriptionController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $scheduledPlan = $this->subscriptionService->getScheduledRenewalPlan($subscription);
+        $scheduledDowngradeWarnings = $scheduledPlan
+            ? $this->subscriptionService->getDowngradeWarnings($company->id, $scheduledPlan)
+            : [];
+
         $isPaidPlan = $this->subscriptionService->isPaidSubscription($subscription);
         $cancellationScheduled = $this->subscriptionService->isCancellationScheduled($subscription);
         $isComplimentary = $this->subscriptionService->isComplimentary($subscription);
         $provisionLabel = $this->subscriptionService->getProvisionLabel($subscription);
+
+        $gate = PlanGate::forCompany($company->id);
+        $usageMeters = $gate->usageMeters();
+        $dataEntitlements = $gate->dataEntitlementsList();
+        $downloadEntitlements = $gate->downloadEntitlementsList();
+        $consultantDirectoryLabel = $gate->consultantDirectoryLabel();
+        $daysRemaining = max(0, (int) now()->diffInDays($subscription->expires_at, false));
 
         return view('client.subscriptions.billing', compact(
             'subscription',
             'company',
             'paymentHistory',
             'billingMethods',
+            'scheduledPlan',
+            'scheduledDowngradeWarnings',
             'isPaidPlan',
             'cancellationScheduled',
             'isComplimentary',
-            'provisionLabel'
+            'provisionLabel',
+            'gate',
+            'usageMeters',
+            'dataEntitlements',
+            'downloadEntitlements',
+            'consultantDirectoryLabel',
+            'daysRemaining'
         ));
     }
 
@@ -677,7 +671,7 @@ class SubscriptionController extends Controller
 
         $this->subscriptionService->scheduleCancellation($subscription);
 
-        return redirect()->route('subscriptions.current-plan')
+        return redirect()->route('subscriptions.billing')
             ->with('success', 'Cancellation scheduled. Your '
                 . ($subscription->plan->plan_name ?? 'paid')
                 . ' plan stays fully active until '
@@ -703,7 +697,7 @@ class SubscriptionController extends Controller
 
         $this->subscriptionService->resumeSubscription($subscription);
 
-        return redirect()->route('subscriptions.current-plan')
+        return redirect()->route('subscriptions.billing')
             ->with('success', 'Cancellation withdrawn. Your plan will continue and you will be reminded to renew before '
                 . $subscription->expires_at->format('F d, Y') . '.');
     }

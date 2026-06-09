@@ -323,7 +323,7 @@
         @if($isAdmin)
             <a href="{{ route('subscriptions.billing') }}" class="nav-link {{ request()->routeIs('subscriptions.*') ? 'active' : '' }}">
                 {!! $svg('card') !!}
-                Billing
+                Plan &amp; billing
             </a>
         @endif
     </div>

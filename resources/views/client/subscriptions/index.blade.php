@@ -25,8 +25,8 @@
                 </p>
             </div>
             <div class="flex gap-3">
-                <a href="{{ route('subscriptions.current-plan') }}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-                    View Details
+                <a href="{{ route('subscriptions.billing') }}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                    Plan &amp; billing
                 </a>
                 <a href="{{ route('subscriptions.upgrade') }}" class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700">
                     Change Plan

@@ -9,7 +9,7 @@
     $planOrder = ['client_free', 'client_starter', 'client_growth', 'client_enterprise'];
     $freeMeta = [
         'name' => 'Free',
-        'tagline' => 'Scope 1 & 2 · 1 location · 2 users',
+        'tagline' => 'Try S1&2 + disclosure forms (preview only)',
         'price_display' => 'AED 0',
         'price_sub' => 'Free forever',
         'is_custom' => false,
@@ -24,7 +24,7 @@
         <div>
             <h1 class="text-3xl font-bold text-gray-900">Choose your plan</h1>
             <p class="mt-2 text-gray-600">
-                Scope 1 &amp; 2 carbon accounting. Prices shown in {{ $displayCurrency }} (billed annually, one-time payment).
+                MOCCAE-ready inventory on Starter; IFRS &amp; GRI downloads on Growth. Prices in {{ $displayCurrency }} (annual, one-time payment).
             </p>
         </div>
         <div class="inline-flex items-center rounded-lg border border-gray-200 overflow-hidden text-sm self-start">
@@ -210,90 +210,41 @@
                 </div>
 
                 <div class="flex items-center justify-end gap-3 border-t border-gray-100 pt-4">
-                    <a href="{{ route('subscriptions.index') }}" class="px-5 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">Cancel</a>
+                    <a href="{{ route('subscriptions.billing') }}" class="px-5 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">Back to billing</a>
                     <button type="submit" class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 text-sm font-medium">Continue</button>
                 </div>
             </div>
         </div>
     </form>
 
-    <!-- Feature comparison -->
-    <div class="mb-12">
-        <h2 class="text-2xl font-bold text-gray-900 mb-1">Compare plans</h2>
-        <p class="text-sm text-gray-500 mb-4">
-            Features marked <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-medium">Coming soon</span> are on our roadmap.
-        </p>
-        <div class="overflow-x-auto bg-white rounded-xl border border-gray-200">
-            <table class="min-w-full text-sm">
-                <thead>
-                    <tr class="border-b border-gray-200 bg-gray-50">
-                        <th class="text-left font-semibold text-gray-700 px-5 py-3 w-1/3">Feature</th>
-                        @foreach($comparisonColumns as $code)
-                            <th class="text-center font-semibold text-gray-700 px-5 py-3">{{ $availablePlans[$code]->plan_name ?? $planMeta[$code]['name'] }}</th>
-                        @endforeach
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                    @foreach($featureRows as $row)
-                        <tr>
-                            <td class="px-5 py-3 text-gray-800">
-                                <span class="font-medium">{{ $row['label'] }}</span>
-                                @if(!empty($row['coming_soon']))
-                                    <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-medium align-middle">Coming soon</span>
-                                @endif
-                            </td>
-                            @foreach($comparisonColumns as $code)
-                                @php $cell = $row['cells'][$code] ?? false; @endphp
-                                <td class="px-5 py-3 text-center {{ !empty($row['coming_soon']) ? 'text-gray-400' : 'text-gray-700' }}">
-                                    @if($cell === true)
-                                        <svg class="w-5 h-5 mx-auto {{ !empty($row['coming_soon']) ? 'text-gray-300' : 'text-green-500' }}" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                                    @elseif($cell === false)
-                                        <span class="text-gray-300">—</span>
-                                    @else
-                                        {{ $cell }}
-                                    @endif
-                                </td>
-                            @endforeach
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    </div>
+    @include('client.subscriptions.partials.comparison-table', [
+        'title' => 'Data & operations',
+        'rows' => $operationsRows,
+        'columns' => $comparisonColumns,
+        'labels' => $comparisonLabels,
+        'plans' => $availablePlans,
+    ])
 
-    <!-- Scope 3 Add-On -->
+    @include('client.subscriptions.partials.comparison-table', [
+        'title' => 'Report downloads',
+        'rows' => $downloadRows,
+        'columns' => $comparisonColumns,
+        'labels' => $comparisonLabels,
+        'plans' => $availablePlans,
+    ])
+
     <div class="mb-12">
-        <h2 class="text-2xl font-bold text-gray-900 mb-1">Scope 3 Add-On</h2>
-        <p class="text-sm text-gray-500 mb-4">
-            Scope 3 (value-chain) emissions are offered as a separate service — not bundled into standard plans.
-            Items marked <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-medium">Coming soon</span> are on the roadmap.
-        </p>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-            @foreach($scope3AddOns as $addon)
-                <div class="bg-white rounded-xl border border-gray-200 p-5 flex flex-col">
-                    <h3 class="text-base font-bold text-gray-900 mb-1">{{ $addon['name'] }}</h3>
-                    <div class="text-sm font-semibold text-emerald-700 mb-3">{{ $addon['price_display'] }}</div>
-                    <ul class="space-y-1.5 text-sm text-gray-600 flex-1">
-                        @foreach($addon['includes'] as $item)
-                            <li class="flex items-start {{ !empty($item['soon']) ? 'text-gray-400' : '' }}">
-                                @if(!empty($item['soon']))
-                                    <svg class="w-4 h-4 text-gray-300 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                @else
-                                    <svg class="w-4 h-4 text-emerald-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                                @endif
-                                <span>
-                                    {{ $item['label'] }}
-                                    @if(!empty($item['soon']))
-                                        <span class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-medium">Coming soon</span>
-                                    @endif
-                                </span>
-                            </li>
-                        @endforeach
-                    </ul>
-                    <a href="mailto:sales@menetzero.com?subject=Scope%203%20Add-On%20enquiry"
-                       class="mt-4 block w-full text-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 text-sm font-medium">
-                        Contact Sales
-                    </a>
+        <h2 class="text-2xl font-bold text-gray-900 mb-1">Consultant review packs</h2>
+        <p class="text-sm text-gray-500 mb-4">Optional human review via verified partners. Checkout integration coming soon — contact sales to bundle today.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            @foreach($consultantAddOns as $addon)
+                <div class="bg-white rounded-xl border border-gray-200 p-5">
+                    <div class="flex items-baseline justify-between gap-2 mb-2">
+                        <h3 class="text-base font-bold text-gray-900">{{ $addon['name'] }}</h3>
+                        <span class="text-sm font-semibold text-emerald-700">{{ $addon['price'] }}</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-4">{{ $addon['description'] }}</p>
+                    <span class="inline-block text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">For {{ $addon['for_plan'] }} subscribers</span>
                 </div>
             @endforeach
         </div>
