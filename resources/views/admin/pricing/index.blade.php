@@ -11,8 +11,10 @@
     @endif
 
     <p class="text-sm text-gray-500 mb-6">
-        Manage the customer-facing <strong>comparison table</strong> and the <strong>Scope 3 add-on</strong> cards shown on the upgrade page.
-        Plan names, prices and limits are managed under <a href="{{ route('admin.subscription-plans') }}" class="text-purple-600 hover:underline">Subscription Plans</a>.
+        <strong>Public pricing</strong> and the in-app <strong>upgrade comparison tables</strong> are driven by plan entitlements
+        (<a href="{{ route('admin.subscription-plans') }}" class="text-purple-600 hover:underline">Plans &amp; entitlements</a>).
+        Use this section for optional <em>extra</em> rows on the legacy upgrade matrix, or
+        <a href="{{ route('pricing') }}" target="_blank" class="text-purple-600 hover:underline">preview public pricing ↗</a>.
     </p>
 
     <!-- Feature comparison rows -->

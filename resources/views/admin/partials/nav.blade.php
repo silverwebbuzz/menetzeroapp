@@ -37,6 +37,10 @@
         </svg>
         Coupons
     </a>
+</div>
+
+<div class="nav-section">
+    <div class="nav-section-title">Commercial</div>
     <a href="{{ route('admin.subscription-plans') }}" class="nav-link {{ $isActive('admin.subscription-plans') ? 'active' : '' }}">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -44,22 +48,33 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M5 10a7 7 0 1114 0v4a7 7 0 11-14 0v-4z"/>
         </svg>
-        Subscription Plans
+        Plans &amp; entitlements
     </a>
     <a href="{{ route('admin.pricing.index') }}" class="nav-link {{ $isActive('admin.pricing') ? 'active' : '' }}">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M7 7h.01M7 3h5a1.99 1.99 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"/>
         </svg>
-        Pricing Page
+        Upgrade page CMS
+    </a>
+    <a href="{{ route('pricing') }}" class="nav-link" target="_blank">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+        </svg>
+        Public pricing ↗
     </a>
     <a href="{{ route('admin.payment-gateways.index') }}" class="nav-link {{ $isActive('admin.payment-gateways') ? 'active' : '' }}">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
         </svg>
-        Payment Gateways
+        Payment gateways
     </a>
+</div>
+
+<div class="nav-section">
+    <div class="nav-section-title">Configuration</div>
     <a href="{{ route('admin.site-content.index') }}" class="nav-link {{ $isActive('admin.site-content') ? 'active' : '' }}">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

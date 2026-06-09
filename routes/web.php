@@ -433,6 +433,9 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
         Route::get('/subscription-plans/{id}/edit', [\App\Http\Controllers\Admin\SuperAdminController::class, 'editSubscriptionPlan'])->name('subscription-plans.edit');
         Route::put('/subscription-plans/{id}', [\App\Http\Controllers\Admin\SuperAdminController::class, 'updateSubscriptionPlan'])->name('subscription-plans.update');
         Route::delete('/subscription-plans/{id}', [\App\Http\Controllers\Admin\SuperAdminController::class, 'destroySubscriptionPlan'])->name('subscription-plans.destroy');
+        Route::get('/subscription-plans/{id}/entitlements', [\App\Http\Controllers\Admin\PlanEntitlementController::class, 'edit'])->name('subscription-plans.entitlements');
+        Route::put('/subscription-plans/{id}/entitlements', [\App\Http\Controllers\Admin\PlanEntitlementController::class, 'update'])->name('subscription-plans.entitlements.update');
+        Route::post('/subscription-plans/{id}/entitlements/reset', [\App\Http\Controllers\Admin\PlanEntitlementController::class, 'resetDefaults'])->name('subscription-plans.entitlements.reset');
         
         // Pricing Page Content Management (comparison table + Scope 3 add-ons)
         Route::prefix('pricing')->name('pricing.')->group(function () {

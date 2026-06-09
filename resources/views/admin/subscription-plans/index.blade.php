@@ -54,6 +54,7 @@
                             </td>
                             <td class="px-4 py-2">
                                 <div class="flex items-center space-x-2">
+                                    <a href="{{ route('admin.subscription-plans.entitlements', $plan->id) }}" class="text-emerald-700 hover:text-emerald-900 text-sm font-medium">Entitlements</a>
                                     <a href="{{ route('admin.subscription-plans.edit', $plan->id) }}" class="text-purple-600 hover:text-purple-900 text-sm">Edit</a>
                                     <form action="{{ route('admin.subscription-plans.destroy', $plan->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this subscription plan?');">
                                         @csrf

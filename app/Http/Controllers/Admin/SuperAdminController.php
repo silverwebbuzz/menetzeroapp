@@ -173,6 +173,7 @@ class SuperAdminController extends Controller
         $request->merge([
             'features' => $this->normalizeJsonArray($request->input('features')),
             'limits' => $this->normalizeJsonArray($request->input('limits')),
+            'entitlements' => $this->normalizeJsonArray($request->input('entitlements')),
             'billing_cycle' => 'annual',
         ]);
 
@@ -187,9 +188,10 @@ class SuperAdminController extends Controller
             'description' => 'nullable|string',
             'features' => 'nullable|array',
             'limits' => 'nullable|array',
+            'entitlements' => 'nullable|array',
         ]);
 
-        $plan->update([
+        $payload = [
             'plan_code' => $request->plan_code,
             'plan_name' => $request->plan_name,
             'plan_category' => $request->plan_category,
@@ -202,7 +204,13 @@ class SuperAdminController extends Controller
             'limits' => $request->limits ?? [],
             'is_active' => $request->has('is_active'),
             'sort_order' => $request->sort_order ?? 0,
-        ]);
+        ];
+
+        if ($request->filled('entitlements')) {
+            $payload['entitlements'] = $request->entitlements;
+        }
+
+        $plan->update($payload);
 
         return redirect()->route('admin.subscription-plans')
             ->with('success', 'Subscription plan updated successfully');

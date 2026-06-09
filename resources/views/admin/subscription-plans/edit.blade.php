@@ -4,6 +4,12 @@
 @section('page-title', 'Edit Subscription Plan')
 
 @section('content')
+    <div class="mb-4 rounded-lg border border-purple-100 bg-purple-50 px-4 py-3 text-sm text-purple-900">
+        Product gates (exports, Scope 3, bulk import, disclosures) are managed on
+        <a href="{{ route('admin.subscription-plans.entitlements', $plan->id) }}" class="font-semibold underline">Plan entitlements</a>.
+        This form is for price, name, and legacy JSON only.
+    </div>
+
     <div class="bg-white shadow rounded-lg p-6">
         <form method="POST" action="{{ route('admin.subscription-plans.update', $plan->id) }}">
             @csrf

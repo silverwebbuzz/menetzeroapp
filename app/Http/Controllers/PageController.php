@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Data\CommercialPlanComparison;
 use App\Models\SitePage;
 use App\Models\SiteSetting;
 use App\Models\SubscriptionPlan;
@@ -42,8 +43,24 @@ class PageController extends Controller
 
         $currency = CurrencyService::displayCurrency();
         $settings = SiteSetting::allSettings();
+        $plansByCode = $plans->keyBy('plan_code');
+        $comparisonColumns = CommercialPlanComparison::PLAN_COLUMNS;
+        $comparisonLabels = CommercialPlanComparison::planLabels();
+        $operationsRows = CommercialPlanComparison::operationsRows();
+        $downloadRows = CommercialPlanComparison::downloadRows();
+        $consultantAddOns = CommercialPlanComparison::consultantAddOns();
 
-        return view('public.pricing', compact('plans', 'currency', 'settings'));
+        return view('public.pricing', compact(
+            'plans',
+            'plansByCode',
+            'currency',
+            'settings',
+            'comparisonColumns',
+            'comparisonLabels',
+            'operationsRows',
+            'downloadRows',
+            'consultantAddOns',
+        ));
     }
 
     /** Switch the display currency and return to the previous page. */
