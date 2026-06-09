@@ -7,6 +7,12 @@
 <div class="max-w-5xl mx-auto">
     @include('disclosures.partials.header', ['framework' => 'gri'])
 
+    @if(!$gate->canDisclosureExportType('gri_pdf', $fiscalYear))
+        <x-preview-only-banner
+            message="GRI preview only on your plan. Upgrade to Growth (AED 2,499/year) to download GRI PDF and content index."
+            upgrade-label="Upgrade to Growth" />
+    @endif
+
     <div class="card mb-6">
         <div class="card-body flex flex-col sm:flex-row sm:justify-between gap-4">
             <div>
@@ -14,8 +20,20 @@
                 <h3 class="text-lg font-semibold">{{ $report['framework'] }}</h3>
             </div>
             <div class="flex gap-2">
-                <a href="{{ route('disclosures.gri.content-index', ['fiscal_year' => $fiscalYear]) }}" class="btn btn-secondary">Content Index</a>
-                <a href="{{ route('disclosures.gri.report.pdf', ['fiscal_year' => $fiscalYear]) }}" class="btn btn-primary">Download PDF</a>
+                <x-plan-gated-link
+                    :allowed="$gate->canDisclosureExportType('gri_content_index', $fiscalYear)"
+                    :href="route('disclosures.gri.content-index', ['fiscal_year' => $fiscalYear])"
+                    :message="$gate->disclosureExportMessage()"
+                    class="btn btn-secondary"
+                    locked-class="btn btn-secondary">
+                    Content Index
+                </x-plan-gated-link>
+                <x-plan-gated-link
+                    :allowed="$gate->canDisclosureExportType('gri_pdf', $fiscalYear)"
+                    :href="route('disclosures.gri.report.pdf', ['fiscal_year' => $fiscalYear])"
+                    :message="$gate->disclosureExportMessage()">
+                    Download PDF
+                </x-plan-gated-link>
             </div>
         </div>
     </div>

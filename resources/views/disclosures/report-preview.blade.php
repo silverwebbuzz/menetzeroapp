@@ -7,14 +7,30 @@
 <div class="max-w-5xl mx-auto">
     @include('disclosures.partials.header', ['framework' => 'ifrs_s2'])
 
-    <div class="card mb-6">
+    @if(!$gate->canDisclosureExportType('ifrs_s2_pdf', $fiscalYear))
+        <x-preview-only-banner
+            message="IFRS S2 preview only on your plan. Upgrade to Growth (AED 2,499/year) to download disclosure PDFs."
+            upgrade-label="Upgrade to Growth" />
+    @endif
+
+    <div class="card mb-6 {{ !$gate->canDisclosureExportType('ifrs_s2_pdf', $fiscalYear) ? 'relative' : '' }}">
+        @if(!$gate->canDisclosureExportType('ifrs_s2_pdf', $fiscalYear))
+            <div class="pointer-events-none absolute inset-0 z-10 flex items-center justify-center overflow-hidden rounded-lg" aria-hidden="true">
+                <span class="text-4xl font-bold uppercase tracking-widest text-slate-200/80 -rotate-12 select-none">Preview</span>
+            </div>
+        @endif
         <div class="card-body flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <p class="text-sm text-gray-500">Completeness: {{ $report['completeness']['percent'] }}%</p>
                 <h3 class="text-lg font-semibold text-gray-900">{{ $report['framework'] }}</h3>
                 <p class="text-sm text-gray-600">Fiscal year {{ $fiscalYear }} · Generated {{ $report['generated_at'] }}</p>
             </div>
-            <a href="{{ route('disclosures.s2.report.pdf', ['fiscal_year' => $fiscalYear]) }}" class="btn btn-primary">Download PDF</a>
+            <x-plan-gated-link
+                :allowed="$gate->canDisclosureExportType('ifrs_s2_pdf', $fiscalYear)"
+                :href="route('disclosures.s2.report.pdf', ['fiscal_year' => $fiscalYear])"
+                :message="$gate->disclosureExportMessage()">
+                Download PDF
+            </x-plan-gated-link>
         </div>
     </div>
 

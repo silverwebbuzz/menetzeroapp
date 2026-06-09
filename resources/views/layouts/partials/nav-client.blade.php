@@ -42,9 +42,7 @@
     $canViewStaff = $isAdmin || ($hasCompany && $user->hasModulePermission('staff_management', 'view', $companyId));
     $canViewRoles = $isAdmin || ($hasCompany && $user->hasModulePermission('roles_permissions', 'view', $companyId));
 
-    $scope3Locked = $companyId
-        ? app(\App\Services\PlanEntitlementService::class)->isScope3Locked($companyId)
-        : true;
+    $scope3Locked = isset($gate) ? $gate->isScope3Locked() : true;
 
     // Route helper for scope icons — each source gets a distinct icon where possible
     $sourceIcon = function ($slug) {

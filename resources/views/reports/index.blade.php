@@ -173,10 +173,23 @@
                 'location_id' => $selectedLocationId ?? request('location_id'),
                 'moccae_only' => $moccaeOnly ? 1 : null,
             ]);
+            $reportFyBanner = (int) ($measurement->fiscal_year ?? 0);
+            $previewOnly = !$gate->canExport(($moccaeOnly ?? false) ? 'moccae_pdf' : 'ghg_pdf', $reportFyBanner);
         @endphp
 
+        @if($previewOnly)
+            <x-preview-only-banner
+                message="In-app preview only on your plan. Upgrade to Starter (from AED 1,499/year) to download GHG, Excel, and IEQT exports."
+                upgrade-label="Upgrade to Starter" />
+        @endif
+
         {{-- Report header --}}
-        <div class="card mb-5">
+        <div class="card mb-5 {{ $previewOnly ? 'relative' : '' }}">
+            @if($previewOnly)
+                <div class="pointer-events-none absolute inset-0 z-10 flex items-center justify-center overflow-hidden rounded-lg" aria-hidden="true">
+                    <span class="text-5xl font-bold uppercase tracking-widest text-slate-200/80 -rotate-12 select-none">Preview</span>
+                </div>
+            @endif
             <div class="card-header">
                 <div class="flex items-center gap-4">
                     @if($company->logo_url ?? false)
@@ -190,25 +203,45 @@
                         </span>
                     </div>
                 </div>
+                @php
+                    $reportFy = (int) ($measurement->fiscal_year ?? $selectedFiscalYear ?? 0);
+                    $pdfExportCode = ($moccaeOnly ?? false) ? 'moccae_pdf' : 'ghg_pdf';
+                @endphp
                 <div class="flex gap-2 flex-wrap">
-                    <a href="{{ route('reports.export.pdf', $exportParams) }}" class="btn btn-primary btn-sm">
+                    <x-plan-gated-link
+                        :allowed="$gate->canExport($pdfExportCode, $reportFy)"
+                        :href="route('reports.export.pdf', $exportParams)"
+                        :message="$gate->exportMessage($pdfExportCode)"
+                        class="btn btn-primary btn-sm"
+                        locked-class="btn btn-secondary btn-sm">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m-3-3l3 3 3-3M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1"/>
                         </svg>
                         Download PDF
-                    </a>
-                    <a href="{{ route('reports.export.excel', $exportParams) }}" class="btn btn-secondary btn-sm">
+                    </x-plan-gated-link>
+                    <x-plan-gated-link
+                        :allowed="$gate->canExport('excel', $reportFy)"
+                        :href="route('reports.export.excel', $exportParams)"
+                        :message="$gate->exportMessage('excel')"
+                        class="btn btn-secondary btn-sm"
+                        locked-class="btn btn-secondary btn-sm">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                         </svg>
                         Export Excel
-                    </a>
-                    <a href="{{ route('reports.export.ieqt', $exportParams) }}" class="btn btn-secondary btn-sm" title="CSV pack for MOCCAE IEQT (mrv.ae)">
+                    </x-plan-gated-link>
+                    <x-plan-gated-link
+                        :allowed="$gate->canExport('ieqt', $reportFy)"
+                        :href="route('reports.export.ieqt', $exportParams)"
+                        :message="$gate->exportMessage('ieqt')"
+                        class="btn btn-secondary btn-sm"
+                        locked-class="btn btn-secondary btn-sm"
+                        title="CSV pack for MOCCAE IEQT (mrv.ae)">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
                         IEQT Export
-                    </a>
+                    </x-plan-gated-link>
                 </div>
             </div>
             <div class="card-body space-y-5">

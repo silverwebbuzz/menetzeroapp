@@ -7,6 +7,12 @@
 <div class="max-w-5xl mx-auto">
     @include('disclosures.partials.header', ['framework' => 'ifrs_s1'])
 
+    @if(!$gate->canDisclosureExportType('ifrs_s1_pdf', $fiscalYear))
+        <x-preview-only-banner
+            message="IFRS S1 preview only on your plan. Upgrade to Growth (AED 2,499/year) to download disclosure PDFs."
+            upgrade-label="Upgrade to Growth" />
+    @endif
+
     <div class="card mb-6">
         <div class="card-body flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
@@ -16,7 +22,12 @@
                     <p class="text-sm text-brand-700">IFRS S2 climate appendix will be included.</p>
                 @endif
             </div>
-            <a href="{{ route('disclosures.s1.report.pdf', ['fiscal_year' => $fiscalYear, 'include_s2' => $includeS2 ? 1 : 0]) }}" class="btn btn-primary">Download PDF</a>
+            <x-plan-gated-link
+                :allowed="$gate->canDisclosureExportType('ifrs_s1_pdf', $fiscalYear)"
+                :href="route('disclosures.s1.report.pdf', ['fiscal_year' => $fiscalYear, 'include_s2' => $includeS2 ? 1 : 0])"
+                :message="$gate->disclosureExportMessage()">
+                Download PDF
+            </x-plan-gated-link>
         </div>
     </div>
 

@@ -59,7 +59,12 @@
             </div>
             <div class="flex gap-2">
                 <a href="{{ route('disclosures.s1.report.preview', ['fiscal_year' => $fiscalYear]) }}" class="btn btn-secondary">Preview</a>
-                <a href="{{ route('disclosures.s1.report.pdf', ['fiscal_year' => $fiscalYear, 'include_s2' => 1]) }}" class="btn btn-primary">Download PDF</a>
+                <x-plan-gated-link
+                    :allowed="$gate->canDisclosureExportType('ifrs_s1_pdf', $fiscalYear)"
+                    :href="route('disclosures.s1.report.pdf', ['fiscal_year' => $fiscalYear, 'include_s2' => 1])"
+                    :message="$gate->disclosureExportMessage()">
+                    Download PDF
+                </x-plan-gated-link>
             </div>
         </div>
     </div>

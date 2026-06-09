@@ -105,11 +105,11 @@
                 </svg>
             </div>
             <div class="flex-1">
-                <h3 class="text-lg font-bold text-gray-900 mb-1">Upgrade to add more Scope 3 records</h3>
+                <h3 class="text-lg font-bold text-gray-900 mb-1">Category limit reached</h3>
                 <p class="text-sm text-gray-600 mb-4">
-                    Your current plan allows only <strong>{{ $scope3Limit }}</strong> record per Scope 3 form.
-                    You've already added the maximum for <strong>{{ $userFriendlyName ?? $emissionSource->name }}</strong>.
-                    Upgrade your plan to unlock unlimited Scope 3 entries.
+                    Your plan allows <strong>{{ $scope3Limit }}</strong> entry per Scope 3 category.
+                    You've reached the limit for <strong>{{ $userFriendlyName ?? $emissionSource->name }}</strong>.
+                    Upgrade to <strong>Enterprise</strong> for full Scope 3 reporting.
                 </p>
                 <a href="{{ route('subscriptions.upgrade') }}"
                    class="inline-flex items-center px-5 py-2.5 bg-purple-600 text-white text-sm font-semibold rounded-lg hover:bg-purple-700 transition-colors shadow-sm">

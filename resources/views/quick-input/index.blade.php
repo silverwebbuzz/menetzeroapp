@@ -11,11 +11,15 @@
             <h1 class="text-3xl font-bold text-gray-900">Input data</h1>
             <p class="mt-2 text-gray-600">View and manage your emission data entries.</p>
         </div>
-        <a href="{{ route('quick-input.help-guide') }}"
-           class="inline-flex items-center px-4 py-2 text-sm font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 whitespace-nowrap">
+        <x-plan-gated-link
+            :allowed="$gate->canHelpGuide()"
+            :href="route('quick-input.help-guide')"
+            :message="$gate->helpGuideMessage()"
+            class="inline-flex items-center px-4 py-2 text-sm font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 whitespace-nowrap"
+            locked-class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-lg whitespace-nowrap">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             Scope 1 &amp; 2 Help Guide
-        </a>
+        </x-plan-gated-link>
     </div>
 
     @if(session('success'))
@@ -53,6 +57,17 @@
 
     <!-- Bulk Import — Scope 1 & 2 -->
     <div id="bulk-import" class="mb-8 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-6">
+        @if(!$gate->canBulkImport())
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900 mb-2">Bulk import — Scope 1 &amp; 2</h2>
+                    <p class="text-gray-600 text-sm">Upload DEWA bills, fuel receipts, and fleet data in one Excel or CSV file. Available on <strong>Starter</strong> (AED 1,499/year) and above.</p>
+                </div>
+                <a href="{{ route('subscriptions.upgrade') }}" class="inline-flex items-center px-5 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-lg hover:bg-emerald-700 whitespace-nowrap">
+                    Upgrade to Starter
+                </a>
+            </div>
+        @else
         <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
             <div class="flex-1">
                 <h2 class="text-xl font-bold text-gray-900 mb-2">Bulk import — Scope 1 &amp; 2</h2>
@@ -106,6 +121,7 @@
                 @endif
             </div>
         </form>
+        @endif
     </div>
 
     <!-- Input Forms - Grouped by Scope -->
@@ -128,7 +144,16 @@
                     <div class="flex items-baseline gap-3 mb-3">
                         <h3 class="text-base font-bold text-gray-800">{{ $meta['title'] }}</h3>
                         <span class="text-xs text-gray-500">{{ $meta['subtitle'] }}</span>
+                        @if($scopeKey === 'Scope 3' && $gate->isScope3Locked())
+                            <span class="text-xs font-medium text-purple-700 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5">Starter+</span>
+                        @endif
                     </div>
+                    @if($scopeKey === 'Scope 3' && $gate->isScope3Locked())
+                        <div class="rounded-xl border border-purple-200 bg-purple-50 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            <p class="text-sm text-gray-700">Scope 3 covers your value chain — purchased goods, travel, commuting, and more. Unlock preview mode on <strong>Starter</strong>.</p>
+                            <a href="{{ route('subscriptions.upgrade') }}" class="inline-flex items-center px-4 py-2 bg-purple-600 text-white text-sm font-semibold rounded-lg hover:bg-purple-700 whitespace-nowrap">Unlock Scope 3</a>
+                        </div>
+                    @else
                     <div class="flex flex-wrap gap-4 pb-2">
                         @foreach($scopeSources as $source)
                             @php
@@ -214,6 +239,7 @@
                 </a>
                         @endforeach
                     </div>
+                    @endif
                 </div>
             @endif
         @endforeach
@@ -280,12 +306,17 @@
             </form>
             <div class="hidden md:flex items-end">
                 <button type="submit" form="filter-form" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 mr-2">Filter</button>
-                <a href="{{ route('quick-input.export', request()->all()) }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 flex items-center">
+                <x-plan-gated-link
+                    :allowed="$gate->canBulkExport()"
+                    :href="route('quick-input.export', request()->all())"
+                    :message="$gate->bulkExportMessage()"
+                    class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 flex items-center"
+                    locked-class="px-4 py-2 border border-gray-200 rounded-md text-gray-500 bg-gray-50 flex items-center">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                     Export CSV
-                </a>
+                </x-plan-gated-link>
             </div>
         </div>
     </div>

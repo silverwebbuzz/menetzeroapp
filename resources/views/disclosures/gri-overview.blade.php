@@ -61,8 +61,20 @@
             </div>
             <div class="flex flex-wrap gap-2">
                 <a href="{{ route('disclosures.gri.report.preview', ['fiscal_year' => $fiscalYear]) }}" class="btn btn-secondary">Preview</a>
-                <a href="{{ route('disclosures.gri.content-index', ['fiscal_year' => $fiscalYear]) }}" class="btn btn-secondary">Content Index CSV</a>
-                <a href="{{ route('disclosures.gri.report.pdf', ['fiscal_year' => $fiscalYear]) }}" class="btn btn-primary">Download PDF</a>
+                <x-plan-gated-link
+                    :allowed="$gate->canDisclosureExportType('gri_content_index', $fiscalYear)"
+                    :href="route('disclosures.gri.content-index', ['fiscal_year' => $fiscalYear])"
+                    :message="$gate->disclosureExportMessage()"
+                    class="btn btn-secondary"
+                    locked-class="btn btn-secondary">
+                    Content Index CSV
+                </x-plan-gated-link>
+                <x-plan-gated-link
+                    :allowed="$gate->canDisclosureExportType('gri_pdf', $fiscalYear)"
+                    :href="route('disclosures.gri.report.pdf', ['fiscal_year' => $fiscalYear])"
+                    :message="$gate->disclosureExportMessage()">
+                    Download PDF
+                </x-plan-gated-link>
             </div>
         </div>
     </div>
