@@ -474,91 +474,26 @@ class SubscriptionService
     }
 
     /**
-     * IFRS S2 disclosure module — Growth, Enterprise, complimentary, or ifrs_s2 feature flag.
+     * Disclosure form access — all plans with disclosures.access (Commercial Plan v1).
      */
     public function canAccessIfrsS2(int $companyId): array
     {
-        $subscription = $this->getActiveSubscription($companyId, 'client');
-
-        if (!$subscription || !$subscription->plan) {
-            return [
-                'allowed' => false,
-                'message' => 'IFRS S2 disclosures require a Growth plan or higher. Please upgrade to continue.',
-            ];
-        }
-
-        if ($this->isComplimentary($subscription)) {
-            return ['allowed' => true, 'message' => null];
-        }
-
-        $planCode = $subscription->plan->plan_code ?? '';
-
-        if (in_array($planCode, ['client_growth', 'client_enterprise'], true)) {
-            return ['allowed' => true, 'message' => null];
-        }
-
-        if ($this->checkFeatureAccess($companyId, 'ifrs_s2')) {
-            return ['allowed' => true, 'message' => null];
-        }
-
-        return [
-            'allowed' => false,
-            'message' => 'IFRS S2 climate disclosures are available on the Growth and Enterprise plans.',
-        ];
+        return app(PlanEntitlementService::class)->canAccessDisclosures($companyId);
     }
 
-    /**
-     * IFRS S1 disclosure module — Growth, Enterprise, complimentary, or ifrs_s1 feature flag.
-     */
     public function canAccessIfrsS1(int $companyId): array
     {
-        $s2 = $this->canAccessIfrsS2($companyId);
-        if ($s2['allowed']) {
-            return $s2;
-        }
-
-        if ($this->checkFeatureAccess($companyId, 'ifrs_s1')) {
-            return ['allowed' => true, 'message' => null];
-        }
-
-        return [
-            'allowed' => false,
-            'message' => 'IFRS S1 sustainability disclosures are available on the Growth and Enterprise plans.',
-        ];
+        return app(PlanEntitlementService::class)->canAccessDisclosures($companyId);
     }
 
-    /**
-     * GRI disclosure module — Growth, Enterprise, complimentary, or gri feature flag.
-     */
     public function canAccessGri(int $companyId): array
     {
-        $base = $this->canAccessIfrsS2($companyId);
-        if ($base['allowed']) {
-            return $base;
-        }
-
-        if ($this->checkFeatureAccess($companyId, 'gri')) {
-            return ['allowed' => true, 'message' => null];
-        }
-
-        return [
-            'allowed' => false,
-            'message' => 'GRI sustainability reporting is available on the Growth and Enterprise plans.',
-        ];
+        return app(PlanEntitlementService::class)->canAccessDisclosures($companyId);
     }
 
-    /**
-     * Either IFRS S1, S2, or GRI disclosure access (for shared middleware / nav).
-     */
     public function canAccessDisclosures(int $companyId): array
     {
-        foreach ([$this->canAccessIfrsS2($companyId), $this->canAccessIfrsS1($companyId), $this->canAccessGri($companyId)] as $access) {
-            if ($access['allowed']) {
-                return $access;
-            }
-        }
-
-        return $this->canAccessIfrsS2($companyId);
+        return app(PlanEntitlementService::class)->canAccessDisclosures($companyId);
     }
 
     /**
@@ -629,38 +564,13 @@ class SubscriptionService
     }
 
     /**
-     * Number of records a company may add per Scope 3 form (emission source).
+     * Records per Scope 3 form. 0 = locked, 1 = preview, -1 = unlimited.
      *
-     * Free plans (and companies without an active subscription) are limited to a
-     * single record per Scope 3 form. Any paid plan is unlimited unless the plan
-     * explicitly defines a `scope3_records_per_form` limit.
-     *
-     * @return int  The per-form limit, or -1 for unlimited.
+     * @return int
      */
     public function getScope3FormRecordLimit($companyId)
     {
-        $subscription = $this->getActiveSubscription($companyId, 'client');
-
-        // No active subscription => treat as free (most restrictive).
-        if (!$subscription || !$subscription->plan) {
-            return 1;
-        }
-
-        $plan = $subscription->plan;
-        $limits = $plan->limits ?? [];
-
-        // Explicit plan limit always wins.
-        if (is_array($limits)
-            && array_key_exists('scope3_records_per_form', $limits)
-            && $limits['scope3_records_per_form'] !== null) {
-            return (int) $limits['scope3_records_per_form'];
-        }
-
-        // Fallback: free plan (price 0 or "free" code) => 1, otherwise unlimited.
-        $isFreePlan = ((float) $plan->price_annual) <= 0
-            || stripos((string) $plan->plan_code, 'free') !== false;
-
-        return $isFreePlan ? 1 : -1;
+        return app(PlanEntitlementService::class)->getScope3RecordsPerFormLimit($companyId);
     }
 
     /**
@@ -680,10 +590,29 @@ class SubscriptionService
      */
     public function canAddScope3Record($companyId, $emissionSourceId)
     {
+        $scope3Access = app(PlanEntitlementService::class)->canAccessScope3($companyId);
+        if (!$scope3Access['allowed']) {
+            return [
+                'allowed' => false,
+                'limit' => 0,
+                'used' => 0,
+                'message' => $scope3Access['message'],
+            ];
+        }
+
         $limit = $this->getScope3FormRecordLimit($companyId);
 
         if ($limit === -1) {
             return ['allowed' => true, 'message' => null, 'limit' => -1, 'used' => 0];
+        }
+
+        if ($limit === 0) {
+            return [
+                'allowed' => false,
+                'limit' => 0,
+                'used' => 0,
+                'message' => $scope3Access['message'] ?? 'Scope 3 is not available on your plan.',
+            ];
         }
 
         $used = $this->getScope3FormRecordCount($companyId, $emissionSourceId);
@@ -693,8 +622,8 @@ class SubscriptionService
                 'allowed' => false,
                 'limit' => $limit,
                 'used' => $used,
-                'message' => "Your current plan allows only {$limit} record per Scope 3 form. "
-                    . "Please upgrade your plan to add more Scope 3 entries.",
+                'message' => "Your plan allows {$limit} entry per Scope 3 category. "
+                    . 'Upgrade to Enterprise for full Scope 3 reporting.',
             ];
         }
 

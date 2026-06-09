@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Services\SubscriptionService;
+use App\Services\PlanEntitlementService;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,7 +18,7 @@ class CheckDisclosureAccess
             abort(403, 'No active company found.');
         }
 
-        $access = app(SubscriptionService::class)->canAccessDisclosures($company->id);
+        $access = app(PlanEntitlementService::class)->canAccessDisclosures($company->id);
         if (!$access['allowed']) {
             return redirect()
                 ->route('subscriptions.upgrade')

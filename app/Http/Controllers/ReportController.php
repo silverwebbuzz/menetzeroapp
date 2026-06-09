@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Measurement;
 use App\Exports\ResultsBreakdownExport;
 use App\Services\GhgReportService;
+use App\Services\PlanEntitlementService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -90,6 +91,8 @@ class ReportController extends Controller
 
         $measurement = $this->findMeasurement($request, $company->id);
         $moccaeOnly = $request->boolean('moccae_only');
+        $this->requirePlanExport($company->id, PlanEntitlementService::EXPORT_EXCEL, (int) $measurement->fiscal_year);
+
         $report = $this->reportService->finalizeReport(
             $this->reportService->build($measurement),
             $moccaeOnly
@@ -115,6 +118,11 @@ class ReportController extends Controller
 
         $measurement = $this->findMeasurement($request, $company->id);
         $moccaeOnly = $request->boolean('moccae_only');
+        $exportCode = $moccaeOnly
+            ? PlanEntitlementService::EXPORT_MOCCAE_PDF
+            : PlanEntitlementService::EXPORT_GHG_PDF;
+        $this->requirePlanExport($company->id, $exportCode, (int) $measurement->fiscal_year);
+
         $report = $this->reportService->finalizeReport(
             $this->reportService->build($measurement),
             $moccaeOnly

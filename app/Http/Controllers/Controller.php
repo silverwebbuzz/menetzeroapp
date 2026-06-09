@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\PlanEntitlementService;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -80,5 +82,67 @@ abstract class Controller extends BaseController
         }
 
         abort(403, 'You do not have permission to perform this action.');
+    }
+
+    protected function planEntitlements(): PlanEntitlementService
+    {
+        return app(PlanEntitlementService::class);
+    }
+
+    protected function denyEntitlement(string $message): never
+    {
+        throw new HttpResponseException(
+            redirect()->route('subscriptions.upgrade')->with('error', $message)
+        );
+    }
+
+    protected function requirePlanExport(int $companyId, string $exportCode, ?int $fiscalYear = null): void
+    {
+        $check = $this->planEntitlements()->canExport($companyId, $exportCode, $fiscalYear);
+        if (!$check['allowed']) {
+            $this->denyEntitlement($check['message']);
+        }
+    }
+
+    protected function requireDisclosureExport(int $companyId, string $exportCode, ?int $fiscalYear = null): void
+    {
+        $disclosureCheck = $this->planEntitlements()->canExportDisclosures($companyId, $fiscalYear);
+        if (!$disclosureCheck['allowed']) {
+            $this->denyEntitlement($disclosureCheck['message']);
+        }
+
+        $this->requirePlanExport($companyId, $exportCode, $fiscalYear);
+    }
+
+    protected function requireBulkImport(int $companyId): void
+    {
+        $check = $this->planEntitlements()->canBulkImport($companyId);
+        if (!$check['allowed']) {
+            $this->denyEntitlement($check['message']);
+        }
+    }
+
+    protected function requireBulkExport(int $companyId): void
+    {
+        $check = $this->planEntitlements()->canBulkExport($companyId);
+        if (!$check['allowed']) {
+            $this->denyEntitlement($check['message']);
+        }
+    }
+
+    protected function requireHelpGuide(int $companyId): void
+    {
+        $check = $this->planEntitlements()->canAccessHelpGuide($companyId);
+        if (!$check['allowed']) {
+            $this->denyEntitlement($check['message']);
+        }
+    }
+
+    protected function requireScope3Access(int $companyId): void
+    {
+        $check = $this->planEntitlements()->canAccessScope3($companyId);
+        if (!$check['allowed']) {
+            $this->denyEntitlement($check['message']);
+        }
     }
 }

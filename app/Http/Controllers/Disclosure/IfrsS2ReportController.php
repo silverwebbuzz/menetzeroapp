@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Disclosure;
 
 use App\Services\IfrsS2ReportService;
+use App\Services\PlanEntitlementService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
@@ -29,6 +30,7 @@ class IfrsS2ReportController extends DisclosureBaseController
     {
         ['company' => $company, 'fiscalYear' => $fiscalYear] = $this->resolveContext($request);
         $this->requirePermission('disclosures', 'export', [['reports', 'view']]);
+        $this->requireDisclosureExport($company->id, PlanEntitlementService::EXPORT_IFRS_S2_PDF, $fiscalYear);
 
         $report = $this->reportService->build($company, $fiscalYear);
 

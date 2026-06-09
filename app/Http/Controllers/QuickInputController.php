@@ -167,6 +167,8 @@ class QuickInputController extends Controller
             abort(403, 'No active company found.');
         }
 
+        $this->requireHelpGuide($company->id);
+
         $intro = \App\Data\Scope12HelpGuide::intro();
         $categories = \App\Data\Scope12HelpGuide::categories();
         $columns = \App\Data\Scope12HelpGuide::columnHelp();
@@ -198,6 +200,10 @@ class QuickInputController extends Controller
             ->where('scope', 'Scope ' . $scope)
             ->where('is_quick_input', true)
             ->firstOrFail();
+
+        if ($emissionSource->scope === 'Scope 3') {
+            $this->requireScope3Access($company->id);
+        }
 
         // Get form fields
         $formFields = $this->formBuilder->buildForm($emissionSource->id);
@@ -1099,6 +1105,8 @@ class QuickInputController extends Controller
         if (!$company) {
             abort(403, 'No active company found.');
         }
+
+        $this->requireBulkExport($company->id);
 
         // Get entries with same filters as index
         $query = MeasurementData::with(['measurement.location', 'emissionSource'])

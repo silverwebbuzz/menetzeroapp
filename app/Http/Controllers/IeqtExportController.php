@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\IeqtExportService;
+use App\Services\PlanEntitlementService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -27,7 +28,10 @@ class IeqtExportController extends Controller
         ]);
 
         $location = $company->locations()->where('id', $request->location_id)->firstOrFail();
+        $fiscalYear = (int) $request->fiscal_year;
 
-        return $this->exportService->downloadCsv($company, $location->id, (int) $request->fiscal_year);
+        $this->requirePlanExport($company->id, PlanEntitlementService::EXPORT_IEQT, $fiscalYear);
+
+        return $this->exportService->downloadCsv($company, $location->id, $fiscalYear);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Disclosure;
 
 use App\Services\GriContentIndexService;
 use App\Services\GriReportService;
+use App\Services\PlanEntitlementService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
@@ -30,6 +31,7 @@ class GriReportController extends DisclosureBaseController
     {
         ['company' => $company, 'fiscalYear' => $fiscalYear] = $this->resolveContext($request);
         $this->requirePermission('disclosures', 'export', [['reports', 'view']]);
+        $this->requireDisclosureExport($company->id, PlanEntitlementService::EXPORT_GRI_PDF, $fiscalYear);
 
         $report = $this->reportService->build($company, $fiscalYear);
 
@@ -52,6 +54,7 @@ class GriReportController extends DisclosureBaseController
     {
         ['company' => $company, 'fiscalYear' => $fiscalYear] = $this->resolveContext($request);
         $this->requirePermission('disclosures', 'export', [['reports', 'view']]);
+        $this->requireDisclosureExport($company->id, PlanEntitlementService::EXPORT_GRI_CONTENT_INDEX, $fiscalYear);
 
         $csv = $this->contentIndexService->toCsv($company, $fiscalYear);
         $filename = 'gri-content-index-' . $fiscalYear . '.csv';

@@ -30,6 +30,8 @@ class Scope12BulkImportController extends Controller
             abort(403, 'No active company found.');
         }
 
+        $this->requireBulkImport($company->id);
+
         $format = strtolower($request->query('format', 'xlsx'));
         $variant = strtolower($request->query('variant', 'workbook'));
 
@@ -99,6 +101,8 @@ class Scope12BulkImportController extends Controller
         if (!$company) {
             abort(403, 'No active company found.');
         }
+
+        $this->requireBulkImport($company->id);
 
         $request->validate([
             'import_file' => 'required|file|mimes:csv,txt,xlsx,xls|max:5120',
