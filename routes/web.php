@@ -123,7 +123,7 @@ Route::middleware(['auth:web'])->group(function () {
 // Profile Routes - Separate for Client and Partner
 
 // Client Routes - Use web guard (default)
-Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client'])->group(function () {
+Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client', 'ensureOnboardingComplete'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('client.dashboard');
     
     // Profile routes

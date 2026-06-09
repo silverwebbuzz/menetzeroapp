@@ -45,7 +45,8 @@ class OAuthController extends Controller
                     return redirect()->route('account.selector');
                 }
                 
-                return redirect()->route('client.dashboard');
+                return redirect()->route('client.dashboard')
+                    ->with('info', 'Welcome back. Complete your business profile and location if you have not already.');
             }
             
             // Check if user exists with this email
@@ -66,7 +67,8 @@ class OAuthController extends Controller
                     return redirect()->route('account.selector');
                 }
                 
-                return redirect()->route('client.dashboard');
+                return redirect()->route('client.dashboard')
+                    ->with('info', 'Google account linked. Complete your business profile and location if you have not already.');
             }
             
             // Create new client user
@@ -93,7 +95,7 @@ class OAuthController extends Controller
             Auth::guard('web')->login($newUser, true);
             
             return redirect()->route('client.dashboard')
-                ->with('success', 'Account created successfully! Please complete your business profile to get started.');
+                ->with('success', 'Account created! Complete your business profile and add a location before entering emission data.');
             
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
             // Network/connection error

@@ -9,10 +9,14 @@ use App\Models\Facility;
 use App\Models\Measurement;
 use App\Models\MasterIndustryCategory;
 use App\Services\GhgReportService;
+use App\Services\OnboardingService;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
+    public function __construct(protected OnboardingService $onboarding)
+    {
+    }
 
     public function index()
     {
@@ -138,10 +142,9 @@ class DashboardController extends Controller
         $isOwner = $user->ownsCompany() && $user->getOwnedCompany()?->id === $company->id;
         
         if ($isOwner) {
-            // Only check if company name is missing or very basic - other fields are optional
-            // Also check if company name is just a placeholder or empty string
-            $companyName = trim($company->name ?? '');
-            if (empty($companyName) || $companyName === 'New Company' || $companyName === '') {
+            $onboardingStep = $this->onboarding->currentStep($user);
+
+            if ($onboardingStep === 'business') {
                 $sectors = MasterIndustryCategory::getSectors();
                 return view('dashboard.index', [
                     'needsCompanySetup' => true,
@@ -177,6 +180,11 @@ class DashboardController extends Controller
                     'topSources' => collect([]),
                     'recentActivity' => collect([])
                 ]);
+            }
+
+            if ($onboardingStep === 'location') {
+                return redirect()->route('locations.create', ['onboarding' => 1])
+                    ->with('info', 'Add at least one business location before entering emission data.');
             }
         }
         // If user is staff, skip company setup check - they don't need to add company info

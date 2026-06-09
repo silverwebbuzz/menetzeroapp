@@ -26,9 +26,9 @@ class CompanySetupController extends Controller
             'business_email' => 'nullable|email|max:255',
             'business_website' => 'nullable|url|max:255',
             'business_address' => 'nullable|string|max:500',
-            'country' => 'nullable|string|max:100',
-            'sector' => 'nullable|string|max:255',
-            'industry' => 'nullable|string|max:255',
+            'country' => 'required|string|max:100',
+            'sector' => 'required|string|max:255',
+            'industry' => 'required|string|max:255',
             'business_subcategory' => 'nullable|string|max:255',
             'business_description' => 'nullable|string|max:1000',
         ]);
@@ -327,7 +327,8 @@ class CompanySetupController extends Controller
             }
         }
 
-        return redirect()->route('client.dashboard')->with('success', 'Business profile completed successfully!');
+        return redirect()->route('locations.create', ['onboarding' => 1])
+            ->with('success', 'Business profile saved. Add your first business location to continue.');
     }
 
 }

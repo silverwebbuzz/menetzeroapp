@@ -136,6 +136,11 @@ class LocationController extends Controller
             'is_active' => true,
         ]);
 
+        if ($isFirstLocation || $request->boolean('onboarding')) {
+            return redirect()->route('client.dashboard')
+                ->with('success', 'Location added. You can now start entering emission data.');
+        }
+
         return redirect()->route('locations.index')->with('success', 'Location created successfully!');
     }
 
@@ -242,6 +247,12 @@ class LocationController extends Controller
                 }
                 // Clear session after final step
                 session()->forget('location_id');
+
+                if ($request->boolean('onboarding') || $company->locations()->where('is_active', true)->count() === 1) {
+                    return redirect()->route('client.dashboard')
+                        ->with('success', 'Location added. You can now start entering emission data.');
+                }
+
                 return redirect()->route('locations.index')->with('success', 'Location created successfully!');
         }
 

@@ -8,6 +8,29 @@
 @endpush
 
 @section('content')
+@if(request('onboarding') || (isset($company) && $company->locations()->where('is_active', true)->count() === 0))
+    <div class="max-w-4xl mx-auto mb-6">
+        <div class="bg-amber-50 border border-amber-200 text-amber-900 px-4 py-3 rounded-lg">
+            <p class="font-medium">Complete your setup</p>
+            <p class="text-sm mt-1">Add your first business location. You cannot enter emission data until this step is finished.</p>
+        </div>
+    </div>
+@endif
+
+@if(session('success') || session('info') || session('error'))
+    <div class="max-w-4xl mx-auto mb-6">
+        @if(session('success'))
+            <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">{{ session('success') }}</div>
+        @endif
+        @if(session('info'))
+            <div class="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg">{{ session('info') }}</div>
+        @endif
+        @if(session('error'))
+            <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">{{ session('error') }}</div>
+        @endif
+    </div>
+@endif
+
 <style>
     .step-indicator { 
         display: flex; 
