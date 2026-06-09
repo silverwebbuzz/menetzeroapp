@@ -9,21 +9,23 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('company_reporting_settings', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('company_id')->constrained()->cascadeOnDelete();
-            $table->unsignedSmallInteger('fiscal_year')->nullable();
-            $table->string('organisational_boundary', 20)->default('operational_control');
-            $table->string('consolidation_approach', 20)->default('operational_control');
-            $table->unsignedSmallInteger('base_year')->nullable();
-            $table->text('base_year_rationale')->nullable();
-            $table->text('recalculation_policy')->nullable();
-            $table->string('gwp_version', 10)->default('AR6');
-            $table->json('scope3_category_policy')->nullable();
-            $table->timestamps();
+        if (!Schema::hasTable('company_reporting_settings')) {
+            Schema::create('company_reporting_settings', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('company_id')->constrained()->cascadeOnDelete();
+                $table->unsignedSmallInteger('fiscal_year')->nullable();
+                $table->string('organisational_boundary', 20)->default('operational_control');
+                $table->string('consolidation_approach', 20)->default('operational_control');
+                $table->unsignedSmallInteger('base_year')->nullable();
+                $table->text('base_year_rationale')->nullable();
+                $table->text('recalculation_policy')->nullable();
+                $table->string('gwp_version', 10)->default('AR6');
+                $table->json('scope3_category_policy')->nullable();
+                $table->timestamps();
 
-            $table->unique(['company_id', 'fiscal_year']);
-        });
+                $table->unique(['company_id', 'fiscal_year']);
+            });
+        }
 
         if (Schema::hasTable('measurement_data')) {
             Schema::table('measurement_data', function (Blueprint $table) {
@@ -111,6 +113,12 @@ return new class extends Migration
             ],
         ];
 
+        // Production DB imports often use explicit IDs without AUTO_INCREMENT on this table.
+        $nextId = ((int) DB::table('emission_source_form_fields')->max('id')) + 1;
+        if ($nextId < 1) {
+            $nextId = 1;
+        }
+
         foreach ($fields as $field) {
             $exists = DB::table('emission_source_form_fields')
                 ->where('emission_source_id', $sourceId)
@@ -122,6 +130,7 @@ return new class extends Migration
             }
 
             DB::table('emission_source_form_fields')->insert(array_merge($field, [
+                'id' => $nextId++,
                 'emission_source_id' => $sourceId,
                 'created_at' => now(),
                 'updated_at' => now(),
