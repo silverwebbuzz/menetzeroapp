@@ -452,6 +452,40 @@
         </div>
     </section>
 
+    <!-- Consultant Partner Programme -->
+    <section class="py-20 px-4 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <span class="inline-block px-3 py-1 rounded-full bg-teal-500/20 text-teal-300 text-xs font-semibold mb-4">For sustainability professionals</span>
+                    <h2 class="text-4xl font-bold mb-4">Are you a carbon consultant in the UAE?</h2>
+                    <p class="text-lg text-slate-300 mb-6">
+                        Join the MENetZero verified partner directory. Our platform prepares SME inventories and disclosures —
+                        you review, sign off, and deliver the human trust layer clients expect.
+                    </p>
+                    <ul class="space-y-3 text-slate-300 mb-8">
+                        <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> Free listing for vetted partners at launch</li>
+                        <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> Qualified leads from Starter &amp; Growth subscribers</li>
+                        <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> Marketplace payouts via platform escrow (coming soon)</li>
+                    </ul>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="{{ route('consultant.register') }}" class="btn btn-primary">Apply as a partner</a>
+                        <a href="{{ route('consultant.landing') }}" class="btn btn-outline" style="color: white; border-color: rgba(255,255,255,0.4);">Learn more</a>
+                    </div>
+                </div>
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-8">
+                    <h3 class="text-xl font-semibold mb-4">How it works</h3>
+                    <ol class="space-y-4 text-slate-300 text-sm">
+                        <li class="flex gap-3"><span class="flex-shrink-0 w-8 h-8 rounded-full bg-teal-500/30 flex items-center justify-center font-bold text-teal-300">1</span><span><strong class="text-white">Register</strong> at app.menetzero.com/consultant with your practice details</span></li>
+                        <li class="flex gap-3"><span class="flex-shrink-0 w-8 h-8 rounded-full bg-teal-500/30 flex items-center justify-center font-bold text-teal-300">2</span><span><strong class="text-white">Upload</strong> trade license and CV for admin verification</span></li>
+                        <li class="flex gap-3"><span class="flex-shrink-0 w-8 h-8 rounded-full bg-teal-500/30 flex items-center justify-center font-bold text-teal-300">3</span><span><strong class="text-white">Get listed</strong> and receive client introduction requests</span></li>
+                        <li class="flex gap-3"><span class="flex-shrink-0 w-8 h-8 rounded-full bg-teal-500/30 flex items-center justify-center font-bold text-teal-300">4</span><span><strong class="text-white">Deliver</strong> review packs — paid engagements via MenetZero escrow</span></li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Enterprise Security Section -->
     <section class="py-20 px-4 section-bg">
         <div class="max-w-6xl mx-auto">
@@ -503,6 +537,7 @@
             <p class="text-gray-400 mb-6">Comprehensive carbon emissions tracking for businesses in the Middle East</p>
             <div class="flex flex-wrap justify-center gap-x-6 gap-y-3 mb-6">
                 <a href="{{ route('pricing') }}" class="text-gray-400 hover:text-white transition-colors">Pricing</a>
+                <a href="{{ route('consultant.landing') }}" class="text-gray-400 hover:text-white transition-colors">Join as consultant</a>
                 <a href="{{ route('contact') }}" class="text-gray-400 hover:text-white transition-colors">Contact Us</a>
                 <a href="{{ route('terms') }}" class="text-gray-400 hover:text-white transition-colors">Terms &amp; Conditions</a>
                 <a href="{{ route('refunds') }}" class="text-gray-400 hover:text-white transition-colors">Refunds &amp; Cancellations</a>

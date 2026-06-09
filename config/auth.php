@@ -44,6 +44,10 @@ return [
             'driver' => 'session',
             'provider' => 'admins',
         ],
+        'consultant' => [
+            'driver' => 'session',
+            'provider' => 'consultants',
+        ],
     ],
 
     /*
@@ -72,6 +76,11 @@ return [
         'admins' => [
             'driver' => 'eloquent',
             'model' => App\Models\Admin::class,
+        ],
+
+        'consultants' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Consultant::class,
         ],
 
         // 'users' => [
@@ -109,6 +118,12 @@ return [
         'admins' => [
             'provider' => 'admins',
             'table' => 'admin_password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'consultants' => [
+            'provider' => 'consultants',
+            'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
         ],

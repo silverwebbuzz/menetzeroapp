@@ -22,6 +22,7 @@
                 </a>
                 <div class="flex items-center gap-3 sm:gap-5 text-sm">
                     <a href="{{ route('pricing') }}" class="text-gray-600 hover:text-teal-600">Pricing</a>
+                    <a href="{{ route('consultant.landing') }}" class="hidden sm:inline text-gray-600 hover:text-teal-600">For consultants</a>
                     <a href="{{ route('contact') }}" class="hidden sm:inline text-gray-600 hover:text-teal-600">Contact</a>
                     <span class="hidden sm:inline-flex items-center rounded-lg border border-gray-200 overflow-hidden">
                         <a href="{{ route('currency.switch', 'AED') }}" class="px-2.5 py-1 {{ $cur === 'AED' ? 'bg-teal-600 text-white' : 'text-gray-600' }}">AED</a>
@@ -50,6 +51,7 @@
                     <div class="font-semibold text-white mb-3">Product</div>
                     <ul class="space-y-2">
                         <li><a href="{{ route('pricing') }}" class="hover:text-white">Pricing</a></li>
+                        <li><a href="{{ route('consultant.landing') }}" class="hover:text-white">Join as consultant</a></li>
                         <li><a href="{{ route('register') }}" class="hover:text-white">Sign Up</a></li>
                         <li><a href="{{ route('login') }}" class="hover:text-white">Login</a></li>
                     </ul>

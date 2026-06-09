@@ -325,6 +325,10 @@
                 {!! $svg('card') !!}
                 Plan &amp; billing
             </a>
+            <a href="{{ route('client.consultants.index') }}" class="nav-link {{ request()->routeIs('client.consultants.*') ? 'active' : '' }}">
+                {!! $svg('users') !!}
+                Consultants
+            </a>
         @endif
     </div>
 @endif

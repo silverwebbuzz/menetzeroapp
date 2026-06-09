@@ -25,6 +25,27 @@ Route::get('/refunds', [\App\Http\Controllers\PageController::class, 'show'])->d
 Route::get('/privacy', [\App\Http\Controllers\PageController::class, 'show'])->defaults('slug', 'privacy')->name('privacy');
 Route::get('/currency/{code}', [\App\Http\Controllers\PageController::class, 'switchCurrency'])->name('currency.switch');
 
+// Consultant partner portal (separate auth guard)
+Route::prefix('consultant')->name('consultant.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Consultant\AuthController::class, 'landing'])->name('landing');
+    Route::get('/register', [\App\Http\Controllers\Consultant\AuthController::class, 'showRegister'])->name('register');
+    Route::post('/register', [\App\Http\Controllers\Consultant\AuthController::class, 'register'])->name('register.post');
+    Route::get('/login', [\App\Http\Controllers\Consultant\AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [\App\Http\Controllers\Consultant\AuthController::class, 'login'])->name('login.post');
+    Route::post('/logout', [\App\Http\Controllers\Consultant\AuthController::class, 'logout'])->name('logout');
+
+    Route::middleware(['ensureConsultant'])->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\Consultant\DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/profile', [\App\Http\Controllers\Consultant\ProfileController::class, 'edit'])->name('profile.edit');
+        Route::put('/profile', [\App\Http\Controllers\Consultant\ProfileController::class, 'update'])->name('profile.update');
+        Route::post('/profile/submit', [\App\Http\Controllers\Consultant\ProfileController::class, 'submitForReview'])->name('profile.submit');
+        Route::get('/documents', [\App\Http\Controllers\Consultant\DocumentController::class, 'index'])->name('documents.index');
+        Route::post('/documents', [\App\Http\Controllers\Consultant\DocumentController::class, 'store'])->name('documents.store');
+        Route::delete('/documents/{document}', [\App\Http\Controllers\Consultant\DocumentController::class, 'destroy'])->name('documents.destroy');
+        Route::get('/intro-requests', [\App\Http\Controllers\Consultant\IntroRequestController::class, 'index'])->name('intro-requests.index');
+    });
+});
+
 // Authentication routes - Client
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
@@ -294,6 +315,13 @@ Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client', 'e
         Route::delete('/billing-methods/{billingMethod}', [\App\Http\Controllers\Client\SubscriptionController::class, 'destroyBillingMethod'])->name('billing-methods.destroy');
         Route::post('/billing-methods/{billingMethod}/set-default', [\App\Http\Controllers\Client\SubscriptionController::class, 'setDefaultBillingMethod'])->name('billing-methods.set-default');
     });
+
+    // Consultant directory (plan-gated visibility)
+    Route::prefix('consultants')->name('consultants.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Client\ConsultantDirectoryController::class, 'index'])->name('index');
+        Route::get('/{consultant}', [\App\Http\Controllers\Client\ConsultantDirectoryController::class, 'show'])->name('show');
+        Route::post('/{consultant}/intro', [\App\Http\Controllers\Client\ConsultantDirectoryController::class, 'requestIntro'])->name('intro');
+    });
     
 });
 
@@ -436,6 +464,21 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
         Route::get('/subscription-plans/{id}/entitlements', [\App\Http\Controllers\Admin\PlanEntitlementController::class, 'edit'])->name('subscription-plans.entitlements');
         Route::put('/subscription-plans/{id}/entitlements', [\App\Http\Controllers\Admin\PlanEntitlementController::class, 'update'])->name('subscription-plans.entitlements.update');
         Route::post('/subscription-plans/{id}/entitlements/reset', [\App\Http\Controllers\Admin\PlanEntitlementController::class, 'resetDefaults'])->name('subscription-plans.entitlements.reset');
+
+        // Consultant directory (Phase A) + marketplace orders stub (C10)
+        Route::prefix('consultants')->name('consultants.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\ConsultantController::class, 'index'])->name('index');
+            Route::get('/intro-requests', [\App\Http\Controllers\Admin\ConsultantIntroRequestController::class, 'index'])->name('intro-requests');
+            Route::put('/intro-requests/{introRequest}', [\App\Http\Controllers\Admin\ConsultantIntroRequestController::class, 'update'])->name('intro-requests.update');
+            Route::get('/orders', [\App\Http\Controllers\Admin\ConsultantOrderController::class, 'index'])->name('orders');
+            Route::get('/{consultant}', [\App\Http\Controllers\Admin\ConsultantController::class, 'show'])->name('show');
+            Route::post('/{consultant}/approve', [\App\Http\Controllers\Admin\ConsultantController::class, 'approve'])->name('approve');
+            Route::post('/{consultant}/reject', [\App\Http\Controllers\Admin\ConsultantController::class, 'reject'])->name('reject');
+            Route::post('/{consultant}/suspend', [\App\Http\Controllers\Admin\ConsultantController::class, 'suspend'])->name('suspend');
+            Route::post('/{consultant}/featured', [\App\Http\Controllers\Admin\ConsultantController::class, 'toggleFeatured'])->name('featured');
+            Route::put('/{consultant}/notes', [\App\Http\Controllers\Admin\ConsultantController::class, 'updateNotes'])->name('notes');
+            Route::get('/{consultant}/documents/{documentId}/download', [\App\Http\Controllers\Admin\ConsultantController::class, 'downloadDocument'])->name('documents.download');
+        });
         
         // Pricing Page Content Management (comparison table + Scope 3 add-ons)
         Route::prefix('pricing')->name('pricing.')->group(function () {

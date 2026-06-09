@@ -201,18 +201,19 @@
         </div>
     </div>
 
-    {{-- Consultant marketplace teaser --}}
+    {{-- Consultant marketplace --}}
     <div class="bg-gradient-to-r from-slate-50 to-gray-100 border border-gray-200 rounded-xl p-6 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
             <h3 class="text-lg font-semibold text-gray-900">Consultant marketplace</h3>
             <p class="text-sm text-gray-600 mt-1">
                 Your plan: <strong>{{ $consultantDirectoryLabel }}</strong>.
-                Verified UAE partners for review and sign-off (coming soon).
+                Verified UAE partners for review and sign-off on your reports.
             </p>
         </div>
-        <span class="inline-flex px-4 py-2 bg-white border border-gray-300 text-gray-500 text-sm font-medium rounded-lg cursor-not-allowed">
-            Browse partners — soon
-        </span>
+        <a href="{{ route('client.consultants.index') }}"
+           class="inline-flex px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium rounded-lg">
+            Browse partners
+        </a>
     </div>
 
     {{-- Payment history & billing methods (tabs) --}}

@@ -40,6 +40,11 @@ class PlanGate
         return $this->companyId !== null;
     }
 
+    public function companyId(): ?int
+    {
+        return $this->companyId;
+    }
+
     public function isScope3Locked(): bool
     {
         if (!$this->companyId) {

@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \App\Http\Middleware\CheckPermission::class,
             'ensureOnboardingComplete' => \App\Http\Middleware\EnsureOnboardingComplete::class,
             'disclosureAccess' => \App\Http\Middleware\CheckDisclosureAccess::class,
+            'ensureConsultant' => \App\Http\Middleware\EnsureConsultant::class,
         ]);
 
         // Payment gateway webhooks are authenticated by signature, not CSRF.
