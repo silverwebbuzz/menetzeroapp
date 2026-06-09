@@ -17,7 +17,7 @@
             <p class="card-subtitle">Climate-related opportunities for {{ $fiscalYear }}.</p>
         </div>
         <div class="card-body">
-            <form method="POST" action="{{ route('disclosures.climate-opportunities.store', ['fiscal_year' => $fiscalYear]) }}" class="space-y-4">
+            <form method="POST" action="{{ route('disclosures.s2.climate-opportunities.store', ['fiscal_year' => $fiscalYear]) }}" class="space-y-4">
                 @csrf
                 <input type="hidden" name="fiscal_year" value="{{ $fiscalYear }}">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -60,7 +60,7 @@
                             <span class="text-xs text-gray-500 ml-2">{{ $opp->category }}</span>
                         @endif
                     </summary>
-                    <form method="POST" action="{{ route('disclosures.climate-opportunities.update', ['climateOpportunity' => $opp, 'fiscal_year' => $fiscalYear]) }}" class="mt-4 space-y-3">
+                    <form method="POST" action="{{ route('disclosures.s2.climate-opportunities.update', ['climateOpportunity' => $opp, 'fiscal_year' => $fiscalYear]) }}" class="mt-4 space-y-3">
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="fiscal_year" value="{{ $fiscalYear }}">
@@ -73,7 +73,7 @@
                         <textarea name="actions" rows="2" class="w-full border border-gray-300 rounded-lg px-3 py-2" placeholder="Actions">{{ $opp->actions }}</textarea>
                         <button type="submit" class="btn btn-secondary btn-sm">Update</button>
                     </form>
-                    <form method="POST" action="{{ route('disclosures.climate-opportunities.destroy', ['climateOpportunity' => $opp, 'fiscal_year' => $fiscalYear]) }}" class="mt-2" onsubmit="return confirm('Remove this opportunity?')">
+                    <form method="POST" action="{{ route('disclosures.s2.climate-opportunities.destroy', ['climateOpportunity' => $opp, 'fiscal_year' => $fiscalYear]) }}" class="mt-2" onsubmit="return confirm('Remove this opportunity?')">
                         @csrf
                         @method('DELETE')
                         <input type="hidden" name="fiscal_year" value="{{ $fiscalYear }}">

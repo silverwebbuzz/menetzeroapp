@@ -11,7 +11,7 @@ class ClimateOpportunityController extends DisclosureBaseController
     {
         ['company' => $company, 'fiscalYear' => $fiscalYear] = $this->resolveContext($request);
 
-        return view('disclosures.climate-opportunities.index', [
+        return view('disclosures.s2.climate-opportunities.index', [
             'company' => $company,
             'fiscalYear' => $fiscalYear,
             'opportunities' => ClimateOpportunity::where('company_id', $company->id)
@@ -38,7 +38,7 @@ class ClimateOpportunityController extends DisclosureBaseController
             'fiscal_year' => $fiscalYear,
         ]));
 
-        return $this->fiscalRedirect('disclosures.climate-opportunities.index', $fiscalYear, 'Opportunity added.');
+        return $this->fiscalRedirect('disclosures.s2.climate-opportunities.index', $fiscalYear, 'Opportunity added.');
     }
 
     public function update(Request $request, ClimateOpportunity $climateOpportunity)
@@ -56,7 +56,7 @@ class ClimateOpportunityController extends DisclosureBaseController
 
         $climateOpportunity->update($validated);
 
-        return $this->fiscalRedirect('disclosures.climate-opportunities.index', $fiscalYear, 'Opportunity updated.');
+        return $this->fiscalRedirect('disclosures.s2.climate-opportunities.index', $fiscalYear, 'Opportunity updated.');
     }
 
     public function destroy(Request $request, ClimateOpportunity $climateOpportunity)
@@ -66,7 +66,7 @@ class ClimateOpportunityController extends DisclosureBaseController
 
         $climateOpportunity->delete();
 
-        return $this->fiscalRedirect('disclosures.climate-opportunities.index', $fiscalYear, 'Opportunity removed.');
+        return $this->fiscalRedirect('disclosures.s2.climate-opportunities.index', $fiscalYear, 'Opportunity removed.');
     }
 
     protected function assertOwned(ClimateOpportunity $item, int $companyId, int $fiscalYear): void

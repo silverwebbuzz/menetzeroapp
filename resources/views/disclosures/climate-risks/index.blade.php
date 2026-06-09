@@ -17,7 +17,7 @@
             <p class="card-subtitle">Physical and transition risks for {{ $fiscalYear }} (IFRS S2 §10).</p>
         </div>
         <div class="card-body">
-            <form method="POST" action="{{ route('disclosures.climate-risks.store', ['fiscal_year' => $fiscalYear]) }}" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <form method="POST" action="{{ route('disclosures.s2.climate-risks.store', ['fiscal_year' => $fiscalYear]) }}" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 @csrf
                 <input type="hidden" name="fiscal_year" value="{{ $fiscalYear }}">
                 <div class="md:col-span-2">
@@ -83,7 +83,7 @@
                         <span>{{ $risk->name }}</span>
                         <span class="text-xs text-gray-500">{{ ucfirst($risk->risk_type) }} · {{ \App\Models\ClimateRisk::HORIZONS[$risk->time_horizon] ?? $risk->time_horizon }}</span>
                     </summary>
-                    <form method="POST" action="{{ route('disclosures.climate-risks.update', ['climateRisk' => $risk, 'fiscal_year' => $fiscalYear]) }}" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <form method="POST" action="{{ route('disclosures.s2.climate-risks.update', ['climateRisk' => $risk, 'fiscal_year' => $fiscalYear]) }}" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="fiscal_year" value="{{ $fiscalYear }}">
@@ -107,7 +107,7 @@
                             <button type="submit" class="btn btn-secondary btn-sm">Update</button>
                         </div>
                     </form>
-                    <form method="POST" action="{{ route('disclosures.climate-risks.destroy', ['climateRisk' => $risk, 'fiscal_year' => $fiscalYear]) }}" class="mt-2" onsubmit="return confirm('Remove this risk?')">
+                    <form method="POST" action="{{ route('disclosures.s2.climate-risks.destroy', ['climateRisk' => $risk, 'fiscal_year' => $fiscalYear]) }}" class="mt-2" onsubmit="return confirm('Remove this risk?')">
                         @csrf
                         @method('DELETE')
                         <input type="hidden" name="fiscal_year" value="{{ $fiscalYear }}">

@@ -5,7 +5,7 @@
 
 @section('content')
 <div class="max-w-5xl mx-auto">
-    @include('disclosures.partials.header')
+    @include('disclosures.partials.header', ['framework' => 'ifrs_s2'])
 
     @if(session('success'))
         <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6">{{ session('success') }}</div>
@@ -31,12 +31,12 @@
                 @foreach($completeness['items'] as $key => $item)
                     @php
                         $routes = [
-                            'governance' => route('disclosures.sections.edit', ['fiscal_year' => $fiscalYear, 'section' => 'governance']),
-                            'strategy' => route('disclosures.sections.edit', ['fiscal_year' => $fiscalYear, 'section' => 'strategy']),
-                            'risk_management' => route('disclosures.sections.edit', ['fiscal_year' => $fiscalYear, 'section' => 'risk_management']),
-                            'climate_risks' => route('disclosures.climate-risks.index', ['fiscal_year' => $fiscalYear]),
-                            'climate_opportunities' => route('disclosures.climate-opportunities.index', ['fiscal_year' => $fiscalYear]),
-                            'reduction_targets' => route('disclosures.targets.index', ['fiscal_year' => $fiscalYear]),
+                            'governance' => route('disclosures.s2.sections.edit', ['fiscal_year' => $fiscalYear, 'section' => 'governance']),
+                            'strategy' => route('disclosures.s2.sections.edit', ['fiscal_year' => $fiscalYear, 'section' => 'strategy']),
+                            'risk_management' => route('disclosures.s2.sections.edit', ['fiscal_year' => $fiscalYear, 'section' => 'risk_management']),
+                            'climate_risks' => route('disclosures.s2.climate-risks.index', ['fiscal_year' => $fiscalYear]),
+                            'climate_opportunities' => route('disclosures.s2.climate-opportunities.index', ['fiscal_year' => $fiscalYear]),
+                            'reduction_targets' => route('disclosures.s2.targets.index', ['fiscal_year' => $fiscalYear]),
                         ];
                     @endphp
                     <a href="{{ $routes[$key] ?? '#' }}" class="flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:border-brand-200 hover:bg-brand-50/30 transition">
@@ -67,8 +67,8 @@
                 <p class="text-sm text-gray-500">Preview or download your IFRS S2 climate report for {{ $fiscalYear }}.</p>
             </div>
             <div class="flex gap-2">
-                <a href="{{ route('disclosures.report.preview', ['fiscal_year' => $fiscalYear]) }}" class="btn btn-secondary">Preview</a>
-                <a href="{{ route('disclosures.report.pdf', ['fiscal_year' => $fiscalYear]) }}" class="btn btn-primary">Download PDF</a>
+                <a href="{{ route('disclosures.s2.report.preview', ['fiscal_year' => $fiscalYear]) }}" class="btn btn-secondary">Preview</a>
+                <a href="{{ route('disclosures.s2.report.pdf', ['fiscal_year' => $fiscalYear]) }}" class="btn btn-primary">Download PDF</a>
             </div>
         </div>
     </div>

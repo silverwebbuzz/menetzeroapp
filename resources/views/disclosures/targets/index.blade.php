@@ -17,10 +17,10 @@
             <p class="card-subtitle">IFRS S2 §33–36 — targets and transition actions.</p>
         </div>
         <div class="card-body">
-            <form method="POST" action="{{ route('disclosures.targets.store', ['fiscal_year' => $fiscalYear]) }}" class="space-y-4">
+            <form method="POST" action="{{ route('disclosures.s2.targets.store', ['fiscal_year' => $fiscalYear]) }}" class="space-y-4">
                 @csrf
                 <input type="hidden" name="fiscal_year" value="{{ $fiscalYear }}">
-                @include('disclosures.targets._form', ['target' => null, 'prefix' => 'new'])
+                @include('disclosures.s2.targets._form', ['target' => null, 'prefix' => 'new'])
                 <button type="submit" class="btn btn-primary">Save target</button>
             </form>
         </div>
@@ -37,14 +37,14 @@
                         <span>{{ $target->name }}</span>
                         <span class="text-xs text-gray-500">{{ $target->target_year }} · {{ \App\Models\ReductionTarget::SCOPE_COVERAGE[$target->scope_coverage] ?? $target->scope_coverage }}</span>
                     </summary>
-                    <form method="POST" action="{{ route('disclosures.targets.update', ['reductionTarget' => $target, 'fiscal_year' => $fiscalYear]) }}" class="mt-4 space-y-4">
+                    <form method="POST" action="{{ route('disclosures.s2.targets.update', ['reductionTarget' => $target, 'fiscal_year' => $fiscalYear]) }}" class="mt-4 space-y-4">
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="fiscal_year" value="{{ $fiscalYear }}">
-                        @include('disclosures.targets._form', ['target' => $target, 'prefix' => 'edit-' . $target->id])
+                        @include('disclosures.s2.targets._form', ['target' => $target, 'prefix' => 'edit-' . $target->id])
                         <button type="submit" class="btn btn-secondary btn-sm">Update target</button>
                     </form>
-                    <form method="POST" action="{{ route('disclosures.targets.destroy', ['reductionTarget' => $target, 'fiscal_year' => $fiscalYear]) }}" class="mt-2" onsubmit="return confirm('Remove this target and its actions?')">
+                    <form method="POST" action="{{ route('disclosures.s2.targets.destroy', ['reductionTarget' => $target, 'fiscal_year' => $fiscalYear]) }}" class="mt-2" onsubmit="return confirm('Remove this target and its actions?')">
                         @csrf
                         @method('DELETE')
                         <input type="hidden" name="fiscal_year" value="{{ $fiscalYear }}">

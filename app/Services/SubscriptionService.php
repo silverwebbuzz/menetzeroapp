@@ -508,6 +508,39 @@ class SubscriptionService
     }
 
     /**
+     * IFRS S1 disclosure module — Growth, Enterprise, complimentary, or ifrs_s1 feature flag.
+     */
+    public function canAccessIfrsS1(int $companyId): array
+    {
+        $s2 = $this->canAccessIfrsS2($companyId);
+        if ($s2['allowed']) {
+            return $s2;
+        }
+
+        if ($this->checkFeatureAccess($companyId, 'ifrs_s1')) {
+            return ['allowed' => true, 'message' => null];
+        }
+
+        return [
+            'allowed' => false,
+            'message' => 'IFRS S1 sustainability disclosures are available on the Growth and Enterprise plans.',
+        ];
+    }
+
+    /**
+     * Either IFRS S1 or S2 disclosure access (for shared middleware / nav).
+     */
+    public function canAccessDisclosures(int $companyId): array
+    {
+        $s2 = $this->canAccessIfrsS2($companyId);
+        if ($s2['allowed']) {
+            return $s2;
+        }
+
+        return $this->canAccessIfrsS1($companyId);
+    }
+
+    /**
      * Check if feature is accessible for company.
      */
     public function checkFeatureAccess($companyId, $featureCode)

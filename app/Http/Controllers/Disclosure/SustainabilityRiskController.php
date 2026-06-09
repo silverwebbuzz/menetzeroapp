@@ -2,21 +2,23 @@
 
 namespace App\Http\Controllers\Disclosure;
 
-use App\Models\ClimateRisk;
+use App\Models\SustainabilityRisk;
 use Illuminate\Http\Request;
 
-class ClimateRiskController extends DisclosureBaseController
+class SustainabilityRiskController extends DisclosureBaseController
 {
     public function index(Request $request)
     {
         ['company' => $company, 'fiscalYear' => $fiscalYear] = $this->resolveContext($request);
+        $topics = config('disclosure.ifrs_s1.material_topics', []);
 
-        return view('disclosures.climate-risks.index', [
+        return view('disclosures.sustainability-risks.index', [
             'company' => $company,
             'fiscalYear' => $fiscalYear,
-            'risks' => ClimateRisk::where('company_id', $company->id)
+            'topics' => $topics,
+            'risks' => SustainabilityRisk::where('company_id', $company->id)
                 ->where('fiscal_year', $fiscalYear)
-                ->orderBy('risk_type')
+                ->orderBy('topic')
                 ->orderBy('name')
                 ->get(),
         ]);
@@ -28,7 +30,7 @@ class ClimateRiskController extends DisclosureBaseController
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'risk_type' => 'required|in:physical,transition',
+            'topic' => 'required|string|max:50',
             'time_horizon' => 'required|in:short,medium,long',
             'description' => 'nullable|string|max:5000',
             'financial_impact' => 'nullable|string|max:2000',
@@ -38,23 +40,23 @@ class ClimateRiskController extends DisclosureBaseController
             'status' => 'nullable|in:open,monitoring,closed',
         ]);
 
-        ClimateRisk::create(array_merge($validated, [
+        SustainabilityRisk::create(array_merge($validated, [
             'company_id' => $company->id,
             'fiscal_year' => $fiscalYear,
             'status' => $validated['status'] ?? 'open',
         ]));
 
-        return $this->fiscalRedirect('disclosures.s2.climate-risks.index', $fiscalYear, 'Climate risk added.');
+        return $this->fiscalRedirect('disclosures.s1.sustainability-risks.index', $fiscalYear, 'Sustainability risk added.');
     }
 
-    public function update(Request $request, ClimateRisk $climateRisk)
+    public function update(Request $request, SustainabilityRisk $sustainabilityRisk)
     {
         ['company' => $company, 'fiscalYear' => $fiscalYear] = $this->resolveContext($request, true);
-        $this->assertOwned($climateRisk, $company->id, $fiscalYear);
+        $this->assertOwned($sustainabilityRisk, $company->id, $fiscalYear);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'risk_type' => 'required|in:physical,transition',
+            'topic' => 'required|string|max:50',
             'time_horizon' => 'required|in:short,medium,long',
             'description' => 'nullable|string|max:5000',
             'financial_impact' => 'nullable|string|max:2000',
@@ -64,22 +66,22 @@ class ClimateRiskController extends DisclosureBaseController
             'status' => 'nullable|in:open,monitoring,closed',
         ]);
 
-        $climateRisk->update($validated);
+        $sustainabilityRisk->update($validated);
 
-        return $this->fiscalRedirect('disclosures.s2.climate-risks.index', $fiscalYear, 'Climate risk updated.');
+        return $this->fiscalRedirect('disclosures.s1.sustainability-risks.index', $fiscalYear, 'Sustainability risk updated.');
     }
 
-    public function destroy(Request $request, ClimateRisk $climateRisk)
+    public function destroy(Request $request, SustainabilityRisk $sustainabilityRisk)
     {
         ['company' => $company, 'fiscalYear' => $fiscalYear] = $this->resolveContext($request, true);
-        $this->assertOwned($climateRisk, $company->id, $fiscalYear);
+        $this->assertOwned($sustainabilityRisk, $company->id, $fiscalYear);
 
-        $climateRisk->delete();
+        $sustainabilityRisk->delete();
 
-        return $this->fiscalRedirect('disclosures.s2.climate-risks.index', $fiscalYear, 'Climate risk removed.');
+        return $this->fiscalRedirect('disclosures.s1.sustainability-risks.index', $fiscalYear, 'Sustainability risk removed.');
     }
 
-    protected function assertOwned(ClimateRisk $risk, int $companyId, int $fiscalYear): void
+    protected function assertOwned(SustainabilityRisk $risk, int $companyId, int $fiscalYear): void
     {
         if ($risk->company_id !== $companyId || $risk->fiscal_year !== $fiscalYear) {
             abort(404);

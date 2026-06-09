@@ -232,9 +232,9 @@
     @if($canViewDisclosures)
         <div class="nav-section">
             <div class="nav-section-title">Disclosures</div>
-            <a href="{{ route('disclosures.overview') }}" class="nav-link {{ request()->routeIs('disclosures.*') ? 'active' : '' }}">
+            <a href="{{ route('disclosures.hub') }}" class="nav-link {{ request()->routeIs('disclosures.*') ? 'active' : '' }}">
                 {!! $svg('shield') !!}
-                IFRS S2 Overview
+                Disclosures
             </a>
         </div>
     @endif
@@ -247,9 +247,13 @@
                 GHG Inventory
             </a>
             @if($canViewDisclosures)
-                <a href="{{ route('disclosures.report.preview') }}" class="nav-link {{ request()->routeIs('disclosures.report.*') ? 'active' : '' }}">
+                <a href="{{ route('disclosures.s2.report.preview') }}" class="nav-link {{ request()->routeIs('disclosures.s2.report.*') ? 'active' : '' }}">
                     {!! $svg('doc') !!}
                     IFRS S2 Report
+                </a>
+                <a href="{{ route('disclosures.s1.report.preview') }}" class="nav-link {{ request()->routeIs('disclosures.s1.report.*') ? 'active' : '' }}">
+                    {!! $svg('doc') !!}
+                    IFRS S1 Report
                 </a>
             @endif
             @if($isAdmin)

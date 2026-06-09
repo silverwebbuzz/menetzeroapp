@@ -12,7 +12,7 @@ class ReductionTargetController extends DisclosureBaseController
     {
         ['company' => $company, 'fiscalYear' => $fiscalYear] = $this->resolveContext($request);
 
-        return view('disclosures.targets.index', [
+        return view('disclosures.s2.targets.index', [
             'company' => $company,
             'fiscalYear' => $fiscalYear,
             'targets' => ReductionTarget::where('company_id', $company->id)
@@ -34,7 +34,7 @@ class ReductionTargetController extends DisclosureBaseController
 
         $this->syncActions($target, $company->id, $request->input('actions', []));
 
-        return $this->fiscalRedirect('disclosures.targets.index', $fiscalYear, 'Reduction target saved.');
+        return $this->fiscalRedirect('disclosures.s2.targets.index', $fiscalYear, 'Reduction target saved.');
     }
 
     public function update(Request $request, ReductionTarget $reductionTarget)
@@ -46,7 +46,7 @@ class ReductionTargetController extends DisclosureBaseController
         $reductionTarget->update($validated);
         $this->syncActions($reductionTarget, $company->id, $request->input('actions', []));
 
-        return $this->fiscalRedirect('disclosures.targets.index', $fiscalYear, 'Reduction target updated.');
+        return $this->fiscalRedirect('disclosures.s2.targets.index', $fiscalYear, 'Reduction target updated.');
     }
 
     public function destroy(Request $request, ReductionTarget $reductionTarget)
@@ -56,7 +56,7 @@ class ReductionTargetController extends DisclosureBaseController
 
         $reductionTarget->delete();
 
-        return $this->fiscalRedirect('disclosures.targets.index', $fiscalYear, 'Reduction target removed.');
+        return $this->fiscalRedirect('disclosures.s2.targets.index', $fiscalYear, 'Reduction target removed.');
     }
 
     protected function validateTarget(Request $request): array

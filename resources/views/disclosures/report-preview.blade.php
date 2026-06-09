@@ -5,7 +5,7 @@
 
 @section('content')
 <div class="max-w-5xl mx-auto">
-    @include('disclosures.partials.header')
+    @include('disclosures.partials.header', ['framework' => 'ifrs_s2'])
 
     <div class="card mb-6">
         <div class="card-body flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -14,7 +14,7 @@
                 <h3 class="text-lg font-semibold text-gray-900">{{ $report['framework'] }}</h3>
                 <p class="text-sm text-gray-600">Fiscal year {{ $fiscalYear }} · Generated {{ $report['generated_at'] }}</p>
             </div>
-            <a href="{{ route('disclosures.report.pdf', ['fiscal_year' => $fiscalYear]) }}" class="btn btn-primary">Download PDF</a>
+            <a href="{{ route('disclosures.s2.report.pdf', ['fiscal_year' => $fiscalYear]) }}" class="btn btn-primary">Download PDF</a>
         </div>
     </div>
 

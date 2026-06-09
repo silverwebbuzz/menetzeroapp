@@ -176,30 +176,54 @@ Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client', 'e
     Route::get('/settings/reporting', [\App\Http\Controllers\CompanyReportingSettingsController::class, 'edit'])->name('settings.reporting');
     Route::post('/settings/reporting', [\App\Http\Controllers\CompanyReportingSettingsController::class, 'update'])->name('settings.reporting.update');
 
-    // IFRS S2 disclosures (Phase 1)
+    // IFRS S1 / S2 disclosures (Phase 1–2)
     Route::prefix('disclosures')->name('disclosures.')->middleware('disclosureAccess')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Disclosure\OverviewController::class, 'index'])->name('overview');
+        Route::get('/', [\App\Http\Controllers\Disclosure\OverviewController::class, 'hub'])->name('hub');
+        Route::redirect('/overview', '/disclosures');
 
-        Route::get('/ifrs-s2/sections/{section}', [\App\Http\Controllers\Disclosure\SectionController::class, 'edit'])->name('sections.edit');
-        Route::post('/ifrs-s2/sections/{section}', [\App\Http\Controllers\Disclosure\SectionController::class, 'update'])->name('sections.update');
+        // IFRS S2 (Phase 1)
+        Route::prefix('ifrs-s2')->name('s2.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Disclosure\OverviewController::class, 's2'])->name('overview');
+            Route::get('/sections/{section}', [\App\Http\Controllers\Disclosure\SectionController::class, 'editS2'])->name('sections.edit');
+            Route::post('/sections/{section}', [\App\Http\Controllers\Disclosure\SectionController::class, 'updateS2'])->name('sections.update');
 
-        Route::get('/ifrs-s2/climate-risks', [\App\Http\Controllers\Disclosure\ClimateRiskController::class, 'index'])->name('climate-risks.index');
-        Route::post('/ifrs-s2/climate-risks', [\App\Http\Controllers\Disclosure\ClimateRiskController::class, 'store'])->name('climate-risks.store');
-        Route::put('/ifrs-s2/climate-risks/{climateRisk}', [\App\Http\Controllers\Disclosure\ClimateRiskController::class, 'update'])->name('climate-risks.update');
-        Route::delete('/ifrs-s2/climate-risks/{climateRisk}', [\App\Http\Controllers\Disclosure\ClimateRiskController::class, 'destroy'])->name('climate-risks.destroy');
+            Route::get('/climate-risks', [\App\Http\Controllers\Disclosure\ClimateRiskController::class, 'index'])->name('climate-risks.index');
+            Route::post('/climate-risks', [\App\Http\Controllers\Disclosure\ClimateRiskController::class, 'store'])->name('climate-risks.store');
+            Route::put('/climate-risks/{climateRisk}', [\App\Http\Controllers\Disclosure\ClimateRiskController::class, 'update'])->name('climate-risks.update');
+            Route::delete('/climate-risks/{climateRisk}', [\App\Http\Controllers\Disclosure\ClimateRiskController::class, 'destroy'])->name('climate-risks.destroy');
 
-        Route::get('/ifrs-s2/opportunities', [\App\Http\Controllers\Disclosure\ClimateOpportunityController::class, 'index'])->name('climate-opportunities.index');
-        Route::post('/ifrs-s2/opportunities', [\App\Http\Controllers\Disclosure\ClimateOpportunityController::class, 'store'])->name('climate-opportunities.store');
-        Route::put('/ifrs-s2/opportunities/{climateOpportunity}', [\App\Http\Controllers\Disclosure\ClimateOpportunityController::class, 'update'])->name('climate-opportunities.update');
-        Route::delete('/ifrs-s2/opportunities/{climateOpportunity}', [\App\Http\Controllers\Disclosure\ClimateOpportunityController::class, 'destroy'])->name('climate-opportunities.destroy');
+            Route::get('/opportunities', [\App\Http\Controllers\Disclosure\ClimateOpportunityController::class, 'index'])->name('climate-opportunities.index');
+            Route::post('/opportunities', [\App\Http\Controllers\Disclosure\ClimateOpportunityController::class, 'store'])->name('climate-opportunities.store');
+            Route::put('/opportunities/{climateOpportunity}', [\App\Http\Controllers\Disclosure\ClimateOpportunityController::class, 'update'])->name('climate-opportunities.update');
+            Route::delete('/opportunities/{climateOpportunity}', [\App\Http\Controllers\Disclosure\ClimateOpportunityController::class, 'destroy'])->name('climate-opportunities.destroy');
 
-        Route::get('/ifrs-s2/targets', [\App\Http\Controllers\Disclosure\ReductionTargetController::class, 'index'])->name('targets.index');
-        Route::post('/ifrs-s2/targets', [\App\Http\Controllers\Disclosure\ReductionTargetController::class, 'store'])->name('targets.store');
-        Route::put('/ifrs-s2/targets/{reductionTarget}', [\App\Http\Controllers\Disclosure\ReductionTargetController::class, 'update'])->name('targets.update');
-        Route::delete('/ifrs-s2/targets/{reductionTarget}', [\App\Http\Controllers\Disclosure\ReductionTargetController::class, 'destroy'])->name('targets.destroy');
+            Route::get('/targets', [\App\Http\Controllers\Disclosure\ReductionTargetController::class, 'index'])->name('targets.index');
+            Route::post('/targets', [\App\Http\Controllers\Disclosure\ReductionTargetController::class, 'store'])->name('targets.store');
+            Route::put('/targets/{reductionTarget}', [\App\Http\Controllers\Disclosure\ReductionTargetController::class, 'update'])->name('targets.update');
+            Route::delete('/targets/{reductionTarget}', [\App\Http\Controllers\Disclosure\ReductionTargetController::class, 'destroy'])->name('targets.destroy');
 
-        Route::get('/ifrs-s2/report', [\App\Http\Controllers\Disclosure\IfrsS2ReportController::class, 'preview'])->name('report.preview');
-        Route::get('/ifrs-s2/report/pdf', [\App\Http\Controllers\Disclosure\IfrsS2ReportController::class, 'exportPdf'])->name('report.pdf');
+            Route::get('/report', [\App\Http\Controllers\Disclosure\IfrsS2ReportController::class, 'preview'])->name('report.preview');
+            Route::get('/report/pdf', [\App\Http\Controllers\Disclosure\IfrsS2ReportController::class, 'exportPdf'])->name('report.pdf');
+        });
+
+        // IFRS S1 (Phase 2)
+        Route::prefix('ifrs-s1')->name('s1.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Disclosure\OverviewController::class, 's1'])->name('overview');
+            Route::get('/sections/{section}', [\App\Http\Controllers\Disclosure\SectionController::class, 'editS1'])->name('sections.edit');
+            Route::post('/sections/{section}', [\App\Http\Controllers\Disclosure\SectionController::class, 'updateS1'])->name('sections.update');
+
+            Route::get('/material-topics', [\App\Http\Controllers\Disclosure\MaterialTopicsController::class, 'edit'])->name('material-topics');
+            Route::post('/material-topics', [\App\Http\Controllers\Disclosure\MaterialTopicsController::class, 'update'])->name('material-topics.update');
+
+            Route::get('/sustainability-risks', [\App\Http\Controllers\Disclosure\SustainabilityRiskController::class, 'index'])->name('sustainability-risks.index');
+            Route::post('/sustainability-risks', [\App\Http\Controllers\Disclosure\SustainabilityRiskController::class, 'store'])->name('sustainability-risks.store');
+            Route::put('/sustainability-risks/{sustainabilityRisk}', [\App\Http\Controllers\Disclosure\SustainabilityRiskController::class, 'update'])->name('sustainability-risks.update');
+            Route::delete('/sustainability-risks/{sustainabilityRisk}', [\App\Http\Controllers\Disclosure\SustainabilityRiskController::class, 'destroy'])->name('sustainability-risks.destroy');
+
+            Route::get('/report', [\App\Http\Controllers\Disclosure\IfrsS1ReportController::class, 'preview'])->name('report.preview');
+            Route::get('/report/pdf', [\App\Http\Controllers\Disclosure\IfrsS1ReportController::class, 'exportPdf'])->name('report.pdf');
+        });
+
     });
 
     // Reports routes

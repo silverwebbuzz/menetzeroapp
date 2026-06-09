@@ -7,24 +7,49 @@ use Illuminate\Http\Request;
 
 class SectionController extends DisclosureBaseController
 {
+    private const FRAMEWORKS = ['ifrs_s2', 'ifrs_s1'];
+
     public function __construct(
         protected DisclosureService $disclosureService,
     ) {
     }
 
-    public function edit(Request $request, string $section)
+    public function editS2(Request $request, string $section)
     {
-        if (!in_array($section, $this->disclosureService->validSections(), true)) {
+        return $this->edit($request, 'ifrs_s2', $section);
+    }
+
+    public function updateS2(Request $request, string $section)
+    {
+        return $this->update($request, 'ifrs_s2', $section);
+    }
+
+    public function editS1(Request $request, string $section)
+    {
+        return $this->edit($request, 'ifrs_s1', $section);
+    }
+
+    public function updateS1(Request $request, string $section)
+    {
+        return $this->update($request, 'ifrs_s1', $section);
+    }
+
+    protected function edit(Request $request, string $framework, string $section)
+    {
+        $this->assertFramework($framework);
+
+        if (!in_array($section, $this->disclosureService->validSections($framework), true)) {
             abort(404);
         }
 
         ['company' => $company, 'fiscalYear' => $fiscalYear] = $this->resolveContext($request);
-        $config = $this->disclosureService->sectionConfig($section);
-        $record = $this->disclosureService->getSection($company->id, $fiscalYear, $section);
+        $config = $this->disclosureService->sectionConfig($framework, $section);
+        $record = $this->disclosureService->getSection($company->id, $fiscalYear, $section, $framework);
 
         return view('disclosures.section', [
             'company' => $company,
             'fiscalYear' => $fiscalYear,
+            'framework' => $framework,
             'section' => $section,
             'config' => $config,
             'record' => $record,
@@ -32,9 +57,11 @@ class SectionController extends DisclosureBaseController
         ]);
     }
 
-    public function update(Request $request, string $section)
+    protected function update(Request $request, string $framework, string $section)
     {
-        if (!in_array($section, $this->disclosureService->validSections(), true)) {
+        $this->assertFramework($framework);
+
+        if (!in_array($section, $this->disclosureService->validSections($framework), true)) {
             abort(404);
         }
 
@@ -44,14 +71,22 @@ class SectionController extends DisclosureBaseController
             $company->id,
             $fiscalYear,
             $section,
-            $request->input('content', [])
+            $request->input('content', []),
+            $framework
         );
 
         return $this->fiscalRedirect(
-            'disclosures.sections.edit',
+            $framework === 'ifrs_s1' ? 'disclosures.s1.sections.edit' : 'disclosures.s2.sections.edit',
             $fiscalYear,
             'Disclosure section saved.',
             ['section' => $section]
         );
+    }
+
+    protected function assertFramework(string $framework): void
+    {
+        if (!in_array($framework, self::FRAMEWORKS, true)) {
+            abort(404);
+        }
     }
 }

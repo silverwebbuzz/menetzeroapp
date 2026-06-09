@@ -1,10 +1,12 @@
 @php
     $fy = $fiscalYear ?? now()->year;
+    $fw = $framework ?? 'ifrs_s2';
+    $frameworkLabel = $fw === 'ifrs_s1' ? 'IFRS S1 Sustainability Disclosures' : 'IFRS S2 Climate Disclosures';
 @endphp
 
 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
     <div>
-        <p class="text-sm text-gray-500">IFRS S2 Climate Disclosures</p>
+        <p class="text-sm text-gray-500">{{ $frameworkLabel }}</p>
         <h2 class="text-xl font-semibold text-gray-900">{{ $company->name }}</h2>
     </div>
     <form method="GET" action="{{ url()->current() }}" class="flex items-center gap-2">
@@ -15,4 +17,4 @@
     </form>
 </div>
 
-@include('layouts.partials.nav-disclosures', ['fiscalYear' => $fy])
+@include('layouts.partials.nav-disclosures', ['fiscalYear' => $fy, 'framework' => $fw])

@@ -18,7 +18,7 @@ class CheckDisclosureAccess
             abort(403, 'No active company found.');
         }
 
-        $access = app(SubscriptionService::class)->canAccessIfrsS2($company->id);
+        $access = app(SubscriptionService::class)->canAccessDisclosures($company->id);
         if (!$access['allowed']) {
             return redirect()
                 ->route('subscriptions.upgrade')

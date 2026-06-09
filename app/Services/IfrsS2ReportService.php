@@ -27,7 +27,7 @@ class IfrsS2ReportService
             ->keyBy('section');
 
         $ghg = $this->aggregateGhg($company, $fiscalYear);
-        $completeness = $this->disclosureService->completeness($company->id, $fiscalYear);
+        $completeness = $this->disclosureService->completenessS2($company->id, $fiscalYear);
 
         return [
             'framework' => 'IFRS S2 Climate-related Disclosures',

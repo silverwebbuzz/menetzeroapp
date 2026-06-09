@@ -24,7 +24,12 @@
             @endif
         </div>
         <div class="card-body">
-            <form method="POST" action="{{ route('disclosures.sections.update', ['section' => $section, 'fiscal_year' => $fiscalYear]) }}" class="space-y-5">
+            @php
+                $updateRoute = ($framework ?? 'ifrs_s2') === 'ifrs_s1'
+                    ? 'disclosures.s1.sections.update'
+                    : 'disclosures.s2.sections.update';
+            @endphp
+            <form method="POST" action="{{ route($updateRoute, ['section' => $section, 'fiscal_year' => $fiscalYear]) }}" class="space-y-5">
                 @csrf
                 <input type="hidden" name="fiscal_year" value="{{ $fiscalYear }}">
 
