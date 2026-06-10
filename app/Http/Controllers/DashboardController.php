@@ -27,8 +27,8 @@ class DashboardController extends Controller
             return redirect()->route('login');
         }
 
-        $partnerWorkspace = app(\App\Services\PartnerWorkspaceService::class);
-        if ($partnerWorkspace->isPartnerUser($user) && !$partnerWorkspace->isActingAsManagedClient($user)) {
+        $consultantOrgWorkspace = app(\App\Services\ConsultantAgencyWorkspaceService::class);
+        if ($consultantOrgWorkspace->isConsultantOrgUser($user) && !$consultantOrgWorkspace->isActingAsManagedClient($user)) {
             return redirect()->route('consultant.dashboard');
         }
         

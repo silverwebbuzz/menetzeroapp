@@ -44,6 +44,6 @@
 </div>
 
 <div class="mt-6">
-    <a href="{{ route('consultant.dashboard') }}" class="text-sm text-teal-600 hover:underline">← Partner dashboard</a>
+    <a href="{{ route('consultant.dashboard') }}" class="text-sm text-teal-600 hover:underline">← Consultant dashboard</a>
 </div>
 @endsection

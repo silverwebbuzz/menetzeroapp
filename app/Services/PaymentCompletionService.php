@@ -4,8 +4,8 @@ namespace App\Services;
 
 use App\Models\ClientSubscription;
 use App\Models\ConsultantOrder;
-use App\Models\PartnerSubscription;
-use App\Models\PartnerSubscriptionAddon;
+use App\Models\ConsultantSubscription;
+use App\Models\ConsultantSubscriptionAddon;
 use App\Models\PaymentTransaction;
 
 class PaymentCompletionService
@@ -13,24 +13,24 @@ class PaymentCompletionService
     public function __construct(
         protected SubscriptionService $subscriptions,
         protected ConsultantMarketplaceService $marketplace,
-        protected PartnerSubscriptionService $partnerSubscriptions,
-        protected PartnerRenewalService $partnerRenewals,
+        protected ConsultantAgencySubscriptionService $consultantSubscriptions,
+        protected ConsultantAgencyRenewalService $consultantRenewals,
     ) {}
 
     public function complete(
         PaymentTransaction $transaction,
         array $gatewayRefs = [],
-    ): ClientSubscription|ConsultantOrder|PartnerSubscription|PartnerSubscriptionAddon {
+    ): ClientSubscription|ConsultantOrder|ConsultantSubscription|ConsultantSubscriptionAddon {
         $type = $transaction->metadata['transaction_type']
             ?? $transaction->transaction_type
             ?? 'subscription';
 
         return match ($type) {
             'consultant_pack' => $this->marketplace->completeTransaction($transaction, $gatewayRefs),
-            'partner_pack' => $this->partnerSubscriptions->completePackTransaction($transaction, $gatewayRefs),
-            'partner_extra_slot' => $this->partnerSubscriptions->completeExtraSlotTransaction($transaction, $gatewayRefs),
-            'partner_year_unlock' => $this->partnerSubscriptions->completeYearUnlockTransaction($transaction, $gatewayRefs),
-            'partner_renewal' => $this->partnerRenewals->completeRenewalTransaction($transaction, $gatewayRefs),
+            'consultant_agency_pack' => $this->consultantSubscriptions->completePackTransaction($transaction, $gatewayRefs),
+            'consultant_agency_extra_slot' => $this->consultantSubscriptions->completeExtraSlotTransaction($transaction, $gatewayRefs),
+            'consultant_agency_year_unlock' => $this->consultantSubscriptions->completeYearUnlockTransaction($transaction, $gatewayRefs),
+            'consultant_agency_renewal' => $this->consultantRenewals->completeRenewalTransaction($transaction, $gatewayRefs),
             default => $this->subscriptions->completeTransaction($transaction, $gatewayRefs),
         };
     }

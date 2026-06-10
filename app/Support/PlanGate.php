@@ -4,7 +4,7 @@ namespace App\Support;
 
 use App\Models\MeasurementData;
 use App\Models\User;
-use App\Services\PartnerEntitlementService;
+use App\Services\ConsultantAgencyEntitlementService;
 use App\Services\PlanEntitlementService;
 use App\Services\SubscriptionService;
 
@@ -109,7 +109,7 @@ class PlanGate
             return false;
         }
 
-        return app(PartnerEntitlementService::class)->isManagedClient($this->companyId);
+        return app(ConsultantAgencyEntitlementService::class)->isManagedClient($this->companyId);
     }
 
     public function managedReportingYearMode(?int $fiscalYear = null): ?string
@@ -118,7 +118,7 @@ class PlanGate
             return null;
         }
 
-        return app(PartnerEntitlementService::class)
+        return app(ConsultantAgencyEntitlementService::class)
             ->reportingYearModeForCompany($this->companyId, $fiscalYear);
     }
 
@@ -128,7 +128,7 @@ class PlanGate
             return null;
         }
 
-        return app(PartnerEntitlementService::class)
+        return app(ConsultantAgencyEntitlementService::class)
             ->previewBannerMessage($this->companyId, $fiscalYear);
     }
 

@@ -68,11 +68,11 @@
         @auth('web')
             @php
                 $user = auth('web')->user();
-                $partnerWorkspace = app(\App\Services\PartnerWorkspaceService::class);
-                $isPartnerActing = $user && $partnerWorkspace->isActingAsManagedClient($user);
-                $partnerActingEngagement = $isPartnerActing ? $partnerWorkspace->engagementForActing($user) : null;
-                $partnerReadOnly = $isPartnerActing && $partnerWorkspace->isReadOnlyWorkspace();
-                $partnerSwitchableClients = $isPartnerActing ? $partnerWorkspace->switchableEngagements($user) : collect();
+                $consultantWorkspace = app(\App\Services\ConsultantAgencyWorkspaceService::class);
+                $isConsultantActing = $user && $consultantWorkspace->isActingAsManagedClient($user);
+                $consultantActingEngagement = $isConsultantActing ? $consultantWorkspace->engagementForActing($user) : null;
+                $consultantReadOnly = $isConsultantActing && $consultantWorkspace->isReadOnlyWorkspace();
+                $consultantSwitchableClients = $isConsultantActing ? $consultantWorkspace->switchableEngagements($user) : collect();
                 $activeCompany = $user ? $user->getActiveCompany() : null;
                 $accessibleCompanies = $user ? $user->getAccessibleCompanies() : collect([]);
                 $hasCompany = $activeCompany !== null;
@@ -119,7 +119,7 @@
                     <h1 class="page-title truncate">@yield('page-title', 'Dashboard')</h1>
 
                     <div class="header-actions">
-                        @if($isPartnerActing)
+                        @if($isConsultantActing)
                         <form action="{{ route('consultant.workspace.exit') }}" method="POST" class="hidden sm:inline">
                             @csrf
                             <button type="submit" class="header-btn text-indigo-700">
@@ -127,7 +127,7 @@
                                 <span class="header-btn-label">Agency hub</span>
                             </button>
                         </form>
-                        @if($partnerSwitchableClients->count() > 1)
+                        @if($consultantSwitchableClients->count() > 1)
                         <div class="relative" x-data="{ open: false }" @click.away="open = false">
                             <button type="button" class="header-btn" @click="open = !open" :aria-expanded="open">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -137,7 +137,7 @@
                             </button>
                             <div x-show="open" x-transition class="dropdown-menu" style="display: none;">
                                 <div class="dropdown-heading">Managed clients</div>
-                                @foreach($partnerSwitchableClients as $engagement)
+                                @foreach($consultantSwitchableClients as $engagement)
                                     <form action="{{ route('consultant.workspace.enter', $engagement) }}" method="POST">
                                         @csrf
                                         <button type="submit" class="dropdown-item {{ $activeCompany && $activeCompany->id == $engagement->managed_company_id ? 'active' : '' }}">
@@ -242,22 +242,22 @@
 
                 <!-- Page content -->
                 <main class="content-area">
-                    @if($isPartnerActing)
-                        <div class="mb-4 rounded-lg border {{ $partnerReadOnly ? 'border-amber-200 bg-amber-50' : 'border-indigo-200 bg-indigo-50' }} px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm {{ $partnerReadOnly ? 'text-amber-900' : 'text-indigo-900' }}">
+                    @if($isConsultantActing)
+                        <div class="mb-4 rounded-lg border {{ $consultantReadOnly ? 'border-amber-200 bg-amber-50' : 'border-indigo-200 bg-indigo-50' }} px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm {{ $consultantReadOnly ? 'text-amber-900' : 'text-indigo-900' }}">
                             <span>
-                                @if($partnerReadOnly)
+                                @if($consultantReadOnly)
                                     Read-only —
                                 @else
                                     Agency mode —
                                 @endif
                                 <strong>{{ $activeCompany?->name }}</strong>
-                                @if($partnerActingEngagement)
-                                    · PRY {{ $partnerActingEngagement->primary_reporting_year }}
+                                @if($consultantActingEngagement)
+                                    · PRY {{ $consultantActingEngagement->primary_reporting_year }}
                                 @endif
                             </span>
                             <form action="{{ route('consultant.workspace.exit') }}" method="POST" class="inline">
                                 @csrf
-                                <button type="submit" class="{{ $partnerReadOnly ? 'text-amber-800' : 'text-indigo-700' }} font-medium hover:underline whitespace-nowrap">Back to agency hub</button>
+                                <button type="submit" class="{{ $consultantReadOnly ? 'text-amber-800' : 'text-indigo-700' }} font-medium hover:underline whitespace-nowrap">Back to agency hub</button>
                             </form>
                         </div>
                     @endif

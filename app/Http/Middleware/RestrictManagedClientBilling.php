@@ -19,7 +19,7 @@ class RestrictManagedClientBilling
         if ($company?->isManagedClient()) {
             return redirect()
                 ->route('consultant.dashboard')
-                ->with('error', 'Subscriptions and billing are managed on your agency partner account.');
+                ->with('error', 'Subscriptions and billing are managed on your consultant agency account.');
         }
 
         return $next($request);

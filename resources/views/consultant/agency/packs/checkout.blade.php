@@ -7,9 +7,9 @@
     $meta = $transaction->metadata ?? [];
     $amountMinor = (int) round(((float) $transaction->amount) * 100);
     $headline = match ($transaction->transaction_type) {
-        'partner_extra_slot' => 'Extra client slots',
-        'partner_year_unlock' => 'Reporting year unlock',
-        'partner_renewal' => 'Agency pack renewal',
+        'consultant_extra_slot' => 'Extra client slots',
+        'consultant_year_unlock' => 'Reporting year unlock',
+        'consultant_renewal' => 'Agency pack renewal',
         default => 'Agency pack',
     };
 @endphp
@@ -72,7 +72,13 @@
             <p class="text-sm text-red-600">Payment session unavailable. Go back and try again.</p>
         @endif
 
-        <a href="{{ route('consultant.packs.index') }}" class="mt-4 inline-block text-sm text-gray-500 hover:text-gray-700">Cancel</a>
+        @php
+            $cancelRoute = match ($transaction->transaction_type) {
+                'consultant_renewal' => route('consultant.renewal.index'),
+                default => route('consultant.packs.index'),
+            };
+        @endphp
+        <a href="{{ $cancelRoute }}" class="mt-4 inline-block text-sm text-gray-500 hover:text-gray-700">Cancel</a>
     </div>
 </div>
 @endsection

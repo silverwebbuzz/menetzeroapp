@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\PartnerWorkspaceService;
+use App\Services\ConsultantAgencyWorkspaceService;
 use Illuminate\Http\Request;
 use App\Models\UserCompanyRole;
 use App\Models\Company;
@@ -21,7 +21,7 @@ class AccountSelectorController extends Controller
             return redirect()->route('login');
         }
 
-        if (app(PartnerWorkspaceService::class)->isPartnerUser($user)) {
+        if (app(ConsultantAgencyWorkspaceService::class)->isConsultantOrgUser($user)) {
             return redirect()->route('consultant.dashboard');
         }
         
@@ -63,7 +63,7 @@ class AccountSelectorController extends Controller
         $user->switchToCompany($request->company_id);
 
         $company = Company::find($request->company_id);
-        if ($company?->isPartner()) {
+        if ($company?->isConsultantOrg()) {
             return redirect()->route('consultant.dashboard');
         }
         

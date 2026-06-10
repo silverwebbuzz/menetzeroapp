@@ -3,27 +3,28 @@
 namespace App\Services;
 
 use App\Models\Company;
-use App\Models\PartnerClientEngagement;
+use App\Models\ConsultantClientEngagement;
+use App\Models\ConsultantSubscription;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use RuntimeException;
 
-class PartnerManagedClientService
+class ConsultantAgencyClientService
 {
     public function __construct(
-        protected PartnerSubscriptionService $subscriptions,
+        protected ConsultantAgencySubscriptionService $subscriptions,
     ) {
     }
 
     /**
-     * @return Collection<int, PartnerClientEngagement>
+     * @return Collection<int, ConsultantClientEngagement>
      */
-    public function listForPartner(int $partnerCompanyId, bool $includeArchived = true): Collection
+    public function listForConsultant(int $consultantCompanyId, bool $includeArchived = true): Collection
     {
-        $query = PartnerClientEngagement::query()
+        $query = ConsultantClientEngagement::query()
             ->with(['managedCompany', 'subscription.plan'])
-            ->forPartner($partnerCompanyId)
+            ->forConsultant($consultantCompanyId)
             ->orderByDesc('id');
 
         if (!$includeArchived) {
@@ -33,11 +34,11 @@ class PartnerManagedClientService
         return $query->get();
     }
 
-    public function findForPartner(int $partnerCompanyId, int $engagementId): PartnerClientEngagement
+    public function findForConsultant(int $consultantCompanyId, int $engagementId): ConsultantClientEngagement
     {
-        return PartnerClientEngagement::query()
+        return ConsultantClientEngagement::query()
             ->with(['managedCompany', 'subscription.plan'])
-            ->forPartner($partnerCompanyId)
+            ->forConsultant($consultantCompanyId)
             ->findOrFail($engagementId);
     }
 
@@ -54,30 +55,38 @@ class PartnerManagedClientService
      *   description?: string|null,
      * }  $data
      */
-    public function create(Company $partner, array $data): PartnerClientEngagement
+    public function create(Company $consultantOrg, array $data): ConsultantClientEngagement
     {
-        $this->assertPartnerOrg($partner);
-
-        $subscription = $this->subscriptions->getActiveSubscription($partner->id);
-
-        if (!$subscription) {
-            throw new RuntimeException(
-                'No active partner pack for this contract year. Purchase or renew an agency pack to add clients.'
-            );
-        }
-
-        if (!$this->subscriptions->canConsumeSlot($partner->id)) {
-            throw new RuntimeException(
-                'All client slots are in use. Add an extra slot or archive a finished engagement.'
-            );
-        }
+        $this->assertConsultantOrg($consultantOrg);
 
         $reportingYear = (int) $data['primary_reporting_year'];
 
-        return DB::transaction(function () use ($partner, $data, $subscription, $reportingYear) {
+        return DB::transaction(function () use ($consultantOrg, $data, $reportingYear) {
+            $subscription = ConsultantSubscription::forConsultant($consultantOrg->id)
+                ->active()
+                ->lockForUpdate()
+                ->orderByDesc('expires_at')
+                ->first();
+
+            if (!$subscription) {
+                throw new RuntimeException(
+                    'No active consultant pack for this contract year. Purchase or renew an agency pack to add clients.'
+                );
+            }
+
+            $used = ConsultantClientEngagement::query()
+                ->where('consultant_subscription_id', $subscription->id)
+                ->active()
+                ->count();
+
+            if ($used >= (int) $subscription->slot_limit) {
+                throw new RuntimeException(
+                    'All client slots are in use. Add an extra slot or archive a finished engagement.'
+                );
+            }
             $managed = Company::create([
                 'name' => $data['name'],
-                'email' => $this->uniqueManagedEmail($partner, $data['name']),
+                'email' => $this->uniqueManagedEmail($consultantOrg, $data['name']),
                 'country' => $data['country'] ?? 'United Arab Emirates',
                 'emirate' => $data['emirate'] ?? null,
                 'sector' => $data['sector'] ?? null,
@@ -86,14 +95,14 @@ class PartnerManagedClientService
                 'description' => $data['description'] ?? null,
                 'company_type' => 'client',
                 'is_direct_client' => false,
-                'partner_id' => $partner->id,
+                'consultant_id' => $consultantOrg->id,
                 'is_active' => true,
             ]);
 
-            return PartnerClientEngagement::create([
-                'partner_company_id' => $partner->id,
+            return ConsultantClientEngagement::create([
+                'consultant_company_id' => $consultantOrg->id,
                 'managed_company_id' => $managed->id,
-                'partner_subscription_id' => $subscription->id,
+                'consultant_subscription_id' => $subscription->id,
                 'primary_reporting_year' => $reportingYear,
                 'status' => 'active',
                 'display_name' => $data['display_name'] ?? null,
@@ -113,7 +122,7 @@ class PartnerManagedClientService
      *   description?: string|null,
      * }  $data
      */
-    public function update(PartnerClientEngagement $engagement, array $data): PartnerClientEngagement
+    public function update(ConsultantClientEngagement $engagement, array $data): ConsultantClientEngagement
     {
         $managed = $engagement->managedCompany;
 
@@ -138,7 +147,7 @@ class PartnerManagedClientService
         return $engagement->fresh(['managedCompany', 'subscription.plan']);
     }
 
-    public function archive(PartnerClientEngagement $engagement): PartnerClientEngagement
+    public function archive(ConsultantClientEngagement $engagement): ConsultantClientEngagement
     {
         if (!$engagement->isActive()) {
             return $engagement;
@@ -147,24 +156,24 @@ class PartnerManagedClientService
         return $this->subscriptions->archiveEngagement($engagement);
     }
 
-    protected function uniqueManagedEmail(Company $partner, string $clientName): string
+    protected function uniqueManagedEmail(Company $consultantOrg, string $clientName): string
     {
-        $base = Str::slug($partner->slug . '-' . Str::slug($clientName));
-        $email = "managed.{$base}@partner.menetzero.local";
+        $base = Str::slug($consultantOrg->slug . '-' . Str::slug($clientName));
+        $email = "managed.{$base}@consultant.menetzero.local";
         $counter = 1;
 
         while (Company::where('email', $email)->exists()) {
-            $email = "managed.{$base}-{$counter}@partner.menetzero.local";
+            $email = "managed.{$base}-{$counter}@consultant.menetzero.local";
             $counter++;
         }
 
         return $email;
     }
 
-    protected function assertPartnerOrg(Company $company): void
+    protected function assertConsultantOrg(Company $company): void
     {
-        if (!$company->isPartner()) {
-            throw new RuntimeException('Active company must be a partner organisation.');
+        if (!$company->isConsultantOrg()) {
+            throw new RuntimeException('Active company must be a consultant organisation.');
         }
     }
 }

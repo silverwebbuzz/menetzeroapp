@@ -19,10 +19,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'ensureOnboardingComplete' => \App\Http\Middleware\EnsureOnboardingComplete::class,
             'disclosureAccess' => \App\Http\Middleware\CheckDisclosureAccess::class,
             'ensureConsultant' => \App\Http\Middleware\EnsureConsultant::class,
-            'syncPartnerSession' => \App\Http\Middleware\SyncConsultantPartnerSession::class,
-            'ensurePartnerPortal' => \App\Http\Middleware\EnsurePartnerPortalAccess::class,
+            'syncConsultantAgencySession' => \App\Http\Middleware\SyncConsultantAgencySession::class,
+            'ensureConsultantAgency' => \App\Http\Middleware\EnsureConsultantAgencyAccess::class,
             'restrictManagedClientBilling' => \App\Http\Middleware\RestrictManagedClientBilling::class,
-            'ensurePartnerManagedWorkspace' => \App\Http\Middleware\EnsurePartnerManagedWorkspace::class,
+            'ensureConsultantManagedWorkspace' => \App\Http\Middleware\EnsureConsultantManagedWorkspace::class,
             'restrictManagedClientWorkspace' => \App\Http\Middleware\RestrictManagedClientWorkspace::class,
         ]);
 

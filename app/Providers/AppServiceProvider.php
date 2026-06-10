@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Http\View\Composers\ConsultantAgencyComposer;
 use App\Http\View\Composers\PlanGateComposer;
 use App\Support\PlanGate;
 use Illuminate\Support\Facades\Auth;
@@ -35,5 +36,7 @@ class AppServiceProvider extends ServiceProvider
             ],
             PlanGateComposer::class
         );
+
+        View::composer('consultant.layouts.app', ConsultantAgencyComposer::class);
     }
 }

@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="max-w-md mx-auto px-4 py-12">
-    <h1 class="text-2xl font-bold text-gray-900 mb-2">Apply to the partner directory</h1>
+    <h1 class="text-2xl font-bold text-gray-900 mb-2">Apply to the consultant directory</h1>
     <p class="text-sm text-gray-600 mb-6">Create your consultant account. You can upload documents after signing in.</p>
 
     <form method="POST" action="{{ route('consultant.register.post') }}" class="space-y-4 bg-white border border-gray-200 rounded-xl p-6">
@@ -37,7 +37,7 @@
             <label class="block text-sm font-medium text-gray-700 mb-1">Confirm password</label>
             <input type="password" name="password_confirmation" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
         </div>
-        <button type="submit" class="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg">Create partner account</button>
+        <button type="submit" class="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg">Create consultant account</button>
     </form>
 
     <p class="text-center text-sm text-gray-500 mt-4">

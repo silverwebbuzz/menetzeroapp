@@ -31,8 +31,8 @@
             <div class="stat-card-value">{{ $companies->where('company_type', 'client')->count() + $companies->whereNull('company_type')->count() }}</div>
         </div>
         <div class="stat-card">
-            <div class="stat-card-label">Partners</div>
-            <div class="stat-card-value">{{ $companies->where('company_type', 'partner')->count() }}</div>
+            <div class="stat-card-label">Consultants</div>
+            <div class="stat-card-value">{{ $companies->where('company_type', 'consultant')->count() }}</div>
         </div>
         <div class="stat-card">
             <div class="stat-card-label">Active this page</div>
@@ -65,7 +65,7 @@
                 <select name="type" class="form-select" style="min-width: 9rem;">
                     <option value="">All types</option>
                     <option value="client" {{ request('type') === 'client' ? 'selected' : '' }}>Client</option>
-                    <option value="partner" {{ request('type') === 'partner' ? 'selected' : '' }}>Partner</option>
+                    <option value="consultant" {{ request('type') === 'consultant' ? 'selected' : '' }}>Consultant</option>
                 </select>
                 <button type="submit" class="btn btn-primary">Apply</button>
             </form>
@@ -103,8 +103,8 @@
                             </td>
                             <td class="cell-muted">{{ $company->email ?? '—' }}</td>
                             <td>
-                                @if($type === 'partner')
-                                    <span class="badge badge-info badge-dot">Partner</span>
+                                @if($type === 'consultant')
+                                    <span class="badge badge-info badge-dot">Consultant</span>
                                 @else
                                     <span class="badge badge-brand badge-dot">Client</span>
                                 @endif

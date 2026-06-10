@@ -2,19 +2,19 @@
 
 namespace App\Services;
 
-use App\Data\PartnerPlanMatrix;
+use App\Data\ConsultantAgencyPlanMatrix;
 use App\Data\PlanEntitlementDefaults;
 use App\Models\Company;
-use App\Models\PartnerClientEngagement;
-use App\Models\PartnerSubscription;
-use App\Models\PartnerSubscriptionAddon;
+use App\Models\ConsultantClientEngagement;
+use App\Models\ConsultantSubscription;
+use App\Models\ConsultantSubscriptionAddon;
 use App\Models\PaymentTransaction;
 use App\Models\SubscriptionPlan;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
-class PartnerSubscriptionService
+class ConsultantAgencySubscriptionService
 {
     /**
      * Last day of the calendar contract year (31 Dec).
@@ -44,42 +44,43 @@ class PartnerSubscriptionService
         return round($annualPrice * ($daysRemaining / $totalDays), 2);
     }
 
-    public function getActiveSubscription(int $partnerCompanyId): ?PartnerSubscription
+    public function getActiveSubscription(int $consultantCompanyId): ?ConsultantSubscription
     {
-        return PartnerSubscription::forPartner($partnerCompanyId)
+        return ConsultantSubscription::forConsultant($consultantCompanyId)
+            ->with('plan')
             ->active()
             ->orderByDesc('expires_at')
             ->first();
     }
 
-    public function activeSlotUsage(int $partnerCompanyId, ?PartnerSubscription $subscription = null): int
+    public function activeSlotUsage(int $consultantCompanyId, ?ConsultantSubscription $subscription = null): int
     {
-        $subscription ??= $this->getActiveSubscription($partnerCompanyId);
+        $subscription ??= $this->getActiveSubscription($consultantCompanyId);
 
         if (!$subscription) {
             return 0;
         }
 
-        return PartnerClientEngagement::query()
-            ->where('partner_subscription_id', $subscription->id)
+        return ConsultantClientEngagement::query()
+            ->where('consultant_subscription_id', $subscription->id)
             ->active()
             ->count();
     }
 
-    public function slotsRemaining(int $partnerCompanyId, ?PartnerSubscription $subscription = null): int
+    public function slotsRemaining(int $consultantCompanyId, ?ConsultantSubscription $subscription = null): int
     {
-        $subscription ??= $this->getActiveSubscription($partnerCompanyId);
+        $subscription ??= $this->getActiveSubscription($consultantCompanyId);
 
         if (!$subscription) {
             return 0;
         }
 
-        return max(0, (int) $subscription->slot_limit - $this->activeSlotUsage($partnerCompanyId, $subscription));
+        return max(0, (int) $subscription->slot_limit - $this->activeSlotUsage($consultantCompanyId, $subscription));
     }
 
-    public function canConsumeSlot(int $partnerCompanyId): bool
+    public function canConsumeSlot(int $consultantCompanyId): bool
     {
-        return $this->slotsRemaining($partnerCompanyId) > 0;
+        return $this->slotsRemaining($consultantCompanyId) > 0;
     }
 
     /**
@@ -95,15 +96,15 @@ class PartnerSubscriptionService
      * }
      */
     public function resolvePackPurchase(
-        Company $partner,
+        Company $consultantOrg,
         SubscriptionPlan $plan,
         ?int $contractYear = null,
         string $chargeCurrency = 'AED',
     ): array {
-        $this->assertPartnerCompany($partner);
+        $this->assertConsultantOrg($consultantOrg);
 
-        if (!$plan->isPartnerPack()) {
-            throw new RuntimeException('Selected plan is not a partner pack.');
+        if (!$plan->isConsultantAgencyPack()) {
+            throw new RuntimeException('Selected plan is not a consultant pack.');
         }
 
         $contractYear ??= (int) now()->year;
@@ -134,15 +135,15 @@ class PartnerSubscriptionService
     }
 
     /**
-     * Activate a partner pack from a completed payment (P19 wiring).
+     * Activate a consultant pack from a completed payment (P19 wiring).
      */
-    public function completePackTransaction(PaymentTransaction $transaction, array $gatewayRefs = []): PartnerSubscription
+    public function completePackTransaction(PaymentTransaction $transaction, array $gatewayRefs = []): ConsultantSubscription
     {
         if ($transaction->status === 'completed') {
-            $existingId = $transaction->metadata['partner_subscription_id'] ?? null;
+            $existingId = $transaction->metadata['consultant_subscription_id'] ?? null;
 
             return $existingId
-                ? PartnerSubscription::findOrFail($existingId)
+                ? ConsultantSubscription::findOrFail($existingId)
                 : throw new RuntimeException('Completed partner transaction is missing subscription reference.');
         }
 
@@ -151,13 +152,13 @@ class PartnerSubscriptionService
         $contractYear = (int) ($metadata['contract_year'] ?? now()->year);
 
         if (!$planId) {
-            throw new RuntimeException('Partner pack transaction is missing plan reference.');
+            throw new RuntimeException('consultant pack transaction is missing plan reference.');
         }
 
         $plan = SubscriptionPlan::findOrFail($planId);
-        $partner = Company::findOrFail($transaction->company_id);
+        $consultantOrg = Company::findOrFail($transaction->company_id);
 
-        $subscription = $this->activatePackSubscription($partner, $plan, [
+        $subscription = $this->activatePackSubscription($consultantOrg, $plan, [
             'contract_year' => $contractYear,
             'starts_at' => now()->toDateString(),
             'payment_transaction_id' => $transaction->id,
@@ -170,7 +171,7 @@ class PartnerSubscriptionService
             'status' => 'completed',
             'paid_at' => now(),
             'metadata' => array_merge($metadata, $gatewayRefs, [
-                'partner_subscription_id' => $subscription->id,
+                'consultant_subscription_id' => $subscription->id,
             ]),
         ]);
 
@@ -180,36 +181,60 @@ class PartnerSubscriptionService
     /**
      * Create or replace the active subscription for a contract year.
      */
-    public function activatePackSubscription(Company $partner, SubscriptionPlan $plan, array $options = []): PartnerSubscription
+    public function activatePackSubscription(Company $consultantOrg, SubscriptionPlan $plan, array $options = []): ConsultantSubscription
     {
-        $this->assertPartnerCompany($partner);
+        $this->assertConsultantOrg($consultantOrg);
 
-        if (!$plan->isPartnerPack()) {
-            throw new RuntimeException('Plan must be a partner pack.');
+        if (!$plan->isConsultantAgencyPack()) {
+            throw new RuntimeException('Plan must be a consultant pack.');
         }
 
         $contractYear = (int) ($options['contract_year'] ?? now()->year);
-        $baseSlots = PartnerPlanMatrix::slotCountForPlanCode($plan->plan_code);
+        $baseSlots = ConsultantAgencyPlanMatrix::slotCountForPlanCode($plan->plan_code);
         $extraSlots = (int) ($options['extra_slots_purchased'] ?? 0);
 
-        return DB::transaction(function () use ($partner, $plan, $options, $contractYear, $baseSlots, $extraSlots) {
-            PartnerSubscription::forPartner($partner->id)
+        return DB::transaction(function () use ($consultantOrg, $plan, $options, $contractYear, $baseSlots, $extraSlots) {
+            $oldSubscriptions = ConsultantSubscription::forConsultant($consultantOrg->id)
                 ->where('contract_year', $contractYear)
                 ->where('status', 'active')
-                ->update(['status' => 'expired']);
+                ->lockForUpdate()
+                ->get();
 
-            return PartnerSubscription::create([
-                'partner_company_id' => $partner->id,
+            $carriedExtraSlots = $extraSlots;
+            $oldIds = [];
+
+            foreach ($oldSubscriptions as $old) {
+                $oldIds[] = $old->id;
+
+                if (!array_key_exists('extra_slots_purchased', $options)) {
+                    $carriedExtraSlots += (int) $old->extra_slots_purchased;
+                }
+            }
+
+            if (!empty($oldIds)) {
+                ConsultantSubscription::whereIn('id', $oldIds)->update(['status' => 'expired']);
+            }
+
+            $newSubscription = ConsultantSubscription::create([
+                'consultant_company_id' => $consultantOrg->id,
                 'subscription_plan_id' => $plan->id,
                 'contract_year' => $contractYear,
-                'slot_limit' => $baseSlots + $extraSlots,
-                'extra_slots_purchased' => $extraSlots,
+                'slot_limit' => $baseSlots + $carriedExtraSlots,
+                'extra_slots_purchased' => $carriedExtraSlots,
                 'starts_at' => $options['starts_at'] ?? now()->toDateString(),
                 'expires_at' => $this->contractYearEnd($contractYear)->toDateString(),
                 'status' => 'active',
                 'payment_transaction_id' => $options['payment_transaction_id'] ?? null,
                 'metadata' => $options['metadata'] ?? null,
             ]);
+
+            if (!empty($oldIds)) {
+                ConsultantClientEngagement::whereIn('consultant_subscription_id', $oldIds)
+                    ->where('status', 'active')
+                    ->update(['consultant_subscription_id' => $newSubscription->id]);
+            }
+
+            return $newSubscription;
         });
     }
 
@@ -217,14 +242,14 @@ class PartnerSubscriptionService
      * Admin grant — no payment required.
      */
     public function grantPackSubscription(
-        Company $partner,
+        Company $consultantOrg,
         string $planCode,
         int $contractYear,
         array $metadata = [],
-    ): PartnerSubscription {
-        $plan = SubscriptionPlan::where('plan_code', $planCode)->where('plan_category', 'partner')->firstOrFail();
+    ): ConsultantSubscription {
+        $plan = SubscriptionPlan::where('plan_code', $planCode)->where('plan_category', 'consultant_agency')->firstOrFail();
 
-        return $this->activatePackSubscription($partner, $plan, [
+        return $this->activatePackSubscription($consultantOrg, $plan, [
             'contract_year' => $contractYear,
             'metadata' => array_merge($metadata, ['provision_type' => 'admin_grant']),
         ]);
@@ -243,7 +268,7 @@ class PartnerSubscriptionService
      * }
      */
     public function resolveExtraSlotPurchase(
-        PartnerSubscription $subscription,
+        ConsultantSubscription $subscription,
         int $quantity,
         string $chargeCurrency = 'AED',
     ): array {
@@ -257,7 +282,7 @@ class PartnerSubscriptionService
 
         $contractYear = (int) $subscription->contract_year;
         $chargeCurrency = strtoupper($chargeCurrency);
-        $annualTotal = PartnerPlanMatrix::EXTRA_SLOT_PRICE_AED * $quantity;
+        $annualTotal = ConsultantAgencyPlanMatrix::EXTRA_SLOT_PRICE_AED * $quantity;
         $chargeAmount = $chargeCurrency === 'INR'
             ? PlanEntitlementDefaults::defaultPriceInr($annualTotal)
             : $annualTotal;
@@ -278,25 +303,25 @@ class PartnerSubscriptionService
         ];
     }
 
-    public function completeExtraSlotTransaction(PaymentTransaction $transaction, array $gatewayRefs = []): PartnerSubscription
+    public function completeExtraSlotTransaction(PaymentTransaction $transaction, array $gatewayRefs = []): ConsultantSubscription
     {
         if ($transaction->status === 'completed') {
-            $subscriptionId = $transaction->metadata['partner_subscription_id'] ?? null;
+            $subscriptionId = $transaction->metadata['consultant_subscription_id'] ?? null;
 
             return $subscriptionId
-                ? PartnerSubscription::findOrFail($subscriptionId)
+                ? ConsultantSubscription::findOrFail($subscriptionId)
                 : throw new RuntimeException('Completed extra slot transaction is missing subscription reference.');
         }
 
         $metadata = array_merge($transaction->metadata ?? [], $gatewayRefs);
-        $subscriptionId = $metadata['partner_subscription_id'] ?? null;
+        $subscriptionId = $metadata['consultant_subscription_id'] ?? null;
         $quantity = (int) ($metadata['quantity'] ?? 0);
 
         if (!$subscriptionId || $quantity < 1) {
             throw new RuntimeException('Extra slot transaction is missing subscription or quantity.');
         }
 
-        $subscription = PartnerSubscription::findOrFail($subscriptionId);
+        $subscription = ConsultantSubscription::findOrFail($subscriptionId);
 
         return DB::transaction(function () use ($transaction, $metadata, $gatewayRefs, $subscription, $quantity) {
             $updated = $this->addExtraSlots($subscription, $quantity, $transaction);
@@ -305,7 +330,7 @@ class PartnerSubscriptionService
                 'status' => 'completed',
                 'paid_at' => now(),
                 'metadata' => array_merge($metadata, $gatewayRefs, [
-                    'partner_subscription_id' => $updated->id,
+                    'consultant_subscription_id' => $updated->id,
                 ]),
             ]);
 
@@ -326,7 +351,7 @@ class PartnerSubscriptionService
      * }
      */
     public function resolveYearUnlockPurchase(
-        PartnerClientEngagement $engagement,
+        ConsultantClientEngagement $engagement,
         int $reportingYear,
         string $chargeCurrency = 'AED',
     ): array {
@@ -340,19 +365,19 @@ class PartnerSubscriptionService
             throw new RuntimeException('Active agency pack required for reporting year unlock.');
         }
 
-        $entitlements = app(PartnerEntitlementService::class);
+        $mode = app(ConsultantAgencyEntitlementService::class)->reportingYearMode($engagement, $reportingYear);
 
-        if ($entitlements->reportingYearMode($engagement, $reportingYear) === PartnerEntitlementService::MODE_PRY_FULL) {
+        if ($mode === ConsultantAgencyEntitlementService::MODE_PRY_FULL) {
             throw new RuntimeException("Reporting year {$reportingYear} already has full export access.");
         }
 
-        if ($entitlements->reportingYearMode($engagement, $reportingYear) === PartnerEntitlementService::MODE_READ_ONLY) {
+        if ($mode === ConsultantAgencyEntitlementService::MODE_READ_ONLY) {
             throw new RuntimeException("Reporting year {$reportingYear} is read-only — use renewal to carry this client forward.");
         }
 
         $contractYear = (int) $subscription->contract_year;
         $chargeCurrency = strtoupper($chargeCurrency);
-        $annualPrice = PartnerPlanMatrix::REPORTING_YEAR_UNLOCK_PRICE_AED;
+        $annualPrice = ConsultantAgencyPlanMatrix::REPORTING_YEAR_UNLOCK_PRICE_AED;
         $chargeAmount = $chargeCurrency === 'INR'
             ? PlanEntitlementDefaults::defaultPriceInr($annualPrice)
             : $annualPrice;
@@ -374,18 +399,18 @@ class PartnerSubscriptionService
     }
 
     public function addReportingYearUnlock(
-        PartnerClientEngagement $engagement,
+        ConsultantClientEngagement $engagement,
         int $reportingYear,
         ?PaymentTransaction $transaction = null,
-    ): PartnerSubscriptionAddon {
+    ): ConsultantSubscriptionAddon {
         $subscription = $engagement->subscription;
 
         if (!$subscription) {
             throw new RuntimeException('Engagement has no linked subscription.');
         }
 
-        if (PartnerSubscriptionAddon::query()
-            ->where('partner_subscription_id', $subscription->id)
+        if (ConsultantSubscriptionAddon::query()
+            ->where('consultant_subscription_id', $subscription->id)
             ->where('addon_type', 'reporting_year_unlock')
             ->where('managed_company_id', $engagement->managed_company_id)
             ->where('reporting_year', $reportingYear)
@@ -393,24 +418,24 @@ class PartnerSubscriptionService
             throw new RuntimeException('This reporting year is already unlocked for this client.');
         }
 
-        return PartnerSubscriptionAddon::create([
-            'partner_subscription_id' => $subscription->id,
+        return ConsultantSubscriptionAddon::create([
+            'consultant_subscription_id' => $subscription->id,
             'addon_type' => 'reporting_year_unlock',
             'quantity' => 1,
             'managed_company_id' => $engagement->managed_company_id,
             'reporting_year' => $reportingYear,
-            'amount_aed' => PartnerPlanMatrix::REPORTING_YEAR_UNLOCK_PRICE_AED,
+            'amount_aed' => ConsultantAgencyPlanMatrix::REPORTING_YEAR_UNLOCK_PRICE_AED,
             'payment_transaction_id' => $transaction?->id,
         ]);
     }
 
-    public function completeYearUnlockTransaction(PaymentTransaction $transaction, array $gatewayRefs = []): PartnerSubscriptionAddon
+    public function completeYearUnlockTransaction(PaymentTransaction $transaction, array $gatewayRefs = []): ConsultantSubscriptionAddon
     {
         if ($transaction->status === 'completed') {
-            $addonId = $transaction->metadata['partner_addon_id'] ?? null;
+            $addonId = $transaction->metadata['consultant_addon_id'] ?? null;
 
             return $addonId
-                ? PartnerSubscriptionAddon::findOrFail($addonId)
+                ? ConsultantSubscriptionAddon::findOrFail($addonId)
                 : throw new RuntimeException('Completed year unlock transaction is missing addon reference.');
         }
 
@@ -422,7 +447,7 @@ class PartnerSubscriptionService
             throw new RuntimeException('Year unlock transaction is missing engagement or reporting year.');
         }
 
-        $engagement = PartnerClientEngagement::findOrFail($engagementId);
+        $engagement = ConsultantClientEngagement::findOrFail($engagementId);
 
         return DB::transaction(function () use ($transaction, $metadata, $gatewayRefs, $engagement, $reportingYear) {
             $addon = $this->addReportingYearUnlock($engagement, $reportingYear, $transaction);
@@ -431,7 +456,7 @@ class PartnerSubscriptionService
                 'status' => 'completed',
                 'paid_at' => now(),
                 'metadata' => array_merge($metadata, $gatewayRefs, [
-                    'partner_addon_id' => $addon->id,
+                    'consultant_addon_id' => $addon->id,
                 ]),
             ]);
 
@@ -439,7 +464,7 @@ class PartnerSubscriptionService
         });
     }
 
-    public function addExtraSlots(PartnerSubscription $subscription, int $quantity, ?PaymentTransaction $transaction = null): PartnerSubscription
+    public function addExtraSlots(ConsultantSubscription $subscription, int $quantity, ?PaymentTransaction $transaction = null): ConsultantSubscription
     {
         if ($quantity < 1) {
             throw new RuntimeException('Quantity must be at least 1.');
@@ -448,18 +473,18 @@ class PartnerSubscriptionService
         $subscription->increment('extra_slots_purchased', $quantity);
         $subscription->increment('slot_limit', $quantity);
 
-        PartnerSubscriptionAddon::create([
-            'partner_subscription_id' => $subscription->id,
+        ConsultantSubscriptionAddon::create([
+            'consultant_subscription_id' => $subscription->id,
             'addon_type' => 'extra_slot',
             'quantity' => $quantity,
-            'amount_aed' => PartnerPlanMatrix::EXTRA_SLOT_PRICE_AED * $quantity,
+            'amount_aed' => ConsultantAgencyPlanMatrix::EXTRA_SLOT_PRICE_AED * $quantity,
             'payment_transaction_id' => $transaction?->id,
         ]);
 
         return $subscription->fresh();
     }
 
-    public function archiveEngagement(PartnerClientEngagement $engagement): PartnerClientEngagement
+    public function archiveEngagement(ConsultantClientEngagement $engagement): ConsultantClientEngagement
     {
         $engagement->update([
             'status' => 'archived',
@@ -472,10 +497,10 @@ class PartnerSubscriptionService
     /**
      * @return array{used: int, limit: int, remaining: int, contract_year: int|null, expires_at: string|null}
      */
-    public function slotSummary(int $partnerCompanyId): array
+    public function slotSummary(int $consultantCompanyId, ?ConsultantSubscription $subscription = null): array
     {
-        $subscription = $this->getActiveSubscription($partnerCompanyId);
-        $used = $this->activeSlotUsage($partnerCompanyId, $subscription);
+        $subscription ??= $this->getActiveSubscription($consultantCompanyId);
+        $used = $this->activeSlotUsage($consultantCompanyId, $subscription);
 
         return [
             'used' => $used,
@@ -486,10 +511,48 @@ class PartnerSubscriptionService
         ];
     }
 
-    private function assertPartnerCompany(Company $company): void
+    /**
+     * @param  iterable<SubscriptionPlan>  $plans
+     * @return array<int, array{charge_amount: float, pro_rata: bool}>
+     */
+    public function planQuotes(Company $consultantOrg, iterable $plans, ?int $contractYear = null): array
     {
-        if ($company->company_type !== 'partner') {
-            throw new RuntimeException('Company must be a partner organisation.');
+        $contractYear ??= (int) now()->year;
+        $quotes = [];
+
+        foreach ($plans as $plan) {
+            $quote = $this->resolvePackPurchase($consultantOrg, $plan, $contractYear);
+            $quotes[$plan->id] = [
+                'charge_amount' => $quote['charge_amount'],
+                'pro_rata' => $quote['pro_rata'],
+            ];
+        }
+
+        return $quotes;
+    }
+
+    public function validatePackChange(Company $consultantOrg, SubscriptionPlan $plan, ?ConsultantSubscription $current): void
+    {
+        if (!$current) {
+            return;
+        }
+
+        $newBaseSlots = ConsultantAgencyPlanMatrix::slotCountForPlanCode($plan->plan_code);
+        $newLimit = $newBaseSlots + (int) $current->extra_slots_purchased;
+        $used = $this->activeSlotUsage($consultantOrg->id, $current);
+
+        if ($used > $newLimit) {
+            throw new RuntimeException(
+                "You have {$used} active clients but {$plan->plan_name} allows {$newLimit} slots. "
+                . 'Archive clients before downgrading your pack.'
+            );
+        }
+    }
+
+    private function assertConsultantOrg(Company $company): void
+    {
+        if ($company->company_type !== 'consultant') {
+            throw new RuntimeException('Company must be a consultant organisation.');
         }
     }
 }

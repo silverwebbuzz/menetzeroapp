@@ -35,7 +35,7 @@ class Consultant extends Authenticatable
         'reviewed_at',
         'reviewed_by_admin_id',
         'is_active',
-        'partner_company_id',
+        'agency_company_id',
     ];
 
     protected $hidden = [
@@ -78,9 +78,9 @@ class Consultant extends Authenticatable
         return $this->belongsTo(Admin::class, 'reviewed_by_admin_id');
     }
 
-    public function partnerCompany(): BelongsTo
+    public function agencyCompany(): BelongsTo
     {
-        return $this->belongsTo(Company::class, 'partner_company_id');
+        return $this->belongsTo(Company::class, 'agency_company_id');
     }
 
     public function isApproved(): bool

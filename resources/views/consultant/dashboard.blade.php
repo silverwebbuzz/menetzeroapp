@@ -33,14 +33,14 @@
 <div class="mb-8">
     <h2 class="text-lg font-semibold text-gray-900 mb-3">Client workspaces</h2>
     <p class="text-sm text-gray-600 mb-4">
-        Manage SME carbon accounts from one login. Freelancers typically start with <strong>Partner 5</strong>; larger practices choose 10 / 25 / 50 slots.
+        Manage SME carbon accounts from one login. Freelancers typically start with <strong>Consultant 5</strong>; larger practices choose 10 / 25 / 50 slots.
     </p>
     <div class="grid sm:grid-cols-3 gap-4 mb-4">
         <div class="bg-white border border-gray-200 rounded-xl p-5">
             <div class="text-xs text-gray-500 uppercase tracking-wide">Agency pack</div>
             <div class="mt-1 font-semibold text-gray-900">
                 @if($subscription)
-                    {{ strtoupper(str_replace('partner_', 'Partner ', $subscription->plan_code)) }}
+                    {{ strtoupper(str_replace('consultant_', 'Consultant ', $subscription->plan_code)) }}
                     <span class="text-xs font-normal text-gray-500">· {{ $subscription->contract_year }}</span>
                 @else
                     <span class="text-amber-700">No pack yet</span>

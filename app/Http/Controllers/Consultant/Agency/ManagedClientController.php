@@ -1,46 +1,49 @@
 <?php
 
-namespace App\Http\Controllers\Partner;
+namespace App\Http\Controllers\Consultant\Agency;
 
 use App\Http\Controllers\Controller;
-use App\Services\PartnerEntitlementService;
-use App\Services\PartnerManagedClientService;
-use App\Services\PartnerSubscriptionService;
-use App\Services\PartnerWorkspaceService;
+use App\Http\Controllers\Consultant\Agency\Concerns\ResolvesConsultantAgency;
+use App\Services\ConsultantAgencyEntitlementService;
+use App\Services\ConsultantAgencyClientService;
+use App\Services\ConsultantAgencySubscriptionService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use RuntimeException;
 
 class ManagedClientController extends Controller
 {
+    use ResolvesConsultantAgency;
+
     public function __construct(
-        protected PartnerManagedClientService $managedClients,
-        protected PartnerSubscriptionService $subscriptions,
+        protected ConsultantAgencyClientService $managedClients,
+        protected ConsultantAgencySubscriptionService $subscriptions,
+        protected ConsultantAgencyEntitlementService $entitlements,
     ) {
     }
 
     public function index()
     {
-        $partner = $this->partnerCompany();
-        $engagements = $this->managedClients->listForPartner($partner->id);
-        $slotSummary = $this->subscriptions->slotSummary($partner->id);
+        $consultantOrg = $this->consultantCompany();
+        $engagements = $this->managedClients->listForConsultant($consultantOrg->id);
+        $subscription = $this->subscriptions->getActiveSubscription($consultantOrg->id);
+        $slotSummary = $this->subscriptions->slotSummary($consultantOrg->id, $subscription);
 
-        return view('partner.clients.index', compact('partner', 'engagements', 'slotSummary'));
+        return view('consultant.agency.clients.index', compact('consultantOrg', 'engagements', 'slotSummary'));
     }
 
     public function create()
     {
-        $partner = $this->partnerCompany();
-        $subscription = $this->subscriptions->getActiveSubscription($partner->id);
-        $slotSummary = $this->subscriptions->slotSummary($partner->id);
+        $consultantOrg = $this->consultantCompany();
+        $subscription = $this->subscriptions->getActiveSubscription($consultantOrg->id);
+        $slotSummary = $this->subscriptions->slotSummary($consultantOrg->id, $subscription);
         $defaultPry = $subscription?->contract_year ?? (int) now()->year;
 
-        return view('partner.clients.create', compact('partner', 'subscription', 'slotSummary', 'defaultPry'));
+        return view('consultant.agency.clients.create', compact('consultantOrg', 'subscription', 'slotSummary', 'defaultPry'));
     }
 
     public function store(Request $request)
     {
-        $partner = $this->partnerCompany();
+        $consultantOrg = $this->consultantCompany();
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -55,7 +58,7 @@ class ManagedClientController extends Controller
         ]);
 
         try {
-            $engagement = $this->managedClients->create($partner, $validated);
+            $engagement = $this->managedClients->create($consultantOrg, $validated);
         } catch (RuntimeException $e) {
             return back()->withInput()->with('error', $e->getMessage());
         }
@@ -67,17 +70,16 @@ class ManagedClientController extends Controller
 
     public function show(int $client)
     {
-        $partner = $this->partnerCompany();
-        $engagement = $this->managedClients->findForPartner($partner->id, $client);
+        $consultantOrg = $this->consultantCompany();
+        $engagement = $this->managedClients->findForConsultant($consultantOrg->id, $client);
         $yearUnlockTarget = null;
         $yearUnlockQuote = null;
 
         if ($engagement->isActive()) {
-            $entitlements = app(PartnerEntitlementService::class);
             $candidateYear = (int) $engagement->primary_reporting_year + 1;
-            $mode = $entitlements->reportingYearMode($engagement, $candidateYear);
+            $mode = $this->entitlements->reportingYearMode($engagement, $candidateYear);
 
-            if ($mode === PartnerEntitlementService::MODE_PREVIEW) {
+            if ($mode === ConsultantAgencyEntitlementService::MODE_PREVIEW) {
                 $yearUnlockTarget = $candidateYear;
 
                 try {
@@ -91,8 +93,8 @@ class ManagedClientController extends Controller
             }
         }
 
-        return view('partner.clients.show', compact(
-            'partner',
+        return view('consultant.agency.clients.show', compact(
+            'consultant_agency',
             'engagement',
             'yearUnlockTarget',
             'yearUnlockQuote',
@@ -101,16 +103,16 @@ class ManagedClientController extends Controller
 
     public function edit(int $client)
     {
-        $partner = $this->partnerCompany();
-        $engagement = $this->managedClients->findForPartner($partner->id, $client);
+        $consultantOrg = $this->consultantCompany();
+        $engagement = $this->managedClients->findForConsultant($consultantOrg->id, $client);
 
-        return view('partner.clients.edit', compact('partner', 'engagement'));
+        return view('consultant.agency.clients.edit', compact('consultantOrg', 'engagement'));
     }
 
     public function update(Request $request, int $client)
     {
-        $partner = $this->partnerCompany();
-        $engagement = $this->managedClients->findForPartner($partner->id, $client);
+        $consultantOrg = $this->consultantCompany();
+        $engagement = $this->managedClients->findForConsultant($consultantOrg->id, $client);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -132,8 +134,8 @@ class ManagedClientController extends Controller
 
     public function destroy(int $client)
     {
-        $partner = $this->partnerCompany();
-        $engagement = $this->managedClients->findForPartner($partner->id, $client);
+        $consultantOrg = $this->consultantCompany();
+        $engagement = $this->managedClients->findForConsultant($consultantOrg->id, $client);
 
         if ($engagement->isActive()) {
             $this->managedClients->archive($engagement);
@@ -148,14 +150,4 @@ class ManagedClientController extends Controller
             ->with('info', 'Client was already archived.');
     }
 
-    protected function partnerCompany()
-    {
-        $company = app(PartnerWorkspaceService::class)->getPartnerHomeCompany(Auth::user());
-
-        if (!$company) {
-            abort(403, 'Partner organisation required.');
-        }
-
-        return $company;
-    }
 }

@@ -5,12 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class PartnerClientEngagement extends Model
+class ConsultantClientEngagement extends Model
 {
+    protected $table = 'consultant_client_engagements';
+
     protected $fillable = [
-        'partner_company_id',
+        'consultant_company_id',
         'managed_company_id',
-        'partner_subscription_id',
+        'consultant_subscription_id',
         'primary_reporting_year',
         'status',
         'archived_at',
@@ -23,9 +25,9 @@ class PartnerClientEngagement extends Model
         'archived_at' => 'datetime',
     ];
 
-    public function partnerCompany(): BelongsTo
+    public function consultantCompany(): BelongsTo
     {
-        return $this->belongsTo(Company::class, 'partner_company_id');
+        return $this->belongsTo(Company::class, 'consultant_company_id');
     }
 
     public function managedCompany(): BelongsTo
@@ -35,7 +37,7 @@ class PartnerClientEngagement extends Model
 
     public function subscription(): BelongsTo
     {
-        return $this->belongsTo(PartnerSubscription::class, 'partner_subscription_id');
+        return $this->belongsTo(ConsultantSubscription::class, 'consultant_subscription_id');
     }
 
     public function previousEngagement(): BelongsTo
@@ -53,8 +55,8 @@ class PartnerClientEngagement extends Model
         return $query->where('status', 'active');
     }
 
-    public function scopeForPartner($query, int $partnerCompanyId)
+    public function scopeForConsultant($query, int $consultantCompanyId)
     {
-        return $query->where('partner_company_id', $partnerCompanyId);
+        return $query->where('consultant_company_id', $consultantCompanyId);
     }
 }

@@ -10,36 +10,45 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 /**
- * P15 — Consultant = Partner: one account, optional directory listing + agency packs.
- *
- * Every consultant gets a linked partner organisation (company_type = partner) and
- * a web User so /consultant agency routes work from the same login session.
+ * Links consultant directory account to agency organisation + web User session.
  */
-class ConsultantPartnerLinkService
+class ConsultantAccountService
 {
     /**
      * @return array{user: User, company: Company}
      */
     public function ensureLinked(Consultant $consultant): array
     {
+        $consultant->loadMissing('agencyCompany');
+
+        if ($consultant->agency_company_id && $consultant->agencyCompany) {
+            $user = User::where('email', $consultant->email)->first();
+
+            if ($user) {
+                $this->ensureOwnerRole($user, $consultant->agencyCompany);
+
+                return ['user' => $user, 'company' => $consultant->agencyCompany];
+            }
+        }
+
         return DB::transaction(function () use ($consultant) {
-            $company = $consultant->partnerCompany;
+            $company = $consultant->agencyCompany;
 
             if (!$company) {
                 $company = Company::create([
                     'name' => $consultant->company_name ?: $consultant->name,
                     'email' => $consultant->email,
                     'phone' => $consultant->phone,
-                    'company_type' => 'partner',
+                    'company_type' => 'consultant',
                     'is_direct_client' => true,
                     'is_active' => true,
                     'license_no' => $consultant->trade_license_number,
                     'description' => $consultant->bio,
                 ]);
 
-                $consultant->update(['partner_company_id' => $company->id]);
-            } elseif ($company->company_type !== 'partner') {
-                $company->update(['company_type' => 'partner']);
+                $consultant->update(['agency_company_id' => $company->id]);
+            } elseif ($company->company_type !== 'consultant') {
+                $company->update(['company_type' => 'consultant']);
             }
 
             $user = User::where('email', $consultant->email)->first();
@@ -63,12 +72,25 @@ class ConsultantPartnerLinkService
 
     public function syncWebSession(Consultant $consultant): User
     {
+        $webUser = Auth::guard('web')->user();
+
+        if ($webUser && $webUser->email === $consultant->email && $consultant->agency_company_id) {
+            if (!app(ConsultantAgencyWorkspaceService::class)->isActingAsManagedClient($webUser)) {
+                $webUser->switchToCompany((int) $consultant->agency_company_id);
+            }
+
+            return $webUser;
+        }
+
         $linked = $this->ensureLinked($consultant);
         $user = $linked['user'];
         $company = $linked['company'];
 
         Auth::guard('web')->login($user, Auth::guard('consultant')->viaRemember());
-        $user->switchToCompany($company->id);
+
+        if (!app(ConsultantAgencyWorkspaceService::class)->isActingAsManagedClient($user)) {
+            $user->switchToCompany($company->id);
+        }
 
         return $user;
     }
@@ -96,14 +118,14 @@ class ConsultantPartnerLinkService
         }
 
         if ((int) $user->company_id !== (int) $company->id) {
-            $ownedPartner = UserCompanyRole::query()
+            $ownedConsultantOrg = UserCompanyRole::query()
                 ->where('user_id', $user->id)
                 ->whereNull('company_custom_role_id')
                 ->where('is_active', true)
-                ->whereHas('company', fn ($q) => $q->where('company_type', 'partner'))
+                ->whereHas('company', fn ($q) => $q->where('company_type', 'consultant'))
                 ->exists();
 
-            if (!$ownedPartner || (int) $user->company_id === 0) {
+            if (!$ownedConsultantOrg || (int) $user->company_id === 0) {
                 $user->update(['company_id' => $company->id]);
             }
         }

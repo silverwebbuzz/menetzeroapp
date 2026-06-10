@@ -19,7 +19,7 @@ class PlanEntitlementService
 
     public function __construct(
         protected SubscriptionService $subscriptionService,
-        protected PartnerEntitlementService $partnerEntitlements,
+        protected ConsultantAgencyEntitlementService $consultantOrgEntitlements,
     ) {
     }
 
@@ -28,8 +28,8 @@ class PlanEntitlementService
      */
     public function forCompany(int $companyId): array
     {
-        if ($this->partnerEntitlements->isManagedClient($companyId)) {
-            return $this->partnerEntitlements->entitlementsForManagedClient($companyId);
+        if ($this->consultantOrgEntitlements->isManagedClient($companyId)) {
+            return $this->consultantOrgEntitlements->entitlementsForManagedClient($companyId);
         }
 
         $subscription = $this->subscriptionService->getActiveSubscription($companyId);
@@ -141,8 +141,8 @@ class PlanEntitlementService
             ];
         }
 
-        if ($this->partnerEntitlements->isManagedClient($companyId)) {
-            return $this->partnerEntitlements->canExportDisclosures($companyId, $fiscalYear);
+        if ($this->consultantOrgEntitlements->isManagedClient($companyId)) {
+            return $this->consultantOrgEntitlements->canExportDisclosures($companyId, $fiscalYear);
         }
 
         $yearCheck = $this->checkExportRegenWindow($companyId, $fiscalYear);
@@ -168,8 +168,8 @@ class PlanEntitlementService
             ];
         }
 
-        if ($this->partnerEntitlements->isManagedClient($companyId)) {
-            return $this->partnerEntitlements->canExport($companyId, $exportCode, $fiscalYear);
+        if ($this->consultantOrgEntitlements->isManagedClient($companyId)) {
+            return $this->consultantOrgEntitlements->canExport($companyId, $exportCode, $fiscalYear);
         }
 
         return $this->checkExportRegenWindow($companyId, $fiscalYear);
@@ -232,7 +232,7 @@ class PlanEntitlementService
      */
     public function canWriteForReportingYear(int $companyId, int $reportingYear): array
     {
-        return $this->partnerEntitlements->canWriteForReportingYear($companyId, $reportingYear);
+        return $this->consultantOrgEntitlements->canWriteForReportingYear($companyId, $reportingYear);
     }
 
     /**

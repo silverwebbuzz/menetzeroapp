@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\Company;
-use App\Models\PartnerClientEngagement;
+use App\Models\ConsultantClientEngagement;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use RuntimeException;
@@ -13,20 +13,20 @@ use RuntimeException;
  *
  * Session key holds managed company id; partner home org comes from the user's owned company.
  */
-class PartnerWorkspaceService
+class ConsultantAgencyWorkspaceService
 {
-    public const SESSION_KEY = 'partner_acting_company_id';
+    public const SESSION_KEY = 'consultant_acting_company_id';
 
-    public const READ_ONLY_KEY = 'partner_acting_read_only';
+    public const READ_ONLY_KEY = 'consultant_acting_read_only';
 
-    public function getPartnerHomeCompany(User $user): ?Company
+    public function getConsultantHomeCompany(User $user): ?Company
     {
         try {
             if (\Illuminate\Support\Facades\Schema::hasTable('user_company_roles')) {
                 $role = $user->companyRoles()
                     ->where('is_active', true)
                     ->whereNull('company_custom_role_id')
-                    ->whereHas('company', fn ($q) => $q->where('company_type', 'partner'))
+                    ->whereHas('company', fn ($q) => $q->where('company_type', 'consultant'))
                     ->first();
 
                 if ($role) {
@@ -39,12 +39,12 @@ class PartnerWorkspaceService
 
         $owned = $user->getOwnedCompany();
 
-        return ($owned && $owned->isPartner()) ? $owned : null;
+        return ($owned && $owned->isConsultantOrg()) ? $owned : null;
     }
 
-    public function isPartnerUser(User $user): bool
+    public function isConsultantOrgUser(User $user): bool
     {
-        return $this->getPartnerHomeCompany($user) !== null;
+        return $this->getConsultantHomeCompany($user) !== null;
     }
 
     public function getActingCompanyId(): ?int
@@ -69,15 +69,15 @@ class PartnerWorkspaceService
             return null;
         }
 
-        $partner = $this->getPartnerHomeCompany($user);
+        $consultantOrg = $this->getConsultantHomeCompany($user);
 
-        if (!$partner) {
+        if (!$consultantOrg) {
             return null;
         }
 
         $managed = Company::find($actingId);
 
-        if (!$managed || !$managed->isManagedClient() || (int) $managed->partner_id !== (int) $partner->id) {
+        if (!$managed || !$managed->isManagedClient() || (int) $managed->consultant_id !== (int) $consultantOrg->id) {
             return null;
         }
 
@@ -89,7 +89,7 @@ class PartnerWorkspaceService
         return (bool) session(self::READ_ONLY_KEY, false);
     }
 
-    public function engagementForActing(User $user): ?PartnerClientEngagement
+    public function engagementForActing(User $user): ?ConsultantClientEngagement
     {
         $managed = $this->resolveActingCompany($user);
 
@@ -98,19 +98,14 @@ class PartnerWorkspaceService
         }
 
         if ($this->isReadOnlyWorkspace()) {
-            return PartnerClientEngagement::query()
+            return ConsultantClientEngagement::query()
                 ->where('managed_company_id', $managed->id)
-                ->where('partner_company_id', $managed->partner_id)
+                ->where('consultant_company_id', $managed->consultant_id)
                 ->orderByDesc('id')
                 ->first();
         }
 
-        return app(PartnerEntitlementService::class)->getActiveEngagement($managed->id);
-    }
-
-    public function activeEngagementForActing(User $user): ?PartnerClientEngagement
-    {
-        return $this->engagementForActing($user);
+        return app(ConsultantAgencyEntitlementService::class)->getActiveEngagement($managed->id);
     }
 
     /**
@@ -142,19 +137,19 @@ class PartnerWorkspaceService
     }
 
     /**
-     * @return Collection<int, PartnerClientEngagement>
+     * @return Collection<int, ConsultantClientEngagement>
      */
     public function switchableEngagements(User $user): Collection
     {
-        $partner = $this->getPartnerHomeCompany($user);
+        $consultantOrg = $this->getConsultantHomeCompany($user);
 
-        if (!$partner) {
+        if (!$consultantOrg) {
             return collect();
         }
 
-        return PartnerClientEngagement::query()
+        return ConsultantClientEngagement::query()
             ->with('managedCompany')
-            ->forPartner($partner->id)
+            ->forConsultant($consultantOrg->id)
             ->active()
             ->orderByDesc('id')
             ->get();
@@ -162,15 +157,15 @@ class PartnerWorkspaceService
 
     public function enterWorkspace(User $user, int $managedCompanyId): Company
     {
-        $partner = $this->getPartnerHomeCompany($user);
+        $consultantOrg = $this->getConsultantHomeCompany($user);
 
-        if (!$partner) {
-            throw new RuntimeException('Your account is not linked to a partner organisation.');
+        if (!$consultantOrg) {
+            throw new RuntimeException('Your account is not linked to a consultant organisation.');
         }
 
         $managed = Company::query()
             ->where('id', $managedCompanyId)
-            ->where('partner_id', $partner->id)
+            ->where('consultant_id', $consultantOrg->id)
             ->where('is_direct_client', false)
             ->first();
 
@@ -178,7 +173,7 @@ class PartnerWorkspaceService
             throw new RuntimeException('Managed client not found for this partner.');
         }
 
-        $engagement = app(PartnerEntitlementService::class)->getActiveEngagement($managed->id);
+        $engagement = app(ConsultantAgencyEntitlementService::class)->getActiveEngagement($managed->id);
 
         if (!$engagement || !$engagement->isActive()) {
             throw new RuntimeException('This client engagement is archived. Open it read-only from the agency hub or renew.');
@@ -192,11 +187,11 @@ class PartnerWorkspaceService
         return $managed;
     }
 
-    public function enterReadOnlyWorkspace(User $user, PartnerClientEngagement $engagement): Company
+    public function enterReadOnlyWorkspace(User $user, ConsultantClientEngagement $engagement): Company
     {
-        $partner = $this->getPartnerHomeCompany($user);
+        $consultantOrg = $this->getConsultantHomeCompany($user);
 
-        if (!$partner || (int) $engagement->partner_company_id !== (int) $partner->id) {
+        if (!$consultantOrg || (int) $engagement->consultant_company_id !== (int) $consultantOrg->id) {
             throw new RuntimeException('You do not have access to this client engagement.');
         }
 
@@ -214,11 +209,11 @@ class PartnerWorkspaceService
         return $managed;
     }
 
-    public function enterWorkspaceFromEngagement(User $user, PartnerClientEngagement $engagement): Company
+    public function enterWorkspaceFromEngagement(User $user, ConsultantClientEngagement $engagement): Company
     {
-        $partner = $this->getPartnerHomeCompany($user);
+        $consultantOrg = $this->getConsultantHomeCompany($user);
 
-        if (!$partner || (int) $engagement->partner_company_id !== (int) $partner->id) {
+        if (!$consultantOrg || (int) $engagement->consultant_company_id !== (int) $consultantOrg->id) {
             throw new RuntimeException('You do not have access to this client engagement.');
         }
 
@@ -236,9 +231,9 @@ class PartnerWorkspaceService
             return false;
         }
 
-        $partner = $this->getPartnerHomeCompany($user);
+        $consultantOrg = $this->getConsultantHomeCompany($user);
 
-        if (!$partner || (int) $company->partner_id !== (int) $partner->id) {
+        if (!$consultantOrg || (int) $company->consultant_id !== (int) $consultantOrg->id) {
             return false;
         }
 

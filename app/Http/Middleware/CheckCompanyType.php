@@ -31,14 +31,14 @@ class CheckCompanyType
         // Dashboard controller will handle showing company setup prompt
         if (!$company) {
             // Only allow dashboard and company setup routes
-            $allowedRoutes = $type === 'partner'
+            $allowedRoutes = $type === 'consultant'
                 ? ['consultant.dashboard', 'company.setup.store', 'logout', 'account.selector', 'account.switch']
                 : ['client.dashboard', 'company.setup.store', 'logout', 'account.selector', 'account.switch'];
             $routeName = $request->route() ? $request->route()->getName() : null;
             
             // If route name exists and is not in allowed list, redirect to dashboard with message
             if ($routeName && !in_array($routeName, $allowedRoutes)) {
-                $fallback = $type === 'partner' ? 'consultant.dashboard' : 'client.dashboard';
+                $fallback = $type === 'consultant' ? 'consultant.dashboard' : 'client.dashboard';
 
                 return redirect()->route($fallback)
                     ->with('error', 'Please complete your company setup first to access this feature.');
@@ -47,14 +47,14 @@ class CheckCompanyType
         }
 
         if ($type === 'client') {
-            if ($company->isPartner()) {
+            if ($company->isConsultantOrg()) {
                 return redirect()
                     ->route('consultant.dashboard')
                     ->with('info', 'Use the agency hub to manage clients and open workspaces.');
             }
 
             if ($company->isManagedClient()) {
-                $workspace = app(\App\Services\PartnerWorkspaceService::class);
+                $workspace = app(\App\Services\ConsultantAgencyWorkspaceService::class);
                 if (!$workspace->canActOnManagedClient($user, $company)) {
                     abort(403, 'Invalid managed client workspace. Open the client from your agency hub.');
                 }
@@ -67,10 +67,10 @@ class CheckCompanyType
             }
         }
 
-        if ($type === 'partner') {
-            $partnerHome = app(\App\Services\PartnerWorkspaceService::class)->getPartnerHomeCompany($user);
-            if (!$partnerHome) {
-                abort(403, 'This route is for partner organisations only.');
+        if ($type === 'consultant') {
+            $consultantOrgHome = app(\App\Services\ConsultantAgencyWorkspaceService::class)->getConsultantHomeCompany($user);
+            if (!$consultantOrgHome) {
+                abort(403, 'This route is for consultant organisations only.');
             }
 
             return $next($request);

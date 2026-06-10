@@ -2,17 +2,17 @@
 
 namespace App\Services;
 
-use App\Data\PartnerPlanMatrix;
+use App\Data\ConsultantAgencyPlanMatrix;
 use App\Models\Company;
-use App\Models\PartnerClientEngagement;
-use App\Models\PartnerSubscriptionAddon;
+use App\Models\ConsultantClientEngagement;
+use App\Models\ConsultantSubscriptionAddon;
 
 /**
  * Entitlements for partner-managed client workspaces (PRY / preview / read-only).
  *
  * @see documentation/PARTNER_AGENCY_PLAN_V1.md §3.1, §7.3
  */
-class PartnerEntitlementService
+class ConsultantAgencyEntitlementService
 {
     public const MODE_PRY_FULL = 'pry_full';
     public const MODE_PREVIEW = 'preview';
@@ -34,29 +34,29 @@ class PartnerEntitlementService
         $engagement = $this->getActiveEngagement($companyId);
 
         if (!$engagement || !$engagement->isActive()) {
-            return array_merge(PartnerPlanMatrix::managedClientEntitlements(), [
-                'channel' => 'partner_managed',
+            return array_merge(ConsultantAgencyPlanMatrix::managedClientEntitlements(), [
+                'channel' => 'consultant_managed',
                 'engagement_status' => $engagement?->status ?? 'none',
             ]);
         }
 
-        return array_merge(PartnerPlanMatrix::managedClientEntitlements(), [
+        return array_merge(ConsultantAgencyPlanMatrix::managedClientEntitlements(), [
             'engagement_status' => 'active',
             'primary_reporting_year' => $engagement->primary_reporting_year,
-            'partner_company_id' => $engagement->partner_company_id,
+            'consultant_company_id' => $engagement->consultant_company_id,
         ]);
     }
 
-    public function getActiveEngagement(int $managedCompanyId): ?PartnerClientEngagement
+    public function getActiveEngagement(int $managedCompanyId): ?ConsultantClientEngagement
     {
-        return PartnerClientEngagement::query()
+        return ConsultantClientEngagement::query()
             ->where('managed_company_id', $managedCompanyId)
             ->active()
             ->orderByDesc('id')
             ->first();
     }
 
-    public function reportingYearMode(PartnerClientEngagement $engagement, int $reportingYear): string
+    public function reportingYearMode(ConsultantClientEngagement $engagement, int $reportingYear): string
     {
         if (!$engagement->isActive()) {
             return self::MODE_DENIED;
@@ -217,10 +217,10 @@ class PartnerEntitlementService
         };
     }
 
-    protected function hasYearUnlock(PartnerClientEngagement $engagement, int $reportingYear): bool
+    protected function hasYearUnlock(ConsultantClientEngagement $engagement, int $reportingYear): bool
     {
-        return PartnerSubscriptionAddon::query()
-            ->where('partner_subscription_id', $engagement->partner_subscription_id)
+        return ConsultantSubscriptionAddon::query()
+            ->where('consultant_subscription_id', $engagement->consultant_subscription_id)
             ->where('addon_type', 'reporting_year_unlock')
             ->where('managed_company_id', $engagement->managed_company_id)
             ->where('reporting_year', $reportingYear)

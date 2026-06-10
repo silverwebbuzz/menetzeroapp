@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class PartnerSubscriptionAddon extends Model
+class ConsultantSubscriptionAddon extends Model
 {
+    protected $table = 'consultant_subscription_addons';
+
     protected $fillable = [
-        'partner_subscription_id',
+        'consultant_subscription_id',
         'addon_type',
         'quantity',
         'managed_company_id',
@@ -27,7 +29,7 @@ class PartnerSubscriptionAddon extends Model
 
     public function subscription(): BelongsTo
     {
-        return $this->belongsTo(PartnerSubscription::class, 'partner_subscription_id');
+        return $this->belongsTo(ConsultantSubscription::class, 'consultant_subscription_id');
     }
 
     public function managedCompany(): BelongsTo

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Consultant;
 
 use App\Http\Controllers\Controller;
 use App\Models\Consultant;
-use App\Services\ConsultantPartnerLinkService;
+use App\Services\ConsultantAccountService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -17,7 +17,7 @@ class AuthController extends Controller
             return redirect()->route('consultant.dashboard');
         }
 
-        $partnerCount = Consultant::query()->where('status', 'approved')->where('is_active', true)->count();
+        $consultantOrgCount = Consultant::query()->where('status', 'approved')->where('is_active', true)->count();
 
         return view('consultant.landing', compact('partnerCount'));
     }
@@ -48,7 +48,7 @@ class AuthController extends Controller
         ]);
 
         Auth::guard('consultant')->login($consultant);
-        app(ConsultantPartnerLinkService::class)->syncWebSession($consultant);
+        app(ConsultantAccountService::class)->syncWebSession($consultant);
 
         return redirect()->route('consultant.dashboard')
             ->with('success', 'Welcome! Complete your profile for the directory, or purchase an agency pack to manage client workspaces.');
@@ -80,7 +80,7 @@ class AuthController extends Controller
 
         if (Auth::guard('consultant')->attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-            app(ConsultantPartnerLinkService::class)->syncWebSession($consultant);
+            app(ConsultantAccountService::class)->syncWebSession($consultant);
 
             return redirect()->intended(route('consultant.dashboard'));
         }

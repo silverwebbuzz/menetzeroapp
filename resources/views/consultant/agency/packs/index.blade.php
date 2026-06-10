@@ -14,7 +14,7 @@
     <div class="bg-white border border-gray-200 rounded-xl p-6 mb-8">
         <h2 class="font-semibold text-gray-900 mb-2">Need more client slots?</h2>
         <p class="text-sm text-gray-600 mb-4">
-            Add slots at <strong>AED {{ number_format(\App\Data\PartnerPlanMatrix::EXTRA_SLOT_PRICE_AED) }}</strong> each (pro-rata through 31 Dec {{ $contractYear }}).
+            Add slots at <strong>AED {{ number_format(\App\Data\ConsultantAgencyPlanMatrix::EXTRA_SLOT_PRICE_AED) }}</strong> each (pro-rata through 31 Dec {{ $contractYear }}).
             You do not need to upgrade to the next pack size.
         </p>
         @if($extraSlotQuote)
@@ -47,8 +47,8 @@
 <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
     @foreach($plans as $plan)
         @php
-            $slots = \App\Data\PartnerPlanMatrix::slotCountForPlanCode($plan->plan_code);
-            $quote = app(\App\Services\PartnerSubscriptionService::class)->resolvePackPurchase($partner, $plan, $contractYear);
+            $slots = \App\Data\ConsultantAgencyPlanMatrix::slotCountForPlanCode($plan->plan_code);
+            $quote = $planQuotes[$plan->id] ?? ['charge_amount' => 0, 'pro_rata' => false];
         @endphp
         <div class="bg-white border border-gray-200 rounded-xl p-5 flex flex-col">
             <h2 class="font-semibold text-gray-900">{{ $plan->plan_name }}</h2>
@@ -72,7 +72,7 @@
                 </select>
                 <button type="submit" class="w-full px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium rounded-lg">
                     @if($subscription)
-                        Change pack
+                        Upgrade / change pack
                     @else
                         Purchase pack
                     @endif

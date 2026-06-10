@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Services\PartnerWorkspaceService;
+use App\Services\ConsultantAgencyWorkspaceService;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * P15 — Agency routes: consultant session (primary) or linked web partner user.
  */
-class EnsurePartnerPortalAccess
+class EnsureConsultantAgencyAccess
 {
     public function handle(Request $request, Closure $next): Response
     {
@@ -21,11 +21,11 @@ class EnsurePartnerPortalAccess
 
         $user = Auth::guard('web')->user();
 
-        if ($user && app(PartnerWorkspaceService::class)->isPartnerUser($user)) {
+        if ($user && app(ConsultantAgencyWorkspaceService::class)->isConsultantOrgUser($user)) {
             return $next($request);
         }
 
         return redirect()->route('consultant.login')
-            ->with('error', 'Sign in to your partner account to manage clients and agency packs.');
+            ->with('error', 'Sign in to your consultant account to manage clients and agency packs.');
     }
 }

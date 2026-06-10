@@ -11,7 +11,7 @@
                 <ul class="text-sm text-gray-600 space-y-1">
                     <li>Total: <span class="font-semibold text-gray-900">{{ $stats['companies']['total'] }}</span></li>
                     <li>Clients: <span class="font-semibold text-gray-900">{{ $stats['companies']['clients'] }}</span></li>
-                    <li>Partners: <span class="font-semibold text-gray-900">{{ $stats['companies']['partners'] }}</span></li>
+                    <li>Consultants: <span class="font-semibold text-gray-900">{{ $stats['companies']['consultants'] }}</span></li>
                     <li>Active: <span class="font-semibold text-gray-900">{{ $stats['companies']['active'] }}</span></li>
                 </ul>
             </div>

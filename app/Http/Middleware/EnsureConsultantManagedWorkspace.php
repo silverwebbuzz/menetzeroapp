@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Services\PartnerWorkspaceService;
+use App\Services\ConsultantAgencyWorkspaceService;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -10,10 +10,10 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * P18 — Validates partner ↔ managed client workspace session on client routes.
  */
-class EnsurePartnerManagedWorkspace
+class EnsureConsultantManagedWorkspace
 {
     public function __construct(
-        protected PartnerWorkspaceService $workspace,
+        protected ConsultantAgencyWorkspaceService $workspace,
     ) {
     }
 
@@ -29,7 +29,7 @@ class EnsurePartnerManagedWorkspace
 
         $company = $user->getActiveCompany();
 
-        if ($company?->isPartner()) {
+        if ($company?->isConsultantOrg()) {
             return redirect()
                 ->route('consultant.dashboard')
                 ->with('info', 'Open a managed client workspace from the agency hub to use client tools.');
@@ -42,8 +42,8 @@ class EnsurePartnerManagedWorkspace
         }
 
         if ($company?->isManagedClient()) {
-            $request->attributes->set('partner_engagement', $this->workspace->engagementForActing($user));
-            $request->attributes->set('partner_workspace_read_only', $this->workspace->isReadOnlyWorkspace());
+            $request->attributes->set('consultant_engagement', $this->workspace->engagementForActing($user));
+            $request->attributes->set('consultant_workspace_read_only', $this->workspace->isReadOnlyWorkspace());
         }
 
         return $next($request);

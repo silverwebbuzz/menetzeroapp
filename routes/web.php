@@ -25,7 +25,7 @@ Route::get('/refunds', [\App\Http\Controllers\PageController::class, 'show'])->d
 Route::get('/privacy', [\App\Http\Controllers\PageController::class, 'show'])->defaults('slug', 'privacy')->name('privacy');
 Route::get('/currency/{code}', [\App\Http\Controllers\PageController::class, 'switchCurrency'])->name('currency.switch');
 
-// MENetZero Partner portal — consultant = agency (directory + client workspaces)
+// MENetZero Consultant portal — consultant = agency (directory + client workspaces)
 Route::prefix('consultant')->name('consultant.')->group(function () {
     Route::get('/', [\App\Http\Controllers\Consultant\AuthController::class, 'landing'])->name('landing');
     Route::get('/register', [\App\Http\Controllers\Consultant\AuthController::class, 'showRegister'])->name('register');
@@ -34,7 +34,7 @@ Route::prefix('consultant')->name('consultant.')->group(function () {
     Route::post('/login', [\App\Http\Controllers\Consultant\AuthController::class, 'login'])->name('login.post');
     Route::post('/logout', [\App\Http\Controllers\Consultant\AuthController::class, 'logout'])->name('logout');
 
-    Route::middleware(['ensureConsultant', 'syncPartnerSession'])->group(function () {
+    Route::middleware(['ensureConsultant', 'syncConsultantAgencySession'])->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Consultant\DashboardController::class, 'index'])->name('dashboard');
         Route::get('/profile', [\App\Http\Controllers\Consultant\ProfileController::class, 'edit'])->name('profile.edit');
         Route::put('/profile', [\App\Http\Controllers\Consultant\ProfileController::class, 'update'])->name('profile.update');
@@ -47,27 +47,27 @@ Route::prefix('consultant')->name('consultant.')->group(function () {
     });
 
     // Agency hub — /consultant/clients, /consultant/packs, etc.
-    Route::middleware(['syncPartnerSession', 'ensurePartnerPortal', 'auth:web', 'setActiveCompany', 'checkCompanyType:partner'])
+    Route::middleware(['syncConsultantAgencySession', 'ensureConsultantAgency', 'auth:web', 'setActiveCompany', 'checkCompanyType:consultant'])
         ->group(function () {
-            Route::get('/workspace', [\App\Http\Controllers\Partner\WorkspaceController::class, 'switcher'])->name('workspace.switcher');
-            Route::post('/workspace/enter/{engagement}', [\App\Http\Controllers\Partner\WorkspaceController::class, 'enter'])->name('workspace.enter');
-            Route::post('/workspace/enter-readonly/{engagement}', [\App\Http\Controllers\Partner\WorkspaceController::class, 'enterReadOnly'])->name('workspace.enter-readonly');
-            Route::post('/workspace/exit', [\App\Http\Controllers\Partner\WorkspaceController::class, 'exit'])->name('workspace.exit');
+            Route::get('/workspace', [\App\Http\Controllers\Consultant\Agency\WorkspaceController::class, 'switcher'])->name('workspace.switcher');
+            Route::post('/workspace/enter/{engagement}', [\App\Http\Controllers\Consultant\Agency\WorkspaceController::class, 'enter'])->name('workspace.enter');
+            Route::post('/workspace/enter-readonly/{engagement}', [\App\Http\Controllers\Consultant\Agency\WorkspaceController::class, 'enterReadOnly'])->name('workspace.enter-readonly');
+            Route::post('/workspace/exit', [\App\Http\Controllers\Consultant\Agency\WorkspaceController::class, 'exit'])->name('workspace.exit');
 
-            Route::get('/renewal', [\App\Http\Controllers\Partner\RenewalController::class, 'index'])->name('renewal.index');
-            Route::post('/renewal', [\App\Http\Controllers\Partner\RenewalController::class, 'process'])->name('renewal.process');
+            Route::get('/renewal', [\App\Http\Controllers\Consultant\Agency\RenewalController::class, 'index'])->name('renewal.index');
+            Route::post('/renewal', [\App\Http\Controllers\Consultant\Agency\RenewalController::class, 'process'])->name('renewal.process');
 
             Route::prefix('packs')->name('packs.')->group(function () {
-                Route::get('/', [\App\Http\Controllers\Partner\PackCheckoutController::class, 'index'])->name('index');
-                Route::post('/checkout', [\App\Http\Controllers\Partner\PackCheckoutController::class, 'processCheckout'])->name('checkout');
-                Route::post('/extra-slots', [\App\Http\Controllers\Partner\PackCheckoutController::class, 'processExtraSlots'])->name('extra-slots');
-                Route::post('/year-unlock', [\App\Http\Controllers\Partner\PackCheckoutController::class, 'processYearUnlock'])->name('year-unlock');
-                Route::get('/payment/{transaction}', [\App\Http\Controllers\Partner\PackCheckoutController::class, 'paymentCheckout'])->name('payment.checkout');
-                Route::post('/payment/razorpay', [\App\Http\Controllers\Partner\PackCheckoutController::class, 'razorpayCallback'])->name('payment.razorpay');
-                Route::get('/payment/cashfree', [\App\Http\Controllers\Partner\PackCheckoutController::class, 'cashfreeCallback'])->name('payment.cashfree');
+                Route::get('/', [\App\Http\Controllers\Consultant\Agency\PackCheckoutController::class, 'index'])->name('index');
+                Route::post('/checkout', [\App\Http\Controllers\Consultant\Agency\PackCheckoutController::class, 'processCheckout'])->name('checkout');
+                Route::post('/extra-slots', [\App\Http\Controllers\Consultant\Agency\PackCheckoutController::class, 'processExtraSlots'])->name('extra-slots');
+                Route::post('/year-unlock', [\App\Http\Controllers\Consultant\Agency\PackCheckoutController::class, 'processYearUnlock'])->name('year-unlock');
+                Route::get('/payment/{transaction}', [\App\Http\Controllers\Consultant\Agency\PackCheckoutController::class, 'paymentCheckout'])->name('payment.checkout');
+                Route::post('/payment/razorpay', [\App\Http\Controllers\Consultant\Agency\PackCheckoutController::class, 'razorpayCallback'])->name('payment.razorpay');
+                Route::get('/payment/cashfree', [\App\Http\Controllers\Consultant\Agency\PackCheckoutController::class, 'cashfreeCallback'])->name('payment.cashfree');
             });
 
-            Route::resource('clients', \App\Http\Controllers\Partner\ManagedClientController::class);
+            Route::resource('clients', \App\Http\Controllers\Consultant\Agency\ManagedClientController::class);
         });
 });
 
@@ -76,7 +76,7 @@ Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->na
 Route::post('/register', [RegisterController::class, 'register']);
 
 Route::get('/login', function () {
-    return view('auth.login', ['isPartner' => false]);
+    return view('auth.login', ['isConsultantLogin' => false]);
 })->name('login');
 
 Route::post('/login', function (\Illuminate\Http\Request $request) {
@@ -97,14 +97,14 @@ Route::post('/login', function (\Illuminate\Http\Request $request) {
         }
         
         $company = $user->getActiveCompany();
-        if ($company?->isPartner()) {
+        if ($company?->isConsultantOrg()) {
             $consultant = \App\Models\Consultant::where('email', $user->email)
                 ->where('is_active', true)
                 ->first();
 
             if ($consultant) {
                 \Illuminate\Support\Facades\Auth::guard('consultant')->login($consultant);
-                app(\App\Services\ConsultantPartnerLinkService::class)->syncWebSession($consultant);
+                app(\App\Services\ConsultantAccountService::class)->syncWebSession($consultant);
             }
 
             return redirect()->intended(route('consultant.dashboard'));
@@ -115,8 +115,8 @@ Route::post('/login', function (\Illuminate\Http\Request $request) {
 
     if (\App\Models\Consultant::where('email', $credentials['email'])->where('is_active', true)->exists()) {
         return back()
-            ->withErrors(['email' => 'This is a partner account — sign in at the partner portal.'])
-            ->with('partner_login_url', route('consultant.login'))
+            ->withErrors(['email' => 'This is a consultant account — sign in at the consultant portal.'])
+            ->with('consultant_login_url', route('consultant.login'))
             ->onlyInput('email');
     }
 
@@ -165,7 +165,7 @@ Route::middleware(['auth:web'])->group(function () {
 Route::middleware([
     'auth:web',
     'setActiveCompany',
-    'ensurePartnerManagedWorkspace',
+    'ensureConsultantManagedWorkspace',
     'checkCompanyType:client',
     'restrictManagedClientWorkspace',
     'ensureOnboardingComplete',

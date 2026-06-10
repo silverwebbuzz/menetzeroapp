@@ -18,7 +18,9 @@
                 <a href="{{ route('consultant.clients.index') }}" class="text-gray-600 hover:text-teal-600">Clients</a>
                 <a href="{{ route('consultant.workspace.switcher') }}" class="text-gray-600 hover:text-teal-600">Workspaces</a>
                 <a href="{{ route('consultant.packs.index') }}" class="text-gray-600 hover:text-teal-600">Agency packs</a>
-                <a href="{{ route('consultant.renewal.index') }}" class="text-gray-600 hover:text-teal-600">Renewal</a>
+                @if(!empty($showRenewalNav))
+                    <a href="{{ route('consultant.renewal.index') }}" class="text-amber-700 hover:text-amber-800 font-medium">Renewal</a>
+                @endif
                 <a href="{{ route('consultant.profile.edit') }}" class="text-gray-600 hover:text-teal-600">Directory profile</a>
                 <a href="{{ route('consultant.intro-requests.index') }}" class="text-gray-600 hover:text-teal-600">Leads</a>
                 <form action="{{ route('consultant.logout') }}" method="POST" class="inline">

@@ -26,7 +26,7 @@ class SetActiveCompanyContext
             return $next($request);
         }
 
-        if (app(\App\Services\PartnerWorkspaceService::class)->isPartnerUser($user)) {
+        if (app(\App\Services\ConsultantAgencyWorkspaceService::class)->isConsultantOrgUser($user)) {
             return $next($request);
         }
 

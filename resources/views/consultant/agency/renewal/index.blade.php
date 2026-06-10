@@ -60,8 +60,8 @@
             <div class="space-y-3 mb-4">
                 @foreach($plans as $plan)
                     @php
-                        $slots = \App\Data\PartnerPlanMatrix::slotCountForPlanCode($plan->plan_code);
-                        $quote = app(\App\Services\PartnerSubscriptionService::class)->resolvePackPurchase($partner, $plan, $nextYear);
+                        $slots = \App\Data\ConsultantAgencyPlanMatrix::slotCountForPlanCode($plan->plan_code);
+                        $quote = $planQuotes[$plan->id] ?? ['charge_amount' => 0, 'pro_rata' => false];
                     @endphp
                     <label class="flex items-center gap-3 border border-gray-200 rounded-lg p-3 cursor-pointer hover:border-teal-300 has-[:checked]:border-teal-500 has-[:checked]:bg-teal-50/40">
                         <input type="radio" name="plan_id" value="{{ $plan->id }}" class="plan-radio text-teal-600" data-slots="{{ $slots }}" @checked($loop->first) required>

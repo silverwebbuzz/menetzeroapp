@@ -415,7 +415,7 @@ class SuperAdminController extends Controller
             'companies' => [
                 'total' => Company::count(),
                 'clients' => Company::where('company_type', 'client')->count(),
-                'partners' => Company::where('company_type', 'partner')->count(),
+                'consultants' => Company::where('company_type', 'consultant')->count(),
                 'active' => Company::where('is_active', true)->count(),
             ],
             'users' => [

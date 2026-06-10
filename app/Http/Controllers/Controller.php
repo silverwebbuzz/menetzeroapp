@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\PartnerEntitlementService;
+use App\Services\ConsultantAgencyEntitlementService;
 use App\Services\PlanEntitlementService;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Auth;
@@ -95,7 +95,7 @@ abstract class Controller extends BaseController
         $user = Auth::user();
         $company = $user?->getActiveCompany();
 
-        if ($company && app(PartnerEntitlementService::class)->isManagedClient($company->id)) {
+        if ($company && app(ConsultantAgencyEntitlementService::class)->isManagedClient($company->id)) {
             throw new HttpResponseException(
                 back()->with('error', $message)
             );
@@ -159,7 +159,7 @@ abstract class Controller extends BaseController
     protected function requireReportingYearWrite(int $companyId, int $reportingYear): void
     {
         $user = \Illuminate\Support\Facades\Auth::user();
-        $check = app(\App\Services\PartnerWorkspaceService::class)->canWriteReportingYear($user, $reportingYear);
+        $check = app(\App\Services\ConsultantAgencyWorkspaceService::class)->canWriteReportingYear($user, $reportingYear);
 
         if (!$check['allowed']) {
             throw new HttpResponseException(

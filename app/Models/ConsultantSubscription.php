@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class PartnerSubscription extends Model
+class ConsultantSubscription extends Model
 {
+    protected $table = 'consultant_subscriptions';
+
     protected $fillable = [
-        'partner_company_id',
+        'consultant_company_id',
         'subscription_plan_id',
         'contract_year',
         'slot_limit',
@@ -30,9 +32,9 @@ class PartnerSubscription extends Model
         'metadata' => 'array',
     ];
 
-    public function partnerCompany(): BelongsTo
+    public function consultantCompany(): BelongsTo
     {
-        return $this->belongsTo(Company::class, 'partner_company_id');
+        return $this->belongsTo(Company::class, 'consultant_company_id');
     }
 
     public function plan(): BelongsTo
@@ -47,12 +49,12 @@ class PartnerSubscription extends Model
 
     public function engagements(): HasMany
     {
-        return $this->hasMany(PartnerClientEngagement::class);
+        return $this->hasMany(ConsultantClientEngagement::class);
     }
 
     public function addons(): HasMany
     {
-        return $this->hasMany(PartnerSubscriptionAddon::class);
+        return $this->hasMany(ConsultantSubscriptionAddon::class);
     }
 
     public function isActive(): bool
@@ -66,8 +68,8 @@ class PartnerSubscription extends Model
             ->where('expires_at', '>=', now()->toDateString());
     }
 
-    public function scopeForPartner($query, int $partnerCompanyId)
+    public function scopeForConsultant($query, int $consultantCompanyId)
     {
-        return $query->where('partner_company_id', $partnerCompanyId);
+        return $query->where('consultant_company_id', $consultantCompanyId);
     }
 }

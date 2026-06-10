@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Partner;
+namespace App\Http\Controllers\Consultant\Agency;
 
 use App\Http\Controllers\Controller;
-use App\Models\PartnerClientEngagement;
-use App\Services\PartnerWorkspaceService;
+use App\Models\ConsultantClientEngagement;
+use App\Services\ConsultantAgencyWorkspaceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use RuntimeException;
@@ -12,7 +12,7 @@ use RuntimeException;
 class WorkspaceController extends Controller
 {
     public function __construct(
-        protected PartnerWorkspaceService $workspace,
+        protected ConsultantAgencyWorkspaceService $workspace,
     ) {
     }
 
@@ -22,13 +22,13 @@ class WorkspaceController extends Controller
         $engagements = $this->workspace->switchableEngagements($user);
         $acting = $this->workspace->resolveActingCompany($user);
 
-        return view('partner.workspace.switcher', compact('engagements', 'acting'));
+        return view('consultant.agency.workspace.switcher', compact('engagements', 'acting'));
     }
 
     public function enter(Request $request, int $engagement)
     {
         $user = Auth::user();
-        $record = PartnerClientEngagement::findOrFail($engagement);
+        $record = ConsultantClientEngagement::findOrFail($engagement);
 
         try {
             $managed = $this->workspace->enterWorkspaceFromEngagement($user, $record);
@@ -41,27 +41,10 @@ class WorkspaceController extends Controller
             ->with('success', "Now working in {$managed->name} (PRY {$record->primary_reporting_year}).");
     }
 
-    public function enterByCompany(Request $request)
-    {
-        $request->validate([
-            'managed_company_id' => 'required|integer|exists:companies,id',
-        ]);
-
-        try {
-            $managed = $this->workspace->enterWorkspace($user = Auth::user(), (int) $request->managed_company_id);
-        } catch (RuntimeException $e) {
-            return back()->with('error', $e->getMessage());
-        }
-
-        return redirect()
-            ->route('client.dashboard')
-            ->with('success', "Now working in {$managed->name}.");
-    }
-
     public function enterReadOnly(int $engagement)
     {
         $user = Auth::user();
-        $record = PartnerClientEngagement::findOrFail($engagement);
+        $record = ConsultantClientEngagement::findOrFail($engagement);
 
         try {
             $managed = $this->workspace->enterReadOnlyWorkspace($user, $record);

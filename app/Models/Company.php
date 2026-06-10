@@ -18,7 +18,7 @@ class Company extends Model
         // UAE additions
         'emirate', 'sector', 'license_no', 'contact_person',
         // Type / channel
-        'company_type', 'is_direct_client', 'partner_id',
+        'company_type', 'is_direct_client', 'consultant_id',
     ];
 
     protected $casts = [
@@ -99,35 +99,35 @@ class Company extends Model
     }
 
     /**
-     * Partner org that manages this client workspace (managed clients only).
+     * Consultant org that manages this client workspace (managed clients only).
      */
-    public function partner()
+    public function consultantOrg()
     {
-        return $this->belongsTo(Company::class, 'partner_id');
+        return $this->belongsTo(Company::class, 'consultant_id');
     }
 
     /**
-     * Managed client workspaces owned by this partner org.
+     * Managed client workspaces owned by this consultant org.
      */
     public function managedClients()
     {
-        return $this->hasMany(Company::class, 'partner_id');
+        return $this->hasMany(Company::class, 'consultant_id');
     }
 
     /**
-     * Agency pack subscriptions for this partner org.
+     * Agency pack subscriptions for this consultant org.
      */
-    public function partnerSubscriptions()
+    public function consultantSubscriptions()
     {
-        return $this->hasMany(PartnerSubscription::class, 'partner_company_id');
+        return $this->hasMany(ConsultantSubscription::class, 'consultant_company_id');
     }
 
     /**
-     * Client engagements where this company is the partner.
+     * Client engagements where this company is the consultant org.
      */
-    public function partnerEngagements()
+    public function consultantEngagements()
     {
-        return $this->hasMany(PartnerClientEngagement::class, 'partner_company_id');
+        return $this->hasMany(ConsultantClientEngagement::class, 'consultant_company_id');
     }
 
     /**
@@ -135,7 +135,7 @@ class Company extends Model
      */
     public function managedEngagements()
     {
-        return $this->hasMany(PartnerClientEngagement::class, 'managed_company_id');
+        return $this->hasMany(ConsultantClientEngagement::class, 'managed_company_id');
     }
 
     /**
@@ -197,30 +197,30 @@ class Company extends Model
         return $this->company_type === 'client' || $this->company_type === null;
     }
 
-    public function isPartner(): bool
+    public function isConsultantOrg(): bool
     {
-        return $this->company_type === 'partner';
+        return $this->company_type === 'consultant';
     }
 
     public function isManagedClient(): bool
     {
-        return $this->partner_id !== null && $this->is_direct_client === false;
+        return $this->consultant_id !== null && $this->is_direct_client === false;
     }
 
-    public function activePartnerSubscription(): ?PartnerSubscription
+    public function activeConsultantSubscription(): ?ConsultantSubscription
     {
-        if (!$this->isPartner()) {
+        if (!$this->isConsultantOrg()) {
             return null;
         }
 
-        return $this->partnerSubscriptions()
+        return $this->consultantSubscriptions()
             ->where('status', 'active')
             ->where('expires_at', '>=', now()->toDateString())
             ->orderByDesc('expires_at')
             ->first();
     }
 
-    public function activeManagedEngagement(): ?PartnerClientEngagement
+    public function activeManagedEngagement(): ?ConsultantClientEngagement
     {
         if (!$this->isManagedClient()) {
             return null;

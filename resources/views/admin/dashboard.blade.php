@@ -62,7 +62,7 @@
                                 <td class="cell-strong">{{ $company->name }}</td>
                                 <td class="cell-muted">{{ $company->email }}</td>
                                 <td>
-                                    @if(($company->company_type ?? 'client') === 'partner')
+                                    @if(($company->company_type ?? 'client') === 'consultant')
                                         <span class="badge badge-info badge-dot">Partner</span>
                                     @else
                                         <span class="badge badge-brand badge-dot">Client</span>

@@ -391,8 +391,8 @@ class User extends Authenticatable
             return null;
         }
 
-        $partnerWorkspace = app(\App\Services\PartnerWorkspaceService::class);
-        if ($actingCompany = $partnerWorkspace->resolveActingCompany($this)) {
+        $consultantOrgWorkspace = app(\App\Services\ConsultantAgencyWorkspaceService::class);
+        if ($actingCompany = $consultantOrgWorkspace->resolveActingCompany($this)) {
             return $actingCompany;
         }
 
@@ -636,9 +636,9 @@ class User extends Authenticatable
             return false;
         }
 
-        $partnerWorkspace = app(\App\Services\PartnerWorkspaceService::class);
-        if ($partnerWorkspace->isActingAsManagedClient($this)) {
-            $acting = $partnerWorkspace->resolveActingCompany($this);
+        $consultantOrgWorkspace = app(\App\Services\ConsultantAgencyWorkspaceService::class);
+        if ($consultantOrgWorkspace->isActingAsManagedClient($this)) {
+            $acting = $consultantOrgWorkspace->resolveActingCompany($this);
             if ($acting && (int) $acting->id === (int) $companyId) {
                 return true;
             }

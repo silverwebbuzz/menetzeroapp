@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::table('companies', function (Blueprint $table) {
             if (!Schema::hasColumn('companies', 'company_type')) {
-                $table->enum('company_type', ['client', 'partner'])->default('client')->after('is_active');
+                $table->enum('company_type', ['client', 'consultant'])->default('client')->after('is_active');
             }
             if (!Schema::hasColumn('companies', 'is_direct_client')) {
                 $table->boolean('is_direct_client')->default(true)->after('company_type');

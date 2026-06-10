@@ -25,7 +25,7 @@
     </form>
 
     <p class="text-center text-sm text-gray-500 mt-4">
-        New partner? <a href="{{ route('consultant.register') }}" class="text-teal-600 hover:underline">Apply here</a>
+        New consultant? <a href="{{ route('consultant.register') }}" class="text-teal-600 hover:underline">Apply here</a>
     </p>
 </div>
 @endsection

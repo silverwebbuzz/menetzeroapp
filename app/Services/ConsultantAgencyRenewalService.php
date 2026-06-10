@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-use App\Data\PartnerPlanMatrix;
+use App\Data\ConsultantAgencyPlanMatrix;
 use App\Models\Company;
-use App\Models\PartnerClientEngagement;
-use App\Models\PartnerSubscription;
+use App\Models\ConsultantClientEngagement;
+use App\Models\ConsultantSubscription;
 use App\Models\PaymentTransaction;
 use App\Models\SubscriptionPlan;
 use Carbon\Carbon;
@@ -16,11 +16,10 @@ use RuntimeException;
 /**
  * P20 — Partner contract renewal: select clients + PRY for the next calendar year.
  */
-class PartnerRenewalService
+class ConsultantAgencyRenewalService
 {
     public function __construct(
-        protected PartnerSubscriptionService $subscriptions,
-        protected PartnerManagedClientService $managedClients,
+        protected ConsultantAgencySubscriptionService $subscriptions,
     ) {
     }
 
@@ -29,21 +28,18 @@ class PartnerRenewalService
         return 45;
     }
 
-    public function getRenewableSubscription(int $partnerCompanyId): ?PartnerSubscription
+    public function getRenewableSubscription(int $consultantCompanyId): ?ConsultantSubscription
     {
-        $active = $this->subscriptions->getActiveSubscription($partnerCompanyId);
+        $active = $this->subscriptions->getActiveSubscription($consultantCompanyId);
 
-        if ($active && $this->subscriptionNeedsRenewalAttention($active)) {
-            return $active;
+        if (!$active || !$this->subscriptionNeedsRenewalAttention($active)) {
+            return null;
         }
 
-        return PartnerSubscription::forPartner($partnerCompanyId)
-            ->where('status', 'active')
-            ->orderByDesc('expires_at')
-            ->first();
+        return $active;
     }
 
-    public function subscriptionNeedsRenewalAttention(PartnerSubscription $subscription): bool
+    public function subscriptionNeedsRenewalAttention(ConsultantSubscription $subscription): bool
     {
         if ($subscription->status !== 'active') {
             return false;
@@ -55,36 +51,34 @@ class PartnerRenewalService
         return now()->greaterThanOrEqualTo($windowStart);
     }
 
-    public function hasNextYearSubscription(int $partnerCompanyId, int $nextContractYear): bool
+    public function hasNextYearSubscription(int $consultantCompanyId, int $nextContractYear): bool
     {
-        return PartnerSubscription::forPartner($partnerCompanyId)
+        return ConsultantSubscription::forConsultant($consultantCompanyId)
             ->where('contract_year', $nextContractYear)
             ->where('status', 'active')
             ->where('expires_at', '>=', now()->toDateString())
             ->exists();
     }
 
-    public function needsRenewalFlow(int $partnerCompanyId): bool
+    public function needsRenewalFlow(int $consultantCompanyId): bool
     {
-        $current = $this->getRenewableSubscription($partnerCompanyId);
+        $current = $this->subscriptions->getActiveSubscription($consultantCompanyId);
 
         if (!$current || !$this->subscriptionNeedsRenewalAttention($current)) {
             return false;
         }
 
-        $nextYear = (int) $current->contract_year + 1;
-
-        return !$this->hasNextYearSubscription($partnerCompanyId, $nextYear);
+        return !$this->hasNextYearSubscription($consultantCompanyId, (int) $current->contract_year + 1);
     }
 
     /**
-     * @return Collection<int, PartnerClientEngagement>
+     * @return Collection<int, ConsultantClientEngagement>
      */
-    public function expiringEngagements(PartnerSubscription $subscription): Collection
+    public function expiringEngagements(ConsultantSubscription $subscription): Collection
     {
-        return PartnerClientEngagement::query()
+        return ConsultantClientEngagement::query()
             ->with('managedCompany')
-            ->where('partner_subscription_id', $subscription->id)
+            ->where('consultant_subscription_id', $subscription->id)
             ->active()
             ->orderBy('display_name')
             ->orderBy('id')
@@ -95,12 +89,12 @@ class PartnerRenewalService
      * @param  list<array{engagement_id: int, primary_reporting_year: int}>  $carried
      */
     public function validateCarryForward(
-        Company $partner,
-        PartnerSubscription $fromSubscription,
+        Company $consultantOrg,
+        ConsultantSubscription $fromSubscription,
         SubscriptionPlan $targetPlan,
         array $carried,
     ): array {
-        $slotLimit = PartnerPlanMatrix::slotCountForPlanCode($targetPlan->plan_code);
+        $slotLimit = ConsultantAgencyPlanMatrix::slotCountForPlanCode($targetPlan->plan_code);
 
         if (count($carried) > $slotLimit) {
             throw new RuntimeException(
@@ -145,24 +139,24 @@ class PartnerRenewalService
      * }
      */
     public function resolveRenewalPurchase(
-        Company $partner,
+        Company $consultantOrg,
         SubscriptionPlan $plan,
-        PartnerSubscription $fromSubscription,
+        ConsultantSubscription $fromSubscription,
         array $carried,
         string $chargeCurrency = 'AED',
     ): array {
-        if (!$partner->isPartner()) {
-            throw new RuntimeException('Company must be a partner organisation.');
+        if (!$consultantOrg->isConsultantOrg()) {
+            throw new RuntimeException('Company must be a consultant organisation.');
         }
 
         $nextYear = (int) $fromSubscription->contract_year + 1;
-        $this->validateCarryForward($partner, $fromSubscription, $plan, $carried);
+        $this->validateCarryForward($consultantOrg, $fromSubscription, $plan, $carried);
 
-        if ($this->hasNextYearSubscription($partner->id, $nextYear)) {
+        if ($this->hasNextYearSubscription($consultantOrg->id, $nextYear)) {
             throw new RuntimeException("You already have an active pack for {$nextYear}.");
         }
 
-        return $this->subscriptions->resolvePackPurchase($partner, $plan, $nextYear, $chargeCurrency);
+        return $this->subscriptions->resolvePackPurchase($consultantOrg, $plan, $nextYear, $chargeCurrency);
     }
 
     /**
@@ -171,12 +165,12 @@ class PartnerRenewalService
     public function completeRenewalTransaction(
         PaymentTransaction $transaction,
         array $gatewayRefs = [],
-    ): PartnerSubscription {
+    ): ConsultantSubscription {
         if ($transaction->status === 'completed') {
-            $existingId = $transaction->metadata['partner_subscription_id'] ?? null;
+            $existingId = $transaction->metadata['consultant_subscription_id'] ?? null;
 
             return $existingId
-                ? PartnerSubscription::findOrFail($existingId)
+                ? ConsultantSubscription::findOrFail($existingId)
                 : throw new RuntimeException('Completed renewal transaction is missing subscription reference.');
         }
 
@@ -191,13 +185,13 @@ class PartnerRenewalService
         }
 
         $plan = SubscriptionPlan::findOrFail($planId);
-        $partner = Company::findOrFail($transaction->company_id);
-        $fromSubscription = PartnerSubscription::findOrFail($fromSubscriptionId);
+        $consultantOrg = Company::findOrFail($transaction->company_id);
+        $fromSubscription = ConsultantSubscription::findOrFail($fromSubscriptionId);
 
-        $carried = $this->validateCarryForward($partner, $fromSubscription, $plan, $carried);
+        $carried = $this->validateCarryForward($consultantOrg, $fromSubscription, $plan, $carried);
 
-        return DB::transaction(function () use ($transaction, $metadata, $gatewayRefs, $plan, $partner, $fromSubscription, $carried, $contractYear) {
-            $newSubscription = $this->subscriptions->activatePackSubscription($partner, $plan, [
+        return DB::transaction(function () use ($transaction, $metadata, $gatewayRefs, $plan, $consultantOrg, $fromSubscription, $carried, $contractYear) {
+            $newSubscription = $this->subscriptions->activatePackSubscription($consultantOrg, $plan, [
                 'contract_year' => $contractYear,
                 'starts_at' => Carbon::create($contractYear, 1, 1)->toDateString(),
                 'payment_transaction_id' => $transaction->id,
@@ -210,7 +204,7 @@ class PartnerRenewalService
                 'status' => 'completed',
                 'paid_at' => now(),
                 'metadata' => array_merge($metadata, $gatewayRefs, [
-                    'partner_subscription_id' => $newSubscription->id,
+                    'consultant_subscription_id' => $newSubscription->id,
                 ]),
             ]);
 
@@ -224,8 +218,8 @@ class PartnerRenewalService
      * @param  list<array{engagement_id: int, primary_reporting_year: int}>  $carried
      */
     public function applyCarryForward(
-        PartnerSubscription $fromSubscription,
-        PartnerSubscription $toSubscription,
+        ConsultantSubscription $fromSubscription,
+        ConsultantSubscription $toSubscription,
         array $carried,
     ): void {
         $carriedById = collect($carried)->keyBy('engagement_id');
@@ -235,10 +229,10 @@ class PartnerRenewalService
             $selection = $carriedById->get($engagement->id);
 
             if ($selection) {
-                PartnerClientEngagement::create([
-                    'partner_company_id' => $engagement->partner_company_id,
+                ConsultantClientEngagement::create([
+                    'consultant_company_id' => $engagement->consultant_company_id,
                     'managed_company_id' => $engagement->managed_company_id,
-                    'partner_subscription_id' => $toSubscription->id,
+                    'consultant_subscription_id' => $toSubscription->id,
                     'primary_reporting_year' => (int) $selection['primary_reporting_year'],
                     'status' => 'active',
                     'display_name' => $engagement->display_name,
