@@ -389,6 +389,14 @@ Route::prefix('partner')->middleware(['auth:web', 'setActiveCompany', 'checkComp
     Route::post('/workspace/enter-readonly/{engagement}', [\App\Http\Controllers\Partner\WorkspaceController::class, 'enterReadOnly'])->name('workspace.enter-readonly');
     Route::post('/workspace/exit', [\App\Http\Controllers\Partner\WorkspaceController::class, 'exit'])->name('workspace.exit');
 
+    Route::prefix('packs')->name('packs.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Partner\PackCheckoutController::class, 'index'])->name('index');
+        Route::post('/checkout', [\App\Http\Controllers\Partner\PackCheckoutController::class, 'processCheckout'])->name('checkout');
+        Route::get('/payment/{transaction}', [\App\Http\Controllers\Partner\PackCheckoutController::class, 'paymentCheckout'])->name('payment.checkout');
+        Route::post('/payment/razorpay', [\App\Http\Controllers\Partner\PackCheckoutController::class, 'razorpayCallback'])->name('payment.razorpay');
+        Route::get('/payment/cashfree', [\App\Http\Controllers\Partner\PackCheckoutController::class, 'cashfreeCallback'])->name('payment.cashfree');
+    });
+
     Route::resource('clients', \App\Http\Controllers\Partner\ManagedClientController::class);
 });
 

@@ -16,6 +16,19 @@
     ];
 @endphp
 
+<div class="bg-indigo-50 border border-indigo-200 rounded-xl p-5 mb-6 text-sm text-indigo-950">
+    <h2 class="font-semibold text-indigo-900 mb-2">Agency packs (managed clients)</h2>
+    <p class="text-indigo-800 mb-3">
+        This page is the <strong>consultant directory</strong> (public listing &amp; leads). It is separate from
+        <strong>agency packs</strong> — where you manage multiple client workspaces with wholesale pricing.
+    </p>
+    <ul class="list-disc list-inside space-y-1 text-indigo-800 mb-3">
+        <li>Directory: complete profile + documents below, then submit for admin review</li>
+        <li>Agency hub: log in at <a href="{{ url('/login') }}" class="underline font-medium">app.menetzero.com/login</a> with your <strong>partner company account</strong>, then open <a href="{{ route('partner.dashboard') }}" class="underline font-medium">/partner/dashboard</a></li>
+    </ul>
+    <p class="text-xs text-indigo-700">Partner accounts need <code class="bg-white/60 px-1 rounded">company_type = partner</code> and an agency pack before you can add clients. Ask admin to set this up, or purchase a pack after login.</p>
+</div>
+
 <div class="grid sm:grid-cols-3 gap-4 mb-8">
     <div class="bg-white border border-gray-200 rounded-xl p-5">
         <div class="text-xs text-gray-500 uppercase tracking-wide">Listing status</div>

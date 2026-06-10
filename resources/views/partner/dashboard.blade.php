@@ -32,9 +32,11 @@
 </div>
 
 @if(!$subscription)
-    <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-6 text-sm text-amber-900">
-        <strong>No active agency pack.</strong> Purchase a Partner 5/10/25/50 pack to add managed clients.
-        <span class="text-amber-700">(Online checkout — P19)</span>
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm text-amber-900">
+        <div>
+            <strong>No active agency pack.</strong> Purchase Partner 5/10/25/50 to add managed clients.
+        </div>
+        <a href="{{ route('partner.packs.index') }}" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg whitespace-nowrap">View agency packs</a>
     </div>
 @else
     <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 mb-6 text-sm text-indigo-900">

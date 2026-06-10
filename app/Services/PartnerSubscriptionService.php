@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Data\PartnerPlanMatrix;
+use App\Data\PlanEntitlementDefaults;
 use App\Models\Company;
 use App\Models\PartnerClientEngagement;
 use App\Models\PartnerSubscription;
@@ -106,7 +107,10 @@ class PartnerSubscriptionService
         }
 
         $contractYear ??= (int) now()->year;
-        $annualPrice = (float) $plan->price_annual;
+        $chargeCurrency = strtoupper($chargeCurrency);
+        $annualPrice = $chargeCurrency === 'INR'
+            ? (float) ($plan->price_inr ?? PlanEntitlementDefaults::defaultPriceInr((float) $plan->price_annual))
+            : (float) $plan->price_annual;
         $isMidYear = !now()->startOfDay()->equalTo(Carbon::create($contractYear, 1, 1)->startOfDay());
         $chargeAmount = $isMidYear
             ? $this->proRataToContractYearEnd($annualPrice, $contractYear)
