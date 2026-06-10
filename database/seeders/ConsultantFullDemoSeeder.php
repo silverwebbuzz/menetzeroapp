@@ -2,11 +2,15 @@
 
 namespace Database\Seeders;
 
+use App\Data\ConsultantAgencyPlanMatrix;
+use App\Data\PlanEntitlementDefaults;
 use App\Models\Consultant;
+use App\Models\ConsultantClientEngagement;
 use App\Models\EmissionFactor;
 use App\Models\EmissionSourceMaster;
 use App\Models\Location;
 use App\Models\MeasurementData;
+use App\Models\SubscriptionPlan;
 use App\Services\ConsultantAccountService;
 use App\Services\ConsultantAgencyClientService;
 use App\Services\ConsultantAgencySubscriptionService;
@@ -14,6 +18,7 @@ use App\Services\MeasurementService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
+use RuntimeException;
 
 /**
  * One consultant with agency org, 1 managed client, location, and emissions for end-to-end testing.
@@ -28,35 +33,60 @@ class ConsultantFullDemoSeeder extends Seeder
 
     public function run(): void
     {
-        if (Consultant::where('email', self::EMAIL)->exists()) {
-            $this->command?->warn('ConsultantFullDemoSeeder: ' . self::EMAIL . ' already exists — skipping.');
-
-            return;
-        }
+        $this->ensureConsultantAgencyPlans();
 
         $reportingYear = (int) date('Y');
 
-        $consultant = Consultant::create([
-            'name' => 'Demo Consultant',
-            'email' => self::EMAIL,
-            'password' => Hash::make(self::PASSWORD),
-            'phone' => '+971501234567',
-            'company_name' => 'Silver Webbuzz Sustainability Practice',
-            'trade_license_number' => 'DEMO-TL-001',
-            'bio' => 'Demo consultant account for testing managed client workspaces, emissions entry, and the client interface from the agency hub.',
-            'emirates' => ['dubai', 'abu_dhabi'],
-            'languages' => ['en', 'ar'],
-            'specialties' => ['moccae', 'ghg_protocol', 'ifrs_s2'],
-            'experience_years' => 8,
-            'has_moccae_experience' => true,
-            'status' => 'draft',
-            'is_active' => true,
-        ]);
+        $consultant = Consultant::where('email', self::EMAIL)->first();
+        $resuming = $consultant !== null;
+
+        if ($resuming) {
+            $consultant->loadMissing('agencyCompany');
+
+            if ($consultant->agency_company_id) {
+                $alreadySeeded = ConsultantClientEngagement::query()
+                    ->where('consultant_company_id', $consultant->agency_company_id)
+                    ->active()
+                    ->exists();
+
+                if ($alreadySeeded) {
+                    $this->command?->warn('ConsultantFullDemoSeeder: ' . self::EMAIL . ' already has a managed client — skipping.');
+
+                    return;
+                }
+            }
+
+            $this->command?->info('Resuming partial demo seed for ' . self::EMAIL . '…');
+        } else {
+            $consultant = Consultant::create([
+                'name' => 'Demo Consultant',
+                'email' => self::EMAIL,
+                'password' => Hash::make(self::PASSWORD),
+                'phone' => '+971501234567',
+                'company_name' => 'Silver Webbuzz Sustainability Practice',
+                'trade_license_number' => 'DEMO-TL-001',
+                'bio' => 'Demo consultant account for testing managed client workspaces, emissions entry, and the client interface from the agency hub.',
+                'emirates' => ['dubai', 'abu_dhabi'],
+                'languages' => ['en', 'ar'],
+                'specialties' => ['moccae', 'ghg_protocol', 'ifrs_s2'],
+                'experience_years' => 8,
+                'has_moccae_experience' => true,
+                'status' => 'draft',
+                'is_active' => true,
+            ]);
+        }
 
         $accountService = app(ConsultantAccountService::class);
         ['user' => $user, 'company' => $consultantOrg] = $accountService->ensureLinked($consultant);
 
-        app(ConsultantAgencySubscriptionService::class)->ensureFreeTrialSubscription($consultantOrg);
+        $subscription = app(ConsultantAgencySubscriptionService::class)->ensureFreeTrialSubscription($consultantOrg);
+
+        if (!$subscription) {
+            throw new RuntimeException(
+                'Could not provision free trial subscription. Ensure consultant_trial exists with plan_category=consultant_agency '
+                . '(run: php artisan migrate --path=database/migrations/2026_06_11_100000_consultant_agency_plans.php).'
+            );
+        }
 
         $engagement = app(ConsultantAgencyClientService::class)->create($consultantOrg, [
             'name' => 'Al Noor Trading LLC',
@@ -72,17 +102,21 @@ class ConsultantFullDemoSeeder extends Seeder
 
         $managed = $engagement->managedCompany;
 
-        $location = Location::create([
-            'company_id' => $managed->id,
-            'name' => 'Dubai Head Office',
-            'address' => 'Business Bay, Dubai',
-            'city' => 'Dubai',
-            'country' => 'United Arab Emirates',
-            'location_type' => 'office',
-            'is_head_office' => true,
-            'is_active' => true,
-            'staff_count' => 25,
-        ]);
+        $location = Location::firstOrCreate(
+            [
+                'company_id' => $managed->id,
+                'name' => 'Dubai Head Office',
+            ],
+            [
+                'address' => 'Business Bay, Dubai',
+                'city' => 'Dubai',
+                'country' => 'United Arab Emirates',
+                'location_type' => 'office',
+                'is_head_office' => true,
+                'is_active' => true,
+                'staff_count' => 25,
+            ]
+        );
 
         $measurementService = app(MeasurementService::class);
         $measurement = $measurementService->getOrCreateMeasurement($location->id, $reportingYear);
@@ -92,7 +126,7 @@ class ConsultantFullDemoSeeder extends Seeder
         $measurement->refresh();
 
         $this->command?->info('');
-        $this->command?->info('✅ Consultant full demo seeded');
+        $this->command?->info($resuming ? '✅ Consultant full demo seed resumed' : '✅ Consultant full demo seeded');
         $this->command?->table(
             ['Item', 'Value'],
             [
@@ -110,12 +144,60 @@ class ConsultantFullDemoSeeder extends Seeder
         $this->command?->info('Test flow: sign in → Dashboard → Open workspace (or Clients → Open) → Quick Input / emissions.');
     }
 
+    /**
+     * Upsert consultant agency pack rows (including consultant_trial).
+     * Production may be missing these if agency migrations were not run.
+     */
+    private function ensureConsultantAgencyPlans(): void
+    {
+        if (!Schema::hasTable('subscription_plans')) {
+            throw new RuntimeException('subscription_plans table missing — run migrations first.');
+        }
+
+        foreach (ConsultantAgencyPlanMatrix::packDefinitions() as $code => $definition) {
+            $priceAnnual = (float) $definition['price_annual'];
+            $priceInr = PlanEntitlementDefaults::defaultPriceInr($priceAnnual);
+
+            SubscriptionPlan::updateOrCreate(
+                ['plan_code' => $code],
+                [
+                    'plan_name' => $definition['plan_name'],
+                    'plan_category' => $definition['plan_category'],
+                    'description' => $definition['description'],
+                    'price_annual' => $priceAnnual,
+                    'price_inr' => $priceInr,
+                    'currency' => $definition['currency'],
+                    'billing_cycle' => $definition['billing_cycle'],
+                    'is_active' => $definition['is_active'],
+                    'sort_order' => $definition['sort_order'],
+                    'limits' => $definition['limits'],
+                    'entitlements' => $definition['entitlements'],
+                    'features' => $definition['features'],
+                ]
+            );
+        }
+
+        $trial = SubscriptionPlan::where('plan_code', ConsultantAgencyPlanMatrix::FREE_TRIAL_CODE)->first();
+
+        if (!$trial?->isConsultantAgencyPack()) {
+            throw new RuntimeException(
+                'consultant_trial plan is missing or has wrong plan_category. Expected plan_category=consultant_agency.'
+            );
+        }
+
+        $this->command?->info('Consultant agency plans verified (' . count(ConsultantAgencyPlanMatrix::packDefinitions()) . ' packs).');
+    }
+
     private function seedEmissionEntries(int $measurementId, int $userId, int $year): int
     {
         if (!Schema::hasTable('measurement_data')) {
             $this->setMeasurementTotalsDirect($measurementId);
 
             return 0;
+        }
+
+        if (MeasurementData::where('measurement_id', $measurementId)->exists()) {
+            return MeasurementData::where('measurement_id', $measurementId)->count();
         }
 
         $created = 0;
