@@ -18,7 +18,7 @@ class Company extends Model
         // UAE additions
         'emirate', 'sector', 'license_no', 'contact_person',
         // Type / channel
-        'company_type', 'is_direct_client',
+        'company_type', 'is_direct_client', 'partner_id',
     ];
 
     protected $casts = [
@@ -99,6 +99,46 @@ class Company extends Model
     }
 
     /**
+     * Partner org that manages this client workspace (managed clients only).
+     */
+    public function partner()
+    {
+        return $this->belongsTo(Company::class, 'partner_id');
+    }
+
+    /**
+     * Managed client workspaces owned by this partner org.
+     */
+    public function managedClients()
+    {
+        return $this->hasMany(Company::class, 'partner_id');
+    }
+
+    /**
+     * Agency pack subscriptions for this partner org.
+     */
+    public function partnerSubscriptions()
+    {
+        return $this->hasMany(PartnerSubscription::class, 'partner_company_id');
+    }
+
+    /**
+     * Client engagements where this company is the partner.
+     */
+    public function partnerEngagements()
+    {
+        return $this->hasMany(PartnerClientEngagement::class, 'partner_company_id');
+    }
+
+    /**
+     * Engagements where this company is the managed client.
+     */
+    public function managedEngagements()
+    {
+        return $this->hasMany(PartnerClientEngagement::class, 'managed_company_id');
+    }
+
+    /**
      * Get client subscriptions.
      */
     public function clientSubscriptions()
@@ -155,6 +195,29 @@ class Company extends Model
     public function isClient()
     {
         return $this->company_type === 'client' || $this->company_type === null;
+    }
+
+    public function isPartner(): bool
+    {
+        return $this->company_type === 'partner';
+    }
+
+    public function isManagedClient(): bool
+    {
+        return $this->partner_id !== null && $this->is_direct_client === false;
+    }
+
+    public function activePartnerSubscription(): ?PartnerSubscription
+    {
+        if (!$this->isPartner()) {
+            return null;
+        }
+
+        return $this->partnerSubscriptions()
+            ->where('status', 'active')
+            ->where('expires_at', '>=', now()->toDateString())
+            ->orderByDesc('expires_at')
+            ->first();
     }
 
     /**
