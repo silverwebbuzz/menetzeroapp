@@ -81,8 +81,12 @@
                         <td class="px-4 py-3">
                             <span class="px-2 py-0.5 rounded-full text-xs bg-green-100 text-green-800">Active</span>
                         </td>
-                        <td class="px-4 py-3 text-right">
-                            <a href="{{ route('partner.clients.show', $engagement) }}" class="text-indigo-600 hover:underline">View</a>
+                        <td class="px-4 py-3 text-right space-x-3">
+                            <form action="{{ route('partner.workspace.enter', $engagement) }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="text-indigo-600 hover:underline">Open</button>
+                            </form>
+                            <a href="{{ route('partner.clients.show', $engagement) }}" class="text-gray-600 hover:underline">View</a>
                         </td>
                     </tr>
                 @endforeach

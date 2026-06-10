@@ -298,8 +298,8 @@ Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client', 'e
         Route::delete('/invitations/{invitation}', [\App\Http\Controllers\StaffManagementController::class, 'cancelInvitation'])->name('cancel-invitation');
     });
     
-    // Subscription & Billing routes
-    Route::prefix('subscriptions')->name('subscriptions.')->group(function () {
+    // Subscription & Billing routes (not for partner-managed client workspaces)
+    Route::prefix('subscriptions')->name('subscriptions.')->middleware('restrictManagedClientBilling')->group(function () {
         Route::get('/', [\App\Http\Controllers\Client\SubscriptionController::class, 'index'])->name('index');
         Route::get('/current-plan', [\App\Http\Controllers\Client\SubscriptionController::class, 'currentPlan'])->name('current-plan');
         Route::get('/upgrade', [\App\Http\Controllers\Client\SubscriptionController::class, 'upgrade'])->name('upgrade');
@@ -376,6 +376,10 @@ Route::get('/api/subcategories', function(Request $request) {
 // Partner / Agency hub (P16+) — web guard + company_type = partner
 Route::prefix('partner')->middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:partner'])->name('partner.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Partner\DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/workspace', [\App\Http\Controllers\Partner\WorkspaceController::class, 'switcher'])->name('workspace.switcher');
+    Route::post('/workspace/enter/{engagement}', [\App\Http\Controllers\Partner\WorkspaceController::class, 'enter'])->name('workspace.enter');
+    Route::post('/workspace/exit', [\App\Http\Controllers\Partner\WorkspaceController::class, 'exit'])->name('workspace.exit');
 
     Route::resource('clients', \App\Http\Controllers\Partner\ManagedClientController::class);
 });

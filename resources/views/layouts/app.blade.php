@@ -68,6 +68,10 @@
         @auth('web')
             @php
                 $user = auth('web')->user();
+                $partnerWorkspace = app(\App\Services\PartnerWorkspaceService::class);
+                $isPartnerActing = $user && $partnerWorkspace->isActingAsManagedClient($user);
+                $partnerActingEngagement = $isPartnerActing ? $partnerWorkspace->activeEngagementForActing($user) : null;
+                $partnerSwitchableClients = $isPartnerActing ? $partnerWorkspace->switchableEngagements($user) : collect();
                 $activeCompany = $user ? $user->getActiveCompany() : null;
                 $accessibleCompanies = $user ? $user->getAccessibleCompanies() : collect([]);
                 $hasCompany = $activeCompany !== null;
@@ -114,7 +118,41 @@
                     <h1 class="page-title truncate">@yield('page-title', 'Dashboard')</h1>
 
                     <div class="header-actions">
-                        @if($accessibleCompanies->count() > 1)
+                        @if($isPartnerActing)
+                        <form action="{{ route('partner.workspace.exit') }}" method="POST" class="hidden sm:inline">
+                            @csrf
+                            <button type="submit" class="header-btn text-indigo-700">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                                <span class="header-btn-label">Agency hub</span>
+                            </button>
+                        </form>
+                        @if($partnerSwitchableClients->count() > 1)
+                        <div class="relative" x-data="{ open: false }" @click.away="open = false">
+                            <button type="button" class="header-btn" @click="open = !open" :aria-expanded="open">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                                </svg>
+                                <span class="header-btn-label truncate max-w-[12rem]">{{ $activeCompany?->name }}</span>
+                            </button>
+                            <div x-show="open" x-transition class="dropdown-menu" style="display: none;">
+                                <div class="dropdown-heading">Managed clients</div>
+                                @foreach($partnerSwitchableClients as $engagement)
+                                    <form action="{{ route('partner.workspace.enter', $engagement) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item {{ $activeCompany && $activeCompany->id == $engagement->managed_company_id ? 'active' : '' }}">
+                                            <div class="flex-1 min-w-0 text-left">
+                                                <div class="font-medium truncate">{{ $engagement->display_name ?: $engagement->managedCompany?->name }}</div>
+                                                <div class="text-xs text-gray-500">PRY {{ $engagement->primary_reporting_year }}</div>
+                                            </div>
+                                        </button>
+                                    </form>
+                                @endforeach
+                                <div class="dropdown-divider"></div>
+                                <a href="{{ route('partner.workspace.switcher') }}" class="dropdown-item text-sm">All workspaces…</a>
+                            </div>
+                        </div>
+                        @endif
+                        @elseif($accessibleCompanies->count() > 1)
                         <!-- Company switcher -->
                         <div class="relative" x-data="{ open: false }" @click.away="open = false">
                             <button type="button"
@@ -203,6 +241,17 @@
 
                 <!-- Page content -->
                 <main class="content-area">
+                    @if($isPartnerActing)
+                        <div class="mb-4 rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-indigo-900">
+                            <span>
+                                Agency mode — <strong>{{ $activeCompany?->name }}</strong>
+                                @if($partnerActingEngagement)
+                                    · PRY {{ $partnerActingEngagement->primary_reporting_year }}
+                                @endif
+                            </span>
+                            <a href="{{ route('partner.dashboard') }}" class="text-indigo-700 font-medium hover:underline whitespace-nowrap">Back to agency hub</a>
+                        </div>
+                    @endif
                     @if(session('success') || session('error'))
                         <div class="flash-stack">
                             @if(session('success'))

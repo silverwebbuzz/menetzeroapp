@@ -47,13 +47,31 @@ class CheckCompanyType
         }
 
         if ($type === 'client') {
-            if (!$company->isClient() || $company->isManagedClient()) {
+            if ($company->isPartner()) {
+                abort(403, 'Use the agency hub at /partner/dashboard for partner organisations.');
+            }
+
+            if ($company->isManagedClient()) {
+                $workspace = app(\App\Services\PartnerWorkspaceService::class);
+                if (!$workspace->canActOnManagedClient($user, $company)) {
+                    abort(403, 'Invalid managed client workspace. Open the client from your agency hub.');
+                }
+
+                return $next($request);
+            }
+
+            if (!$company->isClient()) {
                 abort(403, 'This route is for direct client organisations only.');
             }
         }
 
-        if ($type === 'partner' && !$company->isPartner()) {
-            abort(403, 'This route is for partner organisations only.');
+        if ($type === 'partner') {
+            $partnerHome = app(\App\Services\PartnerWorkspaceService::class)->getPartnerHomeCompany($user);
+            if (!$partnerHome) {
+                abort(403, 'This route is for partner organisations only.');
+            }
+
+            return $next($request);
         }
 
         return $next($request);

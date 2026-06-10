@@ -55,10 +55,11 @@
 </div>
 
 @if($engagement->isActive())
-    <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 text-sm text-indigo-900">
-        <strong>Next (P17):</strong> Open this client workspace to enter emissions and run disclosures.
-        Workspace switching will let you work inside the client UI from here.
-    </div>
+    <form action="{{ route('partner.workspace.enter', $engagement) }}" method="POST" class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        @csrf
+        <p class="text-sm text-indigo-900">Open this workspace to enter emissions, disclosures, and exports (PRY {{ $engagement->primary_reporting_year }}).</p>
+        <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg whitespace-nowrap">Open workspace</button>
+    </form>
 @else
     <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm text-gray-600">
         Archived {{ $engagement->archived_at?->format('d M Y') ?? '' }} — read-only access when workspace switch is enabled.

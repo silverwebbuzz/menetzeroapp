@@ -391,6 +391,11 @@ class User extends Authenticatable
             return null;
         }
 
+        $partnerWorkspace = app(\App\Services\PartnerWorkspaceService::class);
+        if ($actingCompany = $partnerWorkspace->resolveActingCompany($this)) {
+            return $actingCompany;
+        }
+
         try {
             $hasActiveContext = false;
             $activeCompanyId = null;
@@ -629,6 +634,14 @@ class User extends Authenticatable
         
         if (!$companyId) {
             return false;
+        }
+
+        $partnerWorkspace = app(\App\Services\PartnerWorkspaceService::class);
+        if ($partnerWorkspace->isActingAsManagedClient($this)) {
+            $acting = $partnerWorkspace->resolveActingCompany($this);
+            if ($acting && (int) $acting->id === (int) $companyId) {
+                return true;
+            }
         }
 
         try {

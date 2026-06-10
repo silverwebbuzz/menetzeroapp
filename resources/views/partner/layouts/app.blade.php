@@ -16,6 +16,7 @@
             <div class="flex items-center gap-4 text-sm">
                 <a href="{{ route('partner.dashboard') }}" class="text-gray-600 hover:text-indigo-600">Dashboard</a>
                 <a href="{{ route('partner.clients.index') }}" class="text-gray-600 hover:text-indigo-600">Clients</a>
+                <a href="{{ route('partner.workspace.switcher') }}" class="text-gray-600 hover:text-indigo-600">Workspaces</a>
                 <form action="{{ route('logout') }}" method="POST" class="inline">
                     @csrf
                     <button type="submit" class="text-gray-500 hover:text-red-600">Sign out</button>

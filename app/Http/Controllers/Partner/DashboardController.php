@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Partner;
 use App\Http\Controllers\Controller;
 use App\Services\PartnerManagedClientService;
 use App\Services\PartnerSubscriptionService;
+use App\Services\PartnerWorkspaceService;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -17,9 +18,9 @@ class DashboardController extends Controller
 
     public function index()
     {
-        $partner = Auth::user()->getActiveCompany();
+        $partner = app(PartnerWorkspaceService::class)->getPartnerHomeCompany(Auth::user());
 
-        if (!$partner || !$partner->isPartner()) {
+        if (!$partner) {
             abort(403, 'Partner organisation required.');
         }
 

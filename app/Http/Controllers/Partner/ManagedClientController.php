@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Partner;
 use App\Http\Controllers\Controller;
 use App\Services\PartnerManagedClientService;
 use App\Services\PartnerSubscriptionService;
+use App\Services\PartnerWorkspaceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use RuntimeException;
@@ -122,9 +123,9 @@ class ManagedClientController extends Controller
 
     protected function partnerCompany()
     {
-        $company = Auth::user()->getActiveCompany();
+        $company = app(PartnerWorkspaceService::class)->getPartnerHomeCompany(Auth::user());
 
-        if (!$company || !$company->isPartner()) {
+        if (!$company) {
             abort(403, 'Partner organisation required.');
         }
 

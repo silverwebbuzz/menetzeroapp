@@ -9,6 +9,7 @@
         : null;
     $hasCompany = $activeCompany !== null;
     $companyId = $activeCompany ? $activeCompany->id : null;
+    $isManagedClientWorkspace = $activeCompany && $activeCompany->isManagedClient();
 
     // Check permissions for each module — super admin and company admin have all
     $isAdmin = $user && ($user->isAdmin() || ($companyId && $user->isCompanyAdmin($companyId)));
@@ -320,7 +321,7 @@
                 Staff &amp; Roles
             </a>
         @endif
-        @if($isAdmin)
+        @if($isAdmin && !$isManagedClientWorkspace)
             <a href="{{ route('subscriptions.billing') }}" class="nav-link {{ request()->routeIs('subscriptions.*') ? 'active' : '' }}">
                 {!! $svg('card') !!}
                 Plan &amp; billing
