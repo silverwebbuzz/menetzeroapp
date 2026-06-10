@@ -68,6 +68,11 @@ class Consultant extends Authenticatable
         return $this->hasMany(ConsultantIntroRequest::class);
     }
 
+    public function publicInquiries(): HasMany
+    {
+        return $this->hasMany(ConsultantPublicInquiry::class);
+    }
+
     public function orders(): HasMany
     {
         return $this->hasMany(ConsultantOrder::class);

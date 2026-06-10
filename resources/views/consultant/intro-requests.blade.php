@@ -1,42 +1,60 @@
 @extends('consultant.layouts.app')
 
 @section('title', 'Client leads')
+@section('page-title', 'Client leads')
 
 @section('content')
-<h1 class="text-2xl font-bold text-gray-900 mb-6">Introduction requests</h1>
-
 @if($consultant->status !== 'approved')
     <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-900 mb-6">
-        Leads are visible once your profile is approved and listed.
+        Leads are routed once your directory profile is approved and listed.
     </div>
 @endif
 
-<div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
-    <table class="min-w-full text-sm">
-        <thead class="bg-gray-50 text-left text-xs text-gray-500 uppercase">
-            <tr>
-                <th class="px-4 py-3">Date</th>
-                <th class="px-4 py-3">Company</th>
-                <th class="px-4 py-3">Pack</th>
-                <th class="px-4 py-3">Status</th>
-                <th class="px-4 py-3">Message</th>
-            </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-100">
-            @forelse($requests as $req)
-                <tr>
-                    <td class="px-4 py-3 text-gray-600">{{ $req->created_at->format('d M Y') }}</td>
-                    <td class="px-4 py-3 font-medium">{{ $req->company?->name ?? '—' }}</td>
-                    <td class="px-4 py-3">{{ $req->packLabel() }}</td>
-                    <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full bg-gray-100 text-xs">{{ ucfirst($req->status) }}</span></td>
-                    <td class="px-4 py-3 text-gray-600 max-w-xs truncate">{{ $req->message ?? '—' }}</td>
-                </tr>
-            @empty
-                <tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">No leads yet.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
+<div class="card">
+    <div class="card-header">
+        <div>
+            <h3 class="card-title">Introduction requests</h3>
+            <p class="card-subtitle">From MenetZero clients and the public directory — contact details included for you to follow up</p>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-wrap">
+            <table class="table w-full">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Source</th>
+                        <th>Enquirer</th>
+                        <th>Contact</th>
+                        <th>Status</th>
+                        <th>Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($requests as $req)
+                        <tr>
+                            <td class="text-sm text-gray-600">{{ $req['date']->format('d M Y') }}</td>
+                            <td>
+                                <span class="text-xs px-2 py-0.5 rounded-full {{ $req['type'] === 'public' ? 'bg-blue-50 text-blue-700' : 'bg-gray-100 text-gray-600' }}">
+                                    {{ $req['pack'] }}
+                                </span>
+                            </td>
+                            <td class="font-medium text-sm">{{ $req['name'] }}</td>
+                            <td class="text-sm text-gray-600 max-w-[10rem] truncate" title="{{ $req['contact'] }}">{{ $req['contact'] ?? '—' }}</td>
+                            <td><span class="badge badge-neutral text-xs">{{ ucfirst($req['status']) }}</span></td>
+                            <td class="text-sm text-gray-600 max-w-xs truncate">{{ $req['message'] ?? '—' }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center py-10 text-gray-500">
+                                No leads yet. Complete your directory profile to get listed on
+                                <a href="{{ route('consultant-list.index') }}" class="text-brand hover:underline" target="_blank">/consultant-list</a>.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
-
-<div class="mt-4">{{ $requests->links() }}</div>
 @endsection

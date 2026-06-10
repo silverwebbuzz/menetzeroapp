@@ -135,6 +135,8 @@
                 </div>
                 <div class="flex items-center space-x-4">
                     <a href="{{ route('pricing') }}" class="text-gray-600 hover:text-teal-600 font-medium">Pricing</a>
+                    <a href="{{ route('consultant-list.index') }}" class="hidden md:inline text-gray-600 hover:text-teal-600 font-medium">Find consultants</a>
+                    <a href="{{ route('consultant.landing') }}" class="hidden sm:inline text-gray-600 hover:text-teal-600 font-medium">For consultants</a>
                     <a href="{{ route('contact') }}" class="hidden sm:inline text-gray-600 hover:text-teal-600 font-medium">Contact</a>
                     <a href="{{ route('login') }}" class="btn btn-outline">Login</a>
                     <a href="{{ route('register') }}" class="btn btn-primary">Sign Up</a>
@@ -470,7 +472,7 @@
                     </ul>
                     <div class="flex flex-wrap gap-3">
                         <a href="{{ route('consultant.register') }}" class="btn btn-primary">Apply as a consultant</a>
-                        <a href="{{ route('consultant.landing') }}" class="btn btn-outline" style="color: white; border-color: rgba(255,255,255,0.4);">Learn more</a>
+                        <a href="{{ route('consultant-list.index') }}" class="btn btn-outline" style="color: white; border-color: rgba(255,255,255,0.4);">Browse directory</a>
                     </div>
                 </div>
                 <div class="bg-white/5 border border-white/10 rounded-2xl p-8">
@@ -537,6 +539,7 @@
             <p class="text-gray-400 mb-6">Comprehensive carbon emissions tracking for businesses in the Middle East</p>
             <div class="flex flex-wrap justify-center gap-x-6 gap-y-3 mb-6">
                 <a href="{{ route('pricing') }}" class="text-gray-400 hover:text-white transition-colors">Pricing</a>
+                <a href="{{ route('consultant-list.index') }}" class="text-gray-400 hover:text-white transition-colors">Find consultants</a>
                 <a href="{{ route('consultant.landing') }}" class="text-gray-400 hover:text-white transition-colors">Join as consultant</a>
                 <a href="{{ route('contact') }}" class="text-gray-400 hover:text-white transition-colors">Contact Us</a>
                 <a href="{{ route('terms') }}" class="text-gray-400 hover:text-white transition-colors">Terms &amp; Conditions</a>

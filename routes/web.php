@@ -25,6 +25,13 @@ Route::get('/refunds', [\App\Http\Controllers\PageController::class, 'show'])->d
 Route::get('/privacy', [\App\Http\Controllers\PageController::class, 'show'])->defaults('slug', 'privacy')->name('privacy');
 Route::get('/currency/{code}', [\App\Http\Controllers\PageController::class, 'switchCurrency'])->name('currency.switch');
 
+// Public consultant directory (no contact details — leads via platform)
+Route::get('/consultant-list', [\App\Http\Controllers\PublicConsultantDirectoryController::class, 'index'])->name('consultant-list.index');
+Route::get('/consultant-list/{consultant}', [\App\Http\Controllers\PublicConsultantDirectoryController::class, 'show'])->name('consultant-list.show');
+Route::post('/consultant-list/{consultant}/inquire', [\App\Http\Controllers\PublicConsultantDirectoryController::class, 'inquire'])
+    ->middleware('throttle:6,1')
+    ->name('consultant-list.inquire');
+
 // MENetZero Consultant portal — consultant = agency (directory + client workspaces)
 Route::prefix('consultant')->name('consultant.')->group(function () {
     Route::get('/', [\App\Http\Controllers\Consultant\AuthController::class, 'landing'])->name('landing');

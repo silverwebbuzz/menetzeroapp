@@ -11,10 +11,37 @@ class IntroRequestController extends Controller
     {
         $consultant = Auth::guard('consultant')->user();
 
-        $requests = $consultant->introRequests()
+        $clientRequests = $consultant->introRequests()
             ->with(['company', 'user'])
             ->orderByDesc('created_at')
-            ->paginate(20);
+            ->get()
+            ->map(fn ($req) => [
+                'type' => 'client',
+                'date' => $req->created_at,
+                'name' => $req->company?->name ?? 'MenetZero client',
+                'contact' => $req->user?->email,
+                'pack' => $req->packLabel(),
+                'status' => $req->status,
+                'message' => $req->message,
+            ]);
+
+        $publicInquiries = $consultant->publicInquiries()
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(fn ($inq) => [
+                'type' => 'public',
+                'date' => $inq->created_at,
+                'name' => $inq->requester_company ?: $inq->requester_name,
+                'contact' => $inq->requester_phone . ' · ' . $inq->requester_email,
+                'pack' => 'Public directory',
+                'status' => $inq->status,
+                'message' => $inq->message,
+            ]);
+
+        $requests = $clientRequests
+            ->concat($publicInquiries)
+            ->sortByDesc('date')
+            ->values();
 
         return view('consultant.intro-requests', compact('consultant', 'requests'));
     }

@@ -99,4 +99,53 @@ class ConsultantDirectoryService
 
         return substr($name, 0, 1) . str_repeat('•', max(3, strlen($name) - 2)) . substr($name, -1);
     }
+
+    /**
+     * Public directory profile — no phone, email, or direct contact details.
+     *
+     * @return array<string, mixed>
+     */
+    public function presentForPublic(Consultant $consultant): array
+    {
+        return [
+            'id' => $consultant->id,
+            'company_name' => $consultant->company_name,
+            'bio' => $consultant->bio,
+            'specialties' => $consultant->specialtyLabels(),
+            'emirates' => $consultant->emirateLabels(),
+            'languages' => array_map(
+                fn (string $key) => \App\Data\ConsultantOptions::labelFor('language', $key),
+                $consultant->languages ?? []
+            ),
+            'experience_years' => $consultant->experience_years,
+            'has_moccae_experience' => (bool) $consultant->has_moccae_experience,
+            'is_featured' => (bool) $consultant->is_featured,
+        ];
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function availableEmirateFilters(): array
+    {
+        return $this->listedConsultants()
+            ->flatMap(fn (Consultant $c) => $c->emirateLabels())
+            ->unique()
+            ->sort()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function availableSpecialtyFilters(): array
+    {
+        return $this->listedConsultants()
+            ->flatMap(fn (Consultant $c) => $c->specialtyLabels())
+            ->unique()
+            ->sort()
+            ->values()
+            ->all();
+    }
 }
