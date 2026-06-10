@@ -193,6 +193,11 @@ class SubscriptionController extends Controller
         }
 
         // Paid change: payment gateway required.
+        if (!PaymentGateway::checkoutAvailable()) {
+            return redirect()->route('subscriptions.upgrade')
+                ->with('error', 'Online payments are not available yet. Paid upgrades will open when checkout goes live.');
+        }
+
         $request->validate([
             'gateway' => 'required|in:razorpay,cashfree',
         ]);

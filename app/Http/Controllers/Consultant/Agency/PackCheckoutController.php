@@ -60,6 +60,11 @@ class PackCheckoutController extends Controller
 
     public function processCheckout(Request $request)
     {
+        if (!PaymentGateway::checkoutAvailable()) {
+            return redirect()->route('consultant.packs.index')
+                ->with('error', 'Online payments are not available yet. Agency pack checkout is coming soon.');
+        }
+
         $consultantOrg = $this->consultantCompany();
 
         $data = $request->validate([
@@ -106,6 +111,11 @@ class PackCheckoutController extends Controller
 
     public function processExtraSlots(Request $request)
     {
+        if (!PaymentGateway::checkoutAvailable()) {
+            return redirect()->route('consultant.packs.index')
+                ->with('error', 'Online payments are not available yet. Extra slot purchases are coming soon.');
+        }
+
         $consultantOrg = $this->consultantCompany();
         $subscription = $this->consultantSubscriptions->getActiveSubscription($consultantOrg->id);
 
@@ -154,6 +164,11 @@ class PackCheckoutController extends Controller
 
     public function processYearUnlock(Request $request)
     {
+        if (!PaymentGateway::checkoutAvailable()) {
+            return redirect()->route('consultant.packs.index')
+                ->with('error', 'Online payments are not available yet. Reporting year unlocks are coming soon.');
+        }
+
         $consultantOrg = $this->consultantCompany();
 
         $data = $request->validate([

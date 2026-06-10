@@ -11,8 +11,9 @@
         <h1>Company pricing (AED)</h1>
         <p class="mkt-lead">
             Plans for businesses that want to track and report their own carbon emissions manually on the platform.
-            Try Scope 1 &amp; 2 and all disclosure forms free — upgrade to export reports, bulk import, and connect with consultants.
+            Register free to try Scope 1 &amp; 2 and disclosure previews — paid upgrades are coming soon.
         </p>
+        <x-payments-notice class="mt-6" />
         <p class="text-sm text-gray-500 mt-4 max-w-2xl mx-auto">
             Are you a sustainability consultant or agency?
             <a href="{{ route('consultant.landing') }}" class="mkt-text-brand hover:underline">View consultant features</a>
@@ -76,14 +77,12 @@
                         @endif
                     </ul>
 
-                    @if($isEnterprise)
-                        <a href="mailto:{{ $settings['sales_email'] ?? 'sales@menetzero.com' }}?subject=Enterprise%20enquiry"
-                           class="mkt-btn mkt-btn-dark mkt-btn-block">Contact sales</a>
-                    @else
-                        <a href="{{ route('register') }}"
-                           class="mkt-btn mkt-btn-block {{ $isGrowth ? 'mkt-btn-primary' : 'mkt-btn-dark' }}">
-                            Get started
-                        </a>
+                    <x-plan-purchase-cta
+                        :tier="$isFree ? 'free' : ($isEnterprise ? 'enterprise' : 'paid')"
+                        :highlight="$isGrowth"
+                    />
+                    @if(!$isFree && !\App\Models\PaymentGateway::checkoutAvailable())
+                        <p class="text-xs text-gray-400 text-center mt-2">Register free — upgrade from your account later</p>
                     @endif
                 </div>
             @endforeach
@@ -115,9 +114,10 @@
                     <div class="mkt-feature-card" style="padding:1.25rem;">
                         <div class="flex justify-between items-baseline gap-2 mb-2">
                             <h3 class="font-bold text-gray-900">{{ $addon['name'] }}</h3>
-                            <span class="text-sm font-semibold text-teal-700">{{ $addon['price'] }}</span>
+                            <span class="text-sm font-semibold text-gray-500">{{ $addon['price'] }}</span>
                         </div>
-                        <p class="text-sm text-gray-600">{{ $addon['description'] }}</p>
+                        <p class="text-sm text-gray-600 mb-3">{{ $addon['description'] }}</p>
+                        <span class="mkt-btn mkt-btn-coming-soon mkt-btn-sm" style="display:inline-flex;">Checkout coming soon</span>
                     </div>
                 @endforeach
             </div>

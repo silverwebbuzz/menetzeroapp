@@ -15,8 +15,9 @@
             and export IFRS / GRI disclosures — without hiring a consultant to do the data entry.
         </p>
         <p class="text-sm text-gray-500 mt-4 max-w-2xl mx-auto">
-            Start free with Scope 1 &amp; 2 and disclosure previews. Upgrade when you need downloadable reports, bulk import, and verified consultant support.
+            Start free with Scope 1 &amp; 2 and disclosure previews. Paid plan upgrades are coming soon — register now and switch plans from your account when checkout opens.
         </p>
+        <x-payments-notice class="mt-6" />
         <div class="flex flex-wrap justify-center gap-3 mt-6">
             <a href="{{ route('register') }}" class="mkt-btn mkt-btn-primary mkt-btn-lg">Company sign up</a>
             <a href="{{ route('pricing') }}" class="mkt-btn mkt-btn-outline mkt-btn-lg">View company pricing</a>
@@ -105,30 +106,30 @@
         </div>
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             @foreach([
-                ['Free', 'Try before you buy', 'AED 0', [
+                ['Free', 'Try before you buy', 'AED 0', 'free', [
                     'Scope 1 & 2 quick input',
                     'Disclosure forms — in-app preview',
                     '1 location · 1 user',
                     'Scope 3 locked',
-                ], route('register'), 'mkt-btn-dark'],
-                ['Starter', 'MOCCAE-ready inventory', 'AED 1,499 / yr', [
+                ]],
+                ['Starter', 'MOCCAE-ready inventory', 'AED 1,499 / yr', 'paid', [
                     'GHG, MOCCAE & IEQT PDF exports',
                     'Bulk CSV / Excel import',
                     '3 locations · 5 users',
                     'Scope 3 preview (1 per category)',
-                ], route('register'), 'mkt-btn-dark'],
-                ['Growth', 'IFRS & GRI downloads', 'AED 2,499 / yr', [
+                ]],
+                ['Growth', 'IFRS & GRI downloads', 'AED 2,499 / yr', 'paid', [
                     'Everything in Starter',
                     'IFRS S1/S2 + GRI PDF exports',
                     '10 locations · 10 users',
                     'Full consultant directory access',
-                ], route('register'), 'mkt-btn-primary'],
-                ['Enterprise', 'Multi-site & unlimited S3', 'Custom', [
+                ]],
+                ['Enterprise', 'Multi-site & unlimited S3', 'Custom', 'enterprise', [
                     'Unlimited Scope 3 entries',
                     'Unlimited locations & users',
                     'API access & dedicated support',
                     'Priority consultant introductions',
-                ], route('contact'), 'mkt-btn-dark'],
+                ]],
             ] as $plan)
                 <div class="mkt-feature-card flex flex-col h-full {{ $plan[0] === 'Growth' ? 'ring-2 ring-teal-500/30' : '' }}">
                     @if($plan[0] === 'Growth')
@@ -138,13 +139,15 @@
                     <p class="text-xs text-gray-500 mb-3">{{ $plan[1] }}</p>
                     <div class="text-xl font-extrabold text-gray-900 mb-4">{{ $plan[2] }}</div>
                     <ul class="space-y-2 text-sm text-gray-600 flex-1 mb-5">
-                        @foreach($plan[3] as $feat)
+                        @foreach($plan[4] as $feat)
                             <li class="flex items-start"><span class="mkt-checkmark">✓</span> {{ $feat }}</li>
                         @endforeach
                     </ul>
-                    <a href="{{ $plan[4] }}" class="mkt-btn mkt-btn-block mkt-btn-sm {{ $plan[5] }}">
-                        {{ $plan[0] === 'Enterprise' ? 'Contact sales' : 'Get started' }}
-                    </a>
+                    <x-plan-purchase-cta
+                        :tier="$plan[3]"
+                        :highlight="$plan[0] === 'Growth'"
+                        class="mkt-btn-sm"
+                    />
                 </div>
             @endforeach
         </div>
@@ -241,10 +244,11 @@
                 <div class="mkt-feature-card">
                     <div class="flex justify-between items-baseline gap-2 mb-2">
                         <h3 class="font-bold text-gray-900">{{ $addon['name'] }}</h3>
-                        <span class="text-sm font-semibold mkt-text-brand">{{ $addon['price'] }}</span>
+                        <span class="text-sm font-semibold text-gray-500">{{ $addon['price'] }}</span>
                     </div>
                     <p class="text-xs text-gray-500 mb-2">For {{ $addon['for_plan'] }} plan subscribers</p>
-                    <p class="text-sm text-gray-600">{{ $addon['description'] }}</p>
+                    <p class="text-sm text-gray-600 mb-3">{{ $addon['description'] }}</p>
+                    <span class="mkt-btn mkt-btn-coming-soon mkt-btn-sm" style="display:inline-flex;">Checkout coming soon</span>
                 </div>
             @endforeach
         </div>
@@ -349,7 +353,7 @@
     <div class="mkt-container max-w-3xl text-center">
         <h2 class="text-3xl font-bold text-gray-900 mb-4">Ready to measure your organisation's footprint?</h2>
         <p class="text-gray-500 mb-8">
-            Create your company account in minutes. Start free, explore Scope 1 &amp; 2, and upgrade when you need exports.
+            Create your company account in minutes. Start free, explore Scope 1 &amp; 2, and upgrade to paid plans when checkout opens.
         </p>
         <div class="flex flex-wrap justify-center gap-3">
             <a href="{{ route('register') }}" class="mkt-btn mkt-btn-primary mkt-btn-lg">Company sign up</a>

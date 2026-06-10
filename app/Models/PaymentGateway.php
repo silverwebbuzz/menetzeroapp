@@ -47,6 +47,12 @@ class PaymentGateway extends Model
             ->get();
     }
 
+    /** Whether any gateway is configured and ready for checkout. */
+    public static function checkoutAvailable(): bool
+    {
+        return static::enabled()->isNotEmpty();
+    }
+
     public function isLive(): bool
     {
         return $this->mode === 'live';

@@ -17,8 +17,17 @@
         'highlight' => false,
     ];
 @endphp
-@php $displayCurrency = \App\Services\CurrencyService::displayCurrency(); @endphp
+@php
+    $displayCurrency = \App\Services\CurrencyService::displayCurrency();
+    $checkoutAvailable = \App\Models\PaymentGateway::checkoutAvailable();
+@endphp
 <div class="max-w-6xl mx-auto">
+    @if(!$checkoutAvailable)
+        <div class="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            <strong>Paid upgrades coming soon.</strong> Review plans and features below. Stay on Free to explore Scope 1 &amp; 2, or schedule a downgrade at renewal. Paid checkout will open here when online payments go live.
+        </div>
+    @endif
+
     <!-- Header -->
     <div class="mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
@@ -77,6 +86,8 @@
                     $isCurrent = $currentSubscription && $currentSubscription->subscription_plan_id == $plan->id;
                     $change = $planChanges[$code] ?? null;
                     $warnings = $downgradeWarnings[$code] ?? [];
+                    $isPaidUpgrade = ($change['type'] ?? '') === 'upgrade' && ($change['requires_payment'] ?? false);
+                    $paymentsBlocked = !$checkoutAvailable && $isPaidUpgrade;
                 @endphp
                 <div class="relative bg-white rounded-xl border-2 {{ $meta['highlight'] ? 'border-orange-400' : ($isCurrent ? 'border-blue-400' : 'border-gray-200') }} p-5 flex flex-col">
                     @if($meta['highlight'])
@@ -133,10 +144,20 @@
                                 Current plan
                             </button>
                         @elseif(!empty($meta['is_custom']))
-                            <a href="mailto:sales@menetzero.com?subject=Enterprise%20plan%20enquiry"
-                               class="block w-full text-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 text-sm font-medium">
-                                Contact Sales
-                            </a>
+                            @if($checkoutAvailable)
+                                <a href="mailto:sales@menetzero.com?subject=Enterprise%20plan%20enquiry"
+                                   class="block w-full text-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 text-sm font-medium">
+                                    Contact Sales
+                                </a>
+                            @else
+                                <button type="button" disabled class="w-full px-4 py-2 bg-gray-100 text-gray-500 rounded-lg cursor-not-allowed text-sm font-medium">
+                                    Coming soon
+                                </button>
+                            @endif
+                        @elseif($paymentsBlocked)
+                            <button type="button" disabled class="w-full px-4 py-2 bg-gray-100 text-gray-500 rounded-lg cursor-not-allowed text-sm font-medium">
+                                Coming soon
+                            </button>
                         @else
                             <label class="flex items-center justify-center gap-2 w-full px-4 py-2 border-2 {{ in_array($change['type'] ?? '', ['downgrade', 'downgrade_to_free']) ? 'border-amber-400 text-amber-800 hover:bg-amber-50' : 'border-orange-500 text-orange-700 hover:bg-orange-50' }} rounded-lg cursor-pointer text-sm font-medium transition">
                                 <input type="radio" name="plan_id" value="{{ $plan->id }}" class="text-orange-600 focus:ring-orange-500">
@@ -211,7 +232,12 @@
 
                 <div class="flex items-center justify-end gap-3 border-t border-gray-100 pt-4">
                     <a href="{{ route('subscriptions.billing') }}" class="px-5 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">Back to billing</a>
-                    <button type="submit" class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 text-sm font-medium">Continue</button>
+                    <button type="submit" class="px-6 py-2 {{ $checkoutAvailable ? 'bg-orange-600 hover:bg-orange-700 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300' }} rounded-lg text-sm font-medium">
+                        {{ $checkoutAvailable ? 'Continue' : 'Apply change (downgrades only)' }}
+                    </button>
+                    @if(!$checkoutAvailable)
+                        <p class="text-xs text-gray-400 w-full text-right">Paid upgrades show as Coming soon until checkout opens.</p>
+                    @endif
                 </div>
             </div>
         </div>

@@ -53,6 +53,11 @@ class RenewalController extends Controller
 
     public function process(Request $request)
     {
+        if (!\App\Models\PaymentGateway::checkoutAvailable()) {
+            return redirect()->route('consultant.renewal.index')
+                ->with('error', 'Online payments are not available yet. Pack renewal checkout is coming soon.');
+        }
+
         $consultantOrg = $this->consultantCompany();
 
         if (!$this->renewals->needsRenewalFlow($consultantOrg->id)) {

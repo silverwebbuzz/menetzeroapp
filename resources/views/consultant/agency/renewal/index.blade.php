@@ -3,11 +3,19 @@
 @section('title', 'Renew Agency Pack')
 
 @section('content')
+@php $checkoutAvailable = \App\Models\PaymentGateway::checkoutAvailable(); @endphp
+
 <h1 class="text-2xl font-bold text-gray-900 mb-1">Renew for {{ $nextYear }}</h1>
 <p class="text-sm text-gray-600 mb-6">
     Your {{ $subscription->plan?->plan_name }} contract ends <strong>{{ $subscription->expires_at->format('d M Y') }}</strong>.
     Choose a pack for {{ $nextYear }} and select which clients continue (max slots per pack).
 </p>
+
+@if(!$checkoutAvailable)
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 text-sm text-amber-900">
+        <strong>Renewal checkout coming soon.</strong> Review your renewal options below. Payment will be enabled when online checkout goes live.
+    </div>
+@endif
 
 <form action="{{ route('consultant.renewal.process') }}" method="POST" id="renewalForm">
     @csrf
@@ -85,9 +93,15 @@
     <p id="slotWarning" class="hidden mb-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-4 py-3"></p>
 
     <div class="flex gap-3">
-        <button type="submit" class="px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium rounded-lg">
-            Continue to payment
-        </button>
+        @if($checkoutAvailable)
+            <button type="submit" class="px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium rounded-lg">
+                Continue to payment
+            </button>
+        @else
+            <button type="button" disabled class="px-5 py-2 bg-gray-100 text-gray-500 text-sm font-medium rounded-lg cursor-not-allowed">
+                Coming soon
+            </button>
+        @endif
         <a href="{{ route('consultant.dashboard') }}" class="px-5 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Cancel</a>
     </div>
 </form>
