@@ -104,7 +104,16 @@
                     </svg>
                 </button>
 
-                <h1 class="page-title truncate">@hasSection('page-title')@yield('page-title')@else@yield('title')@endif</h1>
+                @php
+                    $headerTitle = trim($__env->yieldContent('page-title'));
+                    if ($headerTitle === '') {
+                        $headerTitle = trim($__env->yieldContent('title'));
+                    }
+                    if ($headerTitle === '') {
+                        $headerTitle = 'Dashboard';
+                    }
+                @endphp
+                <h1 class="page-title truncate">{{ $headerTitle }}</h1>
 
                 <div class="header-actions">
                     <div class="relative" x-data="{ open: false }" @click.away="open = false">
