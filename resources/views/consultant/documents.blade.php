@@ -22,7 +22,7 @@
             <input type="file" name="document" accept=".pdf,.jpg,.jpeg,.png" required class="w-full text-sm">
             @error('document')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
         </div>
-        <button type="submit" class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium rounded-lg">Upload</button>
+        <button type="submit" class="btn btn-primary">Upload</button>
     </form>
 
     <div class="bg-white border border-gray-200 rounded-xl p-6">

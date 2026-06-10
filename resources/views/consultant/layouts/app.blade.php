@@ -34,6 +34,8 @@
                         indigo: BRAND,
                         purple: BRAND,
                         violet: BRAND,
+                        teal: BRAND,
+                        emerald: BRAND,
                     },
                     fontFamily: {
                         sans: ['Inter', 'Poppins', 'system-ui', 'sans-serif'],

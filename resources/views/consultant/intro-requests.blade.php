@@ -5,7 +5,7 @@
 
 @section('content')
 @if($consultant->status !== 'approved')
-    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-900 mb-6">
+    <div class="cd-notice cd-notice--warning p-4 text-sm mb-6">
         Leads are routed once your directory profile is approved and listed.
     </div>
 @endif

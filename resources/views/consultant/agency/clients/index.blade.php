@@ -9,7 +9,7 @@
         <p class="text-sm text-gray-600 mt-1">{{ $slotSummary['used'] }} of {{ $slotSummary['limit'] }} slots used · {{ $slotSummary['remaining'] }} remaining</p>
     </div>
     @if($slotSummary['remaining'] > 0 && $slotSummary['limit'] > 0)
-        <a href="{{ route('consultant.clients.create') }}" class="inline-flex justify-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg">Add client</a>
+        <a href="{{ route('consultant.clients.create') }}" class="btn btn-primary">Add client</a>
     @endif
 </div>
 
@@ -35,13 +35,13 @@
                     <td class="px-4 py-3">{{ $engagement->subscription?->contract_year ?? '—' }}</td>
                     <td class="px-4 py-3">
                         @if($engagement->status === 'active')
-                            <span class="px-2 py-0.5 rounded-full text-xs bg-green-100 text-green-800">Active</span>
+                            <span class="badge badge-success">Active</span>
                         @else
-                            <span class="px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-600">Archived</span>
+                            <span class="badge badge-neutral">Archived</span>
                         @endif
                     </td>
                     <td class="px-4 py-3 text-right space-x-3">
-                        <a href="{{ route('consultant.clients.show', $engagement) }}" class="text-indigo-600 hover:underline">View</a>
+                        <a href="{{ route('consultant.clients.show', $engagement) }}" class="text-brand hover:underline">View</a>
                         @if($engagement->status === 'active')
                             <a href="{{ route('consultant.clients.edit', $engagement) }}" class="text-gray-600 hover:underline">Edit</a>
                         @endif

@@ -67,8 +67,8 @@
     </div>
 
     <div class="flex gap-3 pt-2">
-        <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg">Save changes</button>
-        <a href="{{ route('consultant.clients.show', $engagement) }}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Cancel</a>
+        <button type="submit" class="btn btn-primary">Save changes</button>
+        <a href="{{ route('consultant.clients.show', $engagement) }}" class="btn btn-secondary">Cancel</a>
     </div>
 </form>
 @endsection

@@ -7,19 +7,19 @@
 <p class="text-sm text-gray-600 mb-6">Each new client consumes <strong>1 slot</strong> and is assigned a Primary Reporting Year (PRY).</p>
 
 @if(!empty($slotSummary['is_trial']))
-    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 text-sm text-blue-900">
+    <div class="cd-callout mb-6">
         <strong>Free trial workspace</strong> — this client gets data-entry access only (like a direct Free account): Quick Input and disclosure forms, no PDF exports or annual reports.
         Upgrade to an agency pack for full Growth features across all clients.
     </div>
 @endif
 
 @if(!$subscription)
-    <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 text-sm text-amber-900">
+    <div class="cd-notice cd-notice--warning p-6 text-sm">
         No client slots available. Your one free trial may already be in use — purchase an agency pack to add more clients.
         <a href="{{ route('consultant.packs.index') }}" class="font-medium underline">View agency packs</a>
     </div>
 @elseif($slotSummary['remaining'] < 1)
-    <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 text-sm text-amber-900">
+    <div class="cd-notice cd-notice--warning p-6 text-sm">
         All {{ $slotSummary['limit'] }} slots are in use. Archive a finished client or purchase extra slots.
     </div>
 @else
@@ -93,8 +93,8 @@
         </div>
 
         <div class="flex gap-3 pt-2">
-            <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg">Create client</button>
-            <a href="{{ route('consultant.clients.index') }}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Cancel</a>
+            <button type="submit" class="btn btn-primary">Create client</button>
+            <a href="{{ route('consultant.clients.index') }}" class="btn btn-secondary">Cancel</a>
         </div>
     </form>
 @endif

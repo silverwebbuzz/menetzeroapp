@@ -87,6 +87,6 @@
         I have MOCCAE / UAE federal reporting experience
     </label>
 
-    <button type="submit" class="px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium rounded-lg">Save profile</button>
+    <button type="submit" class="btn btn-primary">Save profile</button>
 </form>
 @endsection

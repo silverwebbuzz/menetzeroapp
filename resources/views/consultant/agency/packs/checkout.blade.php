@@ -29,7 +29,7 @@
         </div>
 
         @if($gateway && $gateway->gateway === 'razorpay')
-            <button id="payBtn" class="w-full px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 font-medium">
+            <button id="payBtn" class="btn btn-primary w-full">
                 Pay {{ $chargeLabel }}
             </button>
             <form id="razorpayForm" method="POST" action="{{ route('consultant.packs.payment.razorpay') }}" class="hidden">

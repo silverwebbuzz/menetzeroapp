@@ -12,7 +12,7 @@
 </p>
 
 @if(!$checkoutAvailable)
-    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 text-sm text-amber-900">
+    <div class="cd-notice cd-notice--warning p-4 mb-6 text-sm">
         <strong>Renewal checkout coming soon.</strong> Review your renewal options below. Payment will be enabled when online checkout goes live.
     </div>
 @endif
@@ -37,7 +37,7 @@
                                 <input type="checkbox"
                                     name="carry[{{ $engagement->id }}][selected]"
                                     value="1"
-                                    class="carry-checkbox mt-1 rounded border-gray-300 text-teal-600"
+                                    class="carry-checkbox mt-1 rounded border-gray-300 text-brand"
                                     checked
                                     data-engagement-id="{{ $engagement->id }}">
                                 <span class="flex-1">
@@ -48,7 +48,7 @@
                             <input type="hidden" name="carry[{{ $engagement->id }}][engagement_id]" value="{{ $engagement->id }}">
                             <div class="mt-2 ml-7">
                                 <label class="text-xs text-gray-500">PRY for {{ $nextYear }}</label>
-                                <select name="carry[{{ $engagement->id }}][primary_reporting_year]" class="text-sm rounded-lg border-gray-300 w-full max-w-[8rem]">
+                                <select name="carry[{{ $engagement->id }}][primary_reporting_year]" class="form-select w-full max-w-[8rem]">
                                     @foreach([$defaultPry - 1, $defaultPry, $defaultPry + 1] as $year)
                                         @if($year >= 2000)
                                             <option value="{{ $year }}" @selected($year === $defaultPry)>{{ $year }}</option>
@@ -71,8 +71,8 @@
                         $slots = \App\Data\ConsultantAgencyPlanMatrix::slotCountForPlanCode($plan->plan_code);
                         $quote = $planQuotes[$plan->id] ?? ['charge_amount' => 0, 'pro_rata' => false];
                     @endphp
-                    <label class="flex items-center gap-3 border border-gray-200 rounded-lg p-3 cursor-pointer hover:border-teal-300 has-[:checked]:border-teal-500 has-[:checked]:bg-teal-50/40">
-                        <input type="radio" name="plan_id" value="{{ $plan->id }}" class="plan-radio text-teal-600" data-slots="{{ $slots }}" @checked($loop->first) required>
+                    <label class="cd-plan-option flex items-center gap-3 border border-gray-200 rounded-lg p-3 cursor-pointer">
+                        <input type="radio" name="plan_id" value="{{ $plan->id }}" class="plan-radio text-brand" data-slots="{{ $slots }}" @checked($loop->first) required>
                         <span class="flex-1">
                             <span class="font-medium">{{ $plan->plan_name }}</span>
                             <span class="block text-xs text-gray-500">{{ $slots }} slots · AED {{ number_format($quote['charge_amount'], 0) }}</span>
@@ -82,7 +82,7 @@
             </div>
             <div>
                 <label class="block text-xs text-gray-500 mb-1">Payment</label>
-                <select name="gateway" class="w-full text-sm rounded-lg border-gray-300" required>
+                <select name="gateway" class="form-select" required>
                     <option value="cashfree">Cashfree</option>
                     <option value="razorpay">Razorpay (INR)</option>
                 </select>
@@ -94,15 +94,15 @@
 
     <div class="flex gap-3">
         @if($checkoutAvailable)
-            <button type="submit" class="px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium rounded-lg">
+            <button type="submit" class="btn btn-primary">
                 Continue to payment
             </button>
         @else
-            <button type="button" disabled class="px-5 py-2 bg-gray-100 text-gray-500 text-sm font-medium rounded-lg cursor-not-allowed">
+            <button type="button" disabled class="btn btn-secondary opacity-60 cursor-not-allowed">
                 Coming soon
             </button>
         @endif
-        <a href="{{ route('consultant.dashboard') }}" class="px-5 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Cancel</a>
+        <a href="{{ route('consultant.dashboard') }}" class="btn btn-secondary">Cancel</a>
     </div>
 </form>
 

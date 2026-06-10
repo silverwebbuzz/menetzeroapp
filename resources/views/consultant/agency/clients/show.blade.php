@@ -14,11 +14,11 @@
     </div>
     <div class="flex gap-2">
         @if($engagement->isActive())
-            <a href="{{ route('consultant.clients.edit', $engagement) }}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Edit</a>
+            <a href="{{ route('consultant.clients.edit', $engagement) }}" class="btn btn-secondary btn-sm">Edit</a>
             <form action="{{ route('consultant.clients.destroy', $engagement) }}" method="POST" onsubmit="return confirm('Archive this client? The slot will be freed but data stays read-only.');">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="px-4 py-2 border border-red-200 text-red-700 rounded-lg text-sm hover:bg-red-50">Archive</button>
+                <button type="submit" class="btn btn-ghost btn-sm text-red-700">Archive</button>
             </form>
         @endif
     </div>
@@ -55,16 +55,16 @@
 </div>
 
 @if($engagement->isActive())
-    <form action="{{ route('consultant.workspace.enter', $engagement) }}" method="POST" class="bg-teal-50 border border-teal-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+    <form action="{{ route('consultant.workspace.enter', $engagement) }}" method="POST" class="cd-callout mb-4">
         @csrf
-        <p class="text-sm text-teal-900">Open this workspace to enter emissions, disclosures, and exports (PRY {{ $engagement->primary_reporting_year }}).</p>
-        <button type="submit" class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium rounded-lg whitespace-nowrap">Open workspace</button>
+        <p class="text-sm">Open this workspace to enter emissions, disclosures, and exports (PRY {{ $engagement->primary_reporting_year }}).</p>
+        <button type="submit" class="btn btn-primary btn-sm whitespace-nowrap">Open workspace</button>
     </form>
 
     @if($yearUnlockTarget && $yearUnlockQuote)
-        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
-            <h3 class="font-semibold text-amber-900 text-sm mb-1">Unlock {{ $yearUnlockTarget }} exports</h3>
-            <p class="text-sm text-amber-800 mb-3">
+        <div class="cd-notice cd-notice--warning p-4 mb-4">
+            <h3 class="font-semibold text-sm mb-1">Unlock {{ $yearUnlockTarget }} exports</h3>
+            <p class="text-sm mb-3">
                 {{ $yearUnlockTarget }} is preview-only today. Purchase a reporting year unlock for full Growth exports
                 (AED {{ number_format($yearUnlockQuote['charge_amount'], 0) }} pro-rata) without using another client slot.
             </p>
@@ -73,13 +73,13 @@
                 <input type="hidden" name="engagement_id" value="{{ $engagement->id }}">
                 <input type="hidden" name="reporting_year" value="{{ $yearUnlockTarget }}">
                 <div>
-                    <label class="block text-xs text-amber-800 mb-1">Payment</label>
-                    <select name="gateway" class="text-sm rounded-lg border-amber-200" required>
+                    <label class="block text-xs mb-1">Payment</label>
+                    <select name="gateway" class="form-select max-w-xs" required>
                         <option value="cashfree">Cashfree</option>
                         <option value="razorpay">Razorpay (INR)</option>
                     </select>
                 </div>
-                <button type="submit" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-lg">
+                <button type="submit" class="btn btn-warning">
                     Unlock {{ $yearUnlockTarget }}
                 </button>
             </form>
@@ -89,11 +89,11 @@
     <form action="{{ route('consultant.workspace.enter-readonly', $engagement) }}" method="POST" class="bg-gray-50 border border-gray-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         @csrf
         <p class="text-sm text-gray-600">Archived {{ $engagement->archived_at?->format('d M Y') ?? '' }} — open read-only to view historical data.</p>
-        <button type="submit" class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-white whitespace-nowrap">Open read-only</button>
+        <button type="submit" class="btn btn-secondary btn-sm whitespace-nowrap">Open read-only</button>
     </form>
 @endif
 
 <div class="mt-6">
-    <a href="{{ route('consultant.clients.index') }}" class="text-sm text-indigo-600 hover:underline">← Back to clients</a>
+    <a href="{{ route('consultant.clients.index') }}" class="text-sm text-brand hover:underline">← Back to clients</a>
 </div>
 @endsection
