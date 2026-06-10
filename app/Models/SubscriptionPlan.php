@@ -57,5 +57,18 @@ class SubscriptionPlan extends Model
     {
         return $query->where('plan_category', 'client');
     }
+
+    /**
+     * Scope for partner / agency pack plans.
+     */
+    public function scopeForPartners($query)
+    {
+        return $query->where('plan_category', 'partner');
+    }
+
+    public function isPartnerPack(): bool
+    {
+        return $this->plan_category === 'partner';
+    }
 }
 
