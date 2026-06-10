@@ -500,8 +500,7 @@ class QuickInputController extends Controller
         if ($emissionSource->scope === 'Scope 3') {
             $scope3Check = $this->subscriptionService->canAddScope3Record($company->id, $emissionSource->id);
             if (!$scope3Check['allowed']) {
-                return redirect()->route('subscriptions.upgrade')
-                    ->with('error', $scope3Check['message']);
+                $this->denyEntitlement($scope3Check['message']);
             }
         }
 
@@ -536,6 +535,8 @@ class QuickInputController extends Controller
         }
 
         $request->validate($validationRules);
+
+        $this->requireReportingYearWrite($company->id, (int) $request->fiscal_year);
 
         // Verify location belongs to company
         $location = Location::where('id', $request->location_id)
@@ -915,6 +916,8 @@ class QuickInputController extends Controller
 
         $request->validate($validationRules);
 
+        $this->requireReportingYearWrite($company->id, (int) $request->fiscal_year);
+
         // Verify location belongs to company
         $location = Location::where('id', $request->location_id)
             ->where('company_id', $company->id)
@@ -1064,6 +1067,8 @@ class QuickInputController extends Controller
                 $q->where('company_id', $company->id);
             })
             ->findOrFail($id);
+
+        $this->requireReportingYearWrite($company->id, (int) $entry->measurement->fiscal_year);
 
         $measurementId = $entry->measurement_id;
 

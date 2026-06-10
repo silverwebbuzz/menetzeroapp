@@ -48,7 +48,9 @@ class CheckCompanyType
 
         if ($type === 'client') {
             if ($company->isPartner()) {
-                abort(403, 'Use the agency hub at /partner/dashboard for partner organisations.');
+                return redirect()
+                    ->route('partner.dashboard')
+                    ->with('info', 'Use the agency hub to manage clients and open workspaces.');
             }
 
             if ($company->isManagedClient()) {

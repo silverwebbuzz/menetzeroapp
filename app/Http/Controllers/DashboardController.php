@@ -26,6 +26,11 @@ class DashboardController extends Controller
         if (!$user) {
             return redirect()->route('login');
         }
+
+        $partnerWorkspace = app(\App\Services\PartnerWorkspaceService::class);
+        if ($partnerWorkspace->isPartnerUser($user) && !$partnerWorkspace->isActingAsManagedClient($user)) {
+            return redirect()->route('partner.dashboard');
+        }
         
         // Reload relationships to ensure fresh data (important after invitation acceptance)
         // Only load activeContext if table exists

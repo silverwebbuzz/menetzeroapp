@@ -155,4 +155,16 @@ abstract class Controller extends BaseController
             $this->denyEntitlement($check['message']);
         }
     }
+
+    protected function requireReportingYearWrite(int $companyId, int $reportingYear): void
+    {
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $check = app(\App\Services\PartnerWorkspaceService::class)->canWriteReportingYear($user, $reportingYear);
+
+        if (!$check['allowed']) {
+            throw new HttpResponseException(
+                back()->with('error', $check['message'])
+            );
+        }
+    }
 }

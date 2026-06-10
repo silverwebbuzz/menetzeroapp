@@ -312,7 +312,7 @@
     </div>
 @endif
 
-@if($hasCompany && ($canViewStaff || $canViewRoles || $isAdmin))
+@if($hasCompany && !$isManagedClientWorkspace && ($canViewStaff || $canViewRoles || $isAdmin))
     <div class="nav-section" style="margin-top: auto; border-top: 1px solid var(--line); padding-top: 0.75rem;">
         <div class="nav-section-title">Settings</div>
         @if($canViewStaff || $canViewRoles)

@@ -104,6 +104,10 @@ class Scope12BulkImportController extends Controller
 
         $this->requireBulkImport($company->id);
 
+        if (app(\App\Services\PartnerWorkspaceService::class)->isReadOnlyWorkspace()) {
+            return back()->with('error', 'Bulk import is not available in read-only archived workspaces.');
+        }
+
         $request->validate([
             'import_file' => 'required|file|mimes:csv,txt,xlsx,xls|max:5120',
         ]);

@@ -58,6 +58,22 @@ class WorkspaceController extends Controller
             ->with('success', "Now working in {$managed->name}.");
     }
 
+    public function enterReadOnly(int $engagement)
+    {
+        $user = Auth::user();
+        $record = PartnerClientEngagement::findOrFail($engagement);
+
+        try {
+            $managed = $this->workspace->enterReadOnlyWorkspace($user, $record);
+        } catch (RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return redirect()
+            ->route('client.dashboard')
+            ->with('info', "Read-only view of {$managed->name} (archived engagement).");
+    }
+
     public function exit()
     {
         $this->workspace->exitWorkspace();

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\PartnerWorkspaceService;
 use Illuminate\Http\Request;
 use App\Models\UserCompanyRole;
 use App\Models\Company;
@@ -18,6 +19,10 @@ class AccountSelectorController extends Controller
         
         if (!$user) {
             return redirect()->route('login');
+        }
+
+        if (app(PartnerWorkspaceService::class)->isPartnerUser($user)) {
+            return redirect()->route('partner.dashboard');
         }
         
         // Get all accessible companies (owned + staff)
@@ -56,6 +61,11 @@ class AccountSelectorController extends Controller
         }
         
         $user->switchToCompany($request->company_id);
+
+        $company = Company::find($request->company_id);
+        if ($company?->isPartner()) {
+            return redirect()->route('partner.dashboard');
+        }
         
         return redirect()->route('client.dashboard');
     }

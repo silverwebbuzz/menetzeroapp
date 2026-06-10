@@ -17,6 +17,8 @@ class PartnerWorkspaceService
 {
     public const SESSION_KEY = 'partner_acting_company_id';
 
+    public const READ_ONLY_KEY = 'partner_acting_read_only';
+
     public function getPartnerHomeCompany(User $user): ?Company
     {
         $owned = $user->getOwnedCompany();
@@ -66,7 +68,12 @@ class PartnerWorkspaceService
         return $managed;
     }
 
-    public function activeEngagementForActing(User $user): ?PartnerClientEngagement
+    public function isReadOnlyWorkspace(): bool
+    {
+        return (bool) session(self::READ_ONLY_KEY, false);
+    }
+
+    public function engagementForActing(User $user): ?PartnerClientEngagement
     {
         $managed = $this->resolveActingCompany($user);
 
@@ -74,7 +81,48 @@ class PartnerWorkspaceService
             return null;
         }
 
+        if ($this->isReadOnlyWorkspace()) {
+            return PartnerClientEngagement::query()
+                ->where('managed_company_id', $managed->id)
+                ->where('partner_company_id', $managed->partner_id)
+                ->orderByDesc('id')
+                ->first();
+        }
+
         return app(PartnerEntitlementService::class)->getActiveEngagement($managed->id);
+    }
+
+    public function activeEngagementForActing(User $user): ?PartnerClientEngagement
+    {
+        return $this->engagementForActing($user);
+    }
+
+    /**
+     * @return array{allowed: bool, message: string|null}
+     */
+    public function canWriteReportingYear(User $user, int $reportingYear): array
+    {
+        if (!$this->isActingAsManagedClient($user)) {
+            return ['allowed' => true, 'message' => null];
+        }
+
+        if ($this->isReadOnlyWorkspace()) {
+            return [
+                'allowed' => false,
+                'message' => 'This archived client workspace is read-only.',
+            ];
+        }
+
+        $managed = $this->resolveActingCompany($user);
+
+        return app(PlanEntitlementService::class)->canWriteForReportingYear((int) $managed->id, $reportingYear);
+    }
+
+    public function purgeInvalidActingSession(User $user): void
+    {
+        if ($this->getActingCompanyId() && !$this->resolveActingCompany($user)) {
+            $this->exitWorkspace();
+        }
     }
 
     /**
@@ -120,7 +168,32 @@ class PartnerWorkspaceService
             throw new RuntimeException('This client engagement is archived. Open it read-only from the agency hub or renew.');
         }
 
-        session([self::SESSION_KEY => $managed->id]);
+        session([
+            self::SESSION_KEY => $managed->id,
+            self::READ_ONLY_KEY => false,
+        ]);
+
+        return $managed;
+    }
+
+    public function enterReadOnlyWorkspace(User $user, PartnerClientEngagement $engagement): Company
+    {
+        $partner = $this->getPartnerHomeCompany($user);
+
+        if (!$partner || (int) $engagement->partner_company_id !== (int) $partner->id) {
+            throw new RuntimeException('You do not have access to this client engagement.');
+        }
+
+        $managed = $engagement->managedCompany;
+
+        if (!$managed) {
+            throw new RuntimeException('Managed client not found.');
+        }
+
+        session([
+            self::SESSION_KEY => $managed->id,
+            self::READ_ONLY_KEY => true,
+        ]);
 
         return $managed;
     }
@@ -138,7 +211,7 @@ class PartnerWorkspaceService
 
     public function exitWorkspace(): void
     {
-        session()->forget(self::SESSION_KEY);
+        session()->forget([self::SESSION_KEY, self::READ_ONLY_KEY]);
     }
 
     public function canActOnManagedClient(User $user, Company $company): bool
@@ -153,10 +226,6 @@ class PartnerWorkspaceService
             return false;
         }
 
-        if ($this->isActingAsManagedClient($user)) {
-            return (int) $this->resolveActingCompany($user)?->id === (int) $company->id;
-        }
-
-        return false;
+        return (int) $this->resolveActingCompany($user)?->id === (int) $company->id;
     }
 }

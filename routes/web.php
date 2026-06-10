@@ -148,7 +148,14 @@ Route::middleware(['auth:web'])->group(function () {
 // Profile Routes - Separate for Client and Partner
 
 // Client Routes - Use web guard (default)
-Route::middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:client', 'ensureOnboardingComplete'])->group(function () {
+Route::middleware([
+    'auth:web',
+    'setActiveCompany',
+    'ensurePartnerManagedWorkspace',
+    'checkCompanyType:client',
+    'restrictManagedClientWorkspace',
+    'ensureOnboardingComplete',
+])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('client.dashboard');
     
     // Profile routes
@@ -379,6 +386,7 @@ Route::prefix('partner')->middleware(['auth:web', 'setActiveCompany', 'checkComp
 
     Route::get('/workspace', [\App\Http\Controllers\Partner\WorkspaceController::class, 'switcher'])->name('workspace.switcher');
     Route::post('/workspace/enter/{engagement}', [\App\Http\Controllers\Partner\WorkspaceController::class, 'enter'])->name('workspace.enter');
+    Route::post('/workspace/enter-readonly/{engagement}', [\App\Http\Controllers\Partner\WorkspaceController::class, 'enterReadOnly'])->name('workspace.enter-readonly');
     Route::post('/workspace/exit', [\App\Http\Controllers\Partner\WorkspaceController::class, 'exit'])->name('workspace.exit');
 
     Route::resource('clients', \App\Http\Controllers\Partner\ManagedClientController::class);

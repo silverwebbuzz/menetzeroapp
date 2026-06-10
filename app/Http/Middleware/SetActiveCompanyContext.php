@@ -26,6 +26,10 @@ class SetActiveCompanyContext
             return $next($request);
         }
 
+        if (app(\App\Services\PartnerWorkspaceService::class)->isPartnerUser($user)) {
+            return $next($request);
+        }
+
         // Check if user has multiple company access
         if ($user->hasMultipleCompanyAccess()) {
             // Check if user has selected a company

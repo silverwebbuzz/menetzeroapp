@@ -28,6 +28,10 @@ abstract class DisclosureBaseController extends Controller
         );
         session(['disclosure_fiscal_year' => $fiscalYear]);
 
+        if ($requireEdit) {
+            $this->requireReportingYearWrite($company->id, $fiscalYear);
+        }
+
         return compact('company', 'fiscalYear', 'user');
     }
 

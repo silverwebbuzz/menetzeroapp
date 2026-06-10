@@ -61,9 +61,11 @@
         <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg whitespace-nowrap">Open workspace</button>
     </form>
 @else
-    <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm text-gray-600">
-        Archived {{ $engagement->archived_at?->format('d M Y') ?? '' }} — read-only access when workspace switch is enabled.
-    </div>
+    <form action="{{ route('partner.workspace.enter-readonly', $engagement) }}" method="POST" class="bg-gray-50 border border-gray-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        @csrf
+        <p class="text-sm text-gray-600">Archived {{ $engagement->archived_at?->format('d M Y') ?? '' }} — open read-only to view historical data.</p>
+        <button type="submit" class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-white whitespace-nowrap">Open read-only</button>
+    </form>
 @endif
 
 <div class="mt-6">

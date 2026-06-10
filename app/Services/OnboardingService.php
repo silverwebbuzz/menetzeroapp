@@ -46,11 +46,15 @@ class OnboardingService
 
         $name = trim((string) $company->name);
 
-        return $name !== ''
-            && $name !== 'New Company'
-            && filled($company->country)
-            && filled($company->sector)
-            && filled($company->industry);
+        if ($name === '' || $name === 'New Company' || !filled($company->country)) {
+            return false;
+        }
+
+        if ($company->isManagedClient()) {
+            return true;
+        }
+
+        return filled($company->sector) && filled($company->industry);
     }
 
     public function hasActiveLocation(Company $company): bool

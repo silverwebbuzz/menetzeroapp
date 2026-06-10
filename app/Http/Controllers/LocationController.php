@@ -104,8 +104,7 @@ class LocationController extends Controller
         // user to the upgrade page so they can pick a paid plan with more locations.
         $limitCheck = $this->subscriptionService->canPerformAction($company->id, 'locations', 1);
         if (!$limitCheck['allowed']) {
-            return redirect()->route('subscriptions.upgrade')
-                ->with('error', $limitCheck['message']);
+            $this->denyEntitlement($limitCheck['message']);
         }
 
         // Check if this is the first location for the company

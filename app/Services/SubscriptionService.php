@@ -466,6 +466,12 @@ class SubscriptionService
      */
     public function getActiveSubscription($companyId, $type = 'client')
     {
+        $company = Company::find($companyId);
+
+        if ($company?->isManagedClient()) {
+            return null;
+        }
+
         return ClientSubscription::where('company_id', $companyId)
             ->where('status', 'active')
             ->where('expires_at', '>', now())
@@ -516,6 +522,14 @@ class SubscriptionService
      */
     public function getPlanLimits($companyId)
     {
+        $company = Company::find($companyId);
+
+        if ($company?->isManagedClient()) {
+            $growth = SubscriptionPlan::where('plan_code', 'client_growth')->first();
+
+            return $growth?->limits ?? [];
+        }
+
         $subscription = $this->getActiveSubscription($companyId, 'client');
 
         if (!$subscription || !$subscription->plan) {

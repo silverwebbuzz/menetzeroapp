@@ -70,7 +70,8 @@
                 $user = auth('web')->user();
                 $partnerWorkspace = app(\App\Services\PartnerWorkspaceService::class);
                 $isPartnerActing = $user && $partnerWorkspace->isActingAsManagedClient($user);
-                $partnerActingEngagement = $isPartnerActing ? $partnerWorkspace->activeEngagementForActing($user) : null;
+                $partnerActingEngagement = $isPartnerActing ? $partnerWorkspace->engagementForActing($user) : null;
+                $partnerReadOnly = $isPartnerActing && $partnerWorkspace->isReadOnlyWorkspace();
                 $partnerSwitchableClients = $isPartnerActing ? $partnerWorkspace->switchableEngagements($user) : collect();
                 $activeCompany = $user ? $user->getActiveCompany() : null;
                 $accessibleCompanies = $user ? $user->getAccessibleCompanies() : collect([]);
@@ -242,14 +243,22 @@
                 <!-- Page content -->
                 <main class="content-area">
                     @if($isPartnerActing)
-                        <div class="mb-4 rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-indigo-900">
+                        <div class="mb-4 rounded-lg border {{ $partnerReadOnly ? 'border-amber-200 bg-amber-50' : 'border-indigo-200 bg-indigo-50' }} px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm {{ $partnerReadOnly ? 'text-amber-900' : 'text-indigo-900' }}">
                             <span>
-                                Agency mode — <strong>{{ $activeCompany?->name }}</strong>
+                                @if($partnerReadOnly)
+                                    Read-only —
+                                @else
+                                    Agency mode —
+                                @endif
+                                <strong>{{ $activeCompany?->name }}</strong>
                                 @if($partnerActingEngagement)
                                     · PRY {{ $partnerActingEngagement->primary_reporting_year }}
                                 @endif
                             </span>
-                            <a href="{{ route('partner.dashboard') }}" class="text-indigo-700 font-medium hover:underline whitespace-nowrap">Back to agency hub</a>
+                            <form action="{{ route('partner.workspace.exit') }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="{{ $partnerReadOnly ? 'text-amber-800' : 'text-indigo-700' }} font-medium hover:underline whitespace-nowrap">Back to agency hub</button>
+                            </form>
                         </div>
                     @endif
                     @if(session('success') || session('error'))
