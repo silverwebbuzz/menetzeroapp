@@ -4,6 +4,7 @@ use App\Data\PartnerPlanMatrix;
 use App\Data\PlanEntitlementDefaults;
 use App\Models\SubscriptionPlan;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -17,6 +18,13 @@ return new class extends Migration
     {
         if (!Schema::hasTable('subscription_plans')) {
             return;
+        }
+
+        // Was ENUM('client') only — widen so partner_* packs can be seeded.
+        if (Schema::hasColumn('subscription_plans', 'plan_category')) {
+            DB::statement(
+                "ALTER TABLE `subscription_plans` MODIFY `plan_category` VARCHAR(20) NOT NULL DEFAULT 'client'"
+            );
         }
 
         foreach (PartnerPlanMatrix::packDefinitions() as $code => $definition) {
@@ -50,5 +58,11 @@ return new class extends Migration
         }
 
         SubscriptionPlan::whereIn('plan_code', PartnerPlanMatrix::PLAN_CODES)->delete();
+
+        if (Schema::hasColumn('subscription_plans', 'plan_category')) {
+            DB::statement(
+                "ALTER TABLE `subscription_plans` MODIFY `plan_category` ENUM('client') NOT NULL DEFAULT 'client'"
+            );
+        }
     }
 };
