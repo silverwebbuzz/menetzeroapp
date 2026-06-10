@@ -21,6 +21,22 @@ class PartnerWorkspaceService
 
     public function getPartnerHomeCompany(User $user): ?Company
     {
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasTable('user_company_roles')) {
+                $role = $user->companyRoles()
+                    ->where('is_active', true)
+                    ->whereNull('company_custom_role_id')
+                    ->whereHas('company', fn ($q) => $q->where('company_type', 'partner'))
+                    ->first();
+
+                if ($role) {
+                    return Company::find($role->company_id);
+                }
+            }
+        } catch (\Throwable) {
+            // fall through
+        }
+
         $owned = $user->getOwnedCompany();
 
         return ($owned && $owned->isPartner()) ? $owned : null;

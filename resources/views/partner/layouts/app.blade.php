@@ -12,12 +12,13 @@
 <body class="bg-slate-50 text-gray-900 min-h-screen">
     <nav class="bg-white border-b border-gray-200">
         <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-            <a href="{{ route('partner.dashboard') }}" class="font-semibold text-indigo-700">MENetZero Agency</a>
+            <a href="{{ route('consultant.dashboard') }}" class="font-semibold text-teal-700">MENetZero Partner</a>
             <div class="flex items-center gap-4 text-sm">
-                <a href="{{ route('partner.dashboard') }}" class="text-gray-600 hover:text-indigo-600">Dashboard</a>
-                <a href="{{ route('partner.clients.index') }}" class="text-gray-600 hover:text-indigo-600">Clients</a>
-                <a href="{{ route('partner.workspace.switcher') }}" class="text-gray-600 hover:text-indigo-600">Workspaces</a>
-                <a href="{{ route('partner.packs.index') }}" class="text-gray-600 hover:text-indigo-600">Agency packs</a>
+                <a href="{{ route('consultant.dashboard') }}" class="text-gray-600 hover:text-teal-600">Dashboard</a>
+                <a href="{{ route('partner.clients.index') }}" class="text-gray-600 hover:text-teal-600">Clients</a>
+                <a href="{{ route('partner.workspace.switcher') }}" class="text-gray-600 hover:text-teal-600">Workspaces</a>
+                <a href="{{ route('partner.packs.index') }}" class="text-gray-600 hover:text-teal-600">Agency packs</a>
+                <a href="{{ route('consultant.profile.edit') }}" class="text-gray-600 hover:text-teal-600">Directory profile</a>
                 <form action="{{ route('logout') }}" method="POST" class="inline">
                     @csrf
                     <button type="submit" class="text-gray-500 hover:text-red-600">Sign out</button>

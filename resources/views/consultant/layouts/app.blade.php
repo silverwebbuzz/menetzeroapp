@@ -15,10 +15,11 @@
             <a href="{{ route('consultant.dashboard') }}" class="font-semibold text-teal-700">MENetZero Partner</a>
             <div class="flex items-center gap-4 text-sm">
                 <a href="{{ route('consultant.dashboard') }}" class="text-gray-600 hover:text-teal-600">Dashboard</a>
-                <a href="{{ route('consultant.profile.edit') }}" class="text-gray-600 hover:text-teal-600">Profile</a>
-                <a href="{{ route('consultant.documents.index') }}" class="text-gray-600 hover:text-teal-600">Documents</a>
+                <a href="{{ route('partner.clients.index') }}" class="text-gray-600 hover:text-teal-600">Clients</a>
+                <a href="{{ route('partner.workspace.switcher') }}" class="text-gray-600 hover:text-teal-600">Workspaces</a>
+                <a href="{{ route('partner.packs.index') }}" class="text-gray-600 hover:text-teal-600">Agency packs</a>
+                <a href="{{ route('consultant.profile.edit') }}" class="text-gray-600 hover:text-teal-600">Directory profile</a>
                 <a href="{{ route('consultant.intro-requests.index') }}" class="text-gray-600 hover:text-teal-600">Leads</a>
-                <a href="{{ route('consultant.orders.index') }}" class="text-gray-600 hover:text-teal-600">Orders</a>
                 <form action="{{ route('consultant.logout') }}" method="POST" class="inline">
                     @csrf
                     <button type="submit" class="text-gray-500 hover:text-red-600">Sign out</button>

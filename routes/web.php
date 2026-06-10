@@ -34,7 +34,7 @@ Route::prefix('consultant')->name('consultant.')->group(function () {
     Route::post('/login', [\App\Http\Controllers\Consultant\AuthController::class, 'login'])->name('login.post');
     Route::post('/logout', [\App\Http\Controllers\Consultant\AuthController::class, 'logout'])->name('logout');
 
-    Route::middleware(['ensureConsultant'])->group(function () {
+    Route::middleware(['ensureConsultant', 'syncPartnerSession'])->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Consultant\DashboardController::class, 'index'])->name('dashboard');
         Route::get('/profile', [\App\Http\Controllers\Consultant\ProfileController::class, 'edit'])->name('profile.edit');
         Route::put('/profile', [\App\Http\Controllers\Consultant\ProfileController::class, 'update'])->name('profile.update');
@@ -110,7 +110,7 @@ Route::post('/partner/login', function (\Illuminate\Http\Request $request) {
 */
 
 Route::post('/logout', function () {
-    // Logout from web guard
+    \Illuminate\Support\Facades\Auth::guard('consultant')->logout();
     \Illuminate\Support\Facades\Auth::guard('web')->logout();
     request()->session()->invalidate();
     request()->session()->regenerateToken();
@@ -381,7 +381,7 @@ Route::get('/api/subcategories', function(Request $request) {
 });
 
 // Partner / Agency hub (P16+) — web guard + company_type = partner
-Route::prefix('partner')->middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:partner'])->name('partner.')->group(function () {
+Route::prefix('partner')->middleware(['syncPartnerSession', 'auth:web', 'setActiveCompany', 'checkCompanyType:partner'])->name('partner.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Partner\DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/workspace', [\App\Http\Controllers\Partner\WorkspaceController::class, 'switcher'])->name('workspace.switcher');

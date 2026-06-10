@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Consultant;
 
 use App\Http\Controllers\Controller;
 use App\Models\Consultant;
+use App\Services\ConsultantPartnerLinkService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -47,9 +48,10 @@ class AuthController extends Controller
         ]);
 
         Auth::guard('consultant')->login($consultant);
+        app(ConsultantPartnerLinkService::class)->syncWebSession($consultant);
 
         return redirect()->route('consultant.dashboard')
-            ->with('success', 'Welcome! Complete your profile and upload documents to apply for the partner directory.');
+            ->with('success', 'Welcome! Complete your profile for the directory, or purchase an agency pack to manage client workspaces.');
     }
 
     public function showLogin()
@@ -78,6 +80,7 @@ class AuthController extends Controller
 
         if (Auth::guard('consultant')->attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
+            app(ConsultantPartnerLinkService::class)->syncWebSession($consultant);
 
             return redirect()->intended(route('consultant.dashboard'));
         }
@@ -90,6 +93,7 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         Auth::guard('consultant')->logout();
+        Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
