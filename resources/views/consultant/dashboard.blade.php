@@ -33,15 +33,26 @@
 <div class="mb-8">
     <h2 class="text-lg font-semibold text-gray-900 mb-3">Client workspaces</h2>
     <p class="text-sm text-gray-600 mb-4">
-        Manage SME carbon accounts from one login. Freelancers typically start with <strong>Consultant 5</strong>; larger practices choose 10 / 25 / 50 slots.
+        Manage SME carbon accounts from one login. Start with <strong>one free client</strong> (data entry only), then upgrade to an agency pack for full Growth workspaces.
     </p>
+
+    @if(!empty($slotSummary['is_trial']))
+        <div class="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+            <strong>Free trial active</strong> — your first managed client can enter emissions and disclosure data only (no PDF exports or reports).
+            <a href="{{ route('consultant.packs.index') }}" class="font-medium underline ml-1">Upgrade to an agency pack</a> for full Growth features.
+        </div>
+    @endif
     <div class="grid sm:grid-cols-3 gap-4 mb-4">
         <div class="bg-white border border-gray-200 rounded-xl p-5">
             <div class="text-xs text-gray-500 uppercase tracking-wide">Agency pack</div>
             <div class="mt-1 font-semibold text-gray-900">
                 @if($subscription)
-                    {{ strtoupper(str_replace('consultant_', 'Consultant ', $subscription->plan_code)) }}
-                    <span class="text-xs font-normal text-gray-500">· {{ $subscription->contract_year }}</span>
+                    @if(!empty($slotSummary['is_trial']))
+                        Free trial
+                    @else
+                        {{ strtoupper(str_replace('consultant_', 'Consultant ', $subscription->plan?->plan_code ?? '')) }}
+                        <span class="text-xs font-normal text-gray-500">· {{ $subscription->contract_year }}</span>
+                    @endif
                 @else
                     <span class="text-amber-700">No pack yet</span>
                 @endif
@@ -59,8 +70,11 @@
         </div>
     </div>
     <div class="flex flex-wrap gap-3">
-        @if(!$subscription)
-            <a href="{{ route('consultant.packs.index') }}" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg">Purchase agency pack</a>
+        @if(!empty($slotSummary['remaining']))
+            <a href="{{ route('consultant.clients.create') }}" class="px-4 py-2 bg-brand hover:bg-brand-dark text-white text-sm font-medium rounded-lg">Add first client</a>
+        @endif
+        @if(empty($slotSummary['is_trial']))
+            <a href="{{ route('consultant.packs.index') }}" class="px-4 py-2 bg-brand hover:bg-brand-dark text-white text-sm font-medium rounded-lg">Purchase agency pack</a>
         @endif
         <a href="{{ route('consultant.clients.index') }}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Manage clients</a>
         <a href="{{ route('consultant.workspace.switcher') }}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Open workspace</a>

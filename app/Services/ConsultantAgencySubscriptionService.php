@@ -46,11 +46,66 @@ class ConsultantAgencySubscriptionService
 
     public function getActiveSubscription(int $consultantCompanyId): ?ConsultantSubscription
     {
-        return ConsultantSubscription::forConsultant($consultantCompanyId)
+        $subscriptions = ConsultantSubscription::forConsultant($consultantCompanyId)
             ->with('plan')
             ->active()
             ->orderByDesc('expires_at')
-            ->first();
+            ->get();
+
+        return $subscriptions->first(fn (ConsultantSubscription $sub) => !$sub->isFreeTrial())
+            ?? $subscriptions->first();
+    }
+
+    /**
+     * Auto-provision the one free trial slot for new consultants (no paid pack yet).
+     */
+    public function ensureFreeTrialSubscription(Company $consultantOrg): ?ConsultantSubscription
+    {
+        $this->assertConsultantOrg($consultantOrg);
+
+        $active = $this->getActiveSubscription($consultantOrg->id);
+
+        if ($active) {
+            return $active;
+        }
+
+        if ($this->hasConsumedFreeTrial($consultantOrg->id) || $this->hasEverHadPaidPack($consultantOrg->id)) {
+            return null;
+        }
+
+        $plan = SubscriptionPlan::where('plan_code', ConsultantAgencyPlanMatrix::FREE_TRIAL_CODE)->first();
+
+        if (!$plan) {
+            return null;
+        }
+
+        $contractYear = (int) now()->year;
+
+        return $this->activatePackSubscription($consultantOrg, $plan, [
+            'contract_year' => $contractYear,
+            'metadata' => ['provision_type' => 'free_trial'],
+            'expires_at' => now()->addYears(5)->toDateString(),
+        ]);
+    }
+
+    public function hasConsumedFreeTrial(int $consultantCompanyId): bool
+    {
+        return ConsultantClientEngagement::query()
+            ->whereHas('subscription', function ($query) use ($consultantCompanyId) {
+                $query->where('consultant_company_id', $consultantCompanyId)
+                    ->where(function ($inner) {
+                        $inner->where('metadata->provision_type', 'free_trial')
+                            ->orWhereHas('plan', fn ($plan) => $plan->where('plan_code', ConsultantAgencyPlanMatrix::FREE_TRIAL_CODE));
+                    });
+            })
+            ->exists();
+    }
+
+    public function hasEverHadPaidPack(int $consultantCompanyId): bool
+    {
+        return ConsultantSubscription::forConsultant($consultantCompanyId)
+            ->whereHas('plan', fn ($query) => $query->where('plan_code', '!=', ConsultantAgencyPlanMatrix::FREE_TRIAL_CODE))
+            ->exists();
     }
 
     public function activeSlotUsage(int $consultantCompanyId, ?ConsultantSubscription $subscription = null): int
@@ -222,7 +277,7 @@ class ConsultantAgencySubscriptionService
                 'slot_limit' => $baseSlots + $carriedExtraSlots,
                 'extra_slots_purchased' => $carriedExtraSlots,
                 'starts_at' => $options['starts_at'] ?? now()->toDateString(),
-                'expires_at' => $this->contractYearEnd($contractYear)->toDateString(),
+                'expires_at' => $options['expires_at'] ?? $this->contractYearEnd($contractYear)->toDateString(),
                 'status' => 'active',
                 'payment_transaction_id' => $options['payment_transaction_id'] ?? null,
                 'metadata' => $options['metadata'] ?? null,
@@ -508,6 +563,7 @@ class ConsultantAgencySubscriptionService
             'remaining' => max(0, ($subscription?->slot_limit ?? 0) - $used),
             'contract_year' => $subscription?->contract_year,
             'expires_at' => $subscription?->expires_at?->toDateString(),
+            'is_trial' => $subscription?->isFreeTrial() ?? false,
         ];
     }
 

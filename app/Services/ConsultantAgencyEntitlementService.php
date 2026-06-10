@@ -31,14 +31,15 @@ class ConsultantAgencyEntitlementService
     {
         $engagement = $this->getActiveEngagement($companyId);
 
+        $base = $this->baseEntitlementsForEngagement($engagement);
+
         if (!$engagement || !$engagement->isActive()) {
-            return array_merge(ConsultantAgencyPlanMatrix::managedClientEntitlements(), [
-                'channel' => 'consultant_managed',
+            return array_merge($base, [
                 'engagement_status' => $engagement?->status ?? 'none',
             ]);
         }
 
-        return array_merge(ConsultantAgencyPlanMatrix::managedClientEntitlements(), [
+        return array_merge($base, [
             'engagement_status' => 'active',
             'primary_reporting_year' => $engagement->primary_reporting_year,
             'consultant_company_id' => $engagement->consultant_company_id,
@@ -223,5 +224,26 @@ class ConsultantAgencyEntitlementService
             ->where('managed_company_id', $engagement->managed_company_id)
             ->where('reporting_year', $reportingYear)
             ->exists();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function baseEntitlementsForEngagement(?ConsultantClientEngagement $engagement): array
+    {
+        if ($engagement && $this->isTrialEngagement($engagement)) {
+            return ConsultantAgencyPlanMatrix::trialManagedClientEntitlements();
+        }
+
+        return ConsultantAgencyPlanMatrix::managedClientEntitlements();
+    }
+
+    protected function isTrialEngagement(ConsultantClientEngagement $engagement): bool
+    {
+        $subscription = $engagement->relationLoaded('subscription')
+            ? $engagement->subscription
+            : $engagement->subscription()->with('plan')->first();
+
+        return $subscription?->isFreeTrial() ?? false;
     }
 }

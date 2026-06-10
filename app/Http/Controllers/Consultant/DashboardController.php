@@ -34,6 +34,7 @@ class DashboardController extends Controller
         $consultantOrg = $consultant->agencyCompany;
 
         $subscriptionService = app(ConsultantAgencySubscriptionService::class);
+        $subscriptionService->ensureFreeTrialSubscription($consultantOrg);
         $subscription = $subscriptionService->getActiveSubscription($consultantOrg->id);
         $slotSummary = $subscriptionService->slotSummary($consultantOrg->id, $subscription);
         $activeClients = app(ConsultantAgencyClientService::class)->listForConsultant($consultantOrg->id, false);

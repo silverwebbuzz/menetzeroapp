@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Data\ConsultantAgencyPlanMatrix;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -60,6 +61,17 @@ class ConsultantSubscription extends Model
     public function isActive(): bool
     {
         return $this->status === 'active' && $this->expires_at->endOfDay()->isFuture();
+    }
+
+    public function isFreeTrial(): bool
+    {
+        if (($this->metadata['provision_type'] ?? null) === 'free_trial') {
+            return true;
+        }
+
+        return $this->relationLoaded('plan')
+            ? $this->plan?->plan_code === ConsultantAgencyPlanMatrix::FREE_TRIAL_CODE
+            : $this->plan()->where('plan_code', ConsultantAgencyPlanMatrix::FREE_TRIAL_CODE)->exists();
     }
 
     public function scopeActive($query)

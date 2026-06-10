@@ -62,15 +62,23 @@ class ConsultantAgencyClientService
         $reportingYear = (int) $data['primary_reporting_year'];
 
         return DB::transaction(function () use ($consultantOrg, $data, $reportingYear) {
+            $this->subscriptions->ensureFreeTrialSubscription($consultantOrg);
+
             $subscription = ConsultantSubscription::forConsultant($consultantOrg->id)
                 ->active()
                 ->lockForUpdate()
                 ->orderByDesc('expires_at')
-                ->first();
+                ->get()
+                ->first(fn (ConsultantSubscription $sub) => !$sub->isFreeTrial())
+                ?? ConsultantSubscription::forConsultant($consultantOrg->id)
+                    ->active()
+                    ->lockForUpdate()
+                    ->orderByDesc('expires_at')
+                    ->first();
 
             if (!$subscription) {
                 throw new RuntimeException(
-                    'No active consultant pack for this contract year. Purchase or renew an agency pack to add clients.'
+                    'No client slots available. Your free trial may already be used — purchase an agency pack to add more clients.'
                 );
             }
 

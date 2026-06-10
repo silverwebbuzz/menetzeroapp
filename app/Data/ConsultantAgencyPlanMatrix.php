@@ -11,11 +11,17 @@ namespace App\Data;
 class ConsultantAgencyPlanMatrix
 {
     public const PLAN_CODES = [
+        'consultant_trial',
         'consultant_5',
         'consultant_10',
         'consultant_25',
         'consultant_50',
     ];
+
+    /** One free managed client per consultant org (data entry only — client_free entitlements). */
+    public const FREE_TRIAL_CODE = 'consultant_trial';
+
+    public const FREE_TRIAL_SLOTS = 1;
 
     public const ENTERPRISE_CODE = 'consultant_enterprise';
 
@@ -37,6 +43,7 @@ class ConsultantAgencyPlanMatrix
     public static function packDefinitions(): array
     {
         return [
+            'consultant_trial' => self::trialPack(),
             'consultant_5' => self::pack(5, 1299, 6495, 1, 'Consultant 5', 'Solo consultant — up to 5 managed clients'),
             'consultant_10' => self::pack(10, 999, 9990, 2, 'Consultant 10', 'Small practice — up to 10 managed clients'),
             'consultant_25' => self::pack(25, 899, 22475, 3, 'Consultant 25', 'Growing agency — up to 25 managed clients'),
@@ -54,7 +61,27 @@ class ConsultantAgencyPlanMatrix
 
     public static function slotCountForPlanCode(string $planCode): int
     {
+        if ($planCode === self::FREE_TRIAL_CODE) {
+            return self::FREE_TRIAL_SLOTS;
+        }
+
         return (int) (self::forPlanCode($planCode)['consultant_slot_count'] ?? 0);
+    }
+
+    /**
+     * Entitlements for the one free trial managed client (mirrors direct client_free).
+     *
+     * @return array<string, mixed>
+     */
+    public static function trialManagedClientEntitlements(): array
+    {
+        $free = PlanEntitlementDefaults::entitlementsForPlanCode('client_free') ?? [];
+
+        return array_merge($free, [
+            'channel' => 'consultant_managed',
+            'consultant_directory' => 'none',
+            'provision_type' => 'free_trial',
+        ]);
     }
 
     /**
@@ -62,7 +89,10 @@ class ConsultantAgencyPlanMatrix
      */
     public static function selectablePacks(): array
     {
-        return array_values(self::packDefinitions());
+        return array_values(array_filter(
+            self::packDefinitions(),
+            fn (array $pack) => ($pack['plan_code'] ?? '') !== self::FREE_TRIAL_CODE,
+        ));
     }
 
     /**
@@ -79,6 +109,39 @@ class ConsultantAgencyPlanMatrix
             'consultant_directory' => 'none',
             'pry_export_only' => true,
         ]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function trialPack(): array
+    {
+        return [
+            'plan_code' => self::FREE_TRIAL_CODE,
+            'plan_name' => 'Free trial',
+            'description' => 'One managed client — data entry only, no exports. Upgrade to an agency pack for full Growth workspaces.',
+            'plan_category' => 'consultant_agency',
+            'price_annual' => 0,
+            'price_per_slot_aed' => 0,
+            'consultant_slot_count' => self::FREE_TRIAL_SLOTS,
+            'currency' => 'AED',
+            'sort_order' => 5,
+            'billing_cycle' => 'annual',
+            'is_active' => false,
+            'limits' => [
+                'users' => self::CONSULTANT_ORG_USER_LIMIT,
+                'consultant_slots' => self::FREE_TRIAL_SLOTS,
+                'locations' => -1,
+                'documents' => -1,
+            ],
+            'entitlements' => [
+                'channel' => 'consultant_agency_pack',
+                'provision_type' => 'free_trial',
+                'consultant_slot_count' => self::FREE_TRIAL_SLOTS,
+                'managed_client_template' => 'client_free',
+            ],
+            'features' => ['consultant_agency', 'managed_clients', 'free_trial'],
+        ];
     }
 
     /**

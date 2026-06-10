@@ -6,9 +6,17 @@
 <h1 class="text-2xl font-bold text-gray-900 mb-1">Add managed client</h1>
 <p class="text-sm text-gray-600 mb-6">Each new client consumes <strong>1 slot</strong> and is assigned a Primary Reporting Year (PRY).</p>
 
+@if(!empty($slotSummary['is_trial']))
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 text-sm text-blue-900">
+        <strong>Free trial workspace</strong> — this client gets data-entry access only (like a direct Free account): Quick Input and disclosure forms, no PDF exports or annual reports.
+        Upgrade to an agency pack for full Growth features across all clients.
+    </div>
+@endif
+
 @if(!$subscription)
     <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 text-sm text-amber-900">
-        You need an active agency pack before adding clients. Contact admin to grant a pack, or purchase online when checkout is available (P19).
+        No client slots available. Your one free trial may already be in use — purchase an agency pack to add more clients.
+        <a href="{{ route('consultant.packs.index') }}" class="font-medium underline">View agency packs</a>
     </div>
 @elseif($slotSummary['remaining'] < 1)
     <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 text-sm text-amber-900">
@@ -36,7 +44,13 @@
             <label for="primary_reporting_year" class="block text-sm font-medium text-gray-700 mb-1">Primary Reporting Year (PRY) *</label>
             <input type="number" name="primary_reporting_year" id="primary_reporting_year" value="{{ old('primary_reporting_year', $defaultPry) }}" required min="2000" max="2100"
                 class="w-full max-w-xs rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-            <p class="text-xs text-gray-500 mt-1">Full Growth exports apply to this year only. Next year is preview until renewal or year unlock.</p>
+            <p class="text-xs text-gray-500 mt-1">
+                @if(!empty($slotSummary['is_trial']))
+                    Trial clients can enter data for this year; exports and reports require an agency pack.
+                @else
+                    Full Growth exports apply to this year only. Next year is preview until renewal or year unlock.
+                @endif
+            </p>
             @error('primary_reporting_year')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
         </div>
 

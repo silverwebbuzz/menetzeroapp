@@ -1,0 +1,18 @@
+/*
+ * Consultant portal — same app shell as client, blue accent.
+ */
+.consultant-shell {
+    --brand: #2563eb;
+    --brand-dark: #1d4ed8;
+    --brand-darker: #1e40af;
+    --brand-soft: #eff6ff;
+    --brand-softer: #dbeafe;
+    --shadow-ring: 0 0 0 3px rgb(37 99 235 / 0.15);
+}
+
+.consultant-shell .sidebar-header .brand-logo span {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--brand-darker);
+    line-height: 1.2;
+}

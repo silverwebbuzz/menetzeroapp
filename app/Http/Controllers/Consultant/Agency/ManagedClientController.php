@@ -24,6 +24,7 @@ class ManagedClientController extends Controller
     public function index()
     {
         $consultantOrg = $this->consultantCompany();
+        $this->subscriptions->ensureFreeTrialSubscription($consultantOrg);
         $engagements = $this->managedClients->listForConsultant($consultantOrg->id);
         $subscription = $this->subscriptions->getActiveSubscription($consultantOrg->id);
         $slotSummary = $this->subscriptions->slotSummary($consultantOrg->id, $subscription);
@@ -34,6 +35,7 @@ class ManagedClientController extends Controller
     public function create()
     {
         $consultantOrg = $this->consultantCompany();
+        $this->subscriptions->ensureFreeTrialSubscription($consultantOrg);
         $subscription = $this->subscriptions->getActiveSubscription($consultantOrg->id);
         $slotSummary = $this->subscriptions->slotSummary($consultantOrg->id, $subscription);
         $defaultPry = $subscription?->contract_year ?? (int) now()->year;
