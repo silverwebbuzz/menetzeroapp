@@ -36,10 +36,11 @@ return new class extends Migration
         }
 
         if (Schema::hasColumn('companies', 'company_type')) {
-            DB::statement("UPDATE companies SET company_type = 'consultant' WHERE company_type = 'partner'");
+            // ENUM('client','partner') must be widened before 'consultant' can be stored.
             DB::statement(
                 "ALTER TABLE `companies` MODIFY `company_type` VARCHAR(20) NOT NULL DEFAULT 'client'"
             );
+            DB::statement("UPDATE companies SET company_type = 'consultant' WHERE company_type = 'partner'");
         }
 
         if (!Schema::hasColumn('companies', 'partner_id')) {

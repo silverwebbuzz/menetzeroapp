@@ -24,10 +24,10 @@ return new class extends Migration
         }
 
         if (Schema::hasTable('companies') && Schema::hasColumn('companies', 'company_type')) {
-            DB::statement("UPDATE companies SET company_type = 'consultant' WHERE company_type = 'partner'");
             DB::statement(
                 "ALTER TABLE `companies` MODIFY `company_type` VARCHAR(20) NOT NULL DEFAULT 'client'"
             );
+            DB::statement("UPDATE companies SET company_type = 'consultant' WHERE company_type = 'partner'");
         }
 
         if (Schema::hasTable('companies') && !Schema::hasColumn('companies', 'consultant_id')) {
@@ -124,10 +124,10 @@ return new class extends Migration
     private function ensureConsultantColumns(): void
     {
         if (Schema::hasTable('companies') && Schema::hasColumn('companies', 'company_type')) {
-            DB::statement("UPDATE companies SET company_type = 'consultant' WHERE company_type = 'partner'");
             DB::statement(
                 "ALTER TABLE `companies` MODIFY `company_type` VARCHAR(20) NOT NULL DEFAULT 'client'"
             );
+            DB::statement("UPDATE companies SET company_type = 'consultant' WHERE company_type = 'partner'");
         }
 
         if (Schema::hasTable('companies')
