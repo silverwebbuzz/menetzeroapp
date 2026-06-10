@@ -19,6 +19,7 @@ class PlanEntitlementService
 
     public function __construct(
         protected SubscriptionService $subscriptionService,
+        protected PartnerEntitlementService $partnerEntitlements,
     ) {
     }
 
@@ -27,6 +28,10 @@ class PlanEntitlementService
      */
     public function forCompany(int $companyId): array
     {
+        if ($this->partnerEntitlements->isManagedClient($companyId)) {
+            return $this->partnerEntitlements->entitlementsForManagedClient($companyId);
+        }
+
         $subscription = $this->subscriptionService->getActiveSubscription($companyId);
 
         return $this->resolveEntitlements($subscription?->plan);
@@ -129,19 +134,23 @@ class PlanEntitlementService
         $entitlements = $this->forCompany($companyId);
         $canExport = (bool) ($entitlements['disclosures']['export'] ?? false);
 
-        if ($canExport) {
-            $yearCheck = $this->checkExportRegenWindow($companyId, $fiscalYear);
-            if (!$yearCheck['allowed']) {
-                return $yearCheck;
-            }
-
-            return ['allowed' => true, 'message' => null];
+        if (!$canExport) {
+            return [
+                'allowed' => false,
+                'message' => 'IFRS and GRI report downloads are available on the Growth plan (AED 2,499/year).',
+            ];
         }
 
-        return [
-            'allowed' => false,
-            'message' => 'IFRS and GRI report downloads are available on the Growth plan (AED 2,499/year).',
-        ];
+        if ($this->partnerEntitlements->isManagedClient($companyId)) {
+            return $this->partnerEntitlements->canExportDisclosures($companyId, $fiscalYear);
+        }
+
+        $yearCheck = $this->checkExportRegenWindow($companyId, $fiscalYear);
+        if (!$yearCheck['allowed']) {
+            return $yearCheck;
+        }
+
+        return ['allowed' => true, 'message' => null];
     }
 
     /**
@@ -157,6 +166,10 @@ class PlanEntitlementService
                 'allowed' => false,
                 'message' => $this->exportDeniedMessage($exportCode),
             ];
+        }
+
+        if ($this->partnerEntitlements->isManagedClient($companyId)) {
+            return $this->partnerEntitlements->canExport($companyId, $exportCode, $fiscalYear);
         }
 
         return $this->checkExportRegenWindow($companyId, $fiscalYear);
@@ -212,6 +225,14 @@ class PlanEntitlementService
     public function consultantDirectoryLevel(int $companyId): string
     {
         return (string) ($this->forCompany($companyId)['consultant_directory'] ?? 'teaser');
+    }
+
+    /**
+     * @return array{allowed: bool, message: string|null}
+     */
+    public function canWriteForReportingYear(int $companyId, int $reportingYear): array
+    {
+        return $this->partnerEntitlements->canWriteForReportingYear($companyId, $reportingYear);
     }
 
     /**

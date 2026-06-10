@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\PartnerEntitlementService;
 use App\Services\PlanEntitlementService;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Auth;
@@ -91,6 +92,15 @@ abstract class Controller extends BaseController
 
     protected function denyEntitlement(string $message): never
     {
+        $user = Auth::user();
+        $company = $user?->getActiveCompany();
+
+        if ($company && app(PartnerEntitlementService::class)->isManagedClient($company->id)) {
+            throw new HttpResponseException(
+                back()->with('error', $message)
+            );
+        }
+
         throw new HttpResponseException(
             redirect()->route('subscriptions.upgrade')->with('error', $message)
         );

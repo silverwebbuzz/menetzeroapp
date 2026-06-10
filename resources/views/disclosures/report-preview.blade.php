@@ -7,11 +7,7 @@
 <div class="max-w-5xl mx-auto">
     @include('disclosures.partials.header', ['framework' => 'ifrs_s2'])
 
-    @if(!$gate->canDisclosureExportType('ifrs_s2_pdf', $fiscalYear))
-        <x-preview-only-banner
-            message="IFRS S2 preview only on your plan. Upgrade to Growth (AED 2,499/year) to download disclosure PDFs."
-            upgrade-label="Upgrade to Growth" />
-    @endif
+    <x-managed-client-year-banner :fiscal-year="$fiscalYear" export-code="ifrs_s2_pdf" />
 
     <div class="card mb-6 {{ !$gate->canDisclosureExportType('ifrs_s2_pdf', $fiscalYear) ? 'relative' : '' }}">
         @if(!$gate->canDisclosureExportType('ifrs_s2_pdf', $fiscalYear))

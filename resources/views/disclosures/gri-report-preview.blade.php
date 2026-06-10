@@ -7,11 +7,7 @@
 <div class="max-w-5xl mx-auto">
     @include('disclosures.partials.header', ['framework' => 'gri'])
 
-    @if(!$gate->canDisclosureExportType('gri_pdf', $fiscalYear))
-        <x-preview-only-banner
-            message="GRI preview only on your plan. Upgrade to Growth (AED 2,499/year) to download GRI PDF and content index."
-            upgrade-label="Upgrade to Growth" />
-    @endif
+    <x-managed-client-year-banner :fiscal-year="$fiscalYear" export-code="gri_pdf" />
 
     <div class="card mb-6">
         <div class="card-body flex flex-col sm:flex-row sm:justify-between gap-4">

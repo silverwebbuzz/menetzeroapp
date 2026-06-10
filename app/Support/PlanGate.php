@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Models\MeasurementData;
 use App\Models\User;
+use App\Services\PartnerEntitlementService;
 use App\Services\PlanEntitlementService;
 use App\Services\SubscriptionService;
 
@@ -96,10 +97,39 @@ class PlanGate
         return $this->entitlements->canExport($this->companyId, $exportCode, $fiscalYear)['allowed'];
     }
 
-    public function exportMessage(string $exportCode): string
+    public function exportMessage(string $exportCode, ?int $fiscalYear = null): string
     {
-        return $this->entitlements->canExport($this->companyId ?? 0, $exportCode)['message']
+        return $this->entitlements->canExport($this->companyId ?? 0, $exportCode, $fiscalYear)['message']
             ?? 'Upgrade to unlock this export.';
+    }
+
+    public function isManagedClient(): bool
+    {
+        if (!$this->companyId) {
+            return false;
+        }
+
+        return app(PartnerEntitlementService::class)->isManagedClient($this->companyId);
+    }
+
+    public function managedReportingYearMode(?int $fiscalYear = null): ?string
+    {
+        if (!$this->companyId || !$this->isManagedClient() || $fiscalYear === null) {
+            return null;
+        }
+
+        return app(PartnerEntitlementService::class)
+            ->reportingYearModeForCompany($this->companyId, $fiscalYear);
+    }
+
+    public function managedPreviewBannerMessage(?int $fiscalYear = null): ?string
+    {
+        if (!$this->companyId) {
+            return null;
+        }
+
+        return app(PartnerEntitlementService::class)
+            ->previewBannerMessage($this->companyId, $fiscalYear);
     }
 
     public function canDisclosureExport(?int $fiscalYear = null): bool
@@ -116,9 +146,9 @@ class PlanGate
         return true;
     }
 
-    public function disclosureExportMessage(): string
+    public function disclosureExportMessage(?int $fiscalYear = null): string
     {
-        return $this->entitlements->canExportDisclosures($this->companyId ?? 0)['message']
+        return $this->entitlements->canExportDisclosures($this->companyId ?? 0, $fiscalYear)['message']
             ?? 'IFRS and GRI downloads require Growth.';
     }
 

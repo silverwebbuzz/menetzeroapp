@@ -220,6 +220,18 @@ class Company extends Model
             ->first();
     }
 
+    public function activeManagedEngagement(): ?PartnerClientEngagement
+    {
+        if (!$this->isManagedClient()) {
+            return null;
+        }
+
+        return $this->managedEngagements()
+            ->where('status', 'active')
+            ->orderByDesc('id')
+            ->first();
+    }
+
     /**
      * Get the route key for the model.
      */
