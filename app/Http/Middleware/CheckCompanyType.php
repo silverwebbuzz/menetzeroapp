@@ -31,24 +31,29 @@ class CheckCompanyType
         // Dashboard controller will handle showing company setup prompt
         if (!$company) {
             // Only allow dashboard and company setup routes
-            $allowedRoutes = [
-                'client.dashboard', 
-                'company.setup.store',
-                'logout', // Allow logout
-            ];
+            $allowedRoutes = $type === 'partner'
+                ? ['partner.dashboard', 'company.setup.store', 'logout', 'account.selector', 'account.switch']
+                : ['client.dashboard', 'company.setup.store', 'logout', 'account.selector', 'account.switch'];
             $routeName = $request->route() ? $request->route()->getName() : null;
             
             // If route name exists and is not in allowed list, redirect to dashboard with message
             if ($routeName && !in_array($routeName, $allowedRoutes)) {
-                return redirect()->route('client.dashboard')
+                $fallback = $type === 'partner' ? 'partner.dashboard' : 'client.dashboard';
+
+                return redirect()->route($fallback)
                     ->with('error', 'Please complete your company setup first to access this feature.');
             }
             return $next($request);
         }
 
-        // Check company type - only clients allowed now
-        if ($type === 'client' && !$company->isClient()) {
-            abort(403, 'This route is for clients only');
+        if ($type === 'client') {
+            if (!$company->isClient() || $company->isManagedClient()) {
+                abort(403, 'This route is for direct client organisations only.');
+            }
+        }
+
+        if ($type === 'partner' && !$company->isPartner()) {
+            abort(403, 'This route is for partner organisations only.');
         }
 
         return $next($request);

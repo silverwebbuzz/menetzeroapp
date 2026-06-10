@@ -72,7 +72,11 @@ Route::post('/login', function (\Illuminate\Http\Request $request) {
             return redirect()->route('account.selector');
         }
         
-        // Single company or no company - go to dashboard
+        $company = $user->getActiveCompany();
+        if ($company?->isPartner()) {
+            return redirect()->intended(route('partner.dashboard'));
+        }
+
         return redirect()->intended(route('client.dashboard'));
     }
 
@@ -369,73 +373,12 @@ Route::get('/api/subcategories', function(Request $request) {
     }
 });
 
-// Partner Routes (DISABLED: partner guard not configured in config/auth.php,
-// Partner\ExternalClientController and Partner\SubscriptionController do not exist,
-// and checkCompanyType middleware currently only supports 'client' type.
-// Re-enable after: (1) adding 'partner' guard in config/auth.php,
-//                  (2) creating the missing controllers,
-//                  (3) extending CheckCompanyType middleware to handle 'partner'.)
-/*
-Route::prefix('partner')->middleware(['auth:partner', 'setActiveCompany', 'checkCompanyType:partner'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('partner.dashboard');
+// Partner / Agency hub (P16+) — web guard + company_type = partner
+Route::prefix('partner')->middleware(['auth:web', 'setActiveCompany', 'checkCompanyType:partner'])->name('partner.')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Partner\DashboardController::class, 'index'])->name('dashboard');
 
-    // Profile routes
-    Route::get('/profile', [ProfileController::class, 'index'])->name('partner.profile');
-    Route::post('/profile/personal', [ProfileController::class, 'updatePersonal'])->name('partner.profile.update.personal');
-    Route::post('/profile/company', [ProfileController::class, 'updateCompany'])->name('partner.profile.update.company');
-    Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('partner.profile.update.password');
-
-    // External Client Management
-    Route::resource('clients', \App\Http\Controllers\Partner\ExternalClientController::class)->names([
-        'index' => 'partner.clients.index',
-        'create' => 'partner.clients.create',
-        'store' => 'partner.clients.store',
-        'show' => 'partner.clients.show',
-        'edit' => 'partner.clients.edit',
-        'update' => 'partner.clients.update',
-        'destroy' => 'partner.clients.destroy',
-    ]);
-
-    // Reports routes
-    Route::prefix('reports')->name('reports.')->group(function () {
-        Route::get('/', function () {
-            return view('reports.index');
-        })->name('index');
-    });
-
-    // Role Management routes - EXPLICIT NAMES for partner
-    Route::resource('roles', \App\Http\Controllers\RoleManagementController::class)->except(['show'])->names([
-        'index' => 'partner.roles.index',
-        'create' => 'partner.roles.create',
-        'store' => 'partner.roles.store',
-        'edit' => 'partner.roles.edit',
-        'update' => 'partner.roles.update',
-        'destroy' => 'partner.roles.destroy',
-    ]);
-
-    // Staff Management routes - Redirect to roles page (combined view)
-    Route::prefix('staff')->name('partner.staff.')->group(function () {
-        Route::get('/', function() { return redirect()->route('partner.roles.index'); })->name('index');
-        Route::get('/create', function() { return redirect()->route('partner.roles.index'); })->name('create');
-        Route::post('/', [\App\Http\Controllers\StaffManagementController::class, 'store'])->name('store');
-        Route::get('/invitations/{invitation}/success', [\App\Http\Controllers\StaffManagementController::class, 'invitationSuccess'])->name('invitation-success');
-        Route::put('/{access}/role', [\App\Http\Controllers\StaffManagementController::class, 'updateRole'])->name('update-role');
-        Route::delete('/{access}', [\App\Http\Controllers\StaffManagementController::class, 'destroy'])->name('destroy');
-        Route::delete('/invitations/{invitation}', [\App\Http\Controllers\StaffManagementController::class, 'cancelInvitation'])->name('cancel-invitation');
-    });
-
-    // Subscription & Billing routes for partner
-    Route::prefix('subscriptions')->name('partner.subscriptions.')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Partner\SubscriptionController::class, 'index'])->name('index');
-        Route::get('/current-plan', [\App\Http\Controllers\Partner\SubscriptionController::class, 'currentPlan'])->name('current-plan');
-        Route::get('/upgrade', [\App\Http\Controllers\Partner\SubscriptionController::class, 'upgrade'])->name('upgrade');
-        Route::post('/upgrade', [\App\Http\Controllers\Partner\SubscriptionController::class, 'processUpgrade'])->name('process-upgrade');
-        Route::get('/billing', [\App\Http\Controllers\Partner\SubscriptionController::class, 'billing'])->name('billing');
-        Route::get('/payment-history', [\App\Http\Controllers\Partner\SubscriptionController::class, 'paymentHistory'])->name('payment-history');
-        Route::post('/cancel', [\App\Http\Controllers\Partner\SubscriptionController::class, 'cancel'])->name('cancel');
-    });
+    Route::resource('clients', \App\Http\Controllers\Partner\ManagedClientController::class);
 });
-*/
 
 // Admin Authentication Routes (Public - outside middleware)
 Route::prefix('admin')->name('admin.')->group(function () {
