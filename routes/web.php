@@ -25,7 +25,7 @@ Route::get('/refunds', [\App\Http\Controllers\PageController::class, 'show'])->d
 Route::get('/privacy', [\App\Http\Controllers\PageController::class, 'show'])->defaults('slug', 'privacy')->name('privacy');
 Route::get('/currency/{code}', [\App\Http\Controllers\PageController::class, 'switchCurrency'])->name('currency.switch');
 
-// Consultant partner portal (separate auth guard)
+// MENetZero Partner portal — consultant = agency (directory + client workspaces)
 Route::prefix('consultant')->name('consultant.')->group(function () {
     Route::get('/', [\App\Http\Controllers\Consultant\AuthController::class, 'landing'])->name('landing');
     Route::get('/register', [\App\Http\Controllers\Consultant\AuthController::class, 'showRegister'])->name('register');
@@ -45,6 +45,30 @@ Route::prefix('consultant')->name('consultant.')->group(function () {
         Route::get('/intro-requests', [\App\Http\Controllers\Consultant\IntroRequestController::class, 'index'])->name('intro-requests.index');
         Route::get('/orders', [\App\Http\Controllers\Consultant\OrderController::class, 'index'])->name('orders.index');
     });
+
+    // Agency hub — /consultant/clients, /consultant/packs, etc.
+    Route::middleware(['syncPartnerSession', 'ensurePartnerPortal', 'auth:web', 'setActiveCompany', 'checkCompanyType:partner'])
+        ->group(function () {
+            Route::get('/workspace', [\App\Http\Controllers\Partner\WorkspaceController::class, 'switcher'])->name('workspace.switcher');
+            Route::post('/workspace/enter/{engagement}', [\App\Http\Controllers\Partner\WorkspaceController::class, 'enter'])->name('workspace.enter');
+            Route::post('/workspace/enter-readonly/{engagement}', [\App\Http\Controllers\Partner\WorkspaceController::class, 'enterReadOnly'])->name('workspace.enter-readonly');
+            Route::post('/workspace/exit', [\App\Http\Controllers\Partner\WorkspaceController::class, 'exit'])->name('workspace.exit');
+
+            Route::get('/renewal', [\App\Http\Controllers\Partner\RenewalController::class, 'index'])->name('renewal.index');
+            Route::post('/renewal', [\App\Http\Controllers\Partner\RenewalController::class, 'process'])->name('renewal.process');
+
+            Route::prefix('packs')->name('packs.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Partner\PackCheckoutController::class, 'index'])->name('index');
+                Route::post('/checkout', [\App\Http\Controllers\Partner\PackCheckoutController::class, 'processCheckout'])->name('checkout');
+                Route::post('/extra-slots', [\App\Http\Controllers\Partner\PackCheckoutController::class, 'processExtraSlots'])->name('extra-slots');
+                Route::post('/year-unlock', [\App\Http\Controllers\Partner\PackCheckoutController::class, 'processYearUnlock'])->name('year-unlock');
+                Route::get('/payment/{transaction}', [\App\Http\Controllers\Partner\PackCheckoutController::class, 'paymentCheckout'])->name('payment.checkout');
+                Route::post('/payment/razorpay', [\App\Http\Controllers\Partner\PackCheckoutController::class, 'razorpayCallback'])->name('payment.razorpay');
+                Route::get('/payment/cashfree', [\App\Http\Controllers\Partner\PackCheckoutController::class, 'cashfreeCallback'])->name('payment.cashfree');
+            });
+
+            Route::resource('clients', \App\Http\Controllers\Partner\ManagedClientController::class);
+        });
 });
 
 // Authentication routes - Client
@@ -74,40 +98,30 @@ Route::post('/login', function (\Illuminate\Http\Request $request) {
         
         $company = $user->getActiveCompany();
         if ($company?->isPartner()) {
-            return redirect()->intended(route('partner.dashboard'));
+            $consultant = \App\Models\Consultant::where('email', $user->email)
+                ->where('is_active', true)
+                ->first();
+
+            if ($consultant) {
+                \Illuminate\Support\Facades\Auth::guard('consultant')->login($consultant);
+                app(\App\Services\ConsultantPartnerLinkService::class)->syncWebSession($consultant);
+            }
+
+            return redirect()->intended(route('consultant.dashboard'));
         }
 
         return redirect()->intended(route('client.dashboard'));
     }
 
-    return back()->withErrors(['email' => 'The provided credentials do not match our records.'])->onlyInput('email');
-})->name('login.post');
-
-// Authentication routes - Partner (DISABLED: partner guard not configured in config/auth.php
-// and Partner\* controllers do not exist. Re-enable after wiring the partner guard and controllers.)
-/*
-Route::get('/partner/register', [RegisterController::class, 'showRegistrationForm'])->name('partner.register');
-Route::post('/partner/register', [RegisterController::class, 'register']);
-
-Route::get('/partner/login', function () {
-    return view('auth.login', ['isPartner' => true]);
-})->name('partner.login');
-
-Route::post('/partner/login', function (\Illuminate\Http\Request $request) {
-    $credentials = $request->validate([
-        'email' => ['required', 'email'],
-        'password' => ['required'],
-    ]);
-
-    // Use 'partner' guard (users_partner table - partners only)
-    if (\Illuminate\Support\Facades\Auth::guard('partner')->attempt($credentials, true)) {
-        $request->session()->regenerate();
-        return redirect()->intended(route('partner.dashboard'));
+    if (\App\Models\Consultant::where('email', $credentials['email'])->where('is_active', true)->exists()) {
+        return back()
+            ->withErrors(['email' => 'This is a partner account — sign in at the partner portal.'])
+            ->with('partner_login_url', route('consultant.login'))
+            ->onlyInput('email');
     }
 
     return back()->withErrors(['email' => 'The provided credentials do not match our records.'])->onlyInput('email');
-})->name('partner.login.post');
-*/
+})->name('login.post');
 
 Route::post('/logout', function () {
     \Illuminate\Support\Facades\Auth::guard('consultant')->logout();
@@ -378,26 +392,6 @@ Route::get('/api/subcategories', function(Request $request) {
     } catch (\Exception $e) {
         return response()->json(['error' => 'Failed to fetch subcategories'], 500);
     }
-});
-
-// Partner / Agency hub (P16+) — web guard + company_type = partner
-Route::prefix('partner')->middleware(['syncPartnerSession', 'auth:web', 'setActiveCompany', 'checkCompanyType:partner'])->name('partner.')->group(function () {
-    Route::get('/dashboard', [\App\Http\Controllers\Partner\DashboardController::class, 'index'])->name('dashboard');
-
-    Route::get('/workspace', [\App\Http\Controllers\Partner\WorkspaceController::class, 'switcher'])->name('workspace.switcher');
-    Route::post('/workspace/enter/{engagement}', [\App\Http\Controllers\Partner\WorkspaceController::class, 'enter'])->name('workspace.enter');
-    Route::post('/workspace/enter-readonly/{engagement}', [\App\Http\Controllers\Partner\WorkspaceController::class, 'enterReadOnly'])->name('workspace.enter-readonly');
-    Route::post('/workspace/exit', [\App\Http\Controllers\Partner\WorkspaceController::class, 'exit'])->name('workspace.exit');
-
-    Route::prefix('packs')->name('packs.')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Partner\PackCheckoutController::class, 'index'])->name('index');
-        Route::post('/checkout', [\App\Http\Controllers\Partner\PackCheckoutController::class, 'processCheckout'])->name('checkout');
-        Route::get('/payment/{transaction}', [\App\Http\Controllers\Partner\PackCheckoutController::class, 'paymentCheckout'])->name('payment.checkout');
-        Route::post('/payment/razorpay', [\App\Http\Controllers\Partner\PackCheckoutController::class, 'razorpayCallback'])->name('payment.razorpay');
-        Route::get('/payment/cashfree', [\App\Http\Controllers\Partner\PackCheckoutController::class, 'cashfreeCallback'])->name('payment.cashfree');
-    });
-
-    Route::resource('clients', \App\Http\Controllers\Partner\ManagedClientController::class);
 });
 
 // Admin Authentication Routes (Public - outside middleware)

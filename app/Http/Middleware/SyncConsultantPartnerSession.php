@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * When a consultant is logged in, ensure the linked web User session exists
- * so /partner/* routes work from the same account (P15).
+ * so agency routes under /consultant work from the same account (P15).
  */
 class SyncConsultantPartnerSession
 {

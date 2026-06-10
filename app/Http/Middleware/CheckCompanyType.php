@@ -32,13 +32,13 @@ class CheckCompanyType
         if (!$company) {
             // Only allow dashboard and company setup routes
             $allowedRoutes = $type === 'partner'
-                ? ['partner.dashboard', 'company.setup.store', 'logout', 'account.selector', 'account.switch']
+                ? ['consultant.dashboard', 'company.setup.store', 'logout', 'account.selector', 'account.switch']
                 : ['client.dashboard', 'company.setup.store', 'logout', 'account.selector', 'account.switch'];
             $routeName = $request->route() ? $request->route()->getName() : null;
             
             // If route name exists and is not in allowed list, redirect to dashboard with message
             if ($routeName && !in_array($routeName, $allowedRoutes)) {
-                $fallback = $type === 'partner' ? 'partner.dashboard' : 'client.dashboard';
+                $fallback = $type === 'partner' ? 'consultant.dashboard' : 'client.dashboard';
 
                 return redirect()->route($fallback)
                     ->with('error', 'Please complete your company setup first to access this feature.');
@@ -49,7 +49,7 @@ class CheckCompanyType
         if ($type === 'client') {
             if ($company->isPartner()) {
                 return redirect()
-                    ->route('partner.dashboard')
+                    ->route('consultant.dashboard')
                     ->with('info', 'Use the agency hub to manage clients and open workspaces.');
             }
 

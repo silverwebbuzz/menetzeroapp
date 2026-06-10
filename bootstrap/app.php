@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'disclosureAccess' => \App\Http\Middleware\CheckDisclosureAccess::class,
             'ensureConsultant' => \App\Http\Middleware\EnsureConsultant::class,
             'syncPartnerSession' => \App\Http\Middleware\SyncConsultantPartnerSession::class,
+            'ensurePartnerPortal' => \App\Http\Middleware\EnsurePartnerPortalAccess::class,
             'restrictManagedClientBilling' => \App\Http\Middleware\RestrictManagedClientBilling::class,
             'ensurePartnerManagedWorkspace' => \App\Http\Middleware\EnsurePartnerManagedWorkspace::class,
             'restrictManagedClientWorkspace' => \App\Http\Middleware\RestrictManagedClientWorkspace::class,

@@ -31,13 +31,13 @@ class EnsurePartnerManagedWorkspace
 
         if ($company?->isPartner()) {
             return redirect()
-                ->route('partner.dashboard')
+                ->route('consultant.dashboard')
                 ->with('info', 'Open a managed client workspace from the agency hub to use client tools.');
         }
 
         if ($company?->isManagedClient() && !$this->workspace->canActOnManagedClient($user, $company)) {
             return redirect()
-                ->route('partner.workspace.switcher')
+                ->route('consultant.workspace.switcher')
                 ->with('error', 'Select a managed client workspace from your agency hub.');
         }
 

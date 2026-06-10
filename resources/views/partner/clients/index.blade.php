@@ -1,4 +1,4 @@
-@extends('partner.layouts.app')
+@extends('consultant.layouts.app')
 
 @section('title', 'Managed Clients')
 
@@ -9,7 +9,7 @@
         <p class="text-sm text-gray-600 mt-1">{{ $slotSummary['used'] }} of {{ $slotSummary['limit'] }} slots used · {{ $slotSummary['remaining'] }} remaining</p>
     </div>
     @if($slotSummary['remaining'] > 0 && $slotSummary['limit'] > 0)
-        <a href="{{ route('partner.clients.create') }}" class="inline-flex justify-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg">Add client</a>
+        <a href="{{ route('consultant.clients.create') }}" class="inline-flex justify-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg">Add client</a>
     @endif
 </div>
 
@@ -41,9 +41,9 @@
                         @endif
                     </td>
                     <td class="px-4 py-3 text-right space-x-3">
-                        <a href="{{ route('partner.clients.show', $engagement) }}" class="text-indigo-600 hover:underline">View</a>
+                        <a href="{{ route('consultant.clients.show', $engagement) }}" class="text-indigo-600 hover:underline">View</a>
                         @if($engagement->status === 'active')
-                            <a href="{{ route('partner.clients.edit', $engagement) }}" class="text-gray-600 hover:underline">Edit</a>
+                            <a href="{{ route('consultant.clients.edit', $engagement) }}" class="text-gray-600 hover:underline">Edit</a>
                         @endif
                     </td>
                 </tr>

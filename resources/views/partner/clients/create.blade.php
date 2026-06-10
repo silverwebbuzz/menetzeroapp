@@ -1,4 +1,4 @@
-@extends('partner.layouts.app')
+@extends('consultant.layouts.app')
 
 @section('title', 'Add Managed Client')
 
@@ -15,7 +15,7 @@
         All {{ $slotSummary['limit'] }} slots are in use. Archive a finished client or purchase extra slots.
     </div>
 @else
-    <form action="{{ route('partner.clients.store') }}" method="POST" class="bg-white border border-gray-200 rounded-xl p-6 max-w-2xl space-y-5">
+    <form action="{{ route('consultant.clients.store') }}" method="POST" class="bg-white border border-gray-200 rounded-xl p-6 max-w-2xl space-y-5">
         @csrf
 
         <div>
@@ -80,7 +80,7 @@
 
         <div class="flex gap-3 pt-2">
             <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg">Create client</button>
-            <a href="{{ route('partner.clients.index') }}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Cancel</a>
+            <a href="{{ route('consultant.clients.index') }}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Cancel</a>
         </div>
     </form>
 @endif

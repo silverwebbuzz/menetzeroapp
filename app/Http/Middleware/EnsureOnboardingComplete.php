@@ -39,7 +39,7 @@ class EnsureOnboardingComplete
             'profile.update.personal',
             'profile.update.password',
             'profile.update.company',
-            'partner.workspace.exit',
+            'consultant.workspace.exit',
         ];
 
         if ($routeName && in_array($routeName, $alwaysAllowed, true)) {

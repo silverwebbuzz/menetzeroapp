@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Partner;
 
 use App\Http\Controllers\Controller;
+use App\Services\PartnerEntitlementService;
 use App\Services\PartnerManagedClientService;
 use App\Services\PartnerSubscriptionService;
 use App\Services\PartnerWorkspaceService;
@@ -60,7 +61,7 @@ class ManagedClientController extends Controller
         }
 
         return redirect()
-            ->route('partner.clients.show', $engagement)
+            ->route('consultant.clients.show', $engagement)
             ->with('success', 'Managed client added — 1 slot consumed.');
     }
 
@@ -68,8 +69,34 @@ class ManagedClientController extends Controller
     {
         $partner = $this->partnerCompany();
         $engagement = $this->managedClients->findForPartner($partner->id, $client);
+        $yearUnlockTarget = null;
+        $yearUnlockQuote = null;
 
-        return view('partner.clients.show', compact('partner', 'engagement'));
+        if ($engagement->isActive()) {
+            $entitlements = app(PartnerEntitlementService::class);
+            $candidateYear = (int) $engagement->primary_reporting_year + 1;
+            $mode = $entitlements->reportingYearMode($engagement, $candidateYear);
+
+            if ($mode === PartnerEntitlementService::MODE_PREVIEW) {
+                $yearUnlockTarget = $candidateYear;
+
+                try {
+                    $yearUnlockQuote = $this->subscriptions->resolveYearUnlockPurchase(
+                        $engagement,
+                        $candidateYear,
+                    );
+                } catch (\Throwable) {
+                    $yearUnlockQuote = null;
+                }
+            }
+        }
+
+        return view('partner.clients.show', compact(
+            'partner',
+            'engagement',
+            'yearUnlockTarget',
+            'yearUnlockQuote',
+        ));
     }
 
     public function edit(int $client)
@@ -99,7 +126,7 @@ class ManagedClientController extends Controller
         $this->managedClients->update($engagement, $validated);
 
         return redirect()
-            ->route('partner.clients.show', $engagement)
+            ->route('consultant.clients.show', $engagement)
             ->with('success', 'Client details updated.');
     }
 
@@ -112,12 +139,12 @@ class ManagedClientController extends Controller
             $this->managedClients->archive($engagement);
 
             return redirect()
-                ->route('partner.clients.index')
+                ->route('consultant.clients.index')
                 ->with('success', 'Client archived — slot freed for this contract year.');
         }
 
         return redirect()
-            ->route('partner.clients.index')
+            ->route('consultant.clients.index')
             ->with('info', 'Client was already archived.');
     }
 

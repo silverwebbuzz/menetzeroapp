@@ -1,4 +1,4 @@
-@extends('partner.layouts.app')
+@extends('consultant.layouts.app')
 
 @section('title', 'Complete Payment')
 
@@ -6,16 +6,18 @@
 @php
     $meta = $transaction->metadata ?? [];
     $amountMinor = (int) round(((float) $transaction->amount) * 100);
+    $headline = match ($transaction->transaction_type) {
+        'partner_extra_slot' => 'Extra client slots',
+        'partner_year_unlock' => 'Reporting year unlock',
+        'partner_renewal' => 'Agency pack renewal',
+        default => 'Agency pack',
+    };
 @endphp
 
 <div class="max-w-lg mx-auto">
-    @if(session('info'))
-        <div class="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">{{ session('info') }}</div>
-    @endif
-
     <div class="bg-white rounded-xl border border-gray-200 p-8 text-center">
-        <h1 class="text-2xl font-bold text-gray-900 mb-1">Complete agency pack payment</h1>
-        <p class="text-gray-600 text-sm mb-6">{{ $plan?->plan_name ?? 'Agency pack' }} · contract {{ $meta['contract_year'] ?? now()->year }}</p>
+        <h1 class="text-2xl font-bold text-gray-900 mb-1">Complete payment</h1>
+        <p class="text-gray-600 text-sm mb-6">{{ $headline }} · {{ $transaction->description }}</p>
 
         @php
             $chargeSymbol = \App\Services\CurrencyService::symbol($transaction->currency);
@@ -27,10 +29,10 @@
         </div>
 
         @if($gateway && $gateway->gateway === 'razorpay')
-            <button id="payBtn" class="w-full px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium">
+            <button id="payBtn" class="w-full px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 font-medium">
                 Pay {{ $chargeLabel }}
             </button>
-            <form id="razorpayForm" method="POST" action="{{ route('partner.packs.payment.razorpay') }}" class="hidden">
+            <form id="razorpayForm" method="POST" action="{{ route('consultant.packs.payment.razorpay') }}" class="hidden">
                 @csrf
                 <input type="hidden" name="transaction_id" value="{{ $transaction->id }}">
                 <input type="hidden" name="razorpay_payment_id" id="rzp_payment_id">
@@ -46,7 +48,7 @@
                         currency: @json($transaction->currency),
                         order_id: @json($meta['razorpay_order_id'] ?? ''),
                         name: @json(config('app.name')),
-                        description: @json($plan?->plan_name ?? 'Agency pack'),
+                        description: @json($transaction->description),
                         handler: function (r) {
                             document.getElementById('rzp_payment_id').value = r.razorpay_payment_id;
                             document.getElementById('rzp_order_id').value = r.razorpay_order_id;
@@ -70,7 +72,7 @@
             <p class="text-sm text-red-600">Payment session unavailable. Go back and try again.</p>
         @endif
 
-        <a href="{{ route('partner.packs.index') }}" class="mt-4 inline-block text-sm text-gray-500 hover:text-gray-700">Cancel</a>
+        <a href="{{ route('consultant.packs.index') }}" class="mt-4 inline-block text-sm text-gray-500 hover:text-gray-700">Cancel</a>
     </div>
 </div>
 @endsection

@@ -22,7 +22,7 @@ class AccountSelectorController extends Controller
         }
 
         if (app(PartnerWorkspaceService::class)->isPartnerUser($user)) {
-            return redirect()->route('partner.dashboard');
+            return redirect()->route('consultant.dashboard');
         }
         
         // Get all accessible companies (owned + staff)
@@ -64,7 +64,7 @@ class AccountSelectorController extends Controller
 
         $company = Company::find($request->company_id);
         if ($company?->isPartner()) {
-            return redirect()->route('partner.dashboard');
+            return redirect()->route('consultant.dashboard');
         }
         
         return redirect()->route('client.dashboard');

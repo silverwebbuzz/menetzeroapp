@@ -79,7 +79,7 @@ class WorkspaceController extends Controller
         $this->workspace->exitWorkspace();
 
         return redirect()
-            ->route('partner.dashboard')
+            ->route('consultant.dashboard')
             ->with('success', 'Returned to agency hub.');
     }
 }

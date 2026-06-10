@@ -1,4 +1,4 @@
-@extends('partner.layouts.app')
+@extends('consultant.layouts.app')
 
 @section('title', 'Edit Client')
 
@@ -7,7 +7,7 @@
 
 <h1 class="text-2xl font-bold text-gray-900 mb-6">Edit client</h1>
 
-<form action="{{ route('partner.clients.update', $engagement) }}" method="POST" class="bg-white border border-gray-200 rounded-xl p-6 max-w-2xl space-y-5">
+<form action="{{ route('consultant.clients.update', $engagement) }}" method="POST" class="bg-white border border-gray-200 rounded-xl p-6 max-w-2xl space-y-5">
     @csrf
     @method('PUT')
 
@@ -68,7 +68,7 @@
 
     <div class="flex gap-3 pt-2">
         <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg">Save changes</button>
-        <a href="{{ route('partner.clients.show', $engagement) }}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Cancel</a>
+        <a href="{{ route('consultant.clients.show', $engagement) }}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Cancel</a>
     </div>
 </form>
 @endsection

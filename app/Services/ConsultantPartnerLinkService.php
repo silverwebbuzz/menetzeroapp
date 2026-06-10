@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
  * P15 — Consultant = Partner: one account, optional directory listing + agency packs.
  *
  * Every consultant gets a linked partner organisation (company_type = partner) and
- * a web User so /partner/* routes work from the same login session.
+ * a web User so /consultant agency routes work from the same login session.
  */
 class ConsultantPartnerLinkService
 {

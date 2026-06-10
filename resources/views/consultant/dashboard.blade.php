@@ -16,6 +16,19 @@
     ];
 @endphp
 
+@if(!empty($needsRenewal) && $renewalSubscription)
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div class="text-sm text-amber-900">
+            <strong>Renewal due:</strong> your {{ $renewalSubscription->plan?->plan_name }} pack ends
+            {{ $renewalSubscription->expires_at->format('d M Y') }}.
+            Select which clients continue into the next year.
+        </div>
+        <a href="{{ route('consultant.renewal.index') }}" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-lg whitespace-nowrap">
+            Renew for {{ (int) $renewalSubscription->contract_year + 1 }}
+        </a>
+    </div>
+@endif
+
 {{-- Agency hub (same account — freelance or multi-consultant agency) --}}
 <div class="mb-8">
     <h2 class="text-lg font-semibold text-gray-900 mb-3">Client workspaces</h2>
@@ -47,11 +60,11 @@
     </div>
     <div class="flex flex-wrap gap-3">
         @if(!$subscription)
-            <a href="{{ route('partner.packs.index') }}" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg">Purchase agency pack</a>
+            <a href="{{ route('consultant.packs.index') }}" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg">Purchase agency pack</a>
         @endif
-        <a href="{{ route('partner.clients.index') }}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Manage clients</a>
-        <a href="{{ route('partner.workspace.switcher') }}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Open workspace</a>
-        <a href="{{ route('partner.packs.index') }}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Agency packs</a>
+        <a href="{{ route('consultant.clients.index') }}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Manage clients</a>
+        <a href="{{ route('consultant.workspace.switcher') }}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Open workspace</a>
+        <a href="{{ route('consultant.packs.index') }}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Agency packs</a>
     </div>
 </div>
 

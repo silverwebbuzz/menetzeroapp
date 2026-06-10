@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Data\ConsultantOptions;
 use App\Http\Controllers\Controller;
 use App\Models\Consultant;
+use App\Services\ConsultantPartnerLinkService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -51,7 +52,9 @@ class ConsultantController extends Controller
             'rejection_reason' => null,
         ]);
 
-        return back()->with('success', 'Consultant approved and listed in the directory.');
+        app(ConsultantPartnerLinkService::class)->ensureLinked($consultant);
+
+        return back()->with('success', 'Partner approved — listed in directory and agency hub linked.');
     }
 
     public function reject(Request $request, Consultant $consultant)

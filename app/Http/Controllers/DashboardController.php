@@ -29,7 +29,7 @@ class DashboardController extends Controller
 
         $partnerWorkspace = app(\App\Services\PartnerWorkspaceService::class);
         if ($partnerWorkspace->isPartnerUser($user) && !$partnerWorkspace->isActingAsManagedClient($user)) {
-            return redirect()->route('partner.dashboard');
+            return redirect()->route('consultant.dashboard');
         }
         
         // Reload relationships to ensure fresh data (important after invitation acceptance)

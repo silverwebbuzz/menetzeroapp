@@ -6,6 +6,7 @@ use App\Data\ConsultantOptions;
 use App\Http\Controllers\Controller;
 use App\Services\ConsultantPartnerLinkService;
 use App\Services\PartnerManagedClientService;
+use App\Services\PartnerRenewalService;
 use App\Services\PartnerSubscriptionService;
 use Illuminate\Support\Facades\Auth;
 
@@ -31,6 +32,11 @@ class DashboardController extends Controller
         $subscription = $subscriptionService->getActiveSubscription($partner->id);
         $slotSummary = $subscriptionService->slotSummary($partner->id);
         $activeClients = app(PartnerManagedClientService::class)->listForPartner($partner->id, false);
+        $renewalService = app(PartnerRenewalService::class);
+        $needsRenewal = $renewalService->needsRenewalFlow($partner->id);
+        $renewalSubscription = $needsRenewal
+            ? $renewalService->getRenewableSubscription($partner->id)
+            : null;
 
         return view('consultant.dashboard', compact(
             'consultant',
@@ -41,6 +47,8 @@ class DashboardController extends Controller
             'subscription',
             'slotSummary',
             'activeClients',
+            'needsRenewal',
+            'renewalSubscription',
         ));
     }
 }

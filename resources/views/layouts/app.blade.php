@@ -120,7 +120,7 @@
 
                     <div class="header-actions">
                         @if($isPartnerActing)
-                        <form action="{{ route('partner.workspace.exit') }}" method="POST" class="hidden sm:inline">
+                        <form action="{{ route('consultant.workspace.exit') }}" method="POST" class="hidden sm:inline">
                             @csrf
                             <button type="submit" class="header-btn text-indigo-700">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
@@ -138,7 +138,7 @@
                             <div x-show="open" x-transition class="dropdown-menu" style="display: none;">
                                 <div class="dropdown-heading">Managed clients</div>
                                 @foreach($partnerSwitchableClients as $engagement)
-                                    <form action="{{ route('partner.workspace.enter', $engagement) }}" method="POST">
+                                    <form action="{{ route('consultant.workspace.enter', $engagement) }}" method="POST">
                                         @csrf
                                         <button type="submit" class="dropdown-item {{ $activeCompany && $activeCompany->id == $engagement->managed_company_id ? 'active' : '' }}">
                                             <div class="flex-1 min-w-0 text-left">
@@ -149,7 +149,7 @@
                                     </form>
                                 @endforeach
                                 <div class="dropdown-divider"></div>
-                                <a href="{{ route('partner.workspace.switcher') }}" class="dropdown-item text-sm">All workspaces…</a>
+                                <a href="{{ route('consultant.workspace.switcher') }}" class="dropdown-item text-sm">All workspaces…</a>
                             </div>
                         </div>
                         @endif
@@ -255,7 +255,7 @@
                                     · PRY {{ $partnerActingEngagement->primary_reporting_year }}
                                 @endif
                             </span>
-                            <form action="{{ route('partner.workspace.exit') }}" method="POST" class="inline">
+                            <form action="{{ route('consultant.workspace.exit') }}" method="POST" class="inline">
                                 @csrf
                                 <button type="submit" class="{{ $partnerReadOnly ? 'text-amber-800' : 'text-indigo-700' }} font-medium hover:underline whitespace-nowrap">Back to agency hub</button>
                             </form>

@@ -4,20 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Consultant Portal') — MENetZero</title>
+    <title>@yield('title', 'Partner Portal') — MENetZero</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>body { font-family: 'Poppins', system-ui, sans-serif; }</style>
 </head>
 <body class="bg-slate-50 text-gray-900 min-h-screen">
     <nav class="bg-white border-b border-gray-200">
-        <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+        <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
             <a href="{{ route('consultant.dashboard') }}" class="font-semibold text-teal-700">MENetZero Partner</a>
             <div class="flex items-center gap-4 text-sm">
                 <a href="{{ route('consultant.dashboard') }}" class="text-gray-600 hover:text-teal-600">Dashboard</a>
-                <a href="{{ route('partner.clients.index') }}" class="text-gray-600 hover:text-teal-600">Clients</a>
-                <a href="{{ route('partner.workspace.switcher') }}" class="text-gray-600 hover:text-teal-600">Workspaces</a>
-                <a href="{{ route('partner.packs.index') }}" class="text-gray-600 hover:text-teal-600">Agency packs</a>
+                <a href="{{ route('consultant.clients.index') }}" class="text-gray-600 hover:text-teal-600">Clients</a>
+                <a href="{{ route('consultant.workspace.switcher') }}" class="text-gray-600 hover:text-teal-600">Workspaces</a>
+                <a href="{{ route('consultant.packs.index') }}" class="text-gray-600 hover:text-teal-600">Agency packs</a>
+                <a href="{{ route('consultant.renewal.index') }}" class="text-gray-600 hover:text-teal-600">Renewal</a>
                 <a href="{{ route('consultant.profile.edit') }}" class="text-gray-600 hover:text-teal-600">Directory profile</a>
                 <a href="{{ route('consultant.intro-requests.index') }}" class="text-gray-600 hover:text-teal-600">Leads</a>
                 <form action="{{ route('consultant.logout') }}" method="POST" class="inline">
@@ -28,12 +29,15 @@
         </div>
     </nav>
 
-    <main class="max-w-5xl mx-auto px-4 py-8">
+    <main class="max-w-6xl mx-auto px-4 py-8">
         @if(session('success'))
             <div class="mb-4 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg text-sm">{{ session('success') }}</div>
         @endif
         @if(session('error'))
             <div class="mb-4 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg text-sm">{{ session('error') }}</div>
+        @endif
+        @if(session('info'))
+            <div class="mb-4 bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg text-sm">{{ session('info') }}</div>
         @endif
         @yield('content')
     </main>
