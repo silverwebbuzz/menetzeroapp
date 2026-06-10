@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Models\Location;
 use App\Models\Measurement;
 use App\Models\MeasurementData;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
+use RuntimeException;
 
 class MeasurementService
 {
@@ -15,15 +17,24 @@ class MeasurementService
      *
      * @param int $locationId
      * @param int $fiscalYear
+     * @param int|null $createdBy
      * @return Measurement
      */
-    public function getOrCreateMeasurement($locationId, $fiscalYear)
+    public function getOrCreateMeasurement($locationId, $fiscalYear, ?int $createdBy = null)
     {
         $measurement = Measurement::where('location_id', $locationId)
             ->where('fiscal_year', $fiscalYear)
             ->first();
 
         if (!$measurement) {
+            $location = Location::find($locationId);
+            $fiscalStartMonth = $this->resolveFiscalYearStartMonth($location?->fiscal_year_start);
+            $createdById = $createdBy ?? Auth::id();
+
+            if (!$createdById) {
+                throw new RuntimeException('created_by is required to create a measurement.');
+            }
+
             $measurement = Measurement::create([
                 'location_id' => $locationId,
                 'fiscal_year' => $fiscalYear,
@@ -31,11 +42,26 @@ class MeasurementService
                 'period_end' => Carbon::create($fiscalYear, 12, 31)->endOfYear(),
                 'frequency' => 'annually',
                 'status' => 'draft',
-                'created_by' => Auth::id(),
+                'fiscal_year_start_month' => $fiscalStartMonth,
+                'created_by' => $createdById,
             ]);
         }
 
         return $measurement;
+    }
+
+    private function resolveFiscalYearStartMonth(?string $fiscalYearStart): string
+    {
+        $codes = [
+            'January' => 'JAN', 'February' => 'FEB', 'March' => 'MAR', 'April' => 'APR',
+            'May' => 'MAY', 'June' => 'JUN', 'July' => 'JUL', 'August' => 'AUG',
+            'September' => 'SEP', 'October' => 'OCT', 'November' => 'NOV', 'December' => 'DEC',
+            'JAN' => 'JAN', 'FEB' => 'FEB', 'MAR' => 'MAR', 'APR' => 'APR',
+            'MAY' => 'MAY', 'JUN' => 'JUN', 'JUL' => 'JUL', 'AUG' => 'AUG',
+            'SEP' => 'SEP', 'OCT' => 'OCT', 'NOV' => 'NOV', 'DEC' => 'DEC',
+        ];
+
+        return $codes[$fiscalYearStart ?? ''] ?? 'JAN';
     }
 
     /**

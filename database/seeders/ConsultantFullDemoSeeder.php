@@ -115,11 +115,20 @@ class ConsultantFullDemoSeeder extends Seeder
                 'is_head_office' => true,
                 'is_active' => true,
                 'staff_count' => 25,
+                'fiscal_year_start' => 'January',
+                'reporting_period' => (string) $reportingYear,
+                'measurement_frequency' => 'annually',
             ]
         );
 
+        $location->update([
+            'fiscal_year_start' => $location->fiscal_year_start ?: 'January',
+            'reporting_period' => $location->reporting_period ?: (string) $reportingYear,
+            'measurement_frequency' => $location->measurement_frequency ?: 'annually',
+        ]);
+
         $measurementService = app(MeasurementService::class);
-        $measurement = $measurementService->getOrCreateMeasurement($location->id, $reportingYear);
+        $measurement = $measurementService->getOrCreateMeasurement($location->id, $reportingYear, $user->id);
 
         $entriesCreated = $this->seedEmissionEntries($measurement->id, $user->id, $reportingYear);
         $measurementService->updateMeasurementTotals($measurement->id);
