@@ -3,382 +3,362 @@
 @section('title', 'MIDDLE EAST NET Zero - Carbon Emissions Tracking')
 
 @section('content')
-    <section class="mkt-hero mkt-hero-xl">
-        <div class="mkt-container max-w-4xl">
-            <div class="tagline">
-                Complete Carbon Management Platform
-            </div>
-            <h1>
-                Everything you need to
-                <span class="block mkt-text-brand">measure and reduce your carbon footprint</span>
-            </h1>
-            <p class="mkt-lead mkt-lead-lg">
-                Comprehensive tools designed specifically for Middle East businesses to
-                track, report, and reduce emissions across all scopes.
-            </p>
+<section class="mkt-hero mkt-hero-xl">
+    <div class="mkt-container max-w-4xl">
+        <div class="mkt-tagline">For companies · self-serve</div>
+        <h1>
+            Everything you need to
+            <span class="block mkt-text-brand">measure and report your carbon footprint</span>
+        </h1>
+        <p class="mkt-lead mkt-lead-lg">
+            UAE-focused carbon management for businesses that want to track Scope 1 &amp; 2, prepare MOCCAE submissions,
+            and export IFRS / GRI disclosures — without hiring a consultant to do the data entry.
+        </p>
+        <p class="text-sm text-gray-500 mt-4 max-w-2xl mx-auto">
+            Start free with Scope 1 &amp; 2 and disclosure previews. Upgrade when you need downloadable reports, bulk import, and verified consultant support.
+        </p>
+        <div class="flex flex-wrap justify-center gap-3 mt-6">
+            <a href="{{ route('register') }}" class="mkt-btn mkt-btn-primary mkt-btn-lg">Company sign up</a>
+            <a href="{{ route('pricing') }}" class="mkt-btn mkt-btn-outline mkt-btn-lg">View company pricing</a>
         </div>
-    </section>
+        <p class="text-xs text-gray-400 mt-4">Free plan available · Annual plans in AED · Google or email registration</p>
+    </div>
+</section>
 
-    <section class="mkt-section mkt-section-bg">
-        <div class="mkt-container">
-            <div class="mkt-section-head">
-                <h2>Complete Scope 1, 2 &amp; 3 Coverage</h2>
-                <p>Track all emission sources across your business operations with our comprehensive methodology</p>
-            </div>
-            <div class="grid md:grid-cols-3 gap-8">
-                <!-- Scope 1 -->
-                <div class="mkt-feature-card">
-                    <div class="flex items-center mb-4">
-                        <div class="scope-number">1</div>
-                        <h3 class="text-xl font-bold text-gray-900">Scope 1 Emissions</h3>
-                    </div>
-                    <p class="mb-6 text-gray-500">Direct emissions from owned or controlled sources</p>
-                    <ul class="space-y-3">
-                        <li class="flex items-center"><span class="checkmark">✓</span> Company vehicles</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> On-site fuel combustion</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> Refrigerant leaks</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> Industrial processes</li>
-                    </ul>
-                </div>
-                <!-- Scope 2 -->
-                <div class="mkt-feature-card">
-                    <div class="flex items-center mb-4">
-                        <div class="scope-number">2</div>
-                        <h3 class="text-xl font-bold text-gray-900">Scope 2 Emissions</h3>
-                    </div>
-                    <p class="mb-6 text-gray-500">Indirect emissions from purchased energy</p>
-                    <ul class="space-y-3">
-                        <li class="flex items-center"><span class="checkmark">✓</span> Electricity consumption</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> Steam and heating</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> Cooling systems</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> MENA grid factors</li>
-                    </ul>
-                </div>
-                <!-- Scope 3 -->
-                <div class="mkt-feature-card">
-                    <div class="flex items-center mb-4">
-                        <div class="scope-number">3</div>
-                        <h3 class="text-xl font-bold text-gray-900">Scope 3 Emissions</h3>
-                    </div>
-                    <p class="mb-6 text-gray-500">All other indirect emissions in value chain</p>
-                    <ul class="space-y-3">
-                        <li class="flex items-center"><span class="checkmark">✓</span> Business travel</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> Supply chain</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> Employee commuting</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> Waste disposal</li>
-                    </ul>
-                </div>
-            </div>
+<section class="mkt-section mkt-section-bg">
+    <div class="mkt-container">
+        <div class="mkt-section-head">
+            <h2>Why UAE companies choose MenetZero</h2>
+            <p>Built for Middle East SMEs and mid-market organisations — not generic global carbon software</p>
         </div>
-    </section>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            @foreach([
+                ['MOCCAE-ready from day one', 'Generate GHG inventories, MOCCAE Scope 1 & 2 PDFs, and IEQT exports aligned with UAE reporting workflows.'],
+                ['Start free, upgrade when ready', 'Try Scope 1 & 2 calculations and disclosure forms at no cost. Pay only when you need PDF exports and bulk data tools.'],
+                ['IFRS & GRI on Growth', 'Complete sustainability disclosure forms in-app and download IFRS S1/S2 and GRI report PDFs on the Growth plan.'],
+                ['Human review when you need it', 'Connect with verified UAE consultants from the directory — optional review packs for professional sign-off.'],
+            ] as $item)
+                <div class="mkt-feature-card">
+                    <h3 class="text-base font-bold text-gray-900 mb-2">{{ $item[0] }}</h3>
+                    <p class="text-sm text-gray-500">{{ $item[1] }}</p>
+                </div>
+            @endforeach
+        </div>
+    </div>
+</section>
 
-    <section class="mkt-section">
-        <div class="mkt-container">
-            <div class="mkt-section-head">
-                <h2>Powerful features for every team</h2>
-                <p>From data collection to reporting, we've built everything you need for comprehensive carbon management</p>
+<section class="mkt-section">
+    <div class="mkt-container">
+        <div class="mkt-section-head">
+            <h2>Complete Scope 1, 2 &amp; 3 coverage</h2>
+            <p>Track direct emissions, purchased energy, and value-chain impacts with MENA-specific emission factors</p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="mkt-feature-card">
+                <div class="flex items-center mb-4">
+                    <div class="mkt-scope-number">1</div>
+                    <h3 class="text-xl font-bold text-gray-900">Scope 1</h3>
+                </div>
+                <p class="mb-6 text-gray-500">Direct emissions from sources you own or control</p>
+                <ul class="space-y-3 text-sm text-gray-600">
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Company vehicles and fleet fuel</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> On-site fuel combustion and generators</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Refrigerant leaks and fugitive emissions</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Quick-input workflows with auto-calculation</li>
+                </ul>
             </div>
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Emission Calculations -->
-                <div class="mkt-feature-card">
-                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-4 text-gray-900">Emission Calculations</h3>
-                    <ul class="space-y-2">
-                        <li class="flex items-center"><span class="checkmark">✓</span> Automated Scope 1, 2 & 3 calculations using MENA-specific emission factors</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> AI-powered data validation and quality checks</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> Support for 50+ emission sources and activities</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> Real-time calculation updates and trend analysis</li>
-                    </ul>
+            <div class="mkt-feature-card">
+                <div class="flex items-center mb-4">
+                    <div class="mkt-scope-number">2</div>
+                    <h3 class="text-xl font-bold text-gray-900">Scope 2</h3>
                 </div>
-                <!-- Regional Compliance -->
-                <div class="mkt-feature-card">
-                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-4 text-gray-900">Regional Compliance</h3>
-                    <ul class="space-y-2">
-                        <li class="flex items-center"><span class="checkmark">✓</span> UAE and Saudi Arabia sustainability reporting standards</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> GHG Protocol and ISO 14064 compliance</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> Region-specific energy grid factors</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> Local transportation and logistics emission data</li>
-                    </ul>
+                <p class="mb-6 text-gray-500">Indirect emissions from purchased electricity and energy</p>
+                <ul class="space-y-3 text-sm text-gray-600">
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Electricity consumption by location</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> District cooling, steam, and heating</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> UAE / MENA grid emission factors</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Location-based reporting per branch</li>
+                </ul>
+            </div>
+            <div class="mkt-feature-card">
+                <div class="flex items-center mb-4">
+                    <div class="mkt-scope-number">3</div>
+                    <h3 class="text-xl font-bold text-gray-900">Scope 3</h3>
                 </div>
-                <!-- Data Management -->
-                <div class="mkt-feature-card">
-                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-4 text-gray-900">Data Management</h3>
-                    <ul class="space-y-2">
-                        <li class="flex items-center"><span class="checkmark">✓</span> Secure cloud storage with 99.9% uptime</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> API integrations with ERP and sustainability platforms</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> Bulk data import from Excel and CSV files</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> Automated data backup and version control</li>
-                    </ul>
-                </div>
-                <!-- Reporting & Analytics -->
-                <div class="mkt-feature-card">
-                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-4 text-gray-900">Reporting & Analytics</h3>
-                    <ul class="space-y-2">
-                        <li class="flex items-center"><span class="checkmark">✓</span> Compliance-ready PDF reports for stakeholders</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> Interactive dashboards with drill-down capabilities</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> Custom KPI tracking and goal setting</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> Executive summary reports for board presentations</li>
-                    </ul>
-                </div>
-                <!-- Team Collaboration -->
-                <div class="mkt-feature-card">
-                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-4 text-gray-900">Team Collaboration</h3>
-                    <ul class="space-y-2">
-                        <li class="flex items-center"><span class="checkmark">✓</span> Multi-user access with role-based permissions</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> Department-level data collection workflows</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> Comment system for data verification</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> Email notifications for task assignments</li>
-                    </ul>
-                </div>
-                <!-- Advanced Analytics -->
-                <div class="mkt-feature-card">
-                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-4 text-gray-900">Advanced Analytics</h3>
-                    <ul class="space-y-2">
-                        <li class="flex items-center"><span class="checkmark">✓</span> Predictive emissions modeling and forecasting</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> Benchmarking against industry peers</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> Carbon reduction scenario planning</li>
-                        <li class="flex items-center"><span class="checkmark">✓</span> Supply chain emissions hotspot analysis</li>
-                    </ul>
-                </div>
+                <p class="mb-6 text-gray-500">Value-chain emissions across GHG Protocol categories</p>
+                <ul class="space-y-3 text-sm text-gray-600">
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Business travel, commuting, and logistics</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Purchased goods, waste, and supply chain</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Preview on Starter &amp; Growth (1 entry per category)</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Unlimited Scope 3 on Enterprise</li>
+                </ul>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <section class="mkt-section mkt-section-bg">
-        <div class="mkt-container">
-            <div class="mkt-section-head">
-                <h2>Everything You Need for Carbon Management</h2>
-                <p>A complete toolkit to measure, manage, and reduce your organization's carbon footprint</p>
-            </div>
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Automated Reporting -->
-                <div class="mkt-feature-card text-center">
-                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-bold mb-2 text-gray-900">Automated Reporting</h3>
-                    <p class="text-sm text-gray-500">Generate comprehensive carbon reports automatically</p>
-                </div>
-                <!-- Cloud-Based -->
-                <div class="mkt-feature-card text-center">
-                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-bold mb-2 text-gray-900">Cloud-Based</h3>
-                    <p class="text-sm text-gray-500">Access your data anywhere, anytime, on any device</p>
-                </div>
-                <!-- Secure Platform -->
-                <div class="mkt-feature-card text-center">
-                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-bold mb-2 text-gray-900">Secure Platform</h3>
-                    <p class="text-sm text-gray-500">Enterprise-grade security for your sensitive data</p>
-                </div>
-                <!-- Live Dashboard -->
-                <div class="mkt-feature-card text-center">
-                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-bold mb-2 text-gray-900">Live Dashboard</h3>
-                    <p class="text-sm text-gray-500">Real-time insights into your carbon performance</p>
-                </div>
-                <!-- Data Integration -->
-                <div class="mkt-feature-card text-center">
-                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-bold mb-2 text-gray-900">Data Integration</h3>
-                    <p class="text-sm text-gray-500">Connect with your existing systems seamlessly</p>
-                </div>
-                <!-- Verified Data -->
-                <div class="mkt-feature-card text-center">
-                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-bold mb-2 text-gray-900">Verified Data</h3>
-                    <p class="text-sm text-gray-500">Quality-assured emission factors and calculations</p>
-                </div>
-                <!-- Sustainability Insights -->
-                <div class="mkt-feature-card text-center">
-                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-bold mb-2 text-gray-900">Sustainability Insights</h3>
-                    <p class="text-sm text-gray-500">AI-powered recommendations for reduction strategies</p>
-                </div>
-                <!-- Audit Trail -->
-                <div class="mkt-feature-card text-center">
-                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-bold mb-2 text-gray-900">Audit Trail</h3>
-                    <p class="text-sm text-gray-500">Complete transparency with detailed audit logs</p>
-                </div>
-            </div>
+<section class="mkt-section mkt-section-bg">
+    <div class="mkt-container">
+        <div class="mkt-section-head">
+            <h2>Plans built for every stage</h2>
+            <p>From free exploration to full ESG disclosure exports — pick the plan that matches your reporting needs</p>
         </div>
-    </section>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            @foreach([
+                ['Free', 'Try before you buy', 'AED 0', [
+                    'Scope 1 & 2 quick input',
+                    'Disclosure forms — in-app preview',
+                    '1 location · 1 user',
+                    'Scope 3 locked',
+                ], route('register'), 'mkt-btn-dark'],
+                ['Starter', 'MOCCAE-ready inventory', 'AED 1,499 / yr', [
+                    'GHG, MOCCAE & IEQT PDF exports',
+                    'Bulk CSV / Excel import',
+                    '3 locations · 5 users',
+                    'Scope 3 preview (1 per category)',
+                ], route('register'), 'mkt-btn-dark'],
+                ['Growth', 'IFRS & GRI downloads', 'AED 2,499 / yr', [
+                    'Everything in Starter',
+                    'IFRS S1/S2 + GRI PDF exports',
+                    '10 locations · 10 users',
+                    'Full consultant directory access',
+                ], route('register'), 'mkt-btn-primary'],
+                ['Enterprise', 'Multi-site & unlimited S3', 'Custom', [
+                    'Unlimited Scope 3 entries',
+                    'Unlimited locations & users',
+                    'API access & dedicated support',
+                    'Priority consultant introductions',
+                ], route('contact'), 'mkt-btn-dark'],
+            ] as $plan)
+                <div class="mkt-feature-card flex flex-col h-full {{ $plan[0] === 'Growth' ? 'ring-2 ring-teal-500/30' : '' }}">
+                    @if($plan[0] === 'Growth')
+                        <span class="text-xs font-semibold text-teal-700 mb-2">MOST POPULAR</span>
+                    @endif
+                    <h3 class="text-lg font-bold mkt-text-brand mb-1">{{ $plan[0] }}</h3>
+                    <p class="text-xs text-gray-500 mb-3">{{ $plan[1] }}</p>
+                    <div class="text-xl font-extrabold text-gray-900 mb-4">{{ $plan[2] }}</div>
+                    <ul class="space-y-2 text-sm text-gray-600 flex-1 mb-5">
+                        @foreach($plan[3] as $feat)
+                            <li class="flex items-start"><span class="mkt-checkmark">✓</span> {{ $feat }}</li>
+                        @endforeach
+                    </ul>
+                    <a href="{{ $plan[4] }}" class="mkt-btn mkt-btn-block mkt-btn-sm {{ $plan[5] }}">
+                        {{ $plan[0] === 'Enterprise' ? 'Contact sales' : 'Get started' }}
+                    </a>
+                </div>
+            @endforeach
+        </div>
+        <p class="text-center text-sm text-gray-500 mt-8">
+            <a href="{{ route('pricing') }}" class="mkt-text-brand hover:underline">See full plan comparison →</a>
+        </p>
+    </div>
+</section>
 
-    <section class="mkt-section">
-        <div class="mkt-container">
-            <div class="mkt-section-head">
-                <h2>Get Started in Four Simple Steps</h2>
-                <p>Begin your carbon management journey today with our streamlined onboarding process</p>
-            </div>
-            <div class="grid md:grid-cols-4 gap-8">
-                <!-- Step 1 -->
+<section class="mkt-section">
+    <div class="mkt-container">
+        <div class="mkt-section-head">
+            <h2>Platform capabilities</h2>
+            <p>Everything your sustainability, finance, and operations teams need in one workspace</p>
+        </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach([
+                ['Emission calculations', ['Automated Scope 1 & 2 from activity data', 'Built-in emission factor library for MENA', 'Dashboard with totals, trends, and hotspots', 'Historical data retention (2–5 years by plan)']],
+                ['UAE & regional compliance', ['GHG Protocol-aligned inventory methodology', 'MOCCAE Scope 1 & 2 report PDFs', 'IEQT export for mrv.ae submission', 'Working papers for your audit trail']],
+                ['ESG disclosures', ['IFRS S1 / S2 climate disclosure forms', 'GRI standards reporting + content index', 'Preview on Free & Starter — export on Growth', 'Guided help including disclosure walkthroughs']],
+                ['Data management', ['Manual quick-input for every emission source', 'Bulk CSV / Excel import (Starter+)', 'Bulk data export for analysis', 'Document storage per organisation']],
+                ['Multi-location & team access', ['Track emissions per branch or site', 'Invite colleagues with role-based access', 'Up to 10 users on Growth', 'Unlimited users on Enterprise']],
+                ['Consultant marketplace', ['Browse verified UAE consultants publicly', 'Request introductions from your account', 'Optional review packs for professional sign-off', 'Growth subscribers get full directory connect']],
+            ] as $block)
+                <div class="mkt-feature-card">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">{{ $block[0] }}</h3>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        @foreach($block[1] as $line)
+                            <li class="flex items-start"><span class="mkt-checkmark">✓</span> {{ $line }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+
+<section class="mkt-section mkt-section-bg">
+    <div class="mkt-container">
+        <div class="mkt-section-head">
+            <h2>Reports &amp; exports by plan</h2>
+            <p>Know exactly which deliverables unlock at each tier</p>
+        </div>
+        <div class="mkt-table-wrap">
+            <table class="mkt-table">
+                <thead>
+                    <tr>
+                        <th>Deliverable</th>
+                        <th>Free</th>
+                        <th>Starter</th>
+                        <th>Growth</th>
+                        <th>Enterprise</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach([
+                        ['Scope 1 & 2 calculations', 'In-app', '✓', '✓', '✓'],
+                        ['GHG inventory PDF', '—', '✓', '✓', '✓'],
+                        ['MOCCAE S1 & 2 PDF', '—', '✓', '✓', '✓'],
+                        ['IEQT export (mrv.ae)', '—', '✓', '✓', '✓'],
+                        ['Excel results export', '—', '✓', '✓', '✓'],
+                        ['Bulk CSV / XLS import', '—', '✓', '✓', '✓'],
+                        ['Disclosure forms (IFRS / GRI)', 'Preview', 'Preview', 'Export PDF', 'Full'],
+                        ['IFRS S1 / S2 PDF', '—', '—', '✓', '✓'],
+                        ['GRI PDF + content index', '—', '—', '✓', '✓'],
+                        ['Scope 3', 'Locked', 'Preview', 'Preview', 'Unlimited'],
+                    ] as $row)
+                        <tr>
+                            <td>{{ $row[0] }}</td>
+                            <td>{{ $row[1] }}</td>
+                            <td>{{ $row[2] }}</td>
+                            <td>{{ $row[3] }}</td>
+                            <td>{{ $row[4] }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        <p class="text-center text-xs text-gray-400 mt-4 max-w-2xl mx-auto">
+            Reports are draft working papers for your compliance workflow. Third-party verification is available through our
+            <a href="{{ route('consultant-list.index') }}" class="mkt-text-brand hover:underline">consultant directory</a>.
+        </p>
+    </div>
+</section>
+
+<section class="mkt-section">
+    <div class="mkt-container">
+        <div class="mkt-section-head">
+            <h2>Optional consultant review</h2>
+            <p>Software prepares your data — a verified consultant can review, sign off, and add the human trust layer</p>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            @foreach(\App\Data\CommercialPlanComparison::consultantAddOns() as $addon)
+                <div class="mkt-feature-card">
+                    <div class="flex justify-between items-baseline gap-2 mb-2">
+                        <h3 class="font-bold text-gray-900">{{ $addon['name'] }}</h3>
+                        <span class="text-sm font-semibold mkt-text-brand">{{ $addon['price'] }}</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mb-2">For {{ $addon['for_plan'] }} plan subscribers</p>
+                    <p class="text-sm text-gray-600">{{ $addon['description'] }}</p>
+                </div>
+            @endforeach
+        </div>
+        <p class="text-center text-sm text-gray-500 mt-6">
+            <a href="{{ route('consultant-list.index') }}" class="mkt-text-brand hover:underline">Browse verified consultants →</a>
+        </p>
+    </div>
+</section>
+
+<section class="mkt-section mkt-section-bg">
+    <div class="mkt-container">
+        <div class="mkt-section-head">
+            <h2>Get started in four simple steps</h2>
+            <p>From sign-up to your first compliance-ready export</p>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            @foreach([
+                ['01', 'Create your account', 'Company sign up with Google or email — add your organisation and first location.'],
+                ['02', 'Enter emission data', 'Use quick input or bulk import to capture Scope 1 & 2 activity data across your sites.'],
+                ['03', 'Review your dashboard', 'See calculated totals, explore disclosure forms, and identify carbon hotspots.'],
+                ['04', 'Export & report', 'Upgrade to Starter or Growth to download MOCCAE, GHG, IFRS, and GRI deliverables.'],
+            ] as $step)
                 <div class="relative">
-                    <div class="mkt-step-badge">01</div>
+                    <div class="mkt-step-badge">{{ $step[0] }}</div>
                     <div class="mkt-feature-card pt-8">
-                        <h3 class="text-xl font-bold mb-3 text-gray-900">Launch Your Account</h3>
-                        <p class="text-gray-500">Sign up and set up your organization profile in minutes</p>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">{{ $step[1] }}</h3>
+                        <p class="text-gray-500 text-sm">{{ $step[2] }}</p>
                     </div>
                 </div>
-                <!-- Step 2 -->
-                <div class="relative">
-                    <div class="mkt-step-badge">02</div>
-                    <div class="mkt-feature-card pt-8">
-                        <h3 class="text-xl font-bold mb-3 text-gray-900">Connect Your Data</h3>
-                        <p class="text-gray-500">Integrate your systems or upload data manually</p>
-                    </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+
+<section class="mkt-section mkt-section-dark">
+    <div class="mkt-container">
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+                <span class="mkt-tagline" style="background:rgba(14,165,163,0.2);color:#5eead4;">For sustainability professionals</span>
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 text-white">Are you a carbon consultant in the UAE?</h2>
+                <p class="text-lg text-slate-300 mb-6">
+                    This home page is for <strong class="text-white">companies</strong> tracking their own emissions.
+                    If you manage carbon inventories for multiple clients, the consultant portal is built for you —
+                    agency packs, client workspaces, and a verified directory listing.
+                </p>
+                <ul class="space-y-3 text-slate-300 mb-8 text-sm">
+                    <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> Manage multiple SME workspaces from one login</li>
+                    <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> Wholesale agency packs — pricing after consultant sign-in</li>
+                    <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> Qualified leads from subscribers and public directory visitors</li>
+                    <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> 1 free trial client to get started</li>
+                </ul>
+                <div class="flex flex-wrap gap-3">
+                    <a href="{{ route('consultant.landing') }}" class="mkt-btn mkt-btn-primary">Explore consultant portal</a>
+                    <a href="{{ route('consultant-list.index') }}" class="mkt-btn mkt-btn-white-outline">Browse directory</a>
                 </div>
-                <!-- Step 3 -->
-                <div class="relative">
-                    <div class="mkt-step-badge">03</div>
-                    <div class="mkt-feature-card pt-8">
-                        <h3 class="text-xl font-bold mb-3 text-gray-900">Track Emissions</h3>
-                        <p class="text-gray-500">Monitor your carbon footprint in real-time</p>
+            </div>
+            <div class="mkt-glass-panel">
+                <h3 class="text-xl font-semibold mb-4 text-white">Not sure which portal?</h3>
+                <div class="space-y-4 text-sm text-slate-300">
+                    <div class="pb-4 border-b border-white/10">
+                        <p class="font-semibold text-white mb-1">Company portal — you are here</p>
+                        <p>Your organisation tracks its own emissions. Self-serve plans from Free to Enterprise.</p>
+                        <a href="{{ route('pricing') }}" class="text-teal-300 hover:underline text-xs mt-2 inline-block">Company pricing (AED) →</a>
                     </div>
-                </div>
-                <!-- Step 4 -->
-                <div class="relative">
-                    <div class="mkt-step-badge">04</div>
-                    <div class="mkt-feature-card pt-8">
-                        <h3 class="text-xl font-bold mb-3 text-gray-900">Take Action</h3>
-                        <p class="text-gray-500">Implement reduction strategies and report progress</p>
+                    <div>
+                        <p class="font-semibold text-white mb-1">Consultant portal</p>
+                        <p>You run carbon workspaces for multiple client companies. Agency packs and directory leads.</p>
+                        <a href="{{ route('consultant.register') }}" class="text-teal-300 hover:underline text-xs mt-2 inline-block">Create consultant account →</a>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <section class="mkt-section mkt-section-dark">
-        <div class="mkt-container">
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div>
-                    <span class="inline-block px-3 py-1 rounded-full bg-teal-500/20 text-teal-300 text-xs font-semibold mb-4">For sustainability professionals</span>
-                    <h2 class="text-4xl font-bold mb-4">Are you a carbon consultant in the UAE?</h2>
-                    <p class="text-lg text-slate-300 mb-6">
-                        Join the MENetZero verified consultant directory. Our platform prepares SME inventories and disclosures —
-                        you review, sign off, and deliver the human trust layer clients expect.
-                    </p>
-                    <ul class="space-y-3 text-slate-300 mb-8">
-                        <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> Free listing for vetted consultants at launch</li>
-                        <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> Qualified leads from Starter &amp; Growth subscribers</li>
-                        <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> Marketplace payouts via platform escrow (coming soon)</li>
-                    </ul>
-                    <div class="flex flex-wrap gap-3">
-                        <a href="{{ route('consultant.register') }}" class="mkt-btn mkt-btn-primary">Apply as a consultant</a>
-                        <a href="{{ route('consultant-list.index') }}" class="mkt-btn mkt-btn-white-outline">Browse directory</a>
-                    </div>
-                </div>
-                <div class="mkt-glass-panel">
-                    <h3 class="text-xl font-semibold mb-4">How it works</h3>
-                    <ol class="space-y-4 text-slate-300 text-sm">
-                        <li class="flex gap-3"><span class="flex-shrink-0 w-8 h-8 rounded-full bg-teal-500/30 flex items-center justify-center font-bold text-teal-300">1</span><span><strong class="text-white">Register</strong> at app.menetzero.com/consultant with your practice details</span></li>
-                        <li class="flex gap-3"><span class="flex-shrink-0 w-8 h-8 rounded-full bg-teal-500/30 flex items-center justify-center font-bold text-teal-300">2</span><span><strong class="text-white">Upload</strong> trade license and CV for admin verification</span></li>
-                        <li class="flex gap-3"><span class="flex-shrink-0 w-8 h-8 rounded-full bg-teal-500/30 flex items-center justify-center font-bold text-teal-300">3</span><span><strong class="text-white">Get listed</strong> and receive client introduction requests</span></li>
-                        <li class="flex gap-3"><span class="flex-shrink-0 w-8 h-8 rounded-full bg-teal-500/30 flex items-center justify-center font-bold text-teal-300">4</span><span><strong class="text-white">Deliver</strong> review packs — paid engagements via MenetZero escrow</span></li>
-                    </ol>
-                </div>
-            </div>
+<section class="mkt-section mkt-section-bg">
+    <div class="mkt-container max-w-3xl">
+        <div class="mkt-section-head">
+            <h2>Common questions</h2>
         </div>
-    </section>
-
-    <section class="mkt-section mkt-section-bg">
-        <div class="mkt-container">
-            <div class="mkt-section-head">
-                <h2 class="mkt-text-brand">Enterprise-Grade Security</h2>
-                <p>Your data security is our top priority. We employ industry-leading security measures to protect your sensitive information</p>
-            </div>
-            <div class="grid md:grid-cols-3 gap-8">
-                <!-- 256-Bit Encryption -->
-                <div class="mkt-feature-card text-center">
-                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3 text-gray-900">256-Bit Encryption</h3>
-                    <p class="text-gray-500">Military-grade encryption for all data transmission and storage</p>
-                </div>
-                <!-- SOC 2 Certified -->
-                <div class="mkt-feature-card text-center">
-                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3 text-gray-900">SOC 2 Certified</h3>
-                    <p class="text-gray-500">Independently verified security controls and processes</p>
-                </div>
-                <!-- Regular Backups -->
-                <div class="mkt-feature-card text-center">
-                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3 text-gray-900">Regular Backups</h3>
-                    <p class="text-gray-500">Automated daily backups with 99.9% uptime guarantee</p>
-                </div>
-            </div>
+        <div class="space-y-4">
+            @foreach([
+                ['Can I really start for free?', 'Yes. The Free plan includes Scope 1 & 2 data entry and disclosure form previews in the app. PDF exports and bulk import unlock on paid plans.'],
+                ['Which plan do I need for MOCCAE reporting?', 'Starter (AED 1,499/year) includes GHG inventory PDF, MOCCAE Scope 1 & 2 PDF, and IEQT export for mrv.ae — plus bulk import and Scope 3 preview.'],
+                ['When do I need Growth?', 'Choose Growth (AED 2,499/year) if you need downloadable IFRS S1/S2 and GRI report PDFs, more locations (up to 10), and full access to connect with verified consultants.'],
+                ['Do I need a consultant to use MenetZero?', 'No. The platform is self-serve for companies. Consultants are optional — for review, sign-off, or if you prefer expert guidance alongside the software.'],
+                ['I manage emissions for clients, not my own company', 'Use the consultant portal instead. Company pricing on this site is for organisations tracking their own footprint. Visit /consultant for agency features.'],
+            ] as $faq)
+                <details class="mkt-feature-card group" style="padding:1.25rem;">
+                    <summary class="font-semibold text-gray-900 cursor-pointer list-none flex justify-between items-center gap-4">
+                        {{ $faq[0] }}
+                        <span class="text-gray-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <p class="text-sm text-gray-500 mt-3 leading-relaxed">{{ $faq[1] }}</p>
+                </details>
+            @endforeach
         </div>
-    </section>
+    </div>
+</section>
 
+<section class="mkt-section">
+    <div class="mkt-container max-w-3xl text-center">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Ready to measure your organisation's footprint?</h2>
+        <p class="text-gray-500 mb-8">
+            Create your company account in minutes. Start free, explore Scope 1 &amp; 2, and upgrade when you need exports.
+        </p>
+        <div class="flex flex-wrap justify-center gap-3">
+            <a href="{{ route('register') }}" class="mkt-btn mkt-btn-primary mkt-btn-lg">Company sign up</a>
+            <a href="{{ route('pricing') }}" class="mkt-btn mkt-btn-outline mkt-btn-lg">View pricing</a>
+            <a href="{{ route('login') }}" class="mkt-btn mkt-btn-outline mkt-btn-lg">Sign in</a>
+        </div>
+        <p class="mt-8 text-xs text-gray-400 max-w-xl mx-auto">
+            Annual plans priced in AED. Reports are draft working papers for your compliance workflow.
+        </p>
+    </div>
+</section>
 @endsection
