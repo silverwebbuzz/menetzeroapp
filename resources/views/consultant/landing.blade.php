@@ -3,21 +3,20 @@
 @section('title', 'MENetZero Consultant — Consultants & Agencies')
 
 @section('content')
-{{-- Hero --}}
-<section class="py-20 px-4">
-    <div class="max-w-4xl mx-auto text-center">
+<section class="mkt-hero mkt-hero-xl">
+    <div class="mkt-container max-w-4xl">
         <div class="mkt-tagline">For sustainability professionals</div>
-        <h1 class="text-4xl md:text-6xl font-bold mb-6 text-gray-900 leading-tight">
+        <h1>
             Freelance consultant or agency —
-            <span class="block text-teal-600">one powerful portal</span>
+            <span class="block mkt-text-brand">one powerful portal</span>
         </h1>
-        <p class="text-lg md:text-xl text-gray-500 mb-8 max-w-2xl mx-auto">
+        <p class="mkt-lead">
             Manage SME carbon workspaces, purchase agency packs, and list in the MenetZero verified consultant directory for qualified leads.
         </p>
         @if($consultantCount > 0)
-            <p class="text-sm text-gray-500 mb-8">
-                Join <strong class="text-teal-600">{{ $consultantCount }}+ verified consultants</strong> already on the platform.
-                <a href="{{ route('consultant-list.index') }}" class="text-teal-600 hover:underline ml-1">Browse the directory →</a>
+            <p class="text-sm text-gray-500 mt-4 mb-6">
+                Join <strong class="mkt-text-brand">{{ $consultantCount }}+ verified consultants</strong> already on the platform.
+                <a href="{{ route('consultant-list.index') }}" class="mkt-text-brand hover:underline">Browse the directory →</a>
             </p>
         @endif
         <div class="flex flex-wrap justify-center gap-3">
@@ -27,12 +26,11 @@
     </div>
 </section>
 
-{{-- Three pillars --}}
-<section class="py-20 px-4 mkt-section-bg">
-    <div class="max-w-6xl mx-auto">
-        <div class="text-center mb-16">
-            <h2 class="text-4xl font-bold text-gray-900 mb-4">Everything consultants need in one place</h2>
-            <p class="text-xl text-gray-500">Software prepares SME data — you review, sign off, and deliver the trust layer clients expect</p>
+<section class="mkt-section mkt-section-bg">
+    <div class="mkt-container">
+        <div class="mkt-section-head">
+            <h2>Everything consultants need in one place</h2>
+            <p>Software prepares SME data — you review, sign off, and deliver the trust layer clients expect</p>
         </div>
         <div class="grid md:grid-cols-3 gap-8">
             <div class="mkt-feature-card">
@@ -78,14 +76,13 @@
     </div>
 </section>
 
-{{-- How it works --}}
-<section class="py-20 px-4">
-    <div class="max-w-6xl mx-auto">
-        <div class="text-center mb-16">
-            <h2 class="text-4xl font-bold text-gray-900 mb-4">How it works</h2>
-            <p class="text-xl text-gray-500">From registration to your first managed client in four steps</p>
+<section class="mkt-section">
+    <div class="mkt-container">
+        <div class="mkt-section-head">
+            <h2>How it works</h2>
+            <p>From registration to your first managed client in four steps</p>
         </div>
-        <div class="grid md:grid-cols-4 gap-8">
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             @foreach([
                 ['01', 'Register', 'Create your account at /consultant with practice details'],
                 ['02', 'Add a client', 'Start with one free trial workspace or purchase an agency pack'],
@@ -104,13 +101,12 @@
     </div>
 </section>
 
-{{-- Directory + CTA split --}}
-<section class="py-20 px-4 mkt-section-dark">
-    <div class="max-w-6xl mx-auto">
+<section class="mkt-section mkt-section-dark">
+    <div class="mkt-container">
         <div class="grid md:grid-cols-2 gap-12 items-center">
             <div>
-                <span class="inline-block px-3 py-1 rounded-full bg-teal-500/20 text-teal-300 text-xs font-semibold mb-4">Public directory</span>
-                <h2 class="text-3xl md:text-4xl font-bold mb-4">Your listing, your leads — privacy protected</h2>
+                <span class="mkt-tagline" style="background:rgba(14,165,163,0.2);color:#5eead4;">Public directory</span>
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 text-white">Your listing, your leads — privacy protected</h2>
                 <p class="text-lg text-slate-300 mb-6">
                     Approved consultants appear on our public directory. Visitors see your practice name, specialties, and experience —
                     not your personal phone or email. When someone wants to work with you, they submit a request and we pass the lead to you.
@@ -125,35 +121,29 @@
                     <a href="{{ route('consultant.register') }}" class="mkt-btn mkt-btn-white-outline">Apply to get listed</a>
                 </div>
             </div>
-            <div class="bg-white/5 border border-white/10 rounded-2xl p-8">
-                <h3 class="text-xl font-semibold mb-6">Agency pack snapshot</h3>
-                <div class="space-y-4 text-sm">
-                    <div class="flex justify-between py-3 border-b border-white/10">
-                        <span class="text-slate-300">Consultant 5</span>
-                        <span class="font-semibold text-white">AED 6,495 / yr</span>
-                    </div>
-                    <div class="flex justify-between py-3 border-b border-white/10">
-                        <span class="text-slate-300">Consultant 10</span>
-                        <span class="font-semibold text-white">AED 9,990 / yr</span>
-                    </div>
-                    <div class="flex justify-between py-3 border-b border-white/10">
-                        <span class="text-slate-300">Extra slot</span>
-                        <span class="font-semibold text-white">AED 1,299 / slot</span>
-                    </div>
-                    <div class="flex justify-between py-3">
-                        <span class="text-slate-300">Free trial</span>
-                        <span class="font-semibold text-teal-300">1 client · data entry</span>
-                    </div>
+            <div class="mkt-glass-panel">
+                <h3 class="text-xl font-semibold mb-6 text-white">Agency pack snapshot</h3>
+                <div class="space-y-0 text-sm">
+                    @foreach([
+                        ['Consultant 5', 'AED 6,495 / yr'],
+                        ['Consultant 10', 'AED 9,990 / yr'],
+                        ['Extra slot', 'AED 1,299 / slot'],
+                        ['Free trial', '1 client · data entry'],
+                    ] as $i => $row)
+                        <div class="flex justify-between py-3 {{ $i < 3 ? 'border-b border-white/10' : '' }}">
+                            <span class="text-slate-300">{{ $row[0] }}</span>
+                            <span class="font-semibold {{ $i === 3 ? 'text-teal-300' : 'text-white' }}">{{ $row[1] }}</span>
+                        </div>
+                    @endforeach
                 </div>
-                <a href="{{ route('consultant.register') }}" class="mkt-btn mkt-btn-primary w-full mt-6 justify-center">Get started free</a>
+                <a href="{{ route('consultant.register') }}" class="mkt-btn mkt-btn-primary mkt-btn-block mt-6">Get started free</a>
             </div>
         </div>
     </div>
 </section>
 
-{{-- Final CTA --}}
-<section class="py-20 px-4 mkt-section-bg">
-    <div class="max-w-3xl mx-auto text-center">
+<section class="mkt-section mkt-section-bg">
+    <div class="mkt-container max-w-3xl text-center">
         <h2 class="text-3xl font-bold text-gray-900 mb-4">Ready to run client workspaces from one login?</h2>
         <p class="text-gray-500 mb-8">
             Register once — your agency hub and directory profile live on the same consultant account.

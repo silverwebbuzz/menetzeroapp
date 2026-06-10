@@ -3,27 +3,27 @@
 @section('title', 'Verified Carbon Consultants — MENetZero')
 
 @section('content')
-<section class="py-16 px-4 mkt-section-bg">
-    <div class="max-w-6xl mx-auto text-center">
+<section class="mkt-hero">
+    <div class="mkt-container max-w-4xl">
         <div class="mkt-tagline">MENetZero verified directory</div>
-        <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        <h1>
             Find a carbon consultant
             @if($consultantCount > 0)
-                <span class="block text-teal-600 text-3xl md:text-4xl mt-2">{{ $consultantCount }} verified on our platform</span>
+                <span class="block mkt-text-brand text-2xl md:text-3xl mt-3 font-bold">{{ $consultantCount }} verified on our platform</span>
             @endif
         </h1>
-        <p class="text-lg text-gray-500 max-w-2xl mx-auto">
+        <p class="mkt-lead">
             Browse admin-approved sustainability consultants in the UAE. Contact details are never shown publicly —
             request an introduction and we route qualified leads through MenetZero.
         </p>
     </div>
 </section>
 
-<section class="py-12 px-4">
-    <div class="max-w-6xl mx-auto">
+<section class="mkt-section pt-0">
+    <div class="mkt-container">
         @if(!empty($emirateFilters) || !empty($specialtyFilters))
             <div class="mb-8 flex flex-wrap gap-2 items-center">
-                <span class="text-sm font-medium text-gray-500 mr-2">Filter:</span>
+                <span class="text-sm font-medium text-gray-500 mr-1">Filter:</span>
                 <a href="{{ route('consultant-list.index') }}"
                    class="mkt-filter-pill {{ !$activeEmirate && !$activeSpecialty ? 'active' : '' }}">All</a>
                 @foreach($emirateFilters as $emirate)
@@ -68,7 +68,7 @@
                         <p class="text-sm text-gray-600 flex-1">{{ \Illuminate\Support\Str::limit($c['bio'], 140) }}</p>
                     @endif
                     <div class="mt-4 pt-4 border-t border-gray-100">
-                        <a href="{{ route('consultant-list.show', $c['id']) }}" class="text-sm font-semibold text-teal-600 hover:underline">
+                        <a href="{{ route('consultant-list.show', $c['id']) }}" class="text-sm font-semibold mkt-text-brand hover:underline">
                             View profile &amp; request intro →
                         </a>
                     </div>
@@ -83,10 +83,10 @@
         </div>
 
         @if($consultants->hasPages())
-            <div class="mb-8">{{ $consultants->links() }}</div>
+            <div class="mb-10 flex justify-center">{{ $consultants->links() }}</div>
         @endif
 
-        <div class="mkt-feature-card text-center max-w-2xl mx-auto">
+        <div class="mkt-feature-card text-center max-w-2xl mx-auto" style="padding:1.5rem;">
             <h3 class="text-lg font-bold text-gray-900 mb-2">Are you a sustainability consultant?</h3>
             <p class="text-sm text-gray-500 mb-4">Get listed for free at launch — verified profiles receive leads from MenetZero clients and public visitors.</p>
             <a href="{{ route('consultant.register') }}" class="mkt-btn mkt-btn-primary">Apply for listing</a>

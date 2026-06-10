@@ -3,11 +3,10 @@
 @section('title', $consultant['company_name'] . ' — Consultant Directory')
 
 @section('content')
-<section class="py-12 px-4 mkt-section-bg">
-    <div class="max-w-6xl mx-auto">
-        <a href="{{ route('consultant-list.index') }}" class="text-sm text-teal-600 hover:underline mb-6 inline-block">← Back to directory</a>
+<section class="mkt-section mkt-section-bg pt-8">
+    <div class="mkt-container">
+        <a href="{{ route('consultant-list.index') }}" class="text-sm mkt-text-brand hover:underline mb-6 inline-block">← Back to directory</a>
         <div class="grid lg:grid-cols-3 gap-8 items-start">
-            {{-- Profile --}}
             <div class="lg:col-span-2">
                 <div class="mkt-feature-card">
                     @if($consultant['is_featured'])
@@ -65,8 +64,7 @@
                 </p>
             </div>
 
-            {{-- Lead form --}}
-            <div class="mkt-feature-card lg:sticky lg:top-24">
+            <div class="mkt-feature-card lg:sticky lg:top-24" style="padding:1.5rem;">
                 <h2 class="text-xl font-bold text-gray-900 mb-1">Request an introduction</h2>
                 <p class="text-sm text-gray-500 mb-6">
                     Share your details and we will pass this lead to the consultant. They typically respond within 2 business days.
@@ -98,12 +96,12 @@
                         <textarea name="message" id="message" rows="4" class="mkt-form-input" placeholder="e.g. Scope 1 & 2 inventory for a 50-person SME in Dubai…">{{ old('message') }}</textarea>
                         @error('message')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror
                     </div>
-                    <button type="submit" class="mkt-btn mkt-btn-primary w-full justify-center">Send introduction request</button>
+                    <button type="submit" class="mkt-btn mkt-btn-primary mkt-btn-block">Send introduction request</button>
                 </form>
 
                 <p class="text-xs text-gray-400 mt-4 text-center">
                     Already a MenetZero client?
-                    <a href="{{ route('login') }}" class="text-teal-600 hover:underline">Sign in</a> for priority consultant access.
+                    <a href="{{ route('login') }}" class="mkt-text-brand hover:underline">Sign in</a> for priority consultant access.
                 </p>
             </div>
         </div>
