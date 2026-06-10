@@ -28,7 +28,7 @@ class ManagedClientController extends Controller
         $subscription = $this->subscriptions->getActiveSubscription($consultantOrg->id);
         $slotSummary = $this->subscriptions->slotSummary($consultantOrg->id, $subscription);
 
-        return view('consultant.agency.clients.index', compact('consultantOrg', 'engagements', 'slotSummary'));
+        return view('consultant.agency.clients.index', compact('engagements', 'slotSummary'));
     }
 
     public function create()
@@ -38,7 +38,7 @@ class ManagedClientController extends Controller
         $slotSummary = $this->subscriptions->slotSummary($consultantOrg->id, $subscription);
         $defaultPry = $subscription?->contract_year ?? (int) now()->year;
 
-        return view('consultant.agency.clients.create', compact('consultantOrg', 'subscription', 'slotSummary', 'defaultPry'));
+        return view('consultant.agency.clients.create', compact('subscription', 'slotSummary', 'defaultPry'));
     }
 
     public function store(Request $request)
@@ -94,7 +94,6 @@ class ManagedClientController extends Controller
         }
 
         return view('consultant.agency.clients.show', compact(
-            'consultant_agency',
             'engagement',
             'yearUnlockTarget',
             'yearUnlockQuote',
@@ -106,7 +105,7 @@ class ManagedClientController extends Controller
         $consultantOrg = $this->consultantCompany();
         $engagement = $this->managedClients->findForConsultant($consultantOrg->id, $client);
 
-        return view('consultant.agency.clients.edit', compact('consultantOrg', 'engagement'));
+        return view('consultant.agency.clients.edit', compact('engagement'));
     }
 
     public function update(Request $request, int $client)

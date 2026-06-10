@@ -49,7 +49,6 @@ class PackCheckoutController extends Controller
             : null;
 
         return view('consultant.agency.packs.index', compact(
-            'consultant_agency',
             'subscription',
             'slotSummary',
             'plans',
@@ -220,7 +219,6 @@ class PackCheckoutController extends Controller
             'transaction' => $record,
             'gateway' => $gateway,
             'plan' => $plan,
-            'consultant_agency' => $consultantOrg,
             'user' => Auth::user(),
         ]);
     }

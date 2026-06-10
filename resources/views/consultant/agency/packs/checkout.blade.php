@@ -7,9 +7,9 @@
     $meta = $transaction->metadata ?? [];
     $amountMinor = (int) round(((float) $transaction->amount) * 100);
     $headline = match ($transaction->transaction_type) {
-        'consultant_extra_slot' => 'Extra client slots',
-        'consultant_year_unlock' => 'Reporting year unlock',
-        'consultant_renewal' => 'Agency pack renewal',
+        'consultant_agency_extra_slot' => 'Extra client slots',
+        'consultant_agency_year_unlock' => 'Reporting year unlock',
+        'consultant_agency_renewal' => 'Agency pack renewal',
         default => 'Agency pack',
     };
 @endphp
@@ -74,7 +74,7 @@
 
         @php
             $cancelRoute = match ($transaction->transaction_type) {
-                'consultant_renewal' => route('consultant.renewal.index'),
+                'consultant_agency_renewal' => route('consultant.renewal.index'),
                 default => route('consultant.packs.index'),
             };
         @endphp

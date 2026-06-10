@@ -43,7 +43,6 @@ class RenewalController extends Controller
         $planQuotes = $this->subscriptions->planQuotes($consultantOrg, $plans, $nextYear);
 
         return view('consultant.agency.renewal.index', compact(
-            'consultant_agency',
             'subscription',
             'nextYear',
             'engagements',
