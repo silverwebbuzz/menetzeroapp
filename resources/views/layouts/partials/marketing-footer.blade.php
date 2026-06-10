@@ -14,10 +14,10 @@
             <div>
                 <div class="font-semibold text-white mb-3">Product</div>
                 <ul class="space-y-2 text-gray-400">
-                    <li><a href="{{ route('pricing') }}" class="hover:text-white">Pricing</a></li>
+                    <li><a href="{{ route('pricing') }}" class="hover:text-white">Company pricing</a></li>
                     <li><a href="{{ route('consultant-list.index') }}" class="hover:text-white">Find consultants</a></li>
                     <li><a href="{{ route('consultant.landing') }}" class="hover:text-white">Join as consultant</a></li>
-                    <li><a href="{{ route('register') }}" class="hover:text-white">Sign Up</a></li>
+                    <li><a href="{{ route('register') }}" class="hover:text-white">Company sign up</a></li>
                 </ul>
             </div>
             <div>
@@ -38,9 +38,9 @@
         </div>
         <div class="border-t border-gray-800 pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-gray-500">
             <span>&copy; {{ date('Y') }} {{ \App\Models\SiteSetting::get('company_legal_name', $brand) }}. All rights reserved.</span>
-            <div class="flex gap-4">
-                <a href="{{ route('login') }}" class="hover:text-white">Login</a>
-                <a href="{{ route('register') }}" class="hover:text-white">Sign Up</a>
+            <div class="flex flex-wrap gap-x-4 gap-y-1">
+                <a href="{{ route('login') }}" class="hover:text-white">Company sign in</a>
+                <a href="{{ route('consultant.login') }}" class="hover:text-white">Consultant sign in</a>
             </div>
         </div>
     </div>

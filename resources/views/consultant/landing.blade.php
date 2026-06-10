@@ -66,10 +66,10 @@
                 </div>
                 <p class="text-gray-500 mb-6">Agency pricing designed for practices — not retail client rates.</p>
                 <ul class="space-y-3 text-sm text-gray-600">
-                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Consultant 5 from AED 6,495 / year</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Consultant 5, 10, 25 &amp; 50 slot packs</li>
                     <li class="flex items-start"><span class="mkt-checkmark">✓</span> Extra slots without upgrading pack size</li>
                     <li class="flex items-start"><span class="mkt-checkmark">✓</span> Reporting year unlocks mid-contract</li>
-                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Calendar-year contract alignment</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Wholesale pricing after you sign in</li>
                 </ul>
             </div>
         </div>
@@ -122,21 +122,22 @@
                 </div>
             </div>
             <div class="mkt-glass-panel">
-                <h3 class="text-xl font-semibold mb-6 text-white">Agency pack snapshot</h3>
+                <h3 class="text-xl font-semibold mb-6 text-white">Agency packs at a glance</h3>
                 <div class="space-y-0 text-sm">
                     @foreach([
-                        ['Consultant 5', 'AED 6,495 / yr'],
-                        ['Consultant 10', 'AED 9,990 / yr'],
-                        ['Extra slot', 'AED 1,299 / slot'],
+                        ['Consultant 5', '5 managed client workspaces'],
+                        ['Consultant 10', '10 managed client workspaces'],
+                        ['Extra slot', 'Add capacity without changing pack'],
                         ['Free trial', '1 client · data entry'],
                     ] as $i => $row)
-                        <div class="flex justify-between py-3 {{ $i < 3 ? 'border-b border-white/10' : '' }}">
-                            <span class="text-slate-300">{{ $row[0] }}</span>
-                            <span class="font-semibold {{ $i === 3 ? 'text-teal-300' : 'text-white' }}">{{ $row[1] }}</span>
+                        <div class="flex justify-between gap-4 py-3 {{ $i < 3 ? 'border-b border-white/10' : '' }}">
+                            <span class="text-slate-300 shrink-0">{{ $row[0] }}</span>
+                            <span class="font-semibold text-right {{ $i === 3 ? 'text-teal-300' : 'text-white' }}">{{ $row[1] }}</span>
                         </div>
                     @endforeach
                 </div>
-                <a href="{{ route('consultant.register') }}" class="mkt-btn mkt-btn-primary mkt-btn-block mt-6">Get started free</a>
+                <p class="text-xs text-slate-400 mt-4">Pack pricing is visible after you create a consultant account and sign in.</p>
+                <a href="{{ route('consultant.register') }}" class="mkt-btn mkt-btn-primary mkt-btn-block mt-4">Get started free</a>
             </div>
         </div>
     </div>

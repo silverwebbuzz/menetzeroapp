@@ -7,18 +7,17 @@
 
 <section class="mkt-hero">
     <div class="mkt-container max-w-4xl">
-        <div class="mkt-tagline">Simple annual pricing</div>
-        <h1>UAE carbon compliance plans</h1>
+        <div class="mkt-tagline">For companies · self-serve</div>
+        <h1>Company pricing (AED)</h1>
         <p class="mkt-lead">
-            Try Scope 1 &amp; 2 and all disclosure forms free. Upgrade to export reports, bulk import, and connect with consultants.
+            Plans for businesses that want to track and report their own carbon emissions manually on the platform.
+            Try Scope 1 &amp; 2 and all disclosure forms free — upgrade to export reports, bulk import, and connect with consultants.
         </p>
-        <div class="mt-6 flex flex-col items-center gap-2">
-            <span class="mkt-currency-toggle">
-                <a href="{{ route('currency.switch', 'AED') }}" class="{{ $currency === 'AED' ? 'active' : '' }}">AED</a>
-                <a href="{{ route('currency.switch', 'INR') }}" class="{{ $currency === 'INR' ? 'active' : '' }}">INR (₹)</a>
-            </span>
-            <p class="text-xs text-gray-400">Showing prices in {{ $currency }}. Secure checkout in INR (₹) where applicable.</p>
-        </div>
+        <p class="text-sm text-gray-500 mt-4 max-w-2xl mx-auto">
+            Are you a sustainability consultant or agency?
+            <a href="{{ route('consultant.landing') }}" class="mkt-text-brand hover:underline">View consultant features</a>
+            — agency pack pricing is available after you sign in.
+        </p>
     </div>
 </section>
 

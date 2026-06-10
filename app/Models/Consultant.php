@@ -15,6 +15,9 @@ class Consultant extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'google_id',
+        'avatar',
+        'provider',
         'password',
         'phone',
         'company_name',

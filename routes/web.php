@@ -140,6 +140,7 @@ Route::post('/logout', function () {
 
 // OAuth routes
 Route::get('/auth/google', [OAuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/consultant/auth/google', [OAuthController::class, 'redirectToGoogle'])->name('consultant.auth.google');
 Route::get('/auth/google/callback', [OAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
 // Password reset routes

@@ -41,7 +41,7 @@ class PageController extends Controller
             ->orderBy('sort_order')
             ->get();
 
-        $currency = CurrencyService::displayCurrency();
+        $currency = 'AED';
         $settings = SiteSetting::allSettings();
         $plansByCode = $plans->keyBy('plan_code');
         $comparisonColumns = CommercialPlanComparison::PLAN_COLUMNS;

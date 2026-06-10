@@ -114,11 +114,12 @@
                         </div>
                 </div>
                 
+                <p class="text-xs font-semibold uppercase tracking-wide mb-2" style="color: #0ea5a3;">For companies</p>
                 <h1 class="text-3xl font-semibold mb-2" style="color: #111827;">
-                    Welcome back!
+                    Company sign in
                 </h1>
                 <p class="text-sm mb-8" style="color: #4b5563;">
-                    Sign in to MIDDLE EAST NET Zero's platform.
+                    Sign in to track and report your organisation's carbon emissions.
                 </p>
 
                 <div class="mb-6">
@@ -156,8 +157,12 @@
                 </form>
 
                 <p class="mt-6 text-sm text-center" style="color: #6b7280;">
-                    Don't have an account? 
-                    <a href="{{ route('register') }}" class="font-medium" style="color: #0ea5a3;">Sign up</a>
+                    Don't have an account?
+                    <a href="{{ route('register') }}" class="font-medium" style="color: #0ea5a3;">Company sign up</a>
+                </p>
+                <p class="mt-3 text-xs text-center" style="color: #9ca3af;">
+                    Sustainability consultant?
+                    <a href="{{ route('consultant.login') }}" class="font-medium" style="color: #0ea5a3;">Consultant sign in</a>
                 </p>
             </div>
         </div>

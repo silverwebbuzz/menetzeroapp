@@ -6,8 +6,22 @@
 <section class="mkt-section">
     <div class="mkt-container max-w-md">
         <div class="mkt-section-head mb-8">
-            <h2>Apply to the consultant directory</h2>
-            <p>Create your consultant account. You can upload documents after signing in.</p>
+            <div class="mkt-tagline mb-3">For consultants</div>
+            <h2>Create consultant account</h2>
+            <p>Register your practice for the directory and agency hub. Pack pricing is shown after you sign in.</p>
+        </div>
+
+        <div class="mkt-feature-card mb-4" style="padding:1.25rem;">
+            <a href="{{ route('consultant.auth.google') }}" class="mkt-btn mkt-btn-outline mkt-btn-block" style="gap:0.5rem;">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="" class="w-5 h-5">
+                Sign up with Google
+            </a>
+        </div>
+
+        <div class="flex items-center gap-4 text-xs text-gray-400 mb-4 max-w-md mx-auto">
+            <div class="h-px flex-1 bg-gray-200"></div>
+            <span>or email</span>
+            <div class="h-px flex-1 bg-gray-200"></div>
         </div>
 
         <form method="POST" action="{{ route('consultant.register.post') }}" class="mkt-feature-card space-y-4" style="padding:1.5rem;">
@@ -45,6 +59,10 @@
 
         <p class="text-center text-sm text-gray-500 mt-4">
             Already registered? <a href="{{ route('consultant.login') }}" class="mkt-text-brand hover:underline">Sign in</a>
+        </p>
+        <p class="text-center text-xs text-gray-400 mt-3">
+            Need plans for your own company?
+            <a href="{{ route('register') }}" class="mkt-text-brand hover:underline">Company sign up</a>
         </p>
     </div>
 </section>
