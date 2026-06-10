@@ -17,9 +17,9 @@ class AuthController extends Controller
             return redirect()->route('consultant.dashboard');
         }
 
-        $consultantOrgCount = Consultant::query()->where('status', 'approved')->where('is_active', true)->count();
+        $consultantCount = Consultant::query()->where('status', 'approved')->where('is_active', true)->count();
 
-        return view('consultant.landing', compact('partnerCount'));
+        return view('consultant.landing', compact('consultantCount'));
     }
 
     public function showRegister()

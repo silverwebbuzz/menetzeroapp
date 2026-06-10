@@ -8,9 +8,7 @@ use App\Models\ConsultantClientEngagement;
 use App\Models\ConsultantSubscriptionAddon;
 
 /**
- * Entitlements for partner-managed client workspaces (PRY / preview / read-only).
- *
- * @see documentation/PARTNER_AGENCY_PLAN_V1.md §3.1, §7.3
+ * Entitlements for consultant-managed client workspaces (PRY / preview / read-only).
  */
 class ConsultantAgencyEntitlementService
 {
@@ -112,7 +110,7 @@ class ConsultantAgencyEntitlementService
         if (!$engagement) {
             return [
                 'allowed' => false,
-                'message' => 'No active partner engagement for this client workspace.',
+                'message' => 'No active consultant engagement for this client workspace.',
             ];
         }
 
@@ -135,7 +133,7 @@ class ConsultantAgencyEntitlementService
         if ($mode === self::MODE_DENIED) {
             return [
                 'allowed' => false,
-                'message' => 'This managed client workspace is not active on the partner contract.',
+                'message' => 'This managed client workspace is not active on the consultant contract.',
             ];
         }
 
@@ -156,7 +154,7 @@ class ConsultantAgencyEntitlementService
         if (!$engagement || !$engagement->isActive()) {
             return [
                 'allowed' => false,
-                'message' => 'Exports require an active partner engagement for this client.',
+                'message' => 'Exports require an active consultant engagement for this client.',
             ];
         }
 
@@ -172,7 +170,7 @@ class ConsultantAgencyEntitlementService
                 'allowed' => false,
                 'message' => "Fiscal year {$reportingYear} is preview-only. "
                     . "Downloads are available for Primary Reporting Year {$engagement->primary_reporting_year} "
-                    . 'or after a reporting year unlock / partner renewal.',
+                    . 'or after a reporting year unlock / consultant renewal.',
             ],
             self::MODE_READ_ONLY => [
                 'allowed' => false,
@@ -180,7 +178,7 @@ class ConsultantAgencyEntitlementService
             ],
             default => [
                 'allowed' => false,
-                'message' => 'Exports are not available for this reporting year on the partner contract.',
+                'message' => 'Exports are not available for this reporting year on the consultant contract.',
             ],
         };
     }
@@ -202,7 +200,7 @@ class ConsultantAgencyEntitlementService
         $engagement = $this->getActiveEngagement($companyId);
 
         if (!$engagement) {
-            return 'This managed client has no active partner engagement.';
+            return 'This managed client has no active consultant engagement.';
         }
 
         $reportingYear ??= (int) $engagement->primary_reporting_year;
@@ -212,7 +210,7 @@ class ConsultantAgencyEntitlementService
             self::MODE_PREVIEW => "Preview only for fiscal year {$reportingYear}. "
                 . "Full IFRS/GRI and report downloads are enabled for PRY {$engagement->primary_reporting_year} only.",
             self::MODE_READ_ONLY => "Fiscal year {$reportingYear} is read-only for this managed client.",
-            self::MODE_DENIED => 'This client workspace is not active on the current partner contract.',
+            self::MODE_DENIED => 'This client workspace is not active on the current consultant contract.',
             default => null,
         };
     }

@@ -207,12 +207,12 @@
             <h3 class="text-lg font-semibold text-gray-900">Consultant marketplace</h3>
             <p class="text-sm text-gray-600 mt-1">
                 Your plan: <strong>{{ $consultantDirectoryLabel }}</strong>.
-                Verified UAE partners for review and sign-off on your reports.
+                Verified UAE consultants for review and sign-off on your reports.
             </p>
         </div>
         <a href="{{ route('client.consultants.index') }}"
            class="inline-flex px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium rounded-lg">
-            Browse partners
+            Browse consultants
         </a>
     </div>
 

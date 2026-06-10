@@ -144,7 +144,7 @@ class ConsultantAgencySubscriptionService
 
             return $existingId
                 ? ConsultantSubscription::findOrFail($existingId)
-                : throw new RuntimeException('Completed partner transaction is missing subscription reference.');
+                : throw new RuntimeException('Completed consultant transaction is missing subscription reference.');
         }
 
         $metadata = array_merge($transaction->metadata ?? [], $gatewayRefs);

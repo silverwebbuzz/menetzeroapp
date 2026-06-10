@@ -3,7 +3,7 @@
 @section('title', 'Profile')
 
 @section('content')
-<h1 class="text-2xl font-bold text-gray-900 mb-6">Partner profile</h1>
+<h1 class="text-2xl font-bold text-gray-900 mb-6">Directory profile</h1>
 
 <form method="POST" action="{{ route('consultant.profile.update') }}" class="bg-white border border-gray-200 rounded-xl p-6 space-y-5">
     @csrf @method('PUT')

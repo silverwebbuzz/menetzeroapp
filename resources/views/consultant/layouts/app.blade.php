@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Partner Portal') — MENetZero</title>
+    <title>@yield('title', 'Consultant Portal') — MENetZero</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>body { font-family: 'Poppins', system-ui, sans-serif; }</style>
@@ -12,7 +12,7 @@
 <body class="bg-slate-50 text-gray-900 min-h-screen">
     <nav class="bg-white border-b border-gray-200">
         <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-            <a href="{{ route('consultant.dashboard') }}" class="font-semibold text-teal-700">MENetZero Partner</a>
+            <a href="{{ route('consultant.dashboard') }}" class="font-semibold text-teal-700">MENetZero Consultant</a>
             <div class="flex items-center gap-4 text-sm">
                 <a href="{{ route('consultant.dashboard') }}" class="text-gray-600 hover:text-teal-600">Dashboard</a>
                 <a href="{{ route('consultant.clients.index') }}" class="text-gray-600 hover:text-teal-600">Clients</a>

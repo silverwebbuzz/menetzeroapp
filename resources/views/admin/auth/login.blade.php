@@ -157,7 +157,7 @@
                 </form>
 
                 <p class="mt-6 text-sm text-center" style="color: #6b7280;">
-                    <a href="{{ route('login') }}" class="font-medium" style="color: #7c3aed;">← Back to Client/Partner Login</a>
+                    <a href="{{ route('login') }}" class="font-medium" style="color: #7c3aed;">← Back to Client/Consultant Login</a>
                 </p>
             </div>
         </div>

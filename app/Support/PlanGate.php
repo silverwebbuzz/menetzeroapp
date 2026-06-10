@@ -291,7 +291,7 @@ class PlanGate
         return match ($level) {
             'partial' => 'Request intro',
             'full' => 'Full connect',
-            'priority' => 'Priority partner',
+            'priority' => 'Priority consultant',
             default => 'Teaser only',
         };
     }

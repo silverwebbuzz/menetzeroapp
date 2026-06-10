@@ -95,7 +95,7 @@
                     </div>
                     <div class="sm:col-span-2">
                         <label class="block font-medium text-gray-700 mb-1">Reason (shown to client)</label>
-                        <input type="text" name="note" required placeholder="e.g. Pilot partner, NGO programme, launch promo" class="w-full border rounded-lg px-3 py-2">
+                        <input type="text" name="note" required placeholder="e.g. Pilot consultant, NGO programme, launch promo" class="w-full border rounded-lg px-3 py-2">
                     </div>
                     <div class="sm:col-span-2">
                         <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700" onclick="return confirm('Grant this plan at no charge?')">

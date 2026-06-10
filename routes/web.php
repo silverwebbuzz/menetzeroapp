@@ -159,7 +159,7 @@ Route::middleware(['auth:web'])->group(function () {
     Route::post('/account/switch', [\App\Http\Controllers\AccountSelectorController::class, 'switch'])->name('account.switch');
 });
 
-// Profile Routes - Separate for Client and Partner
+// Profile Routes - Separate for Client and Consultant
 
 // Client Routes - Use web guard (default)
 Route::middleware([
@@ -319,7 +319,7 @@ Route::middleware([
         Route::delete('/invitations/{invitation}', [\App\Http\Controllers\StaffManagementController::class, 'cancelInvitation'])->name('cancel-invitation');
     });
     
-    // Subscription & Billing routes (not for partner-managed client workspaces)
+    // Subscription & Billing routes (not for consultant-managed client workspaces)
     Route::prefix('subscriptions')->name('subscriptions.')->middleware('restrictManagedClientBilling')->group(function () {
         Route::get('/', [\App\Http\Controllers\Client\SubscriptionController::class, 'index'])->name('index');
         Route::get('/current-plan', [\App\Http\Controllers\Client\SubscriptionController::class, 'currentPlan'])->name('current-plan');

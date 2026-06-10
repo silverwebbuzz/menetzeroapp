@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Partner Registration — MENetZero')
+@section('title', 'Consultant Registration — MENetZero')
 
 @section('content')
 <div class="max-w-md mx-auto px-4 py-12">

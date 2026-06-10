@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="max-w-3xl mx-auto">
-    <a href="{{ route('client.consultants.index') }}" class="text-sm text-teal-600 hover:underline">&larr; All partners</a>
+    <a href="{{ route('client.consultants.index') }}" class="text-sm text-teal-600 hover:underline">&larr; All consultants</a>
 
     <div class="bg-white border border-gray-200 rounded-xl p-6 mt-4">
         <h1 class="text-2xl font-bold text-gray-900">{{ $consultant['display_name'] }}</h1>

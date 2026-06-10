@@ -235,7 +235,7 @@
 
     <div class="mb-12">
         <h2 class="text-2xl font-bold text-gray-900 mb-1">Consultant review packs</h2>
-        <p class="text-sm text-gray-500 mb-4">Optional human review via verified partners. Checkout integration coming soon — contact sales to bundle today.</p>
+        <p class="text-sm text-gray-500 mb-4">Optional human review via verified consultants. Checkout integration coming soon — contact sales to bundle today.</p>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             @foreach($consultantAddOns as $addon)
                 <div class="bg-white rounded-xl border border-gray-200 p-5">

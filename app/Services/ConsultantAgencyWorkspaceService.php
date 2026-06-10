@@ -9,9 +9,9 @@ use Illuminate\Support\Collection;
 use RuntimeException;
 
 /**
- * Partner user "acting as" a managed client workspace (P17).
+ * Consultant user "acting as" a managed client workspace (P17).
  *
- * Session key holds managed company id; partner home org comes from the user's owned company.
+ * Session key holds managed company id; consultant home org comes from the user's owned company.
  */
 class ConsultantAgencyWorkspaceService
 {
@@ -170,7 +170,7 @@ class ConsultantAgencyWorkspaceService
             ->first();
 
         if (!$managed) {
-            throw new RuntimeException('Managed client not found for this partner.');
+            throw new RuntimeException('Managed client not found for this consultant organisation.');
         }
 
         $engagement = app(ConsultantAgencyEntitlementService::class)->getActiveEngagement($managed->id);

@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * P18 — Validates partner ↔ managed client workspace session on client routes.
+ * P18 — Validates consultant ↔ managed client workspace session on client routes.
  */
 class EnsureConsultantManagedWorkspace
 {

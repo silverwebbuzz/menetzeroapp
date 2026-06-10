@@ -1,7 +1,7 @@
 @extends('admin.layouts.app')
 
 @section('title', 'Consultants | MENetZero')
-@section('page-title', 'Consultant partners')
+@section('page-title', 'Consultants')
 
 @section('content')
     @if(session('success'))

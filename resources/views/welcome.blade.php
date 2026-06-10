@@ -452,7 +452,7 @@
         </div>
     </section>
 
-    <!-- Consultant Partner Programme -->
+    <!-- Consultant Programme -->
     <section class="py-20 px-4 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
         <div class="max-w-6xl mx-auto">
             <div class="grid md:grid-cols-2 gap-12 items-center">
@@ -460,16 +460,16 @@
                     <span class="inline-block px-3 py-1 rounded-full bg-teal-500/20 text-teal-300 text-xs font-semibold mb-4">For sustainability professionals</span>
                     <h2 class="text-4xl font-bold mb-4">Are you a carbon consultant in the UAE?</h2>
                     <p class="text-lg text-slate-300 mb-6">
-                        Join the MENetZero verified partner directory. Our platform prepares SME inventories and disclosures —
+                        Join the MENetZero verified consultant directory. Our platform prepares SME inventories and disclosures —
                         you review, sign off, and deliver the human trust layer clients expect.
                     </p>
                     <ul class="space-y-3 text-slate-300 mb-8">
-                        <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> Free listing for vetted partners at launch</li>
+                        <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> Free listing for vetted consultants at launch</li>
                         <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> Qualified leads from Starter &amp; Growth subscribers</li>
                         <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> Marketplace payouts via platform escrow (coming soon)</li>
                     </ul>
                     <div class="flex flex-wrap gap-3">
-                        <a href="{{ route('consultant.register') }}" class="btn btn-primary">Apply as a partner</a>
+                        <a href="{{ route('consultant.register') }}" class="btn btn-primary">Apply as a consultant</a>
                         <a href="{{ route('consultant.landing') }}" class="btn btn-outline" style="color: white; border-color: rgba(255,255,255,0.4);">Learn more</a>
                     </div>
                 </div>

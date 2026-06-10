@@ -1,10 +1,10 @@
 @extends('layouts.public')
 
-@section('title', 'Partner Sign In — MENetZero')
+@section('title', 'Consultant Sign In — MENetZero')
 
 @section('content')
 <div class="max-w-md mx-auto px-4 py-12">
-    <h1 class="text-2xl font-bold text-gray-900 mb-2">Partner sign in</h1>
+    <h1 class="text-2xl font-bold text-gray-900 mb-2">Consultant sign in</h1>
     <p class="text-sm text-gray-600 mb-6">Access your consultant dashboard, documents, and client leads.</p>
 
     <form method="POST" action="{{ route('consultant.login.post') }}" class="space-y-4 bg-white border border-gray-200 rounded-xl p-6">

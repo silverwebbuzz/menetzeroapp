@@ -34,7 +34,7 @@ class ConsultantDirectoryController extends Controller
 
         return view('client.consultants.index', [
             'level' => $level,
-            'partnerCount' => $this->directory->approvedCount(),
+            'consultantCount' => $this->directory->approvedCount(),
             'consultants' => $paginated,
             'canRequestIntro' => $this->directory->canRequestIntro($companyId),
             'consultantAddOns' => CommercialPlanComparison::consultantAddOns(),
@@ -70,7 +70,7 @@ class ConsultantDirectoryController extends Controller
         }
 
         if (!$this->directory->canRequestIntro($companyId)) {
-            return back()->with('error', 'Upgrade to Starter or above to request an introduction to verified partners.');
+            return back()->with('error', 'Upgrade to Starter or above to request an introduction to verified consultants.');
         }
 
         $data = $request->validate([

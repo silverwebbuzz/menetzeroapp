@@ -78,7 +78,7 @@ class ConsultantDemoSeeder extends Seeder
         ];
 
         $companySuffixes = [
-            'Advisory', 'Consulting', 'Partners', 'Solutions', 'Associates', 'Group', 'Experts', 'Services', 'Labs', 'Studio',
+            'Advisory', 'Consulting', 'Solutions', 'Associates', 'Group', 'Experts', 'Services', 'Labs', 'Studio',
         ];
 
         $emirateKeys = array_keys(ConsultantOptions::EMIRATES);

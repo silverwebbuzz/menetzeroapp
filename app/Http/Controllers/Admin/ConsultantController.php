@@ -54,7 +54,7 @@ class ConsultantController extends Controller
 
         app(ConsultantAccountService::class)->ensureLinked($consultant);
 
-        return back()->with('success', 'Partner approved — listed in directory and agency hub linked.');
+        return back()->with('success', 'Consultant approved — listed in directory and agency hub linked.');
     }
 
     public function reject(Request $request, Consultant $consultant)
@@ -89,7 +89,7 @@ class ConsultantController extends Controller
     {
         $consultant->update(['is_featured' => !$consultant->is_featured]);
 
-        return back()->with('success', $consultant->is_featured ? 'Marked as featured partner.' : 'Removed featured flag.');
+        return back()->with('success', $consultant->is_featured ? 'Marked as featured consultant.' : 'Removed featured flag.');
     }
 
     public function downloadDocument(Consultant $consultant, int $documentId)

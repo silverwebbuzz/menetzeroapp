@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * P18 — Routes that do not apply to partner-managed client workspaces.
+ * P18 — Routes that do not apply to consultant-managed client workspaces.
  */
 class RestrictManagedClientWorkspace
 {

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * P15 — Agency routes: consultant session (primary) or linked web partner user.
+ * P15 — Agency routes: consultant session (primary) or linked web user.
  */
 class EnsureConsultantAgencyAccess
 {

@@ -102,7 +102,7 @@
 
     <div class="mb-12">
         <h2 class="text-2xl font-bold text-gray-900 mb-2">Consultant review packs</h2>
-        <p class="text-sm text-gray-500 mb-5">Optional human review via verified UAE partners — software prepares, consultants sign off.</p>
+        <p class="text-sm text-gray-500 mb-5">Optional human review via verified UAE consultants — software prepares, consultants sign off.</p>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             @foreach($consultantAddOns as $addon)
                 <div class="bg-white rounded-xl border border-gray-200 p-5">
@@ -118,7 +118,7 @@
 
     <p class="text-center text-sm text-gray-500 max-w-2xl mx-auto">
         Reports are draft working papers for your compliance workflow.
-        Third-party verification is available through our consultant partners — not a substitute for MOCCAE-authorised verification unless contracted.
+        Third-party verification is available through our consultant directory — not a substitute for MOCCAE-authorised verification unless contracted.
     </p>
     <p class="text-center text-xs text-gray-400 mt-4">
         Prices exclude applicable taxes.

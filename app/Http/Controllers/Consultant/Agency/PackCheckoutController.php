@@ -328,7 +328,7 @@ class PackCheckoutController extends Controller
         try {
             $this->paymentCompletion->complete($transaction, $gatewayRefs);
         } catch (\Throwable $e) {
-            Log::error('Partner payment activation failed', [
+            Log::error('Consultant agency payment activation failed', [
                 'transaction_id' => $transaction->id,
                 'type' => $transaction->transaction_type,
                 'error' => $e->getMessage(),

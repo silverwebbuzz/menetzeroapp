@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Consultant partners')
+@section('title', 'Consultant directory')
 
 @section('content')
 <div class="max-w-5xl mx-auto">
     <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">Verified consultant partners</h1>
+        <h1 class="text-2xl font-bold text-gray-900">Verified consultants</h1>
         <p class="text-sm text-gray-600 mt-1">
             Software prepares your data — consultants review, sign off, and support verification-style workflows.
             Your access: <strong>{{ $directoryLabel }}</strong>.
@@ -22,9 +22,9 @@
     @if($level === 'teaser')
         <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 mb-6">
             <p class="text-gray-700">
-                <strong>{{ max($partnerCount, 1) }}+ verified partners</strong> in the UAE directory.
+                <strong>{{ max($consultantCount, 1) }}+ verified consultants</strong> in the UAE directory.
                 Upgrade to <a href="{{ route('subscriptions.upgrade') }}" class="text-teal-600 hover:underline">Starter</a>
-                to see partner names and request introductions.
+                to see consultant names and request introductions.
             </p>
         </div>
     @endif
@@ -33,7 +33,7 @@
         @forelse($consultants as $c)
             <div class="bg-white border border-gray-200 rounded-xl p-5 {{ ($c['is_featured'] ?? false) ? 'ring-2 ring-teal-400' : '' }}">
                 @if($c['is_featured'] ?? false)
-                    <span class="text-[10px] font-semibold uppercase tracking-wide text-teal-600">Featured partner</span>
+                    <span class="text-[10px] font-semibold uppercase tracking-wide text-teal-600">Featured consultant</span>
                 @endif
                 <h3 class="text-lg font-semibold text-gray-900 {{ $level === 'teaser' ? 'blur-sm select-none' : '' }}">
                     {{ $c['display_name'] }}
@@ -58,7 +58,7 @@
             </div>
         @empty
             <div class="col-span-2 bg-white border border-gray-200 rounded-xl p-8 text-center text-gray-500">
-                Partner directory launching soon. Check back after our first consultants are approved.
+                Consultant directory launching soon. Check back after our first consultants are approved.
             </div>
         @endforelse
     </div>

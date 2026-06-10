@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
 /**
- * P20 — Partner contract renewal: select clients + PRY for the next calendar year.
+ * P20 — Consultant contract renewal: select clients + PRY for the next calendar year.
  */
 class ConsultantAgencyRenewalService
 {

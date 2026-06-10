@@ -24,43 +24,27 @@ return new class extends Migration
             );
         }
 
-        $legacyCodes = [
-            'consultant_5' => 'partner_5',
-            'consultant_10' => 'partner_10',
-            'consultant_25' => 'partner_25',
-            'consultant_50' => 'partner_50',
-        ];
-
         foreach (ConsultantAgencyPlanMatrix::packDefinitions() as $code => $definition) {
             $priceAnnual = (float) $definition['price_annual'];
             $priceInr = PlanEntitlementDefaults::defaultPriceInr($priceAnnual);
 
-            $payload = [
-                'plan_name' => $definition['plan_name'],
-                'plan_category' => $definition['plan_category'],
-                'description' => $definition['description'],
-                'price_annual' => $priceAnnual,
-                'price_inr' => $priceInr,
-                'currency' => $definition['currency'],
-                'billing_cycle' => $definition['billing_cycle'],
-                'is_active' => $definition['is_active'],
-                'sort_order' => $definition['sort_order'],
-                'limits' => $definition['limits'],
-                'entitlements' => $definition['entitlements'],
-                'features' => $definition['features'],
-            ];
-
-            $legacyCode = $legacyCodes[$code] ?? null;
-            $legacyPlan = $legacyCode
-                ? SubscriptionPlan::where('plan_code', $legacyCode)->first()
-                : null;
-
-            if ($legacyPlan) {
-                $legacyPlan->update(array_merge($payload, ['plan_code' => $code]));
-                continue;
-            }
-
-            SubscriptionPlan::updateOrCreate(['plan_code' => $code], $payload);
+            SubscriptionPlan::updateOrCreate(
+                ['plan_code' => $code],
+                [
+                    'plan_name' => $definition['plan_name'],
+                    'plan_category' => $definition['plan_category'],
+                    'description' => $definition['description'],
+                    'price_annual' => $priceAnnual,
+                    'price_inr' => $priceInr,
+                    'currency' => $definition['currency'],
+                    'billing_cycle' => $definition['billing_cycle'],
+                    'is_active' => $definition['is_active'],
+                    'sort_order' => $definition['sort_order'],
+                    'limits' => $definition['limits'],
+                    'entitlements' => $definition['entitlements'],
+                    'features' => $definition['features'],
+                ]
+            );
         }
     }
 

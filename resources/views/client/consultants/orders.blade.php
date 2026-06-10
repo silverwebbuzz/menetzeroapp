@@ -9,7 +9,7 @@
             <h1 class="text-2xl font-bold text-gray-900">Consultant orders</h1>
             <p class="text-sm text-gray-600 mt-1">Review packs purchased through MenetZero escrow.</p>
         </div>
-        <a href="{{ route('client.consultants.index') }}" class="text-sm text-teal-600 hover:underline">Browse partners</a>
+        <a href="{{ route('client.consultants.index') }}" class="text-sm text-teal-600 hover:underline">Browse consultants</a>
     </div>
 
     @if(session('success'))

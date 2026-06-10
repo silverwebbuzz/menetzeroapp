@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Managed clients have no direct subscription — billing lives on the partner account.
+ * Managed clients have no direct subscription — billing lives on the consultant account.
  */
 class RestrictManagedClientBilling
 {
