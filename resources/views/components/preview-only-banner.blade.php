@@ -5,6 +5,12 @@
     'upgradeUrl' => null,
 ])
 
+@php
+    $planGate = \App\Support\PlanGate::forUser(auth('web')->user());
+    $resolvedUpgradeUrl = $upgradeUrl ?? $planGate->upgradeRoute();
+    $resolvedUpgradeLabel = $upgradeLabel ?? $planGate->upgradeButtonLabel('View plans');
+@endphp
+
 <div {{ $attributes->merge(['class' => 'mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3']) }}>
     <div class="flex items-start gap-3">
         <svg class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -13,8 +19,8 @@
         <p class="text-sm text-amber-900">{{ $message }}</p>
     </div>
     @if($showUpgrade)
-        <a href="{{ $upgradeUrl ?? route('subscriptions.upgrade') }}" class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-amber-600 rounded-lg hover:bg-amber-700 whitespace-nowrap">
-            {{ $upgradeLabel }}
+        <a href="{{ $resolvedUpgradeUrl }}" class="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold text-white bg-amber-600 rounded-lg hover:bg-amber-700 whitespace-nowrap">
+            {{ $resolvedUpgradeLabel }}
         </a>
     @endif
 </div>

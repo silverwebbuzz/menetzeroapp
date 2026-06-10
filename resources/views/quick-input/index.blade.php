@@ -61,10 +61,14 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <h2 class="text-xl font-bold text-gray-900 mb-2">Bulk import — Scope 1 &amp; 2</h2>
-                    <p class="text-gray-600 text-sm">Upload DEWA bills, fuel receipts, and fleet data in one Excel or CSV file. Available on <strong>Starter</strong> (AED 1,499/year) and above.</p>
+                    @if($gate->isAgencyWorkspace())
+                        <p class="text-gray-600 text-sm">Upload DEWA bills, fuel receipts, and fleet data in one Excel or CSV file. {{ $gate->agencyLockedMessage('Bulk import') }}</p>
+                    @else
+                        <p class="text-gray-600 text-sm">Upload DEWA bills, fuel receipts, and fleet data in one Excel or CSV file. Available on <strong>Starter</strong> (AED 1,499/year) and above.</p>
+                    @endif
                 </div>
-                <a href="{{ route('subscriptions.upgrade') }}" class="inline-flex items-center px-5 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-lg hover:bg-emerald-700 whitespace-nowrap">
-                    Upgrade to Starter
+                <a href="{{ $gate->upgradeRoute() }}" class="inline-flex items-center px-5 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-lg hover:bg-emerald-700 whitespace-nowrap">
+                    {{ $gate->upgradeButtonLabel('Upgrade to Starter') }}
                 </a>
             </div>
         @else
@@ -150,8 +154,12 @@
                     </div>
                     @if($scopeKey === 'Scope 3' && $gate->isScope3Locked())
                         <div class="rounded-xl border border-purple-200 bg-purple-50 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                            <p class="text-sm text-gray-700">Scope 3 covers your value chain — purchased goods, travel, commuting, and more. Unlock preview mode on <strong>Starter</strong>.</p>
-                            <a href="{{ route('subscriptions.upgrade') }}" class="inline-flex items-center px-4 py-2 bg-purple-600 text-white text-sm font-semibold rounded-lg hover:bg-purple-700 whitespace-nowrap">Unlock Scope 3</a>
+                            @if($gate->isAgencyWorkspace())
+                                <p class="text-sm text-gray-700">Scope 3 covers your value chain — purchased goods, travel, commuting, and more. {{ $gate->agencyLockedMessage('Scope 3') }}</p>
+                            @else
+                                <p class="text-sm text-gray-700">Scope 3 covers your value chain — purchased goods, travel, commuting, and more. Unlock preview mode on <strong>Starter</strong>.</p>
+                            @endif
+                            <a href="{{ $gate->upgradeRoute() }}" class="inline-flex items-center px-4 py-2 bg-purple-600 text-white text-sm font-semibold rounded-lg hover:bg-purple-700 whitespace-nowrap">{{ $gate->upgradeButtonLabel('Unlock Scope 3') }}</a>
                         </div>
                     @else
                     <div class="flex flex-wrap gap-4 pb-2">

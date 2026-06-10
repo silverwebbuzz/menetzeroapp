@@ -112,6 +112,44 @@ class PlanGate
         return app(ConsultantAgencyEntitlementService::class)->isManagedClient($this->companyId);
     }
 
+    /** Consultant is working inside a managed client workspace (not direct client billing). */
+    public function isAgencyWorkspace(): bool
+    {
+        return $this->isManagedClient();
+    }
+
+    public function agencyLockedMessage(string $featureName = 'This feature'): string
+    {
+        return "{$featureName} is only available on paid agency packs.";
+    }
+
+    public function upgradeRoute(): string
+    {
+        if ($this->isAgencyWorkspace()) {
+            return route('consultant.packs.index');
+        }
+
+        return route('subscriptions.upgrade');
+    }
+
+    public function upgradeButtonLabel(string $clientLabel = 'View plans'): string
+    {
+        if ($this->isAgencyWorkspace()) {
+            return 'View agency packs';
+        }
+
+        return $clientLabel;
+    }
+
+    public function lockedFeatureMessage(string $clientMessage, string $featureName = 'This feature'): string
+    {
+        if ($this->isAgencyWorkspace()) {
+            return $this->agencyLockedMessage($featureName);
+        }
+
+        return $clientMessage;
+    }
+
     public function managedReportingYearMode(?int $fiscalYear = null): ?string
     {
         if (!$this->companyId || !$this->isManagedClient() || $fiscalYear === null) {

@@ -1,6 +1,7 @@
 @props(['fiscalYear' => null, 'exportCode' => null])
 
 @php
+    $gate = \App\Support\PlanGate::forUser(auth('web')->user());
     $consultantBannerMessage = $gate->managedPreviewBannerMessage($fiscalYear);
     $canExport = $exportCode
         ? $gate->canDisclosureExportType($exportCode, $fiscalYear)
@@ -11,6 +12,7 @@
     <x-preview-only-banner :message="$consultantBannerMessage" :show-upgrade="false" />
 @elseif(!$canExport)
     <x-preview-only-banner
-        :message="$gate->disclosureExportMessage($fiscalYear)"
-        upgrade-label="Upgrade to Growth" />
+        :message="$gate->lockedFeatureMessage($gate->disclosureExportMessage($fiscalYear), 'Report downloads')"
+        :upgrade-label="$gate->upgradeButtonLabel('Upgrade to Growth')"
+        :upgrade-url="$gate->upgradeRoute()" />
 @endif

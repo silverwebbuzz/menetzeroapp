@@ -220,14 +220,14 @@
                 </button>
                 <div x-show="scope3Open" x-transition.origin.top class="ml-5 space-y-0.5 border-l border-slate-200 pl-2 mb-2">
                     @if($scope3Locked)
-                        <a href="{{ route('subscriptions.upgrade') }}"
+                        <a href="{{ isset($gate) && $gate->isAgencyWorkspace() ? route('consultant.packs.index') : route('subscriptions.upgrade') }}"
                            class="nav-link text-[0.8125rem] opacity-80"
                            style="padding-top:0.375rem;padding-bottom:0.375rem;"
-                           title="Available on Starter and above">
+                           title="{{ isset($gate) && $gate->isAgencyWorkspace() ? $gate->agencyLockedMessage('Scope 3') : 'Available on Starter and above' }}">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:1rem;height:1rem;margin:0;">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                             </svg>
-                            Unlock on Starter
+                            {{ isset($gate) && $gate->isAgencyWorkspace() ? 'Paid agency packs' : 'Unlock on Starter' }}
                         </a>
                     @else
                         @foreach($scope3Sources as $source)

@@ -109,11 +109,15 @@
                 <p class="text-sm text-gray-600 mb-4">
                     Your plan allows <strong>{{ $scope3Limit }}</strong> entry per Scope 3 category.
                     You've reached the limit for <strong>{{ $userFriendlyName ?? $emissionSource->name }}</strong>.
-                    Upgrade to <strong>Enterprise</strong> for full Scope 3 reporting.
+                    @if($gate->isAgencyWorkspace())
+                        {{ $gate->agencyLockedMessage('Full Scope 3 reporting') }}
+                    @else
+                        Upgrade to <strong>Enterprise</strong> for full Scope 3 reporting.
+                    @endif
                 </p>
-                <a href="{{ route('subscriptions.upgrade') }}"
+                <a href="{{ $gate->upgradeRoute() }}"
                    class="inline-flex items-center px-5 py-2.5 bg-purple-600 text-white text-sm font-semibold rounded-lg hover:bg-purple-700 transition-colors shadow-sm">
-                    View upgrade plans
+                    {{ $gate->upgradeButtonLabel('View upgrade plans') }}
                     <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                     </svg>

@@ -179,8 +179,8 @@
 
         @if($previewOnly)
             <x-preview-only-banner
-                message="In-app preview only on your plan. Upgrade to Starter (from AED 1,499/year) to download GHG, Excel, and IEQT exports."
-                upgrade-label="Upgrade to Starter" />
+                :message="$gate->lockedFeatureMessage('In-app preview only on your plan. Upgrade to Starter (from AED 1,499/year) to download GHG, Excel, and IEQT exports.', 'Report downloads')"
+                :upgrade-label="$gate->upgradeButtonLabel('Upgrade to Starter')" />
         @endif
 
         {{-- Report header --}}
