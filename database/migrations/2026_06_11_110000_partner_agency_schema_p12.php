@@ -42,8 +42,8 @@ return new class extends Migration
                 $table->json('metadata')->nullable();
                 $table->timestamps();
 
-                $table->index(['partner_company_id', 'status']);
-                $table->index(['partner_company_id', 'contract_year']);
+                $table->index(['partner_company_id', 'status'], 'ps_partner_status_idx');
+                $table->index(['partner_company_id', 'contract_year'], 'ps_partner_year_idx');
             });
         }
 
@@ -63,8 +63,8 @@ return new class extends Migration
                 $table->string('display_name')->nullable();
                 $table->timestamps();
 
-                $table->index(['partner_company_id', 'status']);
-                $table->index(['managed_company_id', 'partner_company_id']);
+                $table->index(['partner_company_id', 'status'], 'pce_partner_status_idx');
+                $table->index(['managed_company_id', 'partner_company_id'], 'pce_managed_partner_idx');
             });
         }
 
@@ -84,7 +84,7 @@ return new class extends Migration
                 $table->json('metadata')->nullable();
                 $table->timestamps();
 
-                $table->index('partner_subscription_id');
+                $table->index('partner_subscription_id', 'psa_subscription_idx');
             });
         }
 
