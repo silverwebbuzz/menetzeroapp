@@ -10,35 +10,37 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
+        /* Consultant design system — Primary #1563EB · Navy #021D71 */
         const BRAND = {
-            50:  '#eff6ff',
-            100: '#dbeafe',
-            200: '#bfdbfe',
-            300: '#93c5fd',
-            400: '#60a5fa',
-            500: '#3b82f6',
-            600: '#2563eb',
-            700: '#1d4ed8',
-            800: '#1e40af',
-            900: '#1e3a8a',
+            50:  '#eef4fe',
+            100: '#dce9fd',
+            200: '#b9d3fb',
+            300: '#8cb8f8',
+            400: '#5a97f2',
+            500: '#1563eb',
+            600: '#1254c9',
+            700: '#0f459f',
+            800: '#0c3678',
+            900: '#021d71',
         };
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        brand: { DEFAULT: BRAND[600], dark: BRAND[700], soft: BRAND[50], ...BRAND },
+                        brand: { DEFAULT: BRAND[500], dark: BRAND[900], soft: BRAND[50], ...BRAND },
                         indigo: BRAND,
                         purple: BRAND,
                         violet: BRAND,
                         teal: BRAND,
                         emerald: BRAND,
+                        blue: BRAND,
                     },
                     fontFamily: {
-                        sans: ['Inter', 'Poppins', 'system-ui', 'sans-serif'],
+                        sans: ['Manrope', 'system-ui', 'sans-serif'],
                     },
                 },
             },
@@ -46,7 +48,7 @@
     </script>
 
     <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260612">
-    <link rel="stylesheet" href="{{ asset('css/consultant-shell.css') }}?v=20260611">
+    <link rel="stylesheet" href="{{ asset('css/consultant-shell.css') }}?v=20260613">
 
     @stack('styles')
 
@@ -54,7 +56,7 @@
 
     @stack('head')
 </head>
-<body class="antialiased">
+<body class="antialiased consultant-portal">
     @php
         $consultant = auth('consultant')->user();
         $userInitial = strtoupper(substr($consultant->name ?? '?', 0, 1));
