@@ -14,24 +14,22 @@
     font-family: 'Poppins', system-ui, -apple-system, sans-serif;
 }
 
-/* Prevent overflow issues */
-.w-full {
+/* Scoped overflow prevention — quick-input form only (do not touch global .w-full / .grid) */
+form[data-source-id] {
+    box-sizing: border-box !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+}
+
+form[data-source-id] .w-full {
     box-sizing: border-box !important;
     max-width: 100% !important;
     width: 100% !important;
 }
 
-/* Ensure grid containers don't overflow */
-.grid {
+form[data-source-id] .grid {
     box-sizing: border-box !important;
     max-width: 100% !important;
-}
-
-/* Form container overflow prevention */
-form[data-source-id] {
-    box-sizing: border-box !important;
-    max-width: 100% !important;
-    overflow-x: hidden !important;
 }
 
 /* Form Group Spacing - Horizontal Layout */
@@ -661,22 +659,26 @@ button {
     transition: all 0.2s ease-in-out;
 }
 
-/* Table improvements */
-table {
+/* Table improvements — scoped to quick-input pages only */
+form[data-source-id] table,
+.content-area .mt-8.bg-white table.min-w-full {
     border-collapse: separate;
     border-spacing: 0;
 }
 
-thead th {
+form[data-source-id] thead th,
+.content-area .mt-8.bg-white table.min-w-full thead th {
     font-weight: 600;
     letter-spacing: 0.05em;
 }
 
-tbody tr {
+form[data-source-id] tbody tr,
+.content-area .mt-8.bg-white table.min-w-full tbody tr {
     transition: background-color 0.15s ease;
 }
 
-tbody tr:hover {
+form[data-source-id] tbody tr:hover,
+.content-area .mt-8.bg-white table.min-w-full tbody tr:hover {
     background-color: #f9fafb;
 }
 

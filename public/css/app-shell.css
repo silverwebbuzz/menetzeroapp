@@ -856,7 +856,7 @@ table.min-w-full tbody tr:hover { background-color: var(--canvas); }
    trying to be a button (has padding + rounded + either a colour bg or
    a border) gets the design-system shape. */
 .content-area a[class*="px-"][class*="py-"][class*="rounded"],
-.content-area button[class*="px-"][class*="py-"][class*="rounded"]:not(.mobile-menu-btn):not([role="tab"]) {
+.content-area button[class*="px-"][class*="py-"][class*="rounded"]:not(.mobile-menu-btn):not([role="tab"]):not(.tab-button) {
     font-family: inherit;
     font-size: 0.875rem !important;
     font-weight: 500 !important;
@@ -964,9 +964,8 @@ table.min-w-full tbody tr:hover { background-color: var(--canvas); }
 .content-area input[type="url"]:not(.btn),
 .content-area input[type="search"]:not(.btn),
 .content-area textarea:not(.btn) {
-    display: block;
-    width: 100%;
     min-height: 2.375rem;
+    max-width: 100%;
     padding: 0.5rem 0.75rem;
     font-size: 0.875rem;
     line-height: 1.4;
@@ -1274,4 +1273,34 @@ table.min-w-full tbody tr:hover { background-color: var(--canvas); }
     background: var(--brand-soft);
     color: var(--brand-darker);
     border: 1px solid var(--brand-softer);
+}
+
+/* Plan comparison tables (subscriptions upgrade — was mkt-table on public CSS) */
+.plan-comparison-table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xs);
+}
+
+.plan-comparison-table {
+    width: 100%;
+    min-width: 36rem;
+    table-layout: fixed;
+}
+
+.plan-comparison-table thead th:first-child,
+.plan-comparison-table tbody td:first-child {
+    width: 28%;
+    text-align: left;
+    white-space: normal;
+}
+
+.plan-comparison-table thead th.text-center,
+.plan-comparison-table tbody td.text-center {
+    text-align: center;
+}
+
+.plan-comparison-table tbody td.text-center {
+    vertical-align: middle;
 }
