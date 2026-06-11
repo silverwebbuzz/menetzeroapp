@@ -46,19 +46,136 @@ form[data-source-id] {
     box-sizing: border-box !important;
 }
 
-/* Main Information Section - 60% for labels, 40% for inputs */
-.main-information-section .form-group-horizontal {
-    grid-template-columns: 60% 40% !important;
-    gap: 1rem !important;
-    max-width: 100% !important;
+/* Main Information panel — enterprise card (matches Additional Data) */
+.main-information-panel {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    padding: 1.25rem;
+    min-height: 100%;
+    box-shadow: 0 1px 3px 0 rgb(15 23 42 / 0.06), 0 1px 2px 0 rgb(15 23 42 / 0.04);
 }
 
-.main-information-section .form-label-wrapper {
-    grid-column: 1;
+.main-information-panel__header {
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
 }
 
-.main-information-section .form-input-wrapper {
-    grid-column: 2;
+.main-information-panel__title {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: #0f172a;
+    letter-spacing: -0.01em;
+    margin: 0;
+}
+
+.main-information-panel__subtitle {
+    margin: 0.25rem 0 0;
+    font-size: 0.8125rem;
+    color: #64748b;
+}
+
+.main-information-panel__fields {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.125rem;
+}
+
+@media (min-width: 640px) {
+    .main-information-panel__fields--grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 1.5rem;
+        row-gap: 1.125rem;
+    }
+
+    .main-information-panel__fields--grid .form-group-stacked--full {
+        grid-column: 1 / -1;
+    }
+}
+
+.scope2-reporting-block {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #cbd5e1;
+}
+
+.scope2-reporting-block > summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #475569;
+    user-select: none;
+}
+
+.scope2-reporting-block > summary::-webkit-details-marker {
+    display: none;
+}
+
+.scope2-reporting-block > summary::after {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 2px solid #94a3b8;
+    border-bottom: 2px solid #94a3b8;
+    transform: rotate(45deg);
+    transition: transform 0.15s ease;
+    flex-shrink: 0;
+}
+
+.scope2-reporting-block[open] > summary::after {
+    transform: rotate(-135deg);
+    margin-top: 0.25rem;
+}
+
+.scope2-reporting-block__intro {
+    margin: 0.75rem 0 1rem;
+    font-size: 0.75rem;
+    color: #64748b;
+    line-height: 1.45;
+}
+
+.scope2-reporting-block__fields {
+    display: grid;
+    gap: 1rem;
+}
+
+@media (min-width: 640px) {
+    .scope2-reporting-block__fields {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 1.25rem;
+    }
+
+    .scope2-reporting-block__fields .form-group-stacked--full {
+        grid-column: 1 / -1;
+    }
+}
+
+.form-group-stacked--checkbox {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0.625rem;
+}
+
+.form-group-stacked--checkbox .form-label-stacked {
+    margin: 0;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.form-group-stacked--checkbox input[type="checkbox"] {
+    margin-top: 0.125rem;
+    width: 1rem;
+    height: 1rem;
+    accent-color: #10b981;
+    flex-shrink: 0;
 }
 
 /* Additional Data panel (right column) */
@@ -444,9 +561,6 @@ form[data-source-id] {
         max-width: none;
     }
     
-    .main-information-section .form-group-horizontal {
-        grid-template-columns: 1fr !important;
-    }
 }
 
 /* Action buttons in table */
@@ -709,7 +823,7 @@ form .bg-emerald-600:hover, form .bg-emerald-700:hover {
 }
 
 /* Section headers inside quick-input */
-.main-information-section h3,
+.main-information-panel__title,
 .additional-data-section h3,
 form[data-source-id] h3 {
     font-size: 0.9375rem !important;
@@ -718,7 +832,7 @@ form[data-source-id] h3 {
     letter-spacing: -0.005em !important;
 }
 
-.main-information-section p,
+.main-information-panel__subtitle,
 .additional-data-section p {
     color: #64748b !important;
     font-size: 0.8125rem !important;

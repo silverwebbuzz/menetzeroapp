@@ -4,7 +4,7 @@
 @section('page-title', $userFriendlyName ?? $emissionSource->name)
 
 @push('styles')
-<link rel="stylesheet" href="{{asset('css/quick-input.css?v=' . time())}}">
+<link rel="stylesheet" href="{{asset('css/quick-input.css?v=20260608')}}">
 @endpush
 
 @section('content')
@@ -145,131 +145,133 @@
 
         <!-- Split Layout: Main Form (Left 60%) and Additional Data (Right 40%) -->
         <div class="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-6 mb-8">
-            <!-- Left Side: Main Form Fields (50%) -->
+            <!-- Left Side: Main Form Fields -->
             <div class="flex flex-col">
-                <div class="mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-1">Main Information</h3>
-                    <p class="text-sm text-gray-500">Enter the primary emission data</p>
-                </div>
-                
-                <!-- Main Input Fields - Horizontal Layout with aligned labels and inputs -->
-                <div class="flex-1 main-information-section">
-                    @php
-                        // Get additional data from edit entry if available
-                        $editAdditionalData = [];
-                        if ($editEntry && $editEntry->additional_data) {
-                            $editAdditionalData = is_string($editEntry->additional_data) ? json_decode($editEntry->additional_data, true) : ($editEntry->additional_data ?? []);
+                @php
+                    $scope2FieldNames = ['scope2_method', 'supplier_emission_factor', 'renewable_percent', 'is_biogenic'];
+
+                    $editAdditionalData = [];
+                    if ($editEntry && $editEntry->additional_data) {
+                        $editAdditionalData = is_string($editEntry->additional_data) ? json_decode($editEntry->additional_data, true) : ($editEntry->additional_data ?? []);
+                    }
+
+                    $editFuelCategory = $editEntry ? ($editAdditionalData['fuel_category'] ?? null) : null;
+                    $editFuelType = $editEntry ? ($editEntry->fuel_type ?? null) : null;
+                    $editUnit = $editEntry ? ($editEntry->unit ?? null) : null;
+                    $editProcessType = $editEntry ? ($editEntry->fuel_type ?? null) : null;
+
+                    $seenMainFieldNames = [];
+                    $mainFields = $formFields->filter(function($field) use (&$seenMainFieldNames, $scope2FieldNames) {
+                        if (in_array($field->field_name, $scope2FieldNames)) {
+                            return false;
                         }
-                        
-                        // Get fuel_category, fuel_type, unit, and process_type from edit entry
-                        $editFuelCategory = $editEntry ? ($editAdditionalData['fuel_category'] ?? null) : null;
-                        $editFuelType = $editEntry ? ($editEntry->fuel_type ?? null) : null;
-                        $editUnit = $editEntry ? ($editEntry->unit ?? null) : null;
-                        $editProcessType = $editEntry ? ($editEntry->fuel_type ?? null) : null; // For process emissions, fuel_type stores process_type
-                        
-                        // Get main fields (required fields that are not in Additional Data section)
-                        // These are fields like fuel_category, fuel_type, unit_of_measure, amount, quantity
-                        // Deduplicate by field_name to prevent showing the same field twice
-                        $seenMainFieldNames = [];
-                        $mainFields = $formFields->filter(function($field) use (&$seenMainFieldNames) {
-                            // Include required fields and main input fields
-                            $isMainField = $field->is_required || in_array($field->field_name, ['fuel_category', 'fuel_type', 'unit_of_measure', 'unit', 'amount', 'quantity', 'distance', 'process_type']);
-                            
-                            if (!$isMainField) {
-                                return false;
-                            }
-                            
-                            // Deduplicate by field_name - only show first occurrence
-                            if (in_array($field->field_name, $seenMainFieldNames)) {
-                                return false;
-                            }
-                            
-                            $seenMainFieldNames[] = $field->field_name;
-                            return true;
-                        })->sortBy('field_order');
-                    @endphp
-                    
-                    @foreach($mainFields as $field)
-                        @if($field->field_type === 'select')
-                            <div class="form-group-horizontal">
-                                <div class="form-label-wrapper">
-                                    <label for="{{ $field->field_name }}" class="form-label-horizontal">
+
+                        $isMainField = $field->is_required || in_array($field->field_name, ['fuel_category', 'fuel_type', 'unit_of_measure', 'unit', 'amount', 'quantity', 'distance', 'process_type']);
+
+                        if (!$isMainField || in_array($field->field_name, $seenMainFieldNames)) {
+                            return false;
+                        }
+
+                        $seenMainFieldNames[] = $field->field_name;
+                        return true;
+                    })->sortBy('field_order');
+
+                    $scope2Fields = $formFields->filter(fn($field) => in_array($field->field_name, $scope2FieldNames))->sortBy('field_order');
+
+                    $resolveScope2FieldValue = function($field) use ($editEntry, $editAdditionalData) {
+                        $name = $field->field_name;
+                        if (old($name) !== null && old($name) !== '') {
+                            return old($name);
+                        }
+                        if (!$editEntry) {
+                            return $name === 'is_biogenic' ? false : '';
+                        }
+                        return match ($name) {
+                            'scope2_method' => $editEntry->scope2_method ?? 'location',
+                            'supplier_emission_factor' => $editEntry->supplier_emission_factor ?? '',
+                            'renewable_percent' => $editAdditionalData['renewable_percent'] ?? '',
+                            'is_biogenic' => (bool) $editEntry->is_biogenic,
+                            default => $editAdditionalData[$name] ?? '',
+                        };
+                    };
+                @endphp
+
+                <div class="main-information-panel flex-1">
+                    <div class="main-information-panel__header">
+                        <h3 class="main-information-panel__title">Main Information</h3>
+                        <p class="main-information-panel__subtitle">Enter the primary emission data for this source</p>
+                    </div>
+
+                    <div class="main-information-panel__fields main-information-panel__fields--grid">
+                        @foreach($mainFields as $field)
+                            @php
+                                $isFullWidth = in_array($field->field_type, ['textarea']) || in_array($field->field_name, ['fuel_category', 'fuel_type', 'process_type']);
+                            @endphp
+                            @if($field->field_type === 'select')
+                                <div class="form-group-stacked {{ $isFullWidth ? 'form-group-stacked--full' : '' }}">
+                                    <label for="{{ $field->field_name }}" class="form-label-stacked">
                                         {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
                                         @if($field->is_required)
                                             <span class="text-red-500">*</span>
                                         @endif
                                     </label>
-                                    @if($field->help_text)
-                                        <p class="form-help-text-under-label">{{ $field->help_text }}</p>
-                                    @endif
-                                </div>
-                                <div class="form-input-wrapper">
-                                    <select name="{{ $field->field_name }}" 
-                                            id="{{ $field->field_name }}" 
+                                    <select name="{{ $field->field_name }}"
+                                            id="{{ $field->field_name }}"
                                             data-field-name="{{ $field->field_name }}"
                                             data-depends-on="{{ $field->depends_on_field ?? '' }}"
                                             {{ $field->is_required ? 'required' : '' }}
                                             class="form-input-select">
                                         <option value="">Select an option</option>
-                                    @if($field->field_options)
-                                        @php
-                                            $options = is_array($field->field_options) ? $field->field_options : json_decode($field->field_options, true);
-                                        @endphp
-                                        @if(is_array($options))
-                                            @foreach($options as $option)
-                                                @php
-                                                    // Determine the value to check for selection
-                                                    $fieldValue = old($field->field_name);
-                                                    if (!$fieldValue && $editEntry) {
-                                                        if ($field->field_name === 'fuel_category') {
-                                                            $fieldValue = $editFuelCategory;
-                                                        } elseif ($field->field_name === 'fuel_type') {
-                                                            $fieldValue = $editFuelType;
-                                                        } elseif ($field->field_name === 'process_type') {
-                                                            $fieldValue = $editProcessType;
-                                                        } elseif ($field->field_name === 'unit_of_measure' || $field->field_name === 'unit') {
-                                                            $fieldValue = $editUnit;
-                                                        } else {
-                                                            $fieldValue = $editAdditionalData[$field->field_name] ?? null;
+                                        @if($field->field_options)
+                                            @php
+                                                $options = is_array($field->field_options) ? $field->field_options : json_decode($field->field_options, true);
+                                            @endphp
+                                            @if(is_array($options))
+                                                @foreach($options as $option)
+                                                    @php
+                                                        $fieldValue = old($field->field_name);
+                                                        if (!$fieldValue && $editEntry) {
+                                                            if ($field->field_name === 'fuel_category') {
+                                                                $fieldValue = $editFuelCategory;
+                                                            } elseif ($field->field_name === 'fuel_type') {
+                                                                $fieldValue = $editFuelType;
+                                                            } elseif ($field->field_name === 'process_type') {
+                                                                $fieldValue = $editProcessType;
+                                                            } elseif ($field->field_name === 'unit_of_measure' || $field->field_name === 'unit') {
+                                                                $fieldValue = $editUnit;
+                                                            } else {
+                                                                $fieldValue = $editAdditionalData[$field->field_name] ?? null;
+                                                            }
                                                         }
-                                                    }
-                                                    $optionValue = is_array($option) ? ($option['value'] ?? $option) : $option;
-                                                    $isSelected = $fieldValue == $optionValue;
-                                                @endphp
-                                                @if(is_array($option))
-                                                    <option value="{{ $optionValue }}" {{ $isSelected ? 'selected' : '' }}>{{ $option['label'] ?? $optionValue }}</option>
-                                                @else
-                                                    <option value="{{ $optionValue }}" {{ $isSelected ? 'selected' : '' }}>{{ $option }}</option>
-                                                @endif
-                                            @endforeach
+                                                        $optionValue = is_array($option) ? ($option['value'] ?? $option) : $option;
+                                                        $isSelected = $fieldValue == $optionValue;
+                                                    @endphp
+                                                    @if(is_array($option))
+                                                        <option value="{{ $optionValue }}" {{ $isSelected ? 'selected' : '' }}>{{ $option['label'] ?? $optionValue }}</option>
+                                                    @else
+                                                        <option value="{{ $optionValue }}" {{ $isSelected ? 'selected' : '' }}>{{ $option }}</option>
+                                                    @endif
+                                                @endforeach
+                                            @endif
                                         @endif
-                                    @endif
                                     </select>
+                                    @if($field->help_text)
+                                        <p class="form-help-text">{{ $field->help_text }}</p>
+                                    @endif
                                     @error($field->field_name)
                                         <p class="form-error-text">{{ $message }}</p>
                                     @enderror
                                 </div>
-                            </div>
-                        @elseif($field->field_type === 'number')
-                            {{-- For distance field, always show it (no conditional hiding) --}}
-                            <div class="form-group-horizontal">
-                                <div class="form-label-wrapper">
-                                    <label for="{{ $field->field_name }}" class="form-label-horizontal">
+                            @elseif($field->field_type === 'number')
+                                <div class="form-group-stacked {{ $isFullWidth ? 'form-group-stacked--full' : '' }}">
+                                    <label for="{{ $field->field_name }}" class="form-label-stacked">
                                         {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
                                         @if($field->is_required)
                                             <span class="text-red-500">*</span>
                                         @endif
                                     </label>
-                                    @if($field->help_text)
-                                        <p class="form-help-text-under-label">{{ $field->help_text }}</p>
-                                    @endif
-                                </div>
-                                <div class="form-input-wrapper">
-                                    @php
-                                        $validationRules = is_array($field->validation_rules) ? $field->validation_rules : (is_string($field->validation_rules) ? json_decode($field->validation_rules, true) : []);
-                                    @endphp
-                                    <input type="number" 
-                                           name="{{ $field->field_name }}" 
+                                    <input type="number"
+                                           name="{{ $field->field_name }}"
                                            id="{{ $field->field_name }}"
                                            value="{{ old($field->field_name, $editEntry && ($field->field_name === 'amount' || $field->field_name === 'quantity' || $field->field_name === 'distance') ? ($editEntry->quantity ?? $editAdditionalData[$field->field_name] ?? '') : ($editAdditionalData[$field->field_name] ?? '')) }}"
                                            step="any"
@@ -277,49 +279,126 @@
                                            {{ $field->is_required ? 'required' : '' }}
                                            placeholder="{{ $field->field_placeholder ?? 'Enter ' . strtolower($field->field_label ?? $field->field_name) }}"
                                            class="form-input">
+                                    @if($field->help_text)
+                                        <p class="form-help-text">{{ $field->help_text }}</p>
+                                    @endif
                                     @error($field->field_name)
                                         <p class="form-error-text">{{ $message }}</p>
                                     @enderror
                                 </div>
-                            </div>
-                        @else
-                            <!-- Text, textarea, etc. -->
-                            <div class="form-group-horizontal">
-                                <div class="form-label-wrapper">
-                                    <label for="{{ $field->field_name }}" class="form-label-horizontal">
+                            @else
+                                <div class="form-group-stacked {{ $isFullWidth ? 'form-group-stacked--full' : '' }}">
+                                    <label for="{{ $field->field_name }}" class="form-label-stacked">
                                         {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
                                         @if($field->is_required)
                                             <span class="text-red-500">*</span>
                                         @endif
                                     </label>
-                                    @if($field->help_text)
-                                        <p class="form-help-text-under-label">{{ $field->help_text }}</p>
-                                    @endif
-                                </div>
-                                <div class="form-input-wrapper">
                                     @if($field->field_type === 'textarea')
-                                        <textarea name="{{ $field->field_name }}" 
+                                        <textarea name="{{ $field->field_name }}"
                                                   id="{{ $field->field_name }}"
                                                   rows="3"
                                                   {{ $field->is_required ? 'required' : '' }}
                                                   placeholder="{{ $field->field_placeholder ?? '' }}"
                                                   class="form-input form-textarea">{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}</textarea>
                                     @else
-                                        <input type="{{ $field->field_type }}" 
-                                               name="{{ $field->field_name }}" 
+                                        <input type="{{ $field->field_type }}"
+                                               name="{{ $field->field_name }}"
                                                id="{{ $field->field_name }}"
                                                value="{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}"
                                                {{ $field->is_required ? 'required' : '' }}
                                                placeholder="{{ $field->field_placeholder ?? '' }}"
                                                class="form-input">
                                     @endif
+                                    @if($field->help_text)
+                                        <p class="form-help-text">{{ $field->help_text }}</p>
+                                    @endif
                                     @error($field->field_name)
                                         <p class="form-error-text">{{ $message }}</p>
                                     @enderror
                                 </div>
+                            @endif
+                        @endforeach
+                    </div>
+
+                    @if($scope2Fields->count() > 0)
+                        <details class="scope2-reporting-block"@if($editEntry && ($editEntry->scope2_method === 'market' || $editEntry->supplier_emission_factor || ($editAdditionalData['renewable_percent'] ?? null))) open @endif>
+                            <summary>Scope 2 reporting (optional)</summary>
+                            <p class="scope2-reporting-block__intro">IFRS S2 expects location-based figures by default. Expand this section when you have supplier-specific factors or renewable energy certificates.</p>
+                            <div class="scope2-reporting-block__fields">
+                                @foreach($scope2Fields as $field)
+                                    @php
+                                        $scope2Value = $resolveScope2FieldValue($field);
+                                        $isScope2FullWidth = in_array($field->field_name, ['scope2_method', 'is_biogenic']);
+                                    @endphp
+                                    @if($field->field_type === 'checkbox')
+                                        <div class="form-group-stacked form-group-stacked--full">
+                                            <div class="form-group-stacked--checkbox">
+                                                <input type="hidden" name="{{ $field->field_name }}" value="0">
+                                                <input type="checkbox"
+                                                       name="{{ $field->field_name }}"
+                                                       id="{{ $field->field_name }}"
+                                                       value="1"
+                                                       {{ $scope2Value ? 'checked' : '' }}>
+                                                <label for="{{ $field->field_name }}" class="form-label-stacked">
+                                                    {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
+                                                </label>
+                                            </div>
+                                            @if($field->help_text)
+                                                <p class="form-help-text">{{ $field->help_text }}</p>
+                                            @endif
+                                        </div>
+                                    @elseif($field->field_type === 'select')
+                                        <div class="form-group-stacked {{ $isScope2FullWidth ? 'form-group-stacked--full' : '' }}">
+                                            <label for="{{ $field->field_name }}" class="form-label-stacked">{{ $field->field_label }}</label>
+                                            <select name="{{ $field->field_name }}" id="{{ $field->field_name }}" class="form-input-select">
+                                                <option value="">Select {{ $field->field_label }}</option>
+                                                @if($field->field_options)
+                                                    @php
+                                                        $options = is_array($field->field_options) ? $field->field_options : json_decode($field->field_options, true);
+                                                    @endphp
+                                                    @if(is_array($options))
+                                                        @foreach($options as $option)
+                                                            @php
+                                                                $optionValue = is_array($option) ? ($option['value'] ?? $option) : $option;
+                                                            @endphp
+                                                            @if(is_array($option))
+                                                                <option value="{{ $optionValue }}" {{ (string) $scope2Value === (string) $optionValue ? 'selected' : '' }}>{{ $option['label'] ?? $optionValue }}</option>
+                                                            @else
+                                                                <option value="{{ $optionValue }}" {{ (string) $scope2Value === (string) $optionValue ? 'selected' : '' }}>{{ $option }}</option>
+                                                            @endif
+                                                        @endforeach
+                                                    @endif
+                                                @endif
+                                            </select>
+                                            @if($field->help_text)
+                                                <p class="form-help-text">{{ $field->help_text }}</p>
+                                            @endif
+                                            @error($field->field_name)
+                                                <p class="form-error-text">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                    @else
+                                        <div class="form-group-stacked {{ $isScope2FullWidth ? 'form-group-stacked--full' : '' }}">
+                                            <label for="{{ $field->field_name }}" class="form-label-stacked">{{ $field->field_label }}</label>
+                                            <input type="{{ $field->field_type }}"
+                                                   name="{{ $field->field_name }}"
+                                                   id="{{ $field->field_name }}"
+                                                   value="{{ $scope2Value }}"
+                                                   placeholder="{{ $field->field_placeholder ?? '' }}"
+                                                   class="form-input">
+                                            @if($field->help_text)
+                                                <p class="form-help-text">{{ $field->help_text }}</p>
+                                            @endif
+                                            @error($field->field_name)
+                                                <p class="form-error-text">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                    @endif
+                                @endforeach
                             </div>
-                        @endif
-                    @endforeach
+                        </details>
+                    @endif
                 </div>
             </div>
 
@@ -331,10 +410,11 @@
                         $editAdditionalData = is_string($editEntry->additional_data) ? json_decode($editEntry->additional_data, true) : ($editEntry->additional_data ?? []);
                     }
 
+                    $scope2FieldNames = ['scope2_method', 'supplier_emission_factor', 'renewable_percent', 'is_biogenic'];
                     $mainFieldNames = ['fuel_category', 'fuel_type', 'unit_of_measure', 'amount', 'quantity', 'unit'];
                     $seenFieldNames = [];
-                    $additionalFields = $formFields->filter(function($field) use (&$seenFieldNames, $mainFieldNames) {
-                        if (in_array($field->field_name, $mainFieldNames) || $field->is_required || in_array($field->field_name, ['comments', 'link'])) {
+                    $additionalFields = $formFields->filter(function($field) use (&$seenFieldNames, $mainFieldNames, $scope2FieldNames) {
+                        if (in_array($field->field_name, $mainFieldNames) || $field->is_required || in_array($field->field_name, ['comments', 'link']) || in_array($field->field_name, $scope2FieldNames)) {
                             return false;
                         }
                         if (in_array($field->field_name, $seenFieldNames)) {
