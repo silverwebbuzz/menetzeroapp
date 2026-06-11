@@ -51,7 +51,7 @@
     </script>
 
     <!-- App shell styles -->
-    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260611">
 
     @stack('styles')
 

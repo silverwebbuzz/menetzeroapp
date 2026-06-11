@@ -5,34 +5,23 @@
 
 @section('content')
 <div class="w-full">
-    <!-- Header -->
-    <div class="mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+    <div class="page-header">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">Input data</h1>
-            <p class="mt-2 text-gray-600">View and manage your emission data entries.</p>
+            <h1>Input data</h1>
+            <p>View and manage emission entries across all scopes, locations, and reporting years.</p>
         </div>
-        <x-plan-gated-link
-            :allowed="$gate->canHelpGuide()"
-            :href="route('quick-input.help-guide')"
-            :message="$gate->helpGuideMessage()"
-            class="inline-flex items-center px-4 py-2 text-sm font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 whitespace-nowrap"
-            locked-class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-lg whitespace-nowrap">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            Scope 1 &amp; 2 Help Guide
-        </x-plan-gated-link>
+        <div class="page-header-actions">
+            <x-plan-gated-link
+                :allowed="$gate->canHelpGuide()"
+                :href="route('quick-input.help-guide')"
+                :message="$gate->helpGuideMessage()"
+                class="btn btn-secondary btn-sm"
+                locked-class="btn btn-secondary btn-sm opacity-80">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Scope 1 &amp; 2 Help Guide
+            </x-plan-gated-link>
+        </div>
     </div>
-
-    @if(session('success'))
-        <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-            <span class="block sm:inline">{{ session('success') }}</span>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-            <span class="block sm:inline">{{ session('error') }}</span>
-        </div>
-    @endif
 
     @if($errors->any())
         <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
@@ -56,31 +45,32 @@
     @endif
 
     <!-- Bulk Import — Scope 1 & 2 -->
-    <div id="bulk-import" class="mb-8 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-6">
+    <div id="bulk-import" class="card mb-8">
+        <div class="card-body">
         @if(!$gate->canBulkImport())
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="callout-panel callout-panel--brand callout-panel--row">
                 <div>
-                    <h2 class="text-xl font-bold text-gray-900 mb-2">Bulk import — Scope 1 &amp; 2</h2>
+                    <h2 class="callout-panel__title">Bulk import — Scope 1 &amp; 2</h2>
                     @if($gate->isAgencyWorkspace())
-                        <p class="text-gray-600 text-sm">Upload DEWA bills, fuel receipts, and fleet data in one Excel or CSV file. {{ $gate->agencyLockedMessage('Bulk import') }}</p>
+                        <p class="callout-panel__body">Upload DEWA bills, fuel receipts, and fleet data in one Excel or CSV file. {{ $gate->agencyLockedMessage('Bulk import') }}</p>
                     @else
-                        <p class="text-gray-600 text-sm">Upload DEWA bills, fuel receipts, and fleet data in one Excel or CSV file. Available on <strong>Starter</strong> (AED 1,499/year) and above.</p>
+                        <p class="callout-panel__body">Upload DEWA bills, fuel receipts, and fleet data in one Excel or CSV file. Available on <strong>Starter</strong> (AED 1,499/year) and above.</p>
                     @endif
                 </div>
-                <a href="{{ $gate->upgradeRoute() }}" class="inline-flex items-center px-5 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-lg hover:bg-emerald-700 whitespace-nowrap">
-                    {{ $gate->upgradeButtonLabel('Upgrade to Starter') }}
-                </a>
+                <div class="callout-panel__actions">
+                    <a href="{{ $gate->upgradeRoute() }}" class="btn btn-primary btn-sm">{{ $gate->upgradeButtonLabel('Upgrade to Starter') }}</a>
+                </div>
             </div>
         @else
         <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
             <div class="flex-1">
-                <h2 class="text-xl font-bold text-gray-900 mb-2">Bulk import — Scope 1 &amp; 2</h2>
-                <p class="text-gray-600 text-sm mb-3">
+                <h2 class="callout-panel__title">Bulk import — Scope 1 &amp; 2</h2>
+                <p class="callout-panel__body mb-3">
                     First time? Read the <a href="{{ route('quick-input.help-guide') }}" class="text-emerald-700 font-semibold underline hover:text-emerald-900">Scope 1 &amp; 2 Help Guide</a> first —
                     it explains every field, which unit to use, and where to find numbers on DEWA bills, fuel receipts, etc.
                 </p>
                 <a href="{{ route('quick-input.help-guide') }}"
-                   class="inline-flex items-center mb-4 px-4 py-2.5 bg-white border-2 border-emerald-500 text-emerald-800 text-sm font-semibold rounded-lg hover:bg-emerald-50 transition-colors shadow-sm">
+                   class="btn btn-outline btn-sm mb-4">
                     <svg class="w-5 h-5 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     Open Help Guide — what data do I need?
                 </a>
@@ -92,32 +82,31 @@
             </div>
             <div class="flex flex-col gap-2 min-w-[220px]">
                 <a href="{{ route('quick-input.bulk-import.template', ['format' => 'xlsx']) }}"
-                   class="inline-flex items-center justify-center px-4 py-2.5 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors">
+                   class="btn btn-primary btn-sm">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     Download Excel template
                 </a>
                 <a href="{{ route('quick-input.bulk-import.template', ['format' => 'csv', 'variant' => 'blank']) }}"
-                   class="inline-flex items-center justify-center px-4 py-2.5 bg-white border border-emerald-300 text-emerald-800 text-sm font-medium rounded-lg hover:bg-emerald-50 transition-colors">
+                   class="btn btn-secondary btn-sm">
                     Download blank CSV
                 </a>
                 <a href="{{ route('quick-input.bulk-import.template', ['format' => 'csv', 'variant' => 'sample']) }}"
-                   class="inline-flex items-center justify-center px-4 py-2.5 bg-white border border-emerald-300 text-emerald-800 text-sm font-medium rounded-lg hover:bg-emerald-50 transition-colors">
+                   class="btn btn-secondary btn-sm">
                     Download sample CSV (with examples)
                 </a>
             </div>
         </div>
 
-        <form action="{{ route('quick-input.bulk-import.import') }}" method="POST" enctype="multipart/form-data" class="mt-6 pt-6 border-t border-emerald-200">
+        <form action="{{ route('quick-input.bulk-import.import') }}" method="POST" enctype="multipart/form-data" class="mt-6 pt-6 border-t border-gray-200">
             @csrf
             <div class="flex flex-col sm:flex-row sm:items-end gap-4">
-                <div class="flex-1">
-                    <label for="import_file" class="block text-sm font-medium text-gray-700 mb-1">Upload completed file</label>
-                    <input type="file" name="import_file" id="import_file" accept=".xlsx,.xls,.csv,.txt" required
-                           class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-emerald-100 file:text-emerald-800 file:font-medium hover:file:bg-emerald-200">
-                    <p class="mt-1 text-xs text-gray-500">Excel (.xlsx) or CSV — max 5 MB. Use the <strong>Data Entry</strong> sheet for Excel uploads.</p>
+                <div class="flex-1 form-group mb-0">
+                    <label for="import_file" class="form-label">Upload completed file</label>
+                    <input type="file" name="import_file" id="import_file" accept=".xlsx,.xls,.csv,.txt" required class="form-control">
+                    <p class="form-help">Excel (.xlsx) or CSV — max 5 MB. Use the <strong>Data Entry</strong> sheet for Excel uploads.</p>
                 </div>
                 @if(!empty($canAddEntries))
-                <button type="submit" class="px-6 py-2.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 whitespace-nowrap">
+                <button type="submit" class="btn btn-primary whitespace-nowrap">
                     Upload &amp; import
                 </button>
                 @else
@@ -126,11 +115,12 @@
             </div>
         </form>
         @endif
+        </div>
     </div>
 
     <!-- Input Forms - Grouped by Scope -->
     <div class="mb-8">
-        <h2 class="text-xl font-bold text-gray-900 mb-4">Input Forms</h2>
+        <h2 class="section-heading">Input forms</h2>
         @php
             // Group the (already ordered) sources by their scope so we can render
             // a labelled section for Scope 1, 2 and 3.
@@ -144,34 +134,34 @@
         @foreach($scopeSections as $scopeKey => $meta)
             @php $scopeSources = $sourcesByScope->get($scopeKey, collect()); @endphp
             @if($scopeSources->isNotEmpty())
-                <div class="mb-6">
-                    <div class="flex items-baseline gap-3 mb-3">
-                        <h3 class="text-base font-bold text-gray-800">{{ $meta['title'] }}</h3>
-                        <span class="text-xs text-gray-500">{{ $meta['subtitle'] }}</span>
+                <div class="scope-block">
+                    <div class="scope-block__head">
+                        <h3 class="scope-block__title">{{ $meta['title'] }}</h3>
+                        <span class="scope-block__subtitle">{{ $meta['subtitle'] }}</span>
                         @if($scopeKey === 'Scope 3' && $gate->isScope3Locked())
-                            <span class="text-xs font-medium text-purple-700 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5">Starter+</span>
+                            <span class="badge-plan">Starter+</span>
                         @endif
                     </div>
                     @if($scopeKey === 'Scope 3' && $gate->isScope3Locked())
-                        <div class="rounded-xl border border-purple-200 bg-purple-50 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div class="callout-panel callout-panel--brand callout-panel--row">
                             @if($gate->isAgencyWorkspace())
-                                <p class="text-sm text-gray-700">Scope 3 covers your value chain — purchased goods, travel, commuting, and more. {{ $gate->agencyLockedMessage('Scope 3') }}</p>
+                                <p class="callout-panel__body">Scope 3 covers your value chain — purchased goods, travel, commuting, and more. {{ $gate->agencyLockedMessage('Scope 3') }}</p>
                             @else
-                                <p class="text-sm text-gray-700">Scope 3 covers your value chain — purchased goods, travel, commuting, and more. Unlock preview mode on <strong>Starter</strong>.</p>
+                                <p class="callout-panel__body">Scope 3 covers your value chain — purchased goods, travel, commuting, and more. Unlock preview mode on <strong>Starter</strong>.</p>
                             @endif
-                            <a href="{{ $gate->upgradeRoute() }}" class="inline-flex items-center px-4 py-2 bg-purple-600 text-white text-sm font-semibold rounded-lg hover:bg-purple-700 whitespace-nowrap">{{ $gate->upgradeButtonLabel('Unlock Scope 3') }}</a>
+                            <div class="callout-panel__actions">
+                                <a href="{{ $gate->upgradeRoute() }}" class="btn btn-primary btn-sm">{{ $gate->upgradeButtonLabel('View agency packs') }}</a>
+                            </div>
                         </div>
                     @else
-                    <div class="flex flex-wrap gap-4 pb-2">
+                    <div class="source-grid">
                         @foreach($scopeSources as $source)
                             @php
                                 $scopeNumber = str_replace('Scope ', '', $source->scope);
                             @endphp
                             <a href="{{ route('quick-input.show', ['scope' => $scopeNumber, 'slug' => $source->quick_input_slug]) }}"
-                   class="flex-shrink-0 bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow w-[180px] h-[160px] flex flex-col items-center justify-center">
-                    <div class="flex flex-col items-center text-center w-full">
-                        <!-- Icon -->
-                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
+                               class="source-card">
+                        <div class="source-card__icon">
                             @php
                                 $slug = $source->quick_input_slug ?? '';
                                 $iconClass = 'w-6 h-6 text-green-600';
@@ -225,26 +215,20 @@
                                 </svg>
                             @endif
                         </div>
-                        <!-- Name -->
                         @php
                             $name = $source->name ?? '';
                             $mainText = $name;
                             $bracketText = '';
-                            
-                            // Extract text in brackets
                             if (preg_match('/^(.+?)\s*\((.+?)\)$/', $name, $matches)) {
                                 $mainText = trim($matches[1]);
                                 $bracketText = trim($matches[2]);
                             }
                         @endphp
-                        <div class="w-full">
-                            <div class="font-semibold text-gray-900" style="font-size: 0.87rem;">{{ $mainText }}</div>
-                            @if($bracketText)
-                                <div class="text-gray-600 mt-1" style="font-size: 0.70rem;">({{ $bracketText }})</div>
-                            @endif
-                        </div>
-                    </div>
-                </a>
+                        <div class="source-card__title">{{ $mainText }}</div>
+                        @if($bracketText)
+                            <div class="source-card__meta">({{ $bracketText }})</div>
+                        @endif
+                            </a>
                         @endforeach
                     </div>
                     @endif
@@ -253,54 +237,52 @@
         @endforeach
     </div>
 
-    <!-- Summary Cards -->
     @if(isset($summary))
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div class="bg-white rounded-lg shadow p-6">
-            <h3 class="text-sm font-medium text-gray-500">Total Entries</h3>
-            <p class="text-2xl font-bold text-gray-900 mt-2">{{ number_format($summary->total_entries ?? 0) }}</p>
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="stat-card-label">Total entries</div>
+            <div class="stat-card-value">{{ number_format($summary->total_entries ?? 0) }}</div>
         </div>
-        <div class="bg-white rounded-lg shadow p-6">
-            <h3 class="text-sm font-medium text-gray-500">Total Emissions</h3>
-            <p class="text-2xl font-bold text-gray-900 mt-2">{{ co2e_t($summary->total_co2e ?? 0) }} <span class="text-sm font-normal text-gray-500">tCO₂e</span></p>
+        <div class="stat-card">
+            <div class="stat-card-label">Total emissions</div>
+            <div class="stat-card-value">{{ co2e_t($summary->total_co2e ?? 0) }} <span class="text-sm font-medium text-gray-500">tCO₂e</span></div>
         </div>
-        <div class="bg-white rounded-lg shadow p-6">
-            <h3 class="text-sm font-medium text-gray-500">Scope 1</h3>
-            <p class="text-2xl font-bold text-gray-900 mt-2">{{ co2e_t($summary->scope_1_co2e ?? 0) }} <span class="text-sm font-normal text-gray-500">tCO₂e</span></p>
+        <div class="stat-card">
+            <div class="stat-card-label">Scope 1</div>
+            <div class="stat-card-value">{{ co2e_t($summary->scope_1_co2e ?? 0) }} <span class="text-sm font-medium text-gray-500">tCO₂e</span></div>
         </div>
-        <div class="bg-white rounded-lg shadow p-6">
-            <h3 class="text-sm font-medium text-gray-500">Scope 2</h3>
-            <p class="text-2xl font-bold text-gray-900 mt-2">{{ co2e_t($summary->scope_2_co2e ?? 0) }} <span class="text-sm font-normal text-gray-500">tCO₂e</span></p>
+        <div class="stat-card">
+            <div class="stat-card-label">Scope 2</div>
+            <div class="stat-card-value">{{ co2e_t($summary->scope_2_co2e ?? 0) }} <span class="text-sm font-medium text-gray-500">tCO₂e</span></div>
         </div>
     </div>
     @endif
 
-    <!-- Filters and Export -->
-    <div class="bg-white rounded-lg shadow mb-6 p-4">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <form method="GET" action="{{ route('quick-input.index') }}" id="filter-form" class="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
-                <div>
-                    <label for="scope" class="block text-sm font-medium text-gray-700 mb-1">Scope</label>
-                    <select name="scope" id="scope" class="w-full rounded-md border-gray-300 shadow-sm">
-                        <option value="">All Scopes</option>
+    <div class="filter-toolbar mb-6">
+        <div class="filter-toolbar__layout">
+            <form method="GET" action="{{ route('quick-input.index') }}" id="filter-form" class="filter-toolbar__grid flex-1">
+                <div class="field-stack">
+                    <label for="scope" class="form-label">Scope</label>
+                    <select name="scope" id="scope" class="form-select">
+                        <option value="">All scopes</option>
                         <option value="Scope 1" {{ request('scope') == 'Scope 1' ? 'selected' : '' }}>Scope 1</option>
                         <option value="Scope 2" {{ request('scope') == 'Scope 2' ? 'selected' : '' }}>Scope 2</option>
                         <option value="Scope 3" {{ request('scope') == 'Scope 3' ? 'selected' : '' }}>Scope 3</option>
                     </select>
                 </div>
-                <div>
-                    <label for="location_id" class="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                    <select name="location_id" id="location_id" class="w-full rounded-md border-gray-300 shadow-sm">
-                        <option value="">All Locations</option>
+                <div class="field-stack">
+                    <label for="location_id" class="form-label">Location</label>
+                    <select name="location_id" id="location_id" class="form-select">
+                        <option value="">All locations</option>
                         @foreach($locations as $location)
                             <option value="{{ $location->id }}" {{ request('location_id') == $location->id ? 'selected' : '' }}>{{ $location->name }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div>
-                    <label for="fiscal_year" class="block text-sm font-medium text-gray-700 mb-1">Year</label>
-                    <select name="fiscal_year" id="fiscal_year" class="w-full rounded-md border-gray-300 shadow-sm">
-                        <option value="">All Years</option>
+                <div class="field-stack">
+                    <label for="fiscal_year" class="form-label">Year</label>
+                    <select name="fiscal_year" id="fiscal_year" class="form-select">
+                        <option value="">All years</option>
                         @if(isset($yearsWithEntries) && count($yearsWithEntries) > 0)
                             @foreach($yearsWithEntries as $year)
                                 <option value="{{ $year }}" {{ request('fiscal_year') == $year ? 'selected' : '' }}>{{ $year }}</option>
@@ -308,19 +290,19 @@
                         @endif
                     </select>
                 </div>
-                <div class="flex items-end md:hidden">
-                    <button type="submit" class="w-full bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">Filter</button>
+                <div class="filter-toolbar__actions md:hidden">
+                    <button type="submit" class="btn btn-primary btn-sm w-full">Apply filters</button>
                 </div>
             </form>
-            <div class="hidden md:flex items-end">
-                <button type="submit" form="filter-form" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 mr-2">Filter</button>
+            <div class="filter-toolbar__actions hidden md:flex">
+                <button type="submit" form="filter-form" class="btn btn-primary btn-sm">Apply filters</button>
                 <x-plan-gated-link
                     :allowed="$gate->canBulkExport()"
                     :href="route('quick-input.export', request()->all())"
                     :message="$gate->bulkExportMessage()"
-                    class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 flex items-center"
-                    locked-class="px-4 py-2 border border-gray-200 rounded-md text-gray-500 bg-gray-50 flex items-center">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="btn btn-secondary btn-sm"
+                    locked-class="btn btn-secondary btn-sm opacity-80">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                     Export CSV
@@ -329,24 +311,23 @@
         </div>
     </div>
 
-    <!-- Entries Table -->
-    <div class="bg-white rounded-lg shadow overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+    <div class="card">
+        <div class="table-wrap">
+            <table class="table min-w-full">
+                <thead>
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">tCO₂e</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Scope</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th>Date</th>
+                        <th>Source</th>
+                        <th>Location</th>
+                        <th>Year</th>
+                        <th>Quantity</th>
+                        <th>Unit</th>
+                        <th>tCO₂e</th>
+                        <th>Scope</th>
+                        <th class="text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody>
                     @forelse($entries as $entry)
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -404,11 +385,11 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                 {{ co2e_t($entry->calculated_co2e, 4) }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">{{ $entry->scope }}</span>
+                            <td class="cell-muted whitespace-nowrap">
+                                <span class="badge badge-neutral">{{ $entry->scope }}</span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <div class="flex items-center justify-end space-x-2">
+                            <td class="text-right">
+                                <div class="row-actions">
                                     <a href="{{ route('quick-input.view', $entry->id) }}" class="text-blue-600 hover:text-blue-900" title="View">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -454,8 +435,14 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="px-6 py-4 text-center text-sm text-gray-500">
-                                No entries found. <a href="{{ route('quick-input.show', ['scope' => 1, 'slug' => 'natural-gas']) }}" class="text-purple-600 hover:text-purple-800">Add your first entry</a>
+                            <td colspan="9">
+                                <div class="empty-state">
+                                    <p class="empty-state__title">No entries yet</p>
+                                    <p class="empty-state__text">Start by adding electricity, fuel, or other emission sources above.</p>
+                                    <div class="empty-state__action">
+                                        <a href="{{ route('quick-input.show', ['scope' => 2, 'slug' => 'electricity']) }}" class="btn btn-primary btn-sm">Add electricity entry</a>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     @endforelse
@@ -463,7 +450,7 @@
             </table>
         </div>
         @if($entries->hasPages())
-            <div class="px-6 py-4 border-t border-gray-200">
+            <div class="card-footer">
                 {{ $entries->withQueryString()->links() }}
             </div>
         @endif
