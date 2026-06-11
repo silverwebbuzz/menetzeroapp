@@ -530,6 +530,17 @@ class SubscriptionService
             return $growth?->limits ?? [];
         }
 
+        if ($company?->isConsultantOrg()) {
+            $consultantSub = app(\App\Services\ConsultantAgencySubscriptionService::class)
+                ->getActiveSubscription($companyId);
+
+            if (!$consultantSub?->plan) {
+                return ['users' => 1];
+            }
+
+            return $consultantSub->plan->limits ?? [];
+        }
+
         $subscription = $this->getActiveSubscription($companyId, 'client');
 
         if (!$subscription || !$subscription->plan) {

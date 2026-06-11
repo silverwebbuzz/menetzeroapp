@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends($teamLayout ?? 'layouts.app')
 
 @section('title', 'Edit Role - MenetZero')
 @section('page-title', 'Edit Role')
@@ -9,7 +9,7 @@
         <h1 class="text-2xl font-bold text-gray-900 mb-2">Edit Role: {{ $role->role_name }}</h1>
         <p class="text-sm text-gray-600 mb-6">Set role permissions</p>
 
-        <form action="{{ route('roles.update', $role) }}" method="POST" id="roleForm">
+        <form action="{{ route(($teamRoutes ?? [])['roles.update'] ?? 'roles.update', $role) }}" method="POST" id="roleForm">
             @csrf
             @method('PUT')
 
@@ -121,7 +121,7 @@
 
             <!-- Actions -->
             <div class="flex items-center justify-end gap-4 pt-4 border-t border-gray-200">
-                <a href="{{ route('roles.index') }}" class="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                <a href="{{ route(($teamRoutes ?? [])['index'] ?? 'roles.index') }}" class="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
                     Cancel
                 </a>
                 <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">

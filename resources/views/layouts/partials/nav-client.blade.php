@@ -318,7 +318,7 @@
         @if($canViewStaff || $canViewRoles)
             <a href="{{ route('roles.index') }}" class="nav-link {{ request()->routeIs('roles.*') || request()->routeIs('staff.*') ? 'active' : '' }}">
                 {!! $svg('users') !!}
-                Staff &amp; Roles
+                Team &amp; Access
             </a>
         @endif
         @if($isAdmin && !$isManagedClientWorkspace)

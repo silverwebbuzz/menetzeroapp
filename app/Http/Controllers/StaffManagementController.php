@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\CompanyInvitationService;
 use App\Services\SubscriptionService;
+use App\Services\TeamAccessService;
 use App\Models\User;
 use App\Models\UserCompanyRole;
 use App\Models\CompanyInvitation;
@@ -18,8 +19,11 @@ class StaffManagementController extends Controller
     protected $invitationService;
     protected $subscriptionService;
 
-    public function __construct(CompanyInvitationService $invitationService, SubscriptionService $subscriptionService)
-    {
+    public function __construct(
+        CompanyInvitationService $invitationService,
+        SubscriptionService $subscriptionService,
+        protected TeamAccessService $teamAccess,
+    ) {
         $this->invitationService = $invitationService;
         $this->subscriptionService = $subscriptionService;
     }
@@ -159,7 +163,7 @@ class StaffManagementController extends Controller
                     'is_active' => true, // New role assignments are active by default
                 ]);
 
-                return redirect()->route('roles.index')
+                return redirect()->route($this->teamAccess->indexRouteName($company))
                     ->with('success', 'User created successfully.');
             } catch (\Exception $e) {
                 \Log::error('Error creating UserCompanyRole', [
@@ -178,9 +182,9 @@ class StaffManagementController extends Controller
                 'notes' => 'nullable|string|max:1000',
             ]);
 
-            $limitCheck = $this->subscriptionService->canPerformAction($company->id, 'users', 1);
+            $limitCheck = $this->teamAccess->canInviteTeamMember($company->id);
             if (!$limitCheck['allowed']) {
-                return redirect()->route('subscriptions.upgrade')
+                return redirect()->route($this->teamAccess->upgradeRouteName($company))
                     ->with('error', $limitCheck['message']);
             }
 
@@ -216,16 +220,17 @@ class StaffManagementController extends Controller
                 
                 // Redirect to invitation success page
                 // Use invitation ID if available, otherwise use token
+                $successRoute = $this->teamAccess->routesFor($company)['staff.invitation_success'];
+
                 if ($invitationId > 0) {
-                    return redirect()->route('staff.invitation-success', ['invitation' => $invitationId])
-                        ->with('invitation', $invitation)
-                        ->with('success', 'Invitation sent successfully!');
-                } else {
-                    // If invitation ID is 0 (table doesn't exist), use token in session
-                    return redirect()->route('staff.invitation-success', ['invitation' => 0])
+                    return redirect()->route($successRoute, ['invitation' => $invitationId])
                         ->with('invitation', $invitation)
                         ->with('success', 'Invitation sent successfully!');
                 }
+
+                return redirect()->route($successRoute, ['invitation' => 0])
+                    ->with('invitation', $invitation)
+                    ->with('success', 'Invitation sent successfully!');
             } catch (\Exception $e) {
                 \Log::error('Failed to create invitation', [
                     'company_id' => $company->id,
@@ -266,7 +271,7 @@ class StaffManagementController extends Controller
             'assigned_by' => Auth::id(),
         ]);
 
-        return redirect()->route('roles.index')
+        return redirect()->route($this->teamAccess->indexRouteName($company))
             ->with('success', 'Staff role updated successfully.')
             ->with('active_tab', 'staff');
     }
@@ -364,7 +369,7 @@ class StaffManagementController extends Controller
             }
         }
 
-        return redirect()->route('roles.index')
+        return redirect()->route($this->teamAccess->indexRouteName($company))
             ->with('success', 'Staff member removed successfully. They will no longer have access to this company.');
     }
 
@@ -423,7 +428,7 @@ class StaffManagementController extends Controller
         if (!$invitationModel) {
             $invitationModel = session('invitation');
             if (!$invitationModel) {
-                return redirect()->route('roles.index')
+                return redirect()->route($this->teamAccess->indexRouteName($company))
                     ->with('error', 'Invitation not found. Please try sending the invitation again.');
             }
             
@@ -447,7 +452,7 @@ class StaffManagementController extends Controller
             \Log::error('Invitation missing token', [
                 'invitation_id' => $invitationModel->id ?? 'N/A'
             ]);
-            return redirect()->route('roles.index')
+            return redirect()->route($this->teamAccess->indexRouteName($company))
                 ->with('error', 'Invitation is missing required information. Please try again.');
         }
 
@@ -461,10 +466,13 @@ class StaffManagementController extends Controller
             'accept_url' => $acceptUrl
         ]);
 
-        return view('staff.invitation-success', [
-            'invitation' => $invitationModel,
-            'acceptUrl' => $acceptUrl
-        ]);
+        return view('staff.invitation-success', array_merge(
+            [
+                'invitation' => $invitationModel,
+                'acceptUrl' => $acceptUrl,
+            ],
+            $this->teamAccess->viewShared($company),
+        ));
     }
 
     /**
@@ -521,7 +529,7 @@ class StaffManagementController extends Controller
             ]);
         }
 
-        return redirect()->route('roles.index')
+        return redirect()->route($this->teamAccess->indexRouteName($company))
             ->with('success', 'Invitation cancelled successfully.');
     }
 }

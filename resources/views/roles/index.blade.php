@@ -1,15 +1,43 @@
-@extends('layouts.app')
+@extends($teamLayout ?? 'layouts.app')
 
-@section('title', 'Roles & Users - MenetZero')
-@section('page-title', 'Roles & Users')
+@section('title', ($teamMenuLabel ?? 'Team & Access') . ' - MenetZero')
+@section('page-title', $teamMenuLabel ?? 'Team & Access')
 
 @section('content')
+@php
+    $teamRoutes = $teamRoutes ?? [
+        'index' => 'roles.index',
+        'roles.create' => 'roles.create',
+        'roles.edit' => 'roles.edit',
+        'roles.store' => 'roles.store',
+        'staff.store' => 'staff.store',
+        'staff.destroy' => 'staff.destroy',
+        'staff.update_role' => 'staff.update-role',
+        'staff.invitation_success' => 'staff.invitation-success',
+        'staff.resend_invitation' => 'staff.resend-invitation',
+        'staff.cancel_invitation' => 'staff.cancel-invitation',
+    ];
+    $canAddUser = $canAddUser ?? ['allowed' => true, 'message' => null];
+@endphp
 <div class="w-full">
+    @if(!empty($showConsultantTrialNotice))
+        <div class="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            <strong>Free trial — solo workspace.</strong> You can review roles and team settings here. Inviting colleagues requires a paid agency pack
+            (<a href="{{ route($teamUpgradeRoute ?? 'consultant.packs.index') }}" class="font-medium underline">Consultant 5 and above</a>).
+        </div>
+    @endif
+
     <!-- Roles List Section -->
     <div class="mb-12">
         <div class="mb-6">
-            <h1 class="text-3xl font-bold text-gray-900">Roles List</h1>
-            <p class="mt-2 text-gray-600">A role provided access to predefined menus and features so that depending on assigned role an administrator can have access to what user needs.</p>
+            <h1 class="text-3xl font-bold text-gray-900">Roles</h1>
+            <p class="mt-2 text-gray-600">
+                @if(($teamContext ?? 'client') === 'consultant')
+                    Control what agency colleagues can do in your consultant workspace and managed client workspaces.
+                @else
+                    Define what each role can see and do across locations, emissions data, reports, and settings.
+                @endif
+            </p>
         </div>
 
         <!-- Roles Grid -->
@@ -25,7 +53,7 @@
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ $role->role_name }}</h3>
 
                 <!-- Edit Link -->
-                <a href="{{ route('roles.edit', $role) }}" class="text-sm text-blue-600 hover:text-blue-800 mb-4 inline-block">Edit Role</a>
+                <a href="{{ route($teamRoutes['roles.edit'], $role) }}" class="text-sm text-blue-600 hover:text-blue-800 mb-4 inline-block">Edit Role</a>
 
                 <!-- User Avatars -->
                 <div class="flex items-center justify-between mt-4">
@@ -60,7 +88,7 @@
 
             <!-- Add New Role Card -->
             <div class="bg-white rounded-lg border-2 border-dashed border-gray-300 p-6 flex flex-col items-center justify-center hover:border-blue-500 transition-colors">
-                <a href="{{ route('roles.create') }}" class="w-full text-center">
+                <a href="{{ route($teamRoutes['roles.create']) }}" class="w-full text-center">
                     <button class="w-full mb-4 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
                         Add New Role
                     </button>
@@ -78,8 +106,8 @@
     <!-- Total users with their roles Section -->
     <div class="mb-8">
         <div class="mb-6">
-            <h2 class="text-3xl font-bold text-gray-900">Total users with their roles</h2>
-            <p class="mt-2 text-gray-600">Find all of your company's administrator accounts and their associate roles.</p>
+            <h2 class="text-3xl font-bold text-gray-900">Team members</h2>
+            <p class="mt-2 text-gray-600">People with access to this {{ ($teamContext ?? 'client') === 'consultant' ? 'agency' : 'company' }} workspace and their assigned roles.</p>
         </div>
 
         <!-- Toolbar -->
@@ -112,14 +140,14 @@
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                 </svg>
-                                Invite New User
+                                Invite team member
                             </button>
                         @else
                             <button onclick="showUpgradeMessage()" class="px-4 py-2 bg-gray-400 text-white rounded-lg cursor-not-allowed text-sm flex items-center gap-2" title="{{ $userLimitMessage }}">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                 </svg>
-                                Invite New User
+                                Invite team member
                             </button>
                         @endif
                     </div>
@@ -173,7 +201,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="flex items-center justify-end gap-2">
-                                    <form action="{{ route('staff.destroy', $staff->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to remove this user from your company?');">
+                                    <form action="{{ route($teamRoutes['staff.destroy'], $staff->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to remove this user from your company?');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:text-red-900" title="Delete">
@@ -291,7 +319,7 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex items-center gap-2">
                                     @if($invitation->status === 'pending')
-                                        <a href="{{ route('staff.invitation-success', $invitation->id) }}" 
+                                        <a href="{{ route($teamRoutes['staff.invitation_success'], $invitation->id) }}" 
                                            class="text-blue-600 hover:text-blue-900" 
                                            title="View Invitation Link">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -342,7 +370,7 @@
     <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div class="p-6">
             <div class="flex items-center justify-between mb-6">
-                <h2 class="text-2xl font-bold text-gray-900">Invite New User</h2>
+                <h2 class="text-2xl font-bold text-gray-900">Invite team member</h2>
                 <button onclick="closeAddUserModal()" class="text-gray-400 hover:text-gray-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -350,7 +378,7 @@
                 </button>
             </div>
 
-            <form action="{{ route('staff.store') }}" method="POST" id="addUserForm" onsubmit="return submitAddUserForm(event)">
+            <form action="{{ route($teamRoutes['staff.store']) }}" method="POST" id="addUserForm" onsubmit="return submitAddUserForm(event)">
                 @csrf
                 
                 @if($errors->any())
@@ -561,7 +589,7 @@ function editUserRole(userCompanyRoleId, currentRoleId) {
     
     const form = document.getElementById('editUserRoleForm');
     // Set form action to the correct route
-    form.action = '{{ url("/staff") }}/' + userCompanyRoleId + '/role';
+    form.action = @json(route($teamRoutes['staff.update_role'], ['access' => 999999])).replace('999999', String(userCompanyRoleId));
     document.getElementById('editRoleSelect').value = currentRoleId;
     
     document.getElementById('editUserRoleModal').classList.remove('hidden');
@@ -628,8 +656,10 @@ document.addEventListener('click', function(e) {
 @endif
 
 function showUpgradeMessage() {
-    const message = @json($userLimitMessage ?? "You have reached your plan limit for users. Please upgrade your subscription to add more users.");
-    alert(message);
+    const message = @json($userLimitMessage ?? 'You have reached your plan limit for team members. Please upgrade to add more.');
+    if (confirm(message + '\n\nOpen upgrade page now?')) {
+        window.location.href = @json(route($teamUpgradeRoute ?? 'subscriptions.upgrade'));
+    }
 }
 
 // Resend Invitation
@@ -638,7 +668,7 @@ function resendInvitation(invitationId) {
         return;
     }
     
-    fetch(`{{ url('/staff/invitations') }}/${invitationId}/resend`, {
+    fetch(@json(route($teamRoutes['staff.resend_invitation'], ['invitation' => 999999])).replace('999999', String(invitationId)), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -666,7 +696,7 @@ function cancelInvitation(invitationId) {
         return;
     }
     
-    fetch(`{{ url('/staff/invitations') }}/${invitationId}`, {
+    fetch(@json(route($teamRoutes['staff.cancel_invitation'], ['invitation' => 999999])).replace('999999', String(invitationId)), {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',

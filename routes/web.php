@@ -75,6 +75,23 @@ Route::prefix('consultant')->name('consultant.')->group(function () {
             });
 
             Route::resource('clients', \App\Http\Controllers\Consultant\Agency\ManagedClientController::class);
+
+            // Team & access (same tables as client companies; consultant free trial = view only)
+            Route::prefix('team')->name('team.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\RoleManagementController::class, 'index'])->name('index');
+                Route::get('/roles/create', [\App\Http\Controllers\RoleManagementController::class, 'create'])->name('roles.create');
+                Route::post('/roles', [\App\Http\Controllers\RoleManagementController::class, 'store'])->name('roles.store');
+                Route::get('/roles/{role}/edit', [\App\Http\Controllers\RoleManagementController::class, 'edit'])->name('roles.edit');
+                Route::put('/roles/{role}', [\App\Http\Controllers\RoleManagementController::class, 'update'])->name('roles.update');
+                Route::delete('/roles/{role}', [\App\Http\Controllers\RoleManagementController::class, 'destroy'])->name('roles.destroy');
+
+                Route::post('/invites', [\App\Http\Controllers\StaffManagementController::class, 'store'])->name('invites.store');
+                Route::get('/invites/{invitation}/success', [\App\Http\Controllers\StaffManagementController::class, 'invitationSuccess'])->name('invites.success');
+                Route::post('/invites/{invitation}/resend', [\App\Http\Controllers\StaffManagementController::class, 'resendInvitation'])->name('invites.resend');
+                Route::delete('/invites/{invitation}', [\App\Http\Controllers\StaffManagementController::class, 'cancelInvitation'])->name('invites.cancel');
+                Route::put('/members/{access}/role', [\App\Http\Controllers\StaffManagementController::class, 'updateRole'])->name('members.update-role');
+                Route::delete('/members/{access}', [\App\Http\Controllers\StaffManagementController::class, 'destroy'])->name('members.destroy');
+            });
         });
 });
 

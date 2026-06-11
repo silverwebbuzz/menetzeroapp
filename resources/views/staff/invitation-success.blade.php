@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends($teamLayout ?? 'layouts.app')
 
 @section('title', 'Invitation Sent - MenetZero')
 @section('page-title', 'Invitation Sent Successfully')
@@ -139,9 +139,9 @@
 
         <!-- Actions -->
         <div class="flex items-center justify-between pt-6 border-t border-gray-200">
-            <a href="{{ route('roles.index') }}" 
+            <a href="{{ route(($teamRoutes ?? [])['index'] ?? 'roles.index') }}"
                class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-                Back to Staff & Roles
+                Back to {{ $teamMenuLabel ?? 'Team & Access' }}
             </a>
             <button onclick="openAddUserModal()" 
                class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700">

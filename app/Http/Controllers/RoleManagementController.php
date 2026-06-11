@@ -4,68 +4,58 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\RoleManagementService;
+use App\Services\TeamAccessService;
 use App\Models\CompanyCustomRole;
-use App\Models\RoleTemplate;
 use Illuminate\Support\Facades\Auth;
 
 class RoleManagementController extends Controller
 {
-    protected $roleManagementService;
-
-    public function __construct(RoleManagementService $roleManagementService)
-    {
-        $this->roleManagementService = $roleManagementService;
+    public function __construct(
+        protected RoleManagementService $roleManagementService,
+        protected TeamAccessService $teamAccess,
+    ) {
     }
 
-    /**
-     * Display a listing of custom roles and staff members.
-     */
     public function index()
     {
         $this->requirePermission('roles_permissions', 'view');
-        
+
         $company = Auth::user()->getActiveCompany();
         if (!$company) {
             return redirect()->route('client.dashboard')
                 ->with('error', 'Please complete your company setup first.');
         }
 
-        // Get roles with user counts
+        $this->teamAccess->ensureDefaultRoles($company->id);
+
         $customRoles = $company->customRoles()
             ->where('is_active', true)
-            ->withCount(['users' => function($query) {
+            ->withCount(['users' => function ($query) {
                 $query->where('is_active', true);
             }])
             ->get();
 
-        // Get all staff members (users with roles in this company)
         $staffMembers = \App\Models\UserCompanyRole::where('company_id', $company->id)
             ->where('is_active', true)
             ->with(['user', 'companyCustomRole'])
             ->get();
 
-        // Get pending invitations
         $pendingInvitations = \App\Models\CompanyInvitation::where('company_id', $company->id)
             ->where('status', 'pending')
             ->where('expires_at', '>', now())
             ->with('inviter')
             ->get();
 
-        // Check if can add more users
-        $subscriptionService = app(\App\Services\SubscriptionService::class);
-        $canAddUser = $subscriptionService->canPerformAction($company->id, 'users', 1);
-        $userLimitMessage = $canAddUser['allowed'] ? null : $canAddUser['message'];
-
-        return view('roles.index', compact('customRoles', 'staffMembers', 'pendingInvitations', 'canAddUser', 'userLimitMessage'));
+        return view('roles.index', array_merge(
+            compact('customRoles', 'staffMembers', 'pendingInvitations'),
+            $this->teamAccess->viewShared($company),
+        ));
     }
 
-    /**
-     * Show the form for creating a new custom role.
-     */
     public function create()
     {
         $this->requirePermission('roles_permissions', 'add');
-        
+
         $company = Auth::user()->getActiveCompany();
         if (!$company) {
             return redirect()->route('client.dashboard')
@@ -74,16 +64,16 @@ class RoleManagementController extends Controller
 
         $permissions = $this->roleManagementService->getPermissionsGroupedByModule();
 
-        return view('roles.create', compact('permissions'));
+        return view('roles.create', array_merge(
+            compact('permissions'),
+            $this->teamAccess->viewShared($company),
+        ));
     }
 
-    /**
-     * Store a newly created custom role.
-     */
     public function store(Request $request)
     {
         $this->requirePermission('roles_permissions', 'add');
-        
+
         $company = Auth::user()->getActiveCompany();
         if (!$company) {
             return redirect()->route('client.dashboard')
@@ -106,17 +96,14 @@ class RoleManagementController extends Controller
             ]
         );
 
-        return redirect()->route('roles.index')
+        return redirect()->route($this->teamAccess->indexRouteName($company))
             ->with('success', 'Custom role created successfully.');
     }
 
-    /**
-     * Show the form for editing the specified custom role.
-     */
     public function edit(CompanyCustomRole $role)
     {
         $this->requirePermission('roles_permissions', 'edit');
-        
+
         $company = Auth::user()->getActiveCompany();
         if (!$company || $role->company_id !== $company->id) {
             abort(403, 'Unauthorized action.');
@@ -126,16 +113,16 @@ class RoleManagementController extends Controller
         $permissions = $this->roleManagementService->getPermissionsGroupedByModule();
         $selectedPermissionIds = $role->getPermissionIds();
 
-        return view('roles.edit', compact('role', 'permissions', 'selectedPermissionIds'));
+        return view('roles.edit', array_merge(
+            compact('role', 'permissions', 'selectedPermissionIds'),
+            $this->teamAccess->viewShared($company),
+        ));
     }
 
-    /**
-     * Update the specified custom role.
-     */
     public function update(Request $request, CompanyCustomRole $role)
     {
         $this->requirePermission('roles_permissions', 'edit');
-        
+
         $company = Auth::user()->getActiveCompany();
         if (!$company || $role->company_id !== $company->id) {
             abort(403, 'Unauthorized action.');
@@ -156,17 +143,14 @@ class RoleManagementController extends Controller
             'is_active' => $request->has('is_active'),
         ]);
 
-        return redirect()->route('roles.index')
+        return redirect()->route($this->teamAccess->indexRouteName($company))
             ->with('success', 'Custom role updated successfully.');
     }
 
-    /**
-     * Remove the specified custom role.
-     */
     public function destroy(CompanyCustomRole $role)
     {
         $this->requirePermission('roles_permissions', 'delete');
-        
+
         $company = Auth::user()->getActiveCompany();
         if (!$company || $role->company_id !== $company->id) {
             abort(403, 'Unauthorized action.');
@@ -174,8 +158,7 @@ class RoleManagementController extends Controller
 
         $this->roleManagementService->deleteCustomRole($role->id);
 
-        return redirect()->route('roles.index')
+        return redirect()->route($this->teamAccess->indexRouteName($company))
             ->with('success', 'Custom role deleted successfully.');
     }
 }
-
