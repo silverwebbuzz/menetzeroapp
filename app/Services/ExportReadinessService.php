@@ -42,7 +42,7 @@ class ExportReadinessService
                         $additional = json_decode($additional, true) ?? [];
                     }
 
-                    return empty($additional['evidence_link']);
+                    return empty($additional['evidence_link']) && empty($additional['link']);
                 });
 
                 if ($withoutDocs->isNotEmpty()) {

@@ -593,7 +593,7 @@ class QuickInputController extends Controller
             $formFields = EmissionSourceFormField::where('emission_source_id', $emissionSource->id)->get();
             foreach ($formFields as $field) {
                 // Skip main fields that are stored directly or in dedicated columns
-                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments', 'fuel_category', 'fuel_type', 'energy_type', 'refrigerant_type', 'process_type', 'scope2_method', 'supplier_emission_factor', 'renewable_percent', 'is_biogenic'])) {
+                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments', 'link', 'fuel_category', 'fuel_type', 'energy_type', 'refrigerant_type', 'process_type', 'scope2_method', 'supplier_emission_factor', 'renewable_percent', 'is_biogenic'])) {
                     continue;
                 }
                 if ($request->has($field->field_name) && $request->input($field->field_name) !== null && $request->input($field->field_name) !== '') {
@@ -956,7 +956,7 @@ class QuickInputController extends Controller
             $formFields = $this->formBuilder->buildForm($emissionSource->id);
             foreach ($formFields as $field) {
                 // Skip main fields that are stored directly
-                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments', 'fuel_category', 'fuel_type', 'energy_type', 'refrigerant_type', 'process_type', 'scope2_method', 'supplier_emission_factor', 'renewable_percent', 'is_biogenic'])) {
+                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments', 'link', 'fuel_category', 'fuel_type', 'energy_type', 'refrigerant_type', 'process_type', 'scope2_method', 'supplier_emission_factor', 'renewable_percent', 'is_biogenic'])) {
                     continue;
                 }
                 if ($request->has($field->field_name) && $request->input($field->field_name) !== null && $request->input($field->field_name) !== '') {
@@ -1423,6 +1423,8 @@ class QuickInputController extends Controller
         if (!$request->has('evidence_link')) {
             return $additionalData;
         }
+
+        unset($additionalData['link']);
 
         $link = trim((string) $request->input('evidence_link'));
         if ($link !== '') {

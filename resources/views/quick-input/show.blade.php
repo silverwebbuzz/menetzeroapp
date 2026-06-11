@@ -334,7 +334,7 @@
                     $mainFieldNames = ['fuel_category', 'fuel_type', 'unit_of_measure', 'amount', 'quantity', 'unit'];
                     $seenFieldNames = [];
                     $additionalFields = $formFields->filter(function($field) use (&$seenFieldNames, $mainFieldNames) {
-                        if (in_array($field->field_name, $mainFieldNames) || $field->is_required || $field->field_name === 'comments') {
+                        if (in_array($field->field_name, $mainFieldNames) || $field->is_required || in_array($field->field_name, ['comments', 'link'])) {
                             return false;
                         }
                         if (in_array($field->field_name, $seenFieldNames)) {
@@ -344,7 +344,7 @@
                         return true;
                     });
                     $commentsField = $formFields->firstWhere('field_name', 'comments');
-                    $editEvidenceLink = old('evidence_link', $editAdditionalData['evidence_link'] ?? '');
+                    $editEvidenceLink = old('evidence_link', $editAdditionalData['evidence_link'] ?? $editAdditionalData['link'] ?? '');
                 @endphp
 
                 <div class="additional-data-panel flex flex-col flex-1">
@@ -419,14 +419,14 @@
                         </div>
 
                         <div class="form-group-stacked">
-                            <label for="evidence_link" class="form-label-stacked">Reference link</label>
+                            <label for="evidence_link" class="form-label-stacked">Link</label>
                             <input type="url"
                                    name="evidence_link"
                                    id="evidence_link"
                                    value="{{ $editEvidenceLink }}"
                                    class="form-input"
-                                   placeholder="https://docs.google.com/... or bill portal URL">
-                            <p class="form-help-text">Paste a Google Sheet, shared folder, or online bill link if you are not uploading a file.</p>
+                                   placeholder="e.g. SharePoint, Google Drive, or bill portal URL">
+                            <p class="form-help-text">Link to supporting documents (Google Sheet, shared folder, DEWA portal, etc.) if you are not uploading a file.</p>
                             @error('evidence_link')
                                 <p class="form-error-text">{{ $message }}</p>
                             @enderror

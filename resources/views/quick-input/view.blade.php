@@ -143,8 +143,8 @@
         if ($entry->additional_data) {
             $additionalData = is_string($entry->additional_data) ? json_decode($entry->additional_data, true) : $entry->additional_data;
         }
-        $evidenceLink = $additionalData['evidence_link'] ?? null;
-        unset($additionalData['evidence_link']);
+        $evidenceLink = $additionalData['evidence_link'] ?? $additionalData['link'] ?? null;
+        unset($additionalData['evidence_link'], $additionalData['link']);
 
         if ($entry->unit) {
             $additionalData['Unit'] = $entry->unit;
@@ -194,7 +194,7 @@
                         @endif
                         @if($evidenceLink)
                         <div class="flex items-center border-b border-gray-100 pb-3">
-                            <dt class="text-sm font-medium text-gray-500 w-1/3">Reference link</dt>
+                            <dt class="text-sm font-medium text-gray-500 w-1/3">Link</dt>
                             <dd class="text-sm flex-1">
                                 <a href="{{ $evidenceLink }}" target="_blank" rel="noopener noreferrer"
                                    class="text-emerald-700 hover:text-emerald-900 hover:underline break-all">{{ $evidenceLink }}</a>
