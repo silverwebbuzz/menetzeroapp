@@ -82,10 +82,10 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0;
 }
 
-h1 { font-size: 1.5rem; line-height: 1.3; font-weight: 600; letter-spacing: -0.02em; }
-h2 { font-size: 1.25rem; line-height: 1.35; font-weight: 600; }
-h3 { font-size: 1.0625rem; line-height: 1.4; font-weight: 600; }
-h4 { font-size: 0.9375rem; line-height: 1.4; font-weight: 600; }
+h1 { font-size: 0.875rem; line-height: 1.428571; font-weight: 600; letter-spacing: -0.01em; }
+h2 { font-size: 0.875rem; line-height: 1.428571; font-weight: 600; }
+h3 { font-size: 0.875rem; line-height: 1.428571; font-weight: 600; }
+h4 { font-size: 0.875rem; line-height: 1.428571; font-weight: 600; }
 
 strong, b { font-weight: 600; color: var(--ink); }
 small { font-size: 0.8125rem; }
@@ -484,11 +484,11 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
 
 /* Section heading within a page */
 .section-heading {
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
     font-weight: 600;
-    color: var(--ink-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    color: var(--ink);
+    text-transform: none;
+    letter-spacing: -0.01em;
     margin-bottom: 0.75rem;
 }
 
@@ -506,7 +506,7 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
 
 .form-label {
     display: block;
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
     font-weight: 500;
     color: var(--ink);
     margin-bottom: 0.375rem;
@@ -680,11 +680,11 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
 }
 
 .stat-card-value {
-    font-size: 1.5rem;
+    font-size: 0.875rem;
     font-weight: 600;
     color: var(--ink);
-    line-height: 1.15;
-    letter-spacing: -0.02em;
+    line-height: 1.428571;
+    letter-spacing: -0.01em;
 }
 
 .stat-card-delta { font-size: 0.75rem; color: var(--ink-muted); margin-top: 0.375rem; }
@@ -757,8 +757,8 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
 
 @media (max-width: 768px) {
     .content-area { padding: 1.25rem 1rem; }
-    .page-title { font-size: 0.9375rem; }
-    h1 { font-size: 1.25rem; }
+    .page-title { font-size: 0.875rem; }
+    .content-area h1 { font-size: 0.875rem; }
     .card-header { padding: 0.875rem 1rem; }
     .card-body { padding: 1rem; }
     .card-footer { padding: 0.75rem 1rem; }
@@ -939,17 +939,25 @@ table.min-w-full tbody tr:hover { background-color: var(--canvas); }
     box-shadow: var(--shadow-sm) !important;
 }
 
-/* Heading scale normalisation — pages use text-3xl / text-2xl freely,
-   which makes headings huge. Clamp to our scale. */
+/* Heading scale — locked to 14px primary / 12px secondary */
 .content-area h1.text-3xl,
-.content-area h1.text-4xl { font-size: 1.5rem !important; font-weight: 700 !important; letter-spacing: -0.02em !important; }
-.content-area h2.text-2xl { font-size: 1.25rem !important; font-weight: 600 !important; }
+.content-area h1.text-4xl,
+.content-area h1.text-2xl,
+.content-area h2.text-2xl,
+.content-area h2.text-xl,
 .content-area h3.text-xl,
-.content-area h3.text-lg { font-size: 1.0625rem !important; font-weight: 600 !important; }
+.content-area h3.text-lg {
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    line-height: 1.428571 !important;
+}
 
-/* Description text under headings — consistent muted */
 .content-area h1 + p,
-.content-area h1.mb-2 + p { color: var(--ink-muted) !important; font-size: 0.875rem !important; }
+.content-area h1.mb-2 + p {
+    color: #6b7280 !important;
+    font-size: 0.75rem !important;
+    line-height: 1.333333 !important;
+}
 
 /* ===================================================================== */
 /* Enterprise UI — universal native controls (whole portal)               */
@@ -969,7 +977,7 @@ table.min-w-full tbody tr:hover { background-color: var(--canvas); }
     max-width: 100%;
     padding: 0.5rem 0.75rem;
     font-size: 0.875rem;
-    line-height: 1.4;
+    line-height: 1.428571;
     color: var(--ink);
     background-color: var(--surface);
     border: 1px solid var(--line-strong);
@@ -1127,17 +1135,17 @@ table.min-w-full tbody tr:hover { background-color: var(--canvas); }
 }
 
 .source-card__title {
-    font-size: 0.8125rem;
-    font-weight: 600;
+    font-size: 0.875rem;
+    font-weight: 500;
     color: var(--ink);
-    line-height: 1.3;
+    line-height: 1.428571;
 }
 
 .source-card__meta {
-    font-size: 0.6875rem;
-    color: var(--ink-muted);
+    font-size: 0.75rem;
+    color: #6b7280;
     margin-top: 0.25rem;
-    line-height: 1.3;
+    line-height: 1.333333;
 }
 
 /* Scope / section blocks */
@@ -1152,15 +1160,17 @@ table.min-w-full tbody tr:hover { background-color: var(--canvas); }
 }
 
 .scope-block__title {
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     font-weight: 600;
     color: var(--ink);
     margin: 0;
+    line-height: 1.428571;
 }
 
 .scope-block__subtitle {
-    font-size: 0.8125rem;
-    color: var(--ink-muted);
+    font-size: 0.75rem;
+    color: #6b7280;
+    line-height: 1.333333;
 }
 
 /* Callout panels (upgrade, info, scope gates) */
@@ -1185,16 +1195,17 @@ table.min-w-full tbody tr:hover { background-color: var(--canvas); }
 }
 
 .callout-panel__title {
-    font-size: 1rem;
+    font-size: 0.875rem;
     font-weight: 600;
     color: var(--ink);
     margin: 0 0 0.25rem;
+    line-height: 1.428571;
 }
 
 .callout-panel__body {
-    font-size: 0.875rem;
-    color: var(--ink-muted);
-    line-height: 1.5;
+    font-size: 0.75rem;
+    color: #6b7280;
+    line-height: 1.333333;
     margin: 0;
 }
 
@@ -1220,16 +1231,18 @@ table.min-w-full tbody tr:hover { background-color: var(--canvas); }
 }
 
 .empty-state__title {
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     font-weight: 600;
     color: var(--ink);
     margin: 0 0 0.375rem;
+    line-height: 1.428571;
 }
 
 .empty-state__text {
-    font-size: 0.875rem;
-    color: var(--ink-muted);
+    font-size: 0.75rem;
+    color: #6b7280;
     margin: 0;
+    line-height: 1.333333;
 }
 
 .empty-state__action {
@@ -1267,8 +1280,8 @@ table.min-w-full tbody tr:hover { background-color: var(--canvas); }
 
 /* Scope section badge */
 .badge-plan {
-    font-size: 0.6875rem;
-    font-weight: 600;
+    font-size: 0.75rem;
+    font-weight: 500;
     padding: 0.125rem 0.5rem;
     border-radius: 9999px;
     background: var(--brand-soft);

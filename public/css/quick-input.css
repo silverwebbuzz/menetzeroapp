@@ -1,9 +1,8 @@
 /**
- * Quick Input Styles - Clean Professional Design
- * Using Poppins font family
+ * Quick Input — layout & form structure only.
+ * Typography: portal-design-system.css (14px / 12px)
  */
 
-/* Apply Poppins font to all form elements */
 .form-group-horizontal,
 .form-label-horizontal,
 .form-input,
@@ -11,7 +10,7 @@
 .form-textarea,
 .form-help-text,
 .form-error-text {
-    font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+    font-family: inherit;
 }
 
 /* Scoped overflow prevention — quick-input form only (do not touch global .w-full / .grid) */
@@ -61,17 +60,19 @@ form[data-source-id] .grid {
 }
 
 .main-information-panel__title {
-    font-size: 1.0625rem;
+    font-size: 0.875rem;
     font-weight: 600;
     color: #0f172a;
     letter-spacing: -0.01em;
     margin: 0;
+    line-height: 1.428571;
 }
 
 .main-information-panel__subtitle {
     margin: 0.25rem 0 0;
-    font-size: 0.8125rem;
-    color: #64748b;
+    font-size: 0.75rem;
+    color: #6b7280;
+    line-height: 1.333333;
 }
 
 .main-information-panel__fields {
@@ -695,32 +696,17 @@ button:disabled {
 /* without touching the form logic in the Blade template.                */
 /* =================================================================== */
 
-.form-group-horizontal,
-.form-label-horizontal,
-.form-input,
-.form-input-select,
-.form-textarea,
-.form-help-text,
-.form-error-text {
-    font-family: 'Inter', 'Poppins', system-ui, -apple-system, sans-serif !important;
-}
-
-/* Labels — weight + colour to match design system */
+/* Quick Input — layout & brand colours only (typography in portal-design-system.css) */
 .form-label-horizontal {
-    font-size: 0.8125rem !important;
-    font-weight: 500 !important;
     color: #0f172a !important;
     padding-top: 0.5rem !important;
 }
 
-/* Help text */
 .form-help-text-under-label,
 .form-help-text {
-    color: #64748b !important;
-    font-size: 0.75rem !important;
+    color: #6b7280 !important;
 }
 
-/* Inputs + selects + textareas */
 .form-input,
 .form-input-select,
 .form-textarea,
@@ -734,11 +720,25 @@ select.form-input-select {
     border: 1px solid #cbd5e1 !important;
     border-radius: 0.5rem !important;
     padding: 0.5rem 0.75rem !important;
-    font-size: 0.875rem !important;
-    line-height: 1.4 !important;
     color: #0f172a !important;
     box-shadow: 0 1px 2px 0 rgb(15 23 42 / 0.04) !important;
     transition: border-color 0.12s, box-shadow 0.12s !important;
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+    color: #9ca3af !important;
+    opacity: 1 !important;
+}
+
+.form-error-text {
+    color: #dc2626 !important;
+    margin-top: 0.375rem !important;
+}
+
+.main-information-panel__subtitle,
+.additional-data-section p {
+    color: #6b7280 !important;
 }
 
 .form-input:hover,
@@ -753,17 +753,6 @@ select.form-input-select {
     border-color: #10b981 !important;
     box-shadow: 0 0 0 3px rgb(16 185 129 / 0.15) !important;
     outline: none !important;
-}
-
-.form-input::placeholder,
-.form-textarea::placeholder {
-    color: #94a3b8 !important;
-}
-
-.form-error-text {
-    color: #dc2626 !important;
-    font-size: 0.75rem !important;
-    margin-top: 0.375rem !important;
 }
 
 /* Remove the purple gradient ONLY where it's applied as a button/link.
@@ -824,31 +813,7 @@ form .bg-emerald-600:hover, form .bg-emerald-700:hover {
     box-shadow: 0 1px 3px 0 rgb(15 23 42 / 0.06), 0 1px 2px 0 rgb(15 23 42 / 0.04) !important;
 }
 
-/* Section headers inside quick-input */
-.main-information-panel__title,
-.additional-data-section h3,
-form[data-source-id] h3 {
-    font-size: 0.9375rem !important;
-    font-weight: 600 !important;
-    color: #0f172a !important;
-    letter-spacing: -0.005em !important;
-}
-
-.main-information-panel__subtitle,
-.additional-data-section p {
-    color: #64748b !important;
-    font-size: 0.8125rem !important;
-}
-
 /* Number input spinner polish */
 input[type="number"].form-input {
     -moz-appearance: textfield;
-}
-
-/* Hero heading on Quick Input page */
-.content-area > div > .mb-8 > div > h1,
-form[method="GET"] + form[method="POST"] + div > h1 {
-    font-size: 1.5rem !important;
-    font-weight: 700 !important;
-    letter-spacing: -0.02em !important;
 }

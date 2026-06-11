@@ -50,11 +50,10 @@
         };
     </script>
 
-    <!-- App shell styles -->
-    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260618">
-    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260618">
-
+    <!-- App shell styles (portal-design-system loads last so typography always wins) -->
+    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260620">
     @stack('styles')
+    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260620">
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>

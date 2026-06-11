@@ -4,7 +4,7 @@
 @section('page-title', $userFriendlyName ?? $emissionSource->name)
 
 @push('styles')
-<link rel="stylesheet" href="{{asset('css/quick-input.css?v=20260612')}}">
+<link rel="stylesheet" href="{{asset('css/quick-input.css?v=20260620')}}">
 @endpush
 
 @section('content')

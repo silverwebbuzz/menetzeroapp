@@ -115,16 +115,26 @@ body.portal-auth {
 .consultant-shell .content-area dt,
 .app-shell .badge,
 .consultant-shell .badge,
-.app-shell .section-heading,
-.consultant-shell .section-heading,
 .app-shell .table thead th,
 .consultant-shell .table thead th,
 .app-shell table.min-w-full thead th,
-.consultant-shell table.min-w-full thead th {
+.consultant-shell table.min-w-full thead th,
+.app-shell .badge-plan,
+.consultant-shell .badge-plan {
     font-size: var(--portal-12) !important;
     line-height: var(--portal-lh-12) !important;
     font-weight: var(--portal-weight-body);
     color: var(--ink-secondary);
+}
+
+.app-shell .section-heading,
+.consultant-shell .section-heading {
+    font-size: var(--portal-14) !important;
+    line-height: var(--portal-lh-14) !important;
+    font-weight: var(--portal-weight-semibold);
+    color: var(--ink);
+    text-transform: none;
+    letter-spacing: -0.01em;
 }
 
 /* ─── 3. Buttons — all 14px ─── */
@@ -180,16 +190,10 @@ body.portal-auth {
 .consultant-shell .alert-info,
 .app-shell .flash-stack .alert,
 .consultant-shell .flash-stack .alert,
-.app-shell .content-area .rounded-lg.border.px-4.py-3.text-sm,
-.consultant-shell .content-area .rounded-lg.border.px-4.py-3.text-sm,
-.app-shell .content-area [class*='text-green-'],
-.consultant-shell .content-area [class*='text-green-'],
-.app-shell .content-area [class*='text-red-'],
-.consultant-shell .content-area [class*='text-red-'],
-.app-shell .content-area [class*='bg-green-50'],
-.consultant-shell .content-area [class*='bg-green-50'],
-.app-shell .content-area [class*='bg-red-50'],
-.consultant-shell .content-area [class*='bg-red-50'] {
+.app-shell .content-area .mb-4.rounded-lg.border.px-4.py-3,
+.consultant-shell .content-area .mb-4.rounded-lg.border.px-4.py-3,
+.app-shell .content-area [role="alert"],
+.consultant-shell .content-area [role="alert"] {
     font-size: var(--portal-14) !important;
     line-height: var(--portal-lh-14) !important;
 }
@@ -330,12 +334,12 @@ body.portal-auth {
     margin-top: 0;
 }
 
-/* Stat numbers can stay slightly larger but labels/deltas = 12px */
+/* Stat numbers — primary 14px (labels/deltas = 12px via design system) */
 .app-shell .stat-card-value,
 .consultant-shell .stat-card-value,
 .cd-stat-value {
-    font-size: 1.25rem;
-    line-height: 1.2;
+    font-size: var(--portal-14) !important;
+    line-height: var(--portal-lh-14) !important;
     font-weight: var(--portal-weight-semibold);
 }
 
@@ -511,4 +515,156 @@ body.portal-auth {
 
 .portal-auth .btn-full {
     width: 100%;
+}
+
+/* ─── Inner-page components (Quick Input, subscriptions, etc.) ─── */
+.app-shell .scope-block__title,
+.consultant-shell .scope-block__title,
+.app-shell .callout-panel__title,
+.consultant-shell .callout-panel__title,
+.app-shell .source-card__title,
+.consultant-shell .source-card__title,
+.app-shell .empty-state__title,
+.consultant-shell .empty-state__title {
+    font-size: var(--portal-14) !important;
+    line-height: var(--portal-lh-14) !important;
+    font-weight: var(--portal-weight-semibold);
+    color: var(--ink);
+}
+
+.app-shell .scope-block__subtitle,
+.consultant-shell .scope-block__subtitle,
+.app-shell .callout-panel__body,
+.consultant-shell .callout-panel__body,
+.app-shell .source-card__meta,
+.consultant-shell .source-card__meta,
+.app-shell .empty-state__text,
+.consultant-shell .empty-state__text {
+    font-size: var(--portal-12) !important;
+    line-height: var(--portal-lh-12) !important;
+    font-weight: var(--portal-weight-body);
+    color: var(--ink-secondary);
+}
+
+.app-shell .content-area .table td .text-xs,
+.consultant-shell .content-area .table td .text-xs {
+    font-size: var(--portal-12) !important;
+    color: var(--ink-secondary) !important;
+}
+
+.app-shell .content-area input::placeholder,
+.app-shell .content-area textarea::placeholder,
+.consultant-shell .content-area input::placeholder,
+.consultant-shell .content-area textarea::placeholder,
+.app-shell .form-control::placeholder,
+.app-shell .form-textarea::placeholder {
+    color: var(--ink-placeholder) !important;
+    opacity: 1;
+}
+
+/* ─── Typography lock (loads last — wins over page CSS & consultant skin) ─── */
+.app-shell .content-area h1,
+.app-shell .content-area h2,
+.app-shell .content-area h3,
+.app-shell .content-area h4,
+.app-shell .content-area h5,
+.app-shell .content-area h6,
+.consultant-shell .content-area h1,
+.consultant-shell .content-area h2,
+.consultant-shell .content-area h3,
+.consultant-shell .content-area h4,
+.consultant-shell .content-area h5,
+.consultant-shell .content-area h6,
+.cd-page-head h2,
+.cd-card-title,
+.cd-pack-name {
+    font-size: var(--portal-14) !important;
+    line-height: var(--portal-lh-14) !important;
+    font-weight: var(--portal-weight-semibold) !important;
+    color: var(--ink) !important;
+}
+
+.consultant-shell .cd-stat-value,
+.consultant-shell .cd-pack-price {
+    font-size: var(--portal-14) !important;
+    line-height: var(--portal-lh-14) !important;
+    font-weight: var(--portal-weight-semibold) !important;
+    letter-spacing: normal !important;
+}
+
+.app-shell .stat-card-value .text-sm,
+.consultant-shell .stat-card-value .text-sm,
+.cd-stat-value span,
+.cd-pack-price span {
+    font-size: var(--portal-12) !important;
+    line-height: var(--portal-lh-12) !important;
+    font-weight: var(--portal-weight-body) !important;
+    color: var(--ink-secondary) !important;
+}
+
+/* Quick Input form classes */
+.form-label-horizontal,
+.main-information-panel__title,
+.additional-data-section h3,
+form[data-source-id] h3,
+.scope2-reporting-block > summary {
+    font-size: var(--portal-14) !important;
+    line-height: var(--portal-lh-14) !important;
+    font-weight: var(--portal-weight-medium) !important;
+    color: var(--ink) !important;
+}
+
+.form-help-text-under-label,
+.form-help-text,
+.main-information-panel__subtitle,
+.additional-data-section p,
+.scope2-reporting-block__intro {
+    font-size: var(--portal-12) !important;
+    line-height: var(--portal-lh-12) !important;
+    color: var(--ink-secondary) !important;
+}
+
+.form-input,
+.form-input-select,
+.form-textarea,
+input[type="text"].form-input,
+input[type="number"].form-input,
+input[type="email"].form-input,
+input[type="url"].form-input,
+textarea.form-input,
+select.form-input-select,
+.form-error-text {
+    font-size: var(--portal-14) !important;
+    line-height: var(--portal-lh-14) !important;
+}
+
+.app-shell .form-label,
+.consultant-shell .form-label,
+.app-shell .content-area label,
+.consultant-shell .content-area label {
+    font-size: var(--portal-14) !important;
+    line-height: var(--portal-lh-14) !important;
+}
+
+/* Pages with scoped inline styles (reports, etc.) */
+.report-kpi .kpi-label,
+.report-meta-item .label,
+.activity-table th {
+    font-size: var(--portal-12) !important;
+    line-height: var(--portal-lh-12) !important;
+}
+
+.report-kpi .kpi-value,
+.report-meta-item .value,
+.activity-table td,
+.moccae-notice,
+.export-readiness-error,
+.export-readiness-warning {
+    font-size: var(--portal-14) !important;
+    line-height: var(--portal-lh-14) !important;
+}
+
+.report-kpi .kpi-unit {
+    font-size: var(--portal-12) !important;
+    line-height: var(--portal-lh-12) !important;
 }

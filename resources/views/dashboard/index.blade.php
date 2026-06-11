@@ -324,7 +324,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
         <div class="stat-card" style="background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%); border-color: var(--brand-dark); color: white;">
             <div class="stat-card-label" style="color: rgba(255,255,255,0.85);">Total Emissions</div>
-            <div class="stat-card-value" style="color: white;">{{ co2e_t($kpis['total_emissions'] ?? 0) }}<span style="font-size: 0.75rem; font-weight: 500; margin-left: 0.25rem; opacity: 0.85;">tCO₂e</span></div>
+            <div class="stat-card-value" style="color: white;">{{ co2e_t($kpis['total_emissions'] ?? 0) }}<span class="text-sm font-medium ml-1 opacity-85">tCO₂e</span></div>
             <div class="stat-card-delta" style="color: rgba(255,255,255,0.9);">
                 @if(($kpis['monthly_change'] ?? 0) > 0)
                     ↗ {{ $kpis['monthly_change'] ?? 0 }}% vs last month

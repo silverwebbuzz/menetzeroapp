@@ -35,18 +35,18 @@
         }
 
         .report-kpi .kpi-label {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.04em;
             color: #6b7280;
-            font-weight: 600;
+            font-weight: 500;
         }
 
         .report-kpi .kpi-value {
-            font-size: 1.75rem;
-            font-weight: 700;
+            font-size: 0.875rem;
+            font-weight: 600;
             color: #059669;
-            line-height: 1.2;
+            line-height: 1.428571;
             margin-top: 0.25rem;
         }
 
@@ -93,29 +93,29 @@
         }
 
         .report-meta-item .label {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.04em;
             color: #9ca3af;
-            font-weight: 600;
+            font-weight: 500;
         }
 
         .report-meta-item .value {
-            font-size: 0.95rem;
+            font-size: 0.875rem;
             font-weight: 600;
             color: #111827;
             margin-top: 0.125rem;
         }
 
         .activity-table th {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.03em;
             white-space: nowrap;
         }
 
         .activity-table td {
-            font-size: 0.8125rem;
+            font-size: 0.875rem;
             vertical-align: top;
         }
     </style>
