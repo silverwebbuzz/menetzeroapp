@@ -11,7 +11,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Tailwind CDN with brand theme extension -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -51,7 +51,8 @@
     </script>
 
     <!-- App shell styles -->
-    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260612">
+    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260616">
+    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260616">
 
     @stack('styles')
 
@@ -63,7 +64,7 @@
 
     @stack('head')
 </head>
-<body class="antialiased">
+<body class="antialiased company-portal">
     <div class="app-shell" x-data="{ sidebarOpen: false }">
         @auth('web')
             @php

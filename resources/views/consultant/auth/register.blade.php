@@ -1,69 +1,69 @@
-@extends('layouts.public')
+@php($portalVariant = 'consultant')
+@extends('layouts.portal-auth')
 
 @section('title', 'Consultant Registration — MENetZero')
 
 @section('content')
-<section class="mkt-section">
-    <div class="mkt-container max-w-md">
-        <div class="mkt-section-head mb-8">
-            <div class="mkt-tagline mb-3">For consultants</div>
-            <h2>Create consultant account</h2>
-            <p>Register your practice for the directory and agency hub. Pack pricing is shown after you sign in.</p>
-        </div>
+<p class="auth-eyebrow">For consultants</p>
+<h1 class="auth-title">Create consultant account</h1>
+<p class="auth-lead">Register your practice for the directory and agency hub. Pack pricing is shown after you sign in.</p>
 
-        <div class="mkt-feature-card mb-4" style="padding:1.25rem;">
-            <a href="{{ route('consultant.auth.google') }}" class="mkt-btn mkt-btn-outline mkt-btn-block" style="gap:0.5rem;">
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="" class="w-5 h-5">
-                Sign up with Google
-            </a>
-        </div>
+<a href="{{ route('consultant.auth.google') }}" class="btn btn-secondary btn-full">
+    <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="" class="w-5 h-5">
+    Sign up with Google
+</a>
 
-        <div class="flex items-center gap-4 text-xs text-gray-400 mb-4 max-w-md mx-auto">
-            <div class="h-px flex-1 bg-gray-200"></div>
-            <span>or email</span>
-            <div class="h-px flex-1 bg-gray-200"></div>
-        </div>
+<div class="auth-divider">or email</div>
 
-        <form method="POST" action="{{ route('consultant.register.post') }}" class="mkt-feature-card space-y-4" style="padding:1.5rem;">
-            @csrf
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Your name</label>
-                <input type="text" name="name" value="{{ old('name') }}" required class="mkt-form-input">
-                @error('name')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Practice / company name</label>
-                <input type="text" name="company_name" value="{{ old('company_name') }}" required class="mkt-form-input">
-                @error('company_name')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input type="email" name="email" value="{{ old('email') }}" required class="mkt-form-input">
-                @error('email')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Phone (optional)</label>
-                <input type="text" name="phone" value="{{ old('phone') }}" class="mkt-form-input">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                <input type="password" name="password" required class="mkt-form-input">
-                @error('password')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Confirm password</label>
-                <input type="password" name="password_confirmation" required class="mkt-form-input">
-            </div>
-            <button type="submit" class="mkt-btn mkt-btn-primary mkt-btn-block">Create consultant account</button>
-        </form>
-
-        <p class="text-center text-sm text-gray-500 mt-4">
-            Already registered? <a href="{{ route('consultant.login') }}" class="mkt-text-brand hover:underline">Sign in</a>
-        </p>
-        <p class="text-center text-xs text-gray-400 mt-3">
-            Need plans for your own company?
-            <a href="{{ route('register') }}" class="mkt-text-brand hover:underline">Company sign up</a>
-        </p>
+<form method="POST" action="{{ route('consultant.register.post') }}" class="space-y-4">
+    @csrf
+    <div class="form-group mb-0">
+        <label class="form-label" for="name">Your name</label>
+        <input class="form-input" id="name" type="text" name="name" value="{{ old('name') }}" required>
+        @error('name')<p class="form-error">{{ $message }}</p>@enderror
     </div>
-</section>
+    <div class="form-group mb-0">
+        <label class="form-label" for="company_name">Practice / company name</label>
+        <input class="form-input" id="company_name" type="text" name="company_name" value="{{ old('company_name') }}" required>
+        @error('company_name')<p class="form-error">{{ $message }}</p>@enderror
+    </div>
+    <div class="form-group mb-0">
+        <label class="form-label" for="email">Email</label>
+        <input class="form-input" id="email" type="email" name="email" value="{{ old('email') }}" required>
+        @error('email')<p class="form-error">{{ $message }}</p>@enderror
+    </div>
+    <div class="form-group mb-0">
+        <label class="form-label" for="phone">Phone (optional)</label>
+        <input class="form-input" id="phone" type="text" name="phone" value="{{ old('phone') }}">
+    </div>
+    <div class="form-group mb-0">
+        <label class="form-label" for="password">Password</label>
+        <input class="form-input" id="password" type="password" name="password" required>
+        @error('password')<p class="form-error">{{ $message }}</p>@enderror
+    </div>
+    <div class="form-group mb-0">
+        <label class="form-label" for="password_confirmation">Confirm password</label>
+        <input class="form-input" id="password_confirmation" type="password" name="password_confirmation" required>
+    </div>
+    <button type="submit" class="btn btn-primary btn-full">Create consultant account</button>
+</form>
+
+<p class="auth-footer">
+    Already registered?
+    <a href="{{ route('consultant.login') }}" class="text-brand font-semibold hover:underline">Sign in</a>
+</p>
+<p class="auth-footer-sub">
+    Need plans for your own company?
+    <a href="{{ route('register') }}" class="text-brand font-semibold hover:underline">Company sign up</a>
+</p>
+@endsection
+
+@section('sidebar')
+<span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-sm font-semibold">Start with a free trial client</span>
+<ul class="mt-6 space-y-4 text-white/90 text-base font-medium">
+    <li class="flex gap-3"><span>✓</span> One login for all client workspaces</li>
+    <li class="flex gap-3"><span>✓</span> Directory profile for SME leads</li>
+    <li class="flex gap-3"><span>✓</span> IFRS / GRI reporting tools</li>
+    <li class="flex gap-3"><span>✓</span> Scale with agency packs when ready</li>
+</ul>
 @endsection

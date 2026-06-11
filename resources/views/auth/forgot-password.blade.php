@@ -1,41 +1,36 @@
-@extends('components.auth-layout')
+@extends('layouts.portal-auth')
 
-@section('title', 'Forgot Password - MIDDLE EAST NET Zero')
+@section('title', 'Forgot Password — MENetZero')
 
 @section('content')
-    <h1 class="text-3xl font-semibold text-gray-900 mb-2">Forgot Password?</h1>
-    <p class="text-sm text-gray-600 mb-8">No worries, we'll send you reset instructions.</p>
+<h1 class="auth-title">Forgot password?</h1>
+<p class="auth-lead">No worries — we'll send you reset instructions.</p>
 
-    @if (session('status'))
-        <div class="alert alert-success mb-6">
-            {{ session('status') }}
-        </div>
-    @endif
+@if (session('status'))
+    <div class="alert alert-success mb-4">{{ session('status') }}</div>
+@endif
 
-    <form class="space-y-6" method="POST" action="{{ route('password.email') }}">
-        @csrf
-        <div class="form-group">
-            <label class="form-label">Business Email</label>
-            <input class="form-input" type="email" name="email" value="{{ old('email') }}" required placeholder="Enter your email...">
-            @error('email')
-                <p class="form-error">{{ $message }}</p>
-            @enderror
-        </div>
-
-        <button type="submit" class="btn btn-primary btn-full">Send Reset Link</button>
-    </form>
-
-    <div class="mt-6 text-center">
-        <a href="{{ route('login') }}" class="text-sm font-medium" style="color: var(--brand-primary);">Back to Login</a>
+<form method="POST" action="{{ route('password.email') }}" class="space-y-4">
+    @csrf
+    <div class="form-group mb-0">
+        <label class="form-label" for="email">Business email</label>
+        <input class="form-input" id="email" type="email" name="email" value="{{ old('email') }}" required placeholder="Enter your email">
+        @error('email')<p class="form-error">{{ $message }}</p>@enderror
     </div>
+    <button type="submit" class="btn btn-primary btn-full">Send reset link</button>
+</form>
+
+<p class="auth-footer">
+    <a href="{{ route('login') }}" class="text-brand font-semibold hover:underline">← Back to sign in</a>
+</p>
 @endsection
 
-@section('sidebar-content')
-    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-sm">Secure Password Reset</span>
-    <ul class="mt-6 space-y-4 text-white/90">
-        <li class="flex gap-3"><span>✓</span> Secure password reset process</li>
-        <li class="flex gap-3"><span>✓</span> Email verification required</li>
-        <li class="flex gap-3"><span>✓</span> Quick and easy recovery</li>
-        <li class="flex gap-3"><span>✓</span> Your account stays protected</li>
-    </ul>
+@section('sidebar')
+<span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-sm font-semibold">Secure password reset</span>
+<ul class="mt-6 space-y-4 text-white/90 text-base font-medium">
+    <li class="flex gap-3"><span>✓</span> Secure password reset process</li>
+    <li class="flex gap-3"><span>✓</span> Email verification required</li>
+    <li class="flex gap-3"><span>✓</span> Quick and easy recovery</li>
+    <li class="flex gap-3"><span>✓</span> Your account stays protected</li>
+</ul>
 @endsection

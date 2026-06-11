@@ -10,7 +10,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -40,14 +40,15 @@
                         blue: BRAND,
                     },
                     fontFamily: {
-                        sans: ['Manrope', 'system-ui', 'sans-serif'],
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
                     },
                 },
             },
         };
     </script>
 
-    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260612">
+    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260616">
+    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260616">
     <link rel="stylesheet" href="{{ asset('css/consultant-shell.css') }}?v=20260616">
 
     @stack('styles')

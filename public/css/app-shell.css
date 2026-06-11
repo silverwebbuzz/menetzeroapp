@@ -12,10 +12,11 @@
     --brand-soft: #ecfdf5;     /* emerald 50 */
     --brand-softer: #d1fae5;   /* emerald 100 */
 
-    /* Neutrals */
-    --ink: #0f172a;            /* slate 900 */
-    --ink-muted: #475569;      /* slate 600 */
-    --ink-subtle: #94a3b8;     /* slate 400 */
+    /* Neutrals — aligned with portal design system */
+    --ink: #0f172a;
+    --ink-muted: #374151;
+    --ink-subtle: #6b7280;
+    --ink-hint: #9ca3af;
     --line: #e2e8f0;           /* slate 200 */
     --line-strong: #cbd5e1;    /* slate 300 */
     --surface: #ffffff;
@@ -63,9 +64,9 @@ html {
 
 body {
     font-family: 'Inter', 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 1.5;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.55;
     color: var(--ink);
     background-color: var(--canvas);
     -webkit-font-smoothing: antialiased;
