@@ -129,9 +129,9 @@
         </div>
     </div>
 
-    @if(session('error') || isset($error))
+    @if(isset($error))
         <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {{ session('error') ?? $error }}
+            {{ $error }}
         </div>
     @endif
 
@@ -203,28 +203,7 @@
                 :upgrade-label="$gate->upgradeButtonLabel('Upgrade to Starter')" />
         @endif
 
-        @if(!empty($exportReadiness['errors'] ?? []))
-            <div class="export-readiness-error mb-4">
-                <p class="font-semibold mb-1">Export blocked — data gaps detected</p>
-                <ul class="list-disc list-inside space-y-1">
-                    @foreach($exportReadiness['errors'] as $message)
-                        <li>{{ $message }}</li>
-                    @endforeach
-                </ul>
-                <p class="mt-2 text-xs">Add missing electricity data under <a href="{{ route('quick-input.index') }}" class="underline font-medium">Input Data</a>, then regenerate this report.</p>
-            </div>
-        @endif
-
-        @if(!empty($exportReadiness['warnings'] ?? []) || !empty(session('export_warnings')))
-            <div class="export-readiness-warning mb-4">
-                <p class="font-semibold mb-1">Export readiness notes</p>
-                <ul class="list-disc list-inside space-y-1">
-                    @foreach(array_merge($exportReadiness['warnings'] ?? [], session('export_warnings', [])) as $message)
-                        <li>{{ $message }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+        <x-export-readiness-banner :readiness="$exportReadiness ?? null" />
 
         {{-- Report header --}}
         <div class="card mb-5 {{ $previewOnly ? 'relative' : '' }}">

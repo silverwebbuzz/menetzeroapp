@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Disclosure;
 
+use App\Services\ExportReadinessService;
 use App\Services\GriContentIndexService;
 use App\Services\GriReportService;
 use App\Services\PlanEntitlementService;
@@ -13,6 +14,7 @@ class GriReportController extends DisclosureBaseController
     public function __construct(
         protected GriReportService $reportService,
         protected GriContentIndexService $contentIndexService,
+        protected ExportReadinessService $exportReadiness,
     ) {
     }
 
@@ -24,6 +26,7 @@ class GriReportController extends DisclosureBaseController
             'company' => $company,
             'fiscalYear' => $fiscalYear,
             'report' => $this->reportService->build($company, $fiscalYear),
+            'dataReadiness' => $this->exportReadiness->assessCompany($company, $fiscalYear, false),
         ]);
     }
 

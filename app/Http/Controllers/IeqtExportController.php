@@ -41,9 +41,8 @@ class IeqtExportController extends Controller
             ->where('fiscal_year', $fiscalYear)
             ->firstOrFail();
 
-        $readiness = $this->exportReadiness->assess($measurement, true);
-        if (!$readiness['is_ready']) {
-            abort(422, implode(' ', $readiness['errors']));
+        if ($redirect = $this->exportReadiness->redirectIfBlocked($measurement, true, $request)) {
+            return $redirect;
         }
 
         return $this->exportService->downloadCsv($company, $location->id, $fiscalYear);

@@ -127,9 +127,11 @@ class ReportController extends Controller
             ? PlanEntitlementService::EXPORT_MOCCAE_PDF
             : PlanEntitlementService::EXPORT_GHG_PDF;
         $this->requirePlanExport($company->id, $exportCode, (int) $measurement->fiscal_year);
-        if ($moccaeOnly) {
-            $this->guardExportReadiness($measurement, true);
-        } else {
+        if ($redirect = $this->exportReadiness->redirectIfBlocked($measurement, $moccaeOnly, $request)) {
+            return $redirect;
+        }
+
+        if (!$moccaeOnly) {
             $this->attachExportReadinessWarnings($measurement, false);
         }
 
@@ -164,15 +166,6 @@ class ReportController extends Controller
             ->where('location_id', $request->location_id)
             ->whereHas('location', fn ($q) => $q->where('company_id', $companyId))
             ->firstOrFail();
-    }
-
-    protected function guardExportReadiness(Measurement $measurement, bool $strict): void
-    {
-        $readiness = $this->exportReadiness->assess($measurement, $strict);
-
-        if ($strict && !$readiness['is_ready']) {
-            abort(422, implode(' ', $readiness['errors']));
-        }
     }
 
     protected function attachExportReadinessWarnings(Measurement $measurement, bool $moccaeOnly): void

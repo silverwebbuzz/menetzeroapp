@@ -9,6 +9,8 @@
 
     <x-managed-client-year-banner :fiscal-year="$fiscalYear" export-code="gri_pdf" />
 
+    <x-export-readiness-banner :readiness="$dataReadiness ?? null" />
+
     <div class="card mb-6">
         <div class="card-body flex flex-col sm:flex-row sm:justify-between gap-4">
             <div>

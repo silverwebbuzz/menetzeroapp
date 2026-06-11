@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Disclosure;
 
+use App\Services\ExportReadinessService;
 use App\Services\IfrsS2ReportService;
 use App\Services\PlanEntitlementService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -11,6 +12,7 @@ class IfrsS2ReportController extends DisclosureBaseController
 {
     public function __construct(
         protected IfrsS2ReportService $reportService,
+        protected ExportReadinessService $exportReadiness,
     ) {
     }
 
@@ -23,6 +25,7 @@ class IfrsS2ReportController extends DisclosureBaseController
             'company' => $company,
             'fiscalYear' => $fiscalYear,
             'report' => $report,
+            'dataReadiness' => $this->exportReadiness->assessCompany($company, $fiscalYear, true),
         ]);
     }
 

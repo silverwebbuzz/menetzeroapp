@@ -9,6 +9,8 @@
 
     <x-managed-client-year-banner :fiscal-year="$fiscalYear" export-code="ifrs_s2_pdf" />
 
+    <x-export-readiness-banner :readiness="$dataReadiness ?? null" />
+
     <div class="card mb-6 {{ !$gate->canDisclosureExportType('ifrs_s2_pdf', $fiscalYear) ? 'relative' : '' }}">
         @if(!$gate->canDisclosureExportType('ifrs_s2_pdf', $fiscalYear))
             <div class="pointer-events-none absolute inset-0 z-10 flex items-center justify-center overflow-hidden rounded-lg" aria-hidden="true">
