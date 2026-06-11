@@ -451,7 +451,7 @@ class Scope12BulkImportService
 
         $entryDate = $row['entry_date']
             ? Carbon::parse($row['entry_date'])->toDateString()
-            : Carbon::now()->toDateString();
+            : null;
 
         $additionalData = array_filter([
             'fuel_category' => $row['fuel_category'],

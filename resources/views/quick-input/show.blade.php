@@ -323,25 +323,20 @@
                 </div>
             </div>
 
-            <!-- Right Side: Additional Data (50%) -->
+            <!-- Right Side: Additional Data -->
             <div class="flex flex-col">
                 @php
-                    // Get additional data from edit entry if available
                     $editAdditionalData = [];
                     if ($editEntry && $editEntry->additional_data) {
                         $editAdditionalData = is_string($editEntry->additional_data) ? json_decode($editEntry->additional_data, true) : ($editEntry->additional_data ?? []);
                     }
-                    
-                    // Filter and deduplicate fields - only show unique field names
-                    // Exclude main fields (fuel_category, fuel_type, unit_of_measure, amount, quantity, unit) and required fields
+
                     $mainFieldNames = ['fuel_category', 'fuel_type', 'unit_of_measure', 'amount', 'quantity', 'unit'];
                     $seenFieldNames = [];
                     $additionalFields = $formFields->filter(function($field) use (&$seenFieldNames, $mainFieldNames) {
-                        // Skip main fields and required fields (they're in Main Information section)
                         if (in_array($field->field_name, $mainFieldNames) || $field->is_required || $field->field_name === 'comments') {
                             return false;
                         }
-                        // Deduplicate by field_name - only show first occurrence
                         if (in_array($field->field_name, $seenFieldNames)) {
                             return false;
                         }
@@ -349,157 +344,149 @@
                         return true;
                     });
                     $commentsField = $formFields->firstWhere('field_name', 'comments');
+                    $editEvidenceLink = old('evidence_link', $editAdditionalData['evidence_link'] ?? '');
                 @endphp
-                @if($additionalFields->count() > 0 || $commentsField)
-                    <div class="flex flex-col flex-1">
-                        <div class="mb-4">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-1">Additional Data</h3>
-                            <p class="text-sm text-gray-500">Optional supplementary information</p>
-                        </div>
-                        <div class="flex-1 additional-data-section">
+
+                <div class="additional-data-panel flex flex-col flex-1">
+                    <div class="additional-data-panel__header">
+                        <h3 class="text-lg font-semibold text-gray-900">Additional Data</h3>
+                        <p class="text-sm text-gray-500 mt-0.5">Optional context, evidence links, uploads, and notes</p>
+                    </div>
+
+                    @if($additionalFields->count() > 0)
+                        <div class="additional-data-section additional-data-panel__fields">
+                            <p class="additional-data-panel__subheading">Source-specific fields</p>
                             @foreach($additionalFields as $field)
-                                <div class="form-group-horizontal">
-                                    <label for="{{ $field->field_name }}" class="form-label-horizontal">
+                                <div class="form-group-stacked">
+                                    <label for="{{ $field->field_name }}" class="form-label-stacked">
                                         {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
                                     </label>
-                                    <div class="form-input-wrapper">
-                                        @if($field->field_type === 'select')
-                                            <select name="{{ $field->field_name }}" id="{{ $field->field_name }}"
-                                                    class="form-input-select">
-                                                <option value="">Select {{ $field->field_label ?? $field->field_name }}</option>
-                                                @if($field->field_options)
-                                                    @php
-                                                        $options = is_array($field->field_options) ? $field->field_options : json_decode($field->field_options, true);
-                                                    @endphp
-                                                    @if(is_array($options))
-                                                        @foreach($options as $option)
-                                                            @if(is_array($option))
-                                                                <option value="{{ $option['value'] ?? $option }}" {{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') == ($option['value'] ?? $option) ? 'selected' : '' }}>{{ $option['label'] ?? $option['value'] ?? $option }}</option>
-                                                            @else
-                                                                <option value="{{ $option }}" {{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') == $option ? 'selected' : '' }}>{{ $option }}</option>
-                                                            @endif
-                                                        @endforeach
-                                                    @endif
+                                    @if($field->field_type === 'select')
+                                        <select name="{{ $field->field_name }}" id="{{ $field->field_name }}" class="form-input-select">
+                                            <option value="">Select {{ $field->field_label ?? $field->field_name }}</option>
+                                            @if($field->field_options)
+                                                @php
+                                                    $options = is_array($field->field_options) ? $field->field_options : json_decode($field->field_options, true);
+                                                @endphp
+                                                @if(is_array($options))
+                                                    @foreach($options as $option)
+                                                        @if(is_array($option))
+                                                            <option value="{{ $option['value'] ?? $option }}" {{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') == ($option['value'] ?? $option) ? 'selected' : '' }}>{{ $option['label'] ?? $option['value'] ?? $option }}</option>
+                                                        @else
+                                                            <option value="{{ $option }}" {{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') == $option ? 'selected' : '' }}>{{ $option }}</option>
+                                                        @endif
+                                                    @endforeach
                                                 @endif
-                                            </select>
-                                        @elseif($field->field_type === 'textarea')
-                                            <textarea name="{{ $field->field_name }}" id="{{ $field->field_name }}" rows="3"
-                                                      class="form-input form-textarea">{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}</textarea>
-                                        @else
-                                            <input type="{{ $field->field_type }}" name="{{ $field->field_name }}" id="{{ $field->field_name }}"
-                                                   value="{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}"
-                                                   placeholder="{{ $field->field_placeholder ?? '' }}"
-                                                   class="form-input">
-                                        @endif
-                                        @if($field->help_text)
-                                            <p class="form-help-text">{{ $field->help_text }}</p>
-                                        @endif
-                                        @error($field->field_name)
-                                            <p class="form-error-text">{{ $message }}</p>
-                                        @enderror
-                                    </div>
+                                            @endif
+                                        </select>
+                                    @elseif($field->field_type === 'textarea')
+                                        <textarea name="{{ $field->field_name }}" id="{{ $field->field_name }}" rows="3"
+                                                  class="form-input form-textarea">{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}</textarea>
+                                    @else
+                                        <input type="{{ $field->field_type }}" name="{{ $field->field_name }}" id="{{ $field->field_name }}"
+                                               value="{{ old($field->field_name, $editAdditionalData[$field->field_name] ?? '') }}"
+                                               placeholder="{{ $field->field_placeholder ?? '' }}"
+                                               class="form-input">
+                                    @endif
+                                    @if($field->help_text)
+                                        <p class="form-help-text">{{ $field->help_text }}</p>
+                                    @endif
+                                    @error($field->field_name)
+                                        <p class="form-error-text">{{ $message }}</p>
+                                    @enderror
                                 </div>
                             @endforeach
-                            
+                        </div>
+                    @endif
+
+                    <div class="evidence-notes-panel">
+                        <p class="additional-data-panel__subheading">Evidence &amp; notes</p>
+                        <p class="text-xs text-gray-500 mb-4">All fields below are optional. Use a bill date, file upload, shared link (Google Sheet, DEWA portal, etc.), or comments — whatever you have.</p>
+
+                        <div class="form-group-stacked">
+                            <label for="entry_date" class="form-label-stacked">Activity / bill date</label>
+                            <input type="date"
+                                   name="entry_date"
+                                   id="entry_date"
+                                   max="{{ date('Y-m-d') }}"
+                                   value="{{ old('entry_date', $editEntry?->entry_date?->format('Y-m-d') ?? '') }}"
+                                   class="form-input"
+                                   placeholder="Optional">
+                            <p class="form-help-text">Date on the utility bill, fuel receipt, or invoice — leave blank if unknown.</p>
+                            @error('entry_date')
+                                <p class="form-error-text">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="form-group-stacked">
+                            <label for="evidence_link" class="form-label-stacked">Reference link</label>
+                            <input type="url"
+                                   name="evidence_link"
+                                   id="evidence_link"
+                                   value="{{ $editEvidenceLink }}"
+                                   class="form-input"
+                                   placeholder="https://docs.google.com/... or bill portal URL">
+                            <p class="form-help-text">Paste a Google Sheet, shared folder, or online bill link if you are not uploading a file.</p>
+                            @error('evidence_link')
+                                <p class="form-error-text">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="form-group-stacked">
+                            <label for="supporting_documents" class="form-label-stacked">Supporting documents</label>
+                            <div class="evidence-file-zone">
+                                <input type="file"
+                                       name="supporting_documents[]"
+                                       id="supporting_documents"
+                                       multiple
+                                       accept=".pdf,.jpg,.jpeg,.png,.webp"
+                                       class="evidence-file-input">
+                                <p class="evidence-file-zone__hint">PDF, JPG, PNG, or WebP — max 10 MB each, up to 5 files</p>
+                            </div>
+                            @error('supporting_documents')
+                                <p class="form-error-text">{{ $message }}</p>
+                            @enderror
+                            @error('supporting_documents.*')
+                                <p class="form-error-text">{{ $message }}</p>
+                            @enderror
+                            @if($editEntry && !empty($editEntry->supporting_docs))
+                                <ul class="evidence-file-list">
+                                    @foreach($editEntry->supporting_docs as $index => $doc)
+                                        <li>
+                                            <a href="{{ route('quick-input.documents.download', [$editEntry->id, $index]) }}"
+                                               class="evidence-file-list__link">
+                                                <span aria-hidden="true">📎</span>
+                                                {{ $doc['filename'] ?? 'Document' }}
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </div>
+
+                        <div class="form-group-stacked">
                             @if($commentsField)
-                                <!-- Comments field -->
-                                <div class="form-group-horizontal">
-                                    <label for="comments" class="form-label-horizontal">
-                                        {{ $commentsField->field_label ?? 'Comments' }}
-                                    </label>
-                                    <div class="form-input-wrapper">
-                                        <textarea name="comments" id="comments" rows="3"
-                                                  class="form-input form-textarea"
-                                                  placeholder="{{ $commentsField->field_placeholder ?? 'Add any additional notes...' }}">{{ old('comments', $editEntry->notes ?? '') }}</textarea>
-                                        @if($commentsField->help_text)
-                                            <p class="form-help-text">{{ $commentsField->help_text }}</p>
-                                        @endif
-                                        @error('comments')
-                                            <p class="form-error-text">{{ $message }}</p>
-                                        @enderror
-                                    </div>
-                                </div>
+                                <label for="comments" class="form-label-stacked">{{ $commentsField->field_label ?? 'Comments' }}</label>
+                                <textarea name="comments" id="comments" rows="3"
+                                          class="form-input form-textarea"
+                                          placeholder="{{ $commentsField->field_placeholder ?? 'Any extra context for this entry…' }}">{{ old('comments', $editEntry->notes ?? '') }}</textarea>
+                                @if($commentsField->help_text)
+                                    <p class="form-help-text">{{ $commentsField->help_text }}</p>
+                                @endif
+                                @error('comments')
+                                    <p class="form-error-text">{{ $message }}</p>
+                                @enderror
+                            @else
+                                <label for="notes" class="form-label-stacked">Comments</label>
+                                <textarea name="notes" id="notes" rows="3"
+                                          class="form-input form-textarea"
+                                          placeholder="Any extra context for this entry…">{{ old('notes', $editEntry->notes ?? '') }}</textarea>
+                                @error('notes')
+                                    <p class="form-error-text">{{ $message }}</p>
+                                @enderror
                             @endif
                         </div>
                     </div>
-                @else
-                    <!-- If no additional fields, show placeholder -->
-                    <div>
-                        <div class="pb-4 border-b border-gray-200 mb-6">
-                            <h3 class="text-xl font-bold text-gray-900">Additional Data</h3>
-                            <p class="text-sm text-gray-500 mt-1">Optional supplementary information</p>
-                        </div>
-                        <p class="text-sm text-gray-500">No additional fields configured for this emission source.</p>
-                    </div>
-                @endif
-
-                <!-- Notes field (for backward compatibility, only if comments field doesn't exist) -->
-                @if(!$commentsField)
-                    <div class="additional-data-section">
-                        <div class="form-group-horizontal">
-                            <label for="notes" class="form-label-horizontal">Comments</label>
-                            <div class="form-input-wrapper">
-                                <textarea name="notes" id="notes" rows="3"
-                                          class="form-input form-textarea">{{ old('notes', $editEntry->notes ?? '') }}</textarea>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-            </div>
-        </div>
-
-        <!-- Activity period & supporting evidence (UAE audit trail) -->
-        <div class="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6 border-t border-gray-200 pt-6">
-            <div class="form-group-horizontal">
-                <div class="form-label-wrapper">
-                    <label for="entry_date" class="form-label-horizontal">
-                        Activity / bill date <span class="text-red-500">*</span>
-                    </label>
-                    <p class="form-help-text-under-label">Date on the DEWA bill, fuel receipt, or invoice for this entry.</p>
-                </div>
-                <div class="form-input-wrapper">
-                    <input type="date"
-                           name="entry_date"
-                           id="entry_date"
-                           required
-                           max="{{ date('Y-m-d') }}"
-                           value="{{ old('entry_date', $editEntry?->entry_date?->format('Y-m-d') ?? date('Y-m-d')) }}"
-                           class="form-input">
-                    @error('entry_date')
-                        <p class="form-error-text">{{ $message }}</p>
-                    @enderror
-                </div>
-            </div>
-            <div class="form-group-horizontal">
-                <div class="form-label-wrapper">
-                    <label for="supporting_documents" class="form-label-horizontal">Supporting documents</label>
-                    <p class="form-help-text-under-label">Upload DEWA/ADDC bills, fuel receipts, or invoices (PDF/JPG/PNG, max 10 MB each, up to 5 files).</p>
-                </div>
-                <div class="form-input-wrapper">
-                    <input type="file"
-                           name="supporting_documents[]"
-                           id="supporting_documents"
-                           multiple
-                           accept=".pdf,.jpg,.jpeg,.png,.webp"
-                           class="form-input">
-                    @error('supporting_documents')
-                        <p class="form-error-text">{{ $message }}</p>
-                    @enderror
-                    @error('supporting_documents.*')
-                        <p class="form-error-text">{{ $message }}</p>
-                    @enderror
-                    @if($editEntry && !empty($editEntry->supporting_docs))
-                        <ul class="mt-2 text-xs text-gray-600 space-y-1">
-                            @foreach($editEntry->supporting_docs as $index => $doc)
-                                <li>
-                                    <a href="{{ route('quick-input.documents.download', [$editEntry->id, $index]) }}"
-                                       class="text-emerald-700 hover:text-emerald-900 hover:underline">
-                                        📎 {{ $doc['filename'] ?? 'Document' }}
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
-                    @endif
                 </div>
             </div>
         </div>

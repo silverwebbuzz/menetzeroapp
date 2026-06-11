@@ -52,27 +52,6 @@
                     <dd class="text-sm text-gray-900 flex-1">{{ $entry->measurement->fiscal_year ?? 'N/A' }}</dd>
                 </div>
                 <div class="flex items-center border-b border-gray-100 pb-3">
-                    <dt class="text-sm font-medium text-gray-500 w-1/3">Activity / bill date</dt>
-                    <dd class="text-sm text-gray-900 flex-1">{{ $entry->entry_date ? $entry->entry_date->format('Y-m-d') : 'N/A' }}</dd>
-                </div>
-                @if(!empty($entry->supporting_docs))
-                <div class="flex items-start border-b border-gray-100 pb-3">
-                    <dt class="text-sm font-medium text-gray-500 w-1/3">Supporting documents</dt>
-                    <dd class="text-sm text-gray-900 flex-1">
-                        <ul class="space-y-1">
-                            @foreach($entry->supporting_docs as $index => $doc)
-                                <li>
-                                    <a href="{{ route('quick-input.documents.download', [$entry->id, $index]) }}"
-                                       class="text-emerald-700 hover:text-emerald-900 hover:underline">
-                                        {{ $doc['filename'] ?? 'Document' }}
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </dd>
-                </div>
-                @endif
-                <div class="flex items-center border-b border-gray-100 pb-3">
                     <dt class="text-sm font-medium text-gray-500 w-1/3">Quantity</dt>
                     <dd class="text-sm text-gray-900 flex-1">{{ number_format($entry->quantity, 4) }} {{ $entry->unit }}</dd>
                 </div>
@@ -158,13 +137,15 @@
         </div>
     </div>
 
-    <!-- Additional Data Card -->
+    <!-- Additional Data & Evidence -->
     @php
         $additionalData = [];
         if ($entry->additional_data) {
             $additionalData = is_string($entry->additional_data) ? json_decode($entry->additional_data, true) : $entry->additional_data;
         }
-        // Add unit, fuel_category, and fuel_type if they exist
+        $evidenceLink = $additionalData['evidence_link'] ?? null;
+        unset($additionalData['evidence_link']);
+
         if ($entry->unit) {
             $additionalData['Unit'] = $entry->unit;
         }
@@ -177,35 +158,75 @@
         if ($entry->fuel_type) {
             $additionalData['Fuel Type'] = $entry->fuel_type;
         }
-    @endphp
-    @if(is_array($additionalData) && count($additionalData) > 0)
-    <div class="bg-white rounded-lg shadow mt-6 overflow-hidden entry-detail-card">
-        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <h2 class="text-lg font-semibold text-gray-900">Additional Information</h2>
-        </div>
-        <div class="px-6 py-4">
-            <dl class="space-y-4">
-                @foreach($additionalData as $key => $value)
-                    @if($value !== null && $value !== '')
-                        <div class="flex items-center border-b border-gray-100 pb-3">
-                            <dt class="text-sm font-medium text-gray-500 w-1/3">{{ ucwords(str_replace('_', ' ', $key)) }}</dt>
-                            <dd class="text-sm text-gray-900 flex-1">{{ $value }}</dd>
-                        </div>
-                    @endif
-                @endforeach
-            </dl>
-        </div>
-    </div>
-    @endif
 
-    <!-- Notes Card -->
-    @if($entry->notes)
+        $hasEvidence = $entry->entry_date || !empty($entry->supporting_docs) || $evidenceLink || $entry->notes;
+        $hasAdditionalFields = is_array($additionalData) && count(array_filter($additionalData, fn ($v) => $v !== null && $v !== '')) > 0;
+    @endphp
+    @if($hasAdditionalFields || $hasEvidence)
     <div class="bg-white rounded-lg shadow mt-6 overflow-hidden entry-detail-card">
         <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <h2 class="text-lg font-semibold text-gray-900">Notes</h2>
+            <h2 class="text-lg font-semibold text-gray-900">Additional Data</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Optional context, evidence, and notes</p>
         </div>
-        <div class="px-6 py-4">
-            <p class="text-sm text-gray-900 whitespace-pre-wrap">{{ $entry->notes }}</p>
+        <div class="px-6 py-4 space-y-6">
+            @if($hasAdditionalFields)
+                <dl class="space-y-4">
+                    @foreach($additionalData as $key => $value)
+                        @if($value !== null && $value !== '')
+                            <div class="flex items-center border-b border-gray-100 pb-3">
+                                <dt class="text-sm font-medium text-gray-500 w-1/3">{{ ucwords(str_replace('_', ' ', $key)) }}</dt>
+                                <dd class="text-sm text-gray-900 flex-1">{{ $value }}</dd>
+                            </div>
+                        @endif
+                    @endforeach
+                </dl>
+            @endif
+
+            @if($hasEvidence)
+                <div class="{{ $hasAdditionalFields ? 'pt-4 border-t border-gray-100' : '' }}">
+                    <h3 class="text-sm font-semibold text-gray-800 mb-3">Evidence &amp; notes</h3>
+                    <dl class="space-y-4">
+                        @if($entry->entry_date)
+                        <div class="flex items-center border-b border-gray-100 pb-3">
+                            <dt class="text-sm font-medium text-gray-500 w-1/3">Activity / bill date</dt>
+                            <dd class="text-sm text-gray-900 flex-1">{{ $entry->entry_date->format('Y-m-d') }}</dd>
+                        </div>
+                        @endif
+                        @if($evidenceLink)
+                        <div class="flex items-center border-b border-gray-100 pb-3">
+                            <dt class="text-sm font-medium text-gray-500 w-1/3">Reference link</dt>
+                            <dd class="text-sm flex-1">
+                                <a href="{{ $evidenceLink }}" target="_blank" rel="noopener noreferrer"
+                                   class="text-emerald-700 hover:text-emerald-900 hover:underline break-all">{{ $evidenceLink }}</a>
+                            </dd>
+                        </div>
+                        @endif
+                        @if(!empty($entry->supporting_docs))
+                        <div class="flex items-start border-b border-gray-100 pb-3">
+                            <dt class="text-sm font-medium text-gray-500 w-1/3">Supporting documents</dt>
+                            <dd class="text-sm text-gray-900 flex-1">
+                                <ul class="space-y-1">
+                                    @foreach($entry->supporting_docs as $index => $doc)
+                                        <li>
+                                            <a href="{{ route('quick-input.documents.download', [$entry->id, $index]) }}"
+                                               class="text-emerald-700 hover:text-emerald-900 hover:underline">
+                                                {{ $doc['filename'] ?? 'Document' }}
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </dd>
+                        </div>
+                        @endif
+                        @if($entry->notes)
+                        <div class="flex items-start">
+                            <dt class="text-sm font-medium text-gray-500 w-1/3">Comments</dt>
+                            <dd class="text-sm text-gray-900 flex-1 whitespace-pre-wrap">{{ $entry->notes }}</dd>
+                        </div>
+                        @endif
+                    </dl>
+                </div>
+            @endif
         </div>
     </div>
     @endif

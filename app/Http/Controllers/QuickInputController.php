@@ -601,6 +601,8 @@ class QuickInputController extends Controller
                 }
             }
 
+            $additionalData = $this->withEvidenceAdditionalData($additionalData, $request);
+
             // Get notes/comments (handle both 'comments' from form fields and 'notes' for backward compatibility)
             $notes = $request->input('comments') ?? $request->input('notes') ?? null;
 
@@ -961,6 +963,8 @@ class QuickInputController extends Controller
                     $additionalData[$field->field_name] = $request->input($field->field_name);
                 }
             }
+
+            $additionalData = $this->withEvidenceAdditionalData($additionalData, $request);
 
             // Update entry
             // Ensure field_name and field_value are set (required for backward compatibility)
@@ -1372,7 +1376,8 @@ class QuickInputController extends Controller
         $validationRules = [
             'location_id' => 'required|exists:locations,id',
             'fiscal_year' => 'required|integer|min:2000|max:2100',
-            'entry_date' => 'required|date|before_or_equal:today',
+            'entry_date' => 'nullable|date|before_or_equal:today',
+            'evidence_link' => 'nullable|url|max:2048',
             'supporting_documents' => 'nullable|array|max:' . MeasurementDocumentService::MAX_FILES,
             'supporting_documents.*' => 'file|mimes:pdf,jpg,jpeg,png,webp|max:' . MeasurementDocumentService::MAX_SIZE_KB,
         ];
@@ -1400,9 +1405,33 @@ class QuickInputController extends Controller
         $request->validate($validationRules);
     }
 
-    private function resolveEntryDate(Request $request): string
+    private function resolveEntryDate(Request $request): ?string
     {
-        return Carbon::parse($request->input('entry_date', now()->toDateString()))->toDateString();
+        if (!$request->filled('entry_date')) {
+            return null;
+        }
+
+        return Carbon::parse($request->input('entry_date'))->toDateString();
+    }
+
+    /**
+     * @param  array<string, mixed>  $additionalData
+     * @return array<string, mixed>
+     */
+    private function withEvidenceAdditionalData(array $additionalData, Request $request): array
+    {
+        if (!$request->has('evidence_link')) {
+            return $additionalData;
+        }
+
+        $link = trim((string) $request->input('evidence_link'));
+        if ($link !== '') {
+            $additionalData['evidence_link'] = $link;
+        } else {
+            unset($additionalData['evidence_link']);
+        }
+
+        return $additionalData;
     }
 
     private function resolveDefaultRegion(EmissionSourceMaster $emissionSource): string

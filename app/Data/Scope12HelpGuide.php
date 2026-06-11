@@ -312,7 +312,7 @@ class Scope12HelpGuide
         return [
             ['column' => 'location_name', 'required' => true, 'explain' => 'Your site or office name — must match exactly what you set up in MENetZero → Locations.'],
             ['column' => 'fiscal_year', 'required' => true, 'explain' => 'The reporting year you are entering data for, e.g. 2025.'],
-            ['column' => 'entry_date', 'required' => false, 'explain' => 'Date of the bill or end of period (YYYY-MM-DD). Optional — defaults to today if blank.'],
+            ['column' => 'entry_date', 'required' => false, 'explain' => 'Date of the bill or end of period (YYYY-MM-DD). Optional — leave blank if unknown.'],
             ['column' => 'category', 'required' => true, 'explain' => 'Type of emission: electricity, fuel, vehicle, natural-gas, refrigerants, process, or heat-steam-cooling.'],
             ['column' => 'sub_type', 'required' => 'Depends', 'explain' => 'More detail — fuel name, gas type, Diesel/Petrol for vehicles. Blank only for electricity. See help guide per category.'],
             ['column' => 'quantity', 'required' => true, 'explain' => 'The number from your bill — kWh, litres, km, kg, etc. Numbers only, no commas.'],

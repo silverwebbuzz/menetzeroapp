@@ -32,13 +32,22 @@ class ExportReadinessService
                     $measurement->fiscal_year
                 );
             } else {
-                $withoutDocs = $electricityEntries->filter(
-                    fn (MeasurementData $entry) => empty($entry->supporting_docs)
-                );
+                $withoutDocs = $electricityEntries->filter(function (MeasurementData $entry) {
+                    if (!empty($entry->supporting_docs)) {
+                        return false;
+                    }
+
+                    $additional = $entry->additional_data ?? [];
+                    if (is_string($additional)) {
+                        $additional = json_decode($additional, true) ?? [];
+                    }
+
+                    return empty($additional['evidence_link']);
+                });
 
                 if ($withoutDocs->isNotEmpty()) {
                     $warnings[] = sprintf(
-                        '%d electricity %s for %s have no supporting bill attached. MOCCAE audits may request DEWA documentation.',
+                        '%d electricity %s for %s have no supporting file or reference link. MOCCAE audits may request DEWA documentation.',
                         $withoutDocs->count(),
                         $withoutDocs->count() === 1 ? 'entry' : 'entries',
                         $location->name

@@ -61,6 +61,102 @@ form[data-source-id] {
     grid-column: 2;
 }
 
+/* Additional Data panel (right column) */
+.additional-data-panel {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
+    padding: 1.25rem;
+    min-height: 100%;
+}
+
+.additional-data-panel__header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.additional-data-panel__subheading {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #6b7280;
+    margin-bottom: 0.75rem;
+}
+
+.additional-data-panel__fields {
+    margin-bottom: 0.5rem;
+}
+
+.form-group-stacked {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    margin-bottom: 1rem;
+}
+
+.form-group-stacked:last-child {
+    margin-bottom: 0;
+}
+
+.form-label-stacked {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.evidence-notes-panel {
+    padding-top: 1rem;
+    border-top: 1px dashed #d1d5db;
+}
+
+.evidence-file-zone {
+    border: 2px dashed #d1d5db;
+    border-radius: 0.5rem;
+    background: #fff;
+    padding: 0.875rem 1rem;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.evidence-file-zone:focus-within {
+    border-color: #059669;
+    background: #f0fdf4;
+}
+
+.evidence-file-input {
+    width: 100%;
+    font-size: 0.8125rem;
+    color: #374151;
+}
+
+.evidence-file-zone__hint {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+.evidence-file-list {
+    margin-top: 0.625rem;
+    font-size: 0.8125rem;
+    list-style: none;
+    padding: 0;
+}
+
+.evidence-file-list li + li {
+    margin-top: 0.25rem;
+}
+
+.evidence-file-list__link {
+    color: #047857;
+    text-decoration: none;
+}
+
+.evidence-file-list__link:hover {
+    color: #065f46;
+    text-decoration: underline;
+}
+
 /* Additional Data Section - Use w-20 (5rem = 80px) for labels */
 .additional-data-section .form-group-horizontal {
     grid-template-columns: 5rem 1fr !important;
