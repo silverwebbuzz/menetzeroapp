@@ -246,14 +246,77 @@ body.consultant-portal h4,
     color: var(--ink-muted);
     border-bottom-color: var(--line);
     font-weight: 700;
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.consultant-shell .table {
+    font-size: 1rem;
 }
 
 .consultant-shell .table tbody td {
     color: var(--ink);
     border-bottom-color: var(--line);
     font-weight: 600;
+    font-size: 1rem;
+}
+
+/* Card chrome — one scale across dashboard + inner pages */
+.consultant-shell .card-title {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+}
+
+.consultant-shell .card-subtitle {
     font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--ink-muted);
+}
+
+.consultant-shell .btn-sm {
+    font-size: 0.9375rem;
+    font-weight: 700;
+}
+
+.consultant-shell .btn-ghost {
+    color: var(--ink);
+    font-weight: 700;
+}
+
+.consultant-shell .btn-ghost:hover:not(:disabled) {
+    color: var(--brand-darker);
+}
+
+.consultant-shell .badge {
+    font-size: 0.8125rem;
+    font-weight: 700;
+}
+
+.consultant-shell .form-label {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.consultant-shell .form-help {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--ink-muted);
+}
+
+.consultant-shell .section-heading {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--ink-muted);
+}
+
+.consultant-shell .page-header p {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ink-muted);
 }
 
 /* ─── Dashboard ─── */
@@ -270,7 +333,7 @@ body.consultant-portal h4,
     display: inline-flex;
     align-items: center;
     gap: 0.375rem;
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
     font-weight: 700;
     color: var(--brand-darker);
     background: var(--brand-soft);
@@ -340,7 +403,7 @@ body.consultant-portal h4,
 }
 
 .cd-stat-label {
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
     font-weight: 700;
     color: var(--ink-muted);
     margin-bottom: 0.375rem;
@@ -361,9 +424,9 @@ body.consultant-portal h4,
 }
 
 .cd-stat-meta {
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
     font-weight: 600;
-    color: var(--ink-subtle);
+    color: var(--ink-muted);
     margin-top: 0.375rem;
 }
 
@@ -387,7 +450,7 @@ body.consultant-portal h4,
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-size: 0.625rem;
+    font-size: 0.75rem;
     font-weight: 700;
     color: var(--ink-muted);
     line-height: 1.15;
@@ -446,6 +509,18 @@ body.consultant-portal h4,
 .cd-empty {
     text-align: center;
     padding: 2rem 1rem;
+}
+
+.consultant-shell .cd-empty h4 {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.consultant-shell .cd-empty p {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ink-muted);
 }
 
 .cd-empty-icon {
@@ -717,29 +792,39 @@ body.consultant-portal h4,
 
 /* ─── Tailwind utility harmonisation inside consultant portal ─── */
 .consultant-shell .text-gray-900,
-.consultant-shell .text-gray-800 {
+.consultant-shell .text-gray-800,
+.consultant-shell .text-slate-900,
+.consultant-shell .text-slate-800 {
     color: var(--ink) !important;
+    font-weight: 600 !important;
 }
 
 .consultant-shell .text-gray-600,
-.consultant-shell .text-gray-700 {
+.consultant-shell .text-gray-700,
+.consultant-shell .text-slate-600,
+.consultant-shell .text-slate-700 {
     color: var(--ink-muted) !important;
     font-weight: 600 !important;
 }
 
-.consultant-shell .text-gray-500 {
+.consultant-shell .text-gray-500,
+.consultant-shell .text-slate-500 {
     color: var(--ink-muted) !important;
     font-weight: 600 !important;
 }
 
-.consultant-shell .text-gray-400 {
+.consultant-shell .text-gray-400,
+.consultant-shell .text-slate-400 {
     color: var(--ink-subtle) !important;
     font-weight: 600 !important;
 }
 
 .consultant-shell .border-gray-200,
 .consultant-shell .border-gray-300,
-.consultant-shell .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+.consultant-shell .border-slate-100,
+.consultant-shell .border-slate-200,
+.consultant-shell .divide-gray-200 > :not([hidden]) ~ :not([hidden]),
+.consultant-shell .divide-slate-100 > :not([hidden]) ~ :not([hidden]) {
     border-color: var(--line) !important;
 }
 
@@ -846,16 +931,83 @@ body.consultant-portal h4,
 }
 
 /* Tables using Tailwind min-w-full */
+.consultant-shell table.min-w-full {
+    font-size: 1rem !important;
+}
+
 .consultant-shell table.min-w-full thead th {
-    font-size: 0.8125rem !important;
+    font-size: 0.875rem !important;
     font-weight: 700 !important;
     color: var(--ink-muted) !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
 }
 
 .consultant-shell table.min-w-full tbody td {
-    font-size: 0.9375rem !important;
+    font-size: 1rem !important;
     font-weight: 600 !important;
     color: var(--ink) !important;
+}
+
+.consultant-shell table.min-w-full thead.bg-gray-50 th {
+    background-color: var(--canvas) !important;
+}
+
+.consultant-shell .content-area dt {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--ink-muted);
+}
+
+.consultant-shell .content-area dd {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.consultant-shell .content-area a.text-brand,
+.consultant-shell .content-area a[class*='text-brand'] {
+    font-weight: 700;
+}
+
+.consultant-shell .cd-step a,
+.consultant-shell .cd-step span {
+    font-size: 1rem !important;
+    font-weight: 600;
+}
+
+.consultant-shell .cd-step a {
+    font-weight: 700 !important;
+}
+
+/* Page-level titles (inner pages using Tailwind h1/h2, not .card-title) */
+.consultant-shell .content-area > h1,
+.consultant-shell .content-area > .flex h1 {
+    font-size: 1.625rem !important;
+    font-weight: 800 !important;
+    color: var(--ink) !important;
+    letter-spacing: -0.025em !important;
+}
+
+.consultant-shell .content-area > h1 + p,
+.consultant-shell .content-area > p.text-sm,
+.consultant-shell .content-area > p.text-gray-600 {
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    color: var(--ink-muted) !important;
+    line-height: 1.55 !important;
+}
+
+.consultant-shell .content-area h2.font-semibold,
+.consultant-shell .content-area h3.font-semibold {
+    font-size: 1.0625rem !important;
+    font-weight: 700 !important;
+    color: var(--ink) !important;
+}
+
+.consultant-shell .alert {
+    font-size: 0.9375rem;
+    font-weight: 600;
 }
 
 .consultant-shell .header-btn {
@@ -874,17 +1026,4 @@ body.consultant-portal h4,
 .consultant-shell .cd-callout {
     font-size: 0.9375rem;
     font-weight: 600;
-}
-
-.cd-pack-slots,
-.cd-pack-note,
-.cd-pack-features li {
-    font-size: 0.875rem;
-    font-weight: 600;
-}
-
-.cd-btn-coming-soon {
-    font-size: 0.9375rem;
-    font-weight: 700;
-    color: var(--ink-subtle);
 }

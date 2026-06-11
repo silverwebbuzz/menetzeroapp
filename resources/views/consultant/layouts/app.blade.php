@@ -48,7 +48,7 @@
     </script>
 
     <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260612">
-    <link rel="stylesheet" href="{{ asset('css/consultant-shell.css') }}?v=20260615">
+    <link rel="stylesheet" href="{{ asset('css/consultant-shell.css') }}?v=20260616">
 
     @stack('styles')
 
