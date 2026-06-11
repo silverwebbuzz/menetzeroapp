@@ -65,8 +65,8 @@ html {
 body {
     font-family: 'Inter', 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
     font-weight: 400;
-    font-size: 16px;
-    line-height: 1.5;
+    font-size: 0.875rem;
+    line-height: 1.428571;
     color: var(--ink);
     background-color: var(--canvas);
     -webkit-font-smoothing: antialiased;
@@ -142,13 +142,13 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
 .nav-section { padding: 1rem 0.5rem 0.25rem; }
 .nav-section:first-child { padding-top: 0.5rem; }
 .nav-section-title {
-    font-size: 0.6875rem;
-    font-weight: 600;
+    font-size: 0.875rem;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ink-muted);
+    letter-spacing: 0.04em;
+    color: var(--ink-subtle);
     padding: 0 0.75rem 0.5rem;
-    line-height: 1.2;
+    line-height: 1.428571;
 }
 
 .nav-link {
@@ -411,9 +411,9 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
 }
 .btn-danger:hover:not(:disabled) { background-color: #b91c1c; border-color: #b91c1c; }
 
-.btn-sm { padding: 0.375rem 0.75rem; font-size: 0.8125rem; border-radius: var(--radius); }
-.btn-lg { padding: 0.6875rem 1.25rem; font-size: 0.9375rem; }
-.btn-xs { padding: 0.25rem 0.625rem; font-size: 0.75rem; border-radius: var(--radius-sm); gap: 0.25rem; }
+.btn-sm { padding: 0.375rem 0.75rem; font-size: 0.875rem; border-radius: var(--radius); }
+.btn-lg { padding: 0.6875rem 1.25rem; font-size: 0.875rem; }
+.btn-xs { padding: 0.25rem 0.625rem; font-size: 0.875rem; border-radius: var(--radius-sm); gap: 0.25rem; }
 .btn-xs svg { width: 0.875rem; height: 0.875rem; }
 
 /* ===================================================================== */
@@ -443,8 +443,8 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
     flex-wrap: wrap;
 }
 
-.card-title { font-size: 1rem; font-weight: 600; color: var(--ink); margin: 0; }
-.card-subtitle { font-size: 0.875rem; font-weight: 400; color: var(--ink-muted); margin: 0.125rem 0 0; }
+.card-title { font-size: 0.875rem; font-weight: 600; color: var(--ink); margin: 0; line-height: 1.428571; }
+.card-subtitle { font-size: 0.75rem; font-weight: 400; color: #6b7280; margin: 0.125rem 0 0; line-height: 1.333333; }
 
 .card-body { padding: 1.25rem; }
 .card-footer {
@@ -469,7 +469,7 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
 }
 .page-header > div:first-child { min-width: 0; flex: 1 1 20rem; }
 .page-header h1 { margin-bottom: 0.25rem; }
-.page-header p { color: var(--ink-muted); font-size: 0.875rem; font-weight: 400; margin: 0; max-width: 48rem; line-height: 1.5; }
+.page-header p { color: #6b7280; font-size: 0.75rem; font-weight: 400; margin: 0; max-width: 48rem; line-height: 1.333333; }
 .page-header-actions { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; flex-wrap: wrap; }
 
 /* Row action buttons — never let them crush themselves */
@@ -515,8 +515,8 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
 
 .form-label .required { color: var(--danger); margin-left: 0.125rem; }
 
-.form-help { font-size: 0.75rem; color: var(--ink-muted); margin-top: 0.375rem; }
-.form-error { font-size: 0.75rem; color: var(--danger); margin-top: 0.375rem; }
+.form-help { font-size: 0.75rem; color: #6b7280; margin-top: 0.375rem; line-height: 1.333333; }
+.form-error { font-size: 0.875rem; color: var(--danger); margin-top: 0.375rem; line-height: 1.428571; }
 
 .form-control,
 .form-select,
@@ -536,7 +536,7 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
 }
 
 .form-control::placeholder,
-.form-textarea::placeholder { color: var(--ink-subtle); }
+.form-textarea::placeholder { color: #9ca3af; opacity: 1; }
 
 .form-control:hover,
 .form-select:hover,

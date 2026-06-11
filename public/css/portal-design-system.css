@@ -1,45 +1,44 @@
 /*
- * MenetZero — Portal Design System (shared)
- * Inter · normal weights · one type scale for company + consultant portals.
+ * MenetZero — Portal Design System
+ * User spec: 14px primary · 12px secondary (lighter) · both portals
  */
 
 :root {
+    /* Primary text — 14px */
+    --portal-14: 0.875rem;
+    /* Secondary / helper text — 12px, lighter */
+    --portal-12: 0.75rem;
+
     --ink-muted: #374151;
-    --ink-subtle: #6b7280;
-    --ink-hint: #9ca3af;
+    --ink-secondary: #6b7280;
+    --ink-placeholder: #9ca3af;
 
     --font-sans: 'Inter', 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
-    /* Weights — Inter reads well at regular/medium */
     --portal-weight-body: 400;
     --portal-weight-medium: 500;
     --portal-weight-semibold: 600;
-    --portal-weight-bold: 700;
 
-    /* Type scale (16px base) */
-    --portal-text-xs: 0.75rem;
-    --portal-text-sm: 0.875rem;
-    --portal-text-base: 1rem;
-    --portal-text-lg: 1.125rem;
-    --portal-text-xl: 1.25rem;
-    --portal-text-2xl: 1.5rem;
-    --portal-text-3xl: 1.875rem;
+    /* Consistent line-height: 14px→20px, 12px→16px */
+    --portal-lh-14: 1.428571;
+    --portal-lh-12: 1.333333;
 
-    --portal-leading: 1.5;
+    --portal-space-stack: 0.25rem;
+    --portal-space-field: 0.375rem;
+    --portal-space-block: 1rem;
+    --portal-space-section: 1.25rem;
     --portal-space-page-x: 1.5rem;
     --portal-space-page-y: 1.25rem;
-    --portal-space-section: 1.5rem;
-    --portal-space-card: 1.25rem;
 }
 
-/* ─── Base ─── */
+/* ─── 1. Base: everything 14px ─── */
 body.company-portal,
 body.consultant-portal,
 body.portal-auth {
     font-family: var(--font-sans);
-    font-size: var(--portal-text-base);
+    font-size: var(--portal-14);
     font-weight: var(--portal-weight-body);
-    line-height: var(--portal-leading);
+    line-height: var(--portal-lh-14);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
@@ -48,350 +47,336 @@ body.portal-auth {
 .consultant-shell,
 .portal-auth {
     font-family: var(--font-sans);
+    font-size: var(--portal-14);
+    line-height: var(--portal-lh-14);
 }
 
-.app-shell h1,
-.app-shell h2,
-.app-shell h3,
-.app-shell h4,
-.consultant-shell h1,
-.consultant-shell h2,
-.consultant-shell h3,
-.consultant-shell h4 {
-    font-family: inherit;
-    color: var(--ink);
-    letter-spacing: -0.015em;
+.app-shell .content-area,
+.consultant-shell .content-area,
+.app-shell p,
+.app-shell li,
+.app-shell td,
+.app-shell th,
+.app-shell label,
+.consultant-shell p,
+.consultant-shell li,
+.consultant-shell td,
+.consultant-shell th,
+.consultant-shell label {
+    font-size: var(--portal-14);
+    line-height: var(--portal-lh-14);
 }
 
-/* Sticky header label — subtle, not a second page title */
-.app-shell .header .page-title,
-.consultant-shell .header .page-title {
-    font-size: var(--portal-text-sm) !important;
-    font-weight: var(--portal-weight-medium) !important;
-    color: var(--ink-muted) !important;
+/* ─── 2. Left nav — menu + section titles = 14px (both portals) ─── */
+.app-shell .sidebar .nav-link,
+.consultant-shell .sidebar .nav-link,
+.app-shell .sidebar .nav-section-title,
+.consultant-shell .sidebar .nav-section-title {
+    font-size: var(--portal-14) !important;
+    line-height: var(--portal-lh-14) !important;
+    font-weight: var(--portal-weight-medium);
 }
 
-/* ─── Spacing ─── */
+.app-shell .sidebar .nav-section-title,
+.consultant-shell .sidebar .nav-section-title {
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-secondary);
+}
+
+.app-shell .sidebar-footer,
+.consultant-shell .sidebar-footer,
+.app-shell .sidebar-footer .text-xs,
+.consultant-shell .sidebar-footer .text-xs,
+.app-shell .sidebar-footer button,
+.consultant-shell .sidebar-footer button {
+    font-size: var(--portal-14) !important;
+    line-height: var(--portal-lh-14) !important;
+}
+
+/* ─── Secondary text helper (12px + lighter) ─── */
+.portal-text-secondary,
+.app-shell .card-subtitle,
+.consultant-shell .card-subtitle,
+.app-shell .page-header p,
+.consultant-shell .page-header p,
+.cd-subtitle,
+.app-shell .form-help,
+.consultant-shell .form-help,
+.app-shell .form-error,
+.consultant-shell .form-error,
+.app-shell .stat-card-delta,
+.consultant-shell .stat-card-delta,
+.app-shell .stat-card-label,
+.consultant-shell .stat-card-label,
+.cd-stat-label,
+.cd-stat-meta,
+.app-shell .content-area dt,
+.consultant-shell .content-area dt,
+.app-shell .badge,
+.consultant-shell .badge,
+.app-shell .section-heading,
+.consultant-shell .section-heading,
+.app-shell .table thead th,
+.consultant-shell .table thead th,
+.app-shell table.min-w-full thead th,
+.consultant-shell table.min-w-full thead th {
+    font-size: var(--portal-12) !important;
+    line-height: var(--portal-lh-12) !important;
+    font-weight: var(--portal-weight-body);
+    color: var(--ink-secondary);
+}
+
+/* ─── 3. Buttons — all 14px ─── */
+.app-shell .btn,
+.app-shell .btn-primary,
+.app-shell .btn-secondary,
+.app-shell .btn-outline,
+.app-shell .btn-ghost,
+.app-shell .btn-danger,
+.app-shell .btn-warning,
+.app-shell .btn-sm,
+.app-shell .btn-lg,
+.app-shell .btn-xs,
+.consultant-shell .btn,
+.consultant-shell .btn-primary,
+.consultant-shell .btn-secondary,
+.consultant-shell .btn-outline,
+.consultant-shell .btn-ghost,
+.consultant-shell .btn-sm,
+.consultant-shell .btn-lg,
+.consultant-shell .btn-xs,
+.portal-auth .btn,
+.portal-auth .btn-primary,
+.portal-auth .btn-secondary,
+.app-shell .content-area a.btn,
+.consultant-shell .content-area a.btn,
+.app-shell .content-area button.btn,
+.consultant-shell .content-area button.btn {
+    font-size: var(--portal-14) !important;
+    line-height: var(--portal-lh-14) !important;
+    font-weight: var(--portal-weight-medium);
+}
+
+/* Tailwind-style action buttons in content */
+.app-shell .content-area a[class*='px-'][class*='py-']:not(.badge),
+.app-shell .content-area button[class*='px-'][class*='py-']:not(.badge),
+.consultant-shell .content-area a[class*='px-'][class*='py-']:not(.badge),
+.consultant-shell .content-area button[class*='px-'][class*='py-']:not(.badge) {
+    font-size: var(--portal-14) !important;
+    line-height: var(--portal-lh-14) !important;
+}
+
+/* ─── 4. Alerts / success / error messages — 14px ─── */
+.app-shell .alert,
+.app-shell .alert-success,
+.app-shell .alert-danger,
+.app-shell .alert-warning,
+.app-shell .alert-info,
+.consultant-shell .alert,
+.consultant-shell .alert-success,
+.consultant-shell .alert-danger,
+.consultant-shell .alert-warning,
+.consultant-shell .alert-info,
+.app-shell .flash-stack .alert,
+.consultant-shell .flash-stack .alert,
+.app-shell .content-area .rounded-lg.border.px-4.py-3.text-sm,
+.consultant-shell .content-area .rounded-lg.border.px-4.py-3.text-sm,
+.app-shell .content-area [class*='text-green-'],
+.consultant-shell .content-area [class*='text-green-'],
+.app-shell .content-area [class*='text-red-'],
+.consultant-shell .content-area [class*='text-red-'],
+.app-shell .content-area [class*='bg-green-50'],
+.consultant-shell .content-area [class*='bg-green-50'],
+.app-shell .content-area [class*='bg-red-50'],
+.consultant-shell .content-area [class*='bg-red-50'] {
+    font-size: var(--portal-14) !important;
+    line-height: var(--portal-lh-14) !important;
+}
+
+/* ─── 5. Placeholders — lighter ─── */
+.app-shell input::placeholder,
+.app-shell textarea::placeholder,
+.consultant-shell input::placeholder,
+.consultant-shell textarea::placeholder,
+.app-shell .form-control::placeholder,
+.app-shell .form-textarea::placeholder,
+.consultant-shell .form-control::placeholder,
+.consultant-shell .form-textarea::placeholder,
+.portal-auth input::placeholder,
+.portal-auth textarea::placeholder {
+    color: var(--ink-placeholder) !important;
+    font-size: var(--portal-14);
+    font-weight: var(--portal-weight-body);
+    opacity: 1;
+}
+
+/* ─── 6. Consistent spacing ─── */
 .app-shell .content-area,
 .consultant-shell .content-area {
-    padding: 1.75rem var(--portal-space-page-x);
-    padding-top: var(--portal-space-page-y);
+    padding: var(--portal-space-page-y) var(--portal-space-page-x);
 }
 
 .app-shell .page-header,
 .consultant-shell .page-header,
 .cd-page-head {
     margin-bottom: var(--portal-space-section);
-}
-
-.app-shell .card-body,
-.consultant-shell .card-body {
-    padding: var(--portal-space-card);
+    gap: var(--portal-space-block);
 }
 
 .app-shell .card-header,
 .consultant-shell .card-header {
-    padding: 1rem 1.25rem;
+    padding: var(--portal-space-block) 1.25rem;
 }
 
-.app-shell .content-area .mb-5,
-.consultant-shell .content-area .mb-5,
-.app-shell .content-area .mb-6,
-.consultant-shell .content-area .mb-6 {
-    margin-bottom: var(--portal-space-section) !important;
+.app-shell .card-body,
+.consultant-shell .card-body {
+    padding: var(--portal-space-section);
 }
 
-.app-shell .content-area .gap-3,
-.consultant-shell .content-area .gap-3,
-.app-shell .content-area .gap-4,
-.consultant-shell .content-area .gap-4 {
-    gap: 0.875rem;
+.app-shell .form-group,
+.consultant-shell .form-group {
+    margin-bottom: var(--portal-space-block);
 }
 
-/* ─── Page titles (content area) ─── */
-.app-shell .page-header h1,
-.consultant-shell .page-header h1,
-.cd-page-head h2,
-.app-shell .content-area > h1,
-.consultant-shell .content-area > h1 {
-    font-size: var(--portal-text-2xl);
-    font-weight: var(--portal-weight-semibold);
-    line-height: 1.3;
-    margin-bottom: 0.25rem;
-}
-
-.app-shell .page-header p,
-.consultant-shell .page-header p,
-.cd-subtitle,
-.app-shell .content-area > h1 + p,
-.consultant-shell .content-area > h1 + p {
-    font-size: var(--portal-text-sm);
-    font-weight: var(--portal-weight-body);
-    color: var(--ink-muted);
-    line-height: var(--portal-leading);
-    margin: 0;
-}
-
-/* ─── Cards & tables ─── */
-.app-shell .card-title,
-.consultant-shell .card-title {
-    font-size: var(--portal-text-base);
-    font-weight: var(--portal-weight-semibold);
+.app-shell .form-label,
+.consultant-shell .form-label,
+.portal-auth .form-label,
+.app-shell .content-area label.block.text-sm,
+.consultant-shell .content-area label.block.text-sm {
+    font-size: var(--portal-14);
+    line-height: var(--portal-lh-14);
+    font-weight: var(--portal-weight-medium);
     color: var(--ink);
+    margin-bottom: var(--portal-space-field);
 }
 
-.app-shell .card-subtitle,
-.consultant-shell .card-subtitle {
-    font-size: var(--portal-text-sm);
-    font-weight: var(--portal-weight-body);
-    color: var(--ink-muted);
+.app-shell .form-help,
+.consultant-shell .form-help {
+    margin-top: var(--portal-space-field);
 }
 
-.app-shell .table,
-.consultant-shell .table,
-.app-shell table.min-w-full,
-.consultant-shell table.min-w-full {
-    font-size: var(--portal-text-sm);
+.app-shell .flash-stack,
+.consultant-shell .flash-stack {
+    margin-bottom: var(--portal-space-block);
+    gap: var(--portal-space-field);
 }
 
-.app-shell .table thead th,
-.consultant-shell .table thead th,
-.app-shell table.min-w-full thead th,
-.consultant-shell table.min-w-full thead th {
-    font-size: var(--portal-text-xs);
+/* ─── Primary UI elements stay 14px ─── */
+.app-shell .header .page-title,
+.consultant-shell .header .page-title {
+    font-size: var(--portal-14) !important;
+    line-height: var(--portal-lh-14) !important;
     font-weight: var(--portal-weight-medium);
     color: var(--ink-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-}
-
-.app-shell .table tbody td,
-.consultant-shell .table tbody td,
-.app-shell table.min-w-full tbody td,
-.consultant-shell table.min-w-full tbody td {
-    font-size: var(--portal-text-sm);
-    font-weight: var(--portal-weight-body);
-    color: var(--ink);
-}
-
-.app-shell table.min-w-full thead.bg-gray-50 th,
-.consultant-shell table.min-w-full thead.bg-gray-50 th {
-    background-color: var(--canvas) !important;
-}
-
-/* ─── Stat cards (company dashboard) ─── */
-.app-shell .stat-card-label,
-.consultant-shell .stat-card-label {
-    font-size: var(--portal-text-xs);
-    font-weight: var(--portal-weight-medium);
-    letter-spacing: 0.04em;
-}
-
-.app-shell .stat-card-value,
-.consultant-shell .stat-card-value {
-    font-size: var(--portal-text-2xl);
-    font-weight: var(--portal-weight-semibold);
-}
-
-.app-shell .stat-card-delta,
-.consultant-shell .stat-card-delta {
-    font-size: var(--portal-text-xs);
-    font-weight: var(--portal-weight-body);
-    color: var(--ink-muted);
-}
-
-/* ─── Buttons & chrome ─── */
-.app-shell .btn,
-.consultant-shell .btn {
-    font-size: var(--portal-text-sm);
-    font-weight: var(--portal-weight-medium);
 }
 
 .app-shell .header-btn,
 .consultant-shell .header-btn,
 .app-shell .dropdown-item,
 .consultant-shell .dropdown-item {
-    font-size: var(--portal-text-sm);
-    font-weight: var(--portal-weight-medium);
+    font-size: var(--portal-14);
+    line-height: var(--portal-lh-14);
 }
 
-.app-shell .nav-link,
-.consultant-shell .nav-link {
-    font-size: var(--portal-text-sm);
-    font-weight: var(--portal-weight-medium);
+.app-shell .card-title,
+.consultant-shell .card-title {
+    font-size: var(--portal-14);
+    line-height: var(--portal-lh-14);
+    font-weight: var(--portal-weight-semibold);
+    color: var(--ink);
+    margin-bottom: var(--portal-space-stack);
 }
 
-.app-shell .nav-section-title,
-.consultant-shell .nav-section-title {
-    font-size: var(--portal-text-xs);
-    font-weight: var(--portal-weight-medium);
-}
-
-/* ─── Forms ─── */
-.app-shell .form-label,
-.consultant-shell .form-label,
-.portal-auth .form-label {
-    font-size: var(--portal-text-sm);
-    font-weight: var(--portal-weight-medium);
+.app-shell .table tbody td,
+.consultant-shell .table tbody td,
+.app-shell table.min-w-full tbody td,
+.consultant-shell table.min-w-full tbody td {
+    font-size: var(--portal-14);
+    line-height: var(--portal-lh-14);
     color: var(--ink);
 }
 
-.app-shell .form-help,
-.consultant-shell .form-help {
-    font-size: var(--portal-text-xs);
-    font-weight: var(--portal-weight-body);
-    color: var(--ink-muted);
-}
-
-.app-shell .content-area input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]),
+.app-shell .content-area input:not([type='checkbox']):not([type='radio']):not([type='hidden']):not([type='file']),
 .app-shell .content-area textarea,
 .app-shell .content-area select,
-.consultant-shell .content-area input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]),
+.consultant-shell .content-area input:not([type='checkbox']):not([type='radio']):not([type='hidden']):not([type='file']),
 .consultant-shell .content-area textarea,
-.consultant-shell .content-area select {
-    font-family: inherit;
-    font-size: var(--portal-text-sm);
-    font-weight: var(--portal-weight-body);
+.consultant-shell .content-area select,
+.app-shell .form-control,
+.app-shell .form-select,
+.app-shell .form-textarea,
+.consultant-shell .form-control,
+.consultant-shell .form-select,
+.consultant-shell .form-textarea {
+    font-size: var(--portal-14);
+    line-height: var(--portal-lh-14);
     color: var(--ink);
 }
 
-.app-shell .content-area label.block.text-sm,
-.consultant-shell .content-area label.block.text-sm {
-    font-size: var(--portal-text-sm);
-    font-weight: var(--portal-weight-medium);
-    color: var(--ink);
+/* Page titles — primary 14px semibold; subtitle below = 12px secondary */
+.app-shell .page-header h1,
+.consultant-shell .page-header h1,
+.cd-page-head h2 {
+    font-size: var(--portal-14);
+    line-height: var(--portal-lh-14);
+    font-weight: var(--portal-weight-semibold);
+    margin-bottom: var(--portal-space-stack);
 }
 
-.app-shell .badge,
-.consultant-shell .badge {
-    font-size: var(--portal-text-xs);
-    font-weight: var(--portal-weight-medium);
+.app-shell .page-header p,
+.consultant-shell .page-header p,
+.cd-subtitle {
+    margin-top: 0;
 }
 
-.app-shell .section-heading,
-.consultant-shell .section-heading {
-    font-size: var(--portal-text-xs);
-    font-weight: var(--portal-weight-medium);
+/* Stat numbers can stay slightly larger but labels/deltas = 12px */
+.app-shell .stat-card-value,
+.consultant-shell .stat-card-value,
+.cd-stat-value {
+    font-size: 1.25rem;
+    line-height: 1.2;
+    font-weight: var(--portal-weight-semibold);
 }
 
-.app-shell .alert,
-.consultant-shell .alert {
-    font-size: var(--portal-text-sm);
-    font-weight: var(--portal-weight-body);
+.cd-stat-value span {
+    font-size: var(--portal-12);
+    color: var(--ink-secondary);
 }
 
-/* ─── Inner-page Tailwind headings ─── */
-.app-shell .content-area h1.text-2xl,
-.app-shell .content-area h1.text-3xl,
-.consultant-shell .content-area h1.text-2xl,
-.consultant-shell .content-area h1.text-3xl {
-    font-size: var(--portal-text-2xl) !important;
-    font-weight: var(--portal-weight-semibold) !important;
-}
-
-.app-shell .content-area h2.text-xl,
-.app-shell .content-area h2.text-2xl,
-.app-shell .content-area h3.text-lg,
-.consultant-shell .content-area h2.text-xl,
-.consultant-shell .content-area h2.text-2xl,
-.consultant-shell .content-area h3.text-lg {
-    font-size: var(--portal-text-lg) !important;
-    font-weight: var(--portal-weight-semibold) !important;
-}
-
-.app-shell .content-area h2.font-semibold,
-.app-shell .content-area h3.font-semibold,
-.consultant-shell .content-area h2.font-semibold,
-.consultant-shell .content-area h3.font-semibold {
-    font-size: var(--portal-text-base) !important;
-    font-weight: var(--portal-weight-semibold) !important;
-}
-
-.app-shell .content-area dt,
-.consultant-shell .content-area dt {
-    font-size: var(--portal-text-xs);
-    font-weight: var(--portal-weight-medium);
-    color: var(--ink-muted);
-}
-
-.app-shell .content-area dd,
-.consultant-shell .content-area dd {
-    font-size: var(--portal-text-sm);
-    font-weight: var(--portal-weight-body);
-    color: var(--ink);
-}
-
-/* ─── Tailwind text sizes — standard scale, colours only forced ─── */
+/* ─── Tailwind size utilities → locked to 14 / 12 ─── */
 .app-shell .text-xs,
 .consultant-shell .text-xs,
 .portal-auth .text-xs {
-    font-size: var(--portal-text-xs) !important;
-    line-height: 1.4 !important;
+    font-size: var(--portal-12) !important;
+    line-height: var(--portal-lh-12) !important;
+    color: var(--ink-secondary);
 }
 
 .app-shell .text-sm,
-.consultant-shell .text-sm,
-.portal-auth .text-sm {
-    font-size: var(--portal-text-sm) !important;
-    line-height: 1.45 !important;
-}
-
 .app-shell .text-base,
+.consultant-shell .text-sm,
 .consultant-shell .text-base,
+.portal-auth .text-sm,
 .portal-auth .text-base {
-    font-size: var(--portal-text-base) !important;
+    font-size: var(--portal-14) !important;
+    line-height: var(--portal-lh-14) !important;
 }
 
 .app-shell .text-lg,
-.consultant-shell .text-lg,
-.portal-auth .text-lg {
-    font-size: var(--portal-text-lg) !important;
-}
-
 .app-shell .text-xl,
-.consultant-shell .text-xl,
-.portal-auth .text-xl {
-    font-size: var(--portal-text-xl) !important;
-}
-
 .app-shell .text-2xl,
-.consultant-shell .text-2xl,
-.portal-auth .text-2xl {
-    font-size: var(--portal-text-2xl) !important;
-}
-
 .app-shell .text-3xl,
-.consultant-shell .text-3xl,
-.portal-auth .text-3xl {
-    font-size: var(--portal-text-3xl) !important;
+.consultant-shell .text-lg,
+.consultant-shell .text-xl,
+.consultant-shell .text-2xl,
+.consultant-shell .text-3xl {
+    font-size: var(--portal-14) !important;
+    line-height: var(--portal-lh-14) !important;
+    font-weight: var(--portal-weight-semibold);
 }
 
-/* Let Tailwind weight utilities work naturally */
-.app-shell .font-normal,
-.consultant-shell .font-normal,
-.portal-auth .font-normal {
-    font-weight: var(--portal-weight-body) !important;
-}
-
-.app-shell .font-medium,
-.consultant-shell .font-medium,
-.portal-auth .font-medium {
-    font-weight: var(--portal-weight-medium) !important;
-}
-
-.app-shell .font-semibold,
-.consultant-shell .font-semibold,
-.portal-auth .font-semibold {
-    font-weight: var(--portal-weight-semibold) !important;
-}
-
-.app-shell .font-bold,
-.consultant-shell .font-bold,
-.portal-auth .font-bold {
-    font-weight: var(--portal-weight-bold) !important;
-}
-
-/* ─── Grey / slate → readable ink (no weight forcing) ─── */
+/* Grey / slate colours */
 .app-shell .text-gray-900,
 .app-shell .text-gray-800,
 .app-shell .text-slate-900,
@@ -399,37 +384,30 @@ body.portal-auth {
 .consultant-shell .text-gray-900,
 .consultant-shell .text-gray-800,
 .consultant-shell .text-slate-900,
-.consultant-shell .text-slate-800,
-.portal-auth .text-gray-900,
-.portal-auth .text-slate-900 {
+.consultant-shell .text-slate-800 {
     color: var(--ink) !important;
 }
 
 .app-shell .text-gray-600,
 .app-shell .text-gray-700,
+.app-shell .text-gray-500,
 .app-shell .text-slate-600,
 .app-shell .text-slate-700,
+.app-shell .text-slate-500,
 .consultant-shell .text-gray-600,
 .consultant-shell .text-gray-700,
+.consultant-shell .text-gray-500,
 .consultant-shell .text-slate-600,
 .consultant-shell .text-slate-700,
-.portal-auth .text-gray-600,
-.portal-auth .text-slate-600 {
-    color: var(--ink-muted) !important;
-}
-
-.app-shell .text-gray-500,
-.app-shell .text-slate-500,
-.consultant-shell .text-gray-500,
 .consultant-shell .text-slate-500 {
-    color: var(--ink-muted) !important;
+    color: var(--ink-secondary) !important;
 }
 
 .app-shell .text-gray-400,
 .app-shell .text-slate-400,
 .consultant-shell .text-gray-400,
 .consultant-shell .text-slate-400 {
-    color: var(--ink-subtle) !important;
+    color: var(--ink-placeholder) !important;
 }
 
 .app-shell .border-gray-200,
@@ -443,124 +421,53 @@ body.portal-auth {
     border-color: var(--line) !important;
 }
 
-.app-shell .divide-gray-200 > :not([hidden]) ~ :not([hidden]),
-.app-shell .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
-.consultant-shell .divide-gray-200 > :not([hidden]) ~ :not([hidden]),
-.consultant-shell .divide-slate-100 > :not([hidden]) ~ :not([hidden]) {
-    border-color: var(--line) !important;
-}
-
 .app-shell .bg-gray-50,
 .consultant-shell .bg-gray-50 {
     background-color: var(--canvas) !important;
 }
 
-/* ─── Agency-mode banner (consultant in client workspace) ─── */
 .app-shell .portal-agency-banner {
-    font-size: var(--portal-text-sm);
-    font-weight: var(--portal-weight-body);
+    font-size: var(--portal-14);
+    line-height: var(--portal-lh-14);
     margin-bottom: var(--portal-space-section);
 }
 
-.app-shell .portal-agency-banner strong {
-    font-weight: var(--portal-weight-semibold);
-}
-
 /* ─── Auth pages ─── */
-.portal-auth .auth-form .form-group {
-    margin-bottom: 1.125rem;
-}
-
 .portal-auth .auth-form .form-label {
-    display: block;
-    font-size: var(--portal-text-sm);
-    font-weight: var(--portal-weight-medium);
-    color: var(--ink);
-    margin-bottom: 0.375rem;
+    font-size: var(--portal-14);
+    margin-bottom: var(--portal-space-field);
 }
 
 .portal-auth .auth-form .form-input,
-.portal-auth .auth-form input[type='email'],
-.portal-auth .auth-form input[type='password'],
-.portal-auth .auth-form input[type='text'] {
-    width: 100%;
-    padding: 0.625rem 0.875rem;
-    border: 1px solid var(--line-strong);
-    border-radius: var(--radius-md);
-    font-family: inherit;
-    font-size: var(--portal-text-sm);
-    font-weight: var(--portal-weight-body);
-    color: var(--ink);
-    background: var(--surface);
-    box-shadow: var(--shadow-xs);
-}
-
-.portal-auth .auth-form .form-input:focus,
-.portal-auth .auth-form input:focus {
-    outline: none;
-    border-color: var(--brand);
-    box-shadow: var(--shadow-ring);
+.portal-auth .auth-form input {
+    font-size: var(--portal-14);
+    line-height: var(--portal-lh-14);
 }
 
 .portal-auth .form-error {
-    font-size: var(--portal-text-xs);
-    color: var(--danger);
-    margin-top: 0.375rem;
-}
-
-.portal-auth .auth-eyebrow {
-    font-size: var(--portal-text-xs);
-    font-weight: var(--portal-weight-medium);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--brand-dark);
-    margin-bottom: 0.5rem;
+    font-size: var(--portal-14);
+    line-height: var(--portal-lh-14);
 }
 
 .portal-auth .auth-title {
-    font-size: var(--portal-text-2xl);
+    font-size: var(--portal-14);
     font-weight: var(--portal-weight-semibold);
-    color: var(--ink);
-    letter-spacing: -0.02em;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--portal-space-stack);
 }
 
-.portal-auth .auth-lead {
-    font-size: var(--portal-text-sm);
-    font-weight: var(--portal-weight-body);
-    color: var(--ink-muted);
-    margin-bottom: 2rem;
-}
-
-.portal-auth .auth-divider {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    font-size: var(--portal-text-xs);
-    color: var(--ink-subtle);
-    margin: 1.5rem 0;
-}
-
-.portal-auth .auth-divider::before,
-.portal-auth .auth-divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--line);
-}
-
+.portal-auth .auth-lead,
 .portal-auth .auth-footer {
-    font-size: var(--portal-text-sm);
-    color: var(--ink-muted);
-    text-align: center;
-    margin-top: 1.5rem;
+    font-size: var(--portal-14);
+    line-height: var(--portal-lh-14);
+    color: var(--ink-secondary);
 }
 
-.portal-auth .auth-footer-sub {
-    font-size: var(--portal-text-xs);
-    color: var(--ink-subtle);
-    text-align: center;
-    margin-top: 0.75rem;
+.portal-auth .auth-eyebrow,
+.portal-auth .auth-footer-sub,
+.portal-auth .auth-divider {
+    font-size: var(--portal-12);
+    line-height: var(--portal-lh-12);
+    color: var(--ink-secondary);
 }
 
 .portal-auth--company .brand-gradient {
