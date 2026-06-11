@@ -51,8 +51,8 @@
     </script>
 
     <!-- App shell styles -->
-    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260616">
-    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260616">
+    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260617">
+    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260617">
 
     @stack('styles')
 
@@ -244,7 +244,7 @@
                 <!-- Page content -->
                 <main class="content-area">
                     @if($isConsultantActing)
-                        <div class="mb-4 rounded-lg border {{ $consultantReadOnly ? 'border-amber-200 bg-amber-50' : 'border-indigo-200 bg-indigo-50' }} px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm {{ $consultantReadOnly ? 'text-amber-900' : 'text-indigo-900' }}">
+                        <div class="mb-4 rounded-lg border {{ $consultantReadOnly ? 'border-amber-200 bg-amber-50' : 'border-indigo-200 bg-indigo-50' }} px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm {{ $consultantReadOnly ? 'text-amber-900' : 'text-indigo-900' }} portal-agency-banner">
                             <span>
                                 @if($consultantReadOnly)
                                     Read-only —

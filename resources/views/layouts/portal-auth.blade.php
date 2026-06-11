@@ -33,8 +33,8 @@
             },
         };
     </script>
-    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260616">
-    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260616">
+    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260617">
+    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260617">
     @if($isConsultant)
         <link rel="stylesheet" href="{{ asset('css/consultant-shell.css') }}?v=20260616">
     @endif

@@ -64,9 +64,9 @@ html {
 
 body {
     font-family: 'Inter', 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
-    font-weight: 500;
+    font-weight: 400;
     font-size: 16px;
-    line-height: 1.55;
+    line-height: 1.5;
     color: var(--ink);
     background-color: var(--canvas);
     -webkit-font-smoothing: antialiased;
@@ -82,10 +82,10 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0;
 }
 
-h1 { font-size: 1.5rem; line-height: 1.3; font-weight: 700; letter-spacing: -0.02em; }
-h2 { font-size: 1.25rem; line-height: 1.35; }
-h3 { font-size: 1.0625rem; line-height: 1.4; }
-h4 { font-size: 0.9375rem; line-height: 1.4; }
+h1 { font-size: 1.5rem; line-height: 1.3; font-weight: 600; letter-spacing: -0.02em; }
+h2 { font-size: 1.25rem; line-height: 1.35; font-weight: 600; }
+h3 { font-size: 1.0625rem; line-height: 1.4; font-weight: 600; }
+h4 { font-size: 0.9375rem; line-height: 1.4; font-weight: 600; }
 
 strong, b { font-weight: 600; color: var(--ink); }
 small { font-size: 0.8125rem; }
@@ -443,8 +443,8 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
     flex-wrap: wrap;
 }
 
-.card-title { font-size: 0.9375rem; font-weight: 600; color: var(--ink); margin: 0; }
-.card-subtitle { font-size: 0.8125rem; color: var(--ink-muted); margin: 0.125rem 0 0; }
+.card-title { font-size: 1rem; font-weight: 600; color: var(--ink); margin: 0; }
+.card-subtitle { font-size: 0.875rem; font-weight: 400; color: var(--ink-muted); margin: 0.125rem 0 0; }
 
 .card-body { padding: 1.25rem; }
 .card-footer {
@@ -469,7 +469,7 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
 }
 .page-header > div:first-child { min-width: 0; flex: 1 1 20rem; }
 .page-header h1 { margin-bottom: 0.25rem; }
-.page-header p { color: var(--ink-muted); font-size: 0.875rem; margin: 0; max-width: 48rem; line-height: 1.5; }
+.page-header p { color: var(--ink-muted); font-size: 0.875rem; font-weight: 400; margin: 0; max-width: 48rem; line-height: 1.5; }
 .page-header-actions { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; flex-wrap: wrap; }
 
 /* Row action buttons — never let them crush themselves */
@@ -681,7 +681,7 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
 
 .stat-card-value {
     font-size: 1.5rem;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--ink);
     line-height: 1.15;
     letter-spacing: -0.02em;

@@ -360,11 +360,11 @@
         <div class="card-body">
             <div class="flex items-start justify-between gap-4 mb-4 flex-wrap">
                 <div>
-                    <h3 class="text-slate-900 font-semibold">UAE Net Zero 2050 Progress</h3>
-                    <p class="text-sm text-slate-500 mt-0.5">Track your progress towards carbon neutrality</p>
+                    <h3 class="card-title">UAE Net Zero 2050 Progress</h3>
+                    <p class="card-subtitle">Track your progress towards carbon neutrality</p>
                 </div>
                 <div class="text-right">
-                    <div class="text-2xl font-bold text-brand-dark leading-none">{{ $netZeroProgress['progress'] ?? 0 }}%</div>
+                    <div class="text-2xl font-semibold text-brand-dark leading-none">{{ $netZeroProgress['progress'] ?? 0 }}%</div>
                     <div class="text-xs text-slate-500 mt-1">{{ $netZeroProgress['years_remaining'] ?? 25 }} years remaining</div>
                 </div>
             </div>
@@ -374,16 +374,16 @@
             </div>
             <div class="grid grid-cols-3 gap-4 text-sm pt-3 border-t border-slate-100">
                 <div>
-                    <div class="text-xs uppercase tracking-wider text-slate-500 font-medium mb-1">Current</div>
-                    <div class="font-semibold text-slate-900">{{ $netZeroProgress['current'] ?? 0 }} <span class="text-slate-400 text-xs font-medium">tCO₂e</span></div>
+                    <div class="stat-card-label mb-1">Current</div>
+                    <div class="font-medium text-slate-900">{{ $netZeroProgress['current'] ?? 0 }} <span class="text-slate-400 text-xs font-normal">tCO₂e</span></div>
                 </div>
                 <div>
-                    <div class="text-xs uppercase tracking-wider text-slate-500 font-medium mb-1">Baseline</div>
-                    <div class="font-semibold text-slate-900">{{ $netZeroProgress['baseline'] ?? 1000 }} <span class="text-slate-400 text-xs font-medium">tCO₂e</span></div>
+                    <div class="stat-card-label mb-1">Baseline</div>
+                    <div class="font-medium text-slate-900">{{ $netZeroProgress['baseline'] ?? 1000 }} <span class="text-slate-400 text-xs font-normal">tCO₂e</span></div>
                 </div>
                 <div>
-                    <div class="text-xs uppercase tracking-wider text-slate-500 font-medium mb-1">Target 2050</div>
-                    <div class="font-semibold text-slate-900">{{ $netZeroProgress['target'] ?? 0 }} <span class="text-slate-400 text-xs font-medium">tCO₂e</span></div>
+                    <div class="stat-card-label mb-1">Target 2050</div>
+                    <div class="font-medium text-slate-900">{{ $netZeroProgress['target'] ?? 0 }} <span class="text-slate-400 text-xs font-normal">tCO₂e</span></div>
                 </div>
             </div>
         </div>

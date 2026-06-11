@@ -132,8 +132,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-5.13a4 4 0 11-8 0 4 4 0 018 0zm6 3a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
                     </div>
-                    <h4 class="font-semibold text-slate-900 mb-1">No client data yet</h4>
-                    <p class="text-sm text-slate-500 mb-0 max-w-xs mx-auto">
+                    <h4 class="card-title mb-1">No client data yet</h4>
+                    <p class="card-subtitle mb-0 max-w-xs mx-auto">
                         Add a managed client and enter emissions to see portfolio charts here.
                     </p>
                 </div>
@@ -167,9 +167,9 @@
                         {{ $slotsRemaining }} {{ $slotsRemaining === 1 ? 'slot' : 'slots' }} available
                     </p>
                     @if(!empty($slotSummary['is_trial']))
-                        <p class="text-slate-500 text-xs">Trial: data entry only</p>
+                        <p class="card-subtitle">Trial: data entry only</p>
                     @endif
-                    <a href="{{ route('consultant.packs.index') }}" class="text-brand text-xs font-semibold hover:underline">View packs →</a>
+                    <a href="{{ route('consultant.packs.index') }}" class="text-brand text-sm font-medium hover:underline">View packs →</a>
                 </div>
             </div>
         </div>
