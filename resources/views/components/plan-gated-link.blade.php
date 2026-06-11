@@ -4,12 +4,14 @@
     'message' => 'Upgrade to unlock',
     'class' => 'btn btn-primary',
     'lockedClass' => 'btn btn-secondary opacity-80',
+    'lockedHref' => null,
+    'lockedTitle' => null,
 ])
 
 @php
     $planGate = \App\Support\PlanGate::forUser(auth('web')->user());
-    $lockedTitle = $planGate->lockedFeatureMessage($message, 'This feature');
-    $lockedHref = $planGate->upgradeRoute();
+    $lockedTitle = $lockedTitle ?? $planGate->lockedFeatureMessage($message, 'This feature');
+    $lockedHref = $lockedHref ?? $planGate->upgradeRoute();
 @endphp
 
 @if($allowed)

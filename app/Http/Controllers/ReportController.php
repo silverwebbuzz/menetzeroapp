@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Measurement;
 use App\Exports\ResultsBreakdownExport;
+use App\Services\ExportReadinessService;
 use App\Services\GhgReportService;
 use App\Services\PlanEntitlementService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -14,7 +15,8 @@ use Maatwebsite\Excel\Facades\Excel;
 class ReportController extends Controller
 {
     public function __construct(
-        protected GhgReportService $reportService
+        protected GhgReportService $reportService,
+        protected ExportReadinessService $exportReadiness,
     ) {}
 
     public function index()
@@ -67,6 +69,7 @@ class ReportController extends Controller
         $report = $this->reportService->finalizeReport($report, $moccaeOnly);
 
         $chartPayload = $this->buildChartPayload($report, $moccaeOnly);
+        $exportReadiness = $this->exportReadiness->assess($measurement, $moccaeOnly);
 
         return view('reports.index', array_merge(
             compact('locations', 'fiscalYears', 'measurement', 'company'),
@@ -74,6 +77,7 @@ class ReportController extends Controller
                 'report' => $report,
                 'moccaeOnly' => $moccaeOnly,
                 'chartPayload' => $chartPayload,
+                'exportReadiness' => $exportReadiness,
                 'selectedFiscalYear' => $request->fiscal_year,
                 'selectedLocationId' => $request->location_id,
                 'emissionSourceData' => $report['emission_source_data'],
@@ -92,6 +96,7 @@ class ReportController extends Controller
         $measurement = $this->findMeasurement($request, $company->id);
         $moccaeOnly = $request->boolean('moccae_only');
         $this->requirePlanExport($company->id, PlanEntitlementService::EXPORT_EXCEL, (int) $measurement->fiscal_year);
+        $this->attachExportReadinessWarnings($measurement, $moccaeOnly);
 
         $report = $this->reportService->finalizeReport(
             $this->reportService->build($measurement),
@@ -122,6 +127,11 @@ class ReportController extends Controller
             ? PlanEntitlementService::EXPORT_MOCCAE_PDF
             : PlanEntitlementService::EXPORT_GHG_PDF;
         $this->requirePlanExport($company->id, $exportCode, (int) $measurement->fiscal_year);
+        if ($moccaeOnly) {
+            $this->guardExportReadiness($measurement, true);
+        } else {
+            $this->attachExportReadinessWarnings($measurement, false);
+        }
 
         $report = $this->reportService->finalizeReport(
             $this->reportService->build($measurement),
@@ -154,6 +164,24 @@ class ReportController extends Controller
             ->where('location_id', $request->location_id)
             ->whereHas('location', fn ($q) => $q->where('company_id', $companyId))
             ->firstOrFail();
+    }
+
+    protected function guardExportReadiness(Measurement $measurement, bool $strict): void
+    {
+        $readiness = $this->exportReadiness->assess($measurement, $strict);
+
+        if ($strict && !$readiness['is_ready']) {
+            abort(422, implode(' ', $readiness['errors']));
+        }
+    }
+
+    protected function attachExportReadinessWarnings(Measurement $measurement, bool $moccaeOnly): void
+    {
+        $readiness = $this->exportReadiness->assess($measurement, $moccaeOnly);
+
+        if ($readiness['warnings'] !== []) {
+            session()->flash('export_warnings', $readiness['warnings']);
+        }
     }
 
     protected function reportFilename(Measurement $measurement, string $ext, bool $moccaeOnly = false): string

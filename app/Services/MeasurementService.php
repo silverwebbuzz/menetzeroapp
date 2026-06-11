@@ -35,11 +35,15 @@ class MeasurementService
                 throw new RuntimeException('created_by is required to create a measurement.');
             }
 
+            $startMonth = $this->resolveFiscalStartMonthNumber($location?->fiscal_year_start);
+            $periodStart = Carbon::create($fiscalYear, $startMonth, 1)->startOfDay();
+            $periodEnd = $periodStart->copy()->addYear()->subDay()->endOfDay();
+
             $measurement = Measurement::create([
                 'location_id' => $locationId,
                 'fiscal_year' => $fiscalYear,
-                'period_start' => Carbon::create($fiscalYear, 1, 1)->startOfYear(),
-                'period_end' => Carbon::create($fiscalYear, 12, 31)->endOfYear(),
+                'period_start' => $periodStart,
+                'period_end' => $periodEnd,
                 'frequency' => 'annually',
                 'status' => 'draft',
                 'fiscal_year_start_month' => $fiscalStartMonth,
@@ -62,6 +66,20 @@ class MeasurementService
         ];
 
         return $codes[$fiscalYearStart ?? ''] ?? 'JAN';
+    }
+
+    private function resolveFiscalStartMonthNumber(?string $fiscalYearStart): int
+    {
+        $map = [
+            'JAN' => 1, 'FEB' => 2, 'MAR' => 3, 'APR' => 4,
+            'MAY' => 5, 'JUN' => 6, 'JUL' => 7, 'AUG' => 8,
+            'SEP' => 9, 'OCT' => 10, 'NOV' => 11, 'DEC' => 12,
+            'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4,
+            'May' => 5, 'June' => 6, 'July' => 7, 'August' => 8,
+            'September' => 9, 'October' => 10, 'November' => 11, 'December' => 12,
+        ];
+
+        return $map[$fiscalYearStart ?? ''] ?? 1;
     }
 
     /**

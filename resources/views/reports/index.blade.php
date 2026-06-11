@@ -66,6 +66,26 @@
             color: #78350f;
         }
 
+        .export-readiness-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-left: 4px solid #ef4444;
+            border-radius: 0.5rem;
+            padding: 1rem 1.25rem;
+            font-size: 0.875rem;
+            color: #7f1d1d;
+        }
+
+        .export-readiness-warning {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-left: 4px solid #f59e0b;
+            border-radius: 0.5rem;
+            padding: 1rem 1.25rem;
+            font-size: 0.875rem;
+            color: #78350f;
+        }
+
         .report-meta {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -183,6 +203,29 @@
                 :upgrade-label="$gate->upgradeButtonLabel('Upgrade to Starter')" />
         @endif
 
+        @if(!empty($exportReadiness['errors'] ?? []))
+            <div class="export-readiness-error mb-4">
+                <p class="font-semibold mb-1">Export blocked — data gaps detected</p>
+                <ul class="list-disc list-inside space-y-1">
+                    @foreach($exportReadiness['errors'] as $message)
+                        <li>{{ $message }}</li>
+                    @endforeach
+                </ul>
+                <p class="mt-2 text-xs">Add missing electricity data under <a href="{{ route('quick-input.index') }}" class="underline font-medium">Input Data</a>, then regenerate this report.</p>
+            </div>
+        @endif
+
+        @if(!empty($exportReadiness['warnings'] ?? []) || !empty(session('export_warnings')))
+            <div class="export-readiness-warning mb-4">
+                <p class="font-semibold mb-1">Export readiness notes</p>
+                <ul class="list-disc list-inside space-y-1">
+                    @foreach(array_merge($exportReadiness['warnings'] ?? [], session('export_warnings', [])) as $message)
+                        <li>{{ $message }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         {{-- Report header --}}
         <div class="card mb-5 {{ $previewOnly ? 'relative' : '' }}">
             @if($previewOnly)
@@ -206,12 +249,16 @@
                 @php
                     $reportFy = (int) ($measurement->fiscal_year ?? $selectedFiscalYear ?? 0);
                     $pdfExportCode = ($moccaeOnly ?? false) ? 'moccae_pdf' : 'ghg_pdf';
+                    $exportBlocked = !($exportReadiness['is_ready'] ?? true);
+                    $moccaeExportBlocked = $exportBlocked && ($moccaeOnly ?? false);
                 @endphp
                 <div class="flex gap-2 flex-wrap">
                     <x-plan-gated-link
-                        :allowed="$gate->canExport($pdfExportCode, $reportFy)"
+                        :allowed="$gate->canExport($pdfExportCode, $reportFy) && !$moccaeExportBlocked"
                         :href="route('reports.export.pdf', $exportParams)"
                         :message="$gate->exportMessage($pdfExportCode)"
+                        :locked-title="$moccaeExportBlocked ? 'Resolve export readiness issues before downloading MOCCAE PDF.' : null"
+                        :locked-href="$moccaeExportBlocked ? '#' : null"
                         class="btn btn-primary btn-sm"
                         locked-class="btn btn-secondary btn-sm">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
@@ -231,9 +278,11 @@
                         Export Excel
                     </x-plan-gated-link>
                     <x-plan-gated-link
-                        :allowed="$gate->canExport('ieqt', $reportFy)"
+                        :allowed="$gate->canExport('ieqt', $reportFy) && !$exportBlocked"
                         :href="route('reports.export.ieqt', $exportParams)"
                         :message="$gate->exportMessage('ieqt')"
+                        :locked-title="$exportBlocked ? 'Resolve export readiness issues before IEQT export.' : null"
+                        :locked-href="$exportBlocked ? '#' : null"
                         class="btn btn-secondary btn-sm"
                         locked-class="btn btn-secondary btn-sm"
                         title="CSV pack for MOCCAE IEQT (mrv.ae)">

@@ -243,9 +243,11 @@ class EmissionCalculationService
             return $value / $reverseConversion->conversion_factor;
         }
 
-        // If no conversion found, return original value
         Log::warning("Unit conversion not found: {$fromUnit} to {$toUnit}");
-        return $value;
+
+        throw new \InvalidArgumentException(
+            "No unit conversion available from {$fromUnit} to {$toUnit}. Check your unit selection or contact support."
+        );
     }
 
     /**

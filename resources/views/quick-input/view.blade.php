@@ -52,9 +52,26 @@
                     <dd class="text-sm text-gray-900 flex-1">{{ $entry->measurement->fiscal_year ?? 'N/A' }}</dd>
                 </div>
                 <div class="flex items-center border-b border-gray-100 pb-3">
-                    <dt class="text-sm font-medium text-gray-500 w-1/3">Entry Date</dt>
+                    <dt class="text-sm font-medium text-gray-500 w-1/3">Activity / bill date</dt>
                     <dd class="text-sm text-gray-900 flex-1">{{ $entry->entry_date ? $entry->entry_date->format('Y-m-d') : 'N/A' }}</dd>
                 </div>
+                @if(!empty($entry->supporting_docs))
+                <div class="flex items-start border-b border-gray-100 pb-3">
+                    <dt class="text-sm font-medium text-gray-500 w-1/3">Supporting documents</dt>
+                    <dd class="text-sm text-gray-900 flex-1">
+                        <ul class="space-y-1">
+                            @foreach($entry->supporting_docs as $index => $doc)
+                                <li>
+                                    <a href="{{ route('quick-input.documents.download', [$entry->id, $index]) }}"
+                                       class="text-emerald-700 hover:text-emerald-900 hover:underline">
+                                        {{ $doc['filename'] ?? 'Document' }}
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </dd>
+                </div>
+                @endif
                 <div class="flex items-center border-b border-gray-100 pb-3">
                     <dt class="text-sm font-medium text-gray-500 w-1/3">Quantity</dt>
                     <dd class="text-sm text-gray-900 flex-1">{{ number_format($entry->quantity, 4) }} {{ $entry->unit }}</dd>

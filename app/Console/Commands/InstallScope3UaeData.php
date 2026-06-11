@@ -39,7 +39,8 @@ class InstallScope3UaeData extends Command
             return self::FAILURE;
         }
 
-        if (!$this->confirm('This will DELETE existing Scope 3 measurement_data and re-seed Scope 3 master data. Continue?')) {
+        if (!$this->option('force') && !$this->option('no-interaction')
+            && !$this->confirm('This will DELETE existing Scope 3 measurement_data and re-seed Scope 3 master data. Continue?')) {
             $this->warn('Aborted.');
 
             return self::SUCCESS;

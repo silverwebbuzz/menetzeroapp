@@ -9,12 +9,15 @@ use App\Models\EmissionSourceMaster;
 use App\Models\EmissionFactor;
 use App\Models\EmissionSourceFormField;
 use App\Services\EmissionCalculationService;
+use App\Services\MeasurementDocumentService;
 use App\Services\MeasurementService;
 use App\Services\QuickInputFormBuilder;
 use App\Services\SubscriptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
 
 class QuickInputController extends Controller
@@ -23,17 +26,20 @@ class QuickInputController extends Controller
     protected $measurementService;
     protected $formBuilder;
     protected $subscriptionService;
+    protected $documentService;
 
     public function __construct(
         EmissionCalculationService $calculationService,
         MeasurementService $measurementService,
         QuickInputFormBuilder $formBuilder,
-        SubscriptionService $subscriptionService
+        SubscriptionService $subscriptionService,
+        MeasurementDocumentService $documentService,
     ) {
         $this->calculationService = $calculationService;
         $this->measurementService = $measurementService;
         $this->formBuilder = $formBuilder;
         $this->subscriptionService = $subscriptionService;
+        $this->documentService = $documentService;
     }
     /**
      * Display a listing of Quick Input entries
@@ -337,7 +343,13 @@ class QuickInputController extends Controller
             ];
         }
 
-        $fields = EmissionSourceFormField::where('emission_source_id', 54)
+        $vehicleSource = EmissionSourceMaster::where('quick_input_slug', 'vehicle')
+            ->where('scope', 'Scope 1')
+            ->where('is_quick_input', true)
+            ->first();
+        $vehicleSourceId = $vehicleSource?->id ?? 0;
+
+        $fields = EmissionSourceFormField::where('emission_source_id', $vehicleSourceId)
             ->whereIn('field_name', $fieldNames)
             ->orderBy('field_order')
             ->get();
@@ -504,37 +516,7 @@ class QuickInputController extends Controller
             }
         }
 
-        // Validate basic required fields
-        $validationRules = [
-            'location_id' => 'required|exists:locations,id',
-            'fiscal_year' => 'required|integer|min:2000|max:2100',
-        ];
-
-        // Check if form uses 'amount' or 'quantity'
-        $formFields = EmissionSourceFormField::where('emission_source_id', $emissionSource->id)->get();
-        $hasAmountField = $formFields->contains(function ($field) {
-            return $field->field_name === 'amount';
-        });
-        $hasUnitOfMeasure = $formFields->contains(function ($field) {
-            return $field->field_name === 'unit_of_measure';
-        });
-        if ($hasAmountField) {
-            $validationRules['amount'] = 'required|numeric|min:0';
-            if ($hasUnitOfMeasure) {
-                $validationRules['unit_of_measure'] = 'required|string';
-            } else {
-                $validationRules['unit'] = 'required|string';
-            }
-        } else {
-            if ($hasUnitOfMeasure) {
-                $validationRules['unit_of_measure'] = 'required|string';
-            } else {
-                $validationRules['quantity'] = 'required|numeric|min:0';
-                $validationRules['unit'] = 'required|string';
-            }
-        }
-
-        $request->validate($validationRules);
+        $this->validateQuickInputRequest($request, $emissionSource);
 
         $this->requireReportingYearWrite($company->id, (int) $request->fiscal_year);
 
@@ -548,12 +530,18 @@ class QuickInputController extends Controller
             // Get or create measurement record
             $measurement = $this->measurementService->getOrCreateMeasurement(
                 $request->location_id,
-                $request->fiscal_year
+                $request->fiscal_year,
+                $user->id
             );
 
             // Get quantity and unit from request (handle both 'amount' and 'quantity' fields)
             $quantity = ($request->input('amount') ?? $request->input('quantity')) ?? $request->input('distance');
             $unit = $request->input('unit_of_measure') ?? $request->input('unit');
+            $entryDate = $this->resolveEntryDate($request);
+            $supportingDocs = $this->documentService->storeForCompany(
+                $company->id,
+                $request->file('supporting_documents', []) ?? []
+            );
 
             $conditions = $this->buildFactorConditions($request, $emissionSource, $unit);
 
@@ -637,7 +625,8 @@ class QuickInputController extends Controller
                 'ch4_emissions' => isset($calculation['ch4']) && is_numeric($calculation['ch4']) ? $calculation['ch4'] : null,
                 'n2o_emissions' => isset($calculation['n2o']) && is_numeric($calculation['n2o']) ? $calculation['n2o'] : null,
                 'scope' => $emissionSource->scope,
-                'entry_date' => Carbon::now()->toDateString(), // Automatically set to current date
+                'entry_date' => $entryDate,
+                'supporting_docs' => !empty($supportingDocs) ? $supportingDocs : null,
                 'emission_factor_id' => $emissionFactor->id,
                 'gwp_version_used' => $emissionFactor->gwp_version ?? 'AR6',
                 'calculation_method' => $emissionFactor->calculation_method ?? null, // Save calculation method from emission factor
@@ -828,6 +817,37 @@ class QuickInputController extends Controller
     }
 
     /**
+     * Download a supporting document (bill/PDF) attached to a quick-input entry.
+     * Route: GET /quick-input/entries/{id}/documents/{index}/download
+     */
+    public function downloadSupportingDocument(int $id, int $index)
+    {
+        $this->requirePermission('measurements.view', null, ['measurements.*', 'manage_measurements']);
+
+        $user = Auth::user();
+        $company = $user->getActiveCompany();
+
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+
+        $entry = MeasurementData::with('measurement.location')
+            ->whereHas('measurement.location', fn ($q) => $q->where('company_id', $company->id))
+            ->findOrFail($id);
+
+        $resolved = $this->documentService->resolveDownload(
+            $entry->supporting_docs ?? [],
+            $index,
+            $company->id
+        );
+
+        return Storage::disk('local')->download(
+            $resolved['doc']['path'],
+            $resolved['downloadName']
+        );
+    }
+
+    /**
      * Show edit form for an entry (redirects to show page with edit parameter)
      */
     public function edit($id)
@@ -883,38 +903,7 @@ class QuickInputController extends Controller
 
         $emissionSource = $entry->emissionSource;
 
-        // Check if form uses 'amount' or 'quantity'
-        $formFields = EmissionSourceFormField::where('emission_source_id', $emissionSource->id)->get();
-        $hasAmountField = $formFields->contains(function ($field) {
-            return $field->field_name === 'amount';
-        });
-        $hasUnitOfMeasure = $formFields->contains(function ($field) {
-            return $field->field_name === 'unit_of_measure';
-        });
-
-        // Validate
-        $validationRules = [
-            'location_id' => 'required|exists:locations,id',
-            'fiscal_year' => 'required|integer|min:2000|max:2100',
-        ];
-
-        if ($hasAmountField) {
-            $validationRules['amount'] = 'required|numeric|min:0';
-            if ($hasUnitOfMeasure) {
-                $validationRules['unit_of_measure'] = 'required|string';
-            } else {
-                $validationRules['unit'] = 'required|string';
-            }
-        } else {
-            if ($hasUnitOfMeasure) {
-                $validationRules['unit_of_measure'] = 'required|string';
-            } else {
-                $validationRules['quantity'] = 'required|numeric|min:0';
-                $validationRules['unit'] = 'required|string';
-            }
-        }
-
-        $request->validate($validationRules);
+        $this->validateQuickInputRequest($request, $emissionSource);
 
         $this->requireReportingYearWrite($company->id, (int) $request->fiscal_year);
 
@@ -928,11 +917,18 @@ class QuickInputController extends Controller
             // Get or create measurement record (might be different location/year)
             $measurement = $this->measurementService->getOrCreateMeasurement(
                 $request->location_id,
-                $request->fiscal_year
+                $request->fiscal_year,
+                $user->id
             );
             // Get quantity and unit from request (handle both 'amount' and 'quantity' fields)
             $quantity = ($request->input('amount') ?? $request->input('quantity')) ?? $request->input('distance');
             $unit = $request->input('unit_of_measure') ?? $request->input('unit');
+            $entryDate = $this->resolveEntryDate($request);
+            $supportingDocs = $this->documentService->mergeDocuments(
+                $entry->supporting_docs,
+                $request->file('supporting_documents', []) ?? [],
+                $company->id
+            );
 
             $conditions = $this->buildFactorConditions($request, $emissionSource, $unit);
 
@@ -978,7 +974,8 @@ class QuickInputController extends Controller
                 'co2_emissions' => isset($calculation['co2']) && is_numeric($calculation['co2']) ? $calculation['co2'] : null,
                 'ch4_emissions' => isset($calculation['ch4']) && is_numeric($calculation['ch4']) ? $calculation['ch4'] : null,
                 'n2o_emissions' => isset($calculation['n2o']) && is_numeric($calculation['n2o']) ? $calculation['n2o'] : null,
-                'entry_date' => Carbon::now()->toDateString(), // Automatically set to current date
+                'entry_date' => $entryDate,
+                'supporting_docs' => !empty($supportingDocs) ? $supportingDocs : null,
                 'emission_factor_id' => $emissionFactor->id,
                 'gwp_version_used' => $emissionFactor->gwp_version ?? 'AR6',
                 'calculation_method' => $emissionFactor->calculation_method ?? null, // Save calculation method from emission factor
@@ -1347,6 +1344,67 @@ class QuickInputController extends Controller
     /**
      * Determine fuel_type based on request and emission source
      */
+    private function validateQuickInputRequest(Request $request, EmissionSourceMaster $emissionSource): void
+    {
+        $formFields = $this->formBuilder->buildForm($emissionSource->id);
+
+        $formFieldsForValidation = $formFields->filter(function ($field) use ($request, $emissionSource) {
+            if ($field->depends_on_field && !$request->filled($field->depends_on_field)) {
+                return false;
+            }
+
+            if ($emissionSource->quick_input_slug === 'vehicle' && $request->input('knowAmountOfFuel') === 'true') {
+                return !in_array($field->field_name, ['vehicle_category', 'vehicle_type', 'distance'], true);
+            }
+
+            if ($emissionSource->quick_input_slug === 'vehicle' && $request->input('knowAmountOfFuel') !== 'true') {
+                return $field->field_name !== 'amount';
+            }
+
+            return true;
+        });
+
+        $formValidator = $this->formBuilder->validateForm($request->all(), $formFieldsForValidation);
+        if ($formValidator->fails()) {
+            throw ValidationException::withMessages($formValidator->errors()->toArray());
+        }
+
+        $validationRules = [
+            'location_id' => 'required|exists:locations,id',
+            'fiscal_year' => 'required|integer|min:2000|max:2100',
+            'entry_date' => 'required|date|before_or_equal:today',
+            'supporting_documents' => 'nullable|array|max:' . MeasurementDocumentService::MAX_FILES,
+            'supporting_documents.*' => 'file|mimes:pdf,jpg,jpeg,png,webp|max:' . MeasurementDocumentService::MAX_SIZE_KB,
+        ];
+
+        $hasAmountField = $formFields->contains(fn ($field) => $field->field_name === 'amount');
+        $hasUnitOfMeasure = $formFields->contains(fn ($field) => $field->field_name === 'unit_of_measure');
+
+        if ($request->filled('distance') || $emissionSource->quick_input_slug === 'vehicle') {
+            $validationRules['distance'] = 'required_without:amount,quantity|nullable|numeric|min:0';
+            $validationRules['amount'] = 'required_without:distance,quantity|nullable|numeric|min:0';
+            $validationRules['quantity'] = 'required_without:distance,amount|nullable|numeric|min:0';
+            $validationRules[$hasUnitOfMeasure ? 'unit_of_measure' : 'unit'] = 'required|string';
+        } elseif ($hasAmountField) {
+            $validationRules['amount'] = 'required|numeric|min:0';
+            $validationRules[$hasUnitOfMeasure ? 'unit_of_measure' : 'unit'] = 'required|string';
+        } elseif ($hasUnitOfMeasure) {
+            $validationRules['unit_of_measure'] = 'required|string';
+            $validationRules['amount'] = 'nullable|numeric|min:0';
+            $validationRules['quantity'] = 'nullable|numeric|min:0';
+        } else {
+            $validationRules['quantity'] = 'required|numeric|min:0';
+            $validationRules['unit'] = 'required|string';
+        }
+
+        $request->validate($validationRules);
+    }
+
+    private function resolveEntryDate(Request $request): string
+    {
+        return Carbon::parse($request->input('entry_date', now()->toDateString()))->toDateString();
+    }
+
     private function resolveDefaultRegion(EmissionSourceMaster $emissionSource): string
     {
         if ($emissionSource->emission_type === 'fugitive') {

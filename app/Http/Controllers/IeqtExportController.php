@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Measurement;
+use App\Services\ExportReadinessService;
 use App\Services\IeqtExportService;
 use App\Services\PlanEntitlementService;
 use Illuminate\Http\Request;
@@ -9,8 +11,10 @@ use Illuminate\Support\Facades\Auth;
 
 class IeqtExportController extends Controller
 {
-    public function __construct(protected IeqtExportService $exportService)
-    {
+    public function __construct(
+        protected IeqtExportService $exportService,
+        protected ExportReadinessService $exportReadiness,
+    ) {
     }
 
     public function export(Request $request)
@@ -31,6 +35,16 @@ class IeqtExportController extends Controller
         $fiscalYear = (int) $request->fiscal_year;
 
         $this->requirePlanExport($company->id, PlanEntitlementService::EXPORT_IEQT, $fiscalYear);
+
+        $measurement = Measurement::query()
+            ->where('location_id', $location->id)
+            ->where('fiscal_year', $fiscalYear)
+            ->firstOrFail();
+
+        $readiness = $this->exportReadiness->assess($measurement, true);
+        if (!$readiness['is_ready']) {
+            abort(422, implode(' ', $readiness['errors']));
+        }
 
         return $this->exportService->downloadCsv($company, $location->id, $fiscalYear);
     }

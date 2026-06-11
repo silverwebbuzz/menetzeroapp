@@ -127,8 +127,9 @@
     </div>
     @else
     <!-- Entry Form (Handles both Add and Edit) - Professional Design -->
-    <form method="POST" 
-          action="{{ $editEntry ? route('quick-input.update', $editEntry->id) : route('quick-input.store', ['scope' => $scope, 'slug' => $slug]) }}" 
+    <form method="POST"
+          enctype="multipart/form-data"
+          action="{{ $editEntry ? route('quick-input.update', $editEntry->id) : route('quick-input.store', ['scope' => $scope, 'slug' => $slug]) }}"
           class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8"
           data-source-id="{{ $emissionSource->id }}">
         @csrf
@@ -444,6 +445,62 @@
                         </div>
                     </div>
                 @endif
+            </div>
+        </div>
+
+        <!-- Activity period & supporting evidence (UAE audit trail) -->
+        <div class="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6 border-t border-gray-200 pt-6">
+            <div class="form-group-horizontal">
+                <div class="form-label-wrapper">
+                    <label for="entry_date" class="form-label-horizontal">
+                        Activity / bill date <span class="text-red-500">*</span>
+                    </label>
+                    <p class="form-help-text-under-label">Date on the DEWA bill, fuel receipt, or invoice for this entry.</p>
+                </div>
+                <div class="form-input-wrapper">
+                    <input type="date"
+                           name="entry_date"
+                           id="entry_date"
+                           required
+                           max="{{ date('Y-m-d') }}"
+                           value="{{ old('entry_date', $editEntry?->entry_date?->format('Y-m-d') ?? date('Y-m-d')) }}"
+                           class="form-input">
+                    @error('entry_date')
+                        <p class="form-error-text">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+            <div class="form-group-horizontal">
+                <div class="form-label-wrapper">
+                    <label for="supporting_documents" class="form-label-horizontal">Supporting documents</label>
+                    <p class="form-help-text-under-label">Upload DEWA/ADDC bills, fuel receipts, or invoices (PDF/JPG/PNG, max 10 MB each, up to 5 files).</p>
+                </div>
+                <div class="form-input-wrapper">
+                    <input type="file"
+                           name="supporting_documents[]"
+                           id="supporting_documents"
+                           multiple
+                           accept=".pdf,.jpg,.jpeg,.png,.webp"
+                           class="form-input">
+                    @error('supporting_documents')
+                        <p class="form-error-text">{{ $message }}</p>
+                    @enderror
+                    @error('supporting_documents.*')
+                        <p class="form-error-text">{{ $message }}</p>
+                    @enderror
+                    @if($editEntry && !empty($editEntry->supporting_docs))
+                        <ul class="mt-2 text-xs text-gray-600 space-y-1">
+                            @foreach($editEntry->supporting_docs as $index => $doc)
+                                <li>
+                                    <a href="{{ route('quick-input.documents.download', [$editEntry->id, $index]) }}"
+                                       class="text-emerald-700 hover:text-emerald-900 hover:underline">
+                                        📎 {{ $doc['filename'] ?? 'Document' }}
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
             </div>
         </div>
 

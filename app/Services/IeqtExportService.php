@@ -20,7 +20,9 @@ class IeqtExportService
     public function buildRows(Measurement $measurement): array
     {
         $measurement->load(['location.company']);
-        $report = $this->reportService->build($measurement);
+        $report = $this->reportService->applyMoccaeOnly(
+            $this->reportService->build($measurement)
+        );
         $company = $measurement->location->company;
         $settings = CompanyReportingSetting::where('company_id', $company->id)
             ->where('fiscal_year', $measurement->fiscal_year)
@@ -87,8 +89,8 @@ class IeqtExportService
         if (isset($report['scope2_market_tonnes'])) {
             $rows[] = ['Scope 2 market-based tCO2e', $report['scope2_market_tonnes']];
         }
-        $rows[] = ['Scope 3 tCO2e', $report['scope_tonnes']['Scope 3'] ?? 0];
-        $rows[] = ['Total tCO2e', $report['total_tonnes']];
+        $rows[] = ['Total Scope 1+2 tCO2e (MOCCAE)', $report['display_total_tonnes'] ?? ($report['scope_12_tonnes'] ?? 0)];
+        $rows[] = ['Note', 'MOCCAE IEQT export includes Scope 1 and Scope 2 only. Scope 3 excluded per UAE federal reporting.'];
 
         return $rows;
     }
