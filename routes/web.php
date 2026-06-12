@@ -503,6 +503,11 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
         Route::get('/site-content/pages/{id}/edit', [\App\Http\Controllers\Admin\SiteContentController::class, 'editPage'])->name('site-content.pages.edit');
         Route::put('/site-content/pages/{id}', [\App\Http\Controllers\Admin\SiteContentController::class, 'updatePage'])->name('site-content.pages.update');
 
+        Route::get('/email-templates', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'index'])->name('email-templates.index');
+        Route::get('/email-templates/{email_template}/edit', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'edit'])->name('email-templates.edit');
+        Route::put('/email-templates/{email_template}', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'update'])->name('email-templates.update');
+        Route::get('/email-templates/{email_template}/preview', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'preview'])->name('email-templates.preview');
+
         // Role Templates Management
         Route::get('/role-templates', [\App\Http\Controllers\Admin\SuperAdminController::class, 'roleTemplates'])->name('role-templates');
         Route::get('/role-templates/create', [\App\Http\Controllers\Admin\SuperAdminController::class, 'createRoleTemplate'])->name('role-templates.create');

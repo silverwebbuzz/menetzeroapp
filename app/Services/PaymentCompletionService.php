@@ -25,7 +25,7 @@ class PaymentCompletionService
             ?? $transaction->transaction_type
             ?? 'subscription';
 
-        return match ($type) {
+        $result = match ($type) {
             'consultant_pack' => $this->marketplace->completeTransaction($transaction, $gatewayRefs),
             'consultant_agency_pack' => $this->consultantSubscriptions->completePackTransaction($transaction, $gatewayRefs),
             'consultant_agency_extra_slot' => $this->consultantSubscriptions->completeExtraSlotTransaction($transaction, $gatewayRefs),
@@ -33,5 +33,19 @@ class PaymentCompletionService
             'consultant_agency_renewal' => $this->consultantRenewals->completeRenewalTransaction($transaction, $gatewayRefs),
             default => $this->subscriptions->completeTransaction($transaction, $gatewayRefs),
         };
+
+        $fresh = $transaction->fresh();
+        if ($fresh && $fresh->status === 'completed') {
+            try {
+                app(EmailTemplateService::class)->sendPaymentNotifications($fresh);
+            } catch (\Throwable $e) {
+                \Log::error('Payment notification email failed', [
+                    'transaction_id' => $fresh->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return $result;
     }
 }

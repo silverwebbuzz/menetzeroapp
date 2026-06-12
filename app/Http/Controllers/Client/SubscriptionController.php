@@ -530,7 +530,7 @@ class SubscriptionController extends Controller
     private function completePaidSubscription(PaymentTransaction $transaction, array $gatewayRefs, ?string $reference)
     {
         try {
-            $this->subscriptionService->completeTransaction($transaction, $gatewayRefs);
+            app(\App\Services\PaymentCompletionService::class)->complete($transaction, $gatewayRefs);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Subscription activation failed after payment', [
                 'transaction_id' => $transaction->id,
@@ -542,6 +542,23 @@ class SubscriptionController extends Controller
                 'file' => $e->getFile() . ':' . $e->getLine(),
                 'trace' => $e->getTraceAsString(),
             ]);
+
+            try {
+                app(\App\Services\EmailTemplateService::class)->sendSystemAlert(
+                    'Subscription activation failed after payment',
+                    'Payment was captured but subscription activation threw an exception.',
+                    [
+                        'transaction_id' => $transaction->id,
+                        'company_id' => $transaction->company_id,
+                        'reference' => $reference,
+                        'error' => $e->getMessage(),
+                    ]
+                );
+            } catch (\Throwable $mailError) {
+                \Illuminate\Support\Facades\Log::error('Failed to send system alert email', [
+                    'error' => $mailError->getMessage(),
+                ]);
+            }
 
             $message = 'Payment received but the subscription could not be activated. Please contact support.';
             if (config('app.debug')) {

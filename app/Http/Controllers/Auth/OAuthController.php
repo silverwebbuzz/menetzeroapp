@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Consultant;
 use App\Models\User;
-use App\Mail\WelcomeEmail;
+use App\Services\EmailTemplateService;
 use App\Services\ConsultantAccountService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -163,7 +163,9 @@ class OAuthController extends Controller
         ]);
 
         try {
-            Mail::to($newUser->email)->send(new WelcomeEmail($newUser));
+            app(EmailTemplateService::class)->sendToUser('welcome', $newUser, [
+                'dashboard_url' => route('client.dashboard'),
+            ]);
         } catch (\Exception $e) {
             Log::error('Failed to send welcome email: ' . $e->getMessage());
         }

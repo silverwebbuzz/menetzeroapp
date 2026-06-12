@@ -723,4 +723,42 @@ class User extends Authenticatable
             return collect([]);
         }
     }
+
+    /**
+     * Send the password reset notification using the admin-editable template.
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $resetUrl = url(route('password.reset', [
+            'token' => $token,
+            'email' => $this->getEmailForPasswordReset(),
+        ], false));
+
+        app(\App\Services\EmailTemplateService::class)->sendToUser('password_reset', $this, [
+            'reset_url' => $resetUrl,
+        ]);
+    }
+
+    /**
+     * Send the email verification notification using the admin-editable template.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        if (!\Illuminate\Support\Facades\Route::has('verification.verify')) {
+            return;
+        }
+
+        $verifyUrl = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+            'verification.verify',
+            \Illuminate\Support\Carbon::now()->addMinutes(config('auth.verification.expire', 60)),
+            [
+                'id' => $this->getKey(),
+                'hash' => sha1($this->getEmailForVerification()),
+            ]
+        );
+
+        app(\App\Services\EmailTemplateService::class)->sendToUser('email_verification', $this, [
+            'verify_url' => $verifyUrl,
+        ]);
+    }
 }

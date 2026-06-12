@@ -1,0 +1,41 @@
+<?php
+
+namespace App\Mail;
+
+use App\Models\EmailTemplate;
+use Illuminate\Bus\Queueable;
+use Illuminate\Mail\Mailable;
+use Illuminate\Queue\SerializesModels;
+
+class TemplateMail extends Mailable
+{
+    use Queueable, SerializesModels;
+
+    public function __construct(
+        public EmailTemplate $template,
+        public array $variables = [],
+    ) {}
+
+    public function build(): self
+    {
+        $htmlBody = $this->template->renderBodyHtml($this->variables);
+        $textBody = $this->template->renderBodyText($this->variables);
+        $fromKey = $this->template->mailer ?: 'noreply';
+        $from = config("mail.addresses.{$fromKey}", config('mail.from'));
+
+        $mail = $this->from($from['address'] ?? config('mail.from.address'), $from['name'] ?? config('mail.from.name'))
+            ->subject($this->template->renderSubject($this->variables))
+            ->view('emails.template', [
+                'bodyHtml' => $htmlBody,
+                'previewText' => $textBody,
+            ]);
+
+        if ($textBody) {
+            $mail->text('emails.template-text', [
+                'bodyText' => $textBody,
+            ]);
+        }
+
+        return $mail;
+    }
+}

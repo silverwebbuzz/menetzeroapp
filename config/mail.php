@@ -18,21 +18,34 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Mailer Configurations
+    | MeNetZero addresses
     |--------------------------------------------------------------------------
     |
-    | Here you may configure all of the mailers used by your application plus
-    | their respective settings. Several examples have been configured for
-    | you and you are free to add your own as your application requires.
+    | hello@ — sales, demos, partnerships
+    | help@  — support, billing help (Reply-To on automated mail)
+    | noreply@ — welcome, verification, password, subscriptions, invoices, alerts
     |
-    | Laravel supports a variety of mail "transport" drivers that can be used
-    | when delivering an email. You may specify which one you're using for
-    | your mailers below. You may also add additional mailers if needed.
-    |
-    | Supported: "smtp", "sendmail", "mailgun", "ses", "ses-v2",
-    |            "postmark", "resend", "log", "array",
-    |            "failover", "roundrobin"
-    |
+    */
+
+    'addresses' => [
+        'hello' => [
+            'address' => env('MAIL_HELLO_ADDRESS', 'hello@menetzero.com'),
+            'name' => env('MAIL_HELLO_NAME', 'MeNetZero'),
+        ],
+        'help' => [
+            'address' => env('MAIL_HELP_ADDRESS', 'help@menetzero.com'),
+            'name' => env('MAIL_HELP_NAME', 'MeNetZero Support'),
+        ],
+        'noreply' => [
+            'address' => env('MAIL_NOREPLY_ADDRESS', 'noreply@menetzero.com'),
+            'name' => env('MAIL_NOREPLY_NAME', 'MeNetZero'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Mailer Configurations
+    |--------------------------------------------------------------------------
     */
 
     'mailers' => [
@@ -45,6 +58,39 @@ return [
             'port' => env('MAIL_PORT', 2525),
             'username' => env('MAIL_USERNAME'),
             'password' => env('MAIL_PASSWORD'),
+            'timeout' => null,
+            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+        ],
+
+        'smtp_hello' => [
+            'transport' => 'smtp',
+            'scheme' => env('MAIL_HELLO_SCHEME', env('MAIL_SCHEME')),
+            'host' => env('MAIL_HELLO_HOST', env('MAIL_HOST', '127.0.0.1')),
+            'port' => env('MAIL_HELLO_PORT', env('MAIL_PORT', 587)),
+            'username' => env('MAIL_HELLO_USERNAME', env('MAIL_USERNAME')),
+            'password' => env('MAIL_HELLO_PASSWORD', env('MAIL_PASSWORD')),
+            'timeout' => null,
+            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+        ],
+
+        'smtp_help' => [
+            'transport' => 'smtp',
+            'scheme' => env('MAIL_HELP_SCHEME', env('MAIL_SCHEME')),
+            'host' => env('MAIL_HELP_HOST', env('MAIL_HOST', '127.0.0.1')),
+            'port' => env('MAIL_HELP_PORT', env('MAIL_PORT', 587)),
+            'username' => env('MAIL_HELP_USERNAME', env('MAIL_USERNAME')),
+            'password' => env('MAIL_HELP_PASSWORD', env('MAIL_PASSWORD')),
+            'timeout' => null,
+            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+        ],
+
+        'smtp_noreply' => [
+            'transport' => 'smtp',
+            'scheme' => env('MAIL_NOREPLY_SCHEME', env('MAIL_SCHEME')),
+            'host' => env('MAIL_NOREPLY_HOST', env('MAIL_HOST', '127.0.0.1')),
+            'port' => env('MAIL_NOREPLY_PORT', env('MAIL_PORT', 587)),
+            'username' => env('MAIL_NOREPLY_USERNAME', env('MAIL_USERNAME')),
+            'password' => env('MAIL_NOREPLY_PASSWORD', env('MAIL_PASSWORD')),
             'timeout' => null,
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
@@ -111,8 +157,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', 'Example'),
+        'address' => env('MAIL_FROM_ADDRESS', env('MAIL_NOREPLY_ADDRESS', 'noreply@menetzero.com')),
+        'name' => env('MAIL_FROM_NAME', env('MAIL_NOREPLY_NAME', 'MeNetZero')),
     ],
 
 ];

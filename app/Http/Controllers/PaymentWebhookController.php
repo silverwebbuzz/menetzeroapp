@@ -131,6 +131,20 @@ class PaymentWebhookController extends Controller
                 'error' => $e->getMessage(),
                 'file' => $e->getFile() . ':' . $e->getLine(),
             ]);
+
+            try {
+                app(\App\Services\EmailTemplateService::class)->sendSystemAlert(
+                    'Webhook payment completion failed',
+                    'A paid webhook could not activate the subscription or order.',
+                    [
+                        'transaction_id' => $transaction->id,
+                        'refs' => $refs,
+                        'error' => $e->getMessage(),
+                    ]
+                );
+            } catch (\Throwable $mailError) {
+                Log::error('Failed to send system alert email', ['error' => $mailError->getMessage()]);
+            }
         }
     }
 }

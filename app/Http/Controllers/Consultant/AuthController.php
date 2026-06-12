@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Consultant;
 use App\Http\Controllers\Controller;
 use App\Models\Consultant;
 use App\Services\ConsultantAccountService;
+use App\Services\EmailTemplateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -49,6 +50,12 @@ class AuthController extends Controller
 
         Auth::guard('consultant')->login($consultant);
         app(ConsultantAccountService::class)->syncWebSession($consultant);
+
+        try {
+            app(EmailTemplateService::class)->sendToConsultant('welcome_consultant', $consultant);
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         return redirect()->route('consultant.dashboard')
             ->with('success', 'Welcome! Complete your profile for the directory, or purchase an agency pack to manage client workspaces.');

@@ -103,8 +103,15 @@ class CompanyInvitationService
             throw new \Exception('Failed to create invitation: ' . $e->getMessage());
         }
 
-        // Send invitation email (you'll need to create the mailable)
-        // Mail::to($email)->send(new CompanyInvitationMail($invitation));
+        // Send invitation email
+        try {
+            app(\App\Services\EmailTemplateService::class)->sendTeamInvitation($invitation);
+        } catch (\Exception $e) {
+            \Log::error('Failed to send team invitation email', [
+                'invitation_id' => $invitation->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return $invitation;
     }

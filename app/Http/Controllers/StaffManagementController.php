@@ -495,8 +495,14 @@ class StaffManagementController extends Controller
             'invited_at' => now(),
         ]);
 
-        // TODO: Send email when email functionality is configured
-        // Mail::to($invitation->email)->send(new CompanyInvitationMail($invitation));
+        try {
+            app(\App\Services\EmailTemplateService::class)->sendTeamInvitation($invitation);
+        } catch (\Exception $e) {
+            \Log::error('Failed to resend team invitation email', [
+                'invitation_id' => $invitation->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return response()->json([
             'success' => true,

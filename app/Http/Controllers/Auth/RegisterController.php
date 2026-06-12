@@ -5,11 +5,10 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Company;
-use App\Mail\WelcomeEmail;
+use App\Services\EmailTemplateService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Hash;
 
 class RegisterController extends Controller
 {
@@ -44,7 +43,13 @@ class RegisterController extends Controller
 
         // Send welcome email
         try {
-            Mail::to($user->email)->send(new WelcomeEmail($user));
+            app(EmailTemplateService::class)->sendToUser('welcome', $user, [
+                'dashboard_url' => route('client.dashboard'),
+            ]);
+
+            if (config('emails.verification_on_register', false)) {
+                $user->sendEmailVerificationNotification();
+            }
         } catch (\Exception $e) {
             // Log the error but don't fail registration if email fails
             \Log::error('Failed to send welcome email: ' . $e->getMessage());

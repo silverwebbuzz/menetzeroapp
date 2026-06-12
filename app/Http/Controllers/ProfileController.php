@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Company;
 use App\Models\MasterIndustryCategory;
-use App\Mail\PasswordChangedEmail;
+use App\Services\EmailTemplateService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -95,7 +95,9 @@ class ProfileController extends Controller
 
         // Send password changed email notification
         try {
-            Mail::to($user->email)->send(new PasswordChangedEmail($user));
+            app(EmailTemplateService::class)->sendToUser('password_changed', $user, [
+                'changed_at' => now()->format('F j, Y g:i A'),
+            ]);
         } catch (\Exception $e) {
             // Log the error but don't fail password update if email fails
             \Log::error('Failed to send password changed email: ' . $e->getMessage());
