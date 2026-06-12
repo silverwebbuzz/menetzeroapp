@@ -2,13 +2,14 @@
 
 namespace App\Mail;
 
+use App\Mail\Concerns\AppliesGlobalBcc;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
 class RawTestMail extends Mailable
 {
-    use Queueable, SerializesModels;
+    use AppliesGlobalBcc, Queueable, SerializesModels;
 
     /**
      * @param  array{address?: string, name?: string|null}  $fromAddress
@@ -21,14 +22,16 @@ class RawTestMail extends Mailable
 
     public function build(): self
     {
-        return $this->from(
-            $this->fromAddress['address'] ?? config('mail.from.address'),
-            $this->fromAddress['name'] ?? config('mail.from.name'),
-        )
-            ->subject($this->subjectLine)
-            ->view('emails.template', [
-                'bodyHtml' => $this->htmlBody,
-                'previewText' => 'MeNetZero raw email test',
-            ]);
+        return $this->applyGlobalBcc(
+            $this->from(
+                $this->fromAddress['address'] ?? config('mail.from.address'),
+                $this->fromAddress['name'] ?? config('mail.from.name'),
+            )
+                ->subject($this->subjectLine)
+                ->view('emails.template', [
+                    'bodyHtml' => $this->htmlBody,
+                    'previewText' => 'MeNetZero raw email test',
+                ])
+        );
     }
 }

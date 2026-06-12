@@ -13,6 +13,9 @@ return [
 
     'alert_to' => env('MAIL_ALERT_TO', env('MAIL_HELP_ADDRESS', 'help@menetzero.com')),
 
+    /** Optional fallback BCC; admin can override via Site settings → Email Tester. */
+    'global_bcc' => env('MAIL_GLOBAL_BCC', ''),
+
     'verification_on_register' => env('EMAIL_VERIFICATION_ON_REGISTER', false),
 
     'templates' => [

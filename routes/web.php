@@ -509,6 +509,7 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
         Route::get('/email-templates/{email_template}/preview', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'preview'])->name('email-templates.preview');
 
         Route::get('/email-test', [\App\Http\Controllers\Admin\EmailTestController::class, 'index'])->name('email-test.index');
+        Route::put('/email-test/global-bcc', [\App\Http\Controllers\Admin\EmailTestController::class, 'updateGlobalBcc'])->name('email-test.global-bcc');
         Route::post('/email-test', [\App\Http\Controllers\Admin\EmailTestController::class, 'send'])->name('email-test.send');
 
         // Role Templates Management

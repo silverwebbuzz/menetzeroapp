@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Mail\Concerns\AppliesGlobalBcc;
 use App\Models\EmailTemplate;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -9,7 +10,7 @@ use Illuminate\Queue\SerializesModels;
 
 class TemplateMail extends Mailable
 {
-    use Queueable, SerializesModels;
+    use AppliesGlobalBcc, Queueable, SerializesModels;
 
     public function __construct(
         public EmailTemplate $template,
@@ -43,6 +44,6 @@ class TemplateMail extends Mailable
             ]);
         }
 
-        return $mail;
+        return $this->applyGlobalBcc($mail);
     }
 }

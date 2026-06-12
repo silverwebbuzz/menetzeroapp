@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\EmailTemplate;
 use App\Services\EmailTemplateService;
+use App\Support\EmailTriggerRegistry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,7 +19,10 @@ class EmailTemplateController extends Controller
             ->get()
             ->groupBy('mailer');
 
-        return view('admin.email-templates.index', compact('templates'));
+        return view('admin.email-templates.index', [
+            'templates' => $templates,
+            'triggersBySlug' => EmailTriggerRegistry::all(),
+        ]);
     }
 
     public function edit(EmailTemplate $emailTemplate)
@@ -30,6 +34,7 @@ class EmailTemplateController extends Controller
                 'help' => config('mail.addresses.help.address'),
                 'noreply' => config('mail.addresses.noreply.address'),
             ],
+            'triggers' => EmailTriggerRegistry::forSlug($emailTemplate->slug),
         ]);
     }
 

@@ -4,6 +4,37 @@
 @section('page-title', 'Email Tester')
 
 @section('content')
+    @if(session('bcc_success'))
+        <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">{{ session('bcc_success') }}</div>
+    @endif
+
+    <div class="mb-6 bg-white shadow rounded-lg p-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-1">Global BCC copy</h2>
+        <p class="text-sm text-gray-600 mb-4">
+            When set, every outgoing email (welcome, password reset, invoices, invitations, etc.) is silently copied to this address.
+            Leave blank to disable.
+        </p>
+        <form method="POST" action="{{ route('admin.email-test.global-bcc') }}" class="flex flex-col sm:flex-row gap-3 sm:items-end">
+            @csrf
+            @method('PUT')
+            <div class="flex-1">
+                <label class="block text-sm font-medium text-gray-700 mb-1">BCC address</label>
+                <input type="email" name="mail_global_bcc" value="{{ old('mail_global_bcc', $globalBcc) }}"
+                       placeholder="menetzero@gmail.com"
+                       class="w-full rounded border-gray-300 shadow-sm text-sm">
+                @error('mail_global_bcc')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
+            <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-800 text-white text-sm font-medium rounded hover:bg-gray-900 whitespace-nowrap">
+                Save BCC setting
+            </button>
+        </form>
+        @if($globalBcc)
+            <p class="text-xs text-green-700 mt-3">Active — copies go to <strong>{{ $globalBcc }}</strong></p>
+        @else
+            <p class="text-xs text-gray-500 mt-3">Not set — no global copy is sent.</p>
+        @endif
+    </div>
+
     <div class="mb-4 bg-blue-50 border border-blue-200 text-blue-900 px-4 py-3 rounded text-sm">
         Send a test message and inspect SMTP settings, transport errors, and delivery hints on this page.
         If mail still does not arrive after a green result, check spam, DNS (SPF/DKIM), and that the recipient mailbox exists.
@@ -64,6 +95,7 @@
                                 'template_name' => 'Template',
                                 'transport_mailer' => 'Laravel mailer',
                                 'to' => 'To',
+                                'bcc' => 'BCC',
                                 'subject' => 'Subject',
                                 'duration_ms' => 'Duration (ms)',
                             ] as $key => $label)
@@ -160,6 +192,7 @@
                 Default mailer: <code class="bg-gray-100 px-1 rounded">{{ $config['default_mailer'] }}</code>
                 · EHLO: <code class="bg-gray-100 px-1 rounded">{{ $config['ehlo_domain'] ?: '—' }}</code>
                 · Alerts: <code class="bg-gray-100 px-1 rounded">{{ $config['alert_to'] ?: '—' }}</code>
+                · Global BCC: <code class="bg-gray-100 px-1 rounded">{{ $config['global_bcc'] ?: 'off' }}</code>
             </p>
 
             @foreach($config['mailboxes'] as $key => $box)

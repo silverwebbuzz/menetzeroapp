@@ -75,8 +75,15 @@
         </div>
 
         <div>
-            <div class="bg-white shadow rounded-lg p-4 sticky top-4">
-                <h3 class="text-sm font-semibold text-gray-900 mb-2">Available placeholders</h3>
+            <div class="bg-white shadow rounded-lg p-4 sticky top-4 space-y-6">
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-900 mb-2">Triggered from</h3>
+                    <p class="text-xs text-gray-500 mb-2">Page or form that sends this email, plus the source file in code.</p>
+                    @include('admin.email-templates.partials.triggers', ['triggers' => $triggers ?? []])
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-900 mb-2">Available placeholders</h3>
                 <ul class="text-xs text-gray-600 space-y-1 font-mono">
                     <li>@{{ app_name }}</li>
                     <li>@{{ app_url }}</li>
@@ -90,6 +97,7 @@
                         @endif
                     @endforeach
                 </ul>
+                </div>
             </div>
         </div>
     </div>

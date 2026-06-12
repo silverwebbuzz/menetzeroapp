@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Mail\RawTestMail;
 use App\Mail\TemplateMail;
+use App\Mail\TemplateMail;
 use App\Models\EmailTemplate;
 use Illuminate\Support\Facades\Mail;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -36,6 +37,7 @@ class EmailDiagnosticService
             'default_mailer' => $default,
             'ehlo_domain' => config('mail.mailers.smtp.local_domain'),
             'alert_to' => config('emails.alert_to'),
+            'global_bcc' => TemplateMail::globalBccAddress(),
             'mailboxes' => $mailboxes,
             'warnings' => $this->configWarnings($default, $mailboxes),
         ];
@@ -67,6 +69,7 @@ HTML;
             'from' => $from,
             'to' => $to,
             'subject' => $subject,
+            'bcc' => TemplateMail::globalBccAddress(),
         ];
 
         try {
@@ -116,6 +119,7 @@ HTML;
             'from' => $from,
             'to' => $to,
             'subject' => $template->renderSubject($variables),
+            'bcc' => TemplateMail::globalBccAddress(),
         ];
 
         try {

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\TemplateMail;
 use App\Models\EmailTemplate;
+use App\Models\SiteSetting;
 use App\Services\EmailDiagnosticService;
 use Illuminate\Http\Request;
 
@@ -31,7 +33,25 @@ class EmailTestController extends Controller
             'templates' => $templates,
             'result' => session('email_test_result'),
             'old' => session('_old_input', []),
+            'globalBcc' => TemplateMail::globalBccAddress(),
         ]);
+    }
+
+    public function updateGlobalBcc(Request $request)
+    {
+        $validated = $request->validate([
+            'mail_global_bcc' => 'nullable|email|max:255',
+        ]);
+
+        SiteSetting::put('mail_global_bcc', $validated['mail_global_bcc'] ?? '');
+
+        $message = ($validated['mail_global_bcc'] ?? '') === ''
+            ? 'Global BCC disabled — outgoing mail will no longer be copied.'
+            : 'Global BCC saved — all outgoing mail will be copied to ' . $validated['mail_global_bcc'] . '.';
+
+        return redirect()
+            ->route('admin.email-test.index')
+            ->with('bcc_success', $message);
     }
 
     public function send(Request $request, EmailDiagnosticService $diagnostics)
