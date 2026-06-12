@@ -73,24 +73,37 @@
     --chart-5: #bfdbfe;
 }
 
-/* ─── Layout ─── */
+/* ─── Layout (fill main column — no horizontal scroll, no double gutters) ─── */
+body.company-portal,
+body.consultant-portal {
+    overflow-x: clip;
+}
+
+.app-shell,
+.consultant-shell {
+    overflow-x: clip;
+    max-width: 100vw;
+}
+
 .app-shell .main-content,
 .consultant-shell .main-content {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    width: 100%;
+    flex: 1;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: clip;
+    /* width + margin-left: set in app-shell.css — never add width:100% here */
 }
 
 .portal-shell-inner {
-    width: 100%;
-    max-width: var(--content-max);
-    margin-left: auto;
-    margin-right: auto;
     flex: 1;
     display: flex;
     flex-direction: column;
-    min-height: 0;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0;
     box-sizing: border-box;
     padding-left: var(--content-padding);
     padding-right: var(--content-padding);
@@ -99,30 +112,46 @@
 .app-shell .portal-shell-inner > .header,
 .consultant-shell .portal-shell-inner > .header {
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
     padding-left: 0;
     padding-right: 0;
+    box-sizing: border-box;
 }
 
 .app-shell .portal-shell-inner > .content-area,
 .consultant-shell .portal-shell-inner > .content-area {
     flex: 1;
     width: 100%;
-    max-width: none !important;
+    max-width: 100% !important;
+    min-width: 0;
     margin: 0 !important;
     padding: var(--content-padding) 0 !important;
+    overflow-x: clip;
+    box-sizing: border-box;
 }
 
 .app-shell .portal-shell-inner > .site-footer,
 .consultant-shell .portal-shell-inner > .site-footer {
     width: 100%;
+    max-width: 100%;
     padding: 0.875rem 0;
     margin-top: auto;
+    box-sizing: border-box;
 }
 
-/* Pages must not re-cap width — avoids layout shift between routes */
+/* All page roots must stay inside the column */
+.app-shell .content-area > *,
+.consultant-shell .content-area > * {
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+/* Pages must not re-cap width below the shell — but never exceed it */
 .app-shell .content-area > [class*='max-w-']:not(.portal-narrow),
 .consultant-shell .content-area > [class*='max-w-']:not(.portal-narrow) {
-    max-width: none !important;
+    max-width: 100% !important;
     width: 100% !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
@@ -146,6 +175,30 @@
     :root {
         --content-padding: 16px;
     }
+}
+
+.portal-agency-banner {
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.app-shell .header,
+.consultant-shell .header {
+    flex-wrap: nowrap;
+    min-width: 0;
+}
+
+.app-shell .header .page-title,
+.consultant-shell .header .page-title {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.app-shell .header-actions,
+.consultant-shell .header-actions {
+    flex-shrink: 0;
+    max-width: 100%;
 }
 
 .app-shell .header .page-title,
@@ -190,11 +243,12 @@
 }
 
 .ent-kpi-value {
-    font-size: var(--text-kpi);
+    font-size: clamp(1.375rem, 2.2vw, var(--text-kpi));
     font-weight: 700;
     line-height: 1.1;
     color: var(--ink);
     letter-spacing: -0.03em;
+    overflow-wrap: anywhere;
 }
 
 .ent-kpi-unit {
@@ -221,6 +275,9 @@
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-card);
     transition: box-shadow 0.15s ease;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .app-shell .card:hover,
@@ -247,6 +304,10 @@
     border-radius: var(--radius-card);
     padding: var(--space-4);
     box-shadow: var(--shadow-card);
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 .ent-kpi-card:hover {
@@ -257,14 +318,16 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: var(--space-3);
+    gap: var(--space-2);
     margin-bottom: var(--space-3);
+    min-width: 0;
 }
 
 .ent-kpi-card__trend {
     font-size: var(--text-body);
     font-weight: 500;
     margin-top: var(--space-2);
+    overflow-wrap: anywhere;
 }
 
 .ent-kpi-card__trend.up { color: #dc2626; }
@@ -451,92 +514,78 @@
     min-height: var(--header-height);
 }
 
-.app-shell .main-content,
-.consultant-shell .main-content {
-    margin-left: var(--sidebar-width);
-}
-
 /* ─── Dashboard grids ─── */
 .ent-dashboard {
     display: flex;
     flex-direction: column;
     gap: var(--space-5);
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.ent-page-header,
+.page-header {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.page-header-actions {
+    flex-wrap: wrap;
+    max-width: 100%;
 }
 
 .ent-grid-6 {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
     gap: var(--space-3);
-}
-
-@media (min-width: 768px) {
-    .ent-grid-6 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
-
-@media (min-width: 1280px) {
-    .ent-grid-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    width: 100%;
+    min-width: 0;
 }
 
 .ent-chart-row {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
     gap: var(--space-4);
-}
-
-@media (min-width: 1024px) {
-    .ent-chart-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    width: 100%;
+    min-width: 0;
 }
 
 .ent-grid-4 {
     display: grid;
-    grid-template-columns: repeat(1, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
     gap: var(--space-3);
-}
-
-@media (min-width: 640px) {
-    .ent-grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-@media (min-width: 1280px) {
-    .ent-grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    width: 100%;
+    min-width: 0;
 }
 
 .ent-grid-2 {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
     gap: var(--space-4);
-}
-
-@media (min-width: 1024px) {
-    .ent-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    width: 100%;
+    min-width: 0;
 }
 
 .ent-grid-3 {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
     gap: var(--space-3);
-}
-
-@media (min-width: 768px) {
-    .ent-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
-
-@media (min-width: 1280px) {
-    .ent-grid-3 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    width: 100%;
+    min-width: 0;
 }
 
 /* ─── Net zero panel ─── */
 .ent-netzero-metrics {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
     gap: var(--space-4);
+    width: 100%;
+    min-width: 0;
     margin-top: var(--space-4);
     padding-top: var(--space-4);
     border-top: 1px solid var(--line);
-}
-
-@media (min-width: 768px) {
-    .ent-netzero-metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
 .ent-progress-track {
@@ -614,12 +663,10 @@
 /* ─── Consultant pipeline ─── */
 .ent-pipeline {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr));
     gap: var(--space-3);
-}
-
-@media (min-width: 768px) {
-    .ent-pipeline { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    width: 100%;
+    min-width: 0;
 }
 
 .ent-pipeline-step {

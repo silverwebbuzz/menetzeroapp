@@ -227,6 +227,10 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
     background-color: var(--canvas);
     display: flex;
     flex-direction: column;
+    min-width: 0;
+    max-width: calc(100vw - var(--sidebar-width));
+    overflow-x: clip;
+    box-sizing: border-box;
 }
 
 .header {
@@ -757,7 +761,7 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
 @media (max-width: 1024px) {
     .sidebar { transform: translateX(-100%); box-shadow: var(--shadow-lg); }
     .sidebar.is-open { transform: translateX(0); }
-    .main-content { margin-left: 0; }
+    .main-content { margin-left: 0; max-width: 100vw; }
     .mobile-menu-btn { display: inline-flex; align-items: center; }
 }
 
