@@ -240,12 +240,12 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
 
 .main-content {
     margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
     min-height: 100vh;
     background-color: var(--canvas);
     display: flex;
     flex-direction: column;
     min-width: 0;
-    max-width: calc(100vw - var(--sidebar-width));
     overflow-x: clip;
     box-sizing: border-box;
 }
@@ -264,9 +264,34 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
     gap: 0.75rem;
 }
 
-/* Sticky header title — acts as a breadcrumb-style label, subtle so it
-   doesn't compete with the page's in-content <h1>. Pages that have no
-   in-content <h1> still show this as their only heading. */
+/* Sticky header context — company / practice name (page titles live in content) */
+.header-context {
+    color: var(--ink-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin: 0;
+    line-height: 1.3;
+    letter-spacing: 0;
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.header-context strong {
+    color: var(--ink);
+    font-weight: 600;
+}
+
+.header-context__prefix,
+.header-context__meta {
+    color: var(--ink-muted);
+    font-weight: 500;
+}
+
+.header-context--agency strong {
+    color: var(--ink);
+}
+
+/* Legacy admin shells may still use page-title in header */
 .page-title {
     color: var(--ink-muted);
     font-size: 0.875rem;
@@ -280,9 +305,15 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
     flex: 1;
     padding: 1.75rem 1.5rem;
     width: 100%;
-    max-width: 1280px;
-    margin: 0 auto;
     box-sizing: border-box;
+}
+
+/* Admin / legacy shells without portal-shell-inner — centered column */
+.app-shell:not(:has(.portal-shell-inner)) .content-area,
+.consultant-shell:not(:has(.portal-shell-inner)) .content-area {
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /* ===================================================================== */
@@ -778,7 +809,7 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
 @media (max-width: 1024px) {
     .sidebar { transform: translateX(-100%); box-shadow: var(--shadow-lg); }
     .sidebar.is-open { transform: translateX(0); }
-    .main-content { margin-left: 0; max-width: 100vw; }
+    .main-content { margin-left: 0; width: 100%; }
     .mobile-menu-btn { display: inline-flex; align-items: center; }
 }
 
@@ -1316,10 +1347,15 @@ table.min-w-full tbody tr:hover { background-color: var(--canvas); }
 
 .site-footer {
     flex-shrink: 0;
-    padding: 0.875rem 1.5rem;
+    padding: 0.875rem 0;
     border-top: 1px solid var(--line);
     background: var(--surface);
     text-align: center;
+}
+
+/* Authenticated portals: footer sticks to bottom on short pages (flex layout, not fixed) */
+.portal-shell-inner > .site-footer {
+    margin-top: auto;
 }
 
 .site-footer--auth {

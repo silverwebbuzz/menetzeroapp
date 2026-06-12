@@ -47,11 +47,11 @@
         };
     </script>
 
-    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260624">
-    <link rel="stylesheet" href="{{ asset('css/consultant-shell.css') }}?v=20260624">
+    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260627">
+    <link rel="stylesheet" href="{{ asset('css/consultant-shell.css') }}?v=20260627">
     @stack('styles')
-    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260624">
-    <link rel="stylesheet" href="{{ asset('css/portal-enterprise.css') }}?v=20260624">
+    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260627">
+    <link rel="stylesheet" href="{{ asset('css/portal-enterprise.css') }}?v=20260627">
 
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
@@ -110,16 +110,7 @@
                     </svg>
                 </button>
 
-                @php
-                    $headerTitle = trim($__env->yieldContent('page-title'));
-                    if ($headerTitle === '') {
-                        $headerTitle = trim($__env->yieldContent('title'));
-                    }
-                    if ($headerTitle === '') {
-                        $headerTitle = 'Dashboard';
-                    }
-                @endphp
-                <h1 class="page-title truncate">{{ $headerTitle }}</h1>
+                @include('layouts.partials.header-context', ['portal' => 'consultant'])
 
                 <div class="header-actions">
                     <div class="relative" x-data="{ open: false }" @click.away="open = false">

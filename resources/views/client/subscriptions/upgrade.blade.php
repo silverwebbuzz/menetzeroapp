@@ -46,11 +46,6 @@
         </div>
     </div>
 
-    @include('plans.partials.human-guide', [
-        'guide' => $planGuide,
-        'show' => ['intro', 'examples', 'clarifications'],
-    ])
-
     <!-- Current Plan Info -->
     @if($currentSubscription)
     <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 space-y-1">
@@ -270,6 +265,11 @@
         'columns' => $comparisonColumns,
         'labels' => $comparisonLabels,
         'plans' => $availablePlans,
+    ])
+
+    @include('plans.partials.human-guide', [
+        'guide' => $planGuide,
+        'show' => ['examples', 'clarifications', 'intro'],
     ])
 
     <div class="mb-12">

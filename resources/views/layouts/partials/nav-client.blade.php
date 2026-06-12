@@ -342,11 +342,3 @@
         Help &amp; guide
     </a>
 </div>
-
-<div class="nav-section nav-section--help">
-    <div class="nav-section-title">Help</div>
-    <a href="{{ route('client.help') }}" class="nav-link {{ request()->routeIs('client.help') ? 'active' : '' }}">
-        {!! $svg('help') !!}
-        Help &amp; guide
-    </a>
-</div>

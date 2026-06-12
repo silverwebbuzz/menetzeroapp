@@ -433,13 +433,6 @@ body.portal-auth {
     background-color: var(--canvas) !important;
 }
 
-.app-shell .portal-agency-banner {
-    font-size: var(--portal-14);
-    line-height: var(--portal-lh-14);
-    margin-bottom: var(--portal-space-section);
-}
-
-/* ─── Auth pages (complete layout + form controls) ─── */
 .portal-auth {
     background: #ffffff;
     color: var(--ink);

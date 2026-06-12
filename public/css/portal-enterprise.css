@@ -25,7 +25,7 @@
     --sidebar-width: 280px;
     --header-height: 72px;
     --content-max: 1600px;
-    --content-padding: 32px;
+    --content-padding: 24px;
 
     --radius-card: 12px;
     --radius-input: 8px;
@@ -82,7 +82,6 @@ body.consultant-portal {
 .app-shell,
 .consultant-shell {
     overflow-x: clip;
-    max-width: 100vw;
 }
 
 .app-shell .main-content,
@@ -91,9 +90,7 @@ body.consultant-portal {
     flex-direction: column;
     flex: 1;
     min-width: 0;
-    max-width: 100%;
     overflow-x: clip;
-    /* width + margin-left: set in app-shell.css — never add width:100% here */
 }
 
 .portal-shell-inner {
@@ -103,6 +100,7 @@ body.consultant-portal {
     width: 100%;
     max-width: 100%;
     min-width: 0;
+    min-height: 100vh;
     margin: 0;
     box-sizing: border-box;
     padding-left: var(--content-padding);
@@ -123,10 +121,10 @@ body.consultant-portal {
 .consultant-shell .portal-shell-inner > .content-area {
     flex: 1;
     width: 100%;
-    max-width: 100% !important;
+    max-width: none !important;
     min-width: 0;
     margin: 0 !important;
-    padding: var(--content-padding) 0 !important;
+    padding: var(--content-padding) 0 calc(var(--content-padding) + 0.5rem) !important;
     overflow-x: clip;
     box-sizing: border-box;
 }
@@ -135,7 +133,7 @@ body.consultant-portal {
 .consultant-shell .portal-shell-inner > .site-footer {
     width: 100%;
     max-width: 100%;
-    padding: 0.875rem 0;
+    flex-shrink: 0;
     margin-top: auto;
     box-sizing: border-box;
 }
@@ -177,18 +175,14 @@ body.consultant-portal {
     }
 }
 
-.portal-agency-banner {
-    max-width: 100%;
-    min-width: 0;
-    box-sizing: border-box;
-}
-
 .app-shell .header,
 .consultant-shell .header {
     flex-wrap: nowrap;
     min-width: 0;
 }
 
+.app-shell .header .header-context,
+.consultant-shell .header .header-context,
 .app-shell .header .page-title,
 .consultant-shell .header .page-title {
     min-width: 0;
@@ -201,11 +195,19 @@ body.consultant-portal {
     max-width: 100%;
 }
 
+.app-shell .header .header-context,
+.consultant-shell .header .header-context,
 .app-shell .header .page-title,
 .consultant-shell .header .page-title {
     font-size: var(--text-body) !important;
     font-weight: 500 !important;
     color: var(--ink-secondary) !important;
+}
+
+.app-shell .header .header-context strong,
+.consultant-shell .header .header-context strong {
+    color: var(--ink) !important;
+    font-weight: 600 !important;
 }
 
 /* ─── Typography ─── */

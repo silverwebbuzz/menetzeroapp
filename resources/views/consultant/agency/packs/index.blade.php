@@ -28,11 +28,6 @@
     </div>
 </div>
 
-@include('plans.partials.human-guide', [
-    'guide' => $planGuide,
-    'show' => ['intro', 'how_it_works', 'examples', 'clarifications'],
-])
-
 @if(!$checkoutAvailable)
     <div class="cd-notice">
         <span><strong>Checkout coming soon.</strong> Review packs and pricing below. Use your free trial client now — purchase here when online payments go live.</span>
@@ -143,6 +138,11 @@
 @if(!$checkoutAvailable)
     <p class="text-xs text-slate-500 text-center mb-4">All pack purchases will be available here when checkout opens. Continue with your free trial client in the meantime.</p>
 @endif
+
+@include('plans.partials.human-guide', [
+    'guide' => $planGuide,
+    'show' => ['how_it_works', 'examples', 'clarifications', 'intro'],
+])
 
 <p class="text-xs text-slate-500 mb-6">
     Need 50+ slots? <a href="{{ route('contact') }}" class="text-brand font-medium hover:underline">Contact MenetZero</a> for Enterprise agency pricing and invoicing.

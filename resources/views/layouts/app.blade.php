@@ -51,10 +51,10 @@
     </script>
 
     <!-- App shell styles (portal-design-system loads last so typography always wins) -->
-    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260624">
+    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260627">
     @stack('styles')
-    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260624">
-    <link rel="stylesheet" href="{{ asset('css/portal-enterprise.css') }}?v=20260624">
+    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260627">
+    <link rel="stylesheet" href="{{ asset('css/portal-enterprise.css') }}?v=20260627">
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
@@ -118,15 +118,15 @@
                         </svg>
                     </button>
 
-                    <h1 class="page-title truncate">@yield('page-title', 'Dashboard')</h1>
+                    @include('layouts.partials.header-context', ['portal' => 'company'])
 
                     <div class="header-actions">
                         @if($isConsultantActing)
-                        <form action="{{ route('consultant.workspace.exit') }}" method="POST" class="hidden sm:inline">
+                        <form action="{{ route('consultant.workspace.exit') }}" method="POST" class="inline">
                             @csrf
                             <button type="submit" class="header-btn text-indigo-700">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                                <span class="header-btn-label">Agency hub</span>
+                                <span class="header-btn-label">Back to Agency Hub</span>
                             </button>
                         </form>
                         @if($consultantSwitchableClients->count() > 1)
@@ -244,25 +244,6 @@
 
                 <!-- Page content -->
                 <main class="content-area">
-                    @if($isConsultantActing)
-                        <div class="mb-4 rounded-lg border {{ $consultantReadOnly ? 'border-amber-200 bg-amber-50' : 'border-indigo-200 bg-indigo-50' }} px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm {{ $consultantReadOnly ? 'text-amber-900' : 'text-indigo-900' }} portal-agency-banner">
-                            <span>
-                                @if($consultantReadOnly)
-                                    Read-only —
-                                @else
-                                    Agency mode —
-                                @endif
-                                <strong>{{ $activeCompany?->name }}</strong>
-                                @if($consultantActingEngagement)
-                                    · PRY {{ $consultantActingEngagement->primary_reporting_year }}
-                                @endif
-                            </span>
-                            <form action="{{ route('consultant.workspace.exit') }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" class="{{ $consultantReadOnly ? 'text-amber-800' : 'text-indigo-700' }} font-medium hover:underline whitespace-nowrap">Back to agency hub</button>
-                            </form>
-                        </div>
-                    @endif
                     @if(session('success') || session('error'))
                         <div class="flash-stack">
                             @if(session('success'))
