@@ -62,6 +62,12 @@
                         </div>
                     </summary>
                     <div class="card-body border-t border-gray-100">
+                        @if(!empty($section['image']))
+                            @include('help.partials.guide-figure', [
+                                'image' => $section['image'],
+                                'portal' => $portal ?? 'company',
+                            ])
+                        @endif
                         @if(!empty($section['body']))
                             <p class="mb-4">{{ $section['body'] }}</p>
                         @endif

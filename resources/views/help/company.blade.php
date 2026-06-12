@@ -12,6 +12,6 @@
         </div>
     </div>
 
-    @include('help.partials.guide-body', ['guide' => $guide])
+    @include('help.partials.guide-body', ['guide' => $guide, 'portal' => 'company'])
 </div>
 @endsection

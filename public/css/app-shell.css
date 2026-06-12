@@ -1464,6 +1464,38 @@ table.min-w-full tbody tr:hover { background-color: var(--canvas); }
     border-bottom: 1px solid var(--line);
 }
 
+.portal-guide-figure {
+    margin: 0 0 1.25rem;
+}
+
+.portal-guide-figure__frame {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--canvas);
+    box-shadow: var(--shadow-sm);
+}
+
+.portal-guide-figure__img,
+.portal-guide-figure__svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    vertical-align: middle;
+}
+
+.portal-guide-figure__caption {
+    margin: 0.5rem 0 0;
+    font-size: 0.8125rem;
+    line-height: 1.384615;
+    color: var(--ink-subtle);
+    text-align: center;
+}
+
+.consultant-shell .portal-guide-figure__frame {
+    border-color: var(--line);
+}
+
 /* Scope section badge */
 .badge-plan {
     font-size: 0.75rem;
