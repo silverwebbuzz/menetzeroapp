@@ -20,25 +20,20 @@
     </div>
 
     <div class="mb-6 bg-white border border-gray-200 rounded-lg p-4 text-sm">
-        <h3 class="font-semibold text-gray-900 mb-2">Where sales &amp; support inquiries come from today</h3>
+        <h3 class="font-semibold text-gray-900 mb-2">Contact forms (live)</h3>
         <ul class="space-y-2 text-gray-700">
             <li>
-                <strong>Sales (hello@):</strong>
-                <a href="{{ route('contact') }}" target="_blank" rel="noopener" class="text-indigo-700 hover:underline">Public contact page</a>
-                — users click the sales mailto link.
-                Edit the displayed address in
-                <a href="{{ route('admin.site-content.index') }}" class="text-indigo-700 hover:underline">Site Content</a>
-                (<code class="text-xs bg-gray-100 px-1 rounded">sales_email</code> → hello@menetzero.com).
+                <strong>Public:</strong>
+                <a href="{{ route('contact') }}" target="_blank" rel="noopener" class="text-indigo-700 hover:underline">/contact</a>
+                — support → help@, sales → hello@ (+ auto-reply templates).
             </li>
             <li>
-                <strong>Support (help@):</strong>
-                same
-                <a href="{{ route('contact') }}" target="_blank" rel="noopener" class="text-indigo-700 hover:underline">contact page</a>
-                — support mailto link
-                (<code class="text-xs bg-gray-100 px-1 rounded">support_email</code> → help@menetzero.com in Site Content).
+                <strong>Company portal:</strong>
+                Help &amp; Guide → “Email us for support” → <code class="text-xs bg-gray-100 px-1 rounded">/support</code>
             </li>
-            <li class="text-gray-500 text-xs">
-                Auto-reply templates <em>Contact — sales acknowledgement</em> and <em>Contact — support acknowledgement</em> are ready but not yet connected to a submit form — see their “Triggered from” column below.
+            <li>
+                <strong>Consultant portal:</strong>
+                Help &amp; Guide → “Email us for support” → <code class="text-xs bg-gray-100 px-1 rounded">/consultant/support</code>
             </li>
         </ul>
     </div>

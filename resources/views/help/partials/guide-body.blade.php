@@ -7,6 +7,18 @@
 @endphp
 
 <div class="portal-guide">
+    @php
+        $supportRoute = auth('consultant')->check() ? 'consultant.support' : 'client.support';
+    @endphp
+
+    <div class="callout-panel callout-panel--brand mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h2 class="callout-panel__title mb-1">Need help?</h2>
+            <p class="callout-panel__body mb-0">Can&apos;t find what you need in this guide? Send a support request — it goes to {{ site_support_email() }}.</p>
+        </div>
+        <a href="{{ route($supportRoute) }}" class="btn btn-primary shrink-0">Email us for support</a>
+    </div>
+
     @if(!empty($intro))
         <div class="callout-panel callout-panel--brand mb-6">
             <h2 class="callout-panel__title">{{ $intro['title'] ?? 'Welcome' }}</h2>

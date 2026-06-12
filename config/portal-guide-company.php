@@ -322,7 +322,7 @@ return [
         ],
         [
             'q' => 'Who should I contact for support?',
-            'a' => 'Use the contact page (' . rtrim((string) env('APP_URL', 'https://app.menetzero.com'), '/') . '/contact) or email ' . config('mail.addresses.help.address', 'help@menetzero.com') . '. For data methodology questions, your assigned consultant (if any) can also assist.',
+            'a' => 'Open Help & Guide and click “Email us for support”, or use the contact page at ' . rtrim((string) env('APP_URL', 'https://app.menetzero.com'), '/') . '/contact. Messages go to ' . config('mail.addresses.help.address', 'help@menetzero.com') . '.',
         ],
     ],
 ];

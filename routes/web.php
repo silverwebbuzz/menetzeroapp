@@ -20,6 +20,9 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 // Public marketing + policy pages (required for payment gateway whitelisting)
 Route::get('/pricing', [\App\Http\Controllers\PageController::class, 'pricing'])->name('pricing');
 Route::get('/contact', [\App\Http\Controllers\PageController::class, 'contact'])->name('contact');
+Route::post('/contact', [\App\Http\Controllers\ContactInquiryController::class, 'storePublic'])
+    ->middleware('throttle:6,1')
+    ->name('contact.submit');
 Route::get('/terms', [\App\Http\Controllers\PageController::class, 'show'])->defaults('slug', 'terms')->name('terms');
 Route::get('/refunds', [\App\Http\Controllers\PageController::class, 'show'])->defaults('slug', 'refunds')->name('refunds');
 Route::get('/privacy', [\App\Http\Controllers\PageController::class, 'show'])->defaults('slug', 'privacy')->name('privacy');
@@ -45,6 +48,10 @@ Route::prefix('consultant')->name('consultant.')->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Consultant\DashboardController::class, 'index'])->name('dashboard');
         Route::get('/help', [\App\Http\Controllers\PortalGuideController::class, 'consultant'])->name('help');
         Route::get('/company-portal-guide', [\App\Http\Controllers\PortalGuideController::class, 'company'])->name('company-guide');
+        Route::get('/support', [\App\Http\Controllers\ContactInquiryController::class, 'createPortal'])->name('support');
+        Route::post('/support', [\App\Http\Controllers\ContactInquiryController::class, 'storePortal'])
+            ->middleware('throttle:10,1')
+            ->name('support.submit');
         Route::get('/profile', [\App\Http\Controllers\Consultant\ProfileController::class, 'edit'])->name('profile.edit');
         Route::put('/profile', [\App\Http\Controllers\Consultant\ProfileController::class, 'update'])->name('profile.update');
         Route::post('/profile/submit', [\App\Http\Controllers\Consultant\ProfileController::class, 'submitForReview'])->name('profile.submit');
@@ -199,6 +206,10 @@ Route::middleware([
 ])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('client.dashboard');
     Route::get('/help', [\App\Http\Controllers\PortalGuideController::class, 'company'])->name('client.help');
+    Route::get('/support', [\App\Http\Controllers\ContactInquiryController::class, 'createPortal'])->name('client.support');
+    Route::post('/support', [\App\Http\Controllers\ContactInquiryController::class, 'storePortal'])
+        ->middleware('throttle:10,1')
+        ->name('client.support.submit');
     
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'index'])->name('client.profile');
