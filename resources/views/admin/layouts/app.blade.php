@@ -98,6 +98,8 @@
 
                 @yield('content')
             </main>
+
+            @include('layouts.partials.site-footer')
         </div>
     </div>
 

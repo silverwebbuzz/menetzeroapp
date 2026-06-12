@@ -274,10 +274,13 @@
 
                     @yield('content')
                 </main>
+
+                @include('layouts.partials.site-footer')
             </div>
         @else
             <!-- Guest layout -->
             @yield('content')
+            @include('layouts.partials.site-footer')
         @endauth
     </div>
 

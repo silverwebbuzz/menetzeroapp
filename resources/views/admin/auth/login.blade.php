@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260621">
     <style>
         body { 
             font-family: 'Poppins', system-ui, -apple-system, sans-serif; 
@@ -177,6 +178,7 @@
             </div>
         </div>
     </div>
+    @include('layouts.partials.site-footer', ['variant' => 'auth'])
 </body>
 </html>
 

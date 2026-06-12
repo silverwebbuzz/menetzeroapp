@@ -43,6 +43,8 @@ Route::prefix('consultant')->name('consultant.')->group(function () {
 
     Route::middleware(['ensureConsultant', 'syncConsultantAgencySession'])->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Consultant\DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/help', [\App\Http\Controllers\PortalGuideController::class, 'consultant'])->name('help');
+        Route::get('/company-portal-guide', [\App\Http\Controllers\PortalGuideController::class, 'company'])->name('company-guide');
         Route::get('/profile', [\App\Http\Controllers\Consultant\ProfileController::class, 'edit'])->name('profile.edit');
         Route::put('/profile', [\App\Http\Controllers\Consultant\ProfileController::class, 'update'])->name('profile.update');
         Route::post('/profile/submit', [\App\Http\Controllers\Consultant\ProfileController::class, 'submitForReview'])->name('profile.submit');
@@ -196,6 +198,7 @@ Route::middleware([
     'ensureOnboardingComplete',
 ])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('client.dashboard');
+    Route::get('/help', [\App\Http\Controllers\PortalGuideController::class, 'company'])->name('client.help');
     
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'index'])->name('client.profile');

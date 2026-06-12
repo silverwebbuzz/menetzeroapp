@@ -41,7 +41,8 @@
     <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260621">
 </head>
 <body class="portal-auth portal-auth--{{ $portalVariant }}">
-    <div class="grid lg:grid-cols-2 min-h-screen">
+    <div class="portal-auth-shell min-h-screen flex flex-col">
+    <div class="grid lg:grid-cols-2 flex-1">
         <div class="flex items-center justify-center p-6 sm:p-10 bg-white">
             <div class="w-full max-w-md auth-form">
                 <div class="mb-8">
@@ -64,6 +65,8 @@
                 </div>
             </div>
         </div>
+    </div>
+    @include('layouts.partials.site-footer', ['variant' => 'auth'])
     </div>
 </body>
 </html>

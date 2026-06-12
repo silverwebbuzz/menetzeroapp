@@ -9,6 +9,7 @@
         'doc'    => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>',
         'inbox'  => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>',
         'cart'   => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>',
+        'help'   => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>',
     ];
 
     $svg = function ($name) use ($iconMap) {
@@ -67,6 +68,18 @@
 </div>
 
 <div class="nav-section" style="margin-top: auto; border-top: 1px solid var(--line); padding-top: 0.75rem;">
+    <div class="nav-section-title">Help</div>
+    <a href="{{ route('consultant.help') }}" class="nav-link {{ request()->routeIs('consultant.help') ? 'active' : '' }}">
+        {!! $svg('help') !!}
+        Help &amp; guide
+    </a>
+    <a href="{{ route('consultant.company-guide') }}" class="nav-link {{ request()->routeIs('consultant.company-guide') ? 'active' : '' }}">
+        {!! $svg('doc') !!}
+        Company portal guide
+    </a>
+</div>
+
+<div class="nav-section">
     <div class="nav-section-title">Agency</div>
     <a href="{{ route('consultant.team.index') }}" class="nav-link {{ request()->routeIs('consultant.team.*') ? 'active' : '' }}">
         {!! $svg('users') !!}
