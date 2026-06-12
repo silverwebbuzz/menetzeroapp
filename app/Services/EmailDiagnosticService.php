@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Mail\RawTestMail;
 use App\Mail\TemplateMail;
-use App\Mail\TemplateMail;
 use App\Models\EmailTemplate;
 use Illuminate\Support\Facades\Mail;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;

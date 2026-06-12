@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\ContactInquiryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ContactInquiryController extends Controller
 {
@@ -28,7 +29,11 @@ class ContactInquiryController extends Controller
             'source' => 'Public contact page',
         ];
 
-        if (!$contacts->submit($data['topic'], $payload)) {
+        $result = $contacts->submit($data['topic'], $payload);
+
+        if (!$result['ok']) {
+            Log::warning('Public contact form failed', ['error' => $result['error']]);
+
             return back()
                 ->withInput()
                 ->with('error', 'We could not send your message. Please try again or email us directly at ' . site_support_email() . '.');
@@ -113,7 +118,11 @@ class ContactInquiryController extends Controller
             $backRoute = 'client.support';
         }
 
-        if (!$contacts->submit('support', $payload)) {
+        $result = $contacts->submit('support', $payload);
+
+        if (!$result['ok']) {
+            Log::warning('Portal support form failed', ['error' => $result['error']]);
+
             return back()
                 ->withInput()
                 ->with('error', 'We could not send your request. Please try again or email ' . site_support_email() . '.');
