@@ -25,7 +25,6 @@
     --sidebar-width: 280px;
     --header-height: 72px;
     --content-max: 1600px;
-    --content-padding: 24px;
 
     --radius-card: 12px;
     --radius-input: 8px;
@@ -103,8 +102,6 @@ body.consultant-portal {
     min-height: 100vh;
     margin: 0;
     box-sizing: border-box;
-    padding-left: var(--content-padding);
-    padding-right: var(--content-padding);
 }
 
 .app-shell .portal-shell-inner > .header,
@@ -112,8 +109,6 @@ body.consultant-portal {
     width: 100%;
     max-width: 100%;
     min-width: 0;
-    padding-left: 0;
-    padding-right: 0;
     box-sizing: border-box;
 }
 
@@ -123,8 +118,6 @@ body.consultant-portal {
     width: 100%;
     max-width: none !important;
     min-width: 0;
-    margin: 0 !important;
-    padding: var(--content-padding) 0 calc(var(--content-padding) + 0.5rem) !important;
     overflow-x: clip;
     box-sizing: border-box;
 }
@@ -167,12 +160,6 @@ body.consultant-portal {
     width: 100% !important;
     margin-left: auto !important;
     margin-right: auto !important;
-}
-
-@media (max-width: 768px) {
-    :root {
-        --content-padding: 16px;
-    }
 }
 
 .app-shell .header,
