@@ -53,7 +53,7 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">HTML body</label>
                         <textarea name="body_html" rows="18" required class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono">{{ old('body_html', $template->body_html) }}</textarea>
-                        <p class="text-xs text-gray-500 mt-1">Use <code>{{ '{{' }}placeholder{{ '}}' }}</code> tags. Content is wrapped in the branded email layout automatically.</p>
+                        <p class="text-xs text-gray-500 mt-1">Use <code>@{{ placeholder }}</code> tags. Content is wrapped in the branded email layout automatically.</p>
                     </div>
 
                     <div>
@@ -78,15 +78,15 @@
             <div class="bg-white shadow rounded-lg p-4 sticky top-4">
                 <h3 class="text-sm font-semibold text-gray-900 mb-2">Available placeholders</h3>
                 <ul class="text-xs text-gray-600 space-y-1 font-mono">
-                    <li>{{ '{{' }}app_name{{ '}}' }}</li>
-                    <li>{{ '{{' }}app_url{{ '}}' }}</li>
-                    <li>{{ '{{' }}help_email{{ '}}' }}</li>
-                    <li>{{ '{{' }}hello_email{{ '}}' }}</li>
-                    <li>{{ '{{' }}user_name{{ '}}' }}</li>
-                    <li>{{ '{{' }}user_email{{ '}}' }}</li>
+                    <li>@{{ app_name }}</li>
+                    <li>@{{ app_url }}</li>
+                    <li>@{{ help_email }}</li>
+                    <li>@{{ hello_email }}</li>
+                    <li>@{{ user_name }}</li>
+                    <li>@{{ user_email }}</li>
                     @foreach($template->placeholders ?? [] as $placeholder)
                         @if(!in_array($placeholder, ['app_name', 'app_url', 'help_email', 'hello_email', 'user_name', 'user_email'], true))
-                            <li>{{ '{{' }}{{ $placeholder }}{{ '}}' }}</li>
+                            <li>{{ '{' . '{' . $placeholder . '}' . '}' }}</li>
                         @endif
                     @endforeach
                 </ul>
