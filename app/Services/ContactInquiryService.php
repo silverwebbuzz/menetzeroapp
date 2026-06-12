@@ -25,9 +25,8 @@ class ContactInquiryService
         $typeLabel = $type === 'sales' ? 'Sales enquiry' : 'Support request';
         $ackSlug = $type === 'sales' ? 'contact_sales_ack' : 'contact_support_ack';
 
-        // Deliver via noreply SMTP (same credentials that power welcome/reset mail).
-        // From noreply + Reply-To submitter avoids help@→help@ loops on the mail server.
-        $transport = 'smtp_noreply';
+        // Deliver via shared SMTP (noreply credentials) — From address stays help@/hello@ in TemplateMail.
+        $transport = mail_transport_for_mailbox($mailbox);
         $from = config('mail.addresses.noreply', config('mail.from'));
 
         $excerpt = Str::limit(strip_tags($data['message']), 280);

@@ -182,12 +182,6 @@ class EmailTemplateService
 
     protected function mailerName(string $key): string
     {
-        $map = [
-            'hello' => 'smtp_hello',
-            'help' => 'smtp_help',
-            'noreply' => 'smtp_noreply',
-        ];
-
-        return $map[$key] ?? config('mail.default', 'log');
+        return mail_transport_for_mailbox($key);
     }
 }

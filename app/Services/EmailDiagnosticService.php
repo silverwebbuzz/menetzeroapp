@@ -170,12 +170,7 @@ HTML;
 
     protected function transportMailer(string $mailbox): string
     {
-        return match ($mailbox) {
-            'hello' => 'smtp_hello',
-            'help' => 'smtp_help',
-            'noreply' => 'smtp_noreply',
-            default => config('mail.default', 'log'),
-        };
+        return mail_transport_for_mailbox($mailbox);
     }
 
     /**
@@ -189,7 +184,7 @@ HTML;
             'transport' => $cfg['transport'] ?? 'unknown',
             'host' => $cfg['host'] ?? '—',
             'port' => $cfg['port'] ?? '—',
-            'scheme' => $cfg['scheme'] ?? ($cfg['encryption'] ?? '—'),
+            'scheme' => ($cfg['scheme'] ?? null) === 'smtps' ? 'smtps' : 'starttls',
             'username' => $cfg['username'] ?? '—',
             'password_set' => !empty($cfg['password']),
             'local_domain' => $cfg['local_domain'] ?? '—',

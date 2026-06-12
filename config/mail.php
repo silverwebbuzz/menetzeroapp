@@ -1,8 +1,5 @@
 <?php
 
-$smtpScheme = env('MAIL_SCHEME')
-    ?: (env('MAIL_ENCRYPTION') === 'ssl' ? 'smtps' : (env('MAIL_ENCRYPTION') === 'tls' ? 'tls' : null));
-
 return [
 
     /*
@@ -55,7 +52,7 @@ return [
 
         'smtp' => [
             'transport' => 'smtp',
-            'scheme' => $smtpScheme,
+            'scheme' => mail_smtp_scheme(),
             'url' => env('MAIL_URL'),
             'host' => env('MAIL_HOST', '127.0.0.1'),
             'port' => env('MAIL_PORT', 2525),
@@ -67,7 +64,7 @@ return [
 
         'smtp_hello' => [
             'transport' => 'smtp',
-            'scheme' => env('MAIL_HELLO_SCHEME', $smtpScheme),
+            'scheme' => mail_smtp_scheme(env('MAIL_HELLO_SCHEME')),
             'host' => env('MAIL_HELLO_HOST', env('MAIL_HOST', '127.0.0.1')),
             'port' => env('MAIL_HELLO_PORT', env('MAIL_PORT', 587)),
             'username' => env('MAIL_HELLO_USERNAME', env('MAIL_USERNAME')),
@@ -78,7 +75,7 @@ return [
 
         'smtp_help' => [
             'transport' => 'smtp',
-            'scheme' => env('MAIL_HELP_SCHEME', $smtpScheme),
+            'scheme' => mail_smtp_scheme(env('MAIL_HELP_SCHEME')),
             'host' => env('MAIL_HELP_HOST', env('MAIL_HOST', '127.0.0.1')),
             'port' => env('MAIL_HELP_PORT', env('MAIL_PORT', 587)),
             'username' => env('MAIL_HELP_USERNAME', env('MAIL_USERNAME')),
@@ -89,7 +86,7 @@ return [
 
         'smtp_noreply' => [
             'transport' => 'smtp',
-            'scheme' => env('MAIL_NOREPLY_SCHEME', $smtpScheme),
+            'scheme' => mail_smtp_scheme(env('MAIL_NOREPLY_SCHEME')),
             'host' => env('MAIL_NOREPLY_HOST', env('MAIL_HOST', '127.0.0.1')),
             'port' => env('MAIL_NOREPLY_PORT', env('MAIL_PORT', 587)),
             'username' => env('MAIL_NOREPLY_USERNAME', env('MAIL_USERNAME')),

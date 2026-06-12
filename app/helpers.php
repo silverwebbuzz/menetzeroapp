@@ -54,3 +54,53 @@ if (! function_exists('site_support_phone')) {
             : '+91 9998010029';
     }
 }
+
+if (! function_exists('mail_smtp_scheme')) {
+    /**
+     * Normalize SMTP scheme for Laravel 12 / Symfony Mailer.
+     * Valid DSN schemes: null (STARTTLS on 587), smtps (SSL on 465).
+     * Legacy .env values tls/ssl/starttls are mapped here.
+     */
+    function mail_smtp_scheme(?string $override = null): ?string
+    {
+        $raw = $override;
+        if ($raw === null || $raw === '') {
+            $raw = env('MAIL_SCHEME') ?: env('MAIL_ENCRYPTION');
+        }
+        if ($raw === null || $raw === '') {
+            return null;
+        }
+
+        return match (strtolower((string) $raw)) {
+            'ssl', 'smtps' => 'smtps',
+            'tls', 'starttls', 'smtp' => null,
+            default => null,
+        };
+    }
+}
+
+if (! function_exists('mail_transport_for_mailbox')) {
+    /**
+     * SMTP transport name for a logical mailbox (hello, help, noreply).
+     * Falls back to smtp_noreply when mailbox-specific credentials are not set.
+     */
+    function mail_transport_for_mailbox(string $mailbox): string
+    {
+        $dedicatedUser = match ($mailbox) {
+            'hello' => env('MAIL_HELLO_USERNAME'),
+            'help' => env('MAIL_HELP_USERNAME'),
+            'noreply' => env('MAIL_NOREPLY_USERNAME'),
+            default => null,
+        };
+
+        if ($dedicatedUser !== null && $dedicatedUser !== '') {
+            return match ($mailbox) {
+                'hello' => 'smtp_hello',
+                'help' => 'smtp_help',
+                default => 'smtp_noreply',
+            };
+        }
+
+        return 'smtp_noreply';
+    }
+}
