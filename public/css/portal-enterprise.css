@@ -1,0 +1,628 @@
+/*
+ * MenetZero — Enterprise Portal UI (authenticated portals only)
+ * Company: green · Consultant: blue · 8px grid · minimal shadows
+ */
+
+:root {
+    /* Company theme */
+    --brand: #16a34a;
+    --brand-dark: #15803d;
+    --brand-darker: #166534;
+    --brand-soft: #dcfce7;
+    --brand-softer: #bbf7d0;
+    --brand-accent: #22c55e;
+    --brand-secondary: #10b981;
+
+    --ink: #0f172a;
+    --ink-secondary: #64748b;
+    --ink-muted: #64748b;
+    --ink-subtle: #94a3b8;
+    --canvas: #f8fafc;
+    --surface: #ffffff;
+    --line: #e2e8f0;
+    --line-strong: #cbd5e1;
+
+    --sidebar-width: 280px;
+    --header-height: 72px;
+    --content-max: 1600px;
+    --content-padding: 32px;
+
+    --radius-card: 12px;
+    --radius-input: 8px;
+    --radius-btn: 8px;
+
+    --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.05);
+    --shadow-card-hover: 0 4px 12px rgba(15, 23, 42, 0.08);
+    --shadow-ring: 0 0 0 3px rgba(22, 163, 74, 0.18);
+
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 16px;
+    --space-4: 24px;
+    --space-5: 32px;
+    --space-6: 48px;
+    --space-7: 64px;
+
+    --text-page-title: 1.75rem;
+    --text-card-title: 1rem;
+    --text-kpi: 2.25rem;
+    --text-body: 0.875rem;
+    --text-label: 0.8125rem;
+    --text-footer: 0.8125rem;
+
+    --chart-1: #16a34a;
+    --chart-2: #10b981;
+    --chart-3: #22c55e;
+    --chart-4: #86efac;
+    --chart-5: #4ade80;
+}
+
+.consultant-shell {
+    --brand: #2563eb;
+    --brand-dark: #1d4ed8;
+    --brand-darker: #1e40af;
+    --brand-soft: #eff6ff;
+    --brand-softer: #dbeafe;
+    --brand-accent: #3b82f6;
+    --shadow-ring: 0 0 0 3px rgba(37, 99, 235, 0.18);
+
+    --chart-1: #2563eb;
+    --chart-2: #3b82f6;
+    --chart-3: #60a5fa;
+    --chart-4: #93c5fd;
+    --chart-5: #bfdbfe;
+}
+
+/* ─── Layout ─── */
+.app-shell .content-area,
+.consultant-shell .content-area {
+    max-width: var(--content-max) !important;
+    padding: var(--content-padding) !important;
+}
+
+.app-shell .header .page-title,
+.consultant-shell .header .page-title {
+    font-size: var(--text-body) !important;
+    font-weight: 500 !important;
+    color: var(--ink-secondary) !important;
+}
+
+/* ─── Typography ─── */
+.ent-page-title {
+    font-size: var(--text-page-title);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    margin: 0 0 var(--space-2);
+}
+
+.ent-page-lead {
+    font-size: var(--text-body);
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--ink-secondary);
+    margin: 0;
+}
+
+.ent-card-title {
+    font-size: var(--text-card-title);
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--ink);
+    margin: 0;
+}
+
+.ent-card-subtitle {
+    font-size: var(--text-footer);
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--ink-secondary);
+    margin: var(--space-1) 0 0;
+}
+
+.ent-kpi-value {
+    font-size: var(--text-kpi);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--ink);
+    letter-spacing: -0.03em;
+}
+
+.ent-kpi-unit {
+    font-size: var(--text-label);
+    font-weight: 500;
+    color: var(--ink-secondary);
+    margin-left: var(--space-1);
+}
+
+.ent-label {
+    font-size: var(--text-label);
+    font-weight: 500;
+    color: var(--ink-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* ─── Cards ─── */
+.app-shell .card,
+.consultant-shell .card,
+.ent-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    transition: box-shadow 0.15s ease;
+}
+
+.app-shell .card:hover,
+.consultant-shell .card:hover {
+    box-shadow: var(--shadow-card-hover);
+}
+
+.app-shell .card-header,
+.consultant-shell .card-header {
+    padding: var(--space-4);
+    border-bottom: 1px solid var(--line);
+}
+
+.app-shell .card-body,
+.consultant-shell .card-body {
+    padding: var(--space-4);
+}
+
+.app-shell .stat-card,
+.consultant-shell .stat-card,
+.ent-kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-card);
+}
+
+.ent-kpi-card:hover {
+    box-shadow: var(--shadow-card-hover);
+}
+
+.ent-kpi-card__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+}
+
+.ent-kpi-card__trend {
+    font-size: var(--text-body);
+    font-weight: 500;
+    margin-top: var(--space-2);
+}
+
+.ent-kpi-card__trend.up { color: #dc2626; }
+.ent-kpi-card__trend.down { color: var(--brand); }
+.ent-kpi-card__trend.neutral { color: var(--ink-secondary); }
+
+.ent-kpi-card__compare {
+    font-size: var(--text-footer);
+    color: var(--ink-secondary);
+    margin-top: var(--space-1);
+}
+
+.ent-sparkline {
+    width: 72px;
+    height: 28px;
+    flex-shrink: 0;
+}
+
+.ent-sparkline polyline {
+    fill: none;
+    stroke: var(--brand);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* ─── Buttons ─── */
+.app-shell .btn,
+.consultant-shell .btn {
+    min-height: 44px;
+    padding: 0 var(--space-4);
+    border-radius: var(--radius-btn) !important;
+    font-size: var(--text-body) !important;
+    font-weight: 500 !important;
+    box-shadow: none !important;
+}
+
+.app-shell .btn-primary,
+.consultant-shell .btn-primary {
+    background-color: var(--brand) !important;
+    border-color: var(--brand) !important;
+}
+
+.app-shell .btn-primary:hover:not(:disabled),
+.consultant-shell .btn-primary:hover:not(:disabled) {
+    background-color: var(--brand-dark) !important;
+    border-color: var(--brand-dark) !important;
+}
+
+.app-shell .btn-secondary,
+.consultant-shell .btn-secondary {
+    background: var(--surface) !important;
+    border-color: var(--line-strong) !important;
+    color: var(--ink) !important;
+}
+
+/* ─── Forms ─── */
+.app-shell .form-control,
+.app-shell .form-input,
+.app-shell .form-select,
+.consultant-shell .form-control,
+.consultant-shell .form-input,
+.consultant-shell .form-select {
+    min-height: 44px !important;
+    border-radius: var(--radius-input) !important;
+    font-size: var(--text-body) !important;
+}
+
+.app-shell .form-label,
+.consultant-shell .form-label {
+    font-size: var(--text-label) !important;
+    font-weight: 500 !important;
+    margin-bottom: var(--space-2) !important;
+}
+
+/* ─── Tables ─── */
+.app-shell .table thead th,
+.consultant-shell .table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--canvas);
+    font-size: var(--text-label) !important;
+    font-weight: 500 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-secondary) !important;
+    border-bottom: 1px solid var(--line);
+    padding: var(--space-3) var(--space-3) !important;
+}
+
+.app-shell .table tbody td,
+.consultant-shell .table tbody td {
+    font-size: var(--text-body) !important;
+    padding: var(--space-3) !important;
+    border-bottom: 1px solid var(--line);
+}
+
+.app-shell .table-wrap,
+.consultant-shell .table-wrap {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-input);
+    overflow: auto;
+    max-height: 480px;
+}
+
+/* ─── Sidebar (company) ─── */
+.app-shell:not(.consultant-shell) .sidebar {
+    width: var(--sidebar-width);
+    background: var(--surface);
+    border-right: 1px solid var(--line);
+}
+
+.app-shell:not(.consultant-shell) .nav-link {
+    font-size: var(--text-body);
+    font-weight: 500;
+    border-radius: var(--radius-input);
+}
+
+.app-shell:not(.consultant-shell) .nav-link.active {
+    background: #dcfce7 !important;
+    color: #166534 !important;
+}
+
+.app-shell:not(.consultant-shell) .nav-link.active svg {
+    color: #16a34a !important;
+}
+
+.app-shell:not(.consultant-shell) .nav-link.active::before {
+    background-color: #16a34a;
+}
+
+/* ─── Sidebar (consultant — navy) ─── */
+.consultant-shell .sidebar {
+    width: var(--sidebar-width);
+    background: #0f2b6b;
+    border-right: none;
+}
+
+.consultant-shell .sidebar-header {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.consultant-shell .nav-section-title {
+    color: #94a3b8 !important;
+}
+
+.consultant-shell .nav-link {
+    color: #cbd5e1 !important;
+    font-size: var(--text-body);
+    font-weight: 500;
+    border-radius: var(--radius-input);
+}
+
+.consultant-shell .nav-link:hover {
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: #ffffff !important;
+}
+
+.consultant-shell .nav-link.active {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #ffffff !important;
+    font-weight: 600;
+}
+
+.consultant-shell .nav-link svg,
+.consultant-shell .nav-link.active svg {
+    color: #cbd5e1 !important;
+}
+
+.consultant-shell .nav-link.active svg {
+    color: #ffffff !important;
+}
+
+.consultant-shell .sidebar-footer {
+    border-top-color: rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+}
+
+/* ─── Header ─── */
+.app-shell .header,
+.consultant-shell .header {
+    height: var(--header-height);
+    min-height: var(--header-height);
+    padding: 0 var(--content-padding);
+}
+
+.app-shell .main-content,
+.consultant-shell .main-content {
+    margin-left: var(--sidebar-width);
+}
+
+/* ─── Dashboard grids ─── */
+.ent-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.ent-grid-6 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+}
+
+@media (min-width: 768px) {
+    .ent-grid-6 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1280px) {
+    .ent-grid-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
+
+.ent-chart-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+}
+
+@media (min-width: 1024px) {
+    .ent-chart-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.ent-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: var(--space-3);
+}
+
+@media (min-width: 640px) {
+    .ent-grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1280px) {
+    .ent-grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.ent-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+}
+
+@media (min-width: 1024px) {
+    .ent-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.ent-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+}
+
+@media (min-width: 768px) {
+    .ent-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1280px) {
+    .ent-grid-3 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* ─── Net zero panel ─── */
+.ent-netzero-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--line);
+}
+
+@media (min-width: 768px) {
+    .ent-netzero-metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.ent-progress-track {
+    height: 8px;
+    background: var(--canvas);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.ent-progress-fill {
+    height: 100%;
+    background: var(--brand);
+    border-radius: 999px;
+    transition: width 0.4s ease;
+}
+
+/* ─── Compliance cards ─── */
+.ent-compliance-card {
+    display: block;
+    padding: var(--space-4);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--surface);
+    text-decoration: none !important;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.ent-compliance-card:hover {
+    box-shadow: var(--shadow-card-hover);
+    border-color: var(--brand-softer);
+}
+
+.ent-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px var(--space-2);
+    border-radius: 999px;
+    font-size: var(--text-footer);
+    font-weight: 500;
+}
+
+.ent-status--complete { background: #dcfce7; color: #166534; }
+.ent-status--pending { background: #fef3c7; color: #92400e; }
+.ent-status--draft { background: #f1f5f9; color: #475569; }
+
+/* ─── AI recommendations ─── */
+.ent-rec-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.ent-rec-item {
+    display: flex;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    background: var(--canvas);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-input);
+    font-size: var(--text-body);
+    color: var(--ink);
+}
+
+.ent-rec-item svg {
+    flex-shrink: 0;
+    width: 1.125rem;
+    height: 1.125rem;
+    color: var(--brand);
+    margin-top: 2px;
+}
+
+/* ─── Consultant pipeline ─── */
+.ent-pipeline {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+}
+
+@media (min-width: 768px) {
+    .ent-pipeline { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.ent-pipeline-step {
+    padding: var(--space-3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-input);
+    background: var(--surface);
+    text-align: center;
+}
+
+.ent-pipeline-step strong {
+    display: block;
+    font-size: var(--text-kpi);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.1;
+}
+
+.ent-pipeline-step span {
+    font-size: var(--text-footer);
+    color: var(--ink-secondary);
+}
+
+.ent-activity-item {
+    display: flex;
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--line);
+    font-size: var(--text-body);
+}
+
+.ent-activity-item:last-child {
+    border-bottom: none;
+}
+
+/* Remove gradients / glass on portals */
+.app-shell .stat-card[style*="gradient"],
+.consultant-shell .stat-card[style*="gradient"] {
+    background: var(--surface) !important;
+    border-color: var(--line) !important;
+    color: var(--ink) !important;
+}
+
+.app-shell .stat-card-value,
+.consultant-shell .stat-card-value,
+.ent-kpi-card .ent-kpi-value {
+    font-size: var(--text-kpi) !important;
+    font-weight: 700 !important;
+    line-height: 1.1 !important;
+}
+
+.app-shell .stat-card-label,
+.consultant-shell .stat-card-label {
+    font-size: var(--text-label) !important;
+    font-weight: 500 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-secondary) !important;
+}
+
+.app-shell .page-header h1,
+.consultant-shell .cd-page-head h2,
+.ent-page-header h1 {
+    font-size: var(--text-page-title) !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+}
+
+.app-shell .card-title,
+.consultant-shell .card-title {
+    font-size: var(--text-card-title) !important;
+    font-weight: 600 !important;
+}

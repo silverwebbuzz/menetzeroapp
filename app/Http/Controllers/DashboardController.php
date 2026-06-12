@@ -10,6 +10,7 @@ use App\Models\Measurement;
 use App\Models\MasterIndustryCategory;
 use App\Services\GhgReportService;
 use App\Services\OnboardingService;
+use App\Services\DashboardInsightsService;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -217,12 +218,40 @@ class DashboardController extends Controller
         // Get recent activity
         $recentActivity = $measurements->take(5);
 
+        $insights = app(DashboardInsightsService::class);
+        $fiscalYear = (int) ($kpis['period'] ?? now()->year);
+        $twelveMonth = $insights->twelveMonthTrend($measurements);
+        $yearOverYear = $insights->yearOverYear($measurements);
+        $compliance = $insights->complianceStatus(
+            $company->id,
+            $fiscalYear,
+            ($kpis['total_emissions'] ?? 0) > 0
+        );
+        $recommendations = $insights->recommendations($company, $measurements, $kpis);
+
+        $chartData['monthly_labels'] = $twelveMonth['labels'];
+        $chartData['monthly_emissions'] = $twelveMonth['values'];
+        $chartData['sparklines'] = $twelveMonth['sparklines'];
+
+        $reductionPct = $netZeroProgress['baseline'] > 0
+            ? round((1 - ($netZeroProgress['current'] / $netZeroProgress['baseline'])) * 100, 1)
+            : 0;
+        $netZeroProgress['reduction_pct'] = max(0, $reductionPct);
+        $netZeroProgress['target_year'] = 2050;
+        $netZeroProgress['projected_achievement'] = $netZeroProgress['progress'] >= 80
+            ? 'On track'
+            : ($netZeroProgress['progress'] >= 40 ? 'Needs acceleration' : 'Early stage');
+
         return view('dashboard.index', compact(
-            'kpis', 
-            'chartData', 
-            'netZeroProgress', 
-            'topSources', 
-            'recentActivity'
+            'kpis',
+            'chartData',
+            'netZeroProgress',
+            'topSources',
+            'recentActivity',
+            'yearOverYear',
+            'compliance',
+            'recommendations',
+            'company',
         ));
     }
 

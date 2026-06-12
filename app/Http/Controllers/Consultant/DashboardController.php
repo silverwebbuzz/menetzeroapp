@@ -48,6 +48,7 @@ class DashboardController extends Controller
         $dashboardService = app(ConsultantDashboardService::class);
         $directoryProgress = $dashboardService->directoryProgress($consultant, $missingDocs);
         $portfolio = $dashboardService->portfolioStats($activeClients);
+        $enterprise = $dashboardService->enterpriseDashboard($consultant, $activeClients, $needsRenewal);
         $quickActions = $dashboardService->quickActions(
             ($slotSummary['remaining'] ?? 0) > 0,
             !empty($slotSummary['is_trial']),
@@ -71,6 +72,7 @@ class DashboardController extends Controller
             'renewalSubscription',
             'directoryProgress',
             'portfolio',
+            'enterprise',
             'quickActions',
             'slotUsedPercent',
         ));

@@ -198,4 +198,130 @@ class ConsultantDashboardService
 
         return $actions;
     }
+
+    /**
+     * @param  Collection<int, ConsultantClientEngagement>  $engagements
+     * @return array{
+     *   pending_reviews: int,
+     *   monthly_revenue: float,
+     *   pipeline: array{new_leads: int, qualified: int, proposal: int, won: int},
+     *   revenue: array{mrr: float, arr: float, renewals_due: int, outstanding: float},
+     *   clients_by_industry: array<string, int>,
+     *   client_growth: array{labels: list<string>, values: list<int>},
+     *   activity: list<array{text: string, meta: string, at: \Carbon\CarbonInterface}>
+     * }
+     */
+    public function enterpriseDashboard(Consultant $consultant, Collection $engagements, bool $needsRenewal): array
+    {
+        $companyIds = $engagements
+            ->map(fn ($e) => $e->managedCompany?->id)
+            ->filter()
+            ->values()
+            ->all();
+
+        $pendingReviews = empty($companyIds)
+            ? 0
+            : Measurement::query()
+                ->whereIn('status', ['submitted', 'draft'])
+                ->whereHas('location', fn ($q) => $q->whereIn('company_id', $companyIds))
+                ->count();
+
+        $intros = $consultant->introRequests()->get();
+        $pipeline = [
+            'new_leads' => $intros->where('status', 'new')->count(),
+            'qualified' => $intros->where('status', 'contacted')->filter(fn ($i) => blank($i->pack_type))->count(),
+            'proposal' => $intros->where('status', 'contacted')->filter(fn ($i) => filled($i->pack_type))->count(),
+            'won' => $intros->where('status', 'converted')->count(),
+        ];
+
+        $orders = $consultant->orders()->get();
+        $monthStart = now()->startOfMonth();
+
+        $monthlyRevenue = (float) $orders
+            ->filter(fn ($o) => $o->order_status === 'completed'
+                && $o->completed_at
+                && $o->completed_at->gte($monthStart))
+            ->sum('payout_aed');
+
+        if ($monthlyRevenue <= 0) {
+            $monthlyRevenue = (float) $orders
+                ->where('order_status', 'completed')
+                ->sum('payout_aed') / max(1, 12);
+        }
+
+        $mrr = round($monthlyRevenue, 2);
+        $outstanding = (float) $orders
+            ->whereIn('escrow_status', ['pending_payment', 'held'])
+            ->sum('amount_aed');
+
+        $clientsByIndustry = [];
+        foreach ($engagements as $engagement) {
+            $sector = $engagement->managedCompany?->sector ?: 'Other';
+            $clientsByIndustry[$sector] = ($clientsByIndustry[$sector] ?? 0) + 1;
+        }
+        arsort($clientsByIndustry);
+
+        $growthLabels = [];
+        $growthValues = [];
+        for ($i = 11; $i >= 0; $i--) {
+            $month = now()->subMonths($i);
+            $key = $month->format('Y-m');
+            $growthLabels[] = $month->format('M');
+            $growthValues[] = $engagements
+                ->filter(fn ($e) => $e->created_at && $e->created_at->format('Y-m') === $key)
+                ->count();
+        }
+
+        $activity = collect();
+
+        foreach ($consultant->introRequests()->with('company')->latest()->limit(4)->get() as $intro) {
+            $activity->push([
+                'text' => 'Intro request from ' . ($intro->company?->name ?? 'prospect'),
+                'meta' => ucfirst(str_replace('_', ' ', $intro->status)),
+                'at' => $intro->created_at,
+            ]);
+        }
+
+        if (!empty($companyIds)) {
+            $recentMeasurements = Measurement::query()
+                ->with('location.company')
+                ->whereHas('location', fn ($q) => $q->whereIn('company_id', $companyIds))
+                ->latest()
+                ->limit(6)
+                ->get();
+
+            foreach ($recentMeasurements as $measurement) {
+                $companyName = $measurement->location?->company?->name ?? 'Client';
+                $activity->push([
+                    'text' => "{$companyName}: " . ($measurement->location?->name ?? 'Location') . ' entry',
+                    'meta' => ucfirst($measurement->status) . ' · ' . co2e_t($measurement->total_co2e ?? 0) . ' tCO₂e',
+                    'at' => $measurement->created_at,
+                ]);
+            }
+        }
+
+        $activity = $activity
+            ->sortByDesc(fn ($item) => $item['at']?->timestamp ?? 0)
+            ->take(8)
+            ->values()
+            ->all();
+
+        return [
+            'pending_reviews' => $pendingReviews,
+            'monthly_revenue' => $mrr,
+            'pipeline' => $pipeline,
+            'revenue' => [
+                'mrr' => $mrr,
+                'arr' => round($mrr * 12, 2),
+                'renewals_due' => $needsRenewal ? 1 : 0,
+                'outstanding' => round($outstanding, 2),
+            ],
+            'clients_by_industry' => $clientsByIndustry,
+            'client_growth' => [
+                'labels' => $growthLabels,
+                'values' => $growthValues,
+            ],
+            'activity' => $activity,
+        ];
+    }
 }

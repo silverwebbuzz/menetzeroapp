@@ -47,10 +47,11 @@
         };
     </script>
 
-    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260620">
-    <link rel="stylesheet" href="{{ asset('css/consultant-shell.css') }}?v=20260620">
+    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260622">
+    <link rel="stylesheet" href="{{ asset('css/consultant-shell.css') }}?v=20260622">
     @stack('styles')
-    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260620">
+    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260622">
+    <link rel="stylesheet" href="{{ asset('css/portal-enterprise.css') }}?v=20260622">
 
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
