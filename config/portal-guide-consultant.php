@@ -55,12 +55,19 @@ return [
             'id' => 'dashboard',
             'title' => 'Agency dashboard',
             'summary' => 'Portfolio overview across all managed clients.',
-            'image' => [
-                'src' => 'images/help/consultant/dashboard.png',
-                'variant' => 'dashboard',
-                'theme' => 'consultant',
-                'alt' => 'Agency dashboard with portfolio KPIs and client slot usage',
-                'caption' => 'Start here each day — portfolio totals, slots, directory status, and leads.',
+            'highlights' => [
+                [
+                    'title' => 'Portfolio emissions',
+                    'variant' => 'kpi-total',
+                    'theme' => 'consultant',
+                    'caption' => 'Combined tCO₂e across all clients that have entered data.',
+                ],
+                [
+                    'title' => 'Client slot usage',
+                    'variant' => 'slot-usage',
+                    'theme' => 'consultant',
+                    'caption' => 'How many managed clients you have vs your pack or trial limit.',
+                ],
             ],
             'body' => 'The consultant dashboard shows aggregate emissions, active clients, slot usage, directory status, and new leads. Use it as your daily starting point.',
             'steps' => [
@@ -77,12 +84,13 @@ return [
             'id' => 'clients',
             'title' => 'Managed clients',
             'summary' => 'Create and maintain client company records.',
-            'image' => [
-                'src' => 'images/help/consultant/clients.png',
-                'variant' => 'clients',
-                'theme' => 'consultant',
-                'alt' => 'Managed clients list with PRY and enter workspace actions',
-                'caption' => 'Each row is one client — set PRY when you create the engagement.',
+            'highlights' => [
+                [
+                    'title' => 'Client row',
+                    'variant' => 'client-row',
+                    'theme' => 'consultant',
+                    'caption' => 'Shows client name, PRY, and the Enter workspace action.',
+                ],
             ],
             'body' => 'Each managed client is a separate company workspace in MENetZero. You define the client name, sector, PRY, and contact details. One slot is consumed per active client.',
             'steps' => [
@@ -102,12 +110,19 @@ return [
             'id' => 'workspaces',
             'title' => 'Client workspaces',
             'summary' => 'Switch into a client’s portal to do the work.',
-            'image' => [
-                'src' => 'images/help/consultant/workspaces.png',
-                'variant' => 'workspaces',
-                'theme' => 'consultant',
-                'alt' => 'Client workspace switcher with agency mode header',
-                'caption' => 'The header shows agency mode and client name — use Back to Agency Hub to exit.',
+            'highlights' => [
+                [
+                    'title' => 'Agency mode header',
+                    'variant' => 'agency-header',
+                    'theme' => 'consultant',
+                    'caption' => 'Always shows which client you are working on and their PRY.',
+                ],
+                [
+                    'title' => 'Enter workspace',
+                    'variant' => 'client-row',
+                    'theme' => 'consultant',
+                    'caption' => 'Opens the full company portal for that client.',
+                ],
             ],
             'body' => 'Entering a workspace opens the company portal as that client. The header shows you are acting as agency with options to switch clients or return to the agency hub.',
             'steps' => [
@@ -128,12 +143,13 @@ return [
             'id' => 'packs',
             'title' => 'Agency packs & billing',
             'summary' => 'Wholesale pricing for multiple client slots.',
-            'image' => [
-                'src' => 'images/help/consultant/packs.png',
-                'variant' => 'packs',
-                'theme' => 'consultant',
-                'alt' => 'Agency pack pricing cards with slot counts',
-                'caption' => 'Compare packs by client slots and Growth-level exports per client.',
+            'highlights' => [
+                [
+                    'title' => 'Pack card',
+                    'variant' => 'pack-card',
+                    'theme' => 'consultant',
+                    'caption' => 'Each pack lists client slots, price, and Growth-level exports per client.',
+                ],
             ],
             'body' => 'Agency packs bundle client slots, export rights, and feature access. Buy or upgrade from Agency packs; pay via Razorpay or Cashfree. Extra slots and year unlocks are available on some plans.',
             'steps' => [
@@ -151,12 +167,19 @@ return [
             'id' => 'directory',
             'title' => 'Directory profile & leads',
             'summary' => 'Public listing and inbound enquiries.',
-            'image' => [
-                'src' => 'images/help/consultant/directory.png',
-                'variant' => 'directory',
-                'theme' => 'consultant',
-                'alt' => 'Directory profile editor and verification documents',
-                'caption' => 'Complete your profile and upload documents before submitting for review.',
+            'highlights' => [
+                [
+                    'title' => 'Directory profile fields',
+                    'variant' => 'directory-profile',
+                    'theme' => 'consultant',
+                    'caption' => 'Headline and services appear on your public listing once approved.',
+                ],
+                [
+                    'title' => 'Inbound lead',
+                    'variant' => 'lead-row',
+                    'theme' => 'consultant',
+                    'caption' => 'Companies request intros — respond from the Leads page.',
+                ],
             ],
             'body' => 'Once approved, your practice appears on the public consultant directory. SMEs can request introductions; you manage leads in the portal.',
             'steps' => [
@@ -174,12 +197,25 @@ return [
             'id' => 'client-tools',
             'title' => 'Working inside a client workspace',
             'summary' => 'Same tools as the company portal — on behalf of your client.',
-            'image' => [
-                'src' => 'images/help/consultant/client-tools.png',
-                'variant' => 'client-tools',
-                'theme' => 'consultant',
-                'alt' => 'Client workspace with sidebar navigation and Quick Input form',
-                'caption' => 'Inside a workspace the left nav matches the company portal — Locations, Input Data, Reports.',
+            'highlights' => [
+                [
+                    'title' => 'Agency mode header',
+                    'variant' => 'agency-header',
+                    'theme' => 'consultant',
+                    'caption' => 'Confirms you are inside a client workspace, not the agency hub.',
+                ],
+                [
+                    'title' => 'Year & location picker',
+                    'variant' => 'year-location-form',
+                    'theme' => 'company',
+                    'caption' => 'Same Quick Input flow as the company portal — pick these before entering data.',
+                ],
+                [
+                    'title' => 'Input sources',
+                    'variant' => 'scope-nav',
+                    'theme' => 'company',
+                    'caption' => 'Sidebar lists Scope 1, 2, and 3 forms available for this client.',
+                ],
             ],
             'body' => 'When you enter a client workspace, use the company Help & guide for detailed steps on locations, Quick Input, reports, and disclosures. Key tasks consultants perform most often:',
             'steps' => [
@@ -197,12 +233,13 @@ return [
             'id' => 'team',
             'title' => 'Agency team & access',
             'summary' => 'Invite colleagues to your consultant account.',
-            'image' => [
-                'src' => 'images/help/consultant/team.png',
-                'variant' => 'team',
-                'theme' => 'consultant',
-                'alt' => 'Agency team list with invite action',
-                'caption' => 'Add colleagues to help manage clients, packs, and directory settings.',
+            'highlights' => [
+                [
+                    'title' => 'Invite colleague',
+                    'variant' => 'team-invite',
+                    'theme' => 'consultant',
+                    'caption' => 'Add team members who can help manage clients and directory settings.',
+                ],
             ],
             'body' => 'Add team members to your agency with roles controlling access to clients, packs, and directory settings.',
             'steps' => [

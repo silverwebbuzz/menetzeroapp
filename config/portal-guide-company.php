@@ -55,12 +55,25 @@ return [
             'id' => 'dashboard',
             'title' => 'Dashboard',
             'summary' => 'Your emissions snapshot and setup progress.',
-            'image' => [
-                'src' => 'images/help/company/dashboard.png',
-                'variant' => 'dashboard',
-                'theme' => 'company',
-                'alt' => 'Company dashboard with KPI cards and emissions chart',
-                'caption' => 'KPI cards and scope charts give you a quick read on progress.',
+            'highlights' => [
+                [
+                    'title' => 'Total emissions KPI',
+                    'variant' => 'kpi-total',
+                    'theme' => 'company',
+                    'caption' => 'Your headline tCO₂e number for the active reporting period.',
+                ],
+                [
+                    'title' => 'Scope breakdown',
+                    'variant' => 'kpi-scopes',
+                    'theme' => 'company',
+                    'caption' => 'Scope 1, 2, and 3 each get a card once data is entered.',
+                ],
+                [
+                    'title' => 'Setup reminder',
+                    'variant' => 'setup-prompt',
+                    'theme' => 'company',
+                    'caption' => 'Appears until you finish profile and add your first location.',
+                ],
             ],
             'body' => 'The dashboard shows total emissions, scope split, and progress indicators. If onboarding is incomplete, you will see prompts to finish your business profile or add first locations.',
             'steps' => [
@@ -76,12 +89,25 @@ return [
             'id' => 'locations',
             'title' => 'Locations & emission boundaries',
             'summary' => 'Define where you operate and what you measure at each site.',
-            'image' => [
-                'src' => 'images/help/company/locations.png',
-                'variant' => 'locations',
-                'theme' => 'company',
-                'alt' => 'Business locations list with search filters',
-                'caption' => 'Add each site, then open emission boundaries per location.',
+            'highlights' => [
+                [
+                    'title' => 'Location record',
+                    'variant' => 'location-card',
+                    'theme' => 'company',
+                    'caption' => 'Each site gets a name, address, and optional Head Office tag.',
+                ],
+                [
+                    'title' => 'Search & filter',
+                    'variant' => 'location-search',
+                    'theme' => 'company',
+                    'caption' => 'Find locations quickly when you manage many sites.',
+                ],
+                [
+                    'title' => 'Emission boundaries',
+                    'variant' => 'boundary-checklist',
+                    'theme' => 'company',
+                    'caption' => 'Tick only the activity types that apply — this controls which Quick Input forms appear.',
+                ],
             ],
             'body' => 'Locations represent physical sites. Emission boundaries tell MENetZero which activity types apply — so you only see relevant Quick Input forms.',
             'steps' => [
@@ -101,12 +127,31 @@ return [
             'id' => 'quick-input',
             'title' => 'Input Data (Quick Input)',
             'summary' => 'Enter Scope 1, 2, and 3 activity data.',
-            'image' => [
-                'src' => 'images/help/company/quick-input.png',
-                'variant' => 'quick-input',
-                'theme' => 'company',
-                'alt' => 'Quick Input form with year, location, and data table',
-                'caption' => 'Select year and location first, then enter each bill or receipt as a row.',
+            'highlights' => [
+                [
+                    'title' => 'Year & location (pick first)',
+                    'variant' => 'year-location-form',
+                    'theme' => 'company',
+                    'caption' => 'Required on every input form — matches the bill or receipt you are entering.',
+                ],
+                [
+                    'title' => 'Action required notice',
+                    'variant' => 'action-required',
+                    'theme' => 'company',
+                    'caption' => 'The form stays locked until both fields are selected.',
+                ],
+                [
+                    'title' => 'Source in the sidebar',
+                    'variant' => 'scope-nav',
+                    'theme' => 'company',
+                    'caption' => 'Choose electricity, fuel, fleet, etc. under Scope 1, 2, or 3.',
+                ],
+                [
+                    'title' => 'One row per bill',
+                    'variant' => 'entry-row',
+                    'theme' => 'company',
+                    'caption' => 'View Entries lists every submission — e.g. one DEWA invoice per row.',
+                ],
             ],
             'body' => 'Quick Input is the main data entry area. Choose a source (electricity, fuel, flights, etc.), select location and reporting year, enter quantity and unit — the platform calculates tCO₂e automatically.',
             'steps' => [
@@ -129,12 +174,19 @@ return [
             'id' => 'reports',
             'title' => 'GHG Inventory & exports',
             'summary' => 'Official inventory views and file exports.',
-            'image' => [
-                'src' => 'images/help/company/reports.png',
-                'variant' => 'reports',
-                'theme' => 'company',
-                'alt' => 'GHG Inventory report table with export action',
-                'caption' => 'Filter by year, review totals, then export Excel or PDF.',
+            'highlights' => [
+                [
+                    'title' => 'Export controls',
+                    'variant' => 'report-filters',
+                    'theme' => 'company',
+                    'caption' => 'Pick the reporting year, then download Excel or PDF.',
+                ],
+                [
+                    'title' => 'Scope totals',
+                    'variant' => 'report-scope-table',
+                    'theme' => 'company',
+                    'caption' => 'Aggregated tCO₂e by scope and category from your Quick Input entries.',
+                ],
             ],
             'body' => 'The GHG Inventory report aggregates all entered data by scope, category, and location for your selected reporting year. Export to Excel or PDF for auditors, MOCCAE submissions, or internal review.',
             'steps' => [
@@ -151,12 +203,19 @@ return [
             'id' => 'disclosures',
             'title' => 'Disclosures & sustainability reports',
             'summary' => 'IFRS S1, IFRS S2, GRI, and ESG dashboard.',
-            'image' => [
-                'src' => 'images/help/company/disclosures.png',
-                'variant' => 'disclosures',
-                'theme' => 'company',
-                'alt' => 'Disclosures hub with IFRS, GRI, and ESG framework cards',
-                'caption' => 'Open each framework from the hub and complete sections at your pace.',
+            'highlights' => [
+                [
+                    'title' => 'Disclosures hub',
+                    'variant' => 'disclosure-hub',
+                    'theme' => 'company',
+                    'caption' => 'Jump into IFRS S1, IFRS S2, GRI, or the ESG dashboard.',
+                ],
+                [
+                    'title' => 'Section progress',
+                    'variant' => 'disclosure-card',
+                    'theme' => 'company',
+                    'caption' => 'Each framework shows completion % — work through sections in any order.',
+                ],
             ],
             'body' => 'Disclosures capture narrative and structured sustainability information beyond raw emissions. Complete sections progressively; many fields pull from your inventory automatically.',
             'steps' => [
@@ -180,12 +239,13 @@ return [
             'id' => 'team',
             'title' => 'Team & access',
             'summary' => 'Invite colleagues and control permissions.',
-            'image' => [
-                'src' => 'images/help/company/team.png',
-                'variant' => 'team',
-                'theme' => 'company',
-                'alt' => 'Team and access list with invite action',
-                'caption' => 'Invite staff and assign roles that limit who can edit data or billing.',
+            'highlights' => [
+                [
+                    'title' => 'Team member row',
+                    'variant' => 'team-invite',
+                    'theme' => 'company',
+                    'caption' => 'Each person gets a role — limit access to measurements, reports, or billing.',
+                ],
             ],
             'body' => 'Company admins can invite staff, assign roles, and control who can view or edit locations, measurements, reports, and disclosures.',
             'steps' => [
@@ -204,12 +264,13 @@ return [
             'id' => 'billing',
             'title' => 'Plan & billing',
             'summary' => 'Subscription, upgrades, and payment history.',
-            'image' => [
-                'src' => 'images/help/company/billing.png',
-                'variant' => 'billing',
-                'theme' => 'company',
-                'alt' => 'Plan comparison cards on the billing page',
-                'caption' => 'Compare plans and upgrade when you need bulk import, Scope 3, or exports.',
+            'highlights' => [
+                [
+                    'title' => 'Plan card',
+                    'variant' => 'plan-card',
+                    'theme' => 'company',
+                    'caption' => 'Compare tiers — bulk import, Scope 3, and PDF exports vary by plan.',
+                ],
             ],
             'body' => 'View your current plan, upgrade for bulk import / Scope 3 / disclosures, manage payment methods, and download invoices. Not available when your account is fully managed by a consultant agency.',
             'steps' => [
@@ -226,12 +287,13 @@ return [
             'id' => 'consultants',
             'title' => 'Consultants directory',
             'summary' => 'Find and engage sustainability consultants.',
-            'image' => [
-                'src' => 'images/help/company/consultants.png',
-                'variant' => 'consultants',
-                'theme' => 'company',
-                'alt' => 'Consultant directory cards with request intro actions',
-                'caption' => 'Browse verified consultants and request an introduction from your admin.',
+            'highlights' => [
+                [
+                    'title' => 'Consultant listing',
+                    'variant' => 'consultant-card',
+                    'theme' => 'company',
+                    'caption' => 'Browse verified practices and request an introduction from your admin.',
+                ],
             ],
             'body' => 'Browse verified consultants on the platform, request an introduction, or purchase advisory services. Your company admin manages consultant relationships.',
             'steps' => [

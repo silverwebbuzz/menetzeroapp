@@ -1464,36 +1464,61 @@ table.min-w-full tbody tr:hover { background-color: var(--canvas); }
     border-bottom: 1px solid var(--line);
 }
 
-.portal-guide-figure {
-    margin: 0 0 1.25rem;
+.portal-guide-highlights {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 0.875rem;
 }
 
-.portal-guide-figure__frame {
+.portal-guide-highlight {
     border: 1px solid var(--line);
     border-radius: var(--radius-lg);
     overflow: hidden;
-    background: var(--canvas);
-    box-shadow: var(--shadow-sm);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
 }
 
-.portal-guide-figure__img,
-.portal-guide-figure__svg {
+.portal-guide-highlight__title {
+    margin: 0;
+    padding: 0.5rem 0.875rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--ink);
+    background: var(--canvas);
+    border-bottom: 1px solid var(--line);
+}
+
+.portal-guide-highlight__mock {
+    flex: 1;
+    padding: 0.875rem;
+    background: var(--canvas);
+    pointer-events: none;
+    user-select: none;
+}
+
+.portal-guide-highlight__mock .btn,
+.portal-guide-highlight__mock input,
+.portal-guide-highlight__mock select {
+    pointer-events: none;
+}
+
+.portal-guide-highlight__photo {
     display: block;
     width: 100%;
     height: auto;
-    vertical-align: middle;
+    border-radius: var(--radius);
 }
 
-.portal-guide-figure__caption {
-    margin: 0.5rem 0 0;
+.portal-guide-highlight__caption {
+    margin: 0;
+    padding: 0.5rem 0.875rem;
     font-size: 0.8125rem;
-    line-height: 1.384615;
+    line-height: 1.428571;
     color: var(--ink-subtle);
-    text-align: center;
-}
-
-.consultant-shell .portal-guide-figure__frame {
-    border-color: var(--line);
+    border-top: 1px solid var(--line);
+    background: var(--surface);
 }
 
 /* Scope section badge */

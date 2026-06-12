@@ -62,14 +62,26 @@
                         </div>
                     </summary>
                     <div class="card-body border-t border-gray-100">
-                        @if(!empty($section['image']))
-                            @include('help.partials.guide-figure', [
-                                'image' => $section['image'],
-                                'portal' => $portal ?? 'company',
-                            ])
-                        @endif
                         @if(!empty($section['body']))
                             <p class="mb-4">{{ $section['body'] }}</p>
+                        @endif
+                        @if(!empty($section['highlights']))
+                            <div class="portal-guide-highlights mb-4">
+                                @foreach($section['highlights'] as $highlight)
+                                    @include('help.partials.guide-highlight', [
+                                        'highlight' => $highlight,
+                                        'portal' => $portal ?? 'company',
+                                    ])
+                                @endforeach
+                            </div>
+                        @elseif(!empty($section['image']))
+                            {{-- Legacy single image (deprecated — use highlights) --}}
+                            @include('help.partials.guide-highlight', [
+                                'highlight' => array_merge($section['image'], [
+                                    'title' => $section['image']['caption'] ?? null,
+                                ]),
+                                'portal' => $portal ?? 'company',
+                            ])
                         @endif
                         @if(!empty($section['steps']))
                             <ul class="portal-guide-list mb-4">
