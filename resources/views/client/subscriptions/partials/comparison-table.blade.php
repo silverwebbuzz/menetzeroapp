@@ -1,7 +1,10 @@
-@props(['title', 'rows', 'columns', 'labels', 'plans'])
+@props(['title', 'subtitle' => null, 'rows', 'columns', 'labels', 'plans'])
 
 <div class="mb-10">
-    <h2 class="text-xl font-bold text-gray-900 mb-3">{{ $title }}</h2>
+    <h2 class="section-heading mb-1">{{ $title }}</h2>
+    @if($subtitle)
+        <p class="text-sm text-slate-600 mb-3">{{ $subtitle }}</p>
+    @endif
     <div class="plan-comparison-table-wrap table-wrap">
         <table class="table plan-comparison-table">
             <thead>

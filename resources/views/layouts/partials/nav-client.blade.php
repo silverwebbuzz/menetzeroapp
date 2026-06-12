@@ -303,14 +303,6 @@
     </div>
 @endif
 
-<div class="nav-section" style="margin-top: auto; border-top: 1px solid var(--line); padding-top: 0.75rem;">
-    <div class="nav-section-title">Help</div>
-    <a href="{{ route('client.help') }}" class="nav-link {{ request()->routeIs('client.help') ? 'active' : '' }}">
-        {!! $svg('help') !!}
-        Help &amp; guide
-    </a>
-</div>
-
 @if($user && method_exists($user, 'isAdmin') && $user->isAdmin())
     <div class="nav-section">
         <div class="nav-section-title">System</div>
@@ -342,3 +334,19 @@
         @endif
     </div>
 @endif
+
+<div class="nav-section nav-section--help">
+    <div class="nav-section-title">Help</div>
+    <a href="{{ route('client.help') }}" class="nav-link {{ request()->routeIs('client.help') ? 'active' : '' }}">
+        {!! $svg('help') !!}
+        Help &amp; guide
+    </a>
+</div>
+
+<div class="nav-section nav-section--help">
+    <div class="nav-section-title">Help</div>
+    <a href="{{ route('client.help') }}" class="nav-link {{ request()->routeIs('client.help') ? 'active' : '' }}">
+        {!! $svg('help') !!}
+        Help &amp; guide
+    </a>
+</div>

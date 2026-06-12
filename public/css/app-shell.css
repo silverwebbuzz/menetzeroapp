@@ -205,6 +205,23 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
 .nav-link:not(.active) svg { color: var(--ink-subtle); }
 .nav-link:hover:not(.active) svg { color: var(--ink-muted); }
 
+/* Sidebar nav: Help section last, pinned to bottom when space allows */
+.sidebar nav.flex-col > .flex-1 {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.nav-section--help {
+    margin-top: auto;
+    border-top: 1px solid var(--line);
+    padding-top: 0.75rem;
+}
+
+.consultant-shell .nav-section--help {
+    border-top-color: rgba(255, 255, 255, 0.1);
+}
+
 /* Sidebar footer */
 .sidebar-footer {
     padding: 0.875rem 1rem;

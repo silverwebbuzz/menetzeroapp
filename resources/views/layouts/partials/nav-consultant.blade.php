@@ -67,7 +67,15 @@
     </a>
 </div>
 
-<div class="nav-section" style="margin-top: auto; border-top: 1px solid var(--line); padding-top: 0.75rem;">
+<div class="nav-section">
+    <div class="nav-section-title">Agency</div>
+    <a href="{{ route('consultant.team.index') }}" class="nav-link {{ request()->routeIs('consultant.team.*') ? 'active' : '' }}">
+        {!! $svg('users') !!}
+        Team &amp; Access
+    </a>
+</div>
+
+<div class="nav-section nav-section--help">
     <div class="nav-section-title">Help</div>
     <a href="{{ route('consultant.help') }}" class="nav-link {{ request()->routeIs('consultant.help') ? 'active' : '' }}">
         {!! $svg('help') !!}
@@ -76,13 +84,5 @@
     <a href="{{ route('consultant.company-guide') }}" class="nav-link {{ request()->routeIs('consultant.company-guide') ? 'active' : '' }}">
         {!! $svg('doc') !!}
         Company portal guide
-    </a>
-</div>
-
-<div class="nav-section">
-    <div class="nav-section-title">Agency</div>
-    <a href="{{ route('consultant.team.index') }}" class="nav-link {{ request()->routeIs('consultant.team.*') ? 'active' : '' }}">
-        {!! $svg('users') !!}
-        Team &amp; Access
     </a>
 </div>

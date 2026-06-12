@@ -7,9 +7,11 @@
 @php
     // Render order for the selectable plan cards.
     $planOrder = ['client_free', 'client_starter', 'client_growth', 'client_enterprise'];
+    $planGuide = config('plans-company');
+    $planTaglines = $planGuide['plan_taglines'] ?? [];
     $freeMeta = [
         'name' => 'Free',
-        'tagline' => 'Try S1&2 + disclosure forms (preview only)',
+        'tagline' => $planTaglines['client_free'] ?? 'Try S1&2 + disclosure forms (preview only)',
         'price_display' => 'AED 0',
         'price_sub' => 'Free forever',
         'is_custom' => false,
@@ -29,20 +31,25 @@
     @endif
 
     <!-- Header -->
-    <div class="mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">Choose your plan</h1>
-            <p class="mt-2 text-gray-600">
-                MOCCAE-ready inventory on Starter; IFRS &amp; GRI downloads on Growth. Prices in {{ $displayCurrency }} (annual, one-time payment).
+            <h1 class="ent-page-title">Choose your plan</h1>
+            <p class="ent-page-lead mt-2">
+                Simple annual pricing in {{ $displayCurrency }}. Pick based on what you need to download and share — not every feature name on the list below.
             </p>
         </div>
         <div class="inline-flex items-center rounded-lg border border-gray-200 overflow-hidden text-sm self-start">
             <a href="{{ route('currency.switch', 'AED') }}"
-               class="px-3 py-1.5 {{ $displayCurrency === 'AED' ? 'bg-orange-600 text-white' : 'text-gray-600 hover:bg-gray-50' }}">AED</a>
+               class="px-3 py-1.5 {{ $displayCurrency === 'AED' ? 'bg-brand text-white' : 'text-gray-600 hover:bg-gray-50' }}">AED</a>
             <a href="{{ route('currency.switch', 'INR') }}"
-               class="px-3 py-1.5 {{ $displayCurrency === 'INR' ? 'bg-orange-600 text-white' : 'text-gray-600 hover:bg-gray-50' }}">INR (₹)</a>
+               class="px-3 py-1.5 {{ $displayCurrency === 'INR' ? 'bg-brand text-white' : 'text-gray-600 hover:bg-gray-50' }}">INR (₹)</a>
         </div>
     </div>
+
+    @include('plans.partials.human-guide', [
+        'guide' => $planGuide,
+        'show' => ['intro', 'examples', 'clarifications'],
+    ])
 
     <!-- Current Plan Info -->
     @if($currentSubscription)
@@ -67,13 +74,14 @@
             @endforeach
         @endif
         <p class="text-xs text-gray-500">
-            <strong>Upgrades:</strong> unused time on your current plan is credited toward a <em>full year</em> of the new plan (prevents short-term upgrade abuse).
+            <strong>Upgrades:</strong> unused time on your current plan is credited toward a full year on the new plan.
             <strong>Downgrades:</strong> take effect at renewal — no refund for unused time.
         </p>
     </div>
     @endif
 
     <!-- Plan selection -->
+    <h2 class="section-heading mb-3">Select a plan</h2>
     <form action="{{ route('subscriptions.process-upgrade') }}" method="POST">
         @csrf
 
@@ -82,6 +90,9 @@
                 @php
                     $plan = $availablePlans[$code] ?? null;
                     $meta = $code === 'client_free' ? $freeMeta : ($planMeta[$code] ?? null);
+                    if ($meta && isset($planTaglines[$code])) {
+                        $meta['tagline'] = $planTaglines[$code];
+                    }
                     if (!$plan || !$meta) { continue; }
                     $isCurrent = $currentSubscription && $currentSubscription->subscription_plan_id == $plan->id;
                     $change = $planChanges[$code] ?? null;
@@ -245,6 +256,7 @@
 
     @include('client.subscriptions.partials.comparison-table', [
         'title' => 'Data & operations',
+        'subtitle' => 'What you can do inside the platform day to day',
         'rows' => $operationsRows,
         'columns' => $comparisonColumns,
         'labels' => $comparisonLabels,
@@ -253,6 +265,7 @@
 
     @include('client.subscriptions.partials.comparison-table', [
         'title' => 'Report downloads',
+        'subtitle' => 'PDF and export files you can share externally',
         'rows' => $downloadRows,
         'columns' => $comparisonColumns,
         'labels' => $comparisonLabels,
@@ -260,8 +273,8 @@
     ])
 
     <div class="mb-12">
-        <h2 class="text-2xl font-bold text-gray-900 mb-1">Consultant review packs</h2>
-        <p class="text-sm text-gray-500 mb-4">Optional human review via verified consultants. Checkout integration coming soon — contact sales to bundle today.</p>
+        <h2 class="section-heading mb-1">Optional consultant review</h2>
+        <p class="text-sm text-gray-500 mb-4">Want a verified UAE consultant to review your inventory before you submit? These add-ons pair with your subscription — contact sales to bundle today.</p>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             @foreach($consultantAddOns as $addon)
                 <div class="bg-white rounded-xl border border-gray-200 p-5">
@@ -275,6 +288,11 @@
             @endforeach
         </div>
     </div>
+
+    @include('plans.partials.human-guide', [
+        'guide' => $planGuide,
+        'show' => ['faq'],
+    ])
 
 </div>
 @endsection

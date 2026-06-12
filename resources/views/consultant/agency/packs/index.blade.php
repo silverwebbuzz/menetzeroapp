@@ -8,13 +8,16 @@
     $checkoutAvailable = \App\Models\PaymentGateway::checkoutAvailable();
     $isTrial = $subscription?->isFreeTrial() ?? false;
     $packMeta = \App\Data\ConsultantAgencyPlanMatrix::packDefinitions();
+    $planGuide = config('plans-consultant');
+    $packHints = $planGuide['pack_hints'] ?? [];
 @endphp
 
 <div class="cd-page-head">
     <div>
-        <p class="cd-subtitle mb-2">Wholesale pricing for managed client workspaces · contract through 31 Dec {{ $contractYear }}</p>
+        <h1 class="ent-page-title">Agency packs</h1>
+        <p class="ent-page-lead">Wholesale pricing for the client workspaces you manage · contract through 31 Dec {{ $contractYear }}</p>
         @if($subscription)
-            <div class="cd-eyebrow">
+            <div class="cd-eyebrow mt-2">
                 Active: {{ $subscription->plan?->plan_name }} · {{ $slotSummary['used'] }}/{{ $slotSummary['limit'] }} slots used
             </div>
         @endif
@@ -24,6 +27,11 @@
         <a href="{{ route('consultant.dashboard') }}" class="btn btn-ghost btn-sm">← Dashboard</a>
     </div>
 </div>
+
+@include('plans.partials.human-guide', [
+    'guide' => $planGuide,
+    'show' => ['intro', 'how_it_works', 'examples', 'clarifications'],
+])
 
 @if(!$checkoutAvailable)
     <div class="cd-notice">
@@ -41,7 +49,8 @@
         </div>
         <div class="card-body">
             <p class="text-sm text-slate-600 mb-3">
-                <strong>AED {{ number_format(\App\Data\ConsultantAgencyPlanMatrix::EXTRA_SLOT_PRICE_AED) }}</strong> per slot (pro-rata through 31 Dec {{ $contractYear }}).
+                Need one or two more clients without upgrading pack size?
+                <strong>AED {{ number_format(\App\Data\ConsultantAgencyPlanMatrix::EXTRA_SLOT_PRICE_AED) }}</strong> per slot through 31 Dec {{ $contractYear }} (pro-rata if you buy mid-year).
             </p>
             @if($extraSlotQuote)
                 @if($checkoutAvailable)
@@ -73,11 +82,12 @@
     </div>
 @elseif($isTrial)
     <div class="cd-notice" style="margin-bottom:1.25rem;">
-        <span>You're on the <strong>free trial</strong> (1 client, data entry only). Choose a pack below when checkout opens for Growth-equivalent exports per client.</span>
+        <span>You're on the <strong>free trial</strong> — one client, data entry only (no PDF exports). Pick a paid pack below when checkout opens to unlock Growth-level reports for each client.</span>
         <a href="{{ route('consultant.clients.create') }}" class="btn btn-primary btn-sm">Add trial client</a>
     </div>
 @endif
 
+<h2 class="section-heading mb-3">Available packs</h2>
 <div class="cd-pack-grid">
     @foreach($plans as $plan)
         @php
@@ -91,7 +101,10 @@
                 <span class="badge badge-success mb-2" style="align-self:flex-start;">Current plan</span>
             @endif
             <div class="cd-pack-name">{{ $plan->plan_name }}</div>
-            <div class="cd-pack-slots">{{ $slots }} client slots · Growth per PRY</div>
+            <div class="cd-pack-slots">{{ $slots }} client {{ $slots === 1 ? 'slot' : 'slots' }} · Growth exports per client</div>
+            @if(!empty($packHints[$plan->plan_code]))
+                <p class="text-xs text-slate-600 mb-2">{{ $packHints[$plan->plan_code] }}</p>
+            @endif
             <div class="cd-pack-price">AED {{ number_format($quote['charge_amount'], 0) }}</div>
             <div class="cd-pack-note">
                 @if($quote['pro_rata'])
@@ -102,8 +115,9 @@
             </div>
             <ul class="cd-pack-features">
                 <li>{{ $meta['description'] ?? 'Managed SME workspaces' }}</li>
-                <li>Calendar-year contract (31 Dec)</li>
-                <li>Extra slots available mid-year</li>
+                <li>Each client: GHG, IFRS &amp; GRI report downloads (paid pack)</li>
+                <li>Contract through 31 Dec {{ $contractYear }}</li>
+                <li>Extra slots available if you grow mid-year</li>
             </ul>
             <div class="mt-auto">
                 @if($checkoutAvailable)
@@ -130,9 +144,12 @@
     <p class="text-xs text-slate-500 text-center mb-4">All pack purchases will be available here when checkout opens. Continue with your free trial client in the meantime.</p>
 @endif
 
-<p class="text-xs text-slate-500">
-    Enterprise (50+ slots) —
-    <a href="{{ route('contact') }}" class="text-brand font-medium hover:underline">contact MenetZero</a>
-    for manual invoicing.
+<p class="text-xs text-slate-500 mb-6">
+    Need 50+ slots? <a href="{{ route('contact') }}" class="text-brand font-medium hover:underline">Contact MenetZero</a> for Enterprise agency pricing and invoicing.
 </p>
+
+@include('plans.partials.human-guide', [
+    'guide' => $planGuide,
+    'show' => ['faq'],
+])
 @endsection
