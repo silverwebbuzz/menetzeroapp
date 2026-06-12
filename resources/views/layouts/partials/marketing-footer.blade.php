@@ -32,7 +32,7 @@
                 <div class="font-semibold text-white mb-3">Contact</div>
                 <ul class="space-y-2 text-gray-400">
                     <li><a href="{{ route('contact') }}" class="hover:text-white">Contact Us</a></li>
-                    <li><a href="mailto:{{ \App\Models\SiteSetting::get('support_email', 'support@menetzero.com') }}" class="hover:text-white break-all">{{ \App\Models\SiteSetting::get('support_email', 'support@menetzero.com') }}</a></li>
+                    <li><a href="mailto:{{ site_support_email() }}" class="hover:text-white break-all">{{ site_support_email() }}</a></li>
                 </ul>
             </div>
         </div>

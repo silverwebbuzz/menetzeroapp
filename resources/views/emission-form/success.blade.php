@@ -164,7 +164,7 @@
                     <div class="mt-2 text-sm text-blue-700">
                         <p>If you have any questions about your submission or need to make changes, please contact our support team:</p>
                         <ul class="mt-2 space-y-1">
-                            <li>📧 Email: support@menetzero.com</li>
+                            <li>📧 Email: {{ site_support_email() }}</li>
                             <li>📞 Phone: +971 4 123 4567</li>
                             <li>💬 Live Chat: Available on our website</li>
                         </ul>

@@ -24,8 +24,8 @@ return new class extends Migration
         $defaults = [
             'company_legal_name' => 'Silver Webbuzz Private Limited',
             'brand_name' => 'MeNetZero',
-            'support_email' => 'support@menetzero.com',
-            'sales_email' => 'sales@menetzero.com',
+            'support_email' => 'help@menetzero.com',
+            'sales_email' => 'hello@menetzero.com',
             'support_phone' => '+91 9998010029',
             'address_line' => '',
             'city' => '',

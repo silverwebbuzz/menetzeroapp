@@ -322,7 +322,7 @@ return [
         ],
         [
             'q' => 'Who should I contact for support?',
-            'a' => 'Use the contact form on menetzero.com or email your account manager. For data methodology questions, your assigned consultant (if any) can also assist.',
+            'a' => 'Use the contact page at ' . url('/contact') . ' or email ' . config('mail.addresses.help.address', 'help@menetzero.com') . '. For data methodology questions, your assigned consultant (if any) can also assist.',
         ],
     ],
 ];

@@ -20,7 +20,7 @@
         {{ $label ?? 'Coming soon' }}
     </span>
 @elseif($tier === 'enterprise')
-    <a href="mailto:{{ \App\Models\SiteSetting::get('sales_email', 'sales@menetzero.com') }}?subject=Enterprise%20enquiry"
+    <a href="mailto:{{ site_sales_email() }}?subject=Enterprise%20enquiry"
        {{ $attributes->merge(['class' => 'mkt-btn mkt-btn-dark ' . $blockClass]) }}>
         {{ $label ?? 'Contact sales' }}
     </a>

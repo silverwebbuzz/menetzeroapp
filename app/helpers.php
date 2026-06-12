@@ -21,3 +21,36 @@ if (! function_exists('co2e_tonne')) {
         return GhgReportService::kgToTonnes($kg);
     }
 }
+
+if (! function_exists('site_support_email')) {
+    function site_support_email(): string
+    {
+        $email = \App\Models\SiteSetting::get('support_email');
+
+        return ($email !== null && $email !== '')
+            ? $email
+            : config('mail.addresses.help.address', 'help@menetzero.com');
+    }
+}
+
+if (! function_exists('site_sales_email')) {
+    function site_sales_email(): string
+    {
+        $email = \App\Models\SiteSetting::get('sales_email');
+
+        return ($email !== null && $email !== '')
+            ? $email
+            : config('mail.addresses.hello.address', 'hello@menetzero.com');
+    }
+}
+
+if (! function_exists('site_support_phone')) {
+    function site_support_phone(): string
+    {
+        $phone = \App\Models\SiteSetting::get('support_phone');
+
+        return ($phone !== null && $phone !== '')
+            ? $phone
+            : '+91 9998010029';
+    }
+}

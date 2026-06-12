@@ -151,7 +151,7 @@
                             </button>
                         @elseif(!empty($meta['is_custom']))
                             @if($checkoutAvailable)
-                                <a href="mailto:sales@menetzero.com?subject=Enterprise%20plan%20enquiry"
+                                <a href="mailto:{{ site_sales_email() }}?subject=Enterprise%20plan%20enquiry"
                                    class="block w-full text-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 text-sm font-medium">
                                     Contact Sales
                                 </a>

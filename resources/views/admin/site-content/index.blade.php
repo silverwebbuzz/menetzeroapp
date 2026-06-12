@@ -23,8 +23,8 @@
                     $fields = [
                         'company_legal_name' => 'Company legal name',
                         'brand_name' => 'Brand name',
-                        'support_email' => 'Support email',
-                        'sales_email' => 'Sales email',
+                        'support_email' => 'Support email (help@)',
+                        'sales_email' => 'Sales email (hello@)',
                         'support_phone' => 'Support phone',
                         'address_line' => 'Address line',
                         'city' => 'City',

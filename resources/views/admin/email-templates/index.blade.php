@@ -28,14 +28,14 @@
                 — users click the sales mailto link.
                 Edit the displayed address in
                 <a href="{{ route('admin.site-content.index') }}" class="text-indigo-700 hover:underline">Site Content</a>
-                (<code class="text-xs bg-gray-100 px-1 rounded">sales_email</code>).
+                (<code class="text-xs bg-gray-100 px-1 rounded">sales_email</code> → hello@menetzero.com).
             </li>
             <li>
                 <strong>Support (help@):</strong>
                 same
                 <a href="{{ route('contact') }}" target="_blank" rel="noopener" class="text-indigo-700 hover:underline">contact page</a>
                 — support mailto link
-                (<code class="text-xs bg-gray-100 px-1 rounded">support_email</code> in Site Content).
+                (<code class="text-xs bg-gray-100 px-1 rounded">support_email</code> → help@menetzero.com in Site Content).
             </li>
             <li class="text-gray-500 text-xs">
                 Auto-reply templates <em>Contact — sales acknowledgement</em> and <em>Contact — support acknowledgement</em> are ready but not yet connected to a submit form — see their “Triggered from” column below.

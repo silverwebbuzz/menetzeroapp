@@ -24,21 +24,17 @@
                 <h2 class="font-semibold text-gray-900 mb-3">Get in touch</h2>
                 <ul class="space-y-3 text-gray-700 text-sm">
                     <li>
-                        <div class="text-gray-500">Support email</div>
-                        <a href="mailto:{{ $settings['support_email'] ?? '' }}" class="text-teal-600 font-medium">{{ $settings['support_email'] ?? '' }}</a>
+                        <div class="text-gray-500">Support (help@)</div>
+                        <a href="mailto:{{ site_support_email() }}" class="text-teal-600 font-medium">{{ site_support_email() }}</a>
                     </li>
-                    @if(!empty($settings['sales_email']))
                     <li>
-                        <div class="text-gray-500">Sales</div>
-                        <a href="mailto:{{ $settings['sales_email'] }}" class="text-teal-600 font-medium">{{ $settings['sales_email'] }}</a>
+                        <div class="text-gray-500">Sales (hello@)</div>
+                        <a href="mailto:{{ site_sales_email() }}" class="text-teal-600 font-medium">{{ site_sales_email() }}</a>
                     </li>
-                    @endif
-                    @if(!empty($settings['support_phone']))
                     <li>
                         <div class="text-gray-500">Phone</div>
-                        <span class="font-medium">{{ $settings['support_phone'] }}</span>
+                        <a href="tel:{{ preg_replace('/\s+/', '', site_support_phone()) }}" class="text-teal-600 font-medium">{{ site_support_phone() }}</a>
                     </li>
-                    @endif
                 </ul>
             </div>
             <div class="mkt-info-card">
