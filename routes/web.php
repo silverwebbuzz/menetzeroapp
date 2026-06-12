@@ -508,6 +508,9 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
         Route::put('/email-templates/{email_template}', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'update'])->name('email-templates.update');
         Route::get('/email-templates/{email_template}/preview', [\App\Http\Controllers\Admin\EmailTemplateController::class, 'preview'])->name('email-templates.preview');
 
+        Route::get('/email-test', [\App\Http\Controllers\Admin\EmailTestController::class, 'index'])->name('email-test.index');
+        Route::post('/email-test', [\App\Http\Controllers\Admin\EmailTestController::class, 'send'])->name('email-test.send');
+
         // Role Templates Management
         Route::get('/role-templates', [\App\Http\Controllers\Admin\SuperAdminController::class, 'roleTemplates'])->name('role-templates');
         Route::get('/role-templates/create', [\App\Http\Controllers\Admin\SuperAdminController::class, 'createRoleTemplate'])->name('role-templates.create');

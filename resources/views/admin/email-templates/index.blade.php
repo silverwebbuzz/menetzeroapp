@@ -8,12 +8,15 @@
         <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">{{ session('success') }}</div>
     @endif
 
-    <div class="mb-4 bg-blue-50 border border-blue-200 text-blue-900 px-4 py-3 rounded text-sm">
-        <strong>Addresses:</strong>
-        hello — {{ config('mail.addresses.hello.address') }} (sales)
-        · help — {{ config('mail.addresses.help.address') }} (support)
-        · noreply — {{ config('mail.addresses.noreply.address') }} (automated).
-        SMTP credentials are set in <code class="text-xs bg-white px-1 rounded">.env</code> (MAIL_* / MAIL_HELLO_* / MAIL_HELP_* / MAIL_NOREPLY_*).
+    <div class="mb-4 bg-blue-50 border border-blue-200 text-blue-900 px-4 py-3 rounded text-sm flex flex-wrap items-center justify-between gap-2">
+        <span>
+            <strong>Addresses:</strong>
+            hello — {{ config('mail.addresses.hello.address') }} (sales)
+            · help — {{ config('mail.addresses.help.address') }} (support)
+            · noreply — {{ config('mail.addresses.noreply.address') }} (automated).
+            SMTP credentials are set in <code class="text-xs bg-white px-1 rounded">.env</code>.
+        </span>
+        <a href="{{ route('admin.email-test.index') }}" class="text-indigo-700 font-medium hover:underline whitespace-nowrap">Open email tester →</a>
     </div>
 
     @foreach(['noreply' => 'Automated (noreply@)', 'help' => 'Support (help@)', 'hello' => 'Sales (hello@)'] as $mailer => $label)
