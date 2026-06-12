@@ -59,16 +59,8 @@ class EmailTemplateService
             $mailer = $this->mailerName($template->mailer);
 
             $mailable = (new TemplateMail($template, $variables))->mailer($mailer);
-            $pending = Mail::mailer($mailer)->to($to);
 
-            if ($replyKey = $template->reply_to) {
-                $reply = config("mail.addresses.{$replyKey}");
-                if (!empty($reply['address'])) {
-                    $pending->replyTo($reply['address'], $reply['name'] ?? null);
-                }
-            }
-
-            $pending->send($mailable);
+            Mail::mailer($mailer)->to($to)->send($mailable);
 
             return true;
         } catch (\Throwable $e) {

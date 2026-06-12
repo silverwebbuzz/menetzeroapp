@@ -120,16 +120,8 @@ HTML;
 
         try {
             $mailable = (new TemplateMail($template, $variables))->mailer($transportKey);
-            $pending = Mail::mailer($transportKey)->to($to);
 
-            if ($replyKey = $template->reply_to) {
-                $reply = config("mail.addresses.{$replyKey}");
-                if (!empty($reply['address'])) {
-                    $pending->replyTo($reply['address'], $reply['name'] ?? null);
-                }
-            }
-
-            $pending->send($mailable);
+            Mail::mailer($transportKey)->to($to)->send($mailable);
 
             $details['duration_ms'] = (int) round((microtime(true) - $started) * 1000);
 

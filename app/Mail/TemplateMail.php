@@ -30,6 +30,13 @@ class TemplateMail extends Mailable
                 'previewText' => $textBody,
             ]);
 
+        if ($replyKey = $this->template->reply_to) {
+            $reply = config("mail.addresses.{$replyKey}");
+            if (!empty($reply['address'])) {
+                $mail->replyTo($reply['address'], $reply['name'] ?? null);
+            }
+        }
+
         if ($textBody) {
             $mail->text('emails.template-text', [
                 'bodyText' => $textBody,
