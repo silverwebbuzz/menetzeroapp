@@ -3,7 +3,7 @@
 @section('title', 'Consultant orders')
 
 @section('content')
-<div class="max-w-4xl mx-auto">
+<div class="w-full">
     <div class="flex items-center justify-between mb-6">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Consultant orders</h1>

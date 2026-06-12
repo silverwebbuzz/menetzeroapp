@@ -4,7 +4,7 @@
 @section('page-title', 'GRI Report Preview')
 
 @section('content')
-<div class="max-w-5xl mx-auto">
+<div class="w-full">
     @include('disclosures.partials.header', ['framework' => 'gri'])
 
     <x-managed-client-year-banner :fiscal-year="$fiscalYear" export-code="gri_pdf" />

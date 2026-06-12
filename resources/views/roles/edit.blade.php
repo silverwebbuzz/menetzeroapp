@@ -4,7 +4,7 @@
 @section('page-title', 'Edit Role')
 
 @section('content')
-<div class="max-w-4xl mx-auto">
+<div class="w-full">
     <div class="bg-white rounded-lg border border-gray-200 p-6">
         <h1 class="text-2xl font-bold text-gray-900 mb-2">Edit Role: {{ $role->role_name }}</h1>
         <p class="text-sm text-gray-600 mb-6">Set role permissions</p>

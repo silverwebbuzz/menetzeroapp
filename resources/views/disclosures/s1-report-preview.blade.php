@@ -4,7 +4,7 @@
 @section('page-title', 'IFRS S1 Report Preview')
 
 @section('content')
-<div class="max-w-5xl mx-auto">
+<div class="w-full">
     @include('disclosures.partials.header', ['framework' => 'ifrs_s1'])
 
     <x-managed-client-year-banner :fiscal-year="$fiscalYear" export-code="ifrs_s1_pdf" />

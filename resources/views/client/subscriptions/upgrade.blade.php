@@ -21,7 +21,7 @@
     $displayCurrency = \App\Services\CurrencyService::displayCurrency();
     $checkoutAvailable = \App\Models\PaymentGateway::checkoutAvailable();
 @endphp
-<div class="max-w-6xl mx-auto">
+<div class="w-full">
     @if(!$checkoutAvailable)
         <div class="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
             <strong>Paid upgrades coming soon.</strong> Review plans and features below. Stay on Free to explore Scope 1 &amp; 2, or schedule a downgrade at renewal. Paid checkout will open here when online payments go live.

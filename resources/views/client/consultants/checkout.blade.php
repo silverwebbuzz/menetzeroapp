@@ -3,7 +3,7 @@
 @section('title', 'Book consultant pack')
 
 @section('content')
-<div class="max-w-lg mx-auto">
+<div class="portal-narrow">
     <a href="{{ route('client.consultants.show', $consultant) }}" class="text-sm text-teal-600 hover:underline">&larr; Back to profile</a>
 
     <div class="bg-white border border-gray-200 rounded-xl p-6 mt-4">

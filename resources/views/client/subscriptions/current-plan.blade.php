@@ -4,7 +4,7 @@
 @section('page-title', 'Current Subscription')
 
 @section('content')
-<div class="max-w-4xl mx-auto">
+<div class="w-full">
     <!-- Header -->
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900">Current Subscription</h1>

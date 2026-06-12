@@ -51,10 +51,10 @@
     </script>
 
     <!-- App shell styles (portal-design-system loads last so typography always wins) -->
-    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260622">
+    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260623">
     @stack('styles')
-    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260622">
-    <link rel="stylesheet" href="{{ asset('css/portal-enterprise.css') }}?v=20260622">
+    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260623">
+    <link rel="stylesheet" href="{{ asset('css/portal-enterprise.css') }}?v=20260623">
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
@@ -105,6 +105,7 @@
 
             <!-- Main content -->
             <div class="main-content">
+                <div class="portal-shell-inner">
                 <!-- Top header -->
                 <header class="header">
                     <button type="button"
@@ -277,6 +278,7 @@
                 </main>
 
                 @include('layouts.partials.site-footer')
+                </div>
             </div>
         @else
             <!-- Guest layout -->

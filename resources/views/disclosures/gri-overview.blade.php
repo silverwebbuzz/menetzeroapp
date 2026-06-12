@@ -4,7 +4,7 @@
 @section('page-title', 'GRI Sustainability Reporting')
 
 @section('content')
-<div class="max-w-5xl mx-auto">
+<div class="w-full">
     @include('disclosures.partials.header', ['framework' => 'gri'])
 
     @if(session('success'))

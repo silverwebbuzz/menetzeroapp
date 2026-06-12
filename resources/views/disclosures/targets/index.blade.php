@@ -4,7 +4,7 @@
 @section('page-title', 'Targets & Transition Roadmap')
 
 @section('content')
-<div class="max-w-5xl mx-auto" x-data="{ actionRows: 1 }">
+<div class="w-full" x-data="{ actionRows: 1 }">
     @include('disclosures.partials.header')
 
     @if(session('success'))

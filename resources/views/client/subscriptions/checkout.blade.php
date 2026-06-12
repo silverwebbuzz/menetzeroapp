@@ -8,7 +8,7 @@
     $meta = $transaction->metadata ?? [];
     $amountMinor = (int) round(((float) $transaction->amount) * 100);
 @endphp
-<div class="max-w-lg mx-auto">
+<div class="portal-narrow">
     @if(session('info'))
         <div class="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">{{ session('info') }}</div>
     @endif

@@ -4,7 +4,7 @@
 @section('page-title', 'Climate Opportunities')
 
 @section('content')
-<div class="max-w-5xl mx-auto">
+<div class="w-full">
     @include('disclosures.partials.header')
 
     @if(session('success'))

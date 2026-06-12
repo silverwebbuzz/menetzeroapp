@@ -4,7 +4,7 @@
 @section('page-title', 'Entry Details')
 
 @section('content')
-<div class="max-w-4xl mx-auto">
+<div class="w-full">
     <!-- Header -->
     <div class="mb-6 flex justify-between items-center">
         <div>

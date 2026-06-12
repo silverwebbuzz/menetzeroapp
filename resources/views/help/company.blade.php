@@ -4,7 +4,7 @@
 @section('page-title', 'Help & Guide')
 
 @section('content')
-<div class="w-full max-w-4xl">
+<div class="w-full">
     <div class="page-header mb-6">
         <div>
             <h1>Company portal guide</h1>

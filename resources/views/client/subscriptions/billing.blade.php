@@ -4,7 +4,7 @@
 @section('page-title', 'Plan & Billing')
 
 @section('content')
-<div class="w-full max-w-5xl mx-auto">
+<div class="w-full">
     <div class="mb-6">
         <h1 class="text-3xl font-bold text-gray-900">Plan &amp; billing</h1>
         <p class="mt-2 text-gray-600">Your subscription, usage, entitlements, and payment history.</p>

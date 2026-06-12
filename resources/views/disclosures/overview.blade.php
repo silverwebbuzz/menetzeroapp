@@ -4,7 +4,7 @@
 @section('page-title', 'IFRS S2 Disclosures')
 
 @section('content')
-<div class="max-w-5xl mx-auto">
+<div class="w-full">
     @include('disclosures.partials.header', ['framework' => 'ifrs_s2'])
 
     @if(session('success'))

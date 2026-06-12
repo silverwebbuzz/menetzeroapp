@@ -4,7 +4,7 @@
 @section('page-title', 'Material Sustainability Topics')
 
 @section('content')
-<div class="max-w-4xl mx-auto">
+<div class="w-full">
     @include('disclosures.partials.header', ['framework' => $framework ?? 'ifrs_s1'])
 
     @if(session('success'))

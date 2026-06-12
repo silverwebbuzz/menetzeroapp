@@ -215,10 +215,13 @@ body.portal-auth {
     opacity: 1;
 }
 
-/* ─── 6. Consistent spacing ─── */
-.app-shell .content-area,
-.consultant-shell .content-area {
+/* ─── 6. Consistent spacing (horizontal padding via portal-shell-inner) ─── */
+.app-shell:not(:has(.portal-shell-inner)) .content-area,
+.consultant-shell:not(:has(.portal-shell-inner)) .content-area {
     padding: var(--portal-space-page-y) var(--portal-space-page-x);
+    max-width: 1600px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .app-shell .page-header,

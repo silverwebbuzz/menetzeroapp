@@ -4,7 +4,7 @@
 @section('page-title', 'ESG Dashboard')
 
 @section('content')
-<div class="max-w-5xl mx-auto">
+<div class="w-full">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div>
             <p class="text-sm text-gray-500">E + S + G scorecards</p>

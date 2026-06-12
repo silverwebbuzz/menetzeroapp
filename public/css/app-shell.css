@@ -34,7 +34,7 @@
     --success-soft: #ecfdf5;
 
     /* Tokens */
-    --sidebar-width: 260px;
+    --sidebar-width: 280px;
     --header-height: 64px;
     --radius-sm: 0.375rem;
     --radius: 0.5rem;
@@ -762,7 +762,10 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
 }
 
 @media (max-width: 768px) {
-    .content-area { padding: 1.25rem 1rem; }
+    .app-shell:not(:has(.portal-shell-inner)) .content-area,
+    .consultant-shell:not(:has(.portal-shell-inner)) .content-area {
+        padding: 1.25rem 1rem;
+    }
     .page-title { font-size: 0.875rem; }
     .content-area h1 { font-size: 0.875rem; }
     .card-header { padding: 0.875rem 1rem; }
@@ -772,8 +775,14 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
 
 @media (max-width: 640px) {
     .sidebar { width: min(88vw, 320px); }
-    .header { padding: 0 1rem; }
-    .content-area { padding: 1rem 0.75rem; }
+    .app-shell:not(:has(.portal-shell-inner)) .header,
+    .consultant-shell:not(:has(.portal-shell-inner)) .header {
+        padding: 0 1rem;
+    }
+    .app-shell:not(:has(.portal-shell-inner)) .content-area,
+    .consultant-shell:not(:has(.portal-shell-inner)) .content-area {
+        padding: 1rem 0.75rem;
+    }
     .header-btn-label { display: none; }
     .table thead th { padding: 0.5rem 0.75rem; }
     .table tbody td { padding: 0.625rem 0.75rem; }

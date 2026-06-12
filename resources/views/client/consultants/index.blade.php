@@ -3,7 +3,7 @@
 @section('title', 'Consultant directory')
 
 @section('content')
-<div class="max-w-5xl mx-auto">
+<div class="w-full">
     <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-900">Verified consultants</h1>
         <p class="text-sm text-gray-600 mt-1">

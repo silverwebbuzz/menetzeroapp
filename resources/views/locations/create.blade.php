@@ -99,7 +99,7 @@
     }
 </style>
 
-<div class="max-w-4xl mx-auto">
+<div class="w-full">
     <!-- Progress Steps -->
     <div class="mb-8">
         <h2 class="text-2xl font-bold text-gray-900 mb-6">Set-up your location</h2>

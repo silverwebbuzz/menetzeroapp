@@ -74,10 +74,78 @@
 }
 
 /* ─── Layout ─── */
-.app-shell .content-area,
-.consultant-shell .content-area {
-    max-width: var(--content-max) !important;
-    padding: var(--content-padding) !important;
+.app-shell .main-content,
+.consultant-shell .main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.portal-shell-inner {
+    width: 100%;
+    max-width: var(--content-max);
+    margin-left: auto;
+    margin-right: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    box-sizing: border-box;
+    padding-left: var(--content-padding);
+    padding-right: var(--content-padding);
+}
+
+.app-shell .portal-shell-inner > .header,
+.consultant-shell .portal-shell-inner > .header {
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.app-shell .portal-shell-inner > .content-area,
+.consultant-shell .portal-shell-inner > .content-area {
+    flex: 1;
+    width: 100%;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: var(--content-padding) 0 !important;
+}
+
+.app-shell .portal-shell-inner > .site-footer,
+.consultant-shell .portal-shell-inner > .site-footer {
+    width: 100%;
+    padding: 0.875rem 0;
+    margin-top: auto;
+}
+
+/* Pages must not re-cap width — avoids layout shift between routes */
+.app-shell .content-area > [class*='max-w-']:not(.portal-narrow),
+.consultant-shell .content-area > [class*='max-w-']:not(.portal-narrow) {
+    max-width: none !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.app-shell .content-area > .mx-auto:not(.portal-narrow),
+.consultant-shell .content-area > .mx-auto:not(.portal-narrow) {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* Checkout / narrow forms only */
+.portal-narrow {
+    max-width: 36rem !important;
+    width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+@media (max-width: 768px) {
+    :root {
+        --content-padding: 16px;
+    }
 }
 
 .app-shell .header .page-title,
@@ -381,7 +449,6 @@
 .consultant-shell .header {
     height: var(--header-height);
     min-height: var(--header-height);
-    padding: 0 var(--content-padding);
 }
 
 .app-shell .main-content,

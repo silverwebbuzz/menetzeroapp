@@ -5,7 +5,7 @@
 @section('content')
 @if(isset($needsCompanySetup) && $needsCompanySetup)
     <!-- Company Setup Form - Show ONLY when company not added -->
-    <div class="max-w-4xl mx-auto">
+    <div class="w-full">
         <div class="bg-white rounded-lg shadow-lg border border-gray-200">
             <!-- Setup Header -->
             <div class="flex items-center justify-between p-6 border-b border-gray-200">

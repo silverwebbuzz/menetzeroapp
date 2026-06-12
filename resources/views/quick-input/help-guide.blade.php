@@ -4,7 +4,7 @@
 @section('page-title', 'Scope 1 & 2 Help Guide')
 
 @section('content')
-<div class="w-full max-w-5xl mx-auto">
+<div class="w-full">
     <div class="mb-6">
         <a href="{{ route('quick-input.index') }}" class="text-emerald-700 hover:text-emerald-900 text-sm font-medium inline-flex items-center mb-4">
             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>

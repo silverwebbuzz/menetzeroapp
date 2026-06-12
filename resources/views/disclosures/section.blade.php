@@ -4,7 +4,7 @@
 @section('page-title', $config['title'])
 
 @section('content')
-<div class="max-w-4xl mx-auto">
+<div class="w-full">
     @include('disclosures.partials.header', ['framework' => $framework ?? 'ifrs_s2'])
 
     @if(session('success'))

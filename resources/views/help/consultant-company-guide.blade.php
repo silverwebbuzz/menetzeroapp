@@ -4,7 +4,7 @@
 @section('page-title', 'Company Portal Guide')
 
 @section('content')
-<div class="w-full max-w-4xl">
+<div class="w-full">
     <div class="cd-page-head mb-6">
         <div>
             <div class="cd-eyebrow">For client workspaces</div>

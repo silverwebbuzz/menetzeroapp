@@ -4,7 +4,7 @@
 @section('page-title', 'Location Details')
 
 @section('content')
-<div class="max-w-4xl mx-auto">
+<div class="w-full">
     <div class="bg-white rounded-lg border border-gray-200 p-6">
         <div class="flex justify-between items-start mb-6">
             <div>

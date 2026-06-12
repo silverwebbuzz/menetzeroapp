@@ -4,7 +4,7 @@
 @section('page-title', 'Sustainability Risk Register')
 
 @section('content')
-<div class="max-w-5xl mx-auto">
+<div class="w-full">
     @include('disclosures.partials.header', ['framework' => 'ifrs_s1'])
 
     @if(session('success'))

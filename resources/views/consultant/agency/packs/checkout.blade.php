@@ -14,7 +14,7 @@
     };
 @endphp
 
-<div class="max-w-lg mx-auto">
+<div class="portal-narrow">
     <div class="bg-white rounded-xl border border-gray-200 p-8 text-center">
         <h1 class="text-2xl font-bold text-gray-900 mb-1">Complete payment</h1>
         <p class="text-gray-600 text-sm mb-6">{{ $headline }} · {{ $transaction->description }}</p>
