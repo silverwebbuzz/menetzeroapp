@@ -19,31 +19,31 @@
     @csrf
     <div class="form-group mb-0">
         <label class="form-label" for="name">Your name</label>
-        <input class="form-input" id="name" type="text" name="name" value="{{ old('name') }}" required>
+        <input class="form-input" id="name" type="text" name="name" value="{{ old('name') }}" required placeholder="Your full name">
         @error('name')<p class="form-error">{{ $message }}</p>@enderror
     </div>
     <div class="form-group mb-0">
         <label class="form-label" for="company_name">Practice / company name</label>
-        <input class="form-input" id="company_name" type="text" name="company_name" value="{{ old('company_name') }}" required>
+        <input class="form-input" id="company_name" type="text" name="company_name" value="{{ old('company_name') }}" required placeholder="Your practice or company">
         @error('company_name')<p class="form-error">{{ $message }}</p>@enderror
     </div>
     <div class="form-group mb-0">
         <label class="form-label" for="email">Email</label>
-        <input class="form-input" id="email" type="email" name="email" value="{{ old('email') }}" required>
+        <input class="form-input" id="email" type="email" name="email" value="{{ old('email') }}" required placeholder="Enter your email">
         @error('email')<p class="form-error">{{ $message }}</p>@enderror
     </div>
     <div class="form-group mb-0">
         <label class="form-label" for="phone">Phone (optional)</label>
-        <input class="form-input" id="phone" type="text" name="phone" value="{{ old('phone') }}">
+        <input class="form-input" id="phone" type="text" name="phone" value="{{ old('phone') }}" placeholder="Phone number">
     </div>
     <div class="form-group mb-0">
         <label class="form-label" for="password">Password</label>
-        <input class="form-input" id="password" type="password" name="password" required>
+        <input class="form-input" id="password" type="password" name="password" required placeholder="Create password">
         @error('password')<p class="form-error">{{ $message }}</p>@enderror
     </div>
     <div class="form-group mb-0">
         <label class="form-label" for="password_confirmation">Confirm password</label>
-        <input class="form-input" id="password_confirmation" type="password" name="password_confirmation" required>
+        <input class="form-input" id="password_confirmation" type="password" name="password_confirmation" required placeholder="Repeat password">
     </div>
     <button type="submit" class="btn btn-primary btn-full">Create consultant account</button>
 </form>

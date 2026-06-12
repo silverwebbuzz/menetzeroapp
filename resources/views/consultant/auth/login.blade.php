@@ -19,12 +19,12 @@
     @csrf
     <div class="form-group mb-0">
         <label class="form-label" for="email">Email</label>
-        <input class="form-input" id="email" type="email" name="email" value="{{ old('email') }}" required>
+        <input class="form-input" id="email" type="email" name="email" value="{{ old('email') }}" required placeholder="Enter your email">
         @error('email')<p class="form-error">{{ $message }}</p>@enderror
     </div>
     <div class="form-group mb-0">
         <label class="form-label" for="password">Password</label>
-        <input class="form-input" id="password" type="password" name="password" required>
+        <input class="form-input" id="password" type="password" name="password" required placeholder="Enter your password">
     </div>
     <label class="flex items-center gap-2 text-sm text-gray-600">
         <input type="checkbox" name="remember" value="1"> Remember me

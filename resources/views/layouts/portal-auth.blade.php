@@ -33,12 +33,12 @@
             },
         };
     </script>
-    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260620">
+    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260621">
     @if($isConsultant)
-        <link rel="stylesheet" href="{{ asset('css/consultant-shell.css') }}?v=20260620">
+        <link rel="stylesheet" href="{{ asset('css/consultant-shell.css') }}?v=20260621">
     @endif
     @stack('head')
-    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260620">
+    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260621">
 </head>
 <body class="portal-auth portal-auth--{{ $portalVariant }}">
     <div class="grid lg:grid-cols-2 min-h-screen">

@@ -436,42 +436,189 @@ body.portal-auth {
     margin-bottom: var(--portal-space-section);
 }
 
-/* ─── Auth pages ─── */
-.portal-auth .auth-form .form-label {
+/* ─── Auth pages (complete layout + form controls) ─── */
+.portal-auth {
+    background: #ffffff;
+    color: var(--ink);
+}
+
+.portal-auth .auth-form .form-label,
+.portal-auth .form-label {
+    display: block;
     font-size: var(--portal-14);
+    line-height: var(--portal-lh-14);
+    font-weight: var(--portal-weight-medium);
+    color: var(--ink);
     margin-bottom: var(--portal-space-field);
 }
 
-.portal-auth .auth-form .form-input,
-.portal-auth .auth-form input {
-    font-size: var(--portal-14);
-    line-height: var(--portal-lh-14);
-}
-
-.portal-auth .form-error {
-    font-size: var(--portal-14);
-    line-height: var(--portal-lh-14);
+.portal-auth .auth-eyebrow {
+    margin: 0 0 0.375rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: var(--portal-weight-medium);
 }
 
 .portal-auth .auth-title {
     font-size: var(--portal-14);
     font-weight: var(--portal-weight-semibold);
-    margin-bottom: var(--portal-space-stack);
+    line-height: var(--portal-lh-14);
+    color: var(--ink);
+    margin: 0 0 0.375rem;
 }
 
-.portal-auth .auth-lead,
+.portal-auth .auth-lead {
+    font-size: var(--portal-14);
+    line-height: var(--portal-lh-14);
+    color: var(--ink-secondary);
+    margin: 0 0 1.25rem;
+}
+
+.portal-auth .auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1rem 0;
+    font-size: var(--portal-12);
+    line-height: var(--portal-lh-12);
+    color: var(--ink-secondary);
+    text-transform: lowercase;
+}
+
+.portal-auth .auth-divider::before,
+.portal-auth .auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+}
+
 .portal-auth .auth-footer {
+    margin: 1.25rem 0 0;
     font-size: var(--portal-14);
     line-height: var(--portal-lh-14);
     color: var(--ink-secondary);
 }
 
-.portal-auth .auth-eyebrow,
-.portal-auth .auth-footer-sub,
-.portal-auth .auth-divider {
+.portal-auth .auth-footer-sub {
+    margin: 0.5rem 0 0;
     font-size: var(--portal-12);
     line-height: var(--portal-lh-12);
     color: var(--ink-secondary);
+}
+
+.portal-auth .form-group {
+    margin-bottom: 1rem;
+}
+
+.portal-auth .form-group.mb-0 {
+    margin-bottom: 0;
+}
+
+.portal-auth form.space-y-4 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 1rem;
+}
+
+.portal-auth .form-input,
+.portal-auth .auth-form input[type="text"],
+.portal-auth .auth-form input[type="email"],
+.portal-auth .auth-form input[type="password"],
+.portal-auth .auth-form input[type="tel"] {
+    display: block;
+    width: 100%;
+    min-height: 2.5rem;
+    padding: 0.5rem 0.75rem;
+    font-family: inherit;
+    font-size: var(--portal-14) !important;
+    line-height: var(--portal-lh-14) !important;
+    font-weight: var(--portal-weight-body);
+    color: var(--ink) !important;
+    background-color: #ffffff !important;
+    border: 1px solid var(--line-strong) !important;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-xs);
+    transition: border-color 0.12s var(--easing), box-shadow 0.12s var(--easing);
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.portal-auth .form-input:hover,
+.portal-auth .auth-form input:hover {
+    border-color: var(--ink-subtle) !important;
+}
+
+.portal-auth .form-input:focus,
+.portal-auth .auth-form input:focus {
+    outline: none;
+    border-color: var(--brand) !important;
+    box-shadow: var(--shadow-ring);
+}
+
+.portal-auth .form-input::placeholder,
+.portal-auth .auth-form input::placeholder {
+    color: var(--ink-placeholder) !important;
+    opacity: 1;
+}
+
+.portal-auth .form-input[readonly],
+.portal-auth .auth-form input[readonly] {
+    background-color: var(--canvas) !important;
+    color: var(--ink-secondary) !important;
+    cursor: not-allowed;
+}
+
+.portal-auth .form-error {
+    font-size: var(--portal-14);
+    line-height: var(--portal-lh-14);
+    color: var(--danger);
+    margin-top: 0.375rem;
+}
+
+.portal-auth .alert {
+    font-size: var(--portal-14);
+    line-height: var(--portal-lh-14);
+    margin-bottom: 1rem;
+}
+
+.portal-auth .btn {
+    min-height: 2.5rem;
+}
+
+.portal-auth .btn-full {
+    width: 100%;
+}
+
+.portal-auth .btn svg,
+.portal-auth .btn img {
+    width: 1.125rem;
+    height: 1.125rem;
+    flex-shrink: 0;
+}
+
+.portal-auth .glass {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(10px);
+    border-radius: 1rem;
+}
+
+.portal-auth .glass ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.portal-auth .glass .text-base,
+.portal-auth .glass .text-sm,
+.portal-auth .glass li {
+    font-size: var(--portal-14) !important;
+    line-height: var(--portal-lh-14) !important;
+}
+
+.portal-auth .glass .rounded-full.text-sm {
+    font-size: var(--portal-12) !important;
+    line-height: var(--portal-lh-12) !important;
+    font-weight: var(--portal-weight-medium);
 }
 
 .portal-auth--company .brand-gradient {
@@ -504,17 +651,6 @@ body.portal-auth {
         radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.18) 0%, transparent 40%),
         radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 40%);
     pointer-events: none;
-}
-
-.portal-auth .glass {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    backdrop-filter: blur(10px);
-    border-radius: 1.25rem;
-}
-
-.portal-auth .btn-full {
-    width: 100%;
 }
 
 /* ─── Inner-page components (Quick Input, subscriptions, etc.) ─── */
