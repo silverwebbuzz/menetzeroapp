@@ -1,12 +1,12 @@
 @props(['title', 'subtitle' => null, 'rows', 'columns', 'labels', 'plans'])
 
 <div class="mb-10">
-    <h2 class="section-heading mb-1">{{ $title }}</h2>
+    <h2 class="section-heading text-xl font-bold text-gray-900 mb-1">{{ $title }}</h2>
     @if($subtitle)
-        <p class="text-sm text-slate-600 mb-3">{{ $subtitle }}</p>
+        <p class="text-sm text-gray-600 mb-3">{{ $subtitle }}</p>
     @endif
-    <div class="plan-comparison-table-wrap table-wrap">
-        <table class="table plan-comparison-table">
+    <div class="plan-comparison-table-wrap mkt-table-wrap table-wrap">
+        <table class="table plan-comparison-table mkt-table">
             <thead>
                 <tr>
                     <th>Feature</th>
@@ -18,7 +18,7 @@
             <tbody>
                 @foreach($rows as $row)
                     <tr>
-                        <td class="cell-strong">{{ $row['label'] }}</td>
+                        <td class="cell-strong font-medium text-gray-900">{{ $row['label'] }}</td>
                         @foreach($columns as $code)
                             @php $cell = $row['cells'][$code] ?? false; @endphp
                             <td class="text-center">

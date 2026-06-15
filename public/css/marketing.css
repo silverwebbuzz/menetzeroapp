@@ -435,6 +435,23 @@ body.mkt-body {
     border-bottom: 0;
 }
 
+/* Plan comparison tables (public pricing + in-app upgrade — shared partial) */
+.mkt-table.plan-comparison-table {
+    table-layout: fixed;
+}
+
+.mkt-table.plan-comparison-table thead th.text-center,
+.mkt-table.plan-comparison-table tbody td.text-center {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.mkt-table.plan-comparison-table thead th:first-child,
+.mkt-table.plan-comparison-table tbody td:first-child {
+    width: 28%;
+    white-space: normal;
+}
+
 /* Consultant directory */
 .mkt-consultant-card {
     background: white;
