@@ -39,6 +39,7 @@
     @endif
     @stack('head')
     <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260621">
+    @include('layouts.partials.google-analytics')
 </head>
 <body class="portal-auth portal-auth--{{ $portalVariant }}">
     <div class="portal-auth-shell min-h-screen flex flex-col">
