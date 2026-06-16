@@ -69,7 +69,7 @@ class PackCheckoutController extends Controller
 
         $data = $request->validate([
             'plan_id' => 'required|exists:subscription_plans,id',
-            'gateway' => 'required|in:razorpay,cashfree',
+            'gateway' => 'required|in:razorpay,cashfree,stripe',
         ]);
 
         $plan = SubscriptionPlan::where('id', $data['plan_id'])
@@ -125,7 +125,7 @@ class PackCheckoutController extends Controller
 
         $data = $request->validate([
             'quantity' => 'required|integer|min:1|max:50',
-            'gateway' => 'required|in:razorpay,cashfree',
+            'gateway' => 'required|in:razorpay,cashfree,stripe',
         ]);
 
         $displayCurrency = \App\Services\CurrencyService::displayCurrency();
@@ -174,7 +174,7 @@ class PackCheckoutController extends Controller
         $data = $request->validate([
             'engagement_id' => 'required|integer',
             'reporting_year' => 'required|integer|min:2000|max:2100',
-            'gateway' => 'required|in:razorpay,cashfree',
+            'gateway' => 'required|in:razorpay,cashfree,stripe',
         ]);
 
         $engagement = $this->managedClients->findForConsultant($consultantOrg->id, (int) $data['engagement_id']);
@@ -334,6 +334,50 @@ class PackCheckoutController extends Controller
         $transaction->update(['status' => 'failed']);
 
         return $this->redirectAfterFailure($transaction)->with('error', 'Payment failed. Please try again.');
+    }
+
+    public function stripeCallback(Request $request)
+    {
+        $consultantOrg = $this->consultantCompany();
+
+        $request->validate([
+            'transaction_id' => 'required|integer',
+            'session_id' => 'required|string',
+        ]);
+
+        $transaction = $this->findConsultantTransaction($consultantOrg->id, (int) $request->transaction_id);
+
+        if ($transaction->status === 'completed') {
+            return redirect()->route('consultant.dashboard')->with('success', 'Payment already processed.');
+        }
+
+        $gateway = PaymentGateway::forGateway('stripe');
+        if (!$gateway || !$gateway->is_enabled || !$gateway->isConfigured()) {
+            return redirect()->route('consultant.packs.index')->with('error', 'Payment method unavailable.');
+        }
+
+        $sessionId = (string) $request->query('session_id');
+        $session = $this->paymentService->getStripeCheckoutSession($gateway, $sessionId);
+
+        if (!$session || ($session['id'] ?? null) !== $sessionId) {
+            return redirect()->route('consultant.packs.index')->with('error', 'Could not verify Stripe payment.');
+        }
+
+        $expectedTxn = (string) $transaction->id;
+        $sessionTxn = (string) ($session['metadata']['transaction_id'] ?? $session['client_reference_id'] ?? '');
+        if ($sessionTxn !== '' && $sessionTxn !== $expectedTxn) {
+            return redirect()->route('consultant.packs.index')->with('error', 'Payment reference mismatch.');
+        }
+
+        if (($session['payment_status'] ?? null) === 'paid') {
+            return $this->completePaid($transaction, [
+                'stripe_session_id' => $sessionId,
+                'stripe_payment_intent_id' => $session['payment_intent'] ?? null,
+            ]);
+        }
+
+        return redirect()->route('consultant.dashboard')
+            ->with('info', 'Stripe payment is still processing. Your purchase will activate automatically once confirmed.');
     }
 
     protected function completePaid(PaymentTransaction $transaction, array $gatewayRefs)

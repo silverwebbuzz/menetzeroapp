@@ -65,6 +65,19 @@ class ConsultantAgencyPaymentService
                     ['type' => $transactionType, 'consultant_id' => (string) $consultantOrg->id]
                 );
                 $meta['razorpay_order_id'] = $rzOrder['id'] ?? null;
+            } elseif ($gateway->gateway === 'stripe') {
+                $session = $this->paymentService->createStripeCheckoutSession(
+                    $gateway,
+                    $transaction,
+                    route('consultant.packs.payment.stripe') . '?session_id={CHECKOUT_SESSION_ID}&transaction_id=' . $transaction->id,
+                    route('consultant.packs.payment.checkout', $transaction->id),
+                    [
+                        'name' => $user->name ?: $consultantOrg->name,
+                        'email' => $user->email ?: ($consultantOrg->email ?: null),
+                    ]
+                );
+                $meta['stripe_session_id'] = $session['id'] ?? null;
+                $meta['stripe_session_url'] = $session['url'] ?? null;
             } else {
                 $cfOrderId = 'consultant_' . $transaction->id . '_' . Str::lower(Str::random(6));
                 $returnUrl = route('consultant.packs.payment.cashfree') . '?order_id={order_id}';

@@ -85,6 +85,7 @@
                 <select name="gateway" class="form-select" required>
                     <option value="cashfree">Cashfree</option>
                     <option value="razorpay">Razorpay (INR)</option>
+                    <option value="stripe">Stripe</option>
                 </select>
             </div>
         </div>

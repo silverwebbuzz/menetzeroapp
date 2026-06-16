@@ -68,6 +68,19 @@
                     redirectTarget: document.getElementById('cf-root')
                 });
             </script>
+        @elseif($gateway && $gateway->gateway === 'stripe' && !empty($meta['stripe_session_url']))
+            <button id="payBtn" class="btn btn-primary w-full">
+                Pay {{ $chargeLabel }}
+            </button>
+            <script>
+                (function () {
+                    const sessionUrl = @json($meta['stripe_session_url']);
+                    document.getElementById('payBtn').addEventListener('click', function () {
+                        window.location.href = sessionUrl;
+                    });
+                    window.location.href = sessionUrl;
+                })();
+            </script>
         @else
             <p class="text-sm text-red-600">Payment session unavailable. Go back and try again.</p>
         @endif

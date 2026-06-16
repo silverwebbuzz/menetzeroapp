@@ -64,6 +64,7 @@
                             <select name="gateway" class="form-select" required>
                                 <option value="cashfree">Cashfree</option>
                                 <option value="razorpay">Razorpay (INR)</option>
+                                <option value="stripe">Stripe</option>
                             </select>
                         </div>
                         <button type="submit" class="btn btn-primary btn-sm whitespace-nowrap">Buy extra slots</button>
@@ -122,6 +123,7 @@
                         <select name="gateway" class="form-select" required>
                             <option value="cashfree">Cashfree</option>
                             <option value="razorpay">Razorpay (INR)</option>
+                            <option value="stripe">Stripe</option>
                         </select>
                         <button type="submit" class="btn btn-primary btn-sm w-full">
                             {{ $subscription ? 'Upgrade / change' : 'Purchase pack' }}

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Admin-managed credentials for a payment gateway (Razorpay / Cashfree).
+ * Admin-managed credentials for a payment gateway (Razorpay / Cashfree / Stripe).
  */
 class PaymentGateway extends Model
 {

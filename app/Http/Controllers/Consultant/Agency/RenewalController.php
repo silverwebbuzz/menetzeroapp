@@ -73,7 +73,7 @@ class RenewalController extends Controller
 
         $data = $request->validate([
             'plan_id' => 'required|exists:subscription_plans,id',
-            'gateway' => 'required|in:razorpay,cashfree',
+            'gateway' => 'required|in:razorpay,cashfree,stripe',
             'carry' => 'nullable|array',
             'carry.*.engagement_id' => 'required|integer',
             'carry.*.primary_reporting_year' => 'required|integer|min:2000|max:2100',

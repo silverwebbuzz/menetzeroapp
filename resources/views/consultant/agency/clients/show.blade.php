@@ -77,6 +77,7 @@
                     <select name="gateway" class="form-select max-w-xs" required>
                         <option value="cashfree">Cashfree</option>
                         <option value="razorpay">Razorpay (INR)</option>
+                        <option value="stripe">Stripe</option>
                     </select>
                 </div>
                 <button type="submit" class="btn btn-warning">

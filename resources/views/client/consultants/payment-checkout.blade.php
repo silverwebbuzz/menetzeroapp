@@ -82,5 +82,19 @@
         startCheckout();
     })();
 </script>
+@elseif($gateway->gateway === 'stripe')
+<script>
+    (function () {
+        var sessionUrl = @json($meta['stripe_session_url'] ?? null);
+        function startCheckout() {
+            if (!sessionUrl) {
+                return;
+            }
+            window.location.href = sessionUrl;
+        }
+        document.getElementById('payBtn').addEventListener('click', startCheckout);
+        startCheckout();
+    })();
+</script>
 @endif
 @endsection

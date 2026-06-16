@@ -67,6 +67,105 @@ class PaymentService
             : 'https://sandbox.cashfree.com/pg';
     }
 
+    /* ===================== Stripe ===================== */
+
+    /**
+     * Create a Stripe Checkout Session.
+     *
+     * @throws \RuntimeException on API failure
+     */
+    public function createStripeCheckoutSession(
+        PaymentGateway $gw,
+        PaymentTransaction $transaction,
+        string $successUrl,
+        string $cancelUrl,
+        array $customer = []
+    ): array {
+        $response = Http::withBasicAuth($gw->key_secret, '')
+            ->asForm()
+            ->acceptJson()
+            ->post('https://api.stripe.com/v1/checkout/sessions', [
+                'mode' => 'payment',
+                'success_url' => $successUrl,
+                'cancel_url' => $cancelUrl,
+                'payment_method_types[]' => 'card',
+                'client_reference_id' => (string) $transaction->id,
+                'customer_email' => $customer['email'] ?? null,
+                'line_items[0][quantity]' => 1,
+                'line_items[0][price_data][currency]' => strtolower((string) $transaction->currency),
+                'line_items[0][price_data][unit_amount]' => $this->toMinorUnits($transaction->amount),
+                'line_items[0][price_data][product_data][name]' => $transaction->description ?: 'Subscription payment',
+                'metadata[transaction_id]' => (string) $transaction->id,
+                'metadata[company_id]' => (string) $transaction->company_id,
+            ]);
+
+        if ($response->failed()) {
+            Log::error('Stripe checkout session creation failed', ['body' => $response->body()]);
+            throw new \RuntimeException($this->extractError($response->json(), 'Could not start Stripe payment.'));
+        }
+
+        return $response->json();
+    }
+
+    /**
+     * Fetch a Stripe Checkout Session by id.
+     */
+    public function getStripeCheckoutSession(PaymentGateway $gw, string $sessionId): ?array
+    {
+        $response = Http::withBasicAuth($gw->key_secret, '')
+            ->acceptJson()
+            ->get('https://api.stripe.com/v1/checkout/sessions/' . $sessionId);
+
+        if ($response->failed()) {
+            Log::error('Stripe checkout session fetch failed', ['session' => $sessionId, 'body' => $response->body()]);
+            return null;
+        }
+
+        return $response->json();
+    }
+
+    /**
+     * Verify Stripe webhook signature and return the decoded payload.
+     */
+    public function verifyStripeWebhook(string $rawPayload, string $signatureHeader, string $secret, int $tolerance = 300): ?array
+    {
+        $parts = [];
+        foreach (explode(',', $signatureHeader) as $fragment) {
+            [$k, $v] = array_pad(explode('=', trim($fragment), 2), 2, null);
+            if ($k && $v) {
+                $parts[$k][] = $v;
+            }
+        }
+
+        $timestamp = isset($parts['t'][0]) ? (int) $parts['t'][0] : 0;
+        $signatures = $parts['v1'] ?? [];
+        if ($timestamp <= 0 || $signatures === []) {
+            return null;
+        }
+
+        if (abs(time() - $timestamp) > $tolerance) {
+            return null;
+        }
+
+        $signedPayload = $timestamp . '.' . $rawPayload;
+        $expected = hash_hmac('sha256', $signedPayload, $secret);
+
+        $valid = false;
+        foreach ($signatures as $sig) {
+            if (hash_equals($expected, $sig)) {
+                $valid = true;
+                break;
+            }
+        }
+
+        if (!$valid) {
+            return null;
+        }
+
+        $decoded = json_decode($rawPayload, true);
+        return is_array($decoded) ? $decoded : null;
+    }
+
     private function cashfreeHeaders(PaymentGateway $gw): array
     {
         return [

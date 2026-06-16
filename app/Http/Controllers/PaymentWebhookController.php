@@ -120,6 +120,57 @@ class PaymentWebhookController extends Controller
         return response()->json(['status' => 'ok']);
     }
 
+    /**
+     * Stripe webhook using the endpoint signing secret.
+     */
+    public function stripe(Request $request)
+    {
+        $gateway = PaymentGateway::forGateway('stripe');
+        $secret = $gateway?->webhook_secret;
+
+        if (!$gateway || !$secret) {
+            return response()->json(['message' => 'Webhook not configured'], 400);
+        }
+
+        $raw = $request->getContent();
+        $signature = (string) $request->header('Stripe-Signature');
+        $event = $this->paymentService->verifyStripeWebhook($raw, $signature, $secret);
+
+        if (!$event) {
+            Log::warning('Stripe webhook signature mismatch');
+            return response()->json(['message' => 'Invalid signature'], 400);
+        }
+
+        $type = $event['type'] ?? null;
+        $session = $event['data']['object'] ?? [];
+
+        if (in_array($type, ['checkout.session.completed', 'checkout.session.async_payment_succeeded'], true)) {
+            $txnId = $session['metadata']['transaction_id'] ?? $session['client_reference_id'] ?? null;
+            if ($txnId) {
+                $transaction = PaymentTransaction::find($txnId);
+                if ($transaction && $transaction->status !== 'completed') {
+                    $this->activate($transaction, [
+                        'stripe_session_id' => $session['id'] ?? null,
+                        'stripe_payment_intent_id' => $session['payment_intent'] ?? null,
+                        'source' => 'webhook',
+                    ]);
+                }
+            }
+        }
+
+        if ($type === 'checkout.session.expired') {
+            $txnId = $session['metadata']['transaction_id'] ?? $session['client_reference_id'] ?? null;
+            if ($txnId) {
+                $transaction = PaymentTransaction::find($txnId);
+                if ($transaction && $transaction->status === 'pending') {
+                    $transaction->update(['status' => 'failed']);
+                }
+            }
+        }
+
+        return response()->json(['status' => 'ok']);
+    }
+
     private function activate(PaymentTransaction $transaction, array $refs): void
     {
         try {

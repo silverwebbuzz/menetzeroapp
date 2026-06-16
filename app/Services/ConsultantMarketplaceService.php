@@ -12,7 +12,7 @@ class ConsultantMarketplaceService
 {
     public function chargeAmount(float $amountAed, string $gateway): array
     {
-        if ($gateway === 'cashfree') {
+        if (in_array($gateway, ['cashfree', 'stripe'], true)) {
             return [
                 'currency' => 'AED',
                 'amount' => $amountAed,
@@ -99,6 +99,8 @@ class ConsultantMarketplaceService
             'payment_transaction_id' => $transaction->id,
             'payment_reference' => $metadata['razorpay_payment_id']
                 ?? $metadata['cashfree_order_id']
+                ?? $metadata['stripe_payment_intent_id']
+                ?? $metadata['stripe_session_id']
                 ?? $transaction->stripe_payment_intent_id,
             'escrow_status' => 'held',
             'order_status' => 'active',

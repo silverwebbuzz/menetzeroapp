@@ -199,7 +199,7 @@ class SubscriptionController extends Controller
         }
 
         $request->validate([
-            'gateway' => 'required|in:razorpay,cashfree',
+            'gateway' => 'required|in:razorpay,cashfree,stripe',
         ]);
 
         $gateway = PaymentGateway::forGateway($request->gateway);
@@ -311,6 +311,19 @@ class SubscriptionController extends Controller
                     ['plan' => $plan->plan_code, 'company_id' => (string) $company->id]
                 );
                 $metadata['razorpay_order_id'] = $order['id'];
+            } elseif ($gateway->gateway === 'stripe') {
+                $session = $this->paymentService->createStripeCheckoutSession(
+                    $gateway,
+                    $transaction,
+                    route('subscriptions.payment.stripe') . '?session_id={CHECKOUT_SESSION_ID}&transaction_id=' . $transaction->id,
+                    route('subscriptions.checkout', $transaction->id),
+                    [
+                        'name' => $user->name ?: $company->name,
+                        'email' => $user->email ?: ($company->email ?: null),
+                    ]
+                );
+                $metadata['stripe_session_id'] = $session['id'] ?? null;
+                $metadata['stripe_session_url'] = $session['url'] ?? null;
             } else {
                 $cfOrderId = 'txn_' . $transaction->id . '_' . Str::lower(Str::random(6));
                 $returnUrl = route('subscriptions.payment.cashfree') . '?order_id={order_id}';
@@ -522,6 +535,59 @@ class SubscriptionController extends Controller
         $transaction->update(['status' => 'failed']);
         return redirect()->route('subscriptions.upgrade')
             ->with('error', 'Payment failed (status: ' . ($paymentStatus ?? $orderStatus ?? 'unknown') . '). You were not charged. Please try again.');
+    }
+
+    /**
+     * Stripe hosted checkout success handler.
+     */
+    public function stripeCallback(Request $request)
+    {
+        $company = Auth::user()->getActiveCompany();
+        if (!$company || !$company->isClient()) {
+            return redirect()->route('client.dashboard')->with('error', 'Access denied.');
+        }
+
+        $request->validate([
+            'transaction_id' => 'required|integer',
+            'session_id' => 'required|string',
+        ]);
+
+        $transaction = PaymentTransaction::where('id', $request->integer('transaction_id'))
+            ->where('company_id', $company->id)
+            ->firstOrFail();
+
+        if ($transaction->status === 'completed') {
+            return redirect()->route('subscriptions.billing')
+                ->with('success', 'Subscription is already active.');
+        }
+
+        $gateway = PaymentGateway::forGateway('stripe');
+        if (!$gateway || !$gateway->is_enabled || !$gateway->isConfigured()) {
+            return redirect()->route('subscriptions.upgrade')->with('error', 'Payment method unavailable.');
+        }
+
+        $sessionId = (string) $request->query('session_id');
+        $session = $this->paymentService->getStripeCheckoutSession($gateway, $sessionId);
+
+        if (!$session || ($session['id'] ?? null) !== $sessionId) {
+            return redirect()->route('subscriptions.upgrade')->with('error', 'Could not verify Stripe payment.');
+        }
+
+        $expectedTxn = (string) ($transaction->id);
+        $sessionTxn = (string) ($session['metadata']['transaction_id'] ?? $session['client_reference_id'] ?? '');
+        if ($sessionTxn !== '' && $sessionTxn !== $expectedTxn) {
+            return redirect()->route('subscriptions.upgrade')->with('error', 'Payment reference mismatch.');
+        }
+
+        if (($session['payment_status'] ?? null) === 'paid') {
+            return $this->completePaidSubscription($transaction, [
+                'stripe_session_id' => $sessionId,
+                'stripe_payment_intent_id' => $session['payment_intent'] ?? null,
+            ], (string) ($session['payment_intent'] ?? $sessionId));
+        }
+
+        return redirect()->route('subscriptions.index')
+            ->with('info', 'Stripe payment is still processing. Your plan will activate automatically when confirmed.');
     }
 
     /**

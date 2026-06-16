@@ -52,7 +52,7 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">
-                                {{ $gateway->gateway === 'cashfree' ? 'App ID (x-client-id)' : 'Key ID' }}
+                                {{ $gateway->gateway === 'cashfree' ? 'App ID (x-client-id)' : ($gateway->gateway === 'stripe' ? 'Publishable Key' : 'Key ID') }}
                             </label>
                             <input type="text" name="key_id" value="{{ old('key_id', $gateway->key_id) }}"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 font-mono text-sm">
@@ -60,7 +60,7 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">
-                                {{ $gateway->gateway === 'cashfree' ? 'Secret Key (x-client-secret)' : 'Key Secret' }}
+                                {{ $gateway->gateway === 'cashfree' ? 'Secret Key (x-client-secret)' : ($gateway->gateway === 'stripe' ? 'Secret Key (sk_...)' : 'Key Secret') }}
                             </label>
                             <input type="password" name="key_secret" autocomplete="new-password"
                                    placeholder="{{ $gateway->key_secret ? '•••••••• (saved — leave blank to keep)' : 'Enter secret key' }}"
@@ -73,9 +73,11 @@
                                    placeholder="{{ $gateway->webhook_secret ? '•••••••• (saved — leave blank to keep)' : 'Optional' }}"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 font-mono text-sm">
                             @php
-                                $webhookUrl = $gateway->gateway === 'cashfree'
-                                    ? route('webhooks.payments.cashfree')
-                                    : route('webhooks.payments.razorpay');
+                                $webhookUrl = match ($gateway->gateway) {
+                                    'cashfree' => route('webhooks.payments.cashfree'),
+                                    'stripe' => route('webhooks.payments.stripe'),
+                                    default => route('webhooks.payments.razorpay'),
+                                };
                             @endphp
                             <p class="mt-2 text-xs text-gray-500">
                                 Webhook URL (paste into the {{ $gateway->label }} dashboard):
