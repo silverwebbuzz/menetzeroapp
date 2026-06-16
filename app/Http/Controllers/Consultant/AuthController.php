@@ -12,10 +12,33 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    protected function shouldCompleteProfile(Consultant $consultant): bool
+    {
+        return $consultant->status === 'draft'
+            && (
+                blank($consultant->bio)
+                || !is_array($consultant->emirates) || count($consultant->emirates) === 0
+                || !is_array($consultant->specialties) || count($consultant->specialties) === 0
+            );
+    }
+
+    protected function postLoginRedirect(Consultant $consultant)
+    {
+        if ($this->shouldCompleteProfile($consultant)) {
+            return redirect()->route('consultant.profile.edit')
+                ->with('info', 'Complete your consultant profile to continue onboarding.');
+        }
+
+        return redirect()->intended(route('consultant.dashboard'));
+    }
+
     public function landing()
     {
         if (Auth::guard('consultant')->check()) {
-            return redirect()->route('consultant.dashboard');
+            /** @var Consultant $consultant */
+            $consultant = Auth::guard('consultant')->user();
+
+            return $this->postLoginRedirect($consultant);
         }
 
         $consultantCount = Consultant::query()->where('status', 'approved')->where('is_active', true)->count();
@@ -26,7 +49,10 @@ class AuthController extends Controller
     public function showRegister()
     {
         if (Auth::guard('consultant')->check()) {
-            return redirect()->route('consultant.dashboard');
+            /** @var Consultant $consultant */
+            $consultant = Auth::guard('consultant')->user();
+
+            return $this->postLoginRedirect($consultant);
         }
 
         return view('consultant.auth.register');
@@ -57,14 +83,17 @@ class AuthController extends Controller
             report($e);
         }
 
-        return redirect()->route('consultant.dashboard')
-            ->with('success', 'Welcome! Complete your profile for the directory, or purchase an agency pack to manage client workspaces.');
+        return redirect()->route('consultant.profile.edit')
+            ->with('success', 'Welcome! Please complete your profile to continue onboarding.');
     }
 
     public function showLogin()
     {
         if (Auth::guard('consultant')->check()) {
-            return redirect()->route('consultant.dashboard');
+            /** @var Consultant $consultant */
+            $consultant = Auth::guard('consultant')->user();
+
+            return $this->postLoginRedirect($consultant);
         }
 
         return view('consultant.auth.login');
@@ -89,7 +118,7 @@ class AuthController extends Controller
             $request->session()->regenerate();
             app(ConsultantAccountService::class)->syncWebSession($consultant);
 
-            return redirect()->intended(route('consultant.dashboard'));
+            return $this->postLoginRedirect($consultant);
         }
 
         throw ValidationException::withMessages([
