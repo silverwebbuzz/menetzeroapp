@@ -338,10 +338,7 @@
                                     <div class="font-medium">{{ $entry->emissionSource->name ?? 'N/A' }}</div>
                                     @php
                                         // Get type information from entry
-                                        $additionalData = [];
-                                        if ($entry->additional_data) {
-                                            $additionalData = is_string($entry->additional_data) ? json_decode($entry->additional_data, true) : ($entry->additional_data ?? []);
-                                        }
+                                        $additionalData = decode_json_field($entry->additional_data ?? []);
                                         
                                         $energyType = $additionalData['energy_type'] ?? null;
                                         $fuelCategory = $entry->fuel_category ?? ($additionalData['fuel_category'] ?? null);

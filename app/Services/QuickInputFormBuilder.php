@@ -47,7 +47,7 @@ class QuickInputFormBuilder
                 case 'decimal':
                     $fieldRules[] = 'numeric';
                     if ($field->validation_rules) {
-                        $validationRules = json_decode($field->validation_rules, true);
+                        $validationRules = decode_json_field($field->validation_rules);
                         if (isset($validationRules['min'])) {
                             $fieldRules[] = 'min:' . $validationRules['min'];
                         }
@@ -69,8 +69,8 @@ class QuickInputFormBuilder
 
             $rules[$field->field_name] = $fieldRules;
 
-            if ($field->label) {
-                $messages[$field->field_name . '.required'] = $field->label . ' is required.';
+            if ($field->field_label) {
+                $messages[$field->field_name . '.required'] = $field->field_label . ' is required.';
             }
         }
 
@@ -90,8 +90,8 @@ class QuickInputFormBuilder
             ->where('field_name', $fieldName)
             ->first();
 
-        if ($field && $field->options) {
-            return json_decode($field->options, true);
+        if ($field && $field->field_options) {
+            return decode_json_field($field->field_options);
         }
 
         return [];

@@ -130,7 +130,7 @@ class EmissionCalculationService
             return true; // No conditions = match all
         }
 
-        $ruleConditions = is_array($rule->conditions) ? $rule->conditions : json_decode($rule->conditions, true);
+        $ruleConditions = decode_json_field($rule->conditions);
 
         if (!is_array($ruleConditions)) {
             return true;

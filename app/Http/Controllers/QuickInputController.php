@@ -367,15 +367,10 @@ class QuickInputController extends Controller
                 $field->help_text = 'Amount of fuel used in the unit of measure specified above';
                $field->field_placeholder = 'Enter the amount of fuel used';
             }
-        // normalize options safely
+        // normalize options safely (field_options may be array-cast by Eloquent)
         $options = [];
         if ($field->field_type === 'select') {
-            
-            if (is_array($field->field_options)) {
-                $options = $field->field_options;
-            } elseif (is_string($field->field_options)) {
-                $options = json_decode($field->field_options, true) ?? [];
-            }
+            $options = decode_json_field($field->field_options);
         }
 
         $html .= '<div class="form-group-horizontal">';

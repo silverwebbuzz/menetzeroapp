@@ -212,10 +212,7 @@ class ExportReadinessService
             return true;
         }
 
-        $additional = $entry->additional_data ?? [];
-        if (is_string($additional)) {
-            $additional = json_decode($additional, true) ?? [];
-        }
+        $additional = decode_json_field($entry->additional_data ?? []);
 
         return !empty($additional['evidence_link']) || !empty($additional['link']);
     }

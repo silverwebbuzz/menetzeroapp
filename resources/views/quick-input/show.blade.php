@@ -150,10 +150,9 @@
                 @php
                     $scope2FieldNames = ['scope2_method', 'supplier_emission_factor', 'renewable_percent', 'is_biogenic'];
 
-                    $editAdditionalData = [];
-                    if ($editEntry && $editEntry->additional_data) {
-                        $editAdditionalData = is_string($editEntry->additional_data) ? json_decode($editEntry->additional_data, true) : ($editEntry->additional_data ?? []);
-                    }
+                    $editAdditionalData = $editEntry
+                        ? decode_json_field($editEntry->additional_data ?? [])
+                        : [];
 
                     $editFuelCategory = $editEntry ? ($editAdditionalData['fuel_category'] ?? null) : null;
                     $editFuelType = $editEntry ? ($editEntry->fuel_type ?? null) : null;
@@ -224,7 +223,7 @@
                                         <option value="">Select an option</option>
                                         @if($field->field_options)
                                             @php
-                                                $options = is_array($field->field_options) ? $field->field_options : json_decode($field->field_options, true);
+                                                $options = decode_json_field($field->field_options);
                                             @endphp
                                             @if(is_array($options))
                                                 @foreach($options as $option)
@@ -355,7 +354,7 @@
                                                 <option value="">Select {{ $field->field_label }}</option>
                                                 @if($field->field_options)
                                                     @php
-                                                        $options = is_array($field->field_options) ? $field->field_options : json_decode($field->field_options, true);
+                                                        $options = decode_json_field($field->field_options);
                                                     @endphp
                                                     @if(is_array($options))
                                                         @foreach($options as $option)
@@ -405,10 +404,9 @@
             <!-- Right Side: Additional Data -->
             <div class="flex flex-col">
                 @php
-                    $editAdditionalData = [];
-                    if ($editEntry && $editEntry->additional_data) {
-                        $editAdditionalData = is_string($editEntry->additional_data) ? json_decode($editEntry->additional_data, true) : ($editEntry->additional_data ?? []);
-                    }
+                    $editAdditionalData = $editEntry
+                        ? decode_json_field($editEntry->additional_data ?? [])
+                        : [];
 
                     $scope2FieldNames = ['scope2_method', 'supplier_emission_factor', 'renewable_percent', 'is_biogenic'];
                     $mainFieldNames = ['fuel_category', 'fuel_type', 'unit_of_measure', 'amount', 'quantity', 'unit'];
@@ -446,7 +444,7 @@
                                             <option value="">Select {{ $field->field_label ?? $field->field_name }}</option>
                                             @if($field->field_options)
                                                 @php
-                                                    $options = is_array($field->field_options) ? $field->field_options : json_decode($field->field_options, true);
+                                                    $options = decode_json_field($field->field_options);
                                                 @endphp
                                                 @if(is_array($options))
                                                     @foreach($options as $option)
@@ -662,7 +660,7 @@
                                             // Get type information from entry
                                             $additionalData = [];
                                             if ($entry->additional_data) {
-                                                $additionalData = is_string($entry->additional_data) ? json_decode($entry->additional_data, true) : ($entry->additional_data ?? []);
+                                                $additionalData = decode_json_field($entry->additional_data ?? []);
                                             }
                                             
                                             $energyType = $additionalData['energy_type'] ?? null;

@@ -2,6 +2,26 @@
 
 use App\Services\GhgReportService;
 
+if (! function_exists('decode_json_field')) {
+    /**
+     * Normalize a JSON column that may already be cast to an array (Eloquent).
+     */
+    function decode_json_field(mixed $value): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+
+        if (is_string($value) && $value !== '') {
+            $decoded = json_decode($value, true);
+
+            return is_array($decoded) ? $decoded : [];
+        }
+
+        return [];
+    }
+}
+
 if (! function_exists('co2e_t')) {
     /**
      * Format stored kg CO₂e for display as metric tonnes (tCO₂e).

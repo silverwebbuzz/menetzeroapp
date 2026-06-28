@@ -139,10 +139,7 @@
 
     <!-- Additional Data & Evidence -->
     @php
-        $additionalData = [];
-        if ($entry->additional_data) {
-            $additionalData = is_string($entry->additional_data) ? json_decode($entry->additional_data, true) : $entry->additional_data;
-        }
+        $additionalData = decode_json_field($entry->additional_data ?? []);
         $evidenceLink = $additionalData['evidence_link'] ?? $additionalData['link'] ?? null;
         unset($additionalData['evidence_link'], $additionalData['link']);
 
