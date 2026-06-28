@@ -7,6 +7,7 @@ use App\Models\EmissionSourceMaster;
 use App\Models\Location;
 use App\Models\Measurement;
 use App\Models\MeasurementData;
+use App\Support\JsonField;
 use App\Support\UaeUtilityContext;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -212,7 +213,7 @@ class ExportReadinessService
             return true;
         }
 
-        $additional = decode_json_field($entry->additional_data ?? []);
+        $additional = JsonField::decode($entry->additional_data ?? []);
 
         return !empty($additional['evidence_link']) || !empty($additional['link']);
     }

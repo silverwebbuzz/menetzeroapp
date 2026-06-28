@@ -7,6 +7,7 @@ use App\Models\EmissionFactorSelectionRule;
 use App\Models\EmissionGwpValue;
 use App\Models\EmissionUnitConversion;
 use App\Models\EmissionIndustryLabel;
+use App\Support\JsonField;
 use Illuminate\Support\Facades\Log;
 
 class EmissionCalculationService
@@ -130,7 +131,7 @@ class EmissionCalculationService
             return true; // No conditions = match all
         }
 
-        $ruleConditions = decode_json_field($rule->conditions);
+        $ruleConditions = JsonField::decode($rule->conditions);
 
         if (!is_array($ruleConditions)) {
             return true;

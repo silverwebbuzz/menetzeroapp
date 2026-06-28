@@ -8,17 +8,7 @@ if (! function_exists('decode_json_field')) {
      */
     function decode_json_field(mixed $value): array
     {
-        if (is_array($value)) {
-            return $value;
-        }
-
-        if (is_string($value) && $value !== '') {
-            $decoded = json_decode($value, true);
-
-            return is_array($decoded) ? $decoded : [];
-        }
-
-        return [];
+        return \App\Support\JsonField::decode($value);
     }
 }
 

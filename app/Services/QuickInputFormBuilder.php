@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\EmissionSourceFormField;
+use App\Support\JsonField;
 use Illuminate\Support\Facades\Validator;
 
 class QuickInputFormBuilder
@@ -47,7 +48,7 @@ class QuickInputFormBuilder
                 case 'decimal':
                     $fieldRules[] = 'numeric';
                     if ($field->validation_rules) {
-                        $validationRules = decode_json_field($field->validation_rules);
+                        $validationRules = JsonField::decode($field->validation_rules);
                         if (isset($validationRules['min'])) {
                             $fieldRules[] = 'min:' . $validationRules['min'];
                         }
@@ -91,7 +92,7 @@ class QuickInputFormBuilder
             ->first();
 
         if ($field && $field->field_options) {
-            return decode_json_field($field->field_options);
+            return JsonField::decode($field->field_options);
         }
 
         return [];

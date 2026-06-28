@@ -6,6 +6,7 @@ use App\Models\Measurement;
 use App\Models\MeasurementData;
 use App\Models\Location;
 use App\Models\EmissionSourceMaster;
+use App\Support\JsonField;
 use App\Models\EmissionFactor;
 use App\Models\EmissionSourceFormField;
 use App\Services\EmissionCalculationService;
@@ -370,7 +371,7 @@ class QuickInputController extends Controller
         // normalize options safely (field_options may be array-cast by Eloquent)
         $options = [];
         if ($field->field_type === 'select') {
-            $options = decode_json_field($field->field_options);
+            $options = JsonField::decode($field->field_options);
         }
 
         $html .= '<div class="form-group-horizontal">';
