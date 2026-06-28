@@ -362,11 +362,15 @@ class QuickInputController extends Controller
         $html = '';
 
         foreach ($fields as $field) {
+            $inputName = $field->field_name;
+            if ($knowAmountOfFuel == 'true' && $field->field_name === 'distance') {
+                $inputName = 'amount';
+            }
 
-            if($knowAmountOfFuel == "true" && $field->field_label == 'Distance'){
+            if ($knowAmountOfFuel == 'true' && $field->field_label == 'Distance') {
                 $field->field_label = 'Amount';
                 $field->help_text = 'Amount of fuel used in the unit of measure specified above';
-               $field->field_placeholder = 'Enter the amount of fuel used';
+                $field->field_placeholder = 'Enter the amount of fuel used';
             }
         // normalize options safely (field_options may be array-cast by Eloquent)
         $options = [];
@@ -378,7 +382,7 @@ class QuickInputController extends Controller
 
         /* ---------- LABEL + HELP TEXT ---------- */
         $html .= '<div class="form-label-wrapper">';
-        $html .= '<label for="'.e($field->field_name).'" class="form-label-horizontal">';
+        $html .= '<label for="'.e($inputName).'" class="form-label-horizontal">';
         $html .= e($field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)));
 
         if ($field->is_required) {
@@ -446,8 +450,8 @@ class QuickInputController extends Controller
         elseif ($field->field_type === 'number') {
 
             $html .= '<input type="number" '
-                . 'name="'.e($field->field_name).'" '
-                . 'id="'.e($field->field_name).'" '
+                . 'name="'.e($inputName).'" '
+                . 'id="'.e($inputName).'" '
                 . 'step="any" min="0" '
                 . ($field->is_required ? 'required ' : '')
                 . 'placeholder="'.e($field->field_placeholder ?? 'Enter '.strtolower($field->field_label ?? $field->field_name)).'" '
@@ -1342,22 +1346,55 @@ class QuickInputController extends Controller
         }
     }
     /**
+     * Whether the vehicle form is in "known fuel amount" mode (vs distance-based).
+     */
+    private function vehicleKnowsFuelAmount(Request $request): bool
+    {
+        if ($request->input('knowAmountOfFuel') === 'true') {
+            return true;
+        }
+
+        $answer = $request->input('has_already_amount_of_fuel');
+
+        return in_array($answer, ['Yes', 'yes', 'true', '1', 1, true], true);
+    }
+
+    /**
+     * Normalize vehicle request: sync knowAmountOfFuel and map legacy field names.
+     */
+    private function normalizeVehicleRequest(Request $request): void
+    {
+        $knowsFuel = $this->vehicleKnowsFuelAmount($request);
+        $request->merge(['knowAmountOfFuel' => $knowsFuel ? 'true' : 'false']);
+
+        if ($knowsFuel && !$request->filled('amount') && $request->filled('distance')) {
+            $request->merge(['amount' => $request->input('distance')]);
+        }
+    }
+
+    /**
      * Determine fuel_type based on request and emission source
      */
     private function validateQuickInputRequest(Request $request, EmissionSourceMaster $emissionSource): void
     {
-        $formFields = $this->formBuilder->buildForm($emissionSource->id);
+        if ($emissionSource->quick_input_slug === 'vehicle') {
+            $this->normalizeVehicleRequest($request);
+        }
 
-        $formFieldsForValidation = $formFields->filter(function ($field) use ($request, $emissionSource) {
+        $formFields = $this->formBuilder->buildForm($emissionSource->id);
+        $vehicleKnowsFuel = $emissionSource->quick_input_slug === 'vehicle'
+            && $request->input('knowAmountOfFuel') === 'true';
+
+        $formFieldsForValidation = $formFields->filter(function ($field) use ($request, $emissionSource, $vehicleKnowsFuel) {
             if ($field->depends_on_field && !$request->filled($field->depends_on_field)) {
                 return false;
             }
 
-            if ($emissionSource->quick_input_slug === 'vehicle' && $request->input('knowAmountOfFuel') === 'true') {
+            if ($emissionSource->quick_input_slug === 'vehicle' && $vehicleKnowsFuel) {
                 return !in_array($field->field_name, ['vehicle_category', 'vehicle_type', 'distance'], true);
             }
 
-            if ($emissionSource->quick_input_slug === 'vehicle' && $request->input('knowAmountOfFuel') !== 'true') {
+            if ($emissionSource->quick_input_slug === 'vehicle' && !$vehicleKnowsFuel) {
                 return $field->field_name !== 'amount';
             }
 
@@ -1381,7 +1418,16 @@ class QuickInputController extends Controller
         $hasAmountField = $formFields->contains(fn ($field) => $field->field_name === 'amount');
         $hasUnitOfMeasure = $formFields->contains(fn ($field) => $field->field_name === 'unit_of_measure');
 
-        if ($request->filled('distance') || $emissionSource->quick_input_slug === 'vehicle') {
+        if ($emissionSource->quick_input_slug === 'vehicle') {
+            $unitField = $hasUnitOfMeasure ? 'unit_of_measure' : 'unit';
+            $validationRules[$unitField] = 'required|string';
+
+            if ($vehicleKnowsFuel) {
+                $validationRules['amount'] = 'required|numeric|min:0';
+            } else {
+                $validationRules['distance'] = 'required|numeric|min:0';
+            }
+        } elseif ($request->filled('distance')) {
             $validationRules['distance'] = 'required_without:amount,quantity|nullable|numeric|min:0';
             $validationRules['amount'] = 'required_without:distance,quantity|nullable|numeric|min:0';
             $validationRules['quantity'] = 'required_without:distance,amount|nullable|numeric|min:0';

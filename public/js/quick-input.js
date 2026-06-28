@@ -16,25 +16,90 @@
 
         if(document.getElementById('has_already_amount_of_fuel')){
 
-            const knowAmountOfFuel = document.getElementById('has_already_amount_of_fuel').value;
+            const knowAmountSelect = document.getElementById('has_already_amount_of_fuel');
+            syncKnowAmountHidden(knowAmountSelect.value === 'Yes');
 
-            if (knowAmountOfFuel === 'Yes') {
+            if (knowAmountSelect.value === 'Yes') {
                 const params = new URLSearchParams(window.location.search);
                 const edit = params.get('edit');
                 getFormFieldsForVehicle(true, edit);
             }
 
-            document.getElementById('has_already_amount_of_fuel').addEventListener('change', function () {
+            knowAmountSelect.addEventListener('change', function () {
+                const knowsFuel = this.value === 'Yes';
+                syncKnowAmountHidden(knowsFuel);
+                toggleVehicleDistanceFields(knowsFuel);
 
-                    if (this.value === 'Yes') {
-                        getFormFieldsForVehicle(true);
-                    } else {
-                        getFormFieldsForVehicle(false);
-                    }
+                if (knowsFuel) {
+                    getFormFieldsForVehicle(true);
+                } else {
+                    getFormFieldsForVehicle(false);
+                }
             });
+
+            const form = document.querySelector('form[data-source-id]');
+            if (form) {
+                form.addEventListener('submit', function () {
+                    syncKnowAmountHidden(knowAmountSelect.value === 'Yes');
+                });
+            }
         }
      
     });
+
+    function syncKnowAmountHidden(knowsFuel) {
+        const hidden = document.getElementById('knowAmountOfFuel');
+        if (hidden) {
+            hidden.value = knowsFuel ? 'true' : 'false';
+        }
+    }
+
+    function toggleVehicleDistanceFields(knowsFuel) {
+        ['vehicle_category', 'vehicle_type'].forEach(function (name) {
+            const field = document.getElementById(name);
+            if (!field) {
+                return;
+            }
+            const group = field.closest('.form-group-stacked, .form-group-horizontal');
+            if (group) {
+                group.style.display = knowsFuel ? 'none' : '';
+            }
+            if (knowsFuel) {
+                field.removeAttribute('required');
+            }
+        });
+
+        const distanceField = document.getElementById('distance');
+        if (!distanceField) {
+            return;
+        }
+        const group = distanceField.closest('.form-group-stacked, .form-group-horizontal');
+        if (!group) {
+            return;
+        }
+        const label = group.querySelector('label');
+        const help = group.querySelector('.form-help-text, .form-help-text-under-label');
+        if (knowsFuel) {
+            if (label) {
+                label.childNodes[0].nodeValue = 'Amount ';
+            }
+            if (help) {
+                help.textContent = 'Amount of fuel used in the unit of measure specified above';
+            }
+        } else {
+            if (label) {
+                label.childNodes[0].nodeValue = 'Distance ';
+            }
+            if (help) {
+                help.textContent = 'Distance travelled in the unit of measure specified above';
+            }
+        }
+    }
+
+    function getVehicleFieldsContainer() {
+        return document.querySelector('.main-information-panel__fields')
+            || document.querySelector('.main-information-section');
+    }
 
     function getFormFieldsForVehicle(knowAmountOfFuel, edit = null) {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
@@ -48,17 +113,44 @@
         })
             .then(response => response.json())
             .then(data => {
-                const container = document.querySelector('.main-information-section');
+                const container = getVehicleFieldsContainer();
                 if (!container) return;
 
-                const groups = container.querySelectorAll('.form-group-horizontal');
+                syncKnowAmountHidden(knowAmountOfFuel === true || knowAmountOfFuel === 'true');
 
-                groups.forEach((group, index) => {
-                    if (index > 1) {
-                        group.remove();
-                    }
-                });
+                const toggleField = document.getElementById('has_already_amount_of_fuel');
+                const toggleGroup = toggleField
+                    ? toggleField.closest('.form-group-stacked, .form-group-horizontal')
+                    : null;
+
+                if (toggleGroup) {
+                    let removeRest = false;
+                    container.querySelectorAll('.form-group-stacked, .form-group-horizontal').forEach(function (group) {
+                        if (group === toggleGroup) {
+                            removeRest = true;
+                            return;
+                        }
+                        if (removeRest) {
+                            group.remove();
+                        }
+                    });
+                } else {
+                    const groups = container.querySelectorAll('.form-group-horizontal');
+                    groups.forEach(function (group, index) {
+                        if (index > 1) {
+                            group.remove();
+                        }
+                    });
+                }
+
                 container.insertAdjacentHTML('beforeend', data.html);
+
+                if (typeof setupCascadingDropdowns === 'function') {
+                    setupCascadingDropdowns();
+                }
+                if (typeof setupVehicleConditionalFields === 'function') {
+                    setupVehicleConditionalFields();
+                }
             });
     }
 

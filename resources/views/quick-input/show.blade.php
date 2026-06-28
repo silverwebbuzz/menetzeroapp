@@ -139,6 +139,9 @@
         <input type="hidden" name="emission_source_id" value="{{ $emissionSource->id }}">
         <input type="hidden" name="location_id" value="{{ $selectedLocationId }}">
         <input type="hidden" name="fiscal_year" value="{{ $selectedFiscalYear }}">
+        @if($slug === 'vehicle')
+            <input type="hidden" name="knowAmountOfFuel" id="knowAmountOfFuel" value="{{ old('knowAmountOfFuel', old('has_already_amount_of_fuel') === 'Yes' ? 'true' : 'false') }}">
+        @endif
         @if($editEntry)
             <input type="hidden" name="edit_entry_id" value="{{ $editEntry->id }}">
         @endif
@@ -201,7 +204,7 @@
                         <p class="main-information-panel__subtitle">Enter the primary emission data for this source</p>
                     </div>
 
-                    <div class="main-information-panel__fields main-information-panel__fields--grid">
+                    <div class="main-information-panel__fields main-information-panel__fields--grid main-information-section">
                         @foreach($mainFields as $field)
                             @php
                                 $isFullWidth = in_array($field->field_type, ['textarea']) || in_array($field->field_name, ['fuel_category', 'fuel_type', 'process_type']);
