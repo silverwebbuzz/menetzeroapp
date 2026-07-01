@@ -40,13 +40,18 @@ return new class extends Migration
 
         DB::table('emission_factors')
             ->whereIn('fuel_type', $dieselTypes)
-            ->where('unit', 'litres')
+            ->where(function ($q) {
+                $q->where('unit', 'litres')
+                    ->orWhere('unit', 'liters')
+                    ->orWhere('unit', 'like', '%litre%')
+                    ->orWhere('unit', 'like', '%liter%');
+            })
             ->update([
                 'factor_value' => 2.6800,
                 'total_co2e_factor' => 2.6800,
                 'co2_factor' => 2.6800,
-                'source_standard' => 'DEFRA/IPCC',
-                'source_reference' => 'UK Govt GHG Conversion Factors — diesel Scope 1 (2.68 kg CO2e/l, IPCC 2006 Tier 1 / DEFRA rounded)',
+                'source_standard' => 'DEFRA',
+                'source_reference' => 'UK Govt GHG Conversion Factors — diesel Scope 1 (2.68 kg CO2e/l; IPCC 2006 Tier 1 / DEFRA rounded)',
                 'updated_at' => now(),
             ]);
     }
@@ -73,10 +78,10 @@ return new class extends Migration
             ->where('emission_source_id', $heatSourceId)
             ->whereIn('fuel_type', ['Steam', 'Heat'])
             ->where(function ($q) {
-                $q->where('source_standard', 'like', '%DEWA%')
-                    ->orWhere('source_reference', 'like', '%DEWA%')
+                $q->where('source_reference', 'like', '%DEWA%')
                     ->orWhere('source_reference', 'like', '%SR2023%')
-                    ->orWhere('source_reference', 'like', '%SR 2023%');
+                    ->orWhere('source_reference', 'like', '%SR 2023%')
+                    ->orWhere('description', 'like', '%DEWA%');
             })
             ->get(['id', 'unit']);
 
