@@ -422,7 +422,11 @@
             region: document.getElementById('region')?.value || 'UAE',
             vehicle_category: document.getElementById('vehicle_category')?.value,
             vehicle_type: document.getElementById('vehicle_type')?.value,
-            vehicle_fuel_type: document.getElementById('vehicle_fuel_type')?.value,
+            scope2_method: document.getElementById('scope2_method')?.value,
+            supplier_emission_factor: document.getElementById('supplier_emission_factor')?.value,
+            renewable_percent: document.getElementById('renewable_percent')?.value,
+            emission_factor_methodology: document.getElementById('emission_factor_methodology')?.value,
+            methodology_reference: document.getElementById('methodology_reference')?.value,
         };
 
         // Add quantity or distance based on what's available

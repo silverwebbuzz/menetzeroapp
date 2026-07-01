@@ -361,7 +361,7 @@
         </td>
         <td class="kpi-cell">
             <div class="kpi-label">Scope 2</div>
-            <div class="kpi-value">{{ number_format($scope2, 2) }}</div>
+            <div class="kpi-value">{{ number_format($scope2, 4) }}</div>
             <div class="kpi-unit">tCO₂e (energy)</div>
         </td>
         <td class="kpi-cell highlight">
@@ -412,7 +412,7 @@
         <tr>
             <td>Scope 2</td>
             <td>Indirect emissions from purchased electricity (location-based)</td>
-            <td class="num">{{ number_format($scope2, 2) }}</td>
+            <td class="num">{{ number_format($scope2, 4) }}</td>
             <td class="num">{{ $pct[1] ?? 0 }}%</td>
         </tr>
         @if(!$moccaeOnly && ($report['has_scope_3'] || ($scopeTonnes['Scope 3'] ?? 0) > 0))
@@ -461,7 +461,7 @@
             <tr class="scope-row">
                 <td>{{ $scope['name'] }}</td>
                 <td>—</td>
-                <td class="num">{{ number_format($scope['tonnes'], 2) }}</td>
+                <td class="num">{{ number_format($scope['tonnes'], $scope['name'] === 'Scope 2' ? 4 : 2) }}</td>
             </tr>
             @foreach($scope['children'] as $child)
             <tr>

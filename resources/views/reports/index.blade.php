@@ -300,7 +300,7 @@
                     </div>
                     <div class="report-kpi">
                         <div class="kpi-label">Scope 2</div>
-                        <div class="kpi-value">{{ number_format($scopeTonnes['Scope 2'] ?? 0, 2) }}</div>
+                        <div class="kpi-value">{{ number_format($scopeTonnes['Scope 2'] ?? 0, 4) }}</div>
                         <div class="kpi-unit">tCO₂e energy</div>
                     </div>
                     <div class="report-kpi highlight">

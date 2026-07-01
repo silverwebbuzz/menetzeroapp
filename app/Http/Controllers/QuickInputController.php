@@ -593,7 +593,7 @@ class QuickInputController extends Controller
             $formFields = EmissionSourceFormField::where('emission_source_id', $emissionSource->id)->get();
             foreach ($formFields as $field) {
                 // Skip main fields that are stored directly or in dedicated columns
-                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments', 'link', 'fuel_category', 'fuel_type', 'energy_type', 'refrigerant_type', 'process_type', 'scope2_method', 'supplier_emission_factor', 'renewable_percent', 'is_biogenic'])) {
+                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments', 'link', 'fuel_category', 'fuel_type', 'energy_type', 'refrigerant_type', 'process_type', 'scope2_method', 'supplier_emission_factor', 'renewable_percent', 'is_biogenic', 'emission_factor_methodology', 'methodology_reference'])) {
                     continue;
                 }
                 if ($request->has($field->field_name) && $request->input($field->field_name) !== null && $request->input($field->field_name) !== '') {
@@ -602,6 +602,7 @@ class QuickInputController extends Controller
             }
 
             $additionalData = $this->withEvidenceAdditionalData($additionalData, $request);
+            $additionalData = $this->withMethodologyAdditionalData($additionalData, $request, $emissionSource);
 
             // Get notes/comments (handle both 'comments' from form fields and 'notes' for backward compatibility)
             $notes = $request->input('comments') ?? $request->input('notes') ?? null;
@@ -611,6 +612,8 @@ class QuickInputController extends Controller
             if (!is_numeric($co2e)) {
                 $co2e = 0;
             }
+
+            $storedSupplierFactor = $this->resolveCustomEmissionFactor($request, $emissionSource);
 
             // Create measurement_data record
             // Note: field_name and field_value are required by the database schema for backward compatibility
@@ -632,7 +635,7 @@ class QuickInputController extends Controller
                 'emission_factor_id' => $emissionFactor->id,
                 'gwp_version_used' => $emissionFactor->gwp_version ?? 'AR6',
                 'calculation_method' => $emissionFactor->calculation_method ?? null, // Save calculation method from emission factor
-                'supplier_emission_factor' => $this->resolveSupplierEmissionFactor($request, $emissionSource),
+                'supplier_emission_factor' => $storedSupplierFactor,
                 'scope2_method' => $this->resolveScope2Method($request, $emissionSource),
                 'is_biogenic' => $request->boolean('is_biogenic'),
                 'fuel_type' => $this->determineFuelType($request, $emissionSource),
@@ -956,7 +959,7 @@ class QuickInputController extends Controller
             $formFields = $this->formBuilder->buildForm($emissionSource->id);
             foreach ($formFields as $field) {
                 // Skip main fields that are stored directly
-                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments', 'link', 'fuel_category', 'fuel_type', 'energy_type', 'refrigerant_type', 'process_type', 'scope2_method', 'supplier_emission_factor', 'renewable_percent', 'is_biogenic'])) {
+                if (in_array($field->field_name, ['unit_of_measure', 'amount', 'quantity', 'unit', 'comments', 'link', 'fuel_category', 'fuel_type', 'energy_type', 'refrigerant_type', 'process_type', 'scope2_method', 'supplier_emission_factor', 'renewable_percent', 'is_biogenic', 'emission_factor_methodology', 'methodology_reference'])) {
                     continue;
                 }
                 if ($request->has($field->field_name) && $request->input($field->field_name) !== null && $request->input($field->field_name) !== '') {
@@ -965,6 +968,9 @@ class QuickInputController extends Controller
             }
 
             $additionalData = $this->withEvidenceAdditionalData($additionalData, $request);
+            $additionalData = $this->withMethodologyAdditionalData($additionalData, $request, $emissionSource);
+
+            $storedSupplierFactor = $this->resolveCustomEmissionFactor($request, $emissionSource);
 
             // Update entry
             // Ensure field_name and field_value are set (required for backward compatibility)
@@ -983,7 +989,7 @@ class QuickInputController extends Controller
                 'emission_factor_id' => $emissionFactor->id,
                 'gwp_version_used' => $emissionFactor->gwp_version ?? 'AR6',
                 'calculation_method' => $emissionFactor->calculation_method ?? null, // Save calculation method from emission factor
-                'supplier_emission_factor' => $this->resolveSupplierEmissionFactor($request, $emissionSource),
+                'supplier_emission_factor' => $storedSupplierFactor,
                 'scope2_method' => $this->resolveScope2Method($request, $emissionSource),
                 'is_biogenic' => $request->boolean('is_biogenic'),
                 'fuel_type' => $this->determineFuelType($request, $emissionSource),
@@ -1504,7 +1510,7 @@ class QuickInputController extends Controller
     }
 
     /**
-     * Market-based Scope 2: use supplier-specific kg CO2e/kWh when provided.
+     * Scope 2 overrides: market-based electricity, custom heat/steam/cooling factors.
      */
     private function resolveCo2eCalculation(
         Request $request,
@@ -1513,11 +1519,10 @@ class QuickInputController extends Controller
         ?string $unit,
         EmissionFactor $emissionFactor
     ): array {
-        $supplierFactor = $this->resolveSupplierEmissionFactor($request, $emissionSource);
-        $scope2Method = $this->resolveScope2Method($request, $emissionSource);
+        $customFactor = $this->resolveCustomEmissionFactor($request, $emissionSource);
 
-        if ($emissionSource->quick_input_slug === 'electricity' && $scope2Method === 'market' && $supplierFactor > 0) {
-            $co2e = round($quantity * $supplierFactor, 6);
+        if ($customFactor !== null && $customFactor > 0) {
+            $co2e = round($quantity * $customFactor, 6);
 
             return [
                 'co2e' => number_format($co2e, 6, '.', ''),
@@ -1530,6 +1535,43 @@ class QuickInputController extends Controller
         return $this->calculationService->calculateCO2e($quantity, $emissionFactor, $unit);
     }
 
+    /**
+     * User-supplied kg CO2e per activity unit (kWh, litres, RT, etc.).
+     */
+    private function resolveCustomEmissionFactor(Request $request, EmissionSourceMaster $emissionSource): ?float
+    {
+        if ($emissionSource->quick_input_slug === 'electricity') {
+            return $this->resolveSupplierEmissionFactor($request, $emissionSource);
+        }
+
+        if ($emissionSource->quick_input_slug === 'heat-steam-cooling') {
+            return $this->resolveHeatSteamCoolingEmissionFactor($request);
+        }
+
+        return null;
+    }
+
+    private function resolveHeatSteamCoolingEmissionFactor(Request $request): ?float
+    {
+        $methodology = $request->input('emission_factor_methodology', 'default');
+
+        if (!in_array($methodology, ['supplier', 'custom', 'dewa_grid'], true)) {
+            return null;
+        }
+
+        $factor = $request->input('supplier_emission_factor');
+        if ($factor !== null && $factor !== '') {
+            return (float) $factor;
+        }
+
+        if ($methodology === 'dewa_grid') {
+            // DEWA Sustainability Report 2023: 0.3979 tCO2e/MWh = 0.3979 kg CO2e/kWh
+            return 0.3979;
+        }
+
+        return null;
+    }
+
     private function resolveScope2Method(Request $request, EmissionSourceMaster $emissionSource): ?string
     {
         if ($emissionSource->scope !== 'Scope 2') {
@@ -1539,6 +1581,23 @@ class QuickInputController extends Controller
         $method = $request->input('scope2_method', 'location');
 
         return in_array($method, ['location', 'market'], true) ? $method : 'location';
+    }
+
+    private function withMethodologyAdditionalData(array $additionalData, Request $request, EmissionSourceMaster $emissionSource): array
+    {
+        if ($emissionSource->quick_input_slug !== 'heat-steam-cooling') {
+            return $additionalData;
+        }
+
+        if ($request->filled('emission_factor_methodology')) {
+            $additionalData['emission_factor_methodology'] = $request->input('emission_factor_methodology');
+        }
+
+        if ($request->filled('methodology_reference')) {
+            $additionalData['methodology_reference'] = trim((string) $request->input('methodology_reference'));
+        }
+
+        return $additionalData;
     }
 
     private function resolveSupplierEmissionFactor(Request $request, EmissionSourceMaster $emissionSource): ?float

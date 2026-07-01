@@ -253,7 +253,7 @@
         </div>
         <div class="stat-card">
             <div class="stat-card-label">Scope 2</div>
-            <div class="stat-card-value">{{ co2e_t($summary->scope_2_co2e ?? 0) }} <span class="text-sm font-medium text-gray-500">tCO₂e</span></div>
+            <div class="stat-card-value">{{ co2e_t($summary->scope_2_co2e ?? 0, 4) }} <span class="text-sm font-medium text-gray-500">tCO₂e</span></div>
         </div>
     </div>
     @endif

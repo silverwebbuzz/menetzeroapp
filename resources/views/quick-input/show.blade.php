@@ -151,7 +151,7 @@
             <!-- Left Side: Main Form Fields -->
             <div class="flex flex-col">
                 @php
-                    $scope2FieldNames = ['scope2_method', 'supplier_emission_factor', 'renewable_percent', 'is_biogenic'];
+                    $scope2FieldNames = ['scope2_method', 'supplier_emission_factor', 'renewable_percent', 'is_biogenic', 'emission_factor_methodology', 'methodology_reference'];
 
                     $editAdditionalData = $editEntry
                         ? decode_json_field($editEntry->additional_data ?? [])
@@ -193,6 +193,8 @@
                             'supplier_emission_factor' => $editEntry->supplier_emission_factor ?? '',
                             'renewable_percent' => $editAdditionalData['renewable_percent'] ?? '',
                             'is_biogenic' => (bool) $editEntry->is_biogenic,
+                            'emission_factor_methodology' => $editAdditionalData['emission_factor_methodology'] ?? 'default',
+                            'methodology_reference' => $editAdditionalData['methodology_reference'] ?? '',
                             default => $editAdditionalData[$name] ?? '',
                         };
                     };
@@ -324,9 +326,15 @@
                     </div>
 
                     @if($scope2Fields->count() > 0)
-                        <details class="scope2-reporting-block"@if($editEntry && ($editEntry->scope2_method === 'market' || $editEntry->supplier_emission_factor || ($editAdditionalData['renewable_percent'] ?? null))) open @endif>
-                            <summary>Scope 2 reporting (optional)</summary>
-                            <p class="scope2-reporting-block__intro">IFRS S2 expects location-based figures by default. Expand this section when you have supplier-specific factors or renewable energy certificates.</p>
+                        <details class="scope2-reporting-block"@if($editEntry && ($editEntry->scope2_method === 'market' || $editEntry->supplier_emission_factor || ($editAdditionalData['renewable_percent'] ?? null) || ($editAdditionalData['emission_factor_methodology'] ?? null))) open @endif>
+                            <summary>{{ $slug === 'heat-steam-cooling' ? 'Emission factor methodology (optional)' : 'Scope 2 reporting (optional)' }}</summary>
+                            <p class="scope2-reporting-block__intro">
+                                @if($slug === 'heat-steam-cooling')
+                                    DEWA SR2023 grid factor applies to purchased electricity only, not steam or district heat. Use supplier or custom methodology when you have a factor from Empower, Tabreed, DEFRA Heat &amp; Steam, or another published source.
+                                @else
+                                    IFRS S2 expects location-based figures by default. Expand this section when you have supplier-specific factors or renewable energy certificates.
+                                @endif
+                            </p>
                             <div class="scope2-reporting-block__fields">
                                 @foreach($scope2Fields as $field)
                                     @php
@@ -411,7 +419,7 @@
                         ? decode_json_field($editEntry->additional_data ?? [])
                         : [];
 
-                    $scope2FieldNames = ['scope2_method', 'supplier_emission_factor', 'renewable_percent', 'is_biogenic'];
+                    $scope2FieldNames = ['scope2_method', 'supplier_emission_factor', 'renewable_percent', 'is_biogenic', 'emission_factor_methodology', 'methodology_reference'];
                     $mainFieldNames = ['fuel_category', 'fuel_type', 'unit_of_measure', 'amount', 'quantity', 'unit'];
                     $seenFieldNames = [];
                     $additionalFields = $formFields->filter(function($field) use (&$seenFieldNames, $mainFieldNames, $scope2FieldNames) {

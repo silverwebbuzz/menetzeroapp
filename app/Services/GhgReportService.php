@@ -296,6 +296,33 @@ class GhgReportService
             ->get()
             ->map(function ($row) {
                 $factor = $row->emissionFactor;
+                $additional = is_array($row->additional_data)
+                    ? $row->additional_data
+                    : (is_string($row->additional_data) ? json_decode($row->additional_data, true) : []);
+
+                $methodology = $factor->source_standard ?? $row->calculation_method ?? '—';
+                $reference = $factor->source_reference ?? '—';
+
+                if ($row->supplier_emission_factor && (float) $row->supplier_emission_factor > 0) {
+                    $methodologyLabels = [
+                        'default' => 'System default',
+                        'supplier' => 'Supplier-provided factor',
+                        'custom' => 'Custom / published factor',
+                        'dewa_grid' => 'DEWA SR2023 grid (electricity)',
+                    ];
+                    $methodKey = $additional['emission_factor_methodology'] ?? null;
+                    if ($methodKey && isset($methodologyLabels[$methodKey])) {
+                        $methodology = $methodologyLabels[$methodKey];
+                    } elseif ($row->scope2_method === 'market') {
+                        $methodology = 'Market-based (supplier factor)';
+                    } else {
+                        $methodology = 'Custom emission factor';
+                    }
+
+                    $reference = $additional['methodology_reference']
+                        ?? ('User override: ' . number_format((float) $row->supplier_emission_factor, 6) . ' kg CO₂e/' . ($row->unit ?? 'unit'));
+                }
+
                 return [
                     'entry_date' => $row->entry_date?->format('Y-m-d') ?? '—',
                     'scope' => $row->scope,
@@ -303,10 +330,12 @@ class GhgReportService
                     'activity' => $row->fuel_type ?: ($row->emissionSource->name ?? '—'),
                     'quantity' => number_format((float) $row->quantity, 2),
                     'unit' => $row->unit ?? '—',
-                    'factor_value' => $factor ? number_format((float) $factor->factor_value, 4) : '—',
+                    'factor_value' => $row->supplier_emission_factor && (float) $row->supplier_emission_factor > 0
+                        ? number_format((float) $row->supplier_emission_factor, 4)
+                        : ($factor ? number_format((float) $factor->factor_value, 4) : '—'),
                     'factor_unit' => $factor->unit ?? '—',
-                    'methodology' => $factor->source_standard ?? $row->calculation_method ?? '—',
-                    'reference' => $factor->source_reference ?? '—',
+                    'methodology' => $methodology,
+                    'reference' => $reference,
                     'gwp' => $row->gwp_version_used ?? ($factor->gwp_version ?? 'AR6'),
                     'kg' => (float) $row->calculated_co2e,
                     'tonnes' => self::kgToTonnes($row->calculated_co2e),
@@ -380,7 +409,7 @@ class GhgReportService
 
         $report['scope_raw_tonnes'] = [
             number_format(self::kgToTonnes($scope1Kg), 2),
-            number_format(self::kgToTonnes($scope2Kg), 2),
+            number_format(self::kgToTonnes($scope2Kg), 4),
         ];
 
         $report['entry_count'] = $report['activity_register']->count();

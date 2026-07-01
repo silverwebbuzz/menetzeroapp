@@ -141,7 +141,7 @@ class SimpleUaeSeeder extends Seeder
                 EmissionFactor::create([
                     'category' => 'Transport',
                     'subcategory' => 'Diesel Fuel',
-                    'factor_value' => 2.680,
+                    'factor_value' => 2.6800,
                     'unit' => 'kgCO₂e/litre',
                     'source' => 'IPCC',
                     'year' => 2023,
