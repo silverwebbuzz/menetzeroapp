@@ -544,7 +544,7 @@ Before merging each E sub-phase:
 | E.2c Assurance upload | ✅ Enterprise PDF upload + download; Growth text-only unchanged |
 | E.2d HRIS feed | ⏳ Not started |
 | E.2e Energy from activity | ✅ Enterprise scorecard metric; Growth GRI manual energy unchanged |
-| E.2f White-label cover | ⏳ Not started |
+| E.2f White-label cover | ✅ Enterprise PDF (`report/pdf-enterprise`); Growth PDF unchanged |
 | E.2g Arabic PDF | ⏳ Not started |
 | E.2h CSRD workflow | ⏳ Deferred |
 

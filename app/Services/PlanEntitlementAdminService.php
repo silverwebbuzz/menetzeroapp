@@ -79,6 +79,7 @@ class PlanEntitlementAdminService
             PlanEntitlementService::EXPORT_ESG_SCORECARD_ENTERPRISE => 'ESG scorecard enterprise (80+ KPIs)',
             PlanEntitlementService::FEATURE_ASSURANCE_UPLOAD => 'Assurance verifier PDF upload',
             PlanEntitlementService::FEATURE_ENERGY_FROM_ACTIVITY => 'Energy GJ from Quick Input activity',
+            PlanEntitlementService::EXPORT_UAE_ESG_PDF_ENTERPRISE => 'UAE ESG Report PDF (white-label cover)',
         ];
     }
 

@@ -19,10 +19,46 @@
         .page-break { page-break-before: always; }
         .cover { text-align: center; padding-top: 40mm; }
         .disclaimer { font-size: 8px; color: #6b7280; border-top: 1px solid #e5e7eb; padding-top: 8px; margin-top: 20px; }
+        @if(!empty($enterpriseCover))
+        .cover-enterprise { text-align: center; padding: 30mm 15mm 20mm; min-height: 240mm; position: relative; }
+        .cover-enterprise .accent-block { height: 8mm; width: 100%; margin-bottom: 18mm; }
+        .cover-enterprise .logo-wrap { margin-bottom: 14mm; }
+        .cover-enterprise .logo-wrap img { max-height: 72px; max-width: 220px; }
+        .cover-enterprise .report-title { font-size: 28px; font-weight: bold; margin: 0 0 8px; line-height: 1.2; }
+        .cover-enterprise .company-name { font-size: 18px; color: #1f2937; margin: 0 0 6px; }
+        .cover-enterprise .meta { font-size: 11px; color: #6b7280; margin: 4px 0; }
+        .cover-enterprise .tagline { font-size: 10px; color: #4b5563; margin: 14mm auto 0; max-width: 85%; line-height: 1.5; }
+        .cover-enterprise .footer-line { position: absolute; bottom: 18mm; left: 0; right: 0; font-size: 8px; color: #9ca3af; }
+        @endif
     </style>
 </head>
 <body>
     {{-- Cover --}}
+    @if(!empty($enterpriseCover))
+        <div class="cover-enterprise">
+            <div class="accent-block" style="background: {{ $enterpriseCover['accent_color'] }};"></div>
+            <div class="logo-wrap">
+                @if(!empty($enterpriseCover['logo']))
+                    <img src="{{ $enterpriseCover['logo'] }}" alt="">
+                @endif
+            </div>
+            <div class="report-title" style="color: {{ $enterpriseCover['accent_dark'] }};">{{ $enterpriseCover['title'] }}</div>
+            <p class="company-name">{{ $enterpriseCover['company_name'] }}</p>
+            <p class="meta">Fiscal Year {{ $enterpriseCover['fiscal_year'] }} · {{ $enterpriseCover['generated_at'] }}</p>
+            @if(!empty($enterpriseCover['frameworks']))
+                <p class="meta">{{ $enterpriseCover['frameworks'] }}</p>
+            @endif
+            @if(!empty($enterpriseCover['tagline']))
+                <p class="tagline">{{ $enterpriseCover['tagline'] }}</p>
+            @endif
+            @if(!empty($enterpriseCover['approval']))
+                <p class="meta" style="margin-top:10mm;">{{ $enterpriseCover['approval'] }}</p>
+            @endif
+            @if(!empty($enterpriseCover['confidentiality']))
+                <p class="footer-line">{{ $enterpriseCover['confidentiality'] }}</p>
+            @endif
+        </div>
+    @else
     <div class="cover">
         <div class="brand-bar" style="width:60%;margin:0 auto 20px;"></div>
         @if(!empty($companyLogo))
@@ -38,6 +74,7 @@
             <p class="muted" style="margin-top:12px;">{{ implode(' · ', $report['frameworks_disclosed']) }}</p>
         @endif
     </div>
+    @endif
 
     <div class="page-break"></div>
     <div class="brand-bar"></div>
@@ -357,6 +394,13 @@
         @endif
     @endif
 
-    <div class="disclaimer">{{ $report['disclaimer'] }}</div>
+    <div class="disclaimer">
+        @if(!empty($enterpriseCover))
+            This report is published by {{ $report['company']->name }}. Narrative content is the responsibility of the reporting entity.
+            GHG figures are calculated from entered activity data. Official MOCCAE submission must be completed at mrv.ae using IEQT where applicable.
+        @else
+            {{ $report['disclaimer'] }}
+        @endif
+    </div>
 </body>
 </html>

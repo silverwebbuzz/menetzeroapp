@@ -109,6 +109,11 @@
                     :message="$gate->disclosureExportMessage()">
                     Download PDF
                 </x-plan-gated-link>
+                @if($gate->canDisclosureExportType('uae_esg_pdf_enterprise', $fiscalYear))
+                <a href="{{ route('disclosures.uae-esg.report.pdf-enterprise', ['fiscal_year' => $fiscalYear]) }}" class="btn btn-primary">
+                    Download Enterprise PDF
+                </a>
+                @endif
             </div>
         </div>
     </div>

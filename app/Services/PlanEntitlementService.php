@@ -23,6 +23,7 @@ class PlanEntitlementService
     public const EXPORT_ESG_SCORECARD_ENTERPRISE = 'esg_scorecard_enterprise';
     public const FEATURE_ASSURANCE_UPLOAD = 'assurance_upload';
     public const FEATURE_ENERGY_FROM_ACTIVITY = 'energy_from_activity';
+    public const EXPORT_UAE_ESG_PDF_ENTERPRISE = 'uae_esg_pdf_enterprise';
 
     public function __construct(
         protected SubscriptionService $subscriptionService,
@@ -330,6 +331,10 @@ class PlanEntitlementService
 
         if ($exportCode === self::FEATURE_ENERGY_FROM_ACTIVITY) {
             return 'Auto energy (GJ) from Quick Input is available on the Enterprise plan. Contact sales for access.';
+        }
+
+        if ($exportCode === self::EXPORT_UAE_ESG_PDF_ENTERPRISE) {
+            return 'The white-label UAE ESG Report PDF is available on the Enterprise plan. Contact sales for access.';
         }
 
         return 'This export is available on the Starter plan (AED 1,499/year) and above.';

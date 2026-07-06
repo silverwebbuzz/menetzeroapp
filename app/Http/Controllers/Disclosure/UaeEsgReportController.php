@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Disclosure;
 
 use App\Services\AssuranceDocumentService;
+use App\Services\EnterpriseCoverService;
 use App\Services\ExportReadinessService;
 use App\Services\PlanEntitlementService;
 use App\Services\UaeEsgReportService;
@@ -16,6 +17,7 @@ class UaeEsgReportController extends DisclosureBaseController
         protected UaeEsgReportService $reportService,
         protected ExportReadinessService $exportReadiness,
         protected AssuranceDocumentService $assuranceService,
+        protected EnterpriseCoverService $coverService,
     ) {
     }
 
@@ -52,6 +54,31 @@ class UaeEsgReportController extends DisclosureBaseController
         $slug = preg_replace('/[^a-z0-9]+/i', '-', strtolower($company->name ?? 'company'));
 
         return $pdf->download("uae-esg-report-{$fiscalYear}-{$slug}.pdf");
+    }
+
+    public function exportPdfEnterprise(Request $request)
+    {
+        ['company' => $company, 'fiscalYear' => $fiscalYear] = $this->resolveContext($request);
+        $this->requirePermission('disclosures', 'export', [['reports', 'view']]);
+        $this->requireDisclosureExport($company->id, PlanEntitlementService::EXPORT_UAE_ESG_PDF_ENTERPRISE, $fiscalYear);
+
+        $report = $this->reportService->build($company, $fiscalYear);
+        $enterpriseCover = $this->coverService->build($company, $fiscalYear, $report);
+
+        $pdf = Pdf::loadView('reports.uae-esg-pdf', [
+            'report' => $report,
+            'companyLogo' => $company->logoDataUri(),
+            'platformLogo' => null,
+            'enterpriseCover' => $enterpriseCover,
+        ])->setPaper('a4', 'portrait')->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+            'defaultFont' => 'dejavu sans',
+        ]);
+
+        $slug = preg_replace('/[^a-z0-9]+/i', '-', strtolower($company->name ?? 'company'));
+
+        return $pdf->download("uae-esg-report-enterprise-{$fiscalYear}-{$slug}.pdf");
     }
 
     public function uploadAssurance(Request $request)
