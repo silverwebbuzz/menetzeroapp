@@ -170,6 +170,33 @@
     @endif
 
     <div class="page-break"></div>
+    <h2>Sustainability Performance Scorecard</h2>
+    <p class="muted">Three-year comparison ({{ implode(', ', $report['scorecard']['years']) }})</p>
+
+    @foreach($report['scorecard']['categories'] as $category)
+        <h3>{{ $category['title'] }}</h3>
+        <table class="data">
+            <tr>
+                <th>Metric</th>
+                <th>Unit</th>
+                @foreach($report['scorecard']['years'] as $year)
+                    <th>{{ $year }}</th>
+                @endforeach
+            </tr>
+            @foreach($category['rows'] as $row)
+                <tr>
+                    <td>{{ $row['label'] }}</td>
+                    <td>{{ $row['unit'] }}</td>
+                    @foreach($report['scorecard']['years'] as $year)
+                        @php $val = $row['values'][$year] ?? null; @endphp
+                        <td>{{ $val !== null ? number_format($val, $row['decimals']) : '—' }}</td>
+                    @endforeach
+                </tr>
+            @endforeach
+        </table>
+    @endforeach
+
+    <div class="page-break"></div>
     <h2>IFRS S2 Disclosure Index</h2>
     <table class="data">
         <tr><th>Paragraph</th><th>Topic</th><th>Status</th><th>Report location</th></tr>

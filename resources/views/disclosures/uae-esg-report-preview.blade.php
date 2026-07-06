@@ -97,6 +97,38 @@
         </div>
     </div>
 
+    <div class="card mb-4">
+        <div class="card-header"><h3 class="card-title">ESG Scorecard (3-year)</h3></div>
+        <div class="card-body overflow-x-auto">
+            @foreach($report['scorecard']['categories'] as $category)
+                <h4 class="font-medium text-gray-800 mt-4 mb-2">{{ $category['title'] }}</h4>
+                <table class="w-full text-sm mb-4">
+                    <thead>
+                        <tr class="text-left text-gray-500 border-b">
+                            <th class="py-2">Metric</th>
+                            @foreach($report['scorecard']['years'] as $year)
+                                <th class="py-2 text-right">{{ $year }}</th>
+                            @endforeach
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($category['rows'] as $row)
+                            <tr class="border-b border-gray-50">
+                                <td class="py-2">{{ $row['label'] }}</td>
+                                @foreach($report['scorecard']['years'] as $year)
+                                    <td class="py-2 text-right">
+                                        @php $val = $row['values'][$year] ?? null; @endphp
+                                        {{ $val !== null ? number_format($val, $row['decimals']) : '—' }}
+                                    </td>
+                                @endforeach
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endforeach
+        </div>
+    </div>
+
     <div class="card">
         <div class="card-body text-xs text-gray-500">{{ $report['disclaimer'] }}</div>
     </div>

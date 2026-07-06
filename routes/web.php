@@ -328,6 +328,13 @@ Route::middleware([
 
         Route::get('/esg-dashboard', [\App\Http\Controllers\Disclosure\EsgDashboardController::class, 'index'])->name('esg-dashboard');
 
+        Route::prefix('esg-scorecard')->name('esg-scorecard.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Disclosure\EsgScorecardController::class, 'index'])->name('index');
+            Route::post('/', [\App\Http\Controllers\Disclosure\EsgScorecardController::class, 'update'])->name('update');
+            Route::post('/sync', [\App\Http\Controllers\Disclosure\EsgScorecardController::class, 'sync'])->name('sync');
+            Route::get('/export.xlsx', [\App\Http\Controllers\Disclosure\EsgScorecardController::class, 'exportExcel'])->name('export');
+        });
+
         // UAE ESG Report (unified export)
         Route::prefix('uae-esg-report')->name('uae-esg.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Disclosure\OverviewController::class, 'uaeEsg'])->name('overview');

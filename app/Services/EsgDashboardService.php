@@ -9,6 +9,7 @@ class EsgDashboardService
     public function __construct(
         protected DisclosureService $disclosureService,
         protected IfrsS2ReportService $s2ReportService,
+        protected EsgScorecardService $scorecardService,
     ) {
     }
 
@@ -19,6 +20,7 @@ class EsgDashboardService
         $gri = $this->disclosureService->completenessGri($company->id, $fiscalYear);
         $ghg = $this->s2ReportService->build($company, $fiscalYear)['ghg'] ?? [];
         $griContent = $this->disclosureService->griSectionsContent($company->id, $fiscalYear);
+        $scorecard = $this->scorecardService->build($company, $fiscalYear);
 
         $environmental = $this->scoreEnvironmental($gri, $ghg, $griContent);
         $social = $this->scoreSocial($gri, $griContent);
@@ -30,6 +32,7 @@ class EsgDashboardService
             'environmental' => $environmental,
             'social' => $social,
             'governance' => $governance,
+            'scorecard' => $scorecard,
             'frameworks' => [
                 'ifrs_s2' => $s2,
                 'ifrs_s1' => $s1,

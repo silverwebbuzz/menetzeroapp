@@ -23,6 +23,7 @@ class UaeEsgReportService
         protected GriContentIndexService $griContentIndexService,
         protected DisclosureService $disclosureService,
         protected EsgDashboardService $esgDashboardService,
+        protected EsgScorecardService $scorecardService,
     ) {
     }
 
@@ -95,8 +96,9 @@ class UaeEsgReportService
             'ifrs_s1_index' => $this->buildDisclosureIndex('ifrs_s1_index', $s1['completeness']),
             'sdg_map' => $this->buildSdgMapping($gri['material_topics']),
 
-            // E/S/G completeness dashboard (not yet full scorecard)
+            // E/S/G completeness dashboard + 3-year scorecard
             'esg_dashboard' => $dashboard,
+            'scorecard' => $this->scorecardService->build($company, $fiscalYear),
             'completeness' => $this->completeness($company->id, $fiscalYear, $esgDisclosures, $s2, $gri),
 
             'section_config' => config('esg_report.sections', []),

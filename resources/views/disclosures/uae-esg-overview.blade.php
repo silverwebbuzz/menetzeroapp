@@ -68,6 +68,7 @@
             </div>
             <div class="flex flex-wrap gap-2">
                 <a href="{{ route('disclosures.uae-esg.report.preview', ['fiscal_year' => $fiscalYear]) }}" class="btn btn-secondary">Preview</a>
+                <a href="{{ route('disclosures.esg-scorecard.index', ['fiscal_year' => $fiscalYear]) }}" class="btn btn-secondary">ESG Scorecard</a>
                 <x-plan-gated-link
                     :allowed="$gate->canDisclosureExportType('uae_esg_pdf', $fiscalYear)"
                     :href="route('disclosures.uae-esg.report.pdf', ['fiscal_year' => $fiscalYear])"

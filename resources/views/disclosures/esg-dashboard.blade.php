@@ -70,5 +70,46 @@
             </div>
         @endforeach
     </div>
+
+    <div class="mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+        <div>
+            <h3 class="text-lg font-semibold text-gray-900">ESG Scorecard preview</h3>
+            <p class="text-sm text-gray-500">3-year KPI tables — {{ implode(', ', $dashboard['scorecard']['years']) }}</p>
+        </div>
+        <a href="{{ route('disclosures.esg-scorecard.index', ['fiscal_year' => $fiscalYear]) }}" class="btn btn-secondary">Open full scorecard</a>
+    </div>
+
+    @foreach($dashboard['scorecard']['categories'] as $catKey => $category)
+        <div class="card mb-6">
+            <div class="card-header">
+                <h3 class="card-title">{{ $category['title'] }}</h3>
+            </div>
+            <div class="card-body overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-left text-gray-500 border-b">
+                            <th class="py-2 pr-4">Metric</th>
+                            @foreach($dashboard['scorecard']['years'] as $year)
+                                <th class="py-2 px-2 text-right">{{ $year }}</th>
+                            @endforeach
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($category['rows'] as $row)
+                            <tr class="border-b border-gray-50">
+                                <td class="py-2 pr-4">{{ $row['label'] }}</td>
+                                @foreach($dashboard['scorecard']['years'] as $year)
+                                    <td class="py-2 px-2 text-right">
+                                        @php $val = $row['values'][$year] ?? null; @endphp
+                                        {{ $val !== null ? number_format($val, $row['decimals']) : '—' }}
+                                    </td>
+                                @endforeach
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    @endforeach
 </div>
 @endsection

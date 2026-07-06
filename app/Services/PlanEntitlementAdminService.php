@@ -73,6 +73,7 @@ class PlanEntitlementAdminService
             PlanEntitlementService::EXPORT_GRI_PDF => 'GRI PDF',
             PlanEntitlementService::EXPORT_GRI_CONTENT_INDEX => 'GRI content index CSV',
             PlanEntitlementService::EXPORT_UAE_ESG_PDF => 'UAE ESG Report PDF',
+            PlanEntitlementService::EXPORT_ESG_SCORECARD => 'ESG Scorecard Excel',
         ];
     }
 

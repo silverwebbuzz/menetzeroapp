@@ -4,7 +4,7 @@
 |---|---|
 | **Version** | 1.0 |
 | **Created** | July 2026 |
-| **Status** | Phase A v1 shipped — hub, narrative forms, preview & PDF export |
+| **Status** | Phase B shipped — ESG Scorecard with 3-year KPI tables |
 | **Reference report** | External UAE ESG report index (DP World 2024 used as structural reference only; file not stored in repo) |
 | **Client input** | UAE Standard ESG Report Index (Scope 3 purchaser format) |
 
@@ -343,6 +343,17 @@ Quick Input / Bulk Import
 | B.8 | **Scorecard export** | Excel + PDF section in UAE ESG Report | A.4 |
 
 **Exit criteria:** Environmental scorecard shows 3-year Scope 1/2/3; social/governance KPIs manually enterable; dashboard replaces simple % with table preview.
+
+**Progress (July 2026):**
+
+| Task | Status |
+|------|--------|
+| B.1 | ✅ `esg_kpi_snapshots` migration + model |
+| B.2 | ✅ Auto-resolve GHG + GRI metrics live (no duplicate totals) |
+| B.3 | ✅ `/disclosures/esg-scorecard` UI with manual entry |
+| B.4 | ✅ 3-year columns (Y-2, Y-1, Y) |
+| B.5–B.7 | 🟡 Water/waste/energy via GRI forms (not separate Quick Input yet) |
+| B.8 | ✅ Excel export + scorecard section in UAE ESG PDF |
 
 ---
 
