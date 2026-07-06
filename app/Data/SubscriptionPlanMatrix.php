@@ -142,7 +142,7 @@ class SubscriptionPlanMatrix
             ['label' => 'API Access', 'coming_soon' => true, 'cells' => [
                 'client_starter' => false, 'client_growth' => 'Limited', 'client_enterprise' => 'Full',
             ]],
-            ['label' => 'White Label Reports', 'coming_soon' => true, 'cells' => [
+            ['label' => 'White Label Reports', 'coming_soon' => false, 'cells' => [
                 'client_starter' => false, 'client_growth' => false, 'client_enterprise' => true,
             ]],
             ['label' => 'Dedicated Account Manager', 'coming_soon' => false, 'cells' => [
