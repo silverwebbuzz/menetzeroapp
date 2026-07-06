@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Disclosure;
 
 use App\Services\DisclosureService;
+use App\Services\UaeEsgReportService;
 use Illuminate\Http\Request;
 
 class OverviewController extends DisclosureBaseController
 {
     public function __construct(
         protected DisclosureService $disclosureService,
+        protected UaeEsgReportService $uaeEsgReportService,
     ) {
     }
 
@@ -22,6 +24,7 @@ class OverviewController extends DisclosureBaseController
             's2Completeness' => $this->disclosureService->completenessS2($company->id, $fiscalYear),
             's1Completeness' => $this->disclosureService->completenessS1($company->id, $fiscalYear),
             'griCompleteness' => $this->disclosureService->completenessGri($company->id, $fiscalYear),
+            'uaeEsgCompleteness' => $this->uaeEsgReportService->build($company, $fiscalYear)['completeness'],
         ]);
     }
 
@@ -58,6 +61,20 @@ class OverviewController extends DisclosureBaseController
             'fiscalYear' => $fiscalYear,
             'framework' => 'gri',
             'completeness' => $this->disclosureService->completenessGri($company->id, $fiscalYear),
+        ]);
+    }
+
+    public function uaeEsg(Request $request)
+    {
+        ['company' => $company, 'fiscalYear' => $fiscalYear] = $this->resolveContext($request);
+        $report = $this->uaeEsgReportService->build($company, $fiscalYear);
+
+        return view('disclosures.uae-esg-overview', [
+            'company' => $company,
+            'fiscalYear' => $fiscalYear,
+            'framework' => 'esg_report',
+            'completeness' => $report['completeness'],
+            'sectionConfig' => config('esg_report.sections', []),
         ]);
     }
 }

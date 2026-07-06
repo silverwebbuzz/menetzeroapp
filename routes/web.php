@@ -327,6 +327,15 @@ Route::middleware([
         });
 
         Route::get('/esg-dashboard', [\App\Http\Controllers\Disclosure\EsgDashboardController::class, 'index'])->name('esg-dashboard');
+
+        // UAE ESG Report (unified export)
+        Route::prefix('uae-esg-report')->name('uae-esg.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Disclosure\OverviewController::class, 'uaeEsg'])->name('overview');
+            Route::get('/sections/{section}', [\App\Http\Controllers\Disclosure\SectionController::class, 'editEsgReport'])->name('sections.edit');
+            Route::post('/sections/{section}', [\App\Http\Controllers\Disclosure\SectionController::class, 'updateEsgReport'])->name('sections.update');
+            Route::get('/report', [\App\Http\Controllers\Disclosure\UaeEsgReportController::class, 'preview'])->name('report.preview');
+            Route::get('/report/pdf', [\App\Http\Controllers\Disclosure\UaeEsgReportController::class, 'exportPdf'])->name('report.pdf');
+        });
     });
 
     // Reports routes

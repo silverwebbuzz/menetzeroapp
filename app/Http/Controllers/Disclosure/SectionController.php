@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class SectionController extends DisclosureBaseController
 {
-    private const FRAMEWORKS = ['ifrs_s2', 'ifrs_s1', 'gri'];
+    private const FRAMEWORKS = ['ifrs_s2', 'ifrs_s1', 'gri', 'esg_report'];
 
     public function __construct(
         protected DisclosureService $disclosureService,
@@ -42,6 +42,16 @@ class SectionController extends DisclosureBaseController
     public function updateGri(Request $request, string $section)
     {
         return $this->update($request, 'gri', $section);
+    }
+
+    public function editEsgReport(Request $request, string $section)
+    {
+        return $this->edit($request, 'esg_report', $section);
+    }
+
+    public function updateEsgReport(Request $request, string $section)
+    {
+        return $this->update($request, 'esg_report', $section);
     }
 
     protected function edit(Request $request, string $framework, string $section)
@@ -88,6 +98,7 @@ class SectionController extends DisclosureBaseController
         $route = match ($framework) {
             'ifrs_s1' => 'disclosures.s1.sections.edit',
             'gri' => 'disclosures.gri.sections.edit',
+            'esg_report' => 'disclosures.uae-esg.sections.edit',
             default => 'disclosures.s2.sections.edit',
         };
 

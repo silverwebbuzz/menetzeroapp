@@ -17,7 +17,7 @@
         </form>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <a href="{{ route('disclosures.s2.overview', ['fiscal_year' => $fiscalYear]) }}" class="card hover:border-brand-300 transition block">
             <div class="card-header">
                 <div>
@@ -59,6 +59,21 @@
             <div class="card-body">
                 <div class="w-full bg-gray-100 rounded-full h-2">
                     <div class="bg-brand-500 h-2 rounded-full" style="width: {{ $griCompleteness['percent'] }}%"></div>
+                </div>
+            </div>
+        </a>
+
+        <a href="{{ route('disclosures.uae-esg.overview', ['fiscal_year' => $fiscalYear]) }}" class="card hover:border-brand-300 transition block border-brand-200">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title">UAE ESG Report</h3>
+                    <p class="card-subtitle">Unified report — narrative chapters, GHG, IFRS/GRI indexes &amp; SDG mapping.</p>
+                </div>
+                <div class="text-2xl font-bold text-brand-600">{{ $uaeEsgCompleteness['percent'] }}%</div>
+            </div>
+            <div class="card-body">
+                <div class="w-full bg-gray-100 rounded-full h-2">
+                    <div class="bg-brand-500 h-2 rounded-full" style="width: {{ $uaeEsgCompleteness['percent'] }}%"></div>
                 </div>
             </div>
         </a>

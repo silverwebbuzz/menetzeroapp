@@ -15,7 +15,7 @@
         <div class="card-header">
             <div>
                 <h3 class="card-title">{{ $config['title'] }}</h3>
-                <p class="card-subtitle">{{ $config['reference'] }} — {{ $config['description'] }}</p>
+                <p class="card-subtitle">{{ $config['reference'] ?? '' }}@if(!empty($config['description'])) — {{ $config['description'] }}@endif</p>
             </div>
             @if($record->status === 'complete')
                 <span class="text-xs font-medium px-2 py-1 rounded-full bg-green-100 text-green-800">Complete</span>
@@ -28,6 +28,7 @@
                 $updateRoute = match ($framework ?? 'ifrs_s2') {
                     'ifrs_s1' => 'disclosures.s1.sections.update',
                     'gri' => 'disclosures.gri.sections.update',
+                    'esg_report' => 'disclosures.uae-esg.sections.update',
                     default => 'disclosures.s2.sections.update',
                 };
             @endphp

@@ -14,11 +14,19 @@ class DisclosureService
 {
     public function sectionConfig(string $framework, string $section): ?array
     {
+        if ($framework === 'esg_report') {
+            return config("esg_report.sections.{$section}");
+        }
+
         return config("disclosure.{$framework}.sections.{$section}");
     }
 
     public function validSections(string $framework): array
     {
+        if ($framework === 'esg_report') {
+            return array_keys(config('esg_report.sections', []));
+        }
+
         return array_keys(config("disclosure.{$framework}.sections", []));
     }
 

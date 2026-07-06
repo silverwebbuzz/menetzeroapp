@@ -16,6 +16,7 @@ class PlanEntitlementService
     public const EXPORT_IFRS_S1_PDF = 'ifrs_s1_pdf';
     public const EXPORT_GRI_PDF = 'gri_pdf';
     public const EXPORT_GRI_CONTENT_INDEX = 'gri_content_index';
+    public const EXPORT_UAE_ESG_PDF = 'uae_esg_pdf';
 
     public function __construct(
         protected SubscriptionService $subscriptionService,
@@ -300,10 +301,11 @@ class PlanEntitlementService
             self::EXPORT_IFRS_S1_PDF,
             self::EXPORT_GRI_PDF,
             self::EXPORT_GRI_CONTENT_INDEX,
+            self::EXPORT_UAE_ESG_PDF,
         ];
 
         if (in_array($exportCode, $growthOnly, true)) {
-            return 'IFRS and GRI report downloads are available on the Growth plan (AED 2,499/year).';
+            return 'IFRS, GRI, and UAE ESG report downloads are available on the Growth plan (AED 2,499/year).';
         }
 
         return 'This export is available on the Starter plan (AED 1,499/year) and above.';

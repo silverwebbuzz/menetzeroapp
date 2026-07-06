@@ -156,6 +156,7 @@ class PlanEntitlementDefaults
                     'ifrs_s1_pdf',
                     'gri_pdf',
                     'gri_content_index',
+                    'uae_esg_pdf',
                 ],
                 'consultant_directory' => 'full',
                 'export_regen' => 'subscription_year_unlimited',

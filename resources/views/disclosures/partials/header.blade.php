@@ -4,6 +4,7 @@
     $frameworkLabel = match ($fw) {
         'ifrs_s1' => 'IFRS S1 Sustainability Disclosures',
         'gri' => 'GRI Sustainability Reporting',
+        'esg_report' => 'UAE ESG Report',
         default => 'IFRS S2 Climate Disclosures',
     };
 @endphp

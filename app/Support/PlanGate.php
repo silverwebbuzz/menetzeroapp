@@ -298,6 +298,7 @@ class PlanGate
             ['label' => 'IEQT', 'code' => PlanEntitlementService::EXPORT_IEQT],
             ['label' => 'IFRS S1/S2 PDF', 'code' => PlanEntitlementService::EXPORT_IFRS_S2_PDF],
             ['label' => 'GRI PDF', 'code' => PlanEntitlementService::EXPORT_GRI_PDF],
+            ['label' => 'UAE ESG Report PDF', 'code' => PlanEntitlementService::EXPORT_UAE_ESG_PDF],
         ];
 
         return array_map(function (array $item) {
@@ -307,6 +308,7 @@ class PlanGate
                 $hint = in_array($item['code'], [
                     PlanEntitlementService::EXPORT_IFRS_S2_PDF,
                     PlanEntitlementService::EXPORT_GRI_PDF,
+                    PlanEntitlementService::EXPORT_UAE_ESG_PDF,
                 ], true) ? 'Growth' : 'Starter';
             }
 
