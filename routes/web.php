@@ -325,6 +325,7 @@ Route::middleware([
             Route::get('/report/pdf', [\App\Http\Controllers\Disclosure\GriReportController::class, 'exportPdf'])->name('report.pdf');
             Route::get('/content-index.csv', [\App\Http\Controllers\Disclosure\GriReportController::class, 'exportContentIndex'])->name('content-index');
             Route::get('/content-index-full.csv', [\App\Http\Controllers\Disclosure\GriReportController::class, 'exportContentIndexExtended'])->name('content-index-full');
+            Route::get('/content-index-enterprise.csv', [\App\Http\Controllers\Disclosure\GriReportController::class, 'exportContentIndexEnterprise'])->name('content-index-enterprise');
         });
 
         Route::get('/esg-dashboard', [\App\Http\Controllers\Disclosure\EsgDashboardController::class, 'index'])->name('esg-dashboard');

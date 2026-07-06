@@ -80,6 +80,14 @@
                     locked-class="btn btn-secondary">
                     Full Index (UNGC/WEF/SDG)
                 </x-plan-gated-link>
+                @if($gate->canDisclosureExportType('gri_content_index_extended', $fiscalYear))
+                <x-plan-gated-link
+                    :allowed="true"
+                    :href="route('disclosures.gri.content-index-enterprise', ['fiscal_year' => $fiscalYear])"
+                    class="btn btn-secondary">
+                    Enterprise Index (80+)
+                </x-plan-gated-link>
+                @endif
                 <x-plan-gated-link
                     :allowed="$gate->canDisclosureExportType('gri_pdf', $fiscalYear)"
                     :href="route('disclosures.gri.report.pdf', ['fiscal_year' => $fiscalYear])"

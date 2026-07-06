@@ -83,6 +83,21 @@ class GriReportController extends DisclosureBaseController
         ]);
     }
 
+    public function exportContentIndexEnterprise(Request $request)
+    {
+        ['company' => $company, 'fiscalYear' => $fiscalYear] = $this->resolveContext($request);
+        $this->requirePermission('disclosures', 'export', [['reports', 'view']]);
+        $this->requireDisclosureExport($company->id, PlanEntitlementService::EXPORT_GRI_CONTENT_INDEX_EXTENDED, $fiscalYear);
+
+        $csv = $this->contentIndexService->toEnterpriseCsv($company, $fiscalYear, true);
+        $filename = 'gri-content-index-enterprise-' . $fiscalYear . '.csv';
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
+    }
+
     protected function platformLogoDataUri(): ?string
     {
         foreach ([public_path('images/menetzero.png'), public_path('images/menetzero.jpg')] as $path) {

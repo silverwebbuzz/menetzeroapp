@@ -19,6 +19,7 @@ class PlanEntitlementService
     public const EXPORT_UAE_ESG_PDF = 'uae_esg_pdf';
     public const EXPORT_ESG_SCORECARD = 'esg_scorecard';
     public const EXPORT_SASB_INDEX = 'sasb_index';
+    public const EXPORT_GRI_CONTENT_INDEX_EXTENDED = 'gri_content_index_extended';
 
     public function __construct(
         protected SubscriptionService $subscriptionService,
@@ -310,6 +311,10 @@ class PlanEntitlementService
 
         if (in_array($exportCode, $growthOnly, true)) {
             return 'IFRS, GRI, and UAE ESG report downloads are available on the Growth plan (AED 2,499/year).';
+        }
+
+        if ($exportCode === self::EXPORT_GRI_CONTENT_INDEX_EXTENDED) {
+            return 'The full GRI content index (80+ disclosures) is available on the Enterprise plan. Contact sales for access.';
         }
 
         return 'This export is available on the Starter plan (AED 1,499/year) and above.';

@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
-| **Version** | 1.0 |
+| **Version** | 1.1 |
 | **Created** | July 2026 |
-| **Status** | Phase D shipped — SASB index, GRI cross-walk, KPI CSV import, B4SI community |
+| **Status** | Phases 0–D shipped · **Phase E spec approved (not built)** — Enterprise polish |
 | **Reference report** | External UAE ESG report index (DP World 2024 used as structural reference only; file not stored in repo) |
 | **Client input** | UAE Standard ESG Report Index (Scope 3 purchaser format) |
 
@@ -21,10 +21,11 @@ This document captures the gap analysis between MenetZero’s current capabiliti
 5. [Section-by-section gap matrix](#5-section-by-section-gap-matrix)
 6. [What we can state with 100% accuracy today](#6-what-we-can-state-with-100-accuracy-today)
 7. [Architecture principles (360° linkage)](#7-architecture-principles-360-linkage)
-8. [Phased implementation plan](#8-phased-implementation-plan)
+8. [Phased implementation plan](#8-phased-implementation-plan) — includes [Phase E spec](#phase-e--enterprise-polish-spec-only)
 9. [Regression & entitlement safeguards](#9-regression--entitlement-safeguards)
 10. [Open decisions (discuss before build)](#10-open-decisions-discuss-before-build)
 11. [Success criteria per phase](#11-success-criteria-per-phase)
+12. [Appendices](#appendix-a--file-touch-map-phase-a)
 
 ---
 
@@ -46,7 +47,8 @@ This document captures the gap analysis between MenetZero’s current capabiliti
 | Tier | Deliverable |
 |------|-------------|
 | **Now** | GHG + climate (IFRS S2) + partial GRI environmental + MOCCAE compliance |
-| **Roadmap** | Unified UAE ESG Report PDF + ESG Scorecard + disclosure indexes |
+| **Roadmap** | Unified UAE ESG Report PDF + ESG Scorecard + disclosure indexes (**Phases 0–D shipped**) |
+| **Enterprise (Phase E)** | 80+ GRI/KPI, assurance upload, HRIS feed, white-label cover, Arabic — **spec only, Enterprise-gated** |
 | **Always client-owned** | CEO message, assurance sign-off, awards, community stories |
 
 ---
@@ -159,13 +161,36 @@ DP World maps **80+** disclosures plus UNGC, SDG, WEF, SASB columns.
 
 ### 4.6 Plan entitlements (do not break)
 
-| Feature code | Purpose |
-|--------------|---------|
-| `disclosures.access` | View disclosure forms |
-| `disclosures.export` | PDF/CSV downloads |
-| `EXPORT_GHG_PDF`, `EXPORT_MOCCAE_PDF`, `EXPORT_IEQT` | MOCCAE outputs |
-| `EXPORT_IFRS_S2_PDF`, `EXPORT_IFRS_S1_PDF`, `EXPORT_GRI_PDF` | Framework PDFs |
-| `EXPORT_GRI_CONTENT_INDEX` | GRI index CSV |
+**Shipped (Phases 0–D) — Growth tier and above:**
+
+| Feature code | Constant | Purpose | Tier |
+|--------------|----------|---------|------|
+| `disclosures.access` | — | View disclosure forms | Free+ |
+| `disclosures.export` | — | PDF/CSV downloads (master gate) | Growth+ |
+| `ghg_pdf` | `EXPORT_GHG_PDF` | GHG Inventory PDF | Starter+ |
+| `moccae_pdf` | `EXPORT_MOCCAE_PDF` | MOCCAE S1&2 PDF | Starter+ |
+| `ieqt` | `EXPORT_IEQT` | IEQT CSV | Starter+ |
+| `excel` | `EXPORT_EXCEL` | Excel breakdown | Starter+ |
+| `ifrs_s2_pdf` | `EXPORT_IFRS_S2_PDF` | IFRS S2 PDF | Growth+ |
+| `ifrs_s1_pdf` | `EXPORT_IFRS_S1_PDF` | IFRS S1 PDF | Growth+ |
+| `gri_pdf` | `EXPORT_GRI_PDF` | GRI PDF | Growth+ |
+| `gri_content_index` | `EXPORT_GRI_CONTENT_INDEX` | GRI index CSV (4-col + full cross-walk) | Growth+ |
+| `uae_esg_pdf` | `EXPORT_UAE_ESG_PDF` | UAE ESG Report PDF | Growth+ |
+| `esg_scorecard` | `EXPORT_ESG_SCORECARD` | ESG Scorecard Excel | Growth+ |
+| `sasb_index` | `EXPORT_SASB_INDEX` | SASB index CSV | Growth+ |
+
+**Planned (Phase E) — Enterprise tier only** — see [Phase E spec](#phase-e--enterprise-polish-spec-only):
+
+| Feature code | Constant (proposed) | Purpose |
+|--------------|---------------------|---------|
+| `gri_content_index_extended` | `EXPORT_GRI_CONTENT_INDEX_EXTENDED` | 80+ row GRI index CSV/PDF appendix |
+| `esg_scorecard_enterprise` | `EXPORT_ESG_SCORECARD_ENTERPRISE` | 80+ KPI Excel + enterprise PDF tables |
+| `uae_esg_pdf_enterprise` | `EXPORT_UAE_ESG_PDF_ENTERPRISE` | White-label cover + bilingual PDF variant |
+| `assurance_upload` | `FEATURE_ASSURANCE_UPLOAD` | Attach verifier assurance PDF to report |
+| `hris_kpi_import` | `FEATURE_HRIS_KPI_IMPORT` | Scheduled/API HRIS feed → `esg_kpi_snapshots` |
+| `energy_from_activity` | `FEATURE_ENERGY_FROM_ACTIVITY` | Auto GJ from Quick Input (not manual GRI 302) |
+
+Enterprise plan keeps `exports: ['*']` wildcard — new codes must be registered in `PlanEntitlementAdminService` and excluded from Growth defaults explicitly.
 
 ---
 
@@ -403,6 +428,128 @@ Quick Input / Bulk Import
 
 ---
 
+### Phase E — Enterprise polish (spec only)
+
+**Goal:** DP World–grade depth for large / multi-site clients **without** changing Growth deliverables or breaking lower tiers.
+
+**Principle:** Phase E is **additive**. Growth keeps today’s 22-row GRI index, ~35 KPI scorecard, English UAE ESG PDF, and text-only assurance. Enterprise unlocks extended indexes, uploads, integrations, and design polish via **new entitlement codes** — never by moving existing Growth exports behind Enterprise.
+
+#### E.0 — Tier matrix (locked)
+
+| Capability | Free | Starter | Growth | Enterprise |
+|------------|------|---------|--------|------------|
+| Disclosure forms (view/edit) | ✅ | ✅ | ✅ | ✅ |
+| GHG / MOCCAE / IEQT exports | ❌ | ✅ | ✅ | ✅ |
+| IFRS / GRI / UAE ESG / Scorecard / SASB | ❌ | ❌ | ✅ | ✅ |
+| GRI index 80+ rows | ❌ | ❌ | ❌ (22 rows) | ✅ |
+| Scorecard 80+ KPIs | ❌ | ❌ | ❌ (~35 KPIs) | ✅ |
+| Assurance verifier PDF upload | ❌ | ❌ | ❌ (text only) | ✅ |
+| HRIS / API KPI feed | ❌ | ❌ | ❌ (CSV import) | ✅ |
+| White-label report cover | ❌ | ❌ | ❌ | ✅ |
+| Arabic / bilingual UAE ESG PDF | ❌ | ❌ | ❌ | ✅ |
+| Energy auto from Quick Input | ❌ | ❌ | ❌ | ✅ |
+| Full CSRD double-materiality workflow | ❌ | ❌ | 🟡 matrix only | ✅ (optional E.6) |
+
+**Consultant managed clients:** Mirror direct-client tier of their agency pack (Growth-equivalent today). Enterprise polish only when agency pack explicitly includes `client_enterprise` entitlements.
+
+#### E.1 — Entitlement implementation rules
+
+1. Add constants to `PlanEntitlementService` (see §4.6 table).
+2. Add to `PlanEntitlementDefaults::enterprise()` `exports` array explicitly **or** document that `*` includes new codes once registered.
+3. **Do not** add Phase E codes to `growth()` defaults.
+4. Gate routes with `requireDisclosureExport()` or new `requireEnterpriseFeature()`.
+5. Gate UI with `PlanGate` / `x-plan-gated-link` — hide nav items on lower tiers (don’t show locked enterprise links on Growth hub).
+6. Services must **omit** enterprise sections when entitlement missing or data empty — never throw.
+
+```php
+// Pattern: UaeEsgReportService (enterprise sections optional)
+'assurance_attachment' => $this->assuranceService->attachmentIfAllowed($company, $fiscalYear),
+'cover' => $this->enterpriseCoverService->buildIfAllowed($company, $fiscalYear),
+// Growth build() unchanged — enterprise keys null/absent when not entitled
+```
+
+#### E.2 — Sub-phases (build order)
+
+| Sub-phase | Deliverable | Depends on | Est. effort |
+|-----------|-------------|------------|-------------|
+| **E.2a** | GRI index expansion 22 → 80+ | `config/disclosure.php`, new GRI section fields | Medium — mostly config + forms |
+| **E.2b** | Scorecard 80+ KPI pack | `config/esg_scorecard.php`, GRI/social breakdown fields | Medium — config + regional/gender fields |
+| **E.2c** | Assurance PDF upload | `CompanyDisclosure` or `company_documents`, reuse `MeasurementDocumentService` pattern | Small |
+| **E.2d** | HRIS KPI feed v1 | CSV SFTP/email template + optional REST ingest → `esg_kpi_snapshots` | Medium |
+| **E.2e** | Energy from Quick Input | Sum fuel + electricity activity → GRI 302 GJ estimate in scorecard | Small |
+| **E.2f** | White-label cover | Company logo + cover template in `uae-esg-pdf-enterprise.blade.php` | Small |
+| **E.2g** | Arabic UAE ESG PDF | `lang/ar` strings, RTL PDF CSS, bilingual narrative fields | Large |
+| **E.2h** | Full CSRD double materiality (optional) | Extend Phase C matrix with documentation workflow | Large — defer if not contracted |
+
+**Recommended ship order:** E.2a → E.2b → E.2c → E.2e → E.2f → E.2d → E.2g → E.2h.
+
+#### E.3 — Data & flow readiness
+
+| Item | Ready today | Phase E work |
+|------|-------------|--------------|
+| GRI index pipeline | ✅ `GriContentIndexService` | Add rows + `resolveStatus` sources for new sections |
+| KPI storage | ✅ `esg_kpi_snapshots` + CSV import | Expand `config/esg_scorecard.php`; add breakdown fields to GRI `social_hr` / `diversity` |
+| GHG single source of truth | ✅ `Measurement` / `GhgReportService` | E.2e reads activity — never duplicate totals |
+| Assurance narrative | ✅ text in `about_report` | E.2c adds file path + PDF embed page |
+| File upload infra | ✅ Quick Input docs, company logo | E.2c new `assurance_documents` storage disk path |
+| SASB / cross-walk | ✅ Phase D | Enterprise PDF includes same; no tier change |
+| Arabic | ❌ English only | E.2g full i18n pass on report templates |
+| Live HRIS API | ❌ | E.2d v1 = enhanced CSV + audit log; v2 = REST webhook (Enterprise API roadmap) |
+
+#### E.4 — Routes (proposed)
+
+All under `disclosures.` + `disclosureAccess` middleware + `fiscal_year` param.
+
+| Route | Name | Entitlement |
+|-------|------|-------------|
+| `GET /disclosures/gri/content-index-enterprise.csv` | `gri.content-index-enterprise` | `gri_content_index_extended` |
+| `GET /disclosures/esg-scorecard/export-enterprise.xlsx` | `esg-scorecard.export-enterprise` | `esg_scorecard_enterprise` |
+| `GET /disclosures/uae-esg-report/report/pdf-enterprise` | `uae-esg.report.pdf-enterprise` | `uae_esg_pdf_enterprise` |
+| `POST /disclosures/uae-esg-report/assurance` | `uae-esg.assurance.upload` | `assurance_upload` |
+| `POST /disclosures/esg-scorecard/hris-import` | `esg-scorecard.hris-import` | `hris_kpi_import` |
+
+Growth routes (`content-index.csv`, `content-index-full.csv`, `uae-esg.report.pdf`, etc.) **unchanged**.
+
+#### E.5 — Config additions (proposed files)
+
+| File | Purpose |
+|------|---------|
+| `config/gri_content_index_enterprise.php` | 80+ disclosure rows (extends base index, does not replace) |
+| `config/esg_scorecard_enterprise.php` | Additional KPI definitions (regional workforce, age bands, etc.) |
+| `config/esg_report_enterprise.php` | Cover templates, bilingual section keys, assurance doc settings |
+
+Base configs (`disclosure.php`, `esg_scorecard.php`, `esg_report.php`) remain the Growth source of truth.
+
+#### E.6 — Regression contract (Growth must not change)
+
+Before merging each E sub-phase:
+
+| Check | Expected |
+|-------|----------|
+| Growth `uae-esg.report.pdf` | Byte-identical layout/sections vs pre-E (except bugfixes) |
+| Growth `gri.content-index.csv` | Still 4 columns |
+| Growth `gri.content-index-full.csv` | Still 22 rows + UNGC/WEF/SDG |
+| Growth scorecard Excel | ~35 metrics unchanged |
+| Starter GHG / IEQT | Unaffected |
+| Free disclosure forms | Unaffected |
+| Enterprise without E data | Falls back to Growth-equivalent output |
+
+#### E.7 — Progress
+
+| Task | Status |
+|------|--------|
+| E.0 Tier matrix + entitlement codes | ✅ Spec (this doc) |
+| E.2a GRI 80+ | ✅ Enterprise CSV (`content-index-enterprise.csv`); Growth index unchanged |
+| E.2b Scorecard 80+ | ⏳ Not started |
+| E.2c Assurance upload | ⏳ Not started |
+| E.2d HRIS feed | ⏳ Not started |
+| E.2e Energy from activity | ⏳ Not started |
+| E.2f White-label cover | ⏳ Not started |
+| E.2g Arabic PDF | ⏳ Not started |
+| E.2h CSRD workflow | ⏳ Deferred |
+
+---
+
 ## 9. Regression & entitlement safeguards
 
 Before merging each phase:
@@ -415,7 +562,10 @@ Before merging each phase:
 | IEQT | `/reports/export/ieqt` |
 | IFRS S2 PDF | `/disclosures/ifrs-s2/report/pdf` |
 | GRI PDF + index CSV | `/disclosures/gri/report/pdf`, `content-index.csv` |
+| GRI enterprise index CSV | `/disclosures/gri/content-index-enterprise.csv` — Enterprise only; 80+ rows |
+| Growth index row count | `build()` = 22 rows; `buildEnterprise()` = 80+ rows |
 | Plan gates Free vs Growth | Disclosure export blocked on Free |
+| Plan gates Growth vs Enterprise (Phase E) | Enterprise routes 403 / hidden; Growth PDFs unchanged |
 | Consultant agency context | `getActiveCompany()` on all new routes |
 
 **Never:**
@@ -429,16 +579,18 @@ Before merging each phase:
 
 ## 10. Open decisions (discuss before build)
 
-| # | Question | Options | Recommendation |
-|---|----------|---------|----------------|
-| 1 | **Target client tier** | SME (MOCCAE + light ESG) vs enterprise (full DP World style) | Ship Phase A for SME; Phase B for enterprise |
-| 2 | **SASB required for UAE?** | Yes / Optional / Phase D | Optional — sector-specific |
-| 3 | **Minimum scorecard KPIs** | Full DP World (~100) vs UAE SME set (~25) | Start with ~25 env + 15 social + 10 gov |
-| 4 | **Who signs narrative?** | Software = draft; client = legal sign-off | Always disclaimer on PDF |
-| 5 | **Assurance v1** | Upload PDF only vs workflow | Upload only in Phase A |
-| 6 | **New plan tier?** | Bundle UAE ESG PDF in Growth vs new “Enterprise ESG” | Growth export flag first |
-| 7 | **Arabic report** | Phase A English only vs bilingual | English first; RTL later |
-| 8 | **Water/waste data** | Manual GRI forms vs Quick Input sources | Manual in A; Quick Input in B |
+| # | Question | Decision (July 2026) |
+|---|----------|----------------------|
+| 1 | **Target client tier** | Phases 0–D = **Growth** (SME + integrated report). Phase E = **Enterprise only**. |
+| 2 | **SASB required for UAE?** | Optional — sector picker (Phase D). Unchanged. |
+| 3 | **Minimum scorecard KPIs** | Growth ~35 KPIs. Enterprise 80+ (Phase E.2b). |
+| 4 | **Who signs narrative?** | Software = draft; client = legal sign-off. Disclaimer on all PDFs. |
+| 5 | **Assurance v1** | Growth: text fields only. Enterprise: PDF upload (Phase E.2c). |
+| 6 | **New plan tier?** | No new tier — Enterprise plan gets Phase E entitlements; Growth unchanged. |
+| 7 | **Arabic report** | Growth English only. Enterprise bilingual PDF (Phase E.2g). |
+| 8 | **Water/waste data** | Growth: GRI forms. Enterprise: optional auto energy from Quick Input (E.2e). |
+| 9 | **Move Growth exports to Enterprise?** | **No** — explicit product decision. Enterprise is superset, not gatekeeper. |
+| 10 | **HRIS v1 vs API** | CSV/SFTP template first (E.2d); REST webhook with Enterprise API roadmap later. |
 
 ---
 
@@ -451,6 +603,7 @@ Before merging each phase:
 | **B** | Scorecard shows 3-year Scope 1/2/3; ESG dashboard links to scorecard |
 | **C** | Social safety KPIs + stakeholder register in report |
 | **D** | SASB optional index for logistics sector pilot client |
+| **E** | Enterprise client generates 80+ GRI index + assurance PDF + enterprise scorecard; Growth output unchanged |
 
 ---
 
@@ -475,8 +628,26 @@ Before merging each phase:
 |----------|------|
 | Disclosure config schema | `config/disclosure.php` |
 | Phase 0 reporting foundation migration | `database/migrations/2026_06_09_000100_phase0_reporting_foundation.php` |
+| Plan entitlement defaults | `app/Data/PlanEntitlementDefaults.php` |
 | DP World reference | External — not in repository (see `.gitignore`) |
 
 ---
 
-*Last updated: July 2026. Update this file when each phase ships.*
+## Appendix C — File touch map (Phase E)
+
+| Action | Likely files |
+|--------|--------------|
+| New entitlements | `app/Services/PlanEntitlementService.php`, `app/Data/PlanEntitlementDefaults.php`, `PlanEntitlementAdminService.php` |
+| Enterprise configs | `config/gri_content_index_enterprise.php`, `config/esg_scorecard_enterprise.php`, `config/esg_report_enterprise.php` |
+| Extend services | `GriContentIndexService` (merge enterprise rows when entitled), `EsgScorecardService`, `UaeEsgReportService` |
+| New services | `AssuranceDocumentService`, `EnterpriseCoverService`, `HrisKpiImportService`, `EnergyFromActivityService` |
+| Controllers | Extend `GriReportController`, `EsgScorecardController`, `UaeEsgReportController` |
+| Migration | `assurance_documents` or JSON on `company_disclosures`; optional `hris_import_logs` |
+| Views | `uae-esg-pdf-enterprise.blade.php`, assurance upload form on UAE ESG overview |
+| Routes | `routes/web.php` — enterprise-only routes with entitlement middleware |
+| Pricing UI | `SubscriptionPlanMatrix` — flip “White Label Reports” / API from `coming_soon` when shipped |
+| Tests | Growth regression: PDF/CSV snapshots before/after each E sub-phase |
+
+---
+
+*Last updated: July 2026 (v1.1 — Phase E spec). Update this file when each phase ships.*
