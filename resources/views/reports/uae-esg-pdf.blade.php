@@ -346,6 +346,15 @@
             <div class="field-label">Assurance scope</div>
             <div class="field-value">{{ $report['narrative']['about_report']['content']['assurance_scope'] }}</div>
         @endif
+        @if(!empty($report['assurance_document']['filename']))
+            <div class="field-label">Verifier statement on file</div>
+            <div class="field-value">{{ $report['assurance_document']['filename'] }}
+                @if(!empty($report['assurance_document']['uploaded_at']))
+                    (uploaded {{ \Carbon\Carbon::parse($report['assurance_document']['uploaded_at'])->format('d M Y') }})
+                @endif
+            </div>
+            <p class="muted">Full assurance PDF is available for download from the UAE ESG Report workspace.</p>
+        @endif
     @endif
 
     <div class="disclaimer">{{ $report['disclaimer'] }}</div>

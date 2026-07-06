@@ -382,6 +382,9 @@ Route::middleware([
             Route::post('/sections/{section}', [\App\Http\Controllers\Disclosure\SectionController::class, 'updateEsgReport'])->name('sections.update');
             Route::get('/report', [\App\Http\Controllers\Disclosure\UaeEsgReportController::class, 'preview'])->name('report.preview');
             Route::get('/report/pdf', [\App\Http\Controllers\Disclosure\UaeEsgReportController::class, 'exportPdf'])->name('report.pdf');
+            Route::post('/assurance', [\App\Http\Controllers\Disclosure\UaeEsgReportController::class, 'uploadAssurance'])->name('assurance.upload');
+            Route::get('/assurance/download', [\App\Http\Controllers\Disclosure\UaeEsgReportController::class, 'downloadAssurance'])->name('assurance.download');
+            Route::delete('/assurance', [\App\Http\Controllers\Disclosure\UaeEsgReportController::class, 'deleteAssurance'])->name('assurance.delete');
         });
     });
 

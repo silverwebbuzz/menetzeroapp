@@ -541,7 +541,7 @@ Before merging each E sub-phase:
 | E.0 Tier matrix + entitlement codes | ✅ Spec (this doc) |
 | E.2a GRI 80+ | ✅ Enterprise CSV (`content-index-enterprise.csv`); Growth index unchanged |
 | E.2b Scorecard 80+ | ✅ Enterprise Excel (`export-enterprise.xlsx`); Growth scorecard UI unchanged |
-| E.2c Assurance upload | ⏳ Not started |
+| E.2c Assurance upload | ✅ Enterprise PDF upload + download; Growth text-only unchanged |
 | E.2d HRIS feed | ⏳ Not started |
 | E.2e Energy from activity | ⏳ Not started |
 | E.2f White-label cover | ⏳ Not started |

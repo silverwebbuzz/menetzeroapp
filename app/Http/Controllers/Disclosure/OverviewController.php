@@ -75,6 +75,7 @@ class OverviewController extends DisclosureBaseController
             'framework' => 'esg_report',
             'completeness' => $report['completeness'],
             'sectionConfig' => config('esg_report.sections', []),
+            'assuranceDocument' => $report['assurance_document'],
         ]);
     }
 }

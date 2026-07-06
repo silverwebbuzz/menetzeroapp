@@ -57,6 +57,18 @@ class DisclosureService
             }
         }
 
+        if ($framework === 'esg_report' && $section === 'about_report') {
+            $existing = CompanyDisclosure::where('company_id', $companyId)
+                ->where('framework', 'esg_report')
+                ->where('section', 'about_report')
+                ->where('fiscal_year', $fiscalYear)
+                ->value('content');
+
+            if (is_array($existing) && !empty($existing['assurance_document'])) {
+                $filtered['assurance_document'] = $existing['assurance_document'];
+            }
+        }
+
         $complete = $this->sectionFieldsComplete($framework, $section, $filtered);
 
         return CompanyDisclosure::updateOrCreate(

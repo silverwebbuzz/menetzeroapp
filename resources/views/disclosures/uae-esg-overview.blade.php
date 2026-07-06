@@ -60,6 +60,40 @@
         @endforeach
     </div>
 
+    @if($gate->canDisclosureExportType('assurance_upload', $fiscalYear))
+    <div class="card mb-6">
+        <div class="card-header"><h3 class="card-title">Independent assurance statement (Enterprise)</h3></div>
+        <div class="card-body">
+            <p class="text-sm text-gray-500 mb-4">
+                Upload the verifier’s signed assurance PDF (e.g. LRQA). Narrative assurance status remains in
+                <a href="{{ route('disclosures.uae-esg.sections.edit', ['fiscal_year' => $fiscalYear, 'section' => 'about_report']) }}" class="text-brand-600 underline">About This Report</a>.
+                Growth plans use text fields only.
+            </p>
+            @if(!empty($assuranceDocument))
+                <div class="flex flex-wrap items-center gap-3 mb-4 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                    <div class="text-sm">
+                        <span class="font-medium">{{ $assuranceDocument['filename'] }}</span>
+                        @if(!empty($assuranceDocument['uploaded_at']))
+                            <span class="text-gray-500"> — uploaded {{ \Carbon\Carbon::parse($assuranceDocument['uploaded_at'])->format('d M Y') }}</span>
+                        @endif
+                    </div>
+                    <a href="{{ route('disclosures.uae-esg.assurance.download', ['fiscal_year' => $fiscalYear]) }}" class="btn btn-secondary text-sm">Download</a>
+                    <form method="POST" action="{{ route('disclosures.uae-esg.assurance.delete', ['fiscal_year' => $fiscalYear]) }}" onsubmit="return confirm('Remove assurance PDF?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-secondary text-sm text-red-700">Remove</button>
+                    </form>
+                </div>
+            @endif
+            <form method="POST" action="{{ route('disclosures.uae-esg.assurance.upload', ['fiscal_year' => $fiscalYear]) }}" enctype="multipart/form-data" class="flex flex-wrap gap-3 items-end">
+                @csrf
+                <input type="file" name="file" accept="application/pdf,.pdf" required class="text-sm">
+                <button type="submit" class="btn btn-primary">{{ !empty($assuranceDocument) ? 'Replace PDF' : 'Upload PDF' }}</button>
+            </form>
+        </div>
+    </div>
+    @endif
+
     <div class="card">
         <div class="card-body flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>

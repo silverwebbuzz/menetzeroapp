@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers\Disclosure;
 
+use App\Services\AssuranceDocumentService;
 use App\Services\ExportReadinessService;
 use App\Services\PlanEntitlementService;
 use App\Services\UaeEsgReportService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class UaeEsgReportController extends DisclosureBaseController
 {
     public function __construct(
         protected UaeEsgReportService $reportService,
         protected ExportReadinessService $exportReadiness,
+        protected AssuranceDocumentService $assuranceService,
     ) {
     }
 
@@ -49,6 +52,44 @@ class UaeEsgReportController extends DisclosureBaseController
         $slug = preg_replace('/[^a-z0-9]+/i', '-', strtolower($company->name ?? 'company'));
 
         return $pdf->download("uae-esg-report-{$fiscalYear}-{$slug}.pdf");
+    }
+
+    public function uploadAssurance(Request $request)
+    {
+        ['company' => $company, 'fiscalYear' => $fiscalYear] = $this->resolveContext($request, true);
+        $this->requireDisclosureExport($company->id, PlanEntitlementService::FEATURE_ASSURANCE_UPLOAD, $fiscalYear);
+
+        $request->validate([
+            'file' => 'required|file|mimes:pdf|max:10240',
+        ]);
+
+        $this->assuranceService->store($company->id, $fiscalYear, $request->file('file'));
+
+        return $this->fiscalRedirect('disclosures.uae-esg.overview', $fiscalYear, 'Assurance statement uploaded.');
+    }
+
+    public function downloadAssurance(Request $request)
+    {
+        ['company' => $company, 'fiscalYear' => $fiscalYear] = $this->resolveContext($request);
+        $this->requireDisclosureExport($company->id, PlanEntitlementService::FEATURE_ASSURANCE_UPLOAD, $fiscalYear);
+
+        $resolved = $this->assuranceService->resolveDownload($company->id, $fiscalYear);
+
+        return Storage::disk('local')->download(
+            $resolved['path'],
+            $resolved['downloadName'],
+            ['Content-Type' => $resolved['mime']]
+        );
+    }
+
+    public function deleteAssurance(Request $request)
+    {
+        ['company' => $company, 'fiscalYear' => $fiscalYear] = $this->resolveContext($request, true);
+        $this->requireDisclosureExport($company->id, PlanEntitlementService::FEATURE_ASSURANCE_UPLOAD, $fiscalYear);
+
+        $this->assuranceService->delete($company->id, $fiscalYear);
+
+        return $this->fiscalRedirect('disclosures.uae-esg.overview', $fiscalYear, 'Assurance statement removed.');
     }
 
     protected function platformLogoDataUri(): ?string

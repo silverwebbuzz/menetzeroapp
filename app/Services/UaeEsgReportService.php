@@ -110,6 +110,10 @@ class UaeEsgReportService
             'esg_depth' => $this->buildEsgDepth($company, $fiscalYear),
             'completeness' => $this->completeness($company->id, $fiscalYear, $esgDisclosures, $s2, $gri),
 
+            'assurance_document' => $this->publicAssuranceMeta(
+                $esgDisclosures->get('about_report')?->content['assurance_document'] ?? null
+            ),
+
             'section_config' => config('esg_report.sections', []),
             'disclaimer' => 'This report is prepared using MENetZero as a working draft. '
                 . 'Narrative content is the responsibility of the reporting entity. '
@@ -275,6 +279,23 @@ class UaeEsgReportService
                 'impact' => $t['impact_materiality'] ?: '—',
                 'financial' => $t['financial_materiality'] ?: '—',
             ])->values(),
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>|null  $doc
+     * @return array{filename: string, uploaded_at: string|null, size: int|null}|null
+     */
+    protected function publicAssuranceMeta(?array $doc): ?array
+    {
+        if (!$doc || empty($doc['filename'])) {
+            return null;
+        }
+
+        return [
+            'filename' => (string) $doc['filename'],
+            'uploaded_at' => $doc['uploaded_at'] ?? null,
+            'size' => isset($doc['size']) ? (int) $doc['size'] : null,
         ];
     }
 }
