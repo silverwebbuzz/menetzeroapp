@@ -11,7 +11,7 @@ return [
         'tips' => [
             'Not sure yet? Stay on Free — enter a few months of utility bills and explore the dashboard.',
             'Need a PDF for MOCCAE or a landlord? Starter includes your GHG inventory report.',
-            'Reporting to investors or preparing IFRS / GRI disclosures? Growth unlocks those downloads.',
+            'Reporting to investors or preparing an integrated UAE ESG report? Growth unlocks IFRS, GRI, Scorecard, and UAE ESG Report PDFs.',
         ],
     ],
 
@@ -31,14 +31,14 @@ return [
         [
             'plan' => 'Growth',
             'code' => 'client_growth',
-            'scenario' => 'A manufacturing group preparing investor-ready climate disclosures for 10 sites.',
-            'you_get' => 'IFRS S1/S2 and GRI report downloads, full disclosure workspace, consultant directory access.',
+            'scenario' => 'A manufacturing group preparing an integrated UAE ESG report and investor-ready climate disclosures for 10 sites.',
+            'you_get' => 'UAE ESG Report PDF, ESG Scorecard, IFRS S1/S2 and GRI exports, SASB index, consultant directory access.',
         ],
         [
             'plan' => 'Enterprise',
             'code' => 'client_enterprise',
-            'scenario' => 'A holding company with many entities, custom workflows, and training needs.',
-            'you_get' => 'Unlimited scale, tailored onboarding — pricing agreed with our team.',
+            'scenario' => 'A holding company needing 80+ KPI scorecards, HRIS workforce data, assurance PDF attachment, and white-label report covers.',
+            'you_get' => 'Everything in Growth plus extended GRI index, enterprise scorecard, HRIS CSV import, assurance upload, and branded PDF covers.',
         ],
     ],
 
@@ -63,8 +63,12 @@ return [
 
     'faq' => [
         [
+            'q' => 'Which plan do I need for the UAE ESG Report?',
+            'a' => 'Growth or Enterprise. Growth includes the integrated UAE ESG Report PDF, ESG Scorecard, and all IFRS/GRI exports. Enterprise adds 80+ KPI packs, HRIS import, assurance PDF upload, and white-label covers.',
+        ],
+        [
             'q' => 'Which plan do I need for MOCCAE reporting?',
-            'a' => 'Starter or above. Starter includes a downloadable GHG inventory PDF aligned for UAE inventory submissions. Growth adds IFRS and GRI exports if you also disclose to investors.',
+            'a' => 'Starter or above. Starter includes a downloadable GHG inventory PDF aligned for UAE inventory submissions. Growth adds the full integrated UAE ESG Report if you also disclose to investors.',
         ],
         [
             'q' => 'Can I try before I pay?',
@@ -95,7 +99,7 @@ return [
     'plan_taglines' => [
         'client_free' => 'Explore the platform — enter data, preview reports',
         'client_starter' => 'Official GHG inventory PDF for regulators & stakeholders',
-        'client_growth' => 'Investor-ready IFRS & GRI downloads + more capacity',
-        'client_enterprise' => 'Multi-entity organisations — custom scope & support',
+        'client_growth' => 'Integrated UAE ESG Report + IFRS & GRI downloads',
+        'client_enterprise' => '80+ KPI scorecard, HRIS import & white-label PDF',
     ],
 ];

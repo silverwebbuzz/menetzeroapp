@@ -25,7 +25,7 @@ return [
         ],
         [
             'title' => 'Export reports on a paid pack',
-            'body' => 'Paid packs unlock Growth-equivalent PDFs per client for their PRY. Trial is data entry only — no exports.',
+            'body' => 'Paid packs unlock Growth-equivalent PDFs per client for their PRY — including UAE ESG Report, Scorecard, GHG, MOCCAE, IFRS, and GRI. Trial is data entry only — no exports.',
         ],
         [
             'title' => 'Renew or grow each calendar year',
@@ -96,8 +96,8 @@ return [
             'a' => 'Buy extra slots (AED 1,299 each, pro-rata through year-end) or upgrade to the next pack size when checkout is open.',
         ],
         [
-            'q' => 'Can I export MOCCAE / IFRS reports for clients?',
-            'a' => 'On a paid pack, each active client gets Growth-level downloads for their PRY — GHG inventory, IFRS S1/S2, and GRI exports inside their workspace.',
+            'q' => 'Can I export MOCCAE / IFRS / UAE ESG reports for clients?',
+            'a' => 'On a paid pack, each active client gets Growth-level downloads for their PRY — GHG inventory, MOCCAE PDF, IFRS S1/S2, GRI, UAE ESG Report, and ESG Scorecard inside their workspace.',
         ],
         [
             'q' => 'What happens to client data if I downgrade or don\'t renew?',

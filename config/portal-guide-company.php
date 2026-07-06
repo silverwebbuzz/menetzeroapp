@@ -3,10 +3,11 @@
 return [
     'intro' => [
         'title' => 'How the company portal works',
-        'body' => 'MENetZero helps your organisation measure greenhouse gas emissions, build a GHG inventory, and prepare IFRS, GRI, and MOCCAE-ready exports. Use this guide to understand each area of the portal and the order we recommend for first-time setup.',
+        'body' => 'MENetZero helps your organisation measure greenhouse gas emissions, build a GHG inventory, and prepare integrated UAE ESG reports, IFRS/GRI disclosures, and MOCCAE-ready exports. Use this guide to understand each area of the portal and the order we recommend for first-time setup.',
         'tips' => [
             'Your Primary Reporting Year (PRY) is the calendar year you report against — most entries are tagged to a location and year.',
             'Permissions depend on your role. Company admins see billing and team settings; other users may only view or enter data.',
+            'Growth unlocks the unified UAE ESG Report PDF, ESG Scorecard, and disclosure exports. Enterprise adds extended indexes, HRIS import, assurance PDF upload, and white-label report covers.',
             'If a sustainability consultant manages your account, some billing and team settings may be handled by them.',
         ],
     ],
@@ -44,9 +45,15 @@ return [
         ],
         [
             'title' => 'Complete disclosures & export reports',
-            'body' => 'Fill IFRS S1/S2, GRI, and ESG sections, then preview or download PDF reports when ready.',
+            'body' => 'Fill IFRS S1/S2 and GRI sections, add narrative chapters in the UAE ESG Report, then download PDFs and indexes when ready (Growth plan and above).',
             'route' => 'disclosures.hub',
             'link_label' => 'Disclosures',
+        ],
+        [
+            'title' => 'Publish UAE ESG Report (Growth+)',
+            'body' => 'Complete leadership message, strategy, and about sections, then export the integrated UAE ESG Report PDF — GHG numbers pull automatically from your inventory.',
+            'route' => 'disclosures.uae-esg.overview',
+            'link_label' => 'UAE ESG Report',
         ],
     ],
 
@@ -202,13 +209,13 @@ return [
         [
             'id' => 'disclosures',
             'title' => 'Disclosures & sustainability reports',
-            'summary' => 'IFRS S1, IFRS S2, GRI, and ESG dashboard.',
+            'summary' => 'IFRS S1/S2, GRI, UAE ESG Report, ESG Scorecard, and SASB (Growth+).',
             'highlights' => [
                 [
                     'title' => 'Disclosures hub',
                     'variant' => 'disclosure-hub',
                     'theme' => 'company',
-                    'caption' => 'Jump into IFRS S1, IFRS S2, GRI, or the ESG dashboard.',
+                    'caption' => 'Jump into IFRS S1, IFRS S2, GRI, UAE ESG Report, Scorecard, or SASB.',
                 ],
                 [
                     'title' => 'Section progress',
@@ -217,22 +224,51 @@ return [
                     'caption' => 'Each framework shows completion % — work through sections in any order.',
                 ],
             ],
-            'body' => 'Disclosures capture narrative and structured sustainability information beyond raw emissions. Complete sections progressively; many fields pull from your inventory automatically.',
+            'body' => 'Disclosures capture narrative and structured sustainability information beyond raw emissions. On Growth and above you can export PDFs and indexes; Free and Starter can preview forms without downloading.',
             'steps' => [
                 'Disclosures hub — overview of completion status across frameworks.',
                 'IFRS S2 — climate-related disclosures, risks, targets, and GHG emissions (§29).',
                 'IFRS S1 — general sustainability-related financial disclosures.',
-                'GRI — material topics and GRI-aligned narrative sections.',
+                'GRI — material topics, social/safety sections, and GRI content index CSV.',
+                'UAE ESG Report — unified PDF matching the UAE standard report index (narrative + auto GHG + indexes).',
+                'ESG Scorecard — multi-year KPI tables; import manual KPIs via CSV on Growth.',
+                'ESG Depth — stakeholder register, materiality matrix, supply chain suppliers, sustainability targets.',
+                'SASB — optional sector index (logistics, real estate, etc.).',
                 'ESG Dashboard — visual summary linking metrics and disclosure progress.',
-                'Preview and PDF export when sections are ready.',
             ],
             'tips' => [
-                'Plan access may gate advanced disclosure modules — check Plan & billing if a section is locked.',
+                'Plan access gates PDF/CSV exports — Free and Starter preview only; Growth unlocks integrated UAE ESG Report, Scorecard, GRI, and IFRS downloads.',
+                'GHG totals in disclosure PDFs always come from your Quick Input inventory — never re-enter emissions in narrative forms.',
                 'Reporting Settings (admin) controls methodology defaults used in reports.',
             ],
             'links' => [
                 ['route' => 'disclosures.hub', 'label' => 'Disclosures hub'],
+                ['route' => 'disclosures.uae-esg.overview', 'label' => 'UAE ESG Report'],
                 ['route' => 'settings.reporting', 'label' => 'Reporting settings'],
+            ],
+        ],
+        [
+            'id' => 'enterprise-esg',
+            'title' => 'Enterprise ESG add-ons',
+            'summary' => 'Extended indexes, HRIS feed, assurance upload, and white-label PDF (Enterprise plan only).',
+            'body' => 'Enterprise builds on Growth with deeper KPI packs and integrations. Growth clients keep today’s ~25 KPI scorecard and standard UAE ESG PDF — Enterprise features are additional, not replacements.',
+            'steps' => [
+                'GRI content index (80+ rows) — download extended CSV from the GRI overview page.',
+                'ESG Scorecard enterprise export — 80+ KPI Excel workbook from the Scorecard page.',
+                'HRIS KPI import — upload a CSV from your HR system to populate workforce and safety metrics (audit log kept).',
+                'Energy from activity — electricity and fuel Quick Input entries auto-estimate GJ on the enterprise scorecard.',
+                'Assurance PDF — attach your verifier’s limited/reasonable assurance statement on the UAE ESG Report overview.',
+                'White-label UAE ESG PDF — download a branded cover PDF without MenetZero branding on the cover page.',
+            ],
+            'tips' => [
+                'Enterprise-only buttons are hidden on Growth accounts — contact sales to upgrade.',
+                'HRIS import rows are tagged separately from manual scorecard edits and will not be overwritten by UI saves.',
+                'Arabic bilingual PDF is not yet available — English reports are fully supported.',
+            ],
+            'links' => [
+                ['route' => 'disclosures.esg-scorecard.index', 'label' => 'ESG Scorecard'],
+                ['route' => 'disclosures.uae-esg.overview', 'label' => 'UAE ESG Report'],
+                ['route' => 'subscriptions.upgrade', 'label' => 'View plans'],
             ],
         ],
         [
@@ -311,6 +347,10 @@ return [
         [
             'q' => 'What is the difference between Quick Input and GHG Inventory?',
             'a' => 'Quick Input is where you enter raw activity data (kWh, litres, km, etc.). GHG Inventory is the aggregated report built from those entries.',
+        ],
+        [
+            'q' => 'Which plan do I need for the UAE ESG Report and Scorecard?',
+            'a' => 'Growth or Enterprise. Growth includes the integrated UAE ESG Report PDF, ESG Scorecard Excel (~25 KPIs), GRI/IFRS exports, and SASB index. Enterprise adds 80+ KPI/GRI packs, HRIS import, assurance PDF upload, and white-label report covers.',
         ],
         [
             'q' => 'Which plan do I need for bulk import and Scope 3?',

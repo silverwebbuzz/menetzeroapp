@@ -217,12 +217,13 @@ return [
                     'caption' => 'Sidebar lists Scope 1, 2, and 3 forms available for this client.',
                 ],
             ],
-            'body' => 'When you enter a client workspace, use the company Help & guide for detailed steps on locations, Quick Input, reports, and disclosures. Key tasks consultants perform most often:',
+            'body' => 'When you enter a client workspace, use the company Help & guide for detailed steps on locations, Quick Input, reports, and disclosures. On a paid pack each client gets Growth-level exports including the UAE ESG Report and Scorecard. Key tasks consultants perform most often:',
             'steps' => [
                 'Locations & emission boundaries — set up sites and applicable categories.',
                 'Quick Input & bulk import — enter DEWA, fuel, fleet, and Scope 3 data.',
                 'GHG Inventory — review totals and export Excel/PDF for the client.',
-                'Disclosures — complete IFRS S1/S2 and GRI sections for reporting cycles.',
+                'Disclosures — complete IFRS S1/S2, GRI, UAE ESG Report narrative, and ESG Scorecard for reporting cycles.',
+                'ESG Depth — stakeholder register, materiality matrix, suppliers, and targets (included in UAE ESG PDF).',
                 'Scope 1 & 2 Help Guide — field-by-field bulk import reference (linked from Input Data).',
             ],
             'links' => [
@@ -265,6 +266,10 @@ return [
         [
             'q' => 'How do I add more than one client?',
             'a' => 'Upgrade to an agency pack with the slot count you need. Each active managed client uses one slot.',
+        ],
+        [
+            'q' => 'Can I export the UAE ESG Report for clients?',
+            'a' => 'On a paid agency pack, each client workspace gets Growth-level exports for their PRY — including the integrated UAE ESG Report PDF, ESG Scorecard, GHG inventory, MOCCAE, IFRS, and GRI.',
         ],
         [
             'q' => 'Where do I get help with DEWA bills and bulk import columns?',

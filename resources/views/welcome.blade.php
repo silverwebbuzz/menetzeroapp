@@ -167,7 +167,7 @@
             @foreach([
                 ['Emission calculations', ['Automated Scope 1 & 2 from activity data', 'Built-in emission factor library for MENA', 'Dashboard with totals, trends, and hotspots', 'Historical data retention (2–5 years by plan)']],
                 ['UAE & regional compliance', ['GHG Protocol-aligned inventory methodology', 'MOCCAE Scope 1 & 2 report PDFs', 'IEQT export for mrv.ae submission', 'Working papers for your audit trail']],
-                ['ESG disclosures', ['IFRS S1 / S2 climate disclosure forms', 'GRI standards reporting + content index', 'Preview on Free & Starter — export on Growth', 'Guided help including disclosure walkthroughs']],
+                ['ESG disclosures', ['Integrated UAE ESG Report PDF (Growth+)', 'ESG Scorecard with 3-year KPI tables', 'IFRS S1 / S2 and GRI + content index', 'SASB sector index (optional)', 'Preview on Free & Starter — export on Growth']],
                 ['Data management', ['Manual quick-input for every emission source', 'Bulk CSV / Excel import (Starter+)', 'Bulk data export for analysis', 'Document storage per organisation']],
                 ['Multi-location & team access', ['Track emissions per branch or site', 'Invite colleagues with role-based access', 'Up to 10 users on Growth', 'Unlimited users on Enterprise']],
                 ['Consultant marketplace', ['Browse verified UAE consultants publicly', 'Request introductions from your account', 'Optional review packs for professional sign-off', 'Growth subscribers get full directory connect']],
@@ -213,6 +213,11 @@
                         ['Disclosure forms (IFRS / GRI)', 'Preview', 'Preview', 'Export PDF', 'Full'],
                         ['IFRS S1 / S2 PDF', '—', '—', '✓', '✓'],
                         ['GRI PDF + content index', '—', '—', '✓', '✓'],
+                        ['UAE ESG Report PDF', '—', '—', '✓', '✓'],
+                        ['ESG Scorecard Excel', '—', '—', '✓', '80+ KPIs'],
+                        ['SASB index CSV', '—', '—', '✓', '✓'],
+                        ['White-label UAE ESG PDF', '—', '—', '—', '✓'],
+                        ['HRIS KPI import', '—', '—', '—', '✓'],
                         ['Scope 3', 'Locked', 'Preview', 'Preview', 'Unlimited'],
                     ] as $row)
                         <tr>

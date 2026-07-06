@@ -550,6 +550,7 @@ Before merging each E sub-phase:
 | E.2f White-label cover | ✅ Enterprise PDF (`report/pdf-enterprise`); Growth PDF unchanged |
 | E.2g Arabic PDF | ⏸️ Deferred — no Arabic reviewer; English-only v1 complete |
 | E.2h CSRD workflow | ⏸️ Deferred — basic materiality matrix sufficient for v1 |
+| Help & guides updated | ✅ Portal guide, plan copy, pricing comparison (v1.2) |
 
 #### E.8 — English release complete (July 2026)
 

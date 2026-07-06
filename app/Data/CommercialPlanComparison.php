@@ -166,6 +166,69 @@ class CommercialPlanComparison
                     'client_enterprise' => true,
                 ],
             ],
+            [
+                'label' => 'UAE ESG Report PDF',
+                'cells' => [
+                    'client_free' => false,
+                    'client_starter' => false,
+                    'client_growth' => true,
+                    'client_enterprise' => true,
+                ],
+            ],
+            [
+                'label' => 'ESG Scorecard Excel',
+                'cells' => [
+                    'client_free' => false,
+                    'client_starter' => false,
+                    'client_growth' => true,
+                    'client_enterprise' => '80+ KPIs',
+                ],
+            ],
+            [
+                'label' => 'SASB index CSV',
+                'cells' => [
+                    'client_free' => false,
+                    'client_starter' => false,
+                    'client_growth' => true,
+                    'client_enterprise' => true,
+                ],
+            ],
+            [
+                'label' => 'GRI index 80+ rows',
+                'cells' => [
+                    'client_free' => false,
+                    'client_starter' => false,
+                    'client_growth' => false,
+                    'client_enterprise' => true,
+                ],
+            ],
+            [
+                'label' => 'White-label UAE ESG PDF',
+                'cells' => [
+                    'client_free' => false,
+                    'client_starter' => false,
+                    'client_growth' => false,
+                    'client_enterprise' => true,
+                ],
+            ],
+            [
+                'label' => 'Assurance PDF upload',
+                'cells' => [
+                    'client_free' => false,
+                    'client_starter' => false,
+                    'client_growth' => false,
+                    'client_enterprise' => true,
+                ],
+            ],
+            [
+                'label' => 'HRIS KPI CSV import',
+                'cells' => [
+                    'client_free' => false,
+                    'client_starter' => false,
+                    'client_growth' => false,
+                    'client_enterprise' => true,
+                ],
+            ],
         ];
     }
 
@@ -215,8 +278,8 @@ class CommercialPlanComparison
         return [
             'client_free' => ['name' => 'Free', 'tagline' => 'Try S1&2 + disclosure forms'],
             'client_starter' => ['name' => 'Starter', 'tagline' => 'MOCCAE-ready inventory & IEQT'],
-            'client_growth' => ['name' => 'Growth', 'tagline' => 'IFRS & GRI downloads'],
-            'client_enterprise' => ['name' => 'Enterprise', 'tagline' => 'Unlimited Scope 3 & custom'],
+            'client_growth' => ['name' => 'Growth', 'tagline' => 'UAE ESG Report + IFRS & GRI'],
+            'client_enterprise' => ['name' => 'Enterprise', 'tagline' => '80+ KPIs, HRIS & white-label PDF'],
         ];
     }
 }
