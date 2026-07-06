@@ -33,7 +33,7 @@
         <p class="muted">No material topics selected.</p>
     @endif
 
-    @foreach(['material_topics_process' => 'GRI 3 Process', 'general' => 'GRI 2 General Disclosures', 'energy' => 'GRI 302 Energy', 'water' => 'GRI 303 Water', 'waste' => 'GRI 306 Waste', 'social_hr' => 'GRI 401–404 Employment', 'diversity' => 'GRI 405 Diversity'] as $section => $title)
+    @foreach(['material_topics_process' => 'GRI 3 Process', 'general' => 'GRI 2 General Disclosures', 'energy' => 'GRI 302 Energy', 'water' => 'GRI 303 Water', 'waste' => 'GRI 306 Waste', 'social_hr' => 'GRI 401–404 Employment', 'diversity' => 'GRI 405 Diversity', 'health_safety' => 'GRI 403 Health & Safety', 'supply_chain' => 'GRI 308/414 Supply Chain', 'governance_metrics' => 'Governance KPIs'] as $section => $title)
         @php $content = $report[$section] ?? []; $fields = $report['section_config'][$section]['fields'] ?? []; @endphp
         @if(!empty(array_filter($content ?? [])))
             <h2>{{ $title }}</h2>

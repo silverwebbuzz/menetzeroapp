@@ -49,6 +49,9 @@ class GriReportService
             'waste' => $disclosures->get('waste')?->content ?? [],
             'social_hr' => $disclosures->get('social_hr')?->content ?? [],
             'diversity' => $disclosures->get('diversity')?->content ?? [],
+            'health_safety' => $disclosures->get('health_safety')?->content ?? [],
+            'supply_chain' => $disclosures->get('supply_chain')?->content ?? [],
+            'governance_metrics' => $disclosures->get('governance_metrics')?->content ?? [],
             'gri_305' => [
                 'scope1_tonnes' => $ghg['scope_tonnes']['Scope 1'] ?? 0,
                 'scope2_location_tonnes' => $ghg['scope2_location_tonnes'] ?? 0,

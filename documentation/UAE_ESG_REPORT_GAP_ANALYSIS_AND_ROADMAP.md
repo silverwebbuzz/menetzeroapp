@@ -4,7 +4,7 @@
 |---|---|
 | **Version** | 1.0 |
 | **Created** | July 2026 |
-| **Status** | Phase B shipped — ESG Scorecard with 3-year KPI tables |
+| **Status** | Phase C shipped — stakeholders, materiality, supply chain, ESG targets |
 | **Reference report** | External UAE ESG report index (DP World 2024 used as structural reference only; file not stored in repo) |
 | **Client input** | UAE Standard ESG Report Index (Scope 3 purchaser format) |
 
@@ -367,6 +367,17 @@ Quick Input / Bulk Import
 | C.4 | Supply chain module | Scope 3 Cat 1 spend/activity + supplier screening checklist (GRI 308/414 narrative) |
 | C.5 | ESG targets beyond GHG | Non-climate targets table (water, waste, diversity %) |
 | C.6 | Governance KPI pack | Ethics incidents, compliance, board diversity |
+
+**Progress (July 2026):**
+
+| Task | Status |
+|------|--------|
+| C.1 | ✅ GRI 403 health & safety section + scorecard auto-link |
+| C.2 | ✅ Stakeholder register CRUD |
+| C.3 | ✅ Materiality matrix (impact × financial) + visual grid |
+| C.4 | ✅ Supply chain supplier register + GRI 308/414 narrative |
+| C.5 | ✅ Non-climate ESG targets table |
+| C.6 | ✅ Governance metrics GRI section + scorecard link |
 
 ---
 

@@ -242,6 +242,34 @@ class DisclosureService
         }
     }
 
+    public function syncMaterialityMatrix(int $companyId, int $fiscalYear, array $topics): void
+    {
+        $catalog = config('disclosure.ifrs_s1.material_topics', []);
+
+        foreach ($catalog as $key => $meta) {
+            $row = $topics[$key] ?? [];
+            $impact = $row['impact_materiality'] ?? null;
+            $financial = $row['financial_materiality'] ?? null;
+            $isMaterial = !empty($row['is_material'])
+                || in_array($impact, ['medium', 'high'], true)
+                || in_array($financial, ['medium', 'high'], true);
+
+            MaterialSustainabilityTopic::updateOrCreate(
+                [
+                    'company_id' => $companyId,
+                    'fiscal_year' => $fiscalYear,
+                    'topic_key' => $key,
+                ],
+                [
+                    'is_material' => $isMaterial,
+                    'impact_materiality' => in_array($impact, ['low', 'medium', 'high'], true) ? $impact : null,
+                    'financial_materiality' => in_array($financial, ['low', 'medium', 'high'], true) ? $financial : null,
+                    'rationale' => $row['rationale'] ?? ($isMaterial ? null : 'Not material for this reporting period'),
+                ]
+            );
+        }
+    }
+
     public function materialTopicsForCompany(int $companyId, int $fiscalYear): array
     {
         $catalog = config('disclosure.ifrs_s1.material_topics', []);
@@ -259,6 +287,8 @@ class DisclosureService
                 'gri' => $meta['gri'] ?? null,
                 'is_material' => (bool) ($record->is_material ?? false),
                 'rationale' => $record->rationale ?? '',
+                'impact_materiality' => $record->impact_materiality ?? '',
+                'financial_materiality' => $record->financial_materiality ?? '',
             ];
         }
 
@@ -271,7 +301,7 @@ class DisclosureService
         $items = [];
         $earned = 0;
 
-        foreach (['material_topics_process', 'general', 'energy', 'water', 'waste', 'social_hr', 'diversity'] as $section) {
+        foreach (['material_topics_process', 'general', 'energy', 'water', 'waste', 'social_hr', 'diversity', 'health_safety', 'supply_chain', 'governance_metrics'] as $section) {
             $record = CompanyDisclosure::where('company_id', $companyId)
                 ->where('framework', 'gri')
                 ->where('section', $section)

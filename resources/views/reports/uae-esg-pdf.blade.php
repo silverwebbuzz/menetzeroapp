@@ -146,7 +146,7 @@
     @endif
 
     <h2>Social &amp; Governance (GRI)</h2>
-    @foreach(['social_hr' => 'Employment', 'diversity' => 'Diversity'] as $sec => $title)
+    @foreach(['social_hr' => 'Employment', 'diversity' => 'Diversity', 'health_safety' => 'Health & Safety', 'governance_metrics' => 'Governance & Ethics'] as $sec => $title)
         @php $c = $report['gri'][$sec] ?? []; @endphp
         @if(!empty(array_filter($c)))
             <h3>{{ $title }}</h3>
@@ -165,6 +165,75 @@
             <tr><th>Topic</th><th>GRI</th></tr>
             @foreach($report['ifrs_s1']['material_topics'] as $topic)
                 <tr><td>{{ $topic['label'] }}</td><td>{{ $topic['gri'] ?? '—' }}</td></tr>
+            @endforeach
+        </table>
+    @endif
+
+    @if($report['esg_depth']['materiality_matrix']->isNotEmpty())
+        <h3>Materiality matrix</h3>
+        <table class="data">
+            <tr><th>Topic</th><th>Impact</th><th>Financial</th><th>Material</th></tr>
+            @foreach($report['esg_depth']['materiality_matrix'] as $row)
+                <tr>
+                    <td>{{ $row['label'] }}</td>
+                    <td>{{ ucfirst($row['impact']) }}</td>
+                    <td>{{ ucfirst($row['financial']) }}</td>
+                    <td>{{ $row['is_material'] ? 'Yes' : 'No' }}</td>
+                </tr>
+            @endforeach
+        </table>
+    @endif
+
+    @if($report['esg_depth']['stakeholders']->isNotEmpty())
+        <h3>Stakeholder engagement (GRI 2-29)</h3>
+        <table class="data">
+            <tr><th>Group</th><th>Method</th><th>Frequency</th></tr>
+            @foreach($report['esg_depth']['stakeholders'] as $s)
+                <tr>
+                    <td>{{ $s->stakeholder_group }}</td>
+                    <td>{{ $s->engagement_method ?: '—' }}</td>
+                    <td>{{ $s->frequency ? (\App\Models\StakeholderEngagement::FREQUENCIES[$s->frequency] ?? $s->frequency) : '—' }}</td>
+                </tr>
+            @endforeach
+        </table>
+    @endif
+
+    @if($report['esg_depth']['suppliers']->isNotEmpty())
+        <h3>Supply chain — key suppliers (Scope 3 Cat 1)</h3>
+        <table class="data">
+            <tr><th>Supplier</th><th>Spend AED</th><th>Screening</th></tr>
+            @foreach($report['esg_depth']['suppliers'] as $sup)
+                <tr>
+                    <td>{{ $sup->supplier_name }}</td>
+                    <td>{{ $sup->spend_aed !== null ? number_format($sup->spend_aed, 0) : '—' }}</td>
+                    <td>{{ \App\Models\SupplyChainSupplier::SCREENING[$sup->screening_status] ?? $sup->screening_status }}</td>
+                </tr>
+            @endforeach
+        </table>
+    @endif
+
+    @php $sc = $report['gri']['supply_chain'] ?? []; @endphp
+    @if(!empty(array_filter($sc)))
+        <h3>Supply chain due diligence (GRI 308 / 414)</h3>
+        @foreach(config('disclosure.gri.sections.supply_chain.fields', []) as $fk => $f)
+            @if(isset($sc[$fk]) && $sc[$fk] !== '')
+                <div class="field-label">{{ $f['label'] }}</div>
+                <div class="field-value">{{ $sc[$fk] }}</div>
+            @endif
+        @endforeach
+    @endif
+
+    @if($report['esg_depth']['esg_targets']->isNotEmpty())
+        <h3>Non-climate ESG targets</h3>
+        <table class="data">
+            <tr><th>Target</th><th>Category</th><th>Target year</th><th>Target value</th></tr>
+            @foreach($report['esg_depth']['esg_targets'] as $tgt)
+                <tr>
+                    <td>{{ $tgt->name }}</td>
+                    <td>{{ \App\Models\EsgSustainabilityTarget::CATEGORIES[$tgt->target_category] ?? $tgt->target_category }}</td>
+                    <td>{{ $tgt->target_year }}</td>
+                    <td>{{ $tgt->target_value !== null ? number_format($tgt->target_value, 2).' '.$tgt->unit : '—' }}</td>
+                </tr>
             @endforeach
         </table>
     @endif

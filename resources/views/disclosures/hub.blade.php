@@ -92,6 +92,12 @@
                 <p class="text-sm text-gray-500 mt-1">3-year KPI tables — GHG, GRI metrics, and manual social/governance data.</p>
             </div>
         </a>
+        <a href="{{ route('disclosures.esg-depth.overview', ['fiscal_year' => $fiscalYear]) }}" class="card hover:border-brand-300 transition block">
+            <div class="card-body">
+                <h3 class="font-semibold text-gray-900">ESG Depth</h3>
+                <p class="text-sm text-gray-500 mt-1">Stakeholders, materiality matrix, supply chain, and non-climate targets.</p>
+            </div>
+        </a>
         <div class="card">
             <div class="card-body text-sm text-gray-600">
                 <p>IFRS S1 report can include the S2 climate appendix. GRI 305 emissions auto-map from your GHG inventory.</p>

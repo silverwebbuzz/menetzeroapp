@@ -35,6 +35,9 @@
                             'waste' => route('disclosures.gri.sections.edit', ['fiscal_year' => $fiscalYear, 'section' => 'waste']),
                             'social_hr' => route('disclosures.gri.sections.edit', ['fiscal_year' => $fiscalYear, 'section' => 'social_hr']),
                             'diversity' => route('disclosures.gri.sections.edit', ['fiscal_year' => $fiscalYear, 'section' => 'diversity']),
+                            'health_safety' => route('disclosures.gri.sections.edit', ['fiscal_year' => $fiscalYear, 'section' => 'health_safety']),
+                            'supply_chain' => route('disclosures.gri.sections.edit', ['fiscal_year' => $fiscalYear, 'section' => 'supply_chain']),
+                            'governance_metrics' => route('disclosures.gri.sections.edit', ['fiscal_year' => $fiscalYear, 'section' => 'governance_metrics']),
                             'gri_305' => route('reports.index'),
                         ];
                     @endphp

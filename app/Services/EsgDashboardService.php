@@ -72,6 +72,7 @@ class EsgDashboardService
             ['label' => 'GRI 401–404 Employment', 'done' => !empty($griContent['social_hr']['employees_total'])],
             ['label' => 'GRI 404 Training hours', 'done' => !empty($griContent['social_hr']['training_hours_avg'])],
             ['label' => 'GRI 405 Diversity', 'done' => isset($griContent['diversity']['women_management_percent']) && $griContent['diversity']['women_management_percent'] !== ''],
+            ['label' => 'GRI 403 Health & Safety', 'done' => !empty($griContent['health_safety']['ltifr'])],
             ['label' => 'Material social topics', 'done' => $gri['items']['material_topics']['complete'] ?? false],
         ];
         $done = collect($checks)->where('done', true)->count();
@@ -91,6 +92,7 @@ class EsgDashboardService
             ['label' => 'GRI 2 General disclosures', 'done' => $gri['items']['general']['complete'] ?? false],
             ['label' => 'GRI 3 material topics process', 'done' => $gri['items']['material_topics_process']['complete'] ?? false],
             ['label' => 'Stakeholder engagement', 'done' => !empty($griContent['general']['stakeholder_engagement'])],
+            ['label' => 'Governance KPIs', 'done' => !empty($griContent['governance_metrics']['ethics_incidents']) || !empty($griContent['governance_metrics']['compliance_notes'])],
         ];
         $done = collect($checks)->where('done', true)->count();
 

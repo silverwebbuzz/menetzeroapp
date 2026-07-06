@@ -5,6 +5,9 @@ namespace App\Services;
 use App\Models\Company;
 use App\Models\CompanyDisclosure;
 use App\Models\CompanyReportingSetting;
+use App\Models\EsgSustainabilityTarget;
+use App\Models\StakeholderEngagement;
+use App\Models\SupplyChainSupplier;
 
 /**
  * Aggregates existing MenetZero modules into a single UAE ESG Report payload.
@@ -88,6 +91,9 @@ class UaeEsgReportService
                 'waste' => $gri['waste'],
                 'social_hr' => $gri['social_hr'],
                 'diversity' => $gri['diversity'],
+                'health_safety' => $gri['health_safety'],
+                'supply_chain' => $gri['supply_chain'],
+                'governance_metrics' => $gri['governance_metrics'],
             ],
 
             // Indexes & mappings
@@ -99,6 +105,7 @@ class UaeEsgReportService
             // E/S/G completeness dashboard + 3-year scorecard
             'esg_dashboard' => $dashboard,
             'scorecard' => $this->scorecardService->build($company, $fiscalYear),
+            'esg_depth' => $this->buildEsgDepth($company, $fiscalYear),
             'completeness' => $this->completeness($company->id, $fiscalYear, $esgDisclosures, $s2, $gri),
 
             'section_config' => config('esg_report.sections', []),
@@ -241,5 +248,31 @@ class UaeEsgReportService
         }
 
         return true;
+    }
+
+    protected function buildEsgDepth(Company $company, int $fiscalYear): array
+    {
+        $topics = collect($this->disclosureService->materialTopicsForCompany($company->id, $fiscalYear));
+
+        return [
+            'stakeholders' => StakeholderEngagement::where('company_id', $company->id)
+                ->where('fiscal_year', $fiscalYear)
+                ->orderBy('stakeholder_group')
+                ->get(),
+            'suppliers' => SupplyChainSupplier::where('company_id', $company->id)
+                ->where('fiscal_year', $fiscalYear)
+                ->orderBy('supplier_name')
+                ->get(),
+            'esg_targets' => EsgSustainabilityTarget::where('company_id', $company->id)
+                ->where('status', 'active')
+                ->orderBy('target_year')
+                ->get(),
+            'materiality_matrix' => $topics->map(fn ($t) => [
+                'label' => $t['label'],
+                'is_material' => $t['is_material'],
+                'impact' => $t['impact_materiality'] ?: '—',
+                'financial' => $t['financial_materiality'] ?: '—',
+            ])->values(),
+        ];
     }
 }

@@ -19,6 +19,12 @@
        class="px-3 py-1.5 rounded-lg {{ request()->routeIs('disclosures.gri.sections.*') && request()->route('section') === 'social_hr' ? 'bg-brand-50 text-brand-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">Employment</a>
     <a href="{{ route('disclosures.gri.sections.edit', array_merge($q, ['section' => 'diversity'])) }}"
        class="px-3 py-1.5 rounded-lg {{ request()->routeIs('disclosures.gri.sections.*') && request()->route('section') === 'diversity' ? 'bg-brand-50 text-brand-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">Diversity</a>
+    <a href="{{ route('disclosures.gri.sections.edit', array_merge($q, ['section' => 'health_safety'])) }}"
+       class="px-3 py-1.5 rounded-lg {{ request()->routeIs('disclosures.gri.sections.*') && request()->route('section') === 'health_safety' ? 'bg-brand-50 text-brand-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">Health &amp; Safety</a>
+    <a href="{{ route('disclosures.gri.sections.edit', array_merge($q, ['section' => 'supply_chain'])) }}"
+       class="px-3 py-1.5 rounded-lg {{ request()->routeIs('disclosures.gri.sections.*') && request()->route('section') === 'supply_chain' ? 'bg-brand-50 text-brand-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">Supply Chain</a>
+    <a href="{{ route('disclosures.gri.sections.edit', array_merge($q, ['section' => 'governance_metrics'])) }}"
+       class="px-3 py-1.5 rounded-lg {{ request()->routeIs('disclosures.gri.sections.*') && request()->route('section') === 'governance_metrics' ? 'bg-brand-50 text-brand-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">Governance</a>
     <a href="{{ route('disclosures.gri.report.preview', $q) }}"
        class="px-3 py-1.5 rounded-lg {{ request()->routeIs('disclosures.gri.report.*') ? 'bg-brand-50 text-brand-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">GRI Report</a>
 </nav>

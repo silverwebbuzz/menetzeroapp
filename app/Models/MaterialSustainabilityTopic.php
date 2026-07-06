@@ -7,8 +7,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MaterialSustainabilityTopic extends Model
 {
+    public const MATERIALITY_LEVELS = [
+        'low' => 'Low',
+        'medium' => 'Medium',
+        'high' => 'High',
+    ];
+
     protected $fillable = [
         'company_id', 'fiscal_year', 'topic_key', 'is_material', 'rationale',
+        'impact_materiality', 'financial_materiality',
     ];
 
     protected $casts = [

@@ -328,6 +328,35 @@ Route::middleware([
 
         Route::get('/esg-dashboard', [\App\Http\Controllers\Disclosure\EsgDashboardController::class, 'index'])->name('esg-dashboard');
 
+        // Phase C — ESG depth (stakeholders, materiality, supply chain, targets)
+        Route::get('/esg-depth', [\App\Http\Controllers\Disclosure\EsgDepthController::class, 'overview'])->name('esg-depth.overview');
+
+        Route::prefix('stakeholders')->name('stakeholders.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Disclosure\StakeholderEngagementController::class, 'index'])->name('index');
+            Route::post('/', [\App\Http\Controllers\Disclosure\StakeholderEngagementController::class, 'store'])->name('store');
+            Route::put('/{stakeholderEngagement}', [\App\Http\Controllers\Disclosure\StakeholderEngagementController::class, 'update'])->name('update');
+            Route::delete('/{stakeholderEngagement}', [\App\Http\Controllers\Disclosure\StakeholderEngagementController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('materiality-matrix')->name('materiality-matrix.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Disclosure\MaterialityMatrixController::class, 'index'])->name('index');
+            Route::post('/', [\App\Http\Controllers\Disclosure\MaterialityMatrixController::class, 'update'])->name('update');
+        });
+
+        Route::prefix('supply-chain')->name('supply-chain.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Disclosure\SupplyChainSupplierController::class, 'index'])->name('index');
+            Route::post('/', [\App\Http\Controllers\Disclosure\SupplyChainSupplierController::class, 'store'])->name('store');
+            Route::put('/{supplyChainSupplier}', [\App\Http\Controllers\Disclosure\SupplyChainSupplierController::class, 'update'])->name('update');
+            Route::delete('/{supplyChainSupplier}', [\App\Http\Controllers\Disclosure\SupplyChainSupplierController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::prefix('esg-targets')->name('esg-targets.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Disclosure\EsgSustainabilityTargetController::class, 'index'])->name('index');
+            Route::post('/', [\App\Http\Controllers\Disclosure\EsgSustainabilityTargetController::class, 'store'])->name('store');
+            Route::put('/{esgSustainabilityTarget}', [\App\Http\Controllers\Disclosure\EsgSustainabilityTargetController::class, 'update'])->name('update');
+            Route::delete('/{esgSustainabilityTarget}', [\App\Http\Controllers\Disclosure\EsgSustainabilityTargetController::class, 'destroy'])->name('destroy');
+        });
+
         Route::prefix('esg-scorecard')->name('esg-scorecard.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Disclosure\EsgScorecardController::class, 'index'])->name('index');
             Route::post('/', [\App\Http\Controllers\Disclosure\EsgScorecardController::class, 'update'])->name('update');
