@@ -95,6 +95,26 @@
         </div>
     </div>
 
+    @if($gate->canDisclosureExportType('hris_kpi_import', $fiscalYear))
+    <div class="card mb-6 border-brand-200">
+        <div class="card-header"><h3 class="card-title">HRIS / payroll feed (Enterprise)</h3></div>
+        <div class="card-body">
+            <p class="text-sm text-gray-500 mb-4">
+                Bulk import workforce and social KPIs from Workday, SAP SuccessFactors, Oracle HCM, or other HRIS exports.
+                Uses metric keys from the enterprise scorecard pack. Imports are audit-logged.
+            </p>
+            <div class="flex flex-wrap gap-3 items-end">
+                <a href="{{ route('disclosures.esg-scorecard.hris-import-template') }}" class="btn btn-secondary">Download HRIS template</a>
+                <form method="POST" action="{{ route('disclosures.esg-scorecard.hris-import', ['fiscal_year' => $fiscalYear]) }}" enctype="multipart/form-data" class="flex flex-wrap gap-2 items-center">
+                    @csrf
+                    <input type="file" name="file" accept=".csv,text/csv" required class="text-sm">
+                    <button type="submit" class="btn btn-primary">Import HRIS CSV</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <div class="flex flex-wrap gap-2 mb-6">
         @foreach($scorecard['categories'] as $catKey => $category)
             <a href="{{ route('disclosures.esg-scorecard.index', ['fiscal_year' => $fiscalYear, 'category' => $catKey]) }}"

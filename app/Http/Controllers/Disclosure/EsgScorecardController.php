@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Disclosure;
 use App\Exports\EsgScorecardExport;
 use App\Services\EsgScorecardImportService;
 use App\Services\EsgScorecardService;
+use App\Services\HrisKpiImportService;
 use App\Services\PlanEntitlementService;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -14,6 +15,7 @@ class EsgScorecardController extends DisclosureBaseController
     public function __construct(
         protected EsgScorecardService $scorecardService,
         protected EsgScorecardImportService $importService,
+        protected HrisKpiImportService $hrisImportService,
     ) {
     }
 
@@ -121,6 +123,43 @@ class EsgScorecardController extends DisclosureBaseController
         $result = $this->importService->importFromCsv($company, $request->file('file'));
 
         $message = "Imported {$result['imported']} row(s).";
+        if ($result['skipped'] > 0) {
+            $message .= " Skipped {$result['skipped']}.";
+        }
+        if (!empty($result['errors'])) {
+            return redirect()
+                ->route('disclosures.esg-scorecard.index', ['fiscal_year' => $fiscalYear])
+                ->with('success', $message)
+                ->with('import_errors', $result['errors']);
+        }
+
+        return $this->fiscalRedirect('disclosures.esg-scorecard.index', $fiscalYear, $message);
+    }
+
+    public function downloadHrisImportTemplate(Request $request)
+    {
+        ['company' => $company, 'fiscalYear' => $fiscalYear] = $this->resolveContext($request);
+        $this->requireDisclosureExport($company->id, PlanEntitlementService::FEATURE_HRIS_KPI_IMPORT, $fiscalYear);
+
+        $csv = $this->hrisImportService->templateCsv();
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="hris-kpi-import-template.csv"',
+        ]);
+    }
+
+    public function importHrisCsv(Request $request)
+    {
+        ['company' => $company, 'fiscalYear' => $fiscalYear] = $this->resolveContext($request, true);
+        $this->requireDisclosureExport($company->id, PlanEntitlementService::FEATURE_HRIS_KPI_IMPORT, $fiscalYear);
+
+        $maxKb = (int) config('hris_kpi_import.max_file_kb', 4096);
+        $request->validate(['file' => 'required|file|mimes:csv,txt|max:' . $maxKb]);
+
+        $result = $this->hrisImportService->importFromCsv($company, $request->file('file'));
+
+        $message = "HRIS import: {$result['imported']} row(s) saved.";
         if ($result['skipped'] > 0) {
             $message .= " Skipped {$result['skipped']}.";
         }

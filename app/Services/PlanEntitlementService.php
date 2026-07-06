@@ -24,6 +24,7 @@ class PlanEntitlementService
     public const FEATURE_ASSURANCE_UPLOAD = 'assurance_upload';
     public const FEATURE_ENERGY_FROM_ACTIVITY = 'energy_from_activity';
     public const EXPORT_UAE_ESG_PDF_ENTERPRISE = 'uae_esg_pdf_enterprise';
+    public const FEATURE_HRIS_KPI_IMPORT = 'hris_kpi_import';
 
     public function __construct(
         protected SubscriptionService $subscriptionService,
@@ -335,6 +336,10 @@ class PlanEntitlementService
 
         if ($exportCode === self::EXPORT_UAE_ESG_PDF_ENTERPRISE) {
             return 'The white-label UAE ESG Report PDF is available on the Enterprise plan. Contact sales for access.';
+        }
+
+        if ($exportCode === self::FEATURE_HRIS_KPI_IMPORT) {
+            return 'HRIS / payroll KPI bulk import is available on the Enterprise plan. Contact sales for access.';
         }
 
         return 'This export is available on the Starter plan (AED 1,499/year) and above.';

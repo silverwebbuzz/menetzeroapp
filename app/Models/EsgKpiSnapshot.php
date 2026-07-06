@@ -9,6 +9,7 @@ class EsgKpiSnapshot extends Model
 {
     public const SOURCE_MANUAL = 'manual';
     public const SOURCE_AUTO = 'auto';
+    public const SOURCE_HRIS = 'hris';
 
     protected $fillable = [
         'company_id',

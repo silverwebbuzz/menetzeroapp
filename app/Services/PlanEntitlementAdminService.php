@@ -80,6 +80,7 @@ class PlanEntitlementAdminService
             PlanEntitlementService::FEATURE_ASSURANCE_UPLOAD => 'Assurance verifier PDF upload',
             PlanEntitlementService::FEATURE_ENERGY_FROM_ACTIVITY => 'Energy GJ from Quick Input activity',
             PlanEntitlementService::EXPORT_UAE_ESG_PDF_ENTERPRISE => 'UAE ESG Report PDF (white-label cover)',
+            PlanEntitlementService::FEATURE_HRIS_KPI_IMPORT => 'HRIS / payroll KPI bulk import',
         ];
     }
 

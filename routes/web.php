@@ -367,6 +367,8 @@ Route::middleware([
             Route::get('/export-enterprise.xlsx', [\App\Http\Controllers\Disclosure\EsgScorecardController::class, 'exportExcelEnterprise'])->name('export-enterprise');
             Route::get('/import-template.csv', [\App\Http\Controllers\Disclosure\EsgScorecardController::class, 'downloadImportTemplate'])->name('import-template');
             Route::post('/import', [\App\Http\Controllers\Disclosure\EsgScorecardController::class, 'importCsv'])->name('import');
+            Route::get('/hris-import-template.csv', [\App\Http\Controllers\Disclosure\EsgScorecardController::class, 'downloadHrisImportTemplate'])->name('hris-import-template');
+            Route::post('/hris-import', [\App\Http\Controllers\Disclosure\EsgScorecardController::class, 'importHrisCsv'])->name('hris-import');
         });
 
         Route::prefix('sasb')->name('sasb.')->group(function () {

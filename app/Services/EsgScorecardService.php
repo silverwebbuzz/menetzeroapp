@@ -91,6 +91,15 @@ class EsgScorecardService
                 continue;
             }
 
+            $existing = EsgKpiSnapshot::where('company_id', $companyId)
+                ->where('fiscal_year', $fiscalYear)
+                ->where('metric_key', $metricKey)
+                ->first();
+
+            if ($existing && $existing->source === EsgKpiSnapshot::SOURCE_HRIS) {
+                continue;
+            }
+
             EsgKpiSnapshot::updateOrCreate(
                 [
                     'company_id' => $companyId,
@@ -297,7 +306,7 @@ class EsgScorecardService
 
             return [
                 $snapshot?->value !== null ? (float) $snapshot->value : null,
-                'manual',
+                $snapshot?->source === EsgKpiSnapshot::SOURCE_HRIS ? 'hris' : 'manual',
             ];
         }
 
@@ -383,7 +392,7 @@ class EsgScorecardService
     {
         $records = EsgKpiSnapshot::where('company_id', $companyId)
             ->whereIn('fiscal_year', $years)
-            ->where('source', EsgKpiSnapshot::SOURCE_MANUAL)
+            ->whereIn('source', [EsgKpiSnapshot::SOURCE_MANUAL, EsgKpiSnapshot::SOURCE_HRIS])
             ->get();
 
         $indexed = [];

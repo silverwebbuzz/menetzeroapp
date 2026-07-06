@@ -542,7 +542,7 @@ Before merging each E sub-phase:
 | E.2a GRI 80+ | ✅ Enterprise CSV (`content-index-enterprise.csv`); Growth index unchanged |
 | E.2b Scorecard 80+ | ✅ Enterprise Excel (`export-enterprise.xlsx`); Growth scorecard UI unchanged |
 | E.2c Assurance upload | ✅ Enterprise PDF upload + download; Growth text-only unchanged |
-| E.2d HRIS feed | ⏳ Not started |
+| E.2d HRIS feed | ✅ HRIS CSV import + audit log; Growth scorecard import unchanged |
 | E.2e Energy from activity | ✅ Enterprise scorecard metric; Growth GRI manual energy unchanged |
 | E.2f White-label cover | ✅ Enterprise PDF (`report/pdf-enterprise`); Growth PDF unchanged |
 | E.2g Arabic PDF | ⏳ Not started |
