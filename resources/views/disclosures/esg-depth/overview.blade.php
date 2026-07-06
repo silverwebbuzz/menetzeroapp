@@ -54,6 +54,8 @@
             ['ESG targets', 'Water, waste, diversity, and other non-GHG targets.', route('disclosures.esg-targets.index', ['fiscal_year' => $fiscalYear])],
             ['GRI 403 Health & Safety', 'LTIFR, fatalities, OHS management.', route('disclosures.gri.sections.edit', ['fiscal_year' => $fiscalYear, 'section' => 'health_safety'])],
             ['Governance KPIs', 'Ethics incidents, compliance, board diversity.', route('disclosures.gri.sections.edit', ['fiscal_year' => $fiscalYear, 'section' => 'governance_metrics'])],
+            ['SASB Index', 'Sector-specific metrics (TR-MT ports, TR-RO logistics, IF-RE).', route('disclosures.sasb.index', ['fiscal_year' => $fiscalYear])],
+            ['Community Investment', 'Optional B4SI-style community disclosure.', route('disclosures.uae-esg.sections.edit', ['fiscal_year' => $fiscalYear, 'section' => 'community_impact'])],
         ] as [$title, $desc, $url])
             <a href="{{ $url }}" class="card hover:border-brand-300 block">
                 <div class="card-body">

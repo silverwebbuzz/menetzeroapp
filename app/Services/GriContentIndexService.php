@@ -26,32 +26,57 @@ class GriContentIndexService
         $ghg = $this->s2ReportService->build($company, $fiscalYear)['ghg'] ?? [];
 
         $rows = [];
+        $crosswalk = config('gri_crosswalk', []);
         foreach (config('disclosure.gri.content_index', []) as $code => $meta) {
+            $walk = $crosswalk[$code] ?? [];
             $rows[] = [
                 'code' => $code,
                 'title' => $meta['title'],
                 'status' => $this->resolveStatus($meta, $disclosures, $materialTopics, $ghg),
                 'location' => $this->resolveLocation($meta),
+                'ungc' => $walk['ungc'] ?? '—',
+                'wef' => $walk['wef'] ?? '—',
+                'sdg' => $walk['sdg'] ?? '—',
             ];
         }
 
         return $rows;
     }
 
-    public function toCsv(Company $company, int $fiscalYear): string
+    public function toCsv(Company $company, int $fiscalYear, bool $extended = false): string
     {
         $rows = $this->build($company, $fiscalYear);
-        $lines = ['GRI Standard,Disclosure,Status,Report location'];
-        foreach ($rows as $row) {
-            $lines[] = implode(',', [
-                $this->csvCell($row['code']),
-                $this->csvCell($row['title']),
-                $this->csvCell($row['status']),
-                $this->csvCell($row['location']),
-            ]);
+        if ($extended) {
+            $lines = ['GRI Standard,Disclosure,Status,Report location,UNGC,WEF SCM,UN SDG'];
+            foreach ($rows as $row) {
+                $lines[] = implode(',', [
+                    $this->csvCell($row['code']),
+                    $this->csvCell($row['title']),
+                    $this->csvCell($row['status']),
+                    $this->csvCell($row['location']),
+                    $this->csvCell($row['ungc'] ?? '—'),
+                    $this->csvCell($row['wef'] ?? '—'),
+                    $this->csvCell($row['sdg'] ?? '—'),
+                ]);
+            }
+        } else {
+            $lines = ['GRI Standard,Disclosure,Status,Report location'];
+            foreach ($rows as $row) {
+                $lines[] = implode(',', [
+                    $this->csvCell($row['code']),
+                    $this->csvCell($row['title']),
+                    $this->csvCell($row['status']),
+                    $this->csvCell($row['location']),
+                ]);
+            }
         }
 
         return implode("\n", $lines);
+    }
+
+    public function toExtendedCsv(Company $company, int $fiscalYear): string
+    {
+        return $this->toCsv($company, $fiscalYear, true);
     }
 
     protected function resolveStatus(array $meta, $disclosures, $materialTopics, array $ghg): string

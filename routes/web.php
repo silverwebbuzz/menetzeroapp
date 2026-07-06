@@ -324,6 +324,7 @@ Route::middleware([
             Route::get('/report', [\App\Http\Controllers\Disclosure\GriReportController::class, 'preview'])->name('report.preview');
             Route::get('/report/pdf', [\App\Http\Controllers\Disclosure\GriReportController::class, 'exportPdf'])->name('report.pdf');
             Route::get('/content-index.csv', [\App\Http\Controllers\Disclosure\GriReportController::class, 'exportContentIndex'])->name('content-index');
+            Route::get('/content-index-full.csv', [\App\Http\Controllers\Disclosure\GriReportController::class, 'exportContentIndexExtended'])->name('content-index-full');
         });
 
         Route::get('/esg-dashboard', [\App\Http\Controllers\Disclosure\EsgDashboardController::class, 'index'])->name('esg-dashboard');
@@ -362,6 +363,14 @@ Route::middleware([
             Route::post('/', [\App\Http\Controllers\Disclosure\EsgScorecardController::class, 'update'])->name('update');
             Route::post('/sync', [\App\Http\Controllers\Disclosure\EsgScorecardController::class, 'sync'])->name('sync');
             Route::get('/export.xlsx', [\App\Http\Controllers\Disclosure\EsgScorecardController::class, 'exportExcel'])->name('export');
+            Route::get('/import-template.csv', [\App\Http\Controllers\Disclosure\EsgScorecardController::class, 'downloadImportTemplate'])->name('import-template');
+            Route::post('/import', [\App\Http\Controllers\Disclosure\EsgScorecardController::class, 'importCsv'])->name('import');
+        });
+
+        Route::prefix('sasb')->name('sasb.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Disclosure\SasbIndexController::class, 'index'])->name('index');
+            Route::post('/sector', [\App\Http\Controllers\Disclosure\SasbIndexController::class, 'updateSector'])->name('sector');
+            Route::get('/export.csv', [\App\Http\Controllers\Disclosure\SasbIndexController::class, 'exportCsv'])->name('export');
         });
 
         // UAE ESG Report (unified export)

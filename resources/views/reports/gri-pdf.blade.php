@@ -65,14 +65,16 @@
     <div class="page-break"></div>
     <h2>GRI Content Index</h2>
     <table class="data">
-        <thead><tr><th>Code</th><th>Disclosure</th><th>Status</th><th>Location</th></tr></thead>
+        <thead><tr><th>Code</th><th>Disclosure</th><th>Status</th><th>UNGC</th><th>WEF</th><th>SDG</th></tr></thead>
         <tbody>
             @foreach($report['content_index'] as $row)
                 <tr>
                     <td>{{ $row['code'] }}</td>
                     <td>{{ $row['title'] }}</td>
                     <td>{{ $row['status'] }}</td>
-                    <td>{{ $row['location'] }}</td>
+                    <td>{{ $row['ungc'] ?? '—' }}</td>
+                    <td>{{ $row['wef'] ?? '—' }}</td>
+                    <td>{{ $row['sdg'] ?? '—' }}</td>
                 </tr>
             @endforeach
         </tbody>

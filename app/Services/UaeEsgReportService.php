@@ -27,6 +27,7 @@ class UaeEsgReportService
         protected DisclosureService $disclosureService,
         protected EsgDashboardService $esgDashboardService,
         protected EsgScorecardService $scorecardService,
+        protected SasbIndexService $sasbIndexService,
     ) {
     }
 
@@ -105,6 +106,7 @@ class UaeEsgReportService
             // E/S/G completeness dashboard + 3-year scorecard
             'esg_dashboard' => $dashboard,
             'scorecard' => $this->scorecardService->build($company, $fiscalYear),
+            'sasb_index' => $this->sasbIndexService->build($company, $fiscalYear),
             'esg_depth' => $this->buildEsgDepth($company, $fiscalYear),
             'completeness' => $this->completeness($company->id, $fiscalYear, $esgDisclosures, $s2, $gri),
 

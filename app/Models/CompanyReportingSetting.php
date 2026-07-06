@@ -41,6 +41,7 @@ class CompanyReportingSetting extends Model
         'recalculation_policy',
         'gwp_version',
         'scope3_category_policy',
+        'sasb_sector',
     ];
 
     protected $casts = [

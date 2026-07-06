@@ -158,6 +158,7 @@ class PlanEntitlementDefaults
                     'gri_content_index',
                     'uae_esg_pdf',
                     'esg_scorecard',
+                    'sasb_index',
                 ],
                 'consultant_directory' => 'full',
                 'export_regen' => 'subscription_year_unlimited',

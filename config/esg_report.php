@@ -82,6 +82,17 @@ return [
                 'awards_list' => ['label' => 'Awards and recognition (year, award, issuer)', 'type' => 'textarea', 'required' => false],
             ],
         ],
+        'community_impact' => [
+            'title' => 'Community Investment (B4SI optional)',
+            'reference' => 'UAE ESG Report — Community',
+            'description' => 'Community investment and social impact (optional B4SI-style disclosure).',
+            'fields' => [
+                'total_investment_aed' => ['label' => 'Total community investment (AED)', 'type' => 'number', 'required' => false],
+                'beneficiaries_count' => ['label' => 'Beneficiaries reached', 'type' => 'number', 'required' => false],
+                'investment_methodology' => ['label' => 'Methodology and boundaries', 'type' => 'textarea', 'required' => false],
+                'assurance_notes' => ['label' => 'Assurance status (if externally assured)', 'type' => 'textarea', 'required' => false],
+            ],
+        ],
     ],
 
     'completeness_weights' => [

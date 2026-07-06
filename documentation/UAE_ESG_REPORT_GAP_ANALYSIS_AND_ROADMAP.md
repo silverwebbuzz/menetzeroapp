@@ -4,7 +4,7 @@
 |---|---|
 | **Version** | 1.0 |
 | **Created** | July 2026 |
-| **Status** | Phase C shipped — stakeholders, materiality, supply chain, ESG targets |
+| **Status** | Phase D shipped — SASB index, GRI cross-walk, KPI CSV import, B4SI community |
 | **Reference report** | External UAE ESG report index (DP World 2024 used as structural reference only; file not stored in repo) |
 | **Client input** | UAE Standard ESG Report Index (Scope 3 purchaser format) |
 
@@ -390,6 +390,16 @@ Quick Input / Bulk Import
 | D.3 | B4SI / community investment | Only if enterprise clients require |
 | D.4 | Double materiality workflow | CSRD-style; larger UX |
 | D.5 | HRIS / safety system import | CSV templates for bulk social KPIs |
+
+**Progress (July 2026):**
+
+| Task | Status |
+|------|--------|
+| D.1 | ✅ SASB sector picker (TR-MT, TR-RO, IF-RE, EM-EP) + index CSV + UAE PDF |
+| D.2 | ✅ GRI index UNGC / WEF / SDG cross-walk columns + full CSV export |
+| D.3 | ✅ Community investment narrative (B4SI optional) in UAE ESG report |
+| D.4 | 🟡 Double materiality via Phase C matrix (full CSRD workflow deferred) |
+| D.5 | ✅ ESG Scorecard manual KPI CSV import template |
 
 ---
 

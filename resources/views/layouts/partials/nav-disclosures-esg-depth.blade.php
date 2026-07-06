@@ -11,6 +11,8 @@
        class="px-3 py-1.5 rounded-lg {{ request()->routeIs('disclosures.supply-chain.*') ? 'bg-brand-50 text-brand-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">Supply Chain</a>
     <a href="{{ route('disclosures.esg-targets.index', $q) }}"
        class="px-3 py-1.5 rounded-lg {{ request()->routeIs('disclosures.esg-targets.*') ? 'bg-brand-50 text-brand-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">ESG Targets</a>
+    <a href="{{ route('disclosures.sasb.index', $q) }}"
+       class="px-3 py-1.5 rounded-lg {{ request()->routeIs('disclosures.sasb.*') ? 'bg-brand-50 text-brand-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">SASB Index</a>
     <a href="{{ route('disclosures.gri.sections.edit', array_merge($q, ['section' => 'health_safety'])) }}"
        class="px-3 py-1.5 rounded-lg text-gray-600 hover:bg-gray-50">GRI 403 Safety</a>
     <a href="{{ route('disclosures.gri.sections.edit', array_merge($q, ['section' => 'governance_metrics'])) }}"

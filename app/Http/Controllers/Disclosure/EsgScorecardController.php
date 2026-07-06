@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Disclosure;
 
 use App\Exports\EsgScorecardExport;
+use App\Services\EsgScorecardImportService;
 use App\Services\EsgScorecardService;
 use App\Services\PlanEntitlementService;
 use Illuminate\Http\Request;
@@ -12,6 +13,7 @@ class EsgScorecardController extends DisclosureBaseController
 {
     public function __construct(
         protected EsgScorecardService $scorecardService,
+        protected EsgScorecardImportService $importService,
     ) {
     }
 
@@ -82,5 +84,37 @@ class EsgScorecardController extends DisclosureBaseController
             new EsgScorecardExport($rows, $scorecard['years'], $company->name),
             "esg-scorecard-{$fiscalYear}-{$slug}.xlsx"
         );
+    }
+
+    public function downloadImportTemplate()
+    {
+        $csv = $this->importService->templateCsv();
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="esg-scorecard-import-template.csv"',
+        ]);
+    }
+
+    public function importCsv(Request $request)
+    {
+        ['company' => $company, 'fiscalYear' => $fiscalYear] = $this->resolveContext($request, true);
+
+        $request->validate(['file' => 'required|file|mimes:csv,txt|max:2048']);
+
+        $result = $this->importService->importFromCsv($company, $request->file('file'));
+
+        $message = "Imported {$result['imported']} row(s).";
+        if ($result['skipped'] > 0) {
+            $message .= " Skipped {$result['skipped']}.";
+        }
+        if (!empty($result['errors'])) {
+            return redirect()
+                ->route('disclosures.esg-scorecard.index', ['fiscal_year' => $fiscalYear])
+                ->with('success', $message)
+                ->with('import_errors', $result['errors']);
+        }
+
+        return $this->fiscalRedirect('disclosures.esg-scorecard.index', $fiscalYear, $message);
     }
 }

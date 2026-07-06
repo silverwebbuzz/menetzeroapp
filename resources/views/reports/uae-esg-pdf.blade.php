@@ -294,16 +294,37 @@
 
     <h2>GRI Content Index</h2>
     <table class="data">
-        <tr><th>Code</th><th>Disclosure</th><th>Status</th><th>Location</th></tr>
+        <tr><th>Code</th><th>Disclosure</th><th>Status</th><th>Location</th><th>UNGC</th><th>WEF</th><th>SDG</th></tr>
         @foreach($report['gri_content_index'] as $row)
             <tr>
                 <td>{{ $row['code'] }}</td>
                 <td>{{ $row['title'] }}</td>
                 <td>{{ $row['status'] }}</td>
                 <td>{{ $row['location'] }}</td>
+                <td>{{ $row['ungc'] ?? '—' }}</td>
+                <td>{{ $row['wef'] ?? '—' }}</td>
+                <td>{{ $row['sdg'] ?? '—' }}</td>
             </tr>
         @endforeach
     </table>
+
+    @if(!empty($report['sasb_index']['sector']))
+        <div class="page-break"></div>
+        <h2>SASB Disclosure Index — {{ $report['sasb_index']['sector'] }}</h2>
+        <p class="muted">{{ $report['sasb_index']['sector_label'] }} · {{ $report['sasb_index']['industry'] }}</p>
+        <table class="data">
+            <tr><th>Code</th><th>Metric</th><th>Unit</th><th>Value</th><th>Status</th></tr>
+            @foreach($report['sasb_index']['metrics'] as $row)
+                <tr>
+                    <td>{{ $row['code'] }}</td>
+                    <td>{{ $row['label'] }}</td>
+                    <td>{{ $row['unit'] }}</td>
+                    <td>{{ $row['value'] ?? '—' }}</td>
+                    <td>{{ $row['status'] }}</td>
+                </tr>
+            @endforeach
+        </table>
+    @endif
 
     <h2>UN Sustainable Development Goals — Mapping</h2>
     <table class="data">

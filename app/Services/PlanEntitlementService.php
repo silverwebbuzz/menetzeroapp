@@ -18,6 +18,7 @@ class PlanEntitlementService
     public const EXPORT_GRI_CONTENT_INDEX = 'gri_content_index';
     public const EXPORT_UAE_ESG_PDF = 'uae_esg_pdf';
     public const EXPORT_ESG_SCORECARD = 'esg_scorecard';
+    public const EXPORT_SASB_INDEX = 'sasb_index';
 
     public function __construct(
         protected SubscriptionService $subscriptionService,
@@ -304,6 +305,7 @@ class PlanEntitlementService
             self::EXPORT_GRI_CONTENT_INDEX,
             self::EXPORT_UAE_ESG_PDF,
             self::EXPORT_ESG_SCORECARD,
+            self::EXPORT_SASB_INDEX,
         ];
 
         if (in_array($exportCode, $growthOnly, true)) {

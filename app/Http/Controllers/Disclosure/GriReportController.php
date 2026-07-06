@@ -59,8 +59,23 @@ class GriReportController extends DisclosureBaseController
         $this->requirePermission('disclosures', 'export', [['reports', 'view']]);
         $this->requireDisclosureExport($company->id, PlanEntitlementService::EXPORT_GRI_CONTENT_INDEX, $fiscalYear);
 
-        $csv = $this->contentIndexService->toCsv($company, $fiscalYear);
+        $csv = $this->contentIndexService->toCsv($company, $fiscalYear, false);
         $filename = 'gri-content-index-' . $fiscalYear . '.csv';
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
+    }
+
+    public function exportContentIndexExtended(Request $request)
+    {
+        ['company' => $company, 'fiscalYear' => $fiscalYear] = $this->resolveContext($request);
+        $this->requirePermission('disclosures', 'export', [['reports', 'view']]);
+        $this->requireDisclosureExport($company->id, PlanEntitlementService::EXPORT_GRI_CONTENT_INDEX, $fiscalYear);
+
+        $csv = $this->contentIndexService->toCsv($company, $fiscalYear, true);
+        $filename = 'gri-content-index-full-' . $fiscalYear . '.csv';
 
         return response($csv, 200, [
             'Content-Type' => 'text/csv',

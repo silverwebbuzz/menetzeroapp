@@ -35,6 +35,16 @@
     @if(session('success'))
         <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6">{{ session('success') }}</div>
     @endif
+    @if(!empty(session('import_errors')))
+        <div class="bg-amber-50 border border-amber-200 text-amber-900 px-4 py-3 rounded-lg mb-6 text-sm">
+            <p class="font-medium mb-1">Import notes:</p>
+            <ul class="list-disc pl-5 space-y-1">
+                @foreach(session('import_errors') as $err)
+                    <li>{{ $err }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     <div class="card mb-6">
         <div class="card-body flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -58,6 +68,21 @@
                     locked-class="btn btn-secondary">
                     Export Excel
                 </x-plan-gated-link>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-6">
+        <div class="card-header"><h3 class="card-title">Bulk import — manual KPIs</h3></div>
+        <div class="card-body">
+            <p class="text-sm text-gray-500 mb-4">Import manual scorecard metrics (LTIFR overrides, SASB manual fields, community investment) via CSV.</p>
+            <div class="flex flex-wrap gap-3 items-end">
+                <a href="{{ route('disclosures.esg-scorecard.import-template') }}" class="btn btn-secondary">Download template</a>
+                <form method="POST" action="{{ route('disclosures.esg-scorecard.import', ['fiscal_year' => $fiscalYear]) }}" enctype="multipart/form-data" class="flex flex-wrap gap-2 items-center">
+                    @csrf
+                    <input type="file" name="file" accept=".csv,text/csv" required class="text-sm">
+                    <button type="submit" class="btn btn-primary">Import CSV</button>
+                </form>
             </div>
         </div>
     </div>
