@@ -364,6 +364,7 @@ Route::middleware([
             Route::post('/', [\App\Http\Controllers\Disclosure\EsgScorecardController::class, 'update'])->name('update');
             Route::post('/sync', [\App\Http\Controllers\Disclosure\EsgScorecardController::class, 'sync'])->name('sync');
             Route::get('/export.xlsx', [\App\Http\Controllers\Disclosure\EsgScorecardController::class, 'exportExcel'])->name('export');
+            Route::get('/export-enterprise.xlsx', [\App\Http\Controllers\Disclosure\EsgScorecardController::class, 'exportExcelEnterprise'])->name('export-enterprise');
             Route::get('/import-template.csv', [\App\Http\Controllers\Disclosure\EsgScorecardController::class, 'downloadImportTemplate'])->name('import-template');
             Route::post('/import', [\App\Http\Controllers\Disclosure\EsgScorecardController::class, 'importCsv'])->name('import');
         });

@@ -20,6 +20,7 @@ class PlanEntitlementService
     public const EXPORT_ESG_SCORECARD = 'esg_scorecard';
     public const EXPORT_SASB_INDEX = 'sasb_index';
     public const EXPORT_GRI_CONTENT_INDEX_EXTENDED = 'gri_content_index_extended';
+    public const EXPORT_ESG_SCORECARD_ENTERPRISE = 'esg_scorecard_enterprise';
 
     public function __construct(
         protected SubscriptionService $subscriptionService,
@@ -315,6 +316,10 @@ class PlanEntitlementService
 
         if ($exportCode === self::EXPORT_GRI_CONTENT_INDEX_EXTENDED) {
             return 'The full GRI content index (80+ disclosures) is available on the Enterprise plan. Contact sales for access.';
+        }
+
+        if ($exportCode === self::EXPORT_ESG_SCORECARD_ENTERPRISE) {
+            return 'The enterprise ESG scorecard (80+ KPIs) is available on the Enterprise plan. Contact sales for access.';
         }
 
         return 'This export is available on the Starter plan (AED 1,499/year) and above.';

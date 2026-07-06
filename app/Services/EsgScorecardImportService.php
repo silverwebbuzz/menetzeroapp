@@ -10,6 +10,7 @@ class EsgScorecardImportService
 {
     public function __construct(
         protected EsgScorecardService $scorecardService,
+        protected PlanEntitlementService $entitlements,
     ) {
     }
 
@@ -54,7 +55,7 @@ class EsgScorecardImportService
         $skipped = 0;
         $errors = [];
         $line = 1;
-        $categories = config('esg_scorecard.categories', []);
+        $categories = $this->categoriesForImport($company->id);
 
         while (($row = fgetcsv($handle)) !== false) {
             $line++;
@@ -122,5 +123,17 @@ class EsgScorecardImportService
         fclose($handle);
 
         return compact('imported', 'skipped', 'errors');
+    }
+
+    /**
+     * @return array<string, array{title: string, metrics: array<string, mixed>}>
+     */
+    protected function categoriesForImport(int $companyId): array
+    {
+        if ($this->entitlements->canExport($companyId, PlanEntitlementService::EXPORT_ESG_SCORECARD_ENTERPRISE)['allowed']) {
+            return $this->scorecardService->mergedCategoriesConfig();
+        }
+
+        return $this->scorecardService->baseCategoriesConfig();
     }
 }

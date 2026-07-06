@@ -540,7 +540,7 @@ Before merging each E sub-phase:
 |------|--------|
 | E.0 Tier matrix + entitlement codes | ✅ Spec (this doc) |
 | E.2a GRI 80+ | ✅ Enterprise CSV (`content-index-enterprise.csv`); Growth index unchanged |
-| E.2b Scorecard 80+ | ⏳ Not started |
+| E.2b Scorecard 80+ | ✅ Enterprise Excel (`export-enterprise.xlsx`); Growth scorecard UI unchanged |
 | E.2c Assurance upload | ⏳ Not started |
 | E.2d HRIS feed | ⏳ Not started |
 | E.2e Energy from activity | ⏳ Not started |
@@ -564,6 +564,7 @@ Before merging each phase:
 | GRI PDF + index CSV | `/disclosures/gri/report/pdf`, `content-index.csv` |
 | GRI enterprise index CSV | `/disclosures/gri/content-index-enterprise.csv` — Enterprise only; 80+ rows |
 | Growth index row count | `build()` = 22 rows; `buildEnterprise()` = 80+ rows |
+| Growth scorecard row count | `build()` = base metrics only; `buildEnterprise()` = 80+ KPIs |
 | Plan gates Free vs Growth | Disclosure export blocked on Free |
 | Plan gates Growth vs Enterprise (Phase E) | Enterprise routes 403 / hidden; Growth PDFs unchanged |
 | Consultant agency context | `getActiveCompany()` on all new routes |

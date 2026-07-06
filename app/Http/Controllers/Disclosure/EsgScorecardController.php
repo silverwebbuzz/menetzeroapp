@@ -86,6 +86,22 @@ class EsgScorecardController extends DisclosureBaseController
         );
     }
 
+    public function exportExcelEnterprise(Request $request)
+    {
+        ['company' => $company, 'fiscalYear' => $fiscalYear] = $this->resolveContext($request);
+        $this->requirePermission('disclosures', 'export', [['reports', 'view']]);
+        $this->requireDisclosureExport($company->id, PlanEntitlementService::EXPORT_ESG_SCORECARD_ENTERPRISE, $fiscalYear);
+
+        $scorecard = $this->scorecardService->buildEnterprise($company, $fiscalYear);
+        $rows = $this->scorecardService->flattenForExport($scorecard);
+        $slug = preg_replace('/[^a-z0-9]+/i', '-', strtolower($company->name ?? 'company'));
+
+        return Excel::download(
+            new EsgScorecardExport($rows, $scorecard['years'], $company->name),
+            "esg-scorecard-enterprise-{$fiscalYear}-{$slug}.xlsx"
+        );
+    }
+
     public function downloadImportTemplate()
     {
         $csv = $this->importService->templateCsv();

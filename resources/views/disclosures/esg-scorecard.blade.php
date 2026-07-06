@@ -68,6 +68,11 @@
                     locked-class="btn btn-secondary">
                     Export Excel
                 </x-plan-gated-link>
+                @if($gate->canDisclosureExportType('esg_scorecard_enterprise', $fiscalYear))
+                <a href="{{ route('disclosures.esg-scorecard.export-enterprise', ['fiscal_year' => $fiscalYear]) }}" class="btn btn-secondary">
+                    Export Enterprise (80+ KPIs)
+                </a>
+                @endif
             </div>
         </div>
     </div>

@@ -3,7 +3,10 @@
 namespace App\Services;
 
 use App\Models\Company;
+use App\Models\CompanyDisclosure;
 use App\Models\EsgKpiSnapshot;
+use App\Models\EsgSustainabilityTarget;
+use App\Models\StakeholderEngagement;
 
 class EsgScorecardService
 {
@@ -14,59 +17,54 @@ class EsgScorecardService
     }
 
     /**
-     * Build 3-year scorecard tables (Y-2, Y-1, Y).
+     * Growth-tier scorecard — base metrics only (unchanged contract).
      *
      * @return array{fiscal_year: int, years: int[], categories: array<string, array{title: string, rows: array}>}
      */
     public function build(Company $company, int $fiscalYear): array
     {
-        $years = [$fiscalYear - 2, $fiscalYear - 1, $fiscalYear];
-        $manualSnapshots = $this->loadManualSnapshots($company->id, $years);
-        $categories = [];
-
-        foreach (config('esg_scorecard.categories', []) as $categoryKey => $category) {
-            $rows = [];
-            foreach ($category['metrics'] as $metricKey => $metric) {
-                $values = [];
-                $sources = [];
-                foreach ($years as $year) {
-                    [$values[$year], $sources[$year]] = $this->resolveMetric(
-                        $company,
-                        $year,
-                        $categoryKey,
-                        $metricKey,
-                        $metric,
-                        $manualSnapshots
-                    );
-                }
-
-                $rows[] = [
-                    'key' => $metricKey,
-                    'label' => $metric['label'],
-                    'unit' => $metric['unit'],
-                    'source' => $metric['source'],
-                    'editable' => $metric['source'] === 'manual',
-                    'decimals' => $metric['decimals'] ?? 2,
-                    'values' => $values,
-                    'value_sources' => $sources,
-                ];
-            }
-
-            $categories[$categoryKey] = [
-                'title' => $category['title'],
-                'rows' => $rows,
-            ];
-        }
-
-        return [
-            'fiscal_year' => $fiscalYear,
-            'years' => $years,
-            'categories' => $categories,
-        ];
+        return $this->buildFromCategories(
+            $company,
+            $fiscalYear,
+            config('esg_scorecard.categories', []),
+        );
     }
 
     /**
-     * Persist manual KPI values for a fiscal year.
+     * Enterprise-tier scorecard — base + enterprise extension metrics.
+     *
+     * @return array{fiscal_year: int, years: int[], categories: array<string, array{title: string, rows: array}>}
+     */
+    public function buildEnterprise(Company $company, int $fiscalYear): array
+    {
+        return $this->buildFromCategories(
+            $company,
+            $fiscalYear,
+            $this->mergedCategoriesConfig(),
+        );
+    }
+
+    /**
+     * @return array<string, array{title: string, metrics: array<string, array<string, mixed>>}>
+     */
+    public function mergedCategoriesConfig(): array
+    {
+        return $this->mergeCategoryMetrics(
+            config('esg_scorecard.categories', []),
+            config('esg_scorecard_enterprise.categories', []),
+        );
+    }
+
+    /**
+     * @return array<string, array{title: string, metrics: array<string, array<string, mixed>>}>
+     */
+    public function baseCategoriesConfig(): array
+    {
+        return config('esg_scorecard.categories', []);
+    }
+
+    /**
+     * Persist manual KPI values for a fiscal year (base + enterprise manual metrics).
      *
      * @param  array<string, string|float|null>  $metrics
      */
@@ -109,16 +107,110 @@ class EsgScorecardService
     }
 
     /**
-     * Cache auto-resolved GHG/GRI values as snapshots (audit / historical point-in-time).
+     * Cache auto-resolved GHG/GRI values as snapshots (base metrics only).
      */
     public function syncAutoSnapshots(Company $company, int $fiscalYear): int
+    {
+        return $this->syncSnapshotsForConfig($company, $fiscalYear, config('esg_scorecard.categories', []));
+    }
+
+    /**
+     * Cache auto-resolved values including enterprise-linked metrics.
+     */
+    public function syncEnterpriseAutoSnapshots(Company $company, int $fiscalYear): int
+    {
+        return $this->syncSnapshotsForConfig($company, $fiscalYear, $this->mergedCategoriesConfig());
+    }
+
+    /**
+     * Flat rows for Excel export.
+     *
+     * @return list<array{category: string, metric: string, unit: string, source: string, y1: mixed, y2: mixed, y3: mixed}>
+     */
+    public function flattenForExport(array $scorecard): array
+    {
+        $years = $scorecard['years'];
+        $rows = [];
+
+        foreach ($scorecard['categories'] as $category) {
+            foreach ($category['rows'] as $row) {
+                $rows[] = [
+                    'category' => $category['title'],
+                    'metric' => $row['label'],
+                    'unit' => $row['unit'],
+                    'source' => $row['source'],
+                    (string) $years[0] => $this->formatValue($row['values'][$years[0]] ?? null, $row['decimals']),
+                    (string) $years[1] => $this->formatValue($row['values'][$years[1]] ?? null, $row['decimals']),
+                    (string) $years[2] => $this->formatValue($row['values'][$years[2]] ?? null, $row['decimals']),
+                ];
+            }
+        }
+
+        return $rows;
+    }
+
+    /**
+     * @param  array<string, array{title: string, metrics: array<string, array<string, mixed>>}>  $categories
+     * @return array{fiscal_year: int, years: int[], categories: array}
+     */
+    protected function buildFromCategories(Company $company, int $fiscalYear, array $categories): array
+    {
+        $years = [$fiscalYear - 2, $fiscalYear - 1, $fiscalYear];
+        $manualSnapshots = $this->loadManualSnapshots($company->id, $years);
+        $builtCategories = [];
+
+        foreach ($categories as $categoryKey => $category) {
+            $rows = [];
+            foreach ($category['metrics'] as $metricKey => $metric) {
+                $values = [];
+                $sources = [];
+                foreach ($years as $year) {
+                    [$values[$year], $sources[$year]] = $this->resolveMetric(
+                        $company,
+                        $year,
+                        $categoryKey,
+                        $metricKey,
+                        $metric,
+                        $manualSnapshots,
+                    );
+                }
+
+                $rows[] = [
+                    'key' => $metricKey,
+                    'label' => $metric['label'],
+                    'unit' => $metric['unit'],
+                    'source' => $metric['source'],
+                    'editable' => $metric['source'] === 'manual',
+                    'decimals' => $metric['decimals'] ?? 2,
+                    'values' => $values,
+                    'value_sources' => $sources,
+                ];
+            }
+
+            $builtCategories[$categoryKey] = [
+                'title' => $category['title'],
+                'rows' => $rows,
+            ];
+        }
+
+        return [
+            'fiscal_year' => $fiscalYear,
+            'years' => $years,
+            'categories' => $builtCategories,
+        ];
+    }
+
+    /**
+     * @param  array<string, array{title: string, metrics: array<string, array<string, mixed>>}>  $categories
+     */
+    protected function syncSnapshotsForConfig(Company $company, int $fiscalYear, array $categories): int
     {
         $years = [$fiscalYear - 2, $fiscalYear - 1, $fiscalYear];
         $manualSnapshots = $this->loadManualSnapshots($company->id, $years);
         $written = 0;
 
         foreach ($years as $year) {
-            foreach (config('esg_scorecard.categories', []) as $categoryKey => $category) {
+            foreach ($categories as $categoryKey => $category) {
                 foreach ($category['metrics'] as $metricKey => $metric) {
                     if ($metric['source'] === 'manual') {
                         continue;
@@ -130,7 +222,7 @@ class EsgScorecardService
                         $categoryKey,
                         $metricKey,
                         $metric,
-                        $manualSnapshots
+                        $manualSnapshots,
                     );
 
                     if ($value === null) {
@@ -165,30 +257,26 @@ class EsgScorecardService
     }
 
     /**
-     * Flat rows for Excel export.
-     *
-     * @return list<array{category: string, metric: string, unit: string, source: string, y1: mixed, y2: mixed, y3: mixed}>
+     * @param  array<string, array{title: string, metrics: array<string, mixed>}>  $base
+     * @param  array<string, array{title: string, metrics: array<string, mixed>}>  $extra
+     * @return array<string, array{title: string, metrics: array<string, mixed>}>
      */
-    public function flattenForExport(array $scorecard): array
+    protected function mergeCategoryMetrics(array $base, array $extra): array
     {
-        $years = $scorecard['years'];
-        $rows = [];
+        foreach ($extra as $catKey => $cat) {
+            if (!isset($base[$catKey])) {
+                $base[$catKey] = $cat;
 
-        foreach ($scorecard['categories'] as $categoryKey => $category) {
-            foreach ($category['rows'] as $row) {
-                $rows[] = [
-                    'category' => $category['title'],
-                    'metric' => $row['label'],
-                    'unit' => $row['unit'],
-                    'source' => $row['source'],
-                    (string) $years[0] => $this->formatValue($row['values'][$years[0]] ?? null, $row['decimals']),
-                    (string) $years[1] => $this->formatValue($row['values'][$years[1]] ?? null, $row['decimals']),
-                    (string) $years[2] => $this->formatValue($row['values'][$years[2]] ?? null, $row['decimals']),
-                ];
+                continue;
             }
+
+            $base[$catKey]['metrics'] = array_merge(
+                $base[$catKey]['metrics'] ?? [],
+                $cat['metrics'] ?? [],
+            );
         }
 
-        return $rows;
+        return $base;
     }
 
     /**
@@ -210,6 +298,22 @@ class EsgScorecardService
                 $snapshot?->value !== null ? (float) $snapshot->value : null,
                 'manual',
             ];
+        }
+
+        if ($metric['source'] === 'stakeholder_count') {
+            $count = StakeholderEngagement::where('company_id', $company->id)
+                ->where('fiscal_year', $fiscalYear)
+                ->count();
+
+            return [$count > 0 ? (float) $count : null, 'register'];
+        }
+
+        if ($metric['source'] === 'esg_target_count') {
+            $count = EsgSustainabilityTarget::where('company_id', $company->id)
+                ->where('fiscal_year', $fiscalYear)
+                ->count();
+
+            return [$count > 0 ? (float) $count : null, 'targets'];
         }
 
         if ($metric['source'] === 'ghg') {
@@ -242,6 +346,23 @@ class EsgScorecardService
             }
 
             return [(float) $raw, 'gri'];
+        }
+
+        if ($metric['source'] === 'esg_report') {
+            $section = $metric['section'] ?? '';
+            $field = $metric['field'] ?? '';
+            $content = CompanyDisclosure::where('company_id', $company->id)
+                ->where('framework', 'esg_report')
+                ->where('fiscal_year', $fiscalYear)
+                ->where('section', $section)
+                ->value('content') ?? [];
+            $raw = $content[$field] ?? null;
+
+            if ($raw === '' || $raw === null) {
+                return [null, 'esg_report'];
+            }
+
+            return [(float) $raw, 'esg_report'];
         }
 
         return [null, 'unknown'];

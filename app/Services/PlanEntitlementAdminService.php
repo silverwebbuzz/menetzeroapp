@@ -76,6 +76,7 @@ class PlanEntitlementAdminService
             PlanEntitlementService::EXPORT_ESG_SCORECARD => 'ESG Scorecard Excel',
             PlanEntitlementService::EXPORT_SASB_INDEX => 'SASB index CSV',
             PlanEntitlementService::EXPORT_GRI_CONTENT_INDEX_EXTENDED => 'GRI enterprise content index (80+)',
+            PlanEntitlementService::EXPORT_ESG_SCORECARD_ENTERPRISE => 'ESG scorecard enterprise (80+ KPIs)',
         ];
     }
 
