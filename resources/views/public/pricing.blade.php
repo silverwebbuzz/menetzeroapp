@@ -68,12 +68,12 @@
                             <li class="flex items-start"><span class="mkt-checkmark">✓</span> Scope 3 preview</li>
                         @elseif($isGrowth)
                             <li class="flex items-start"><span class="mkt-checkmark">✓</span> Everything in Starter</li>
-                            <li class="flex items-start"><span class="mkt-checkmark">✓</span> IFRS S1/S2 PDF</li>
-                            <li class="flex items-start"><span class="mkt-checkmark">✓</span> GRI PDF + content index</li>
+                            <li class="flex items-start"><span class="mkt-checkmark">✓</span> UAE ESG Report + Scorecard</li>
+                            <li class="flex items-start"><span class="mkt-checkmark">✓</span> IFRS S1/S2, GRI &amp; SASB exports</li>
                         @else
-                            <li class="flex items-start"><span class="mkt-checkmark">✓</span> Unlimited Scope 3</li>
-                            <li class="flex items-start"><span class="mkt-checkmark">✓</span> Multi-site &amp; API</li>
-                            <li class="flex items-start"><span class="mkt-checkmark">✓</span> Dedicated support</li>
+                            <li class="flex items-start"><span class="mkt-checkmark">✓</span> Everything in Growth</li>
+                            <li class="flex items-start"><span class="mkt-checkmark">✓</span> 80+ GRI index &amp; KPI scorecard</li>
+                            <li class="flex items-start"><span class="mkt-checkmark">✓</span> HRIS import &amp; white-label PDF</li>
                         @endif
                     </ul>
 

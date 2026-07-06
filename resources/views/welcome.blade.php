@@ -12,7 +12,7 @@
         </h1>
         <p class="mkt-lead mkt-lead-lg">
             UAE-focused carbon management for businesses that want to track Scope 1 &amp; 2, prepare MOCCAE submissions,
-            and export IFRS / GRI disclosures — without hiring a consultant to do the data entry.
+            and publish an integrated UAE ESG Report with IFRS / GRI disclosures — without hiring a consultant to do the data entry.
         </p>
         <p class="text-sm text-gray-500 mt-4 max-w-2xl mx-auto">
             Start free with Scope 1 &amp; 2 and disclosure previews. Paid plan upgrades are coming soon — register now and switch plans from your account when checkout opens.
@@ -36,7 +36,7 @@
             @foreach([
                 ['MOCCAE-ready from day one', 'Generate GHG inventories, MOCCAE Scope 1 & 2 PDFs, and IEQT exports aligned with UAE reporting workflows.'],
                 ['Start free, upgrade when ready', 'Try Scope 1 & 2 calculations and disclosure forms at no cost. Pay only when you need PDF exports and bulk data tools.'],
-                ['IFRS & GRI on Growth', 'Complete sustainability disclosure forms in-app and download IFRS S1/S2 and GRI report PDFs on the Growth plan.'],
+                ['UAE ESG Report on Growth', 'Build narrative chapters, auto-pull GHG totals, and download the integrated UAE ESG Report PDF plus ESG Scorecard on the Growth plan.'],
                 ['Human review when you need it', 'Connect with verified UAE consultants from the directory — optional review packs for professional sign-off.'],
             ] as $item)
                 <div class="mkt-feature-card">
@@ -118,17 +118,17 @@
                     '3 locations · 5 users',
                     'Scope 3 preview (1 per category)',
                 ]],
-                ['Growth', 'IFRS & GRI downloads', 'AED 2,499 / yr', 'paid', [
+                ['Growth', 'UAE ESG Report + IFRS & GRI', 'AED 2,499 / yr', 'paid', [
                     'Everything in Starter',
-                    'IFRS S1/S2 + GRI PDF exports',
+                    'UAE ESG Report PDF + ESG Scorecard',
+                    'IFRS S1/S2, GRI & SASB exports',
                     '10 locations · 10 users',
-                    'Full consultant directory access',
                 ]],
-                ['Enterprise', 'Multi-site & unlimited S3', 'Custom', 'enterprise', [
-                    'Unlimited Scope 3 entries',
-                    'Unlimited locations & users',
-                    'API access & dedicated support',
-                    'Priority consultant introductions',
+                ['Enterprise', '80+ KPIs & white-label PDF', 'Custom', 'enterprise', [
+                    'Everything in Growth',
+                    '80+ GRI index & KPI scorecard',
+                    'HRIS CSV import & assurance PDF upload',
+                    'White-label UAE ESG PDF covers',
                 ]],
             ] as $plan)
                 <div class="mkt-feature-card flex flex-col h-full {{ $plan[0] === 'Growth' ? 'ring-2 ring-teal-500/30' : '' }}">
@@ -216,6 +216,8 @@
                         ['UAE ESG Report PDF', '—', '—', '✓', '✓'],
                         ['ESG Scorecard Excel', '—', '—', '✓', '80+ KPIs'],
                         ['SASB index CSV', '—', '—', '✓', '✓'],
+                        ['GRI index 80+ rows', '—', '—', '—', '✓'],
+                        ['Assurance PDF upload', '—', '—', '—', '✓'],
                         ['White-label UAE ESG PDF', '—', '—', '—', '✓'],
                         ['HRIS KPI import', '—', '—', '—', '✓'],
                         ['Scope 3', 'Locked', 'Preview', 'Preview', 'Unlimited'],
@@ -274,7 +276,7 @@
                 ['01', 'Create your account', 'Company sign up with Google or email — add your organisation and first location.'],
                 ['02', 'Enter emission data', 'Use quick input or bulk import to capture Scope 1 & 2 activity data across your sites.'],
                 ['03', 'Review your dashboard', 'See calculated totals, explore disclosure forms, and identify carbon hotspots.'],
-                ['04', 'Export & report', 'Upgrade to Starter or Growth to download MOCCAE, GHG, IFRS, and GRI deliverables.'],
+                ['04', 'Export & report', 'Upgrade to Starter for MOCCAE/GHG exports, or Growth for the integrated UAE ESG Report, Scorecard, IFRS, and GRI deliverables.'],
             ] as $step)
                 <div class="relative">
                     <div class="mkt-step-badge">{{ $step[0] }}</div>
@@ -338,7 +340,8 @@
             @foreach([
                 ['Can I really start for free?', 'Yes. The Free plan includes Scope 1 & 2 data entry and disclosure form previews in the app. PDF exports and bulk import unlock on paid plans.'],
                 ['Which plan do I need for MOCCAE reporting?', 'Starter (AED 1,499/year) includes GHG inventory PDF, MOCCAE Scope 1 & 2 PDF, and IEQT export for mrv.ae — plus bulk import and Scope 3 preview.'],
-                ['When do I need Growth?', 'Choose Growth (AED 2,499/year) if you need downloadable IFRS S1/S2 and GRI report PDFs, more locations (up to 10), and full access to connect with verified consultants.'],
+                ['When do I need Growth?', 'Choose Growth (AED 2,499/year) if you need the integrated UAE ESG Report PDF, ESG Scorecard, IFRS S1/S2 and GRI exports, SASB index, more locations (up to 10), and full consultant directory access.'],
+                ['What does Enterprise add?', 'Enterprise includes everything in Growth plus 80+ GRI index rows, 80+ KPI scorecard export, HRIS CSV import for workforce metrics, assurance PDF upload, and white-label UAE ESG report covers. Contact sales for pricing.'],
                 ['Do I need a consultant to use MenetZero?', 'No. The platform is self-serve for companies. Consultants are optional — for review, sign-off, or if you prefer expert guidance alongside the software.'],
                 ['I manage emissions for clients, not my own company', 'Use the consultant portal instead. Company pricing on this site is for organisations tracking their own footprint. Visit /consultant for agency features.'],
             ] as $faq)

@@ -11,8 +11,8 @@
             <span class="block mkt-text-brand">one powerful portal</span>
         </h1>
         <p class="mkt-lead">
-            Run multiple SME carbon workspaces from a single login, deliver MOCCAE-ready inventories and IFRS / GRI reports,
-            and grow your practice through the MenetZero verified consultant directory.
+            Run multiple SME carbon workspaces from a single login, deliver MOCCAE-ready inventories, integrated UAE ESG reports,
+            and IFRS / GRI disclosures — and grow your practice through the MenetZero verified consultant directory.
         </p>
         <p class="text-sm text-gray-500 mt-4 max-w-2xl mx-auto">
             MenetZero prepares the data layer — you review, sign off, and deliver the professional trust layer UAE SMEs expect.
@@ -40,7 +40,7 @@
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             @foreach([
                 ['One login, many clients', 'Switch between managed SME workspaces without juggling separate accounts or passwords.'],
-                ['Growth-grade per client', 'Paid pack clients receive Growth-equivalent tools — MOCCAE, GHG, IFRS, GRI exports per reporting year.'],
+                ['Growth-grade per client', 'Paid pack clients receive Growth-equivalent tools — UAE ESG Report, Scorecard, MOCCAE, GHG, IFRS, and GRI exports per reporting year.'],
                 ['Wholesale agency packs', 'Practice pricing for 5, 10, 25 or 50 slots — not retail rates your clients would pay directly.'],
                 ['Leads without spam', 'Directory listing routes inquiries through the platform — your phone and email stay private.'],
             ] as $item)
@@ -117,7 +117,7 @@
                 ['Emissions engine', ['Scope 1 & 2 quick input and calculations', 'Scope 3 preview (one entry per category)', 'MENA-specific emission factors', 'Dashboard with trends and hotspots']],
                 ['Data operations', ['Bulk CSV / Excel import', 'Bulk data export', 'Up to 10 branches per client', '5 years historical data retention']],
                 ['UAE compliance', ['GHG inventory PDF', 'MOCCAE Scope 1 & 2 PDF', 'IEQT export for mrv.ae', 'Excel results export']],
-                ['Disclosure &amp; ESG', ['IFRS S1 / S2 disclosure forms + PDF export', 'GRI report PDF + content index', 'Full help guide including disclosures', 'Unlimited annual report PDFs per PRY']],
+                ['Disclosure &amp; ESG', ['Integrated UAE ESG Report PDF', 'ESG Scorecard with 3-year KPI tables', 'IFRS S1 / S2 + GRI PDF + SASB index', 'Full help guide including disclosures']],
                 ['Your workflow', ['Enter client data on their behalf', 'Review calculations before sign-off', 'Export client-ready working papers', 'Separate workspace per client organisation']],
                 ['Free trial client', ['1 client included at registration', 'Full Scope 1 & 2 + disclosure preview', 'In-app preview — no PDF downloads', 'Upgrade slot when ready to deliver exports']],
             ] as $block)
@@ -183,6 +183,9 @@
                         ['Excel results export', '—', '✓'],
                         ['IFRS S1 / S2 PDF', '—', '✓'],
                         ['GRI PDF + content index', '—', '✓'],
+                        ['UAE ESG Report PDF', '—', '✓'],
+                        ['ESG Scorecard Excel', '—', '✓'],
+                        ['SASB index CSV', '—', '✓'],
                         ['Bulk CSV / XLS import', '—', '✓'],
                     ] as $row)
                         <tr>

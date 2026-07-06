@@ -1855,8 +1855,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/consultant/landing.blade.php": {
-    "mtime": 1781097104.3120775,
-    "ast_hash": "eecb5bb978f1c128bce4d7ebd2f8e654",
+    "mtime": 1783329254.7522871,
+    "ast_hash": "25ad9732d753c264686fc580c81b29d1",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/consultant/layouts/app.blade.php": {
@@ -2145,8 +2145,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/public/pricing.blade.php": {
-    "mtime": 1781098169.222527,
-    "ast_hash": "a5a4b877ca18d16f595287aeebb7867f",
+    "mtime": 1783329251.8288212,
+    "ast_hash": "b16f555c51b18e12ac43c81428c73a1e",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/quick-input/help-guide.blade.php": {
@@ -2220,8 +2220,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/welcome.blade.php": {
-    "mtime": 1783323562.1240904,
-    "ast_hash": "952a4347f8eb820d1ae18bdb1d56075f",
+    "mtime": 1783329245.8967805,
+    "ast_hash": "546922dd5e5634634fb07d27f92365a3",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/routes/console.php": {
@@ -2530,8 +2530,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/config/portal-guide-consultant.php": {
-    "mtime": 1783323519.760162,
-    "ast_hash": "5cd31633c4b547041258d757eff22643",
+    "mtime": 1783323605.455455,
+    "ast_hash": "50f2b3a56da73b31d985ba30feda3cd3",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/config/sasb.php": {
@@ -2832,6 +2832,11 @@
   "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/archive/SYSTEM_DOCUMENTATION_COMPLETE.md": {
     "mtime": 1776855083.1545162,
     "ast_hash": "7f1be66632f3fe01a5118a63303d9fe9",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_07_06_500000_update_plan_descriptions_for_uae_esg.php": {
+    "mtime": 1783329259.1455698,
+    "ast_hash": "a9127555f240946fbcc7654c27b760cc",
     "semantic_hash": ""
   }
 }
