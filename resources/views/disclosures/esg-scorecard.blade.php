@@ -50,10 +50,13 @@
         <div class="card-body flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h3 class="font-semibold text-gray-900">ESG Scorecard</h3>
-                <p class="text-sm text-gray-500 mt-1">
-                    GHG metrics auto-link from Quick Input. Energy, water, waste, and social metrics link from GRI disclosures.
-                    Manual metrics can be entered below.
-                </p>
+            <p class="text-sm text-gray-500 mt-1">
+                GHG metrics auto-link from Quick Input. Energy, water, waste, and social metrics link from GRI disclosures.
+                Manual metrics can be entered below.
+                @if($gate->canDisclosureExportType('energy_from_activity', $fiscalYear))
+                    <span class="block mt-1 text-brand-700">Enterprise: “Energy from Quick Input” is included in the enterprise scorecard export.</span>
+                @endif
+            </p>
             </div>
             <div class="flex flex-wrap gap-2">
                 <form method="POST" action="{{ route('disclosures.esg-scorecard.sync', ['fiscal_year' => $fiscalYear]) }}">

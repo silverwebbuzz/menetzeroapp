@@ -78,6 +78,7 @@ class PlanEntitlementAdminService
             PlanEntitlementService::EXPORT_GRI_CONTENT_INDEX_EXTENDED => 'GRI enterprise content index (80+)',
             PlanEntitlementService::EXPORT_ESG_SCORECARD_ENTERPRISE => 'ESG scorecard enterprise (80+ KPIs)',
             PlanEntitlementService::FEATURE_ASSURANCE_UPLOAD => 'Assurance verifier PDF upload',
+            PlanEntitlementService::FEATURE_ENERGY_FROM_ACTIVITY => 'Energy GJ from Quick Input activity',
         ];
     }
 

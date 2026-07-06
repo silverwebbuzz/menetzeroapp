@@ -148,6 +148,12 @@ return [
                     'source' => 'manual',
                     'decimals' => 0,
                 ],
+                'energy_gj_from_activity' => [
+                    'label' => 'Total energy from Quick Input activity (GRI 302-1 auto)',
+                    'unit' => 'GJ',
+                    'source' => 'energy_activity',
+                    'decimals' => 2,
+                ],
             ],
         ],
         'social' => [

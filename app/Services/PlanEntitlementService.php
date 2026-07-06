@@ -22,6 +22,7 @@ class PlanEntitlementService
     public const EXPORT_GRI_CONTENT_INDEX_EXTENDED = 'gri_content_index_extended';
     public const EXPORT_ESG_SCORECARD_ENTERPRISE = 'esg_scorecard_enterprise';
     public const FEATURE_ASSURANCE_UPLOAD = 'assurance_upload';
+    public const FEATURE_ENERGY_FROM_ACTIVITY = 'energy_from_activity';
 
     public function __construct(
         protected SubscriptionService $subscriptionService,
@@ -325,6 +326,10 @@ class PlanEntitlementService
 
         if ($exportCode === self::FEATURE_ASSURANCE_UPLOAD) {
             return 'Independent assurance PDF upload is available on the Enterprise plan. Contact sales for access.';
+        }
+
+        if ($exportCode === self::FEATURE_ENERGY_FROM_ACTIVITY) {
+            return 'Auto energy (GJ) from Quick Input is available on the Enterprise plan. Contact sales for access.';
         }
 
         return 'This export is available on the Starter plan (AED 1,499/year) and above.';

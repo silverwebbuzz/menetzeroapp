@@ -13,6 +13,7 @@ class EsgScorecardService
     public function __construct(
         protected IfrsS2ReportService $s2ReportService,
         protected DisclosureService $disclosureService,
+        protected EnergyFromActivityService $energyFromActivityService,
     ) {
     }
 
@@ -363,6 +364,12 @@ class EsgScorecardService
             }
 
             return [(float) $raw, 'esg_report'];
+        }
+
+        if ($metric['source'] === 'energy_activity') {
+            $gj = $this->energyFromActivityService->totalGj($company->id, $fiscalYear);
+
+            return [$gj, 'energy_activity'];
         }
 
         return [null, 'unknown'];
