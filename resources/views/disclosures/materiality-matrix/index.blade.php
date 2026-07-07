@@ -17,6 +17,7 @@
             <p class="card-subtitle">GRI 3 / IFRS S1 — impact and financial materiality for {{ $fiscalYear }}. Topics marked medium/high on either axis are flagged as material.</p>
         </div>
         <div class="card-body">
+            <x-field-help key="esg_depth.materiality.intro" class="mb-4" />
             <form method="POST" action="{{ route('disclosures.materiality-matrix.update', ['fiscal_year' => $fiscalYear]) }}">
                 @csrf
                 <div class="overflow-x-auto">

@@ -173,6 +173,7 @@
                 <p class="card-subtitle">Enter values not available from GHG or GRI modules.</p>
             </div>
             <div class="card-body">
+                <x-field-help key="scorecard.manual_intro" class="mb-4" />
                 <form method="POST" action="{{ route('disclosures.esg-scorecard.update', ['fiscal_year' => $fiscalYear]) }}" class="space-y-4">
                     @csrf
                     <input type="hidden" name="fiscal_year" value="{{ $fiscalYear }}">

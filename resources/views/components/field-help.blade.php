@@ -2,12 +2,17 @@
     'framework' => null,
     'section' => '',
     'field' => null,
+    'key' => null,
 ])
 
 @php
-    $text = $field !== null
-        ? field_help($framework, $section, $field)
-        : field_help_section($framework, $section);
+    if ($key !== null) {
+        $text = \App\Support\FieldHelp::line($key);
+    } elseif ($field !== null) {
+        $text = field_help($framework, $section, $field);
+    } else {
+        $text = field_help_section($framework, $section);
+    }
 @endphp
 
 @if($text)

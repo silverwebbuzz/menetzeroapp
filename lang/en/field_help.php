@@ -186,4 +186,60 @@ return [
             'investment_methodology' => 'What is included (donations, volunteering valued at rate, pro bono services).',
         ],
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | ESG Depth register forms (standalone, not config-driven)
+    | Referenced via <x-field-help key="esg_depth.{form}.{field}" />
+    |--------------------------------------------------------------------------
+    */
+    'esg_depth' => [
+        'stakeholders' => [
+            'intro' => 'Record how you engage each stakeholder group (GRI 2-29). This register feeds the Stakeholder Engagement chapter of the UAE ESG Report.',
+            'stakeholder_group' => 'Who you engage — e.g. Employees, Investors, Regulators, Communities, Suppliers.',
+            'engagement_method' => 'How you engage them — surveys, workshops, town halls, regulator meetings.',
+            'frequency' => 'How regularly this group is engaged during the year.',
+            'last_engaged_at' => 'Date of the most recent engagement with this group.',
+            'topics_discussed' => 'Key issues raised by this group during engagement.',
+            'outcomes' => 'What changed as a result — decisions, actions, or commitments made.',
+        ],
+        'supply_chain' => [
+            'intro' => 'Supplier register for Scope 3 Category 1 (GRI 308 / 414). Spend here can complement purchased goods & services in Quick Input.',
+            'supplier_name' => 'Legal or trading name of the supplier.',
+            'category' => 'Type of goods or services supplied — drives materiality of screening.',
+            'spend_aed' => 'Annual spend with this supplier in AED for the reporting year.',
+            'country' => 'Country where the supplier primarily operates or ships from.',
+            'screening_status' => 'Whether this supplier has been screened on ESG criteria — GRI 308-1 / 414-1.',
+            'human_rights_assessed' => 'Tick if a human rights / labour assessment was completed for this supplier.',
+            'environmental_assessed' => 'Tick if an environmental assessment was completed for this supplier.',
+            'notes' => 'Audit findings, corrective actions, or context for this supplier.',
+        ],
+        'targets' => [
+            'intro' => 'Non-climate ESG targets (water, waste, diversity, social, governance). Climate targets stay in IFRS S2 reduction targets to keep one source of truth.',
+            'name' => 'Describe the target outcome — e.g. "Reduce water withdrawal 20% by 2030".',
+            'target_category' => 'ESG pillar this target belongs to (environmental, social, governance).',
+            'metric_label' => 'What is measured — e.g. "Water withdrawal m³", "Women in management %".',
+            'baseline_value' => 'Starting value in the base year against which progress is measured.',
+            'target_value' => 'Value you aim to reach by the target year.',
+            'unit' => 'Unit of the metric — m³, %, tonnes, hours, etc.',
+            'base_year' => 'Reference year the baseline was measured in.',
+            'target_year' => 'Year by which the target should be achieved.',
+            'notes' => 'Methodology, assumptions, or dependencies for this target.',
+        ],
+        'materiality' => [
+            'intro' => 'Double materiality (GRI 3 / IFRS S1): rate each topic on impact (effect on people/environment) and financial (effect on your business). Medium/high on either axis flags the topic as material.',
+            'impact_materiality' => 'Severity of the topic\'s effect on people and the environment.',
+            'financial_materiality' => 'Significance of the topic\'s effect on your financial position and prospects.',
+            'is_material' => 'Tick to include this topic in the material topics list and report matrix.',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | ESG Scorecard
+    |--------------------------------------------------------------------------
+    */
+    'scorecard' => [
+        'manual_intro' => 'Enter only values not already sourced from GHG (Quick Input) or GRI disclosures. Auto-linked rows are read-only above.',
+    ],
 ];

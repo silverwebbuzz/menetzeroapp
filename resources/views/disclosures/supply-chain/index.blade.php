@@ -23,11 +23,13 @@
             <p class="card-subtitle">Scope 3 Category 1 — GRI 308 / 414</p>
         </div>
         <div class="card-body">
+            <x-field-help key="esg_depth.supply_chain.intro" class="mb-4" />
             <form method="POST" action="{{ route('disclosures.supply-chain.store', ['fiscal_year' => $fiscalYear]) }}" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 @csrf
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Supplier name *</label>
                     <input type="text" name="supplier_name" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                    <x-field-help key="esg_depth.supply_chain.supplier_name" class="mt-1" />
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
@@ -36,14 +38,17 @@
                             <option value="{{ $val }}">{{ $label }}</option>
                         @endforeach
                     </select>
+                    <x-field-help key="esg_depth.supply_chain.category" class="mt-1" />
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Spend (AED)</label>
                     <input type="number" step="0.01" name="spend_aed" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                    <x-field-help key="esg_depth.supply_chain.spend_aed" class="mt-1" />
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Country</label>
                     <input type="text" name="country" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                    <x-field-help key="esg_depth.supply_chain.country" class="mt-1" />
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Screening status</label>
@@ -52,6 +57,7 @@
                             <option value="{{ $val }}">{{ $label }}</option>
                         @endforeach
                     </select>
+                    <x-field-help key="esg_depth.supply_chain.screening_status" class="mt-1" />
                 </div>
                 <div class="flex items-center gap-4 md:col-span-2">
                     <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="human_rights_assessed" value="1"> Human rights assessed</label>
@@ -60,6 +66,7 @@
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
                     <textarea name="notes" rows="2" class="w-full border border-gray-300 rounded-lg px-3 py-2"></textarea>
+                    <x-field-help key="esg_depth.supply_chain.notes" class="mt-1" />
                 </div>
                 <div class="md:col-span-2">
                     <button type="submit" class="btn btn-primary">Add supplier</button>

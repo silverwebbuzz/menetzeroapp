@@ -17,15 +17,18 @@
             <p class="card-subtitle">GRI 2-29 — {{ $fiscalYear }}</p>
         </div>
         <div class="card-body">
+            <x-field-help key="esg_depth.stakeholders.intro" class="mb-4" />
             <form method="POST" action="{{ route('disclosures.stakeholders.store', ['fiscal_year' => $fiscalYear]) }}" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 @csrf
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Stakeholder group *</label>
                     <input type="text" name="stakeholder_group" required placeholder="e.g. Employees, Investors, Regulators" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                    <x-field-help key="esg_depth.stakeholders.stakeholder_group" class="mt-1" />
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Engagement method</label>
                     <input type="text" name="engagement_method" placeholder="e.g. Survey, workshops, meetings" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                    <x-field-help key="esg_depth.stakeholders.engagement_method" class="mt-1" />
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Frequency</label>
@@ -35,18 +38,22 @@
                             <option value="{{ $val }}">{{ $label }}</option>
                         @endforeach
                     </select>
+                    <x-field-help key="esg_depth.stakeholders.frequency" class="mt-1" />
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Last engaged</label>
                     <input type="date" name="last_engaged_at" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                    <x-field-help key="esg_depth.stakeholders.last_engaged_at" class="mt-1" />
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Topics discussed</label>
                     <textarea name="topics_discussed" rows="2" class="w-full border border-gray-300 rounded-lg px-3 py-2"></textarea>
+                    <x-field-help key="esg_depth.stakeholders.topics_discussed" class="mt-1" />
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Outcomes / actions</label>
                     <textarea name="outcomes" rows="2" class="w-full border border-gray-300 rounded-lg px-3 py-2"></textarea>
+                    <x-field-help key="esg_depth.stakeholders.outcomes" class="mt-1" />
                 </div>
                 <div class="md:col-span-2">
                     <button type="submit" class="btn btn-primary">Add engagement</button>

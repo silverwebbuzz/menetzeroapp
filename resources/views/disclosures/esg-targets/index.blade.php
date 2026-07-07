@@ -17,11 +17,13 @@
             <p class="card-subtitle">Water, waste, diversity, social, governance — climate targets remain in IFRS S2 reduction targets.</p>
         </div>
         <div class="card-body">
+            <x-field-help key="esg_depth.targets.intro" class="mb-4" />
             <form method="POST" action="{{ route('disclosures.esg-targets.store', ['fiscal_year' => $fiscalYear]) }}" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 @csrf
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Target name *</label>
                     <input type="text" name="name" required placeholder="e.g. Reduce water withdrawal 20% by 2030" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                    <x-field-help key="esg_depth.targets.name" class="mt-1" />
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Category *</label>
@@ -30,34 +32,42 @@
                             <option value="{{ $val }}">{{ $label }}</option>
                         @endforeach
                     </select>
+                    <x-field-help key="esg_depth.targets.target_category" class="mt-1" />
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Metric label</label>
                     <input type="text" name="metric_label" placeholder="e.g. Water withdrawal m³" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                    <x-field-help key="esg_depth.targets.metric_label" class="mt-1" />
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Baseline value</label>
                     <input type="number" step="any" name="baseline_value" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                    <x-field-help key="esg_depth.targets.baseline_value" class="mt-1" />
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Target value</label>
                     <input type="number" step="any" name="target_value" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                    <x-field-help key="esg_depth.targets.target_value" class="mt-1" />
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Unit</label>
                     <input type="text" name="unit" placeholder="m³, %, tonnes" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                    <x-field-help key="esg_depth.targets.unit" class="mt-1" />
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Base year</label>
                     <input type="number" name="base_year" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                    <x-field-help key="esg_depth.targets.base_year" class="mt-1" />
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Target year *</label>
                     <input type="number" name="target_year" required value="{{ $fiscalYear + 5 }}" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                    <x-field-help key="esg_depth.targets.target_year" class="mt-1" />
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
                     <textarea name="notes" rows="2" class="w-full border border-gray-300 rounded-lg px-3 py-2"></textarea>
+                    <x-field-help key="esg_depth.targets.notes" class="mt-1" />
                 </div>
                 <div class="md:col-span-2">
                     <button type="submit" class="btn btn-primary">Save target</button>
