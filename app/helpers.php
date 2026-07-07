@@ -122,6 +122,7 @@ if (! function_exists('quick_input_help')) {
     }
 }
 
+if (! function_exists('field_help')) {
     /**
      * Per-field help line from lang/{locale}/field_help.php (null if no entry).
      */
