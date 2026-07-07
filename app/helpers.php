@@ -114,3 +114,23 @@ if (! function_exists('mail_transport_for_mailbox')) {
         return 'smtp_noreply';
     }
 }
+
+if (! function_exists('field_help')) {
+    /**
+     * Per-field help line from lang/{locale}/field_help.php (null if no entry).
+     */
+    function field_help(?string $framework, string $section, string $field): ?string
+    {
+        return \App\Support\FieldHelp::field($framework, $section, $field);
+    }
+}
+
+if (! function_exists('field_help_section')) {
+    /**
+     * Optional section-level callout from lang/{locale}/field_help.php.
+     */
+    function field_help_section(?string $framework, string $section): ?string
+    {
+        return \App\Support\FieldHelp::section($framework, $section);
+    }
+}

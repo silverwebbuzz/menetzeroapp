@@ -31,10 +31,13 @@
                     'esg_report' => 'disclosures.uae-esg.sections.update',
                     default => 'disclosures.s2.sections.update',
                 };
+                $formFramework = $framework ?? 'ifrs_s2';
             @endphp
             <form method="POST" action="{{ route($updateRoute, ['section' => $section, 'fiscal_year' => $fiscalYear]) }}" class="space-y-5">
                 @csrf
                 <input type="hidden" name="fiscal_year" value="{{ $fiscalYear }}">
+
+                <x-field-help :framework="$formFramework" :section="$section" class="mb-2" />
 
                 @foreach($config['fields'] as $key => $field)
                     <div>
@@ -44,6 +47,8 @@
                                 <span class="text-red-500">*</span>
                             @endif
                         </label>
+
+                        <x-field-help :framework="$formFramework" :section="$section" :field="$key" class="mb-2 -mt-1" />
 
                         @if(($field['type'] ?? 'text') === 'textarea')
                             <textarea name="content[{{ $key }}]" rows="4"
