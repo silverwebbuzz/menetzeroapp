@@ -10,8 +10,9 @@ namespace App\Support;
  *   esg_report.{section}.{field}              — UAE ESG Report narrative
  *   sections.disclosure.{framework}.{section}   — optional section intro callout
  *   sections.esg_report.{section}
- *
- * Future locales: add lang/ar/field_help.php with the same keys; set App::locale() from user/profile.
+ *   quick_input.{slug}.{field}                  — Quick Input forms
+ *   quick_input._common.{field}                 — shared across all sources
+ *   sections.quick_input.{slug}                 — optional source intro callout
  */
 class FieldHelp
 {
@@ -47,6 +48,49 @@ class FieldHelp
             : "field_help.{$dotPath}";
 
         return self::resolve($key);
+    }
+
+    /**
+     * Quick Input: lang key quick_input.{slug}.{field}, then quick_input._common.{field}.
+     * Optional context['variant'] tries quick_input.{slug}.{field}_{variant} first.
+     */
+    public static function forQuickInput(string $slug, string $fieldName, array $context = []): ?string
+    {
+        $slug = self::normalizeSlug($slug);
+        $fieldName = trim($fieldName);
+        if ($slug === '' || $fieldName === '') {
+            return null;
+        }
+
+        $variant = isset($context['variant']) ? trim((string) $context['variant']) : '';
+        if ($variant !== '') {
+            $variantKey = "field_help.quick_input.{$slug}.{$fieldName}_{$variant}";
+            if (($text = self::resolve($variantKey)) !== null) {
+                return $text;
+            }
+        }
+
+        $sourceKey = "field_help.quick_input.{$slug}.{$fieldName}";
+        if (($text = self::resolve($sourceKey)) !== null) {
+            return $text;
+        }
+
+        return self::resolve("field_help.quick_input._common.{$fieldName}");
+    }
+
+    public static function quickInputSection(string $slug): ?string
+    {
+        $slug = self::normalizeSlug($slug);
+        if ($slug === '') {
+            return null;
+        }
+
+        return self::resolve("field_help.sections.quick_input.{$slug}");
+    }
+
+    private static function normalizeSlug(string $slug): string
+    {
+        return trim(str_replace('_', '-', $slug), '/');
     }
 
     private static function resolve(string $key): ?string

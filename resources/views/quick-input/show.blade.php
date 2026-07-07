@@ -25,6 +25,7 @@
                 @if($instructions)
                     <p class="text-base text-gray-600 leading-relaxed">{{ $instructions }}</p>
                 @endif
+                <x-field-help key="sections.quick_input.{{ $slug }}" class="mt-3" />
             </div>
         </div>
         
@@ -259,9 +260,7 @@
                                             @endif
                                         @endif
                                     </select>
-                                    @if($field->help_text)
-                                        <p class="form-help-text">{{ $field->help_text }}</p>
-                                    @endif
+                                    @include('quick-input.partials.resolved-field-help', ['field' => $field, 'slug' => $slug])
                                     @error($field->field_name)
                                         <p class="form-error-text">{{ $message }}</p>
                                     @enderror
@@ -283,9 +282,7 @@
                                            {{ $field->is_required ? 'required' : '' }}
                                            placeholder="{{ $field->field_placeholder ?? 'Enter ' . strtolower($field->field_label ?? $field->field_name) }}"
                                            class="form-input">
-                                    @if($field->help_text)
-                                        <p class="form-help-text">{{ $field->help_text }}</p>
-                                    @endif
+                                    @include('quick-input.partials.resolved-field-help', ['field' => $field, 'slug' => $slug])
                                     @error($field->field_name)
                                         <p class="form-error-text">{{ $message }}</p>
                                     @enderror
@@ -314,9 +311,7 @@
                                                placeholder="{{ $field->field_placeholder ?? '' }}"
                                                class="form-input">
                                     @endif
-                                    @if($field->help_text)
-                                        <p class="form-help-text">{{ $field->help_text }}</p>
-                                    @endif
+                                    @include('quick-input.partials.resolved-field-help', ['field' => $field, 'slug' => $slug])
                                     @error($field->field_name)
                                         <p class="form-error-text">{{ $message }}</p>
                                     @enderror
@@ -354,9 +349,7 @@
                                                     {{ $field->field_label ?? ucwords(str_replace('_', ' ', $field->field_name)) }}
                                                 </label>
                                             </div>
-                                            @if($field->help_text)
-                                                <p class="form-help-text">{{ $field->help_text }}</p>
-                                            @endif
+                                            @include('quick-input.partials.resolved-field-help', ['field' => $field, 'slug' => $slug])
                                         </div>
                                     @elseif($field->field_type === 'select')
                                         <div class="form-group-stacked {{ $isScope2FullWidth ? 'form-group-stacked--full' : '' }}">
@@ -381,9 +374,7 @@
                                                     @endif
                                                 @endif
                                             </select>
-                                            @if($field->help_text)
-                                                <p class="form-help-text">{{ $field->help_text }}</p>
-                                            @endif
+                                            @include('quick-input.partials.resolved-field-help', ['field' => $field, 'slug' => $slug])
                                             @error($field->field_name)
                                                 <p class="form-error-text">{{ $message }}</p>
                                             @enderror
@@ -397,9 +388,7 @@
                                                    value="{{ $scope2Value }}"
                                                    placeholder="{{ $field->field_placeholder ?? '' }}"
                                                    class="form-input">
-                                            @if($field->help_text)
-                                                <p class="form-help-text">{{ $field->help_text }}</p>
-                                            @endif
+                                            @include('quick-input.partials.resolved-field-help', ['field' => $field, 'slug' => $slug])
                                             @error($field->field_name)
                                                 <p class="form-error-text">{{ $message }}</p>
                                             @enderror
@@ -477,9 +466,7 @@
                                                placeholder="{{ $field->field_placeholder ?? '' }}"
                                                class="form-input">
                                     @endif
-                                    @if($field->help_text)
-                                        <p class="form-help-text">{{ $field->help_text }}</p>
-                                    @endif
+                                    @include('quick-input.partials.resolved-field-help', ['field' => $field, 'slug' => $slug])
                                     @error($field->field_name)
                                         <p class="form-error-text">{{ $message }}</p>
                                     @enderror
@@ -501,7 +488,7 @@
                                    value="{{ old('entry_date', $editEntry?->entry_date?->format('Y-m-d') ?? '') }}"
                                    class="form-input"
                                    placeholder="Optional">
-                            <p class="form-help-text">Date on the utility bill, fuel receipt, or invoice — leave blank if unknown.</p>
+                            <x-field-help key="quick_input._common.entry_date" class="mt-1" />
                             @error('entry_date')
                                 <p class="form-error-text">{{ $message }}</p>
                             @enderror
@@ -515,7 +502,7 @@
                                    value="{{ $editEvidenceLink }}"
                                    class="form-input"
                                    placeholder="e.g. SharePoint, Google Drive, or bill portal URL">
-                            <p class="form-help-text">Link to supporting documents (Google Sheet, shared folder, DEWA portal, etc.) if you are not uploading a file.</p>
+                            <x-field-help key="quick_input._common.evidence_link" class="mt-1" />
                             @error('evidence_link')
                                 <p class="form-error-text">{{ $message }}</p>
                             @enderror
@@ -530,7 +517,7 @@
                                        multiple
                                        accept=".pdf,.jpg,.jpeg,.png,.webp"
                                        class="evidence-file-input">
-                                <p class="evidence-file-zone__hint">PDF, JPG, PNG, or WebP — max 10 MB each, up to 5 files</p>
+                                <p class="evidence-file-zone__hint">{{ quick_input_help('_common', 'supporting_documents') ?? 'PDF, JPG, PNG, or WebP — max 10 MB each, up to 5 files' }}</p>
                             </div>
                             @error('supporting_documents')
                                 <p class="form-error-text">{{ $message }}</p>
@@ -559,9 +546,7 @@
                                 <textarea name="comments" id="comments" rows="3"
                                           class="form-input form-textarea"
                                           placeholder="{{ $commentsField->field_placeholder ?? 'Any extra context for this entry…' }}">{{ old('comments', $editEntry->notes ?? '') }}</textarea>
-                                @if($commentsField->help_text)
-                                    <p class="form-help-text">{{ $commentsField->help_text }}</p>
-                                @endif
+                                @include('quick-input.partials.resolved-field-help', ['field' => $commentsField, 'slug' => $slug])
                                 @error('comments')
                                     <p class="form-error-text">{{ $message }}</p>
                                 @enderror

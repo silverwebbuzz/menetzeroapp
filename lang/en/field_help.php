@@ -6,8 +6,8 @@
  * Loaded via Laravel's translator: __('field_help.{path}').
  * Add lang/ar/field_help.php with the same keys for Arabic (E.2g).
  *
- * Keys are resolved automatically from framework + section + field in forms —
- * you do not need help_key in config/disclosure.php.
+ * Keys: quick_input.{slug}.{field} or quick_input._common.{field}
+ * Section intros: sections.quick_input.{slug}
  */
 return [
 
@@ -43,6 +43,15 @@ return [
             'about_company' => 'Public-facing company profile for investors and regulators reading your integrated report.',
             'esg_strategy' => 'Summarise ESG priorities that align with your material topics and reduction targets.',
             'community_impact' => 'Optional B4SI-style community investment disclosure for the UAE ESG Report.',
+        ],
+        'quick_input' => [
+            'electricity' => 'Enter one row per DEWA/ADDC bill. Use kWh from the bill — never the AED total.',
+            'heat-steam-cooling' => 'Only if you have a separate district cooling bill. Do not double-count cooling already on your DEWA bill.',
+            'natural-gas' => 'Piped utility gas only. LPG cylinders belong under Fuel.',
+            'fuel' => 'Stationary fuel — generators, forklifts, LPG catering. Company cars use the Vehicle form.',
+            'vehicle' => 'Company-owned or operated cars and vans. Use km if possible; litres from fuel card otherwise.',
+            'refrigerants' => 'Only when AC was serviced and refrigerant was topped up this year.',
+            'process' => 'Factories and industrial plants only — skip for offices and retail.',
         ],
     ],
 
@@ -241,5 +250,64 @@ return [
     */
     'scorecard' => [
         'manual_intro' => 'Enter only values not already sourced from GHG (Quick Input) or GRI disclosures. Auto-linked rows are read-only above.',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Quick Input (activity data entry)
+    | Keys: quick_input.{slug}.{field} or quick_input._common.{field}
+    |--------------------------------------------------------------------------
+    */
+    'quick_input' => [
+        '_common' => [
+            'amount' => 'Enter the quantity from your bill or receipt — not the cost in AED.',
+            'quantity' => 'Enter the quantity from your bill or receipt — not the cost in AED.',
+            'distance' => 'Total distance driven in the period (km) or fuel litres from your fuel card.',
+            'unit_of_measure' => 'Pick the unit shown on your bill (kWh, litres, km, m³, etc.).',
+            'unit' => 'Pick the unit shown on your bill (kWh, litres, km, m³, etc.).',
+            'entry_date' => 'Date on the utility bill, fuel receipt, or invoice — leave blank if unknown.',
+            'evidence_link' => 'Link to supporting documents (Google Sheet, shared folder, DEWA portal, etc.) if you are not uploading a file.',
+            'supporting_documents' => 'PDF, JPG, PNG, or WebP — max 10 MB each, up to 5 files.',
+            'comments' => 'Optional context for auditors — e.g. "January DEWA bill" or "Generator diesel H1".',
+            'link' => 'URL to a shared folder or bill portal if you are not uploading a file here.',
+        ],
+        'electricity' => [
+            'amount' => 'Total kWh from your DEWA, ADDC, or SEWA bill — not the AED amount.',
+            'scope2_method' => 'IFRS S2 expects location-based; add market-based when you have supplier data or renewable certificates.',
+            'supplier_emission_factor' => 'From your electricity supplier or REC documentation. Used for market-based Scope 2.',
+            'renewable_percent' => 'Optional: if supplier factor unknown, we blend grid factor with renewable share.',
+            'is_biogenic' => 'Check if this activity is biogenic carbon (IFRS S2 reports separately from fossil GHG).',
+        ],
+        'heat-steam-cooling' => [
+            'amount' => 'Use kWh or RT as shown on your Empower, Tabreed, or district cooling bill.',
+            'emission_factor_methodology' => 'DEWA grid factor applies to electricity, not steam. Choose supplier or custom for district cooling when you have a better factor.',
+            'supplier_emission_factor' => 'Enter when methodology is Supplier or Custom. Must match your quantity unit (kWh or RT).',
+            'methodology_reference' => 'Document or standard used for your custom factor (shown on reports).',
+        ],
+        'natural-gas' => [
+            'amount' => 'Volume from your gas utility bill in m³ or kWh — not LPG cylinders (use fuel category for LPG).',
+            'fuel_type' => 'Select Natural gas for piped utility gas.',
+        ],
+        'fuel' => [
+            'amount' => 'Litres from pump meter or fuel invoice — for generators, forklifts, or stationary equipment.',
+            'fuel_category' => 'Liquid fuels (diesel, petrol) or Gaseous fuels (LPG, propane).',
+            'fuel_type' => 'Copy sub-type exactly from the list — e.g. Diesel (100% mineral diesel).',
+        ],
+        'vehicle' => [
+            'distance' => 'Total km driven in the period — from fleet log, GPS, or odometer readings.',
+            'distance_amount_fuel' => 'Amount of fuel used in the unit of measure specified above.',
+            'amount' => 'Litres from fuel card if you do not have mileage data.',
+            'vehicle_fuel_type' => 'Diesel or Petrol — match your fleet fuel card.',
+            'vehicle_type' => 'Vehicle size class — affects the emission factor per km.',
+            'vehicle_category' => 'Car, van, or truck category for the distance-based factor.',
+        ],
+        'refrigerants' => [
+            'amount' => 'Kg of refrigerant gas added during service — not the AC unit\'s total capacity.',
+            'fuel_type' => 'Gas type from the AC service report (e.g. R-410A, HFC-32).',
+        ],
+        'process' => [
+            'amount' => 'Tonnes of product manufactured in the reporting period.',
+            'process_type' => 'Match your industrial process — cement, steel, aluminium, etc.',
+        ],
     ],
 ];

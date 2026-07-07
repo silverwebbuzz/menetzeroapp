@@ -369,7 +369,6 @@ class QuickInputController extends Controller
 
             if ($knowAmountOfFuel == 'true' && $field->field_label == 'Distance') {
                 $field->field_label = 'Amount';
-                $field->help_text = 'Amount of fuel used in the unit of measure specified above';
                 $field->field_placeholder = 'Enter the amount of fuel used';
             }
         // normalize options safely (field_options may be array-cast by Eloquent)
@@ -391,8 +390,13 @@ class QuickInputController extends Controller
 
         $html .= '</label>';
 
-        if (!empty($field->help_text)) {
-            $html .= '<p class="form-help-text-under-label">'.e($field->help_text).'</p>';
+        $helpContext = [];
+        if ($knowAmountOfFuel == 'true' && $field->field_name === 'distance') {
+            $helpContext['variant'] = 'amount_fuel';
+        }
+        $helpText = $field->resolvedHelpText('vehicle', $helpContext);
+        if ($helpText !== null) {
+            $html .= '<p class="form-help-text-under-label">'.e($helpText).'</p>';
         }
 
         $html .= '</div>'; // label wrapper

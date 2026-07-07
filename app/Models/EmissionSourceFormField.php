@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\FieldHelp;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -44,5 +45,22 @@ class EmissionSourceFormField extends Model
         return self::where('emission_source_id', $emissionSourceId)
                    ->orderBy('field_order')
                    ->get();
+    }
+
+    /**
+     * Help text: lang file first (field_help.quick_input.{slug}.{field}), DB help_text as fallback.
+     */
+    public function resolvedHelpText(?string $sourceSlug = null, array $context = []): ?string
+    {
+        if ($sourceSlug !== null && $sourceSlug !== '') {
+            $fromLang = FieldHelp::forQuickInput($sourceSlug, $this->field_name, $context);
+            if ($fromLang !== null) {
+                return $fromLang;
+            }
+        }
+
+        $legacy = trim((string) ($this->help_text ?? ''));
+
+        return $legacy !== '' ? $legacy : null;
     }
 }

@@ -115,7 +115,13 @@ if (! function_exists('mail_transport_for_mailbox')) {
     }
 }
 
-if (! function_exists('field_help')) {
+if (! function_exists('quick_input_help')) {
+    function quick_input_help(string $slug, string $field, array $context = []): ?string
+    {
+        return \App\Support\FieldHelp::forQuickInput($slug, $field, $context);
+    }
+}
+
     /**
      * Per-field help line from lang/{locale}/field_help.php (null if no entry).
      */
