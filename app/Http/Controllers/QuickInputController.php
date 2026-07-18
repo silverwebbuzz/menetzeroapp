@@ -416,20 +416,50 @@ class QuickInputController extends Controller
 
             $html .= '<option value="">Select an option</option>';
 
-            if($knowAmountOfFuel == "true") {
-                if($field->field_name == 'vehicle_fuel_type'){
-                    $options = [
-                        ['value' => 'Diesel (average biofuel blend)', 'label' => 'Diesel (average biofuel blend)'],
-                        ['value' => 'Petrol (average biofuel blend)', 'label' => 'Petrol (average biofuel blend)'],
-                    ];
+            if ($knowAmountOfFuel == 'true') {
+                if ($field->field_name == 'vehicle_fuel_type') {
+                    // Pull from active litre/tonne factors so dropdowns stay in sync with DB.
+                    $fuelAmountTypes = EmissionFactor::where('emission_source_id', $vehicleSourceId)
+                        ->where('is_active', true)
+                        ->whereIn('unit', ['litres', 'tonnes'])
+                        ->whereNotNull('fuel_type')
+                        ->distinct()
+                        ->orderBy('fuel_type')
+                        ->pluck('fuel_type')
+                        ->filter()
+                        ->values()
+                        ->all();
+
+                    if (empty($fuelAmountTypes)) {
+                        $fuelAmountTypes = [
+                            'Diesel (average biofuel blend)',
+                            'Petrol (average biofuel blend)',
+                            'Diesel (100% mineral diesel)',
+                            'Petrol (100% mineral petrol)',
+                        ];
+                    }
+
+                    $options = array_map(
+                        fn ($value) => ['value' => $value, 'label' => $value],
+                        $fuelAmountTypes
+                    );
                 }
-                if($field->field_name == 'unit_of_measure'){
-                    $options = [
-                        ['value' => 'litres', 'label' => 'litres'],
-                        ['value' => 'tonnes', 'label' => 'tonnes'],
-                    ];
+                if ($field->field_name == 'unit_of_measure') {
+                    $fuelUnits = EmissionFactor::where('emission_source_id', $vehicleSourceId)
+                        ->where('is_active', true)
+                        ->whereIn('unit', ['litres', 'tonnes'])
+                        ->distinct()
+                        ->orderBy('unit')
+                        ->pluck('unit')
+                        ->filter()
+                        ->values()
+                        ->all();
+
+                    $options = array_map(
+                        fn ($value) => ['value' => $value, 'label' => $value],
+                        !empty($fuelUnits) ? $fuelUnits : ['litres', 'tonnes']
+                    );
                 }
-                
             }
             foreach ($options as $option) {
                 $value = is_array($option) ? ($option['value'] ?? '') : $option;
@@ -1291,7 +1321,7 @@ class QuickInputController extends Controller
     public function getVehicleFuelTypes($sourceId, Request $request)
     {
         try {
-            $query = EmissionFactor::where('emission_source_id', operator: $sourceId)
+            $query = EmissionFactor::where('emission_source_id', $sourceId)
                 ->where('is_active', true)
                 ->whereNotNull('fuel_type');
 
@@ -1325,7 +1355,7 @@ class QuickInputController extends Controller
     public function getVehicleUoms($sourceId, Request $request)
     {
         try {
-            $query = EmissionFactor::where('emission_source_id', operator: $sourceId)
+            $query = EmissionFactor::where('emission_source_id', $sourceId)
                 ->where('is_active', true)
                 ->whereNotNull('unit');
 
@@ -1379,6 +1409,15 @@ class QuickInputController extends Controller
 
         if ($knowsFuel && !$request->filled('amount') && $request->filled('distance')) {
             $request->merge(['amount' => $request->input('distance')]);
+        }
+
+        // Fuel-amount factors have no vehicle_category/type — strip leftovers so
+        // EmissionCalculationService does not over-filter and miss litre factors.
+        if ($knowsFuel) {
+            $request->merge([
+                'vehicle_category' => null,
+                'vehicle_type' => null,
+            ]);
         }
     }
 
@@ -1503,13 +1542,16 @@ class QuickInputController extends Controller
 
     private function buildFactorConditions(Request $request, EmissionSourceMaster $emissionSource, ?string $unit): array
     {
+        $vehicleKnowsFuel = $emissionSource->quick_input_slug === 'vehicle'
+            && $this->vehicleKnowsFuelAmount($request);
+
         return [
             'region' => $request->input('region', $this->resolveDefaultRegion($emissionSource)),
             'fuel_category' => $request->input('fuel_category'),
             'fuel_type' => $this->determineFuelType($request, $emissionSource),
             'unit' => $unit ?? $request->input('unit') ?? $request->input('unit_of_measure'),
-            'vehicle_category' => $request->input('vehicle_category'),
-            'vehicle_type' => $request->input('vehicle_type'),
+            'vehicle_category' => $vehicleKnowsFuel ? null : $request->input('vehicle_category'),
+            'vehicle_type' => $vehicleKnowsFuel ? null : $request->input('vehicle_type'),
         ];
     }
 

@@ -726,8 +726,8 @@
             const dependsOnFieldName = field.getAttribute('data-depends-on');
             if (!dependsOnFieldName) return;
 
-            // Find the parent form-group container (support both .form-group-horizontal and .form-group)
-            const formGroup = field.closest('.form-group-horizontal') || field.closest('.form-group');
+            // Find the parent form-group container (stacked + horizontal layouts)
+            const formGroup = field.closest('.form-group-horizontal, .form-group-stacked, .form-group');
             if (!formGroup) return;
 
             const dependsOnField = form.querySelector(`[name="${dependsOnFieldName}"]`) ||
@@ -762,13 +762,13 @@
                 const dependsOnFieldName = field.getAttribute('data-depends-on');
                 if (!dependsOnFieldName) return;
 
-                const formGroup = field.closest('.form-group-horizontal') || field.closest('.form-group');
+                const formGroup = field.closest('.form-group-horizontal, .form-group-stacked, .form-group');
                 if (!formGroup) return;
 
                 const dependsOnField = form.querySelector(`[name="${dependsOnFieldName}"]`) ||
                     form.querySelector(`#${dependsOnFieldName}`);
                 if (dependsOnField && dependsOnField.value && dependsOnField.value.trim() !== '') {
-                    formGroup.style.display = formGroup.classList.contains('form-group-horizontal') ? 'flex' : 'block';
+                    formGroup.style.display = formGroup.classList.contains('form-group-horizontal') ? 'flex' : '';
                 }
             });
         }, 200);
@@ -864,14 +864,20 @@
             vehicleCategory.dataset.handlerAttached = 'true';
             vehicleCategory.addEventListener('change', function () {
                 const category = this.value;
+
+                // Always reset dependent vehicle dropdowns first
+                if (vehicleTypeSelect) {
+                    vehicleTypeSelect.innerHTML = '<option value="">Select an option</option>';
+                }
+                if (vehicleFuelTypeSelect) {
+                    vehicleFuelTypeSelect.innerHTML = '<option value="">Select an option</option>';
+                }
+                if (unitSelect) {
+                    unitSelect.innerHTML = '<option value="">Select an option</option>';
+                }
+
                 if (category && vehicleTypeSelect) {
                     loadVehicleTypes(emissionSourceId, category, vehicleTypeSelect);
-                    // Clear unit options when category changes
-                    if (unitSelect) {
-                        unitSelect.innerHTML = '<option value="">Select an option</option>';
-                    }
-                } else if (vehicleTypeSelect) {
-                    vehicleTypeSelect.innerHTML = '<option value="">Select an option</option>';
                 }
 
                 changeFuelTypeLables(category);
@@ -880,17 +886,36 @@
             if (vehicleTypeSelect && !vehicleTypeSelect.dataset.handlerAttached) {
                 vehicleTypeSelect.dataset.handlerAttached = 'true';
                 vehicleTypeSelect.addEventListener('change', function () {
-                    const vehicleCategory = document.getElementById('vehicle_category').value;
+                    const vehicleCategory = document.getElementById('vehicle_category')?.value;
                     const vehicleType = this.value;
-                    if (vehicleCategory && vehicleType && vehicleTypeSelect) {
-                        loadVehicleFuelTypes(emissionSourceId, vehicleCategory, vehicleType, vehicleFuelTypeSelect);
-                        loadVehicleUoms(emissionSourceId, vehicleCategory, vehicleType, unitSelect);
-                        // Clear unit options when category changes
+                    if (vehicleCategory && vehicleType) {
+                        if (vehicleFuelTypeSelect) {
+                            loadVehicleFuelTypes(emissionSourceId, vehicleCategory, vehicleType, vehicleFuelTypeSelect);
+                        }
+                        if (unitSelect) {
+                            // Reset first, then reload units for the selected type.
+                            unitSelect.innerHTML = '<option value="">Select an option</option>';
+                            loadVehicleUoms(emissionSourceId, vehicleCategory, vehicleType, unitSelect);
+                        }
+                    } else {
+                        if (vehicleFuelTypeSelect) {
+                            vehicleFuelTypeSelect.innerHTML = '<option value="">Select an option</option>';
+                        }
                         if (unitSelect) {
                             unitSelect.innerHTML = '<option value="">Select an option</option>';
                         }
-                    } else if (vehicleTypeSelect) {
-                        vehicleTypeSelect.innerHTML = '<option value="">Select an option</option>';
+                    }
+                });
+            }
+
+            // When fuel type changes, refresh units for the current vehicle selection.
+            if (vehicleFuelTypeSelect && !vehicleFuelTypeSelect.dataset.unitHandlerAttached) {
+                vehicleFuelTypeSelect.dataset.unitHandlerAttached = 'true';
+                vehicleFuelTypeSelect.addEventListener('change', function () {
+                    const vehicleCategory = document.getElementById('vehicle_category')?.value;
+                    const vehicleType = document.getElementById('vehicle_type')?.value;
+                    if (vehicleCategory && vehicleType && unitSelect) {
+                        loadVehicleUoms(emissionSourceId, vehicleCategory, vehicleType, unitSelect);
                     }
                 });
             }
@@ -911,13 +936,27 @@
     }
 
     function changeFuelTypeLables(category){
+        const fuelTypeEl = document.getElementById('vehicle_fuel_type');
+        const vehicleTypeEl = document.getElementById('vehicle_type');
+        if (!fuelTypeEl || !vehicleTypeEl) {
+            return;
+        }
+
         const fuelTypeLabel = document.querySelector('label[for="vehicle_fuel_type"]');
-        const fuelTypeHelpText = document.getElementById('vehicle_fuel_type').closest('.form-group-horizontal')
-                            .querySelector('.form-help-text-under-label');
+        const fuelTypeGroup = fuelTypeEl.closest('.form-group-horizontal, .form-group-stacked, .form-group');
+        const fuelTypeHelpText = fuelTypeGroup
+            ? fuelTypeGroup.querySelector('.form-help-text-under-label, .form-help-text')
+            : null;
 
         const vehicleType = document.querySelector('label[for="vehicle_type"]');
-        const vehicleTypeHelpText = document.getElementById('vehicle_type').closest('.form-group-horizontal')
-                            .querySelector('.form-help-text-under-label');
+        const vehicleTypeGroup = vehicleTypeEl.closest('.form-group-horizontal, .form-group-stacked, .form-group');
+        const vehicleTypeHelpText = vehicleTypeGroup
+            ? vehicleTypeGroup.querySelector('.form-help-text-under-label, .form-help-text')
+            : null;
+
+        if (!fuelTypeLabel || !vehicleType) {
+            return;
+        }
 
         if (category === 'HGV (all diesel)') {
 
