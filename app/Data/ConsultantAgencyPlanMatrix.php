@@ -12,6 +12,7 @@ class ConsultantAgencyPlanMatrix
 {
     public const PLAN_CODES = [
         'consultant_trial',
+        'consultant_1',
         'consultant_5',
         'consultant_10',
         'consultant_25',
@@ -22,6 +23,14 @@ class ConsultantAgencyPlanMatrix
     public const FREE_TRIAL_CODE = 'consultant_trial';
 
     public const FREE_TRIAL_SLOTS = 1;
+
+    /**
+     * Complimentary demo pack — one managed client with FULL Growth access.
+     * Admin-assigned only (not shown on the consultant self-serve packs page).
+     */
+    public const DEMO_PACK_CODE = 'consultant_1';
+
+    public const DEMO_PACK_SLOTS = 1;
 
     public const ENTERPRISE_CODE = 'consultant_enterprise';
 
@@ -44,6 +53,7 @@ class ConsultantAgencyPlanMatrix
     {
         return [
             'consultant_trial' => self::trialPack(),
+            'consultant_1' => self::demoPack(),
             'consultant_5' => self::pack(5, 1299, 6495, 1, 'Consultant 5', 'Solo consultant — up to 5 managed clients'),
             'consultant_10' => self::pack(10, 999, 9990, 2, 'Consultant 10', 'Small practice — up to 10 managed clients'),
             'consultant_25' => self::pack(25, 899, 22475, 3, 'Consultant 25', 'Growing agency — up to 25 managed clients'),
@@ -89,9 +99,11 @@ class ConsultantAgencyPlanMatrix
      */
     public static function selectablePacks(): array
     {
+        $hidden = [self::FREE_TRIAL_CODE, self::DEMO_PACK_CODE];
+
         return array_values(array_filter(
             self::packDefinitions(),
-            fn (array $pack) => ($pack['plan_code'] ?? '') !== self::FREE_TRIAL_CODE,
+            fn (array $pack) => !in_array($pack['plan_code'] ?? '', $hidden, true),
         ));
     }
 
@@ -141,6 +153,45 @@ class ConsultantAgencyPlanMatrix
                 'managed_client_template' => 'client_free',
             ],
             'features' => ['consultant_agency', 'managed_clients', 'free_trial'],
+        ];
+    }
+
+    /**
+     * Complimentary demo pack — one managed client with FULL Growth access (unlike
+     * the trial, which is data-entry only). Not a free_trial provision, so managed
+     * clients resolve to the full managedClientEntitlements() template. Assigned by
+     * admins only; kept inactive so it never appears on the self-serve packs page.
+     *
+     * @return array<string, mixed>
+     */
+    private static function demoPack(): array
+    {
+        return [
+            'plan_code' => self::DEMO_PACK_CODE,
+            'plan_name' => 'Consultant 1',
+            'description' => 'One managed client with full Growth access — complimentary demo pack for special consultants (admin-assigned).',
+            'plan_category' => 'consultant_agency',
+            'price_annual' => 0,
+            'price_per_slot_aed' => 0,
+            'consultant_slot_count' => self::DEMO_PACK_SLOTS,
+            'currency' => 'AED',
+            'sort_order' => 6,
+            'billing_cycle' => 'annual',
+            'is_active' => false,
+            'limits' => [
+                'users' => self::CONSULTANT_ORG_USER_LIMIT,
+                'consultant_slots' => self::DEMO_PACK_SLOTS,
+                'locations' => -1,
+                'documents' => -1,
+            ],
+            'entitlements' => [
+                'channel' => 'consultant_agency_pack',
+                'consultant_slot_count' => self::DEMO_PACK_SLOTS,
+                'contract_alignment' => 'calendar_year',
+                'managed_client_template' => self::MANAGED_CLIENT_TEMPLATE,
+                'reporting_year_unlock_price_aed' => self::REPORTING_YEAR_UNLOCK_PRICE_AED,
+            ],
+            'features' => ['consultant_agency', 'managed_clients', 'full_demo'],
         ];
     }
 

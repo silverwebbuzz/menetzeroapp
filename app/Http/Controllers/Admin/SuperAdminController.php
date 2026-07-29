@@ -89,7 +89,10 @@ class SuperAdminController extends Controller
             ->get();
 
         $consultantPacks = SubscriptionPlan::where('plan_category', 'consultant_agency')
-            ->where('is_active', true)
+            ->where(function ($q) {
+                $q->where('is_active', true)
+                    ->orWhere('plan_code', \App\Data\ConsultantAgencyPlanMatrix::DEMO_PACK_CODE);
+            })
             ->orderBy('sort_order')
             ->get();
 
