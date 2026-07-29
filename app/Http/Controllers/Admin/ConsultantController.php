@@ -33,13 +33,35 @@ class ConsultantController extends Controller
 
     public function show(Consultant $consultant)
     {
-        $consultant->load(['documents', 'introRequests.company', 'orders.company', 'reviewedBy']);
+        $consultant->load(['documents', 'introRequests.company', 'orders.company', 'reviewedBy', 'agencyCompany']);
+
+        $consultantPacks = \App\Models\SubscriptionPlan::where('plan_category', 'consultant_agency')
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
+
+        $activeSubscription = null;
+        $packageAssignments = collect();
+
+        if ($consultant->agency_company_id) {
+            $activeSubscription = app(\App\Services\ConsultantAgencySubscriptionService::class)
+                ->getActiveSubscription($consultant->agency_company_id);
+
+            $packageAssignments = \App\Models\AdminPackageAssignment::with(['plan', 'admin'])
+                ->where('company_id', $consultant->agency_company_id)
+                ->where('target_type', 'consultant')
+                ->latest()
+                ->get();
+        }
 
         return view('admin.consultants.show', [
             'consultant' => $consultant,
             'documentTypes' => ConsultantOptions::DOCUMENT_TYPES,
             'specialties' => ConsultantOptions::SPECIALTIES,
             'emirates' => ConsultantOptions::EMIRATES,
+            'consultantPacks' => $consultantPacks,
+            'activeSubscription' => $activeSubscription,
+            'packageAssignments' => $packageAssignments,
         ]);
     }
 

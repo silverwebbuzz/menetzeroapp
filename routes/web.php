@@ -516,6 +516,10 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
         Route::get('/companies/{id}', [\App\Http\Controllers\Admin\SuperAdminController::class, 'showCompany'])->name('companies.show');
         Route::post('/companies/{company}/grant-subscription', [\App\Http\Controllers\Admin\CompanySubscriptionController::class, 'grant'])->name('companies.grant-subscription');
 
+        // Unified admin package assignment (client plans + consultant agency packs) with DB audit
+        Route::get('/package-assignments', [\App\Http\Controllers\Admin\AdminPackageAssignmentController::class, 'index'])->name('package-assignments.index');
+        Route::post('/companies/{company}/assign-package', [\App\Http\Controllers\Admin\AdminPackageAssignmentController::class, 'assignToCompany'])->name('companies.assign-package');
+
         // Campaign coupons
         Route::get('/coupons', [\App\Http\Controllers\Admin\CouponController::class, 'index'])->name('coupons.index');
         Route::get('/coupons/create', [\App\Http\Controllers\Admin\CouponController::class, 'create'])->name('coupons.create');
@@ -545,6 +549,7 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
             Route::post('/orders/{order}/release', [\App\Http\Controllers\Admin\ConsultantOrderController::class, 'releaseEscrow'])->name('orders.release');
             Route::post('/orders/{order}/refund', [\App\Http\Controllers\Admin\ConsultantOrderController::class, 'refundEscrow'])->name('orders.refund');
             Route::get('/{consultant}', [\App\Http\Controllers\Admin\ConsultantController::class, 'show'])->name('show');
+            Route::post('/{consultant}/assign-package', [\App\Http\Controllers\Admin\AdminPackageAssignmentController::class, 'assignToConsultant'])->name('assign-package');
             Route::post('/{consultant}/approve', [\App\Http\Controllers\Admin\ConsultantController::class, 'approve'])->name('approve');
             Route::post('/{consultant}/reject', [\App\Http\Controllers\Admin\ConsultantController::class, 'reject'])->name('reject');
             Route::post('/{consultant}/suspend', [\App\Http\Controllers\Admin\ConsultantController::class, 'suspend'])->name('suspend');

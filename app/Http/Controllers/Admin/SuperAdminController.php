@@ -88,7 +88,17 @@ class SuperAdminController extends Controller
             ->orderBy('sort_order')
             ->get();
 
-        return view('admin.companies.show', compact('company', 'grantPlans'));
+        $consultantPacks = SubscriptionPlan::where('plan_category', 'consultant_agency')
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
+
+        $packageAssignments = \App\Models\AdminPackageAssignment::with(['plan', 'admin'])
+            ->where('company_id', $company->id)
+            ->latest()
+            ->get();
+
+        return view('admin.companies.show', compact('company', 'grantPlans', 'consultantPacks', 'packageAssignments'));
     }
 
     /**

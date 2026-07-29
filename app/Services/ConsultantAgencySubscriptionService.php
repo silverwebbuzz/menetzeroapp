@@ -342,12 +342,17 @@ class ConsultantAgencySubscriptionService
         string $planCode,
         int $contractYear,
         array $metadata = [],
+        ?int $adminId = null,
     ): ConsultantSubscription {
         $plan = SubscriptionPlan::where('plan_code', $planCode)->where('plan_category', 'consultant_agency')->firstOrFail();
 
         return $this->activatePackSubscription($consultantOrg, $plan, [
             'contract_year' => $contractYear,
-            'metadata' => array_merge($metadata, ['provision_type' => 'admin_grant']),
+            'metadata' => array_merge($metadata, array_filter([
+                'provision_type' => 'admin_grant',
+                'granted_by' => $adminId,
+                'granted_at' => now()->toIso8601String(),
+            ], fn ($value) => $value !== null)),
         ]);
     }
 

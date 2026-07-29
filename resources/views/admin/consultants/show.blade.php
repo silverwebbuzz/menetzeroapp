@@ -7,6 +7,9 @@
     @if(session('success'))
         <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">{{ session('success') }}</div>
     @endif
+    @if(session('error'))
+        <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">{{ session('error') }}</div>
+    @endif
 
     <div class="mb-4">
         <a href="{{ route('admin.consultants.index') }}" class="text-sm text-brand hover:underline">&larr; All consultants</a>
@@ -101,6 +104,57 @@
                     </form>
                 </div>
             @endif
+
+            <div class="bg-white shadow rounded-lg p-5 border-l-4 border-indigo-500">
+                <h3 class="font-semibold text-gray-900 mb-1 text-sm">Assign agency pack</h3>
+                <p class="text-xs text-gray-500 mb-3">Admin-approved grant, no payment. Links the consultant to an agency org if needed.</p>
+
+                @if($activeSubscription)
+                    <div class="mb-3 text-xs text-gray-600 bg-gray-50 rounded p-2">
+                        Current: <span class="font-medium">{{ optional($activeSubscription->plan)->plan_name ?? 'Unknown' }}</span>
+                        · {{ $activeSubscription->slot_limit }} slots
+                        · expires {{ optional($activeSubscription->expires_at)->format('Y-m-d') }}
+                    </div>
+                @endif
+
+                @if($consultantPacks->isEmpty())
+                    <p class="text-sm text-gray-500">No active consultant packs found.</p>
+                @else
+                <form action="{{ route('admin.consultants.assign-package', $consultant) }}" method="POST" class="space-y-2 text-sm" onsubmit="return confirm('Assign this consultant pack at no charge?')">
+                    @csrf
+                    <div>
+                        <label class="block font-medium text-gray-700 mb-1">Pack</label>
+                        <select name="plan_id" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                            @foreach($consultantPacks as $plan)
+                                <option value="{{ $plan->id }}">{{ $plan->plan_name }} (AED {{ number_format($plan->price_annual, 0) }}/yr)</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-medium text-gray-700 mb-1">Contract year</label>
+                        <input type="number" name="contract_year" value="{{ now()->year }}" min="2024" max="2100" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-gray-700 mb-1">Reason / approval note</label>
+                        <input type="text" name="note" required placeholder="e.g. Launch partner" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                    </div>
+                    <button type="submit" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium">Assign pack</button>
+                </form>
+                @endif
+
+                @if($packageAssignments->isNotEmpty())
+                    <div class="mt-4 border-t border-gray-100 pt-3">
+                        <div class="text-xs font-medium text-gray-500 mb-1">Assignment history</div>
+                        @foreach($packageAssignments as $assignment)
+                            <div class="text-xs text-gray-600 py-1">
+                                {{ optional($assignment->plan)->plan_name ?? 'Plan' }} · Year {{ $assignment->contract_year }} ·
+                                {{ $assignment->created_at->format('Y-m-d') }}
+                                @if($assignment->admin) · {{ $assignment->admin->name }}@endif
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
 
             <div class="bg-white shadow rounded-lg p-5">
                 <h3 class="font-semibold text-gray-900 mb-3 text-sm">Admin notes</h3>

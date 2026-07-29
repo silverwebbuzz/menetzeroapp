@@ -75,11 +75,44 @@
                 @endif
             </div>
 
-            @if(($company->company_type ?? 'client') === 'client')
+            @if($company->isConsultantOrg())
+            <div class="bg-white shadow rounded-lg p-4 border-l-4 border-indigo-500">
+                <h2 class="text-md font-semibold text-gray-900 mb-1">Assign consultant agency pack</h2>
+                <p class="text-xs text-gray-500 mb-4">Admin-approved grant — no payment required. Replaces the consultant org&rsquo;s active pack for the selected contract year.</p>
+                @if($consultantPacks->isEmpty())
+                    <p class="text-sm text-gray-500">No active consultant packs found. Run the consultant agency plan migrations first.</p>
+                @else
+                <form action="{{ route('admin.companies.assign-package', $company->id) }}" method="POST" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                    @csrf
+                    <div>
+                        <label class="block font-medium text-gray-700 mb-1">Pack</label>
+                        <select name="plan_id" required class="w-full border rounded-lg px-3 py-2">
+                            @foreach($consultantPacks as $plan)
+                                <option value="{{ $plan->id }}">{{ $plan->plan_name }} (AED {{ number_format($plan->price_annual, 0) }}/yr)</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-medium text-gray-700 mb-1">Contract year</label>
+                        <input type="number" name="contract_year" value="{{ now()->year }}" min="2024" max="2100" required class="w-full border rounded-lg px-3 py-2">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block font-medium text-gray-700 mb-1">Reason / approval note</label>
+                        <input type="text" name="note" required placeholder="e.g. Launch partner, agency pilot" class="w-full border rounded-lg px-3 py-2">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700" onclick="return confirm('Assign this consultant pack at no charge?')">
+                            Assign agency pack
+                        </button>
+                    </div>
+                </form>
+                @endif
+            </div>
+            @else
             <div class="bg-white shadow rounded-lg p-4 border-l-4 border-purple-500">
-                <h2 class="text-md font-semibold text-gray-900 mb-1">Grant complimentary plan</h2>
+                <h2 class="text-md font-semibold text-gray-900 mb-1">Assign complimentary plan</h2>
                 <p class="text-xs text-gray-500 mb-4">Special cases only. Client sees full plan features with a &ldquo;Complimentary&rdquo; label — no payment or billing history.</p>
-                <form action="{{ route('admin.companies.grant-subscription', $company->id) }}" method="POST" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                <form action="{{ route('admin.companies.assign-package', $company->id) }}" method="POST" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     @csrf
                     <div>
                         <label class="block font-medium text-gray-700 mb-1">Plan</label>
@@ -98,11 +131,34 @@
                         <input type="text" name="note" required placeholder="e.g. Pilot consultant, NGO programme, launch promo" class="w-full border rounded-lg px-3 py-2">
                     </div>
                     <div class="sm:col-span-2">
-                        <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700" onclick="return confirm('Grant this plan at no charge?')">
-                            Grant complimentary access
+                        <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700" onclick="return confirm('Assign this plan at no charge?')">
+                            Assign complimentary access
                         </button>
                     </div>
                 </form>
+            </div>
+            @endif
+
+            @if(isset($packageAssignments) && $packageAssignments->isNotEmpty())
+            <div class="bg-white shadow rounded-lg p-4">
+                <h2 class="text-md font-semibold text-gray-900 mb-3">Admin package assignment history</h2>
+                <ul class="divide-y divide-gray-200 text-sm">
+                    @foreach($packageAssignments as $assignment)
+                        <li class="py-2">
+                            <div class="text-gray-900 font-medium">
+                                {{ optional($assignment->plan)->plan_name ?? 'Unknown plan' }}
+                                <span class="text-xs font-normal text-gray-500">({{ $assignment->target_type }})</span>
+                            </div>
+                            <div class="text-gray-500 text-xs">
+                                {{ $assignment->status }} ·
+                                {{ $assignment->contract_year ? 'Year '.$assignment->contract_year : $assignment->duration_months.' months' }} ·
+                                by {{ optional($assignment->admin)->name ?? 'admin #'.$assignment->admin_id }} ·
+                                {{ $assignment->created_at->format('Y-m-d H:i') }}
+                            </div>
+                            @if($assignment->note)<div class="text-gray-600 text-xs mt-0.5">&ldquo;{{ $assignment->note }}&rdquo;</div>@endif
+                        </li>
+                    @endforeach
+                </ul>
             </div>
             @endif
 

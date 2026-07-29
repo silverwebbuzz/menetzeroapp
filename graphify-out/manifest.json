@@ -110,8 +110,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Admin/ConsultantController.php": {
-    "mtime": 1781090229.0850832,
-    "ast_hash": "acabf50274f775358c4a2b2924deb384",
+    "mtime": 1785307535.821086,
+    "ast_hash": "ace54ce0beec7e798ed242129e92211f",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Admin/ConsultantIntroRequestController.php": {
@@ -155,8 +155,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Admin/SuperAdminController.php": {
-    "mtime": 1781089326.5939865,
-    "ast_hash": "c5f0e803de38b7de21eeb881c114edcb",
+    "mtime": 1785307526.8103094,
+    "ast_hash": "be857ec2600923d5e69ecd9f398ec421",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Auth/ForgotPasswordController.php": {
@@ -825,8 +825,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/ConsultantAgencySubscriptionService.php": {
-    "mtime": 1785306892.4279313,
-    "ast_hash": "8e05e1be7591b7fee1ef1f835325db65",
+    "mtime": 1785307481.1222336,
+    "ast_hash": "55f9c3945d5deced87052e5d75d2babc",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/ConsultantAgencyWorkspaceService.php": {
@@ -1435,8 +1435,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/companies/show.blade.php": {
-    "mtime": 1781090276.1279445,
-    "ast_hash": "f0cba73ecc79b34fe20096eaddb1e6ba",
+    "mtime": 1785307567.3402195,
+    "ast_hash": "4d64227d3f172ae6dffc88cf3d635013",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/consultants/index.blade.php": {
@@ -1455,8 +1455,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/consultants/show.blade.php": {
-    "mtime": 1781015872.7746115,
-    "ast_hash": "a5e5b19d93b3127a1064ac2dcce4d6c3",
+    "mtime": 1785307594.1931808,
+    "ast_hash": "931a7fe0bf20c255e45ec0adbd9a90b2",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/coupons/form.blade.php": {
@@ -1575,8 +1575,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/partials/nav.blade.php": {
-    "mtime": 1781265509.8710809,
-    "ast_hash": "938b56a97185240f13623e60d44fe903",
+    "mtime": 1785307630.734001,
+    "ast_hash": "2b31add384f2c9a13e7f57b0e0900c8a",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/payment-gateways/index.blade.php": {
@@ -2230,8 +2230,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/routes/web.php": {
-    "mtime": 1783321772.3723013,
-    "ast_hash": "901854eb82c9609b73e113efe899db80",
+    "mtime": 1785307516.5419989,
+    "ast_hash": "33aca4cc87fcd259086cdedd91fd308e",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/public/robots.txt": {
@@ -2872,6 +2872,26 @@
   "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/MENETZERO_CLIENT_PRESENTATION_BRIEF.md": {
     "mtime": 1785306697.7536027,
     "ast_hash": "7d144ad0b09b192c98f324adb0e89c6c",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Admin/AdminPackageAssignmentController.php": {
+    "mtime": 1785307505.0248196,
+    "ast_hash": "30e705f1010ce7bae0693d19a17a49d2",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/AdminPackageAssignment.php": {
+    "mtime": 1785307473.773819,
+    "ast_hash": "9c746548a23a0f3562c72e4e95b28a2f",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_07_29_100000_create_admin_package_assignments_table.php": {
+    "mtime": 1785307462.207851,
+    "ast_hash": "98abdd90501fb22d7b2b407dca9dca33",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/package-assignments/index.blade.php": {
+    "mtime": 1785307611.1294904,
+    "ast_hash": "01dd43fe66139104892e2138e4895fa5",
     "semantic_hash": ""
   }
 }
