@@ -73,7 +73,7 @@ class ConsultantAgencySubscriptionService
             return null;
         }
 
-        $plan = SubscriptionPlan::where('plan_code', ConsultantAgencyPlanMatrix::FREE_TRIAL_CODE)->first();
+        $plan = $this->resolveFreeTrialPlan();
 
         if (!$plan) {
             return null;
@@ -86,6 +86,47 @@ class ConsultantAgencySubscriptionService
             'metadata' => ['provision_type' => 'free_trial'],
             'expires_at' => now()->addYears(5)->toDateString(),
         ]);
+    }
+
+    /**
+     * Fetch the free-trial pack, repairing/creating it from the plan matrix when
+     * the stored row is missing or has drifted (e.g. wrong plan_category from an
+     * incomplete migration). Prevents consultant onboarding from 500-ing with
+     * "Plan must be a consultant pack." when the DB seed is out of sync.
+     */
+    private function resolveFreeTrialPlan(): ?SubscriptionPlan
+    {
+        $definition = ConsultantAgencyPlanMatrix::forPlanCode(ConsultantAgencyPlanMatrix::FREE_TRIAL_CODE);
+
+        if (!$definition) {
+            return null;
+        }
+
+        $plan = SubscriptionPlan::where('plan_code', ConsultantAgencyPlanMatrix::FREE_TRIAL_CODE)->first();
+
+        if ($plan && $plan->isConsultantAgencyPack()) {
+            return $plan;
+        }
+
+        $priceAnnual = (float) $definition['price_annual'];
+
+        return SubscriptionPlan::updateOrCreate(
+            ['plan_code' => ConsultantAgencyPlanMatrix::FREE_TRIAL_CODE],
+            [
+                'plan_name' => $definition['plan_name'],
+                'plan_category' => $definition['plan_category'],
+                'description' => $definition['description'],
+                'price_annual' => $priceAnnual,
+                'price_inr' => PlanEntitlementDefaults::defaultPriceInr($priceAnnual),
+                'currency' => $definition['currency'],
+                'billing_cycle' => $definition['billing_cycle'],
+                'is_active' => $definition['is_active'],
+                'sort_order' => $definition['sort_order'],
+                'limits' => $definition['limits'],
+                'entitlements' => $definition['entitlements'],
+                'features' => $definition['features'],
+            ]
+        );
     }
 
     public function hasConsumedFreeTrial(int $consultantCompanyId): bool
