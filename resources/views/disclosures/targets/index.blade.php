@@ -20,7 +20,7 @@
             <form method="POST" action="{{ route('disclosures.s2.targets.store', ['fiscal_year' => $fiscalYear]) }}" class="space-y-4">
                 @csrf
                 <input type="hidden" name="fiscal_year" value="{{ $fiscalYear }}">
-                @include('disclosures.s2.targets._form', ['target' => null, 'prefix' => 'new'])
+                @include('disclosures.targets._form', ['target' => null, 'prefix' => 'new'])
                 <button type="submit" class="btn btn-primary">Save target</button>
             </form>
         </div>
@@ -41,7 +41,7 @@
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="fiscal_year" value="{{ $fiscalYear }}">
-                        @include('disclosures.s2.targets._form', ['target' => $target, 'prefix' => 'edit-' . $target->id])
+                        @include('disclosures.targets._form', ['target' => $target, 'prefix' => 'edit-' . $target->id])
                         <button type="submit" class="btn btn-secondary btn-sm">Update target</button>
                     </form>
                     <form method="POST" action="{{ route('disclosures.s2.targets.destroy', ['reductionTarget' => $target, 'fiscal_year' => $fiscalYear]) }}" class="mt-2" onsubmit="return confirm('Remove this target and its actions?')">
