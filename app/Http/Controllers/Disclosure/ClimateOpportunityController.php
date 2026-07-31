@@ -11,7 +11,7 @@ class ClimateOpportunityController extends DisclosureBaseController
     {
         ['company' => $company, 'fiscalYear' => $fiscalYear] = $this->resolveContext($request);
 
-        return view('disclosures.s2.climate-opportunities.index', [
+        return view('disclosures.climate-opportunities.index', [
             'company' => $company,
             'fiscalYear' => $fiscalYear,
             'opportunities' => ClimateOpportunity::where('company_id', $company->id)

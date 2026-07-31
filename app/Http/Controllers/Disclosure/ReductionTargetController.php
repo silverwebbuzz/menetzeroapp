@@ -12,7 +12,7 @@ class ReductionTargetController extends DisclosureBaseController
     {
         ['company' => $company, 'fiscalYear' => $fiscalYear] = $this->resolveContext($request);
 
-        return view('disclosures.s2.targets.index', [
+        return view('disclosures.targets.index', [
             'company' => $company,
             'fiscalYear' => $fiscalYear,
             'targets' => ReductionTarget::where('company_id', $company->id)
