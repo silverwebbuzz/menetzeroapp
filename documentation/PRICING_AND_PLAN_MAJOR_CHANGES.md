@@ -235,7 +235,11 @@ Align codes · Free S3 · Watermarked exports.
 - [x] Admin inbox (`/admin/entity-requests`).
 - [x] Paid managed clients → **Standard** entitlements; demo pack keeps Growth.
 
-### Phase 6 — Admin quote (band calculator) + activate
+### Phase 6 — Admin quote + activate ✅ DONE
+- [x] Band / list calculator (`CommercialPriceBook`) on package & entity request inboxes.
+- [x] Save quote · mark paid · activate from request (maps to live plans / nearest agency pack + extras).
+- [x] Audit via `AdminPackageAssignment` metadata (`request_activate`).
+
 ### Phase 7 — Price book (1,399/1,199 + company packages)
 ### Phase 8 — DB seeds (`consultant_entity`, company codes); retire pack checkout paths · enforce 5 sites on Standard
 ### Phase 9 — Portal guides + ElevenLabs
@@ -249,6 +253,7 @@ Align codes · Free S3 · Watermarked exports.
 |------|------|
 | Free defaults | `PlanEntitlementDefaults.php` |
 | Consultant Standard / packs | `ConsultantAgencyPlanMatrix.php` |
+| Price book / quotes | `CommercialPriceBook.php`, `AdminRequestActivationService.php` |
 | Watermark | `ExportWatermark.php`, reports export controllers |
 | Public Explore Free | `/pricing`, `public/pricing.blade.php` |
 | Company request | `PackageRequestController`, `CompanyPackageOptions`, `company_package_requests` |
@@ -282,6 +287,7 @@ Logged-in: Request a package / Request slots · features only · pricing offline
 |------|--------|
 | Paid consultant entity feature depth | **Locked §6.3 = Standard** (live in code for paid engagements) |
 | Enforce 5 sites vs Starter’s 3 on activation | Phase 8 / admin assign |
+| Seed `client_scope_*` / `consultant_entity` | Phase 8 (activate maps to starter/growth/packs for now) |
 | Min-10 preferential in software | Deferred |
 | Legacy subscriber mapping | Phase 8 |
 
@@ -296,7 +302,8 @@ Logged-in: Request a package / Request slots · features only · pricing offline
 | Aug 2026 | Phase 3: Explore Free + hide self-serve checkout; §6.3 Standard locked. |
 | Aug 2026 | Phase 4: Company Request a package UI + admin inbox. |
 | Aug 2026 | Phase 5: Consultant Request entities + Standard entitlements for paid managed clients. |
+| Aug 2026 | Phase 6: Admin quote calculator + mark paid + activate from request inboxes. |
 
 ---
 
-**Next:** Phase 6 (admin quote / band calculator + activate from request inbox).
+**Next:** Phase 7 (formalise price book admin UI) or Phase 8 (seed live package codes).

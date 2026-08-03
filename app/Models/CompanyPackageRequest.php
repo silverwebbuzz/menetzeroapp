@@ -16,10 +16,21 @@ class CompanyPackageRequest extends Model
         'message',
         'status',
         'admin_notes',
+        'quote_amount_aed',
+        'quote_breakdown',
+        'duration_months',
+        'quoted_at',
+        'paid_at',
+        'activated_at',
     ];
 
     protected $casts = [
         'extras' => 'array',
+        'quote_amount_aed' => 'float',
+        'duration_months' => 'integer',
+        'quoted_at' => 'datetime',
+        'paid_at' => 'datetime',
+        'activated_at' => 'datetime',
     ];
 
     public function company(): BelongsTo

@@ -525,8 +525,14 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
         Route::get('/package-assignments', [\App\Http\Controllers\Admin\AdminPackageAssignmentController::class, 'index'])->name('package-assignments.index');
         Route::get('/package-requests', [\App\Http\Controllers\Admin\CompanyPackageRequestController::class, 'index'])->name('package-requests.index');
         Route::put('/package-requests/{packageRequest}', [\App\Http\Controllers\Admin\CompanyPackageRequestController::class, 'update'])->name('package-requests.update');
+        Route::post('/package-requests/{packageRequest}/quote', [\App\Http\Controllers\Admin\CompanyPackageRequestController::class, 'saveQuote'])->name('package-requests.quote');
+        Route::post('/package-requests/{packageRequest}/mark-paid', [\App\Http\Controllers\Admin\CompanyPackageRequestController::class, 'markPaid'])->name('package-requests.mark-paid');
+        Route::post('/package-requests/{packageRequest}/activate', [\App\Http\Controllers\Admin\CompanyPackageRequestController::class, 'activate'])->name('package-requests.activate');
         Route::get('/entity-requests', [\App\Http\Controllers\Admin\ConsultantEntityRequestController::class, 'index'])->name('entity-requests.index');
         Route::put('/entity-requests/{entityRequest}', [\App\Http\Controllers\Admin\ConsultantEntityRequestController::class, 'update'])->name('entity-requests.update');
+        Route::post('/entity-requests/{entityRequest}/quote', [\App\Http\Controllers\Admin\ConsultantEntityRequestController::class, 'saveQuote'])->name('entity-requests.quote');
+        Route::post('/entity-requests/{entityRequest}/mark-paid', [\App\Http\Controllers\Admin\ConsultantEntityRequestController::class, 'markPaid'])->name('entity-requests.mark-paid');
+        Route::post('/entity-requests/{entityRequest}/activate', [\App\Http\Controllers\Admin\ConsultantEntityRequestController::class, 'activate'])->name('entity-requests.activate');
         Route::post('/companies/{company}/assign-package', [\App\Http\Controllers\Admin\AdminPackageAssignmentController::class, 'assignToCompany'])->name('companies.assign-package');
 
         // Campaign coupons
