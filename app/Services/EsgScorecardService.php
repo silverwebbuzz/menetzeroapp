@@ -320,7 +320,6 @@ class EsgScorecardService
 
         if ($metric['source'] === 'esg_target_count') {
             $count = EsgSustainabilityTarget::where('company_id', $company->id)
-                ->where('fiscal_year', $fiscalYear)
                 ->count();
 
             return [$count > 0 ? (float) $count : null, 'targets'];
