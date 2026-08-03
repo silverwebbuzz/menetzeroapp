@@ -128,7 +128,9 @@
             </table>
         @endif
         @if(!empty($report['ghg_methodology']))
-            <p class="muted" style="margin-top:8px;">{{ $report['ghg_methodology'] }}</p>
+            @foreach($report['ghg_methodology'] as $label => $line)
+                <p class="muted" style="margin-top:8px;"><strong>{{ ucfirst(str_replace('_', ' ', $label)) }}:</strong> {{ $line }}</p>
+            @endforeach
         @endif
     @else
         <p class="muted">No GHG data entered for this fiscal year.</p>
