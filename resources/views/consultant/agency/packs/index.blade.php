@@ -8,29 +8,7 @@
     $isTrial = $subscription?->isFreeTrial() ?? false;
     $currentUsed = (int) ($slotSummary['used'] ?? 0);
     $currentLimit = $slotSummary['limit'] ?? '—';
-    $profiles = [
-        'standard' => [
-            'name' => 'Standard',
-            'summary' => 'Default paid profile per managed client',
-            'features' => [
-                'Scope 1 & 2 data + bulk import',
-                'Up to 5 sites per client',
-                'Clean GHG / MOCCAE / Excel / IEQT',
-                'Not full ESG suite by default',
-            ],
-        ],
-        'enterprise' => [
-            'name' => 'Enterprise',
-            'summary' => 'Custom / white-label for complex deployments',
-            'features' => [
-                'Everything negotiable (sites, seats, branding)',
-                'White-label report covers & custom workflows',
-                'MENetZero invoices the consultant practice',
-                'Quoted offline — no public list price',
-            ],
-        ],
-    ];
-    $selectedProfile = old('plan_profile', old('wants_enterprise') ? 'enterprise' : 'standard');
+    $selectedPackage = old('package_code', 'client_scope_basic');
 @endphp
 
 <div class="w-full max-w-5xl">
@@ -38,8 +16,7 @@
         <a href="{{ route('consultant.dashboard') }}" class="text-sm text-brand hover:underline">&larr; Dashboard</a>
         <h1 class="text-3xl font-bold text-gray-900 mt-2">Request managed clients</h1>
         <p class="mt-2 text-gray-600">
-            Same pattern as company <em>Request a package</em>: choose a profile by capability, then how many managed clients you need.
-            Pricing is confirmed offline — nothing checkoutable here.
+            Choose the package depth your clients need, then how many managed clients. Pricing is confirmed offline — nothing checkoutable here.
         </p>
         @if($subscription)
             <p class="mt-2 text-sm text-gray-500">
@@ -71,14 +48,14 @@
         @csrf
 
         <div class="grid sm:grid-cols-2 gap-4">
-            @foreach($profiles as $code => $pkg)
+            @foreach($packages as $code => $pkg)
                 <label class="relative flex flex-col h-full rounded-xl border border-gray-200 bg-white p-5 cursor-pointer hover:border-teal-400 has-[:checked]:border-teal-600 has-[:checked]:ring-2 has-[:checked]:ring-teal-500/30">
                     <input
                         type="radio"
-                        name="plan_profile"
+                        name="package_code"
                         value="{{ $code }}"
                         class="sr-only"
-                        @checked($selectedProfile === $code)
+                        @checked($selectedPackage === $code)
                         required
                     >
                     <span class="text-lg font-bold text-gray-900">{{ $pkg['name'] }}</span>
@@ -97,7 +74,7 @@
                 How many managed clients do you need?
             </label>
             <p class="text-xs text-gray-500 mb-3">
-                One managed client = one client workspace under this profile.
+                One managed client = one client workspace under the package you selected.
             </p>
             <input
                 type="number"
@@ -115,16 +92,18 @@
             <h2 class="text-sm font-semibold text-gray-900 mb-3">Optional extras</h2>
             <p class="text-xs text-gray-500 mb-3">Tick only if needed — confirmed when quoting.</p>
             <div class="grid sm:grid-cols-2 gap-2">
-                <label class="flex items-start gap-2 text-sm text-gray-700">
-                    <input
-                        type="checkbox"
-                        name="needs_sites_over_5"
-                        value="1"
-                        class="mt-1 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
-                        @checked(old('needs_sites_over_5'))
-                    >
-                    <span>Some clients need <strong>more than 5 sites</strong> each</span>
-                </label>
+                @foreach($extraOptions as $key => $label)
+                    <label class="flex items-start gap-2 text-sm text-gray-700">
+                        <input
+                            type="checkbox"
+                            name="extras[]"
+                            value="{{ $key }}"
+                            class="mt-1 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                            @checked(in_array($key, old('extras', []), true))
+                        >
+                        <span>{{ $label }}</span>
+                    </label>
+                @endforeach
             </div>
         </div>
 
@@ -135,7 +114,7 @@
                 name="message"
                 rows="4"
                 class="w-full rounded-lg border-gray-300 text-sm focus:border-teal-500 focus:ring-teal-500"
-                placeholder="Industries, reporting years, urgency, or clients that need &gt;5 sites…"
+                placeholder="Industries, reporting years, urgency, or clients that need more sites…"
             >{{ old('message') }}</textarea>
         </div>
 
@@ -158,7 +137,7 @@
                         <tr>
                             <th class="px-4 py-2">Date</th>
                             <th class="px-4 py-2">Clients</th>
-                            <th class="px-4 py-2">Profile</th>
+                            <th class="px-4 py-2">Package</th>
                             <th class="px-4 py-2">Status</th>
                         </tr>
                     </thead>
@@ -168,8 +147,8 @@
                                 <td class="px-4 py-2 text-gray-600">{{ $req->created_at->format('d M Y') }}</td>
                                 <td class="px-4 py-2">{{ $req->entity_count }}</td>
                                 <td class="px-4 py-2 text-xs text-gray-600">
-                                    {{ $req->wants_enterprise ? 'Enterprise' : 'Standard' }}
-                                    @if($req->needs_sites_over_5) · &gt;5 sites @endif
+                                    {{ $req->packageLabel() }}
+                                    @if($req->needs_sites_over_5) · extra sites @endif
                                 </td>
                                 <td class="px-4 py-2">{{ ucfirst($req->status) }}</td>
                             </tr>

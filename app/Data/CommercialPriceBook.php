@@ -103,32 +103,75 @@ class CommercialPriceBook
     }
 
     /**
+     * Consultant request with company-style package profile × client count.
+     * Suggest = company list price × entities (xlsx / price book). Enterprise = custom.
+     * Legacy rows without package_code fall back to §6 preferential per-client band.
+     *
      * @return array{
      *   amount_aed: float|null,
      *   custom: bool,
      *   rate_aed: float|null,
      *   entity_count: int,
+     *   package_code: string|null,
      *   breakdown: string,
      *   band: string,
      *   suggested_pack_code: string|null
      * }
      */
-    public static function suggestConsultantQuote(int $entityCount, bool $wantsEnterprise = false): array
-    {
+    public static function suggestConsultantQuote(
+        int $entityCount,
+        bool $wantsEnterprise = false,
+        ?string $packageCode = null,
+    ): array {
         $entityCount = max(1, $entityCount);
+        $code = $packageCode
+            ?? ($wantsEnterprise ? 'client_enterprise' : null);
 
-        if ($wantsEnterprise) {
+        if ($code === 'client_enterprise' || ($wantsEnterprise && $code === null)) {
             return [
                 'amount_aed' => null,
                 'custom' => true,
                 'rate_aed' => null,
                 'entity_count' => $entityCount,
-                'breakdown' => 'Enterprise / white-label — set quote manually. Activation still grants Consultant Plan capacity for the requested client count.',
+                'package_code' => 'client_enterprise',
+                'breakdown' => 'Enterprise / white-label — set quote manually. Activation grants Consultant Plan capacity for the requested client count; managed clients use Enterprise-depth entitlements when activated.',
                 'band' => 'enterprise',
                 'suggested_pack_code' => self::nearestAgencyPackCode($entityCount),
             ];
         }
 
+        if ($code && array_key_exists($code, self::COMPANY_LIST_AED)) {
+            $unit = self::companyAmountAed($code);
+            $label = CompanyPackageOptions::label($code);
+
+            if ($unit === null) {
+                return [
+                    'amount_aed' => null,
+                    'custom' => true,
+                    'rate_aed' => null,
+                    'entity_count' => $entityCount,
+                    'package_code' => $code,
+                    'breakdown' => "{$label} × {$entityCount} clients — custom quote (no list price).",
+                    'band' => 'custom',
+                    'suggested_pack_code' => self::nearestAgencyPackCode($entityCount),
+                ];
+            }
+
+            $total = $unit * $entityCount;
+
+            return [
+                'amount_aed' => (float) $total,
+                'custom' => false,
+                'rate_aed' => (float) $unit,
+                'entity_count' => $entityCount,
+                'package_code' => $code,
+                'breakdown' => "{$entityCount} × {$label} (AED " . number_format($unit, 0) . ') = AED ' . number_format($total, 0) . ' / year excl. VAT (company package list × clients). Preferential overrides allowed offline.',
+                'band' => 'package×clients',
+                'suggested_pack_code' => self::nearestAgencyPackCode($entityCount),
+            ];
+        }
+
+        // Legacy Standard band (§6.2) when package_code missing
         $rate = self::consultantRateAed($entityCount);
         $total = $rate * $entityCount;
         $band = $entityCount > 10
@@ -140,7 +183,8 @@ class CommercialPriceBook
             'custom' => false,
             'rate_aed' => (float) $rate,
             'entity_count' => $entityCount,
-            'breakdown' => "{$entityCount} × AED " . number_format($rate, 0) . ' = AED ' . number_format($total, 0) . " / year excl. VAT ({$band}). Preferential ≥10 onboarded is sales-only.",
+            'package_code' => null,
+            'breakdown' => "{$entityCount} × AED " . number_format($rate, 0) . ' = AED ' . number_format($total, 0) . " / year excl. VAT ({$band} · legacy Standard band).",
             'band' => $band,
             'suggested_pack_code' => self::nearestAgencyPackCode($entityCount),
         ];

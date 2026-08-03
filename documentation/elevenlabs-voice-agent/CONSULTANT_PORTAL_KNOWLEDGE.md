@@ -14,18 +14,18 @@ When guiding a user, name the **sidebar menu item**, then give the **link**.
 
 ## 1. What the consultant portal is
 
-The consultant portal is the **agency hub**: manage client workspaces, purchase agency packs, maintain a public directory profile, and respond to leads.
+The consultant portal is the **agency hub**: manage client workspaces, **request managed-client capacity**, maintain a public directory profile, and respond to leads.
 
 When a consultant **enters a client workspace**, they use the same emissions tools as a company (Locations, Quick Input, Reports, Disclosures). For detailed company-tool help, use the Company portal knowledge / Company portal guide.
 
-**Problem it solves:** UAE carbon consultants serve many SMEs. Instead of each SME buying a separate subscription, the consultant buys **agency packs** (wholesale slots), works from **one login**, and switches between **client workspaces**.
+**Problem it solves:** UAE carbon consultants serve many SMEs. Instead of each SME buying a separate package, the consultant works from **one login**, requests **managed-client capacity** with a package depth (Scope Basic through Enterprise), and switches between **client workspaces**. Pricing is offline — no public AED grid.
 
 ---
 
 ## 2. Who uses the Consultant portal
 
 - **Consultant org** — freelancer or multi-person agency (`consultant` company type).
-- **Agency team members** — invited under Team & Access (up to pack limits; trial may be view-only for team).
+- **Agency team members** — invited under Team & Access (limits follow Free/paid capacity; Free may restrict team features).
 - **Managed clients (end SMEs)** — in the current agency model, end SMEs typically **do not get separate logins**; the consultant operates the workspace on their behalf. Support is for the consultant org, not the end SME.
 
 **Consultant login:** https://app.menetzero.com/consultant/login  
@@ -40,7 +40,7 @@ Do not send consultants to the company `/login` for agency work.
 
 | Area | Purpose | Typical URL |
 |------|---------|-------------|
-| **Agency hub** | Practice, clients, packs, directory, leads | https://app.menetzero.com/consultant/dashboard |
+| **Agency hub** | Practice, clients, capacity requests, directory, leads | https://app.menetzero.com/consultant/dashboard |
 | **Client workspace** | Enter emissions and reports for one client | Same company UI while “in” a client; header shows agency mode |
 
 Exit a workspace with **Back to Agency Hub** in the header, or leave via Workspaces.
@@ -51,15 +51,15 @@ Exit a workspace with **Back to Agency Hub** in the header, or leave via Workspa
 
 | Menu section | Item | What it does | Link |
 |--------------|------|--------------|------|
-| — | Dashboard | Portfolio overview, slots, directory status | https://app.menetzero.com/consultant/dashboard |
+| — | Dashboard | Portfolio overview, capacity, directory status | https://app.menetzero.com/consultant/dashboard |
 | Client workspaces | Managed clients | Create and edit client company records | https://app.menetzero.com/consultant/clients |
 | Client workspaces | Workspaces | Enter / switch client portals | https://app.menetzero.com/consultant/workspace |
-| Client workspaces | Agency packs | Buy/upgrade packs and slots | https://app.menetzero.com/consultant/packs |
-| Client workspaces | Renewal | Renew pack when due | https://app.menetzero.com/consultant/renewal |
+| Client workspaces | Agency packs / Request clients | Request Standard or Enterprise capacity (no public prices) | https://app.menetzero.com/consultant/packs |
+| Client workspaces | Renewal | Renew when due (after paid activation) | https://app.menetzero.com/consultant/renewal |
 | Directory | Profile | Public listing profile | https://app.menetzero.com/consultant/profile |
 | Directory | Documents | Verification uploads | https://app.menetzero.com/consultant/documents |
 | Directory | Leads | Intro requests from companies | https://app.menetzero.com/consultant/intro-requests |
-| Directory | Orders | Pack and marketplace order history | https://app.menetzero.com/consultant/orders |
+| Directory | Orders | Request / order history | https://app.menetzero.com/consultant/orders |
 | Agency | Team & Access | Invite colleagues, roles | https://app.menetzero.com/consultant/team |
 | Help | Help & guide | Consultant portal guide | https://app.menetzero.com/consultant/help |
 | Help | Company portal guide | How company tools work | https://app.menetzero.com/consultant/company-portal-guide |
@@ -70,15 +70,17 @@ Exit a workspace with **Back to Agency Hub** in the header, or leave via Workspa
 
 1. **Complete consultant profile** — practice name, bio, services, credentials. Submit for review to appear in the public directory. [Edit profile](https://app.menetzero.com/consultant/profile)
 2. **Upload verification documents** — trade licence, certifications. [Documents](https://app.menetzero.com/consultant/documents)
-3. **Add first managed client** — create client company, set **Primary Reporting Year (PRY)**, assign free trial or paid slot. [Add client](https://app.menetzero.com/consultant/clients/create) · [Managed clients](https://app.menetzero.com/consultant/clients)
+3. **Add first managed client** — create client company, set **Primary Reporting Year (PRY)**, use Free (1 client) or paid capacity after activation. [Add client](https://app.menetzero.com/consultant/clients/create) · [Managed clients](https://app.menetzero.com/consultant/clients)
 4. **Enter the client workspace** — switch into the client portal to work. [Workspaces](https://app.menetzero.com/consultant/workspace)
 5. **Set up locations & input data** — inside workspace: locations, boundaries, Quick Input or bulk import. Use Company portal guide for details.
-6. **Upgrade agency pack when ready** — more slots, exports, Scope 3. [Agency packs](https://app.menetzero.com/consultant/packs)
+6. **Request clients when ready** — more capacity and package depth (Scope Basic, Scope Pro, ESG Starter, ESG Complete, or Enterprise). [Request clients](https://app.menetzero.com/consultant/packs)
 
 **Tips:**
-- Free trial includes **one managed client slot** — enough to test the workflow.
+- Free includes **one managed client** — enough to test the workflow (watermarked trial exports).
 - Each client has a **PRY** set when you create the engagement.
-- Paid packs unlock exports, extra slots, and Scope 3 for managed clients.
+- Say **managed client(s)** / **capacity** in the app. Sales docs may say “entity” — same meaning.
+- Paid requests choose **package depth** for client workspaces: Scope Basic (clean GHG/MOCCAE/Excel/IEQT) through ESG packages (disclosure PDFs) and Enterprise (custom).
+- No self-serve checkout or public AED prices — MENetZero quotes offline (typically package list × client count) and activates after payment.
 
 ---
 
@@ -88,10 +90,10 @@ Exit a workspace with **Back to Agency Hub** in the header, or leave via Workspa
 
 Daily starting point:
 - Portfolio emissions — combined tCO₂e across clients with data
-- Client slots — used vs available on pack or trial
+- Client capacity — used vs available on Free or paid capacity
 - Directory status — draft, pending review, approved, or rejected
 - New leads summary
-- Quick actions — add client, open workspaces, view packs
+- Quick actions — add client, open workspaces, request clients
 
 ---
 
@@ -101,23 +103,22 @@ Daily starting point:
 - [Managed clients](https://app.menetzero.com/consultant/clients)
 - [Add client](https://app.menetzero.com/consultant/clients/create)
 
-Each managed client is a separate company workspace. You define name, sector, PRY, and contacts. **One slot is consumed per active client.**
+Each managed client is a separate company workspace. You define name, sector, PRY, and contacts. **One place of capacity is used per active client.**
 
 Steps:
 1. Add client — creates company and links to agency.
 2. Edit client — update PRY, display name, engagement settings.
-3. Archive/remove — frees a slot when engagement ends (subject to pack rules).
+3. Archive/remove — frees capacity when engagement ends.
 
 **Critical:** Set PRY correctly at creation — it drives default year filters in Quick Input and reports.
 
 ### Agency model rules (plain language)
 
-- **Slot** = licence for one managed client + one Primary Reporting Year with full Growth-level entitlements for that PRY.
-- **Contract year** is calendar-aligned (typically 1 Jan – 31 Dec). Mid-year purchase may be pro-rata to 31 Dec.
-- **Next reporting year** after PRY is often **preview only** (forms, completeness) until **renewal** or a **reporting-year unlock** add-on — full exports for the new year are not free inside the same annual payment.
-- Prior year may be read-only / baseline.
-- On a paid pack, each active engagement gets Growth-level tools: GHG, MOCCAE, Excel, IEQT, bulk import, IFRS/GRI PDFs, Scope 3 limits as per Growth, UAE ESG Report & Scorecard for the PRY.
-- Consultant directory is typically **hidden** on managed client workspaces (the consultant *is* their consultant).
+- **Managed client / capacity** = one client company workspace + Primary Reporting Year. (Sales docs may say “entity”.)
+- **Free** = 1 managed client with Free rules (watermarked trial downloads; Scope 3 one entry/category).
+- **Paid packages** = Scope Basic, Scope Pro, ESG Starter, ESG Complete, or Enterprise — same capability options as direct companies; applied to managed client workspaces after activation.
+- Preferential annual rates may still be negotiated offline. Suggested quote is typically **package list × number of clients**. Guide users to Request clients; never invent AED.
+- Consultant directory is typically **hidden** on managed client workspaces.
 - End SME users: no separate login in the standard agency model (v1).
 - If SME switches consultancy: new engagement under new consultant; no automatic data migration.
 
@@ -137,24 +138,28 @@ Steps:
 
 While inside a workspace, left navigation matches the company portal: Dashboard, Locations, Quick Input, Disclosures, Reports, etc.
 
-**Billing for the managed client is often locked** — upgrades go through **Agency packs**, not the client Plan & billing page.
+**Billing for the managed client is often locked** — capacity upgrades go through **Request clients** (Agency packs page), not the client Plan & billing page.
 
 For how-to on Locations, Quick Input, DEWA bills, reports, disclosures: open [Company portal guide](https://app.menetzero.com/consultant/company-portal-guide) or use the Company knowledge document.
 
 ---
 
-## 9. Agency packs, billing & renewal
+## 9. Request clients, capacity & renewal
 
-**Commercial update (Aug 2026):** After Free (1 client), consultants request additional **entities**. Preferential annual rates are confirmed offline (AED 1,399 per entity/year up to 10 entities; AED 1,199 above 10; typically up to 5 sites per entity). Self-serve pack price cards are being removed. Enterprise / white-label is custom.
+**Commercial model:** After Free (1 managed client), consultants **Request clients**. They choose:
+1. Package depth — Scope Basic, Scope Pro, ESG Starter, ESG Complete, or Enterprise
+2. How many managed clients
 
-**Pages (transitional):**
-- [Agency packs](https://app.menetzero.com/consultant/packs) — legacy; prefer request entities / contact MENetZero
+Suggested quote is typically **company package list price × client count** (excl. VAT). Sales may override offline. Enterprise is always custom. There is **no self-serve checkout** and **no public price cards**.
+
+**Pages:**
+- [Request clients / Agency packs](https://app.menetzero.com/consultant/packs)
 - [Orders](https://app.menetzero.com/consultant/orders)
 - [Renewal](https://app.menetzero.com/consultant/renewal)
 
-**Trial vs paid:** Free = 1 client with Free rules and watermarked trial exports. Paid Consultant Plan entities unlock clean exports once MENetZero activates them.
+**Flow:** Request form → MENetZero quotes offline → payment outside the app → admin activates capacity → managed clients receive that package depth.
 
-Do not invent old Essential/Complete pack grids in voice answers; guide users to request entities or contact support.
+**Free vs paid:** Free = 1 client, watermarked trial exports. Paid packages unlock entitlements matching the chosen cards (Scope Basic ≈ clean inventory exports; Scope Pro / ESG packages add disclosure PDF suites; Enterprise is custom). Do not invent old Essential/Complete pack grids.
 
 ---
 
@@ -179,14 +184,14 @@ Directory statuses: draft, pending review, approved, rejected.
 
 ## 11. Working inside a client workspace (most common tasks)
 
-On a paid pack, each client typically gets Growth-level exports for their PRY, including UAE ESG Report PDF, ESG Scorecard, GHG inventory, MOCCAE, IFRS, and GRI.
+Paid managed clients follow the **package** activated for the agency (Scope Basic through Enterprise). Scope Basic focuses on clean GHG / MOCCAE / Excel / IEQT. Scope Pro and ESG packages unlock disclosure PDF suites (UAE ESG Report, Scorecard, IFRS/GRI) when those are part of the package. Enterprise adds custom / white-label options.
 
 Common consultant tasks:
 1. Locations & emission boundaries
-2. Quick Input & bulk import (DEWA, fuel, fleet, Scope 3)
+2. Quick Input & bulk import (DEWA, fuel, fleet, Scope 3 within limits)
 3. GHG Inventory — review and export Excel/PDF for the client
-4. Disclosures — IFRS S1/S2, GRI, UAE ESG narrative, ESG Scorecard
-5. ESG Depth — stakeholders, materiality, suppliers, targets
+4. Disclosures — fill forms where available; PDF exports depend on entitlements
+5. ESG Depth — stakeholders, materiality, suppliers, targets when unlocked
 6. Scope 1 & 2 Help Guide — from Input Data inside the workspace for bill/column help
 
 Point users to: [Company portal guide](https://app.menetzero.com/consultant/company-portal-guide)
@@ -197,14 +202,14 @@ Point users to: [Company portal guide](https://app.menetzero.com/consultant/comp
 
 **Page:** [Team & Access](https://app.menetzero.com/consultant/team)
 
-Invite colleagues; assign roles for clients, packs, and directory settings.
+Invite colleagues; assign roles for clients, Request clients, and directory settings.
 
 Steps:
 1. Invite by email.
 2. Assign roles with module permissions.
 3. Manage pending invitations; remove access when needed.
 
-Free trial may limit team features to view-only — check current entitlements.
+Free may limit team features — check current entitlements.
 
 ---
 
@@ -214,11 +219,13 @@ Free trial may limit team features to view-only — check current entitlements.
 |------|---------|
 | Agency hub | Consultant dashboard and practice management area |
 | Client workspace | Company portal for one managed client |
-| Managed client | End SME workspace linked to the consultant |
-| Slot | Licence for one active managed client (with PRY) |
-| PRY | Primary Reporting Year — year with full export rights for that engagement |
-| Agency pack | Wholesale subscription bundling slots and Growth-level features |
-| Reporting-year unlock | Paid add-on to fully unlock another year beyond PRY rules |
+| Managed client | End SME workspace linked to the consultant (sales may say “entity”) |
+| Capacity | How many managed clients you may hold |
+| PRY | Primary Reporting Year for that engagement |
+| Request clients | In-app form — package depth + how many managed clients; pricing offline |
+| Package | Scope Basic / Pro / ESG Starter / Complete / Enterprise applied to managed clients |
+| Standard (legacy term) | Older name for GHG-focused paid client profile — prefer Scope Basic in new answers |
+| Enterprise | Custom / white-label deployment |
 | Directory | Public listing of approved consultants |
 | Lead / intro request | Company asking to be introduced to the consultant |
 | Enter workspace | Switch into a client’s company portal |
@@ -232,4 +239,4 @@ Free trial may limit team features to view-only — check current entitlements.
 3. [Support](https://app.menetzero.com/consultant/support) or [Contact](https://app.menetzero.com/contact)
 4. Email: help@menetzero.com
 
-Never invent pack prices, unlock exports falsely on trial, or claim end-SME logins exist if the org uses the standard managed-client model.
+Never invent prices, unlock clean exports falsely on Free, or claim end-SME logins exist if the org uses the standard managed-client model.

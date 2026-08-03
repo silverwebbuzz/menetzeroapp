@@ -36,12 +36,12 @@ Implement **one phase at a time**. Check off §12 as you ship.
 | 3 | Free — Consultant | **1 entity (managed client)**. Same Free rules inside. |
 | 4 | Scope 1 & 2 | Always included in Free and every paid package. |
 | 5 | Company after Free | **Request a package** (xlsx tiers ± extras). No AED in UI. |
-| 6 | Consultant after Free | **Request slots/entities** under Consultant Plan (§6). No AED in UI. |
+| 6 | Consultant after Free | **Request clients** with company package depth (Scope Basic…Enterprise) × count. No AED in UI. |
 | 7 | Payment | Offline only. |
 | 8 | Admin | Request → quote → paid → Activate. |
-| 9 | Forms | Separate company vs consultant forms. |
+| 9 | Forms | Separate company vs consultant forms (consultant also has client count). |
 | 10 | Company packages | Keep xlsx Scope Basic / Pro / ESG Starter / Complete. |
-| 11 | Consultant paid pricing | **§6 proposal supersedes** xlsx Essential/Standard/Complete/Plus as default sales offer. |
+| 11 | Consultant paid pricing | Default suggest = **package list × clients**; sales may apply §6 preferential overrides offline. |
 | 12 | Entity (consultant) | **1 entity = 1 managed client slot**; included **up to 5 sites**. |
 | 13 | Min 10 companies / 12 months | Preferential-price **sales/contract policy only** — **no software enforcement** yet. |
 | 14 | Enterprise | Fully custom (branding / white-label / implementation). MENetZero may invoice consultant. |
@@ -251,7 +251,12 @@ Align codes · Free S3 · Watermarked exports.
 - [x] Paid managed clients use `consultant_managed_standard` limits (**5 sites**).
 - [x] Activation maps request codes → live plans; consultant activate → `consultant_entity` + extras.
 
-### Phase 9 — Portal guides + ElevenLabs
+### Phase 9 — Portal guides + ElevenLabs ✅ DONE
+- [x] Company portal guide: Free / watermark / Request a package (Scope Basic…Enterprise); no public AED.
+- [x] Consultant portal guide: Free 1 client / Request clients / Standard vs Enterprise; capacity terminology.
+- [x] ElevenLabs knowledge + pre-questions synced (company + consultant).
+- [x] Voice prompt: offline pricing; managed client wording; no invented AED grids.
+
 ### Phase 10 — Renewals / optional min-10 reminders later
 
 ---
@@ -310,7 +315,8 @@ Logged-in: Request a package / Request clients · features only · pricing offli
 | Aug 2026 | **Aligned to Ojas commercial proposal** |
 | Aug 2026 | Phases 3–7 (Explore Free, requests, quotes, price book) + client terminology |
 | Aug 2026 | Phase 8: seed scope packages + consultant_entity; keep demo QA pack; Standard 5 sites |
+| Aug 2026 | Phase 9: portal guides + ElevenLabs knowledge for Free / Request / Standard / offline pricing |
 
 ---
 
-**Next:** Phase 9 (portal guides + ElevenLabs sync).
+**Next:** Phase 10 (renewals / optional min-10 reminders).

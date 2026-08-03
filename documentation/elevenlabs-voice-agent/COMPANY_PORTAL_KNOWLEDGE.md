@@ -51,11 +51,12 @@ Consultants should use the consultant portal, not the company login.
 | Reports & Compliance | Reporting Settings | Methodology defaults (admin) | https://app.menetzero.com/settings/reporting |
 | Reports & Compliance | My Profile | Company / user profile | https://app.menetzero.com/profile |
 | Settings | Team & Access | Roles, invites, permissions | https://app.menetzero.com/roles |
-| Settings | Plan & billing | Subscription and invoices | https://app.menetzero.com/subscriptions/billing |
+| Settings | Plan & billing | Current package, Request a package, invoices | https://app.menetzero.com/subscriptions/billing |
+| Settings | Request a package | Choose Scope Basic / Pro / ESG packages / Enterprise (features only) | https://app.menetzero.com/subscriptions/request-package |
 | Settings | Consultants | Find and engage consultants | https://app.menetzero.com/consultants |
 | Help | Help & Guide | Full company portal guide (this content) | https://app.menetzero.com/help |
 
-Scope 3 may show as locked on lower plans (“Unlock on Starter”) until the plan allows it.
+On Free, Scope 3 allows **one entry per category**. Beyond Free, use **Request a package**. Public Explore Free pages never show AED prices.
 
 ---
 
@@ -68,13 +69,15 @@ Tell users to follow this order (same as the in-app guide):
 3. **Define emission boundaries** — for each location, tick which activity types apply (electricity, fuel, fleet, etc.). This controls which Quick Input forms appear. [Locations](https://app.menetzero.com/locations)
 4. **Enter activity data** — Quick Input forms or bulk import for Scope 1 & 2. One row per bill or receipt (e.g. monthly DEWA invoice). [Input Data / View Entries](https://app.menetzero.com/quick-input)
 5. **Review dashboard & GHG inventory** — check totals, then open GHG Inventory for breakdown and exports. [GHG Inventory](https://app.menetzero.com/reports)
-6. **Complete disclosures & export reports** — IFRS S1/S2, GRI, UAE ESG narrative; download PDFs when plan allows (Growth+). [Disclosures](https://app.menetzero.com/disclosures)
-7. **Publish UAE ESG Report (Growth+)** — leadership message, strategy, about sections; GHG numbers pull automatically from inventory.
+6. **Complete disclosures & export reports** — IFRS S1/S2, GRI, UAE ESG narrative; download PDFs when package allows (typically Scope Pro / ESG packages). [Disclosures](https://app.menetzero.com/disclosures)
+7. **Publish UAE ESG Report (Scope Pro / ESG packages)** — leadership message, strategy, about sections; GHG numbers pull automatically from inventory. Request a package if exports are locked.
 
 **Important tips:**
 - Primary Reporting Year (PRY) is the calendar year you report against — most entries are tagged to a location and year.
 - Permissions depend on role.
-- Growth unlocks unified UAE ESG Report PDF, ESG Scorecard, and disclosure exports. Enterprise adds extended indexes, HRIS import, assurance PDF upload, and white-label covers.
+- **Free:** Scope 1 & 2 full; Scope 3 one entry per category; disclosure previews; watermarked GHG / Excel / IEQT trial downloads.
+- **Request a package** for clean exports and higher packages: Scope Basic, Scope Pro, ESG Starter, ESG Complete, Enterprise. Features only in-app — pricing offline; MENetZero activates after payment.
+- Enterprise can add extended indexes, HRIS import, assurance PDF upload, and white-label covers.
 
 ---
 
@@ -125,14 +128,14 @@ Quick Input is the main data entry area. Choose a source (electricity, fuel, fli
 4. Enter quantity and unit from the bill (not the AED amount).
 5. Save. One row = one bill or period.
 6. Review all rows under **View Entries**. Filter by scope, location, year.
-7. Optional: bulk import Excel/CSV for Scope 1 & 2 (Starter plan and above).
+7. Optional: bulk import Excel/CSV for Scope 1 & 2 (Scope Basic and paid packages).
 8. Optional: export CSV of filtered entries for audit.
 
 ### Scope meanings
 
 - **Scope 1** — direct emissions (fuel on site, company vehicles, refrigerants, process).
 - **Scope 2** — purchased energy (electricity, district cooling).
-- **Scope 3** — value chain (travel, waste, purchased goods, etc.). Requires Starter or higher (or managed client on an agency pack).
+- **Scope 3** — value chain (travel, waste, purchased goods, etc.). Free allows one entry per category; Request Scope Pro or an ESG package for higher capacity. Managed clients follow consultant entitlements (paid Standard is typically GHG-focused with limited Scope 3).
 
 ### UAE-focused data tips (Scope 1 & 2)
 
@@ -167,6 +170,8 @@ Bulk import columns (common): location_name (must match Locations), fiscal_year,
 
 Aggregates all entered data by scope, category, and location for the selected reporting year. Export Excel or PDF for auditors, MOCCAE, or internal review. IEQT export available where configured.
 
+On **Free**, allowed downloads are **watermarked trial** files — for exploration only. Request **Scope Basic** or higher for clean official GHG / MOCCAE / Excel / IEQT.
+
 Steps:
 1. Select reporting year and filters.
 2. Review scope totals and activity breakdown.
@@ -180,14 +185,14 @@ Difference vs Quick Input: Quick Input = raw activity data; GHG Inventory = aggr
 
 **Hub:** [Disclosures](https://app.menetzero.com/disclosures)
 
-Beyond raw emissions: narrative and structured sustainability information. Free/Starter can often preview forms; Growth+ unlocks PDF/CSV downloads.
+Beyond raw emissions: narrative and structured sustainability information. Free / Scope Basic can often preview forms; Scope Pro, ESG Starter, ESG Complete, and Enterprise unlock PDF/CSV downloads when activated.
 
 What lives here:
 - **IFRS S2** — climate-related disclosures, risks, targets, GHG (§29)
 - **IFRS S1** — general sustainability-related financial disclosures
 - **GRI** — material topics, social/safety, GRI content index CSV
 - **UAE ESG Report** — unified PDF (narrative + auto GHG + indexes)
-- **ESG Scorecard** — multi-year KPI tables; CSV import of manual KPIs on Growth
+- **ESG Scorecard** — multi-year KPI tables; CSV import of manual KPIs when package allows
 - **ESG Depth** — stakeholders, materiality matrix, suppliers, targets
 - **SASB** — optional sector index
 - **ESG Dashboard** — visual summary of metrics and progress
@@ -196,7 +201,7 @@ Critical rule: GHG totals in disclosure PDFs always come from Quick Input invent
 
 **Reporting Settings** (admin): https://app.menetzero.com/settings/reporting — methodology defaults.
 
-### Enterprise ESG add-ons (Enterprise plan only)
+### Enterprise ESG add-ons (Enterprise / custom)
 
 - Extended GRI content index (80+ rows)
 - ESG Scorecard enterprise Excel (80+ KPIs)
@@ -205,7 +210,7 @@ Critical rule: GHG totals in disclosure PDFs always come from Quick Input invent
 - Assurance PDF attach on UAE ESG Report overview
 - White-label UAE ESG PDF (no MenetZero branding on cover)
 
-Arabic bilingual PDF is not yet available — English reports are supported.
+Request Enterprise (or tick white-label / assurance extras) when needed. Arabic bilingual PDF is not yet available — English reports are supported.
 
 ---
 
@@ -228,16 +233,18 @@ Tip: Give data-entry staff measurements access only; keep billing restricted to 
 
 **Pages:**
 - [Plan & billing](https://app.menetzero.com/subscriptions/billing)
-- [View / upgrade plans](https://app.menetzero.com/subscriptions/upgrade)
+- [Request a package](https://app.menetzero.com/subscriptions/request-package)
 
-View current plan, upgrade, payment methods, invoices. **Not available** when the account is fully managed by a consultant agency.
+View current package and entitlements. To move beyond Free, submit **Request a package** (features only — no public AED). MENetZero confirms pricing offline and activates after payment. **Not available** when the account is fully managed by a consultant agency.
 
-Typical entitlements (guide users to Plan & billing for their exact plan):
-- **Bulk import & Scope 3** — typically Starter or higher
-- **UAE ESG Report, Scorecard, GRI/IFRS downloads** — Growth or Enterprise
-- **Enterprise add-ons** — as listed in section 9
+Package summary (guide users to Request a package / Plan & billing for their exact entitlements):
+- **Free** — Scope 1 & 2; Scope 3 one entry/category; watermarked trial downloads; disclosure previews
+- **Scope Basic** — clean GHG / MOCCAE / Excel / IEQT; bulk import; up to ~3 sites
+- **Scope Pro** — broader Scope 3 + ESG disclosure suite exports; up to ~10 sites
+- **ESG Starter / ESG Complete** — full ESG report set at mid/larger scale
+- **Enterprise** — custom / white-label / extended KPIs
 
-Do not invent exact AED prices in voice answers unless they are confirmed elsewhere; send users to Plan & billing / View plans.
+Never invent exact AED prices. Never send users to a public price grid. Use Request a package + offline quote messaging.
 
 ---
 
@@ -245,7 +252,7 @@ Do not invent exact AED prices in voice answers unless they are confirmed elsewh
 
 **Page:** [Consultants](https://app.menetzero.com/consultants)
 
-Browse verified consultants, request an introduction, or purchase listed advisory services. Company admin manages relationships. Track orders under Consultants → Orders.
+Browse verified consultants and request an introduction. Company admin manages relationships.
 
 Managed clients usually do not see this directory (their consultant already manages them).
 
@@ -261,9 +268,11 @@ Managed clients usually do not see this directory (their consultant already mana
 | Emission boundary | Which activity types apply at a location |
 | Quick Input / Input Data | Where activity data is entered |
 | GHG Inventory | Aggregated emissions report and exports |
+| Watermark | Free-trial stamp on allowed download files |
 | PRY / reporting year | Calendar year you report against |
 | Disclosures | IFRS, GRI, UAE ESG narrative and structured forms |
-| Growth / Enterprise | Higher plans that unlock PDF exports and advanced ESG tools |
+| Package | Scope Basic / Pro / ESG Starter / Complete / Enterprise |
+| Request a package | In-app form — features only; pricing offline |
 | Managed client | Company workspace run by a consultant agency |
 
 ---

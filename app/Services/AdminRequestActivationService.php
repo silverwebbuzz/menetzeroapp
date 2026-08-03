@@ -40,6 +40,7 @@ class AdminRequestActivationService
         return CommercialPriceBook::suggestConsultantQuote(
             (int) $request->entity_count,
             (bool) $request->wants_enterprise,
+            $request->package_code,
         );
     }
 
@@ -208,8 +209,10 @@ class AdminRequestActivationService
 
         $needed = max(1, (int) $request->entity_count);
         $contractYear = $contractYear ?? (int) now()->year;
+        $packageCode = $request->package_code
+            ?? ($request->wants_enterprise ? 'client_enterprise' : 'client_scope_basic');
 
-        return DB::transaction(function () use ($request, $org, $needed, $note, $adminId, $contractYear) {
+        return DB::transaction(function () use ($request, $org, $needed, $note, $adminId, $contractYear, $packageCode) {
             $active = $this->consultantSubscriptions->getActiveSubscription($org->id);
             $subscription = null;
 
@@ -227,6 +230,7 @@ class AdminRequestActivationService
                         'provision_note' => $note,
                         'consultant_entity_request_id' => $request->id,
                         'requested_clients' => $needed,
+                        'managed_client_package_code' => $packageCode,
                     ],
                     $adminId,
                     $extras,
@@ -247,6 +251,7 @@ class AdminRequestActivationService
                         'consultant_entity_request_id' => $request->id,
                         'entity_count' => $needed,
                         'quote_amount_aed' => $request->quote_amount_aed,
+                        'package_code' => $packageCode,
                         'wants_enterprise' => $request->wants_enterprise,
                         'slot_limit' => $subscription->slot_limit,
                         'plan_code' => $packCode,
@@ -258,6 +263,10 @@ class AdminRequestActivationService
                 if ($shortfall > 0) {
                     $subscription = $this->consultantSubscriptions->addExtraSlots($subscription, $shortfall);
                 }
+
+                $meta = $subscription->metadata ?? [];
+                $meta['managed_client_package_code'] = $packageCode;
+                $subscription->update(['metadata' => $meta]);
 
                 AdminPackageAssignment::create([
                     'admin_id' => $adminId,
@@ -274,6 +283,7 @@ class AdminRequestActivationService
                         'entity_count' => $needed,
                         'slots_added' => $shortfall,
                         'quote_amount_aed' => $request->quote_amount_aed,
+                        'package_code' => $packageCode,
                         'slot_limit' => $subscription->slot_limit,
                     ],
                 ]);

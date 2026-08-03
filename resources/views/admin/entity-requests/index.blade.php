@@ -12,8 +12,8 @@
     @endif
 
     <p class="text-sm text-gray-600 mb-4">
-        Workflow: Review → Suggest/edit band quote (price book) → Mark paid → Activate (grants capacity for the requested managed clients).
-        Preferential ≥10 onboarded is sales-only (not auto-applied).
+        Workflow: Review → Suggest/edit quote (package list × clients) → Mark paid → Activate (grants capacity; managed clients get the requested package depth).
+        Preferential overrides are sales-only.
     </p>
 
     <div class="mb-4 flex flex-wrap gap-2 text-sm">
@@ -43,14 +43,15 @@
                 <div class="grid md:grid-cols-3 gap-4 mb-4">
                     <div>
                         <div class="text-xs text-gray-500">Requested</div>
-                        <div class="font-medium">{{ $req->entity_count }} managed clients · {{ $req->wants_enterprise ? 'Enterprise' : 'Standard' }}</div>
+                        <div class="font-medium">{{ $req->entity_count }} managed clients · {{ $req->packageLabel() }}</div>
                         <div class="text-xs text-gray-500 mt-1">
-                            @if($req->needs_sites_over_5)&gt;5 sites flagged · @endif
+                            @if($req->package_code)<span class="font-mono">{{ $req->package_code }}</span> · @endif
+                            @if($req->needs_sites_over_5)&gt;5 sites / extra sites flagged · @endif
                             {{ $req->message ? \Illuminate\Support\Str::limit($req->message, 140) : 'No message' }}
                         </div>
                     </div>
                     <div>
-                        <div class="text-xs text-gray-500">Suggested (§6.2)</div>
+                        <div class="text-xs text-gray-500">Suggested (package × clients)</div>
                         @if($sug)
                             <div class="font-medium">
                                 @if($sug['custom'])

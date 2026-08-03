@@ -104,7 +104,7 @@ Q: Where do I see all my entries?
 A: Open View Entries under Quick Input: https://app.menetzero.com/quick-input — filter by scope, location, and year.
 
 Q: Can I upload Excel or CSV?
-A: Yes for Scope 1 and 2 on Starter plan and above. Use bulk import from Input Data, and read the Scope 1 & 2 data guide first: https://app.menetzero.com/quick-input/help-guide
+A: Yes for Scope 1 and 2 on Scope Basic and paid packages. Use bulk import from Input Data, and read the Scope 1 & 2 data guide first: https://app.menetzero.com/quick-input/help-guide
 
 Q: Where is the Scope 1 and 2 help guide?
 A: From Input Data open Scope 1 & 2 data guide, or https://app.menetzero.com/quick-input/help-guide
@@ -119,10 +119,10 @@ Q: What is Scope 2?
 A: Purchased energy — grid electricity and district cooling.
 
 Q: What is Scope 3?
-A: Value-chain emissions such as travel, waste, and purchased goods. Usually needs Starter or higher.
+A: Value-chain emissions such as travel, waste, and purchased goods. Free allows one entry per category; Request Scope Pro or an ESG package for higher capacity.
 
-Q: Why is Scope 3 locked?
-A: Your plan may not include Scope 3. Upgrade via Plan & billing / View plans: https://app.menetzero.com/subscriptions/upgrade — or if managed by a consultant, they use agency packs.
+Q: Why is Scope 3 locked or limited?
+A: Free only allows one row per Scope 3 category. Submit Request a package: https://app.menetzero.com/subscriptions/request-package — or if managed by a consultant, they use Request clients (package depth × clients).
 
 Q: Do I need to be an environmental expert?
 A: No. For most UAE offices you mainly need utility bills, fuel receipts, and maybe fleet records. Start with electricity if unsure.
@@ -192,7 +192,7 @@ Q: Where is the GHG Inventory?
 A: Sidebar → GHG Inventory, or https://app.menetzero.com/reports
 
 Q: How do I export Excel or PDF?
-A: Open GHG Inventory, select reporting year and filters, then use the export controls for Excel or PDF.
+A: Open GHG Inventory, select reporting year and filters, then use the export controls for Excel or PDF. On Free, allowed downloads are watermarked trial files — Request Scope Basic or higher for clean official exports.
 
 Q: What is MOCCAE / IEQT export?
 A: UAE-oriented reporting formats available where configured on the reports page. Use GHG Inventory exports for auditor and authority submissions.
@@ -213,20 +213,20 @@ A: Sidebar → Disclosures, or https://app.menetzero.com/disclosures
 Q: What frameworks are available?
 A: IFRS S1, IFRS S2, GRI, UAE ESG Report, ESG Scorecard, ESG Depth, SASB, and ESG Dashboard — open from the Disclosures hub.
 
-Q: Which plan do I need for UAE ESG Report and Scorecard?
-A: Growth or Enterprise. Growth includes integrated UAE ESG PDF, Scorecard (~25 KPIs), GRI/IFRS exports, SASB. Enterprise adds 80+ packs, HRIS import, assurance upload, white-label cover.
+Q: Which package do I need for UAE ESG Report and Scorecard?
+A: Typically Scope Pro, ESG Starter, ESG Complete, or Enterprise. Those unlock disclosure PDF/CSV exports. Enterprise can add extended KPI packs, HRIS import, assurance upload, white-label cover. Use Request a package — pricing is offline.
 
-Q: Can Free or Starter download disclosure PDFs?
-A: Usually they can preview forms; PDF/CSV downloads unlock on Growth and above. Check Plan & billing.
+Q: Can Free or Scope Basic download disclosure PDFs?
+A: Usually they can preview forms; PDF/CSV downloads unlock on Scope Pro and ESG packages. Check Plan & billing.
 
 Q: Do I re-enter GHG numbers in disclosure forms?
 A: No. Disclosure PDFs pull GHG totals from your Quick Input inventory automatically.
 
 Q: What is the UAE ESG Report?
-A: A unified PDF with narrative chapters plus auto GHG and indexes. Complete leadership, strategy, and about sections, then export on Growth+.
+A: A unified PDF with narrative chapters plus auto GHG and indexes. Complete leadership, strategy, and about sections, then export when your package allows (typically Scope Pro / ESG packages).
 
 Q: What is the ESG Scorecard?
-A: Multi-year KPI tables. On Growth you can import manual KPIs via CSV. Enterprise has a larger KPI pack.
+A: Multi-year KPI tables. Packages that unlock disclosure exports may allow CSV import of manual KPIs. Enterprise has a larger KPI pack.
 
 Q: What is ESG Depth?
 A: Stakeholder register, materiality matrix, supply-chain suppliers, and sustainability targets — used in the UAE ESG package.
@@ -260,20 +260,23 @@ A: Keep Plan & billing restricted to company admins. Give data-entry staff measu
 
 ## Plans & billing
 
-Q: Where do I see my plan?
+Q: Where do I see my package?
 A: Plan & billing: https://app.menetzero.com/subscriptions/billing
 
-Q: How do I upgrade?
-A: Open View plans / upgrade: https://app.menetzero.com/subscriptions/upgrade and compare tiers.
+Q: How do I move beyond Free?
+A: Request a package (features only, no public prices): https://app.menetzero.com/subscriptions/request-package — MENetZero confirms pricing offline and activates after payment.
 
-Q: Which plan do I need for bulk import and Scope 3?
-A: Typically Starter or higher. Confirm on Plan & billing for your entitlements.
+Q: Which package do I need for clean exports, bulk import, and Scope 3?
+A: Free includes Scope 1 & 2, one Scope 3 entry per category, and watermarked trial downloads. Scope Basic unlocks clean GHG/MOCCAE/Excel/IEQT and bulk import. Scope Pro and ESG packages add broader Scope 3 and disclosure exports. Confirm on Plan & billing.
 
-Q: Where are invoices and payment methods?
-A: Under Plan & billing — payment methods and transaction history.
+Q: Where do I see prices?
+A: You do not — Request a package shows features only. Sales confirms amounts offline.
+
+Q: Where are invoices?
+A: Under Plan & billing after offline settlement.
 
 Q: I can’t change billing — why?
-A: If a consultant manages your workspace, billing is locked and upgrades go through the consultant’s agency packs.
+A: If a consultant manages your workspace, billing is locked and capacity upgrades go through the consultant’s Request clients flow.
 
 ---
 
@@ -328,7 +331,10 @@ Q: I entered data but dashboard didn’t update.
 A: Refresh and confirm entries were saved under View Entries for the active year. Totals come from saved Quick Input rows.
 
 Q: Export button missing or disabled.
-A: Your plan may only allow preview. Upgrade to Growth for most disclosure PDFs, or check with your consultant if managed.
+A: Free downloads may be watermarked or limited; disclosure PDFs often need Scope Pro or an ESG package. Use Request a package, or check with your consultant if managed.
+
+Q: Where is Request a package?
+A: https://app.menetzero.com/subscriptions/request-package
 
 Q: I still need help.
 A: Open https://app.menetzero.com/help or contact https://app.menetzero.com/contact — help@menetzero.com

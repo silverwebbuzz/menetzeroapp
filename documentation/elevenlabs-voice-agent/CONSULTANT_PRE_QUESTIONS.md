@@ -13,7 +13,7 @@ Use these as Knowledge Base content for ElevenLabs. Written in natural user phra
 ## Getting started
 
 Q: What is the consultant portal?
-A: It is your agency hub — manage client workspaces, buy agency packs, maintain your directory profile, and respond to leads. Guide: https://app.menetzero.com/consultant/help
+A: It is your agency hub — manage client workspaces, request managed-client capacity, maintain your directory profile, and respond to leads. Guide: https://app.menetzero.com/consultant/help
 
 Q: How is this different from the company portal?
 A: The agency hub manages your practice and clients. A client workspace is the company portal for one client, where you enter emissions and run reports.
@@ -28,7 +28,7 @@ Q: I tried company login with my consultant email — what happens?
 A: The system may tell you this is a consultant account and to sign in at the consultant portal.
 
 Q: What should I do first after signing up?
-A: Complete Profile → upload Documents → Add managed client → Enter workspace → set Locations and Quick Input → buy an Agency pack when you need more slots or exports. Same flow as Help & guide.
+A: Complete Profile → upload Documents → Add managed client → Enter workspace → set Locations and Quick Input → Request clients when you need more capacity or clean exports. Same flow as Help & guide.
 
 Q: Where is the consultant help guide?
 A: Sidebar Help & guide, or https://app.menetzero.com/consultant/help
@@ -47,7 +47,7 @@ A: In the standard agency model, end SMEs usually do not get separate logins —
 ## Agency hub vs workspace
 
 Q: What is the agency hub?
-A: Your consultant dashboard and practice area: clients, packs, profile, leads. https://app.menetzero.com/consultant/dashboard
+A: Your consultant dashboard and practice area: managed clients, capacity requests, profile, leads. https://app.menetzero.com/consultant/dashboard
 
 Q: What is a client workspace?
 A: The company portal opened for one managed client — Locations, Quick Input, Reports, Disclosures — while the header shows agency mode.
@@ -72,10 +72,10 @@ A: Because you are inside that client’s company UI. For how-tos, use the Compa
 ## Dashboard
 
 Q: What does the consultant dashboard show?
-A: Portfolio emissions, client slot usage, directory status, leads, and quick actions. https://app.menetzero.com/consultant/dashboard
+A: Portfolio emissions, managed-client capacity used, directory status, leads, and quick actions. https://app.menetzero.com/consultant/dashboard
 
-Q: What are client slots on the dashboard?
-A: Used versus available managed-client licences on your trial or paid pack.
+Q: What is client capacity on the dashboard?
+A: Used versus available managed clients on Free or paid capacity.
 
 Q: What is directory status?
 A: Whether your public listing is draft, pending review, approved, or rejected.
@@ -91,10 +91,10 @@ Q: Where is the client list?
 A: https://app.menetzero.com/consultant/clients
 
 Q: What is a managed client?
-A: An end-company workspace linked to your agency. Each active client uses one slot.
+A: An end-company workspace linked to your agency. Each active client uses one place of your capacity.
 
 Q: What is PRY / Primary Reporting Year?
-A: The main reporting year for that engagement — set at creation. It drives default year filters and which year gets full Growth-level exports.
+A: The main reporting year for that engagement — set at creation. It drives default year filters in Quick Input and reports.
 
 Q: Why must I set PRY carefully?
 A: Wrong PRY causes wrong defaults in Quick Input and reports. Set it correctly when creating the client.
@@ -102,66 +102,60 @@ A: Wrong PRY causes wrong defaults in Quick Input and reports. Set it correctly 
 Q: How do I edit a client?
 A: Managed clients → open the client → edit name, PRY, or engagement settings.
 
-Q: How do I free a slot?
-A: Archive or remove an engagement when it ends, subject to pack rules — that frees a slot for another client.
+Q: How do I free capacity?
+A: Archive or remove an engagement when it ends — that frees capacity for another client.
 
-Q: How many clients can I have on free trial?
-A: Free trial includes one managed client slot — enough to test the full workflow.
+Q: How many clients can I have on Free?
+A: Free includes one managed client — enough to test the workflow (watermarked trial exports).
 
 Q: How do I add more than one client?
-A: Buy or upgrade an agency pack with enough slots. Each active managed client uses one slot. Packs: https://app.menetzero.com/consultant/packs
+A: Request clients — choose package depth and how many you need: https://app.menetzero.com/consultant/packs — pricing offline; MENetZero activates after payment.
 
 Q: Can two consultants share the same managed client data automatically if the SME switches?
 A: No automatic migration. A new engagement under the new consultant is created; the previous consultant keeps archived history as applicable.
 
 ---
 
-## Slots, packs & commercial rules
+## Capacity, Request clients & commercial rules
 
-Q: What is an agency pack?
-A: Wholesale subscription that bundles client slots, export rights, and Growth-level features for managed clients. https://app.menetzero.com/consultant/packs
+Q: What is Request clients?
+A: The in-app form on Agency packs where you choose package depth (Scope Basic, Scope Pro, ESG Starter, ESG Complete, or Enterprise) and how many managed clients you need. Features only — no public AED. https://app.menetzero.com/consultant/packs
 
-Q: What does one slot include?
-A: One managed client plus one Primary Reporting Year with full Growth-level entitlements for that PRY.
+Q: What packages can I request as a consultant?
+A: Scope Basic, Scope Pro, ESG Starter, ESG Complete, and Enterprise — capability cards without prices. Same depth options companies use, applied to your managed clients after activation.
 
-Q: Can I get two full reporting years of exports from one annual payment?
-A: Typically no. Next year is often preview only until renewal or a reporting-year unlock add-on.
+Q: What does Scope Basic include for each client?
+A: Typically Scope 1 & 2, bulk import, and clean GHG / MOCCAE / Excel / IEQT. Prefer that package for inventory-focused engagements.
 
-Q: What is preview only for next year?
-A: Forms and completeness may be available, but full PDF/Excel/IFRS/GRI exports for that new year stay locked until unlock or renewal.
+Q: What do Scope Pro / ESG packages add?
+A: Broader Scope 3 and ESG disclosure PDF/CSV suites (UAE ESG Report, Scorecard, IFRS/GRI) depending on the package. Choose the card that matches the engagement.
 
-Q: What is a reporting-year unlock?
-A: A paid add-on (where offered on Agency packs) to fully unlock another reporting year for a client.
+Q: What is Enterprise for consultants?
+A: Custom / white-label / implementation — confirmed offline with MENetZero.
 
-Q: What is the contract year?
-A: Consultant packs are typically calendar-aligned (1 January–31 December). Mid-year purchases may be pro-rata to 31 December.
+Q: How is pricing suggested?
+A: Typically package list price × number of managed clients (excl. VAT). Sales may adjust offline. Never invent exact AED in voice answers.
 
-Q: Can I buy extra slots mid-year?
-A: Extra slots and unlocks are available on some plans from Agency packs; they usually follow the same contract end date.
-
-Q: What features do paid-pack clients get?
-A: Growth-level tools for the PRY: GHG inventory, MOCCAE/Excel/IEQT where configured, bulk import, IFRS/GRI PDFs, Scope 3 per Growth rules, UAE ESG Report and Scorecard.
-
-Q: Can I export on free trial?
-A: Trial allows most data entry; full exports and higher limits typically need a paid agency pack. Check Agency packs for your entitlements.
+Q: Can I export clean reports on Free?
+A: Free allows data entry and watermarked trial downloads. Clean official exports need a paid package via Request clients.
 
 Q: Can I export the UAE ESG Report for clients?
-A: On a paid agency pack, yes for the client’s PRY — including UAE ESG PDF, Scorecard, GHG, MOCCAE, IFRS, and GRI.
+A: When your activated package includes disclosure exports (typically Scope Pro or ESG packages). Scope Basic is inventory-focused. Ask MENetZero if unsure.
 
-Q: Where do I renew my pack?
-A: When due, open Renewal in the sidebar: https://app.menetzero.com/consultant/renewal
+Q: Where do I renew?
+A: When due, open Renewal: https://app.menetzero.com/consultant/renewal — or contact MENetZero.
 
-Q: Where is pack purchase history?
+Q: Where is order / request history?
 A: Orders: https://app.menetzero.com/consultant/orders
 
-Q: How do I pay for a pack?
-A: Agency packs → choose pack → checkout via the supported payment gateway. Do not share card details with the voice assistant.
+Q: How do I pay?
+A: There is no self-serve checkout for paid capacity. Submit Request clients, pay the offline quote MENetZero sends, then admin activates. Do not share card details with the voice assistant.
 
 Q: Why can’t I upgrade billing inside the client workspace?
-A: Managed-client billing is often locked. Upgrades go through Agency packs in the agency hub.
+A: Managed-client billing is often locked. Use Request clients in the agency hub.
 
-Q: Exact pack prices?
-A: Check live prices on https://app.menetzero.com/consultant/packs — the voice assistant should not invent AED amounts.
+Q: Exact prices?
+A: Not shown in the app. MENetZero confirms offline. Never invent AED amounts.
 
 ---
 
@@ -193,13 +187,13 @@ Q: How do I enter electricity for a client?
 A: In their workspace: Quick Input → Scope 2 → Electricity → year & location → kWh from DEWA/ADDC — not AED.
 
 Q: How do I bulk import for a client?
-A: Inside workspace Input Data, use bulk import (available on paid Growth-level entitlements). Match location_name exactly.
+A: Inside workspace Input Data, use bulk import (available on paid packages). Match location_name exactly.
 
 Q: How do I export a client GHG report?
 A: Inside workspace → GHG Inventory → select year → export Excel or PDF.
 
 Q: How do I complete IFRS / GRI / UAE ESG for a client?
-A: Inside workspace → Disclosures hub — fill sections, then export on paid pack PRY entitlements.
+A: Inside workspace → Disclosures hub — fill sections; PDF exports depend on your activated package (Scope Pro / ESG packages typically unlock suites).
 
 Q: Do GHG numbers need re-entry in disclosure forms?
 A: No — PDFs pull from Quick Input inventory automatically.
@@ -240,7 +234,7 @@ Q: How do I respond to an intro request?
 A: Open Leads and follow up on the request from the portal.
 
 Q: What are Orders?
-A: History of pack purchases and related marketplace/order activity: https://app.menetzero.com/consultant/orders
+A: History of capacity requests and related order activity: https://app.menetzero.com/consultant/orders
 
 ---
 
@@ -253,29 +247,29 @@ Q: Can team members manage clients?
 A: Yes if their role permissions allow clients, workspaces, packs, or directory modules.
 
 Q: Is team invite limited on free trial?
-A: Trial may limit team features (for example view-only). Check your current entitlements on packs/dashboard.
+A: Trial may limit team features (for example view-only). Check your current entitlements on Request clients / dashboard.
 
 Q: How many users can an agency have?
-A: Packs typically allow multiple users on the consultant org (commonly up to a defined limit such as 10 — confirm on your pack). Use Team & Access to manage them.
+A: Capacity typically allows multiple users on the consultant org — confirm your limit with MENetZero. Use Team & Access to manage them.
 
 ---
 
 ## Troubleshooting
 
 Q: I can’t add another client.
-A: You likely have no free slots. Upgrade or buy extra slots on Agency packs.
+A: You likely have no free capacity. Submit Request clients: https://app.menetzero.com/consultant/packs
 
 Q: I can’t export for my client.
-A: Confirm you are on a paid pack, working in the PRY, and not in a preview-only next year. Check Agency packs and the year banner in the workspace.
+A: Confirm a paid package is activated and you are in the PRY. Free downloads are watermarked. UAE ESG PDFs need a package that includes disclosure exports.
 
 Q: Client billing page is missing.
-A: Expected for managed clients — use Agency packs instead.
+A: Expected for managed clients — use Request clients in the agency hub.
 
 Q: Forms look locked in Quick Input.
 A: Select year and location first inside the client workspace.
 
 Q: I don’t see Renewal in the menu.
-A: Renewal appears when renewal is relevant for your subscription. Otherwise manage from Agency packs / Orders.
+A: Renewal appears when renewal is relevant for your subscription. Otherwise manage from Request clients / Orders.
 
 Q: Wrong client data while editing.
 A: Check the agency header — you may be in the wrong workspace. Switch via Workspaces.
@@ -299,8 +293,8 @@ A: https://app.menetzero.com/consultant/clients/create
 Q: Where are Workspaces?
 A: https://app.menetzero.com/consultant/workspace
 
-Q: Where are Agency packs?
-A: https://app.menetzero.com/consultant/packs
+Q: Where are Agency packs / Request clients?
+A: https://app.menetzero.com/consultant/packs — use the Request clients form (no public prices).
 
 Q: Where is Renewal?
 A: https://app.menetzero.com/consultant/renewal
@@ -330,14 +324,14 @@ A: https://app.menetzero.com/consultant/company-portal-guide
 
 ## Concept checks
 
-Q: What is the difference between a slot and a pack?
-A: A pack is the subscription you buy. Slots are how many managed clients that pack allows.
+Q: What is the difference between capacity and Request clients?
+A: Capacity is how many managed clients you may hold. Request clients is how you ask MENetZero to quote and activate more — you pick package depth and client count.
 
 Q: What is the difference between Profile and Documents?
 A: Profile is public listing content. Documents are verification files for approval.
 
 Q: Agency hub vs Help Company portal guide — which do I open?
-A: Use consultant Help for packs/clients/directory. Use Company portal guide when asking how to enter DEWA, locations, disclosures, or GHG exports inside a client.
+A: Use consultant Help for capacity/clients/directory. Use Company portal guide when asking how to enter DEWA, locations, disclosures, or GHG exports inside a client.
 
 Q: Who does MenetZero support in the agency channel?
 A: The consultant organisation — not each end SME separately under the managed-client model.

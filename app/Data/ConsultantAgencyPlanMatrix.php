@@ -130,15 +130,47 @@ class ConsultantAgencyPlanMatrix
 
     /**
      * Entitlements applied to each paid managed client (Standard — §6.3).
-     * Scope 1&2 exports (GHG/MOCCAE/Excel/IEQT), bulk import — not full ESG.
-     * Site limit ≤5 is commercial; use client_starter for limit lookups until Phase 8
-     * seeds consultant_entity (admin activation should set locations to 5).
      *
      * @return array<string, mixed>
      */
     public static function managedClientEntitlements(): array
     {
         return self::standardManagedClientEntitlements();
+    }
+
+    /**
+     * Managed-client entitlements for a requested package profile (company-style codes).
+     *
+     * @return array<string, mixed>
+     */
+    public static function managedClientEntitlementsForPackage(?string $packageCode): array
+    {
+        if (!$packageCode || $packageCode === 'consultant_managed_standard') {
+            return self::standardManagedClientEntitlements();
+        }
+
+        // Scope Basic ≈ previous Standard commercial depth
+        if ($packageCode === 'client_scope_basic') {
+            return array_merge(self::standardManagedClientEntitlements(), [
+                'package_profile' => 'scope_basic',
+            ]);
+        }
+
+        $fromPlan = PlanEntitlementDefaults::entitlementsForPlanCode($packageCode);
+        if (!$fromPlan) {
+            return self::standardManagedClientEntitlements();
+        }
+
+        $limits = PlanEntitlementDefaults::forPlanCode($packageCode)['limits'] ?? [];
+
+        return array_merge($fromPlan, [
+            'channel' => 'consultant_managed',
+            'consultant_directory' => 'none',
+            'pry_export_only' => true,
+            'package_profile' => $packageCode,
+            'export_watermark' => false,
+            'limits_hint' => $limits,
+        ]);
     }
 
     /**

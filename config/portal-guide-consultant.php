@@ -3,11 +3,13 @@
 return [
     'intro' => [
         'title' => 'How the consultant agency portal works',
-        'body' => 'The consultant portal is your agency hub: manage client workspaces, purchase agency packs, maintain your public directory profile, and respond to leads. When you enter a client workspace, you use the same emissions tools as a company — this guide covers both sides.',
+        'body' => 'The consultant portal is your agency hub: manage client workspaces, request managed-client capacity, maintain your public directory profile, and respond to leads. When you enter a client workspace, you use the same emissions tools as a company — this guide covers both sides.',
         'tips' => [
-            'Free trial includes one managed client with Free rules (Scope 1 & 2 full, Scope 3 one entry per category).',
+            'Free includes one managed client with Free rules (Scope 1 & 2 full, Scope 3 one entry per category, watermarked GHG / Excel / IEQT trial downloads).',
             'Each client has a Primary Reporting Year (PRY) set when you create the engagement.',
-            'Request clients to unlock exports, additional client capacity, and Scope 3 beyond Free trial limits.',
+            'Request clients — choose Scope Basic, Scope Pro, ESG Starter, ESG Complete, or Enterprise, then how many managed clients you need.',
+            'Pricing is confirmed offline; MENetZero activates after payment. In-app pages never show AED amounts.',
+            'Each paid request sets package depth for your managed-client workspaces.',
         ],
     ],
 
@@ -26,7 +28,7 @@ return [
         ],
         [
             'title' => 'Add your first managed client',
-            'body' => 'Create a client company record, set PRY, and assign your free trial or paid capacity.',
+            'body' => 'Create a client company record, set PRY, and use your Free capacity (one client) or paid capacity after activation.',
             'route' => 'consultant.clients.create',
             'link_label' => 'Add client',
         ],
@@ -43,10 +45,10 @@ return [
             'link_label' => 'Input Data (in workspace)',
         ],
         [
-            'title' => 'Upgrade agency pack when ready',
-            'body' => 'Request more managed clients for exports and advanced features across your portfolio.',
+            'title' => 'Request clients when ready',
+            'body' => 'Need clean exports or more managed clients? Open Agency packs → Request clients. Pick the package depth (Scope Basic … Enterprise) and how many clients. MENetZero quotes offline and activates after payment.',
             'route' => 'consultant.packs.index',
-            'link_label' => 'Agency packs',
+            'link_label' => 'Request clients',
         ],
     ],
 
@@ -66,15 +68,15 @@ return [
                     'title' => 'Client capacity',
                     'variant' => 'slot-usage',
                     'theme' => 'consultant',
-                    'caption' => 'How many managed clients you have vs your pack or trial limit.',
+                    'caption' => 'How many managed clients you have vs your Free or paid capacity.',
                 ],
             ],
             'body' => 'The consultant dashboard shows aggregate emissions, active clients, capacity used, directory status, and new leads. Use it as your daily starting point.',
             'steps' => [
                 'Portfolio emissions — combined tCO₂e across clients with data.',
-                'Managed clients — used vs available on your current capacity or trial.',
+                'Managed clients — used vs available on your Free or paid capacity.',
                 'Directory status — draft, pending review, approved, or rejected.',
-                'Quick actions — add client, open workspaces, view packs.',
+                'Quick actions — add client, open workspaces, request clients.',
             ],
             'links' => [
                 ['route' => 'consultant.dashboard', 'label' => 'Dashboard'],
@@ -92,7 +94,7 @@ return [
                     'caption' => 'Shows client name, PRY, and the Enter workspace action.',
                 ],
             ],
-            'body' => 'Each managed client is a separate company workspace in MENetZero. You define the client name, sector, PRY, and contact details. One managed client place is used per active client.',
+            'body' => 'Each managed client is a separate company workspace in MENetZero. You define the client name, sector, PRY, and contact details. One place of capacity is used per active client.',
             'steps' => [
                 'Add client — creates the company and links it to your agency.',
                 'Edit client — update PRY, display name, or engagement settings.',
@@ -100,6 +102,7 @@ return [
             ],
             'tips' => [
                 'Set PRY correctly at creation — it drives default year filters in Quick Input and reports.',
+                'Say “managed client” in the app — sales docs may still say “entity”; both mean one client company.',
             ],
             'links' => [
                 ['route' => 'consultant.clients.index', 'label' => 'Managed clients'],
@@ -133,7 +136,7 @@ return [
             ],
             'tips' => [
                 'While inside a workspace, left navigation matches the company portal: Locations, Input Data, Reports, Disclosures.',
-                'Billing for the client may be locked when you manage them — upgrades go through agency packs.',
+                'Billing for the client is usually locked — capacity and upgrades go through Request clients in the agency hub.',
             ],
             'links' => [
                 ['route' => 'consultant.workspace.switcher', 'label' => 'Workspaces'],
@@ -141,25 +144,31 @@ return [
         ],
         [
             'id' => 'packs',
-            'title' => 'Agency packs & billing',
-            'summary' => 'Preferential pricing for multiple managed clients.',
+            'title' => 'Request clients & capacity',
+            'summary' => 'Ask for package depth × managed-client capacity (no public prices).',
             'highlights' => [
                 [
-                    'title' => 'Pack card',
+                    'title' => 'Request card',
                     'variant' => 'pack-card',
                     'theme' => 'consultant',
-                    'caption' => 'Request Standard or Enterprise clients — pricing confirmed offline.',
+                    'caption' => 'Choose Scope Basic / Pro / ESG packages / Enterprise and how many clients — pricing confirmed offline.',
                 ],
             ],
-            'body' => 'Request managed clients for export rights and feature access. MENetZero confirms rates offline and activates after payment.',
+            'body' => 'After Free (one managed client), open Agency packs to Request clients. Pick the same package options companies use (Scope Basic through Enterprise), plus how many managed clients. MENetZero confirms rates offline (typically package list × clients) and activates capacity after payment. There is no self-serve checkout.',
             'steps' => [
-                'Request clients — choose Standard or Enterprise, then how many you need.',
-                'Checkout — select pack and complete payment.',
-                'Renewal — extend before expiry from Renewal in the nav (when due).',
-                'Orders — history of pack purchases.',
+                'Request clients — choose package, then how many managed clients you need.',
+                'Optional extras — additional sites, seats, white-label, assurance, or notes for sales.',
+                'Offline payment — MENetZero sends a quote; you pay outside the app.',
+                'Activation — once marked paid, admin activates capacity; managed clients get that package depth.',
+                'Orders / renewal — history and renewal prompts when relevant.',
+            ],
+            'tips' => [
+                'Scope Basic ≈ clean GHG / MOCCAE / Excel / IEQT. Scope Pro and ESG packages add disclosure PDF suites.',
+                'Enterprise is fully custom (branding, implementation, deeper ESG).',
+                'Never quote exact AED rates in help answers unless MENetZero has confirmed them for that engagement.',
             ],
             'links' => [
-                ['route' => 'consultant.packs.index', 'label' => 'Agency packs'],
+                ['route' => 'consultant.packs.index', 'label' => 'Request clients'],
                 ['route' => 'consultant.orders.index', 'label' => 'Orders'],
             ],
         ],
@@ -217,13 +226,13 @@ return [
                     'caption' => 'Sidebar lists Scope 1, 2, and 3 forms available for this client.',
                 ],
             ],
-            'body' => 'When you enter a client workspace, use the company Help & guide for detailed steps on locations, Quick Input, reports, and disclosures. On a paid pack each client gets Growth-level exports including the UAE ESG Report and Scorecard. Key tasks consultants perform most often:',
+            'body' => 'When you enter a client workspace, use the company Help & guide for detailed steps on locations, Quick Input, reports, and disclosures. Paid managed clients follow the package activated for your agency (Scope Basic through Enterprise).',
             'steps' => [
                 'Locations & emission boundaries — set up sites and applicable categories.',
-                'Quick Input & bulk import — enter DEWA, fuel, fleet, and Scope 3 data.',
-                'GHG Inventory — review totals and export Excel/PDF for the client.',
-                'Disclosures — complete IFRS S1/S2, GRI, UAE ESG Report narrative, and ESG Scorecard for reporting cycles.',
-                'ESG Depth — stakeholder register, materiality matrix, suppliers, and targets (included in UAE ESG PDF).',
+                'Quick Input & bulk import — enter DEWA, fuel, fleet, and Scope 3 data (within package limits).',
+                'GHG Inventory — review totals and export Excel/PDF for the client (clean when a paid package is active).',
+                'Disclosures — complete forms where available; PDF exports depend on entitlements.',
+                'ESG Depth — stakeholder register, materiality matrix, suppliers, and targets when unlocked.',
                 'Scope 1 & 2 Help Guide — field-by-field bulk import reference (linked from Input Data).',
             ],
             'links' => [
@@ -242,7 +251,7 @@ return [
                     'caption' => 'Add team members who can help manage clients and directory settings.',
                 ],
             ],
-            'body' => 'Add team members to your agency with roles controlling access to clients, packs, and directory settings.',
+            'body' => 'Add team members to your agency with roles controlling access to clients, Request clients, and directory settings.',
             'steps' => [
                 'Invite staff by email.',
                 'Assign roles with module permissions.',
@@ -257,19 +266,19 @@ return [
     'faq' => [
         [
             'q' => 'What is the difference between the agency hub and a client workspace?',
-            'a' => 'The agency hub (/consultant/dashboard) manages your practice, clients, and packs. A client workspace is the company portal for one client — where you enter emissions data and run reports.',
+            'a' => 'The agency hub (/consultant/dashboard) manages your practice, managed clients, and capacity requests. A client workspace is the company portal for one client — where you enter emissions data and run reports.',
         ],
         [
-            'q' => 'Can I export reports on the free trial?',
-            'a' => 'Trial clients can use most data entry features; full exports and higher limits typically require a paid agency pack. Check your pack details on Agency packs.',
+            'q' => 'Can I export clean reports on Free?',
+            'a' => 'Free allows data entry and watermarked trial downloads (GHG / Excel / IEQT where offered). Clean official exports need a paid package via Request clients. Check Agency packs for your current entitlements.',
         ],
         [
             'q' => 'How do I add more than one client?',
-            'a' => 'Request the number of managed clients you need. Each active managed client uses one place of your capacity.',
+            'a' => 'Request the number of managed clients you need and choose package depth (Scope Basic … Enterprise). Each active managed client uses one place of your capacity. Pricing is confirmed offline — no public AED grid.',
         ],
         [
-            'q' => 'Can I export the UAE ESG Report for clients?',
-            'a' => 'On a paid agency pack, each client workspace gets Growth-level exports for their PRY — including the integrated UAE ESG Report PDF, ESG Scorecard, GHG inventory, MOCCAE, IFRS, and GRI.',
+            'q' => 'What packages can consultants request?',
+            'a' => 'The same capability cards as companies: Scope Basic, Scope Pro, ESG Starter, ESG Complete, and Enterprise. Suggest quote is typically list price × client count; sales may adjust offline.',
         ],
         [
             'q' => 'Where do I get help with DEWA bills and bulk import columns?',

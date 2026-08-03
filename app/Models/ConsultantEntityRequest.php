@@ -11,7 +11,9 @@ class ConsultantEntityRequest extends Model
         'consultant_company_id',
         'user_id',
         'entity_count',
+        'package_code',
         'needs_sites_over_5',
+        'extras',
         'wants_enterprise',
         'message',
         'status',
@@ -27,11 +29,21 @@ class ConsultantEntityRequest extends Model
         'needs_sites_over_5' => 'boolean',
         'wants_enterprise' => 'boolean',
         'entity_count' => 'integer',
+        'extras' => 'array',
         'quote_amount_aed' => 'float',
         'quoted_at' => 'datetime',
         'paid_at' => 'datetime',
         'activated_at' => 'datetime',
     ];
+
+    public function packageLabel(): string
+    {
+        if ($this->package_code) {
+            return \App\Data\CompanyPackageOptions::label($this->package_code);
+        }
+
+        return $this->wants_enterprise ? 'Enterprise' : 'Standard';
+    }
 
     public function consultantCompany(): BelongsTo
     {

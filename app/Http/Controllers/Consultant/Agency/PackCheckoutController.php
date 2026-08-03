@@ -48,12 +48,17 @@ class PackCheckoutController extends Controller
             ->limit(5)
             ->get();
 
-        // Phase 3–5: self-serve pack grid/checkout hidden — request entities offline.
+        $packages = \App\Data\CompanyPackageOptions::packages();
+        $extraOptions = \App\Data\CompanyPackageOptions::extraOptions();
+
+        // Phase 3–5: self-serve pack grid/checkout hidden — request clients offline.
         return view('consultant.agency.packs.index', compact(
             'subscription',
             'slotSummary',
             'contractYear',
             'recentRequests',
+            'packages',
+            'extraOptions',
         ));
     }
 

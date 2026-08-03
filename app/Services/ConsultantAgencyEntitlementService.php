@@ -239,11 +239,31 @@ class ConsultantAgencyEntitlementService
             return ConsultantAgencyPlanMatrix::demoManagedClientEntitlements();
         }
 
-        return ConsultantAgencyPlanMatrix::managedClientEntitlements();
+        $packageCode = $this->managedClientPackageCode($engagement);
+
+        return ConsultantAgencyPlanMatrix::managedClientEntitlementsForPackage($packageCode);
     }
 
     /**
-     * Plan code whose limits apply to a managed client (Free on trial, Starter/Standard on paid).
+     * Package profile requested for paid managed clients (from consultant subscription metadata).
+     */
+    protected function managedClientPackageCode(?ConsultantClientEngagement $engagement): ?string
+    {
+        if (!$engagement) {
+            return null;
+        }
+
+        $subscription = $engagement->relationLoaded('subscription')
+            ? $engagement->subscription
+            : $engagement->subscription()->first();
+
+        $code = $subscription?->metadata['managed_client_package_code'] ?? null;
+
+        return is_string($code) && $code !== '' ? $code : null;
+    }
+
+    /**
+     * Plan code whose limits apply to a managed client (Free on trial, package on paid).
      */
     public function managedClientLimitsPlanCode(int $companyId): string
     {
@@ -255,6 +275,19 @@ class ConsultantAgencyEntitlementService
 
         if ($engagement && $this->isDemoEngagement($engagement)) {
             return 'client_growth';
+        }
+
+        $packageCode = $this->managedClientPackageCode($engagement);
+        if ($packageCode && in_array($packageCode, [
+            'client_scope_basic',
+            'client_scope_pro',
+            'client_esg_starter',
+            'client_esg_complete',
+            'client_enterprise',
+        ], true)) {
+            return $packageCode === 'client_scope_basic'
+                ? ConsultantAgencyPlanMatrix::MANAGED_CLIENT_TEMPLATE
+                : $packageCode;
         }
 
         return ConsultantAgencyPlanMatrix::MANAGED_CLIENT_TEMPLATE;

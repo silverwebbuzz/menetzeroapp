@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Consultant\Agency;
 
+use App\Data\CompanyPackageOptions;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Consultant\Agency\Concerns\ResolvesConsultantAgency;
 use App\Models\ConsultantEntityRequest;
@@ -10,6 +11,7 @@ use App\Services\ContactInquiryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class EntityRequestController extends Controller
 {
@@ -26,20 +28,25 @@ class EntityRequestController extends Controller
         $user = Auth::user();
 
         $data = $request->validate([
-            'plan_profile' => 'required|in:standard,enterprise',
+            'package_code' => ['required', 'string', Rule::in(CompanyPackageOptions::CODES)],
             'entity_count' => 'required|integer|min:1|max:500',
-            'needs_sites_over_5' => 'sometimes|boolean',
+            'extras' => 'nullable|array',
+            'extras.*' => ['string', Rule::in(array_keys(CompanyPackageOptions::extraOptions()))],
             'message' => 'nullable|string|max:2000',
         ]);
 
-        $needsSitesOver5 = $request->boolean('needs_sites_over_5');
-        $wantsEnterprise = $data['plan_profile'] === 'enterprise';
+        $packageCode = $data['package_code'];
+        $wantsEnterprise = $packageCode === 'client_enterprise';
+        $extras = $data['extras'] ?? [];
+        $needsSitesOver5 = in_array('extra_sites', $extras, true);
 
         $record = ConsultantEntityRequest::create([
             'consultant_company_id' => $consultantOrg->id,
             'user_id' => $user->id,
             'entity_count' => (int) $data['entity_count'],
+            'package_code' => $packageCode,
             'needs_sites_over_5' => $needsSitesOver5,
+            'extras' => $extras,
             'wants_enterprise' => $wantsEnterprise,
             'message' => $data['message'] ?? null,
             'status' => 'new',
@@ -48,18 +55,21 @@ class EntityRequestController extends Controller
         $subscription = $this->consultantSubscriptions->getActiveSubscription($consultantOrg->id);
         $slotSummary = $this->consultantSubscriptions->slotSummary($consultantOrg->id, $subscription);
 
-        $profile = $wantsEnterprise ? 'Enterprise' : 'Standard';
+        $profile = CompanyPackageOptions::label($packageCode);
+        $extrasLabel = $extras
+            ? implode(', ', array_map(
+                fn ($k) => CompanyPackageOptions::extraOptions()[$k] ?? $k,
+                $extras
+            ))
+            : 'none';
 
         $body = "Managed client request (Consultant · {$profile})\n"
             . 'Consultant org: ' . $consultantOrg->name . " (ID {$consultantOrg->id})\n"
             . 'Requested by: ' . $user->name . ' <' . $user->email . ">\n"
             . 'Managed clients requested: ' . $record->entity_count . "\n"
             . 'Current capacity: ' . ($slotSummary['used'] ?? 0) . '/' . ($slotSummary['limit'] ?? 0) . "\n"
-            . 'Profile: ' . $profile . "\n"
-            . 'Sites over 5 per client: ' . ($needsSitesOver5 ? 'yes' : 'no') . "\n"
-            . ($wantsEnterprise
-                ? "Entitlements: custom / white-label (Enterprise)\n"
-                : "Entitlements: Standard (S1&2, ≤5 sites, clean GHG/MOCCAE/Excel/IEQT)\n")
+            . 'Package: ' . $profile . " ({$packageCode})\n"
+            . 'Extras: ' . $extrasLabel . "\n"
             . 'Request ID: ' . $record->id . "\n\n"
             . trim((string) ($data['message'] ?? ''));
 
