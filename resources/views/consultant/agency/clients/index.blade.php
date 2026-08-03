@@ -6,7 +6,7 @@
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Managed clients</h1>
-        <p class="text-sm text-gray-600 mt-1">{{ $slotSummary['used'] }} of {{ $slotSummary['limit'] }} slots used · {{ $slotSummary['remaining'] }} remaining</p>
+        <p class="text-sm text-gray-600 mt-1">{{ $slotSummary['used'] }} of {{ $slotSummary['limit'] }} managed clients used · {{ $slotSummary['remaining'] }} remaining</p>
     </div>
     @if($slotSummary['remaining'] > 0 && $slotSummary['limit'] > 0)
         <a href="{{ route('consultant.clients.create') }}" class="btn btn-primary">Add client</a>

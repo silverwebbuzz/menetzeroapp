@@ -120,7 +120,7 @@ class PlanGate
 
     public function agencyLockedMessage(string $featureName = 'This feature'): string
     {
-        return "{$featureName} requires paid slots. Use Request slots to ask MENetZero for activation.";
+        return "{$featureName} requires paid managed clients. Use Request clients to ask MENetZero for activation.";
     }
 
     public function upgradeRoute(): string
@@ -135,7 +135,7 @@ class PlanGate
     public function upgradeButtonLabel(string $clientLabel = 'Request a package'): string
     {
         if ($this->isAgencyWorkspace()) {
-            return 'Request slots';
+            return 'Request clients';
         }
 
         if (str_contains(strtolower($clientLabel), 'starter')

@@ -7,7 +7,7 @@
     $meta = $transaction->metadata ?? [];
     $amountMinor = (int) round(((float) $transaction->amount) * 100);
     $headline = match ($transaction->transaction_type) {
-        'consultant_agency_extra_slot' => 'Extra client slots',
+        'consultant_agency_extra_slot' => 'Extra managed clients',
         'consultant_agency_year_unlock' => 'Reporting year unlock',
         'consultant_agency_renewal' => 'Agency pack renewal',
         default => 'Agency pack',

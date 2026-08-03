@@ -47,7 +47,7 @@ class ConsultantEntityRequestController extends Controller
 
         $entityRequest->update($data);
 
-        return back()->with('success', 'Entity request updated.');
+        return back()->with('success', 'Client request updated.');
     }
 
     public function saveQuote(Request $request, ConsultantEntityRequest $entityRequest)
@@ -107,6 +107,6 @@ class ConsultantEntityRequestController extends Controller
             return back()->with('error', $e->getMessage());
         }
 
-        return back()->with('success', 'Slots activated and audit logged.');
+        return back()->with('success', 'Managed clients activated and audit logged.');
     }
 }

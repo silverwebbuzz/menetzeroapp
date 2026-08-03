@@ -71,7 +71,7 @@ Admin quotes offline → payment → Activate
 |------|---------|
 | **Site / location** | Physical place → Locations in app. |
 | **Entity (company packages)** | Legal company under a direct subscription. |
-| **Entity (consultant commercial)** | **One managed client** (= one **slot**). “AED per entity/year” = per managed client / year. |
+| **Entity (consultant commercial)** | **One managed client** (same thing). Sales docs may say “entity”; **app UI says “managed client / clients”.** |
 | **Package** | Direct company tier (Scope Basic … ESG Complete). |
 | **Consultant Plan** | Paid consultant annual offer after Free (§6.2). |
 | **Enterprise** | Custom / white-label deployment (§6.4). |
@@ -240,7 +240,10 @@ Align codes · Free S3 · Watermarked exports.
 - [x] Save quote · mark paid · activate from request (maps to live plans / nearest agency pack + extras).
 - [x] Audit via `AdminPackageAssignment` metadata (`request_activate`).
 
-### Phase 7 — Price book (1,399/1,199 + company packages)
+### Phase 7 — Price book ✅ DONE
+- [x] `commercial_price_book_entries` seeded (company xlsx + consultant 1,399/1,199 + extras).
+- [x] Admin **Price book** UI edits amounts; quote calculator reads DB with constant fallbacks.
+
 ### Phase 8 — DB seeds (`consultant_entity`, company codes); retire pack checkout paths · enforce 5 sites on Standard
 ### Phase 9 — Portal guides + ElevenLabs
 ### Phase 10 — Renewals / optional min-10 reminders later
@@ -253,7 +256,8 @@ Align codes · Free S3 · Watermarked exports.
 |------|------|
 | Free defaults | `PlanEntitlementDefaults.php` |
 | Consultant Standard / packs | `ConsultantAgencyPlanMatrix.php` |
-| Price book / quotes | `CommercialPriceBook.php`, `AdminRequestActivationService.php` |
+| Price book | `CommercialPriceBookEntry`, `CommercialPriceBook.php`, `Admin\PriceBookController` |
+| Quotes / activate | `AdminRequestActivationService.php` |
 | Watermark | `ExportWatermark.php`, reports export controllers |
 | Public Explore Free | `/pricing`, `public/pricing.blade.php` |
 | Company request | `PackageRequestController`, `CompanyPackageOptions`, `company_package_requests` |
@@ -303,7 +307,8 @@ Logged-in: Request a package / Request slots · features only · pricing offline
 | Aug 2026 | Phase 4: Company Request a package UI + admin inbox. |
 | Aug 2026 | Phase 5: Consultant Request entities + Standard entitlements for paid managed clients. |
 | Aug 2026 | Phase 6: Admin quote calculator + mark paid + activate from request inboxes. |
+| Aug 2026 | Phase 7: Admin commercial price book (editable; drives quotes). |
 
 ---
 
-**Next:** Phase 7 (formalise price book admin UI) or Phase 8 (seed live package codes).
+**Next:** Phase 8 (seed live `client_scope_*` / `consultant_entity` codes; enforce Standard 5 sites).

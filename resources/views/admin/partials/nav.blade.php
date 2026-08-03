@@ -50,6 +50,13 @@
         </svg>
         Plans &amp; entitlements
     </a>
+    <a href="{{ route('admin.price-book.index') }}" class="nav-link {{ $isActive('admin.price-book') ? 'active' : '' }}">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        Price book
+    </a>
     <a href="{{ route('admin.pricing.index') }}" class="nav-link {{ $isActive('admin.pricing') ? 'active' : '' }}">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -90,7 +97,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-5.13a4 4 0 11-8 0 4 4 0 018 0zm6 3a3 3 0 11-6 0 3 3 0 016 0z"/>
         </svg>
-        Entity requests
+        Client requests
     </a>
     <a href="{{ route('admin.package-assignments.index') }}" class="nav-link {{ $isActive('admin.package-assignments') ? 'active' : '' }}">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,7 +1,7 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Entity requests | MENetZero')
-@section('page-title', 'Consultant entity requests')
+@section('title', 'Client requests | MENetZero')
+@section('page-title', 'Consultant client requests')
 
 @section('content')
     @if(session('success'))
@@ -12,7 +12,7 @@
     @endif
 
     <p class="text-sm text-gray-600 mb-4">
-        Workflow: Review → Suggest/edit band quote (1,399 / 1,199) → Mark paid → Activate (nearest agency pack + extras to cover entity count).
+        Workflow: Review → Suggest/edit band quote (price book) → Mark paid → Activate (grants capacity for the requested managed clients).
         Preferential ≥10 onboarded is sales-only (not auto-applied).
     </p>
 
@@ -60,7 +60,7 @@
                                 @endif
                             </div>
                             <div class="text-xs text-gray-500 mt-1">{{ $sug['breakdown'] }}</div>
-                            <div class="text-xs text-gray-400 mt-1">Activate pack → {{ $sug['suggested_pack_code'] ?? '—' }} (+extras if needed)</div>
+                            <div class="text-xs text-gray-400 mt-1">Activate pack → {{ $sug['suggested_pack_code'] ?? '—' }} (+extra clients if needed)</div>
                         @endif
                     </div>
                     <div>
@@ -101,12 +101,12 @@
                                     @csrf
                                     <button type="submit" class="text-xs px-3 py-1.5 border border-green-600 text-green-700 rounded hover:bg-green-50">Mark paid</button>
                                 </form>
-                                <form action="{{ route('admin.entity-requests.activate', $req) }}" method="POST" onsubmit="return confirm('Grant pack/slots for {{ $req->entity_count }} entities?')">
+                                <form action="{{ route('admin.entity-requests.activate', $req) }}" method="POST" onsubmit="return confirm('Grant capacity for {{ $req->entity_count }} managed clients?')">
                                     @csrf
                                     <button type="submit" class="text-xs px-3 py-1.5 bg-orange-600 text-white rounded hover:bg-orange-700">Activate</button>
                                 </form>
                             </div>
-                            <p class="text-xs text-gray-500">Uses nearest consultant_5/10/25/50 (+ extra slots) until Phase 8 consultant_entity seed. Standard entitlements apply to paid managed clients.</p>
+                            <p class="text-xs text-gray-500">Uses nearest capacity pack (+ extras) until Phase 8. Standard entitlements apply to paid managed clients.</p>
                         </div>
                     </div>
                 @endif
@@ -132,7 +132,7 @@
                 </form>
             </div>
         @empty
-            <div class="bg-white shadow rounded-lg px-4 py-8 text-center text-gray-500">No entity requests yet.</div>
+            <div class="bg-white shadow rounded-lg px-4 py-8 text-center text-gray-500">No client requests yet.</div>
         @endforelse
     </div>
 

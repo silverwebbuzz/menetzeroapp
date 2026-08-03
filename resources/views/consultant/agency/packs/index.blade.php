@@ -1,7 +1,7 @@
 @extends('consultant.layouts.app')
 
-@section('title', 'Request entities')
-@section('page-title', 'Request entities')
+@section('title', 'Request clients')
+@section('page-title', 'Request clients')
 
 @section('content')
 @php
@@ -14,7 +14,7 @@
             'summary' => 'Default paid profile per managed client',
             'features' => [
                 'Scope 1 & 2 data + bulk import',
-                'Up to 5 sites per entity',
+                'Up to 5 sites per client',
                 'Clean GHG / MOCCAE / Excel / IEQT',
                 'Not full ESG suite by default',
             ],
@@ -36,7 +36,7 @@
 <div class="w-full max-w-5xl">
     <div class="mb-6">
         <a href="{{ route('consultant.dashboard') }}" class="text-sm text-brand hover:underline">&larr; Dashboard</a>
-        <h1 class="text-3xl font-bold text-gray-900 mt-2">Request managed-client entities</h1>
+        <h1 class="text-3xl font-bold text-gray-900 mt-2">Request managed clients</h1>
         <p class="mt-2 text-gray-600">
             Same pattern as company <em>Request a package</em>: choose a profile by capability, then how many managed clients you need.
             Pricing is confirmed offline — nothing checkoutable here.
@@ -94,10 +94,10 @@
 
         <div class="bg-white rounded-xl border border-gray-200 p-5">
             <label for="entity_count" class="block text-sm font-semibold text-gray-900 mb-2">
-                How many managed clients (entities) do you need?
+                How many managed clients do you need?
             </label>
             <p class="text-xs text-gray-500 mb-3">
-                One entity = one client workspace under this profile.
+                One managed client = one client workspace under this profile.
             </p>
             <input
                 type="number"
@@ -123,7 +123,7 @@
                         class="mt-1 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
                         @checked(old('needs_sites_over_5'))
                     >
-                    <span>Some clients need <strong>more than 5 sites</strong> per entity</span>
+                    <span>Some clients need <strong>more than 5 sites</strong> each</span>
                 </label>
             </div>
         </div>
@@ -157,7 +157,7 @@
                     <thead class="bg-gray-50 text-left text-xs text-gray-500">
                         <tr>
                             <th class="px-4 py-2">Date</th>
-                            <th class="px-4 py-2">Managed clients</th>
+                            <th class="px-4 py-2">Clients</th>
                             <th class="px-4 py-2">Profile</th>
                             <th class="px-4 py-2">Status</th>
                         </tr>

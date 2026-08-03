@@ -22,7 +22,7 @@
 
 @if(!empty($slotSummary['is_trial']) && $activeClients->isEmpty())
     <div class="cd-notice mb-4">
-        <span><strong>Free trial ready.</strong> Add one managed client to capture emissions (exports unlock with a paid pack).</span>
+        <span><strong>Free trial ready.</strong> Add one managed client to capture emissions (clean exports unlock after paid clients are activated).</span>
         <a href="{{ route('consultant.clients.create') }}" class="btn btn-primary btn-sm">Add first client</a>
     </div>
 @endif
@@ -70,9 +70,9 @@
             <div class="ent-kpi-card__compare">Consultant payout (est.)</div>
         </div>
         <div class="ent-kpi-card">
-            <span class="ent-label">Client slots</span>
+            <span class="ent-label">Client capacity</span>
             <div class="ent-kpi-value">{{ $slotSummary['used'] ?? 0 }}<span class="ent-kpi-unit">/ {{ $slotSummary['limit'] ?? 0 }}</span></div>
-            <div class="ent-kpi-card__compare">{{ $slotsRemaining }} remaining</div>
+            <div class="ent-kpi-card__compare">{{ $slotsRemaining }} remaining · <a href="{{ route('consultant.packs.index') }}" class="text-brand hover:underline">Request clients</a></div>
         </div>
     </div>
 

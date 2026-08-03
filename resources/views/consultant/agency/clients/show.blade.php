@@ -15,7 +15,7 @@
     <div class="flex gap-2">
         @if($engagement->isActive())
             <a href="{{ route('consultant.clients.edit', $engagement) }}" class="btn btn-secondary btn-sm">Edit</a>
-            <form action="{{ route('consultant.clients.destroy', $engagement) }}" method="POST" onsubmit="return confirm('Archive this client? The slot will be freed but data stays read-only.');">
+            <form action="{{ route('consultant.clients.destroy', $engagement) }}" method="POST" onsubmit="return confirm('Archive this client? Capacity frees up; data stays read-only.');">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="btn btn-ghost btn-sm text-red-700">Archive</button>
@@ -66,7 +66,7 @@
             <h3 class="font-semibold text-sm mb-1">Unlock {{ $yearUnlockTarget }} exports</h3>
             <p class="text-sm mb-3">
                 {{ $yearUnlockTarget }} is preview-only today. Purchase a reporting year unlock for full Growth exports
-                (AED {{ number_format($yearUnlockQuote['charge_amount'], 0) }} pro-rata) without using another client slot.
+                (AED {{ number_format($yearUnlockQuote['charge_amount'], 0) }} pro-rata) without using another managed client place.
             </p>
             <form action="{{ route('consultant.packs.year-unlock') }}" method="POST" class="flex flex-col sm:flex-row sm:items-end gap-3">
                 @csrf

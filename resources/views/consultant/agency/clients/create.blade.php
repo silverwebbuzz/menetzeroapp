@@ -4,24 +4,24 @@
 
 @section('content')
 <h1 class="text-2xl font-bold text-gray-900 mb-1">Add managed client</h1>
-<p class="text-sm text-gray-600 mb-6">Each new client consumes <strong>1 slot</strong> and is assigned a Primary Reporting Year (PRY).</p>
+<p class="text-sm text-gray-600 mb-6">Each new client uses <strong>1 managed client</strong> place from your capacity and is assigned a Primary Reporting Year (PRY).</p>
 
 @if(!empty($slotSummary['is_trial']))
     <div class="cd-callout mb-6">
-        <strong>Free trial workspace</strong> — this client gets Free rules: Scope 1 &amp; 2 full, Scope 3 (1 entry per category), disclosure form previews. Official PDF exports unlock after you request slots and MENetZero activates a paid package.
-        <a href="{{ route('consultant.packs.index') }}" class="font-medium underline">Request slots</a>
+        <strong>Free trial workspace</strong> — this client gets Free rules: Scope 1 &amp; 2 full, Scope 3 (1 entry per category), disclosure form previews. Official PDF exports unlock after you request more clients and MENetZero activates paid capacity.
+        <a href="{{ route('consultant.packs.index') }}" class="font-medium underline">Request clients</a>
     </div>
 @endif
 
 @if(!$subscription)
     <div class="cd-notice cd-notice--warning p-6 text-sm">
-        No client slots available. Your one free trial may already be in use — request additional slots from MENetZero.
-        <a href="{{ route('consultant.packs.index') }}" class="font-medium underline">Request slots</a>
+        No managed client capacity available. Your one free trial may already be in use — request additional clients from MENetZero.
+        <a href="{{ route('consultant.packs.index') }}" class="font-medium underline">Request clients</a>
     </div>
 @elseif($slotSummary['remaining'] < 1)
     <div class="cd-notice cd-notice--warning p-6 text-sm">
-        All {{ $slotSummary['limit'] }} slots are in use. Archive a finished client or request extra slots.
-        <a href="{{ route('consultant.packs.index') }}" class="font-medium underline">Request slots</a>
+        All {{ $slotSummary['limit'] }} managed client places are in use. Archive a finished client or request more clients.
+        <a href="{{ route('consultant.packs.index') }}" class="font-medium underline">Request clients</a>
     </div>
 @else
     <form action="{{ route('consultant.clients.store') }}" method="POST" class="bg-white border border-gray-200 rounded-xl p-6 max-w-2xl space-y-5">

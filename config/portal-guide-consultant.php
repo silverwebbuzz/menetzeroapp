@@ -5,9 +5,9 @@ return [
         'title' => 'How the consultant agency portal works',
         'body' => 'The consultant portal is your agency hub: manage client workspaces, purchase agency packs, maintain your public directory profile, and respond to leads. When you enter a client workspace, you use the same emissions tools as a company — this guide covers both sides.',
         'tips' => [
-            'Free trial includes one managed client slot with Free rules (Scope 1 & 2 full, Scope 3 one entry per category).',
+            'Free trial includes one managed client with Free rules (Scope 1 & 2 full, Scope 3 one entry per category).',
             'Each client has a Primary Reporting Year (PRY) set when you create the engagement.',
-            'Request paid slots to unlock exports, additional clients, and Scope 3 beyond the Free trial limits.',
+            'Request clients to unlock exports, additional client capacity, and Scope 3 beyond Free trial limits.',
         ],
     ],
 
@@ -26,7 +26,7 @@ return [
         ],
         [
             'title' => 'Add your first managed client',
-            'body' => 'Create a client company record, set PRY, and assign your free trial or paid slot.',
+            'body' => 'Create a client company record, set PRY, and assign your free trial or paid capacity.',
             'route' => 'consultant.clients.create',
             'link_label' => 'Add client',
         ],
@@ -44,7 +44,7 @@ return [
         ],
         [
             'title' => 'Upgrade agency pack when ready',
-            'body' => 'Buy a pack for more client slots, exports, and advanced features across your portfolio.',
+            'body' => 'Request more managed clients for exports and advanced features across your portfolio.',
             'route' => 'consultant.packs.index',
             'link_label' => 'Agency packs',
         ],
@@ -63,16 +63,16 @@ return [
                     'caption' => 'Combined tCO₂e across all clients that have entered data.',
                 ],
                 [
-                    'title' => 'Client slot usage',
+                    'title' => 'Client capacity',
                     'variant' => 'slot-usage',
                     'theme' => 'consultant',
                     'caption' => 'How many managed clients you have vs your pack or trial limit.',
                 ],
             ],
-            'body' => 'The consultant dashboard shows aggregate emissions, active clients, slot usage, directory status, and new leads. Use it as your daily starting point.',
+            'body' => 'The consultant dashboard shows aggregate emissions, active clients, capacity used, directory status, and new leads. Use it as your daily starting point.',
             'steps' => [
                 'Portfolio emissions — combined tCO₂e across clients with data.',
-                'Client slots — used vs available on your current pack or trial.',
+                'Managed clients — used vs available on your current capacity or trial.',
                 'Directory status — draft, pending review, approved, or rejected.',
                 'Quick actions — add client, open workspaces, view packs.',
             ],
@@ -92,11 +92,11 @@ return [
                     'caption' => 'Shows client name, PRY, and the Enter workspace action.',
                 ],
             ],
-            'body' => 'Each managed client is a separate company workspace in MENetZero. You define the client name, sector, PRY, and contact details. One slot is consumed per active client.',
+            'body' => 'Each managed client is a separate company workspace in MENetZero. You define the client name, sector, PRY, and contact details. One managed client place is used per active client.',
             'steps' => [
                 'Add client — creates the company and links it to your agency.',
                 'Edit client — update PRY, display name, or engagement settings.',
-                'Archive or remove — frees a slot when a engagement ends (subject to pack rules).',
+                'Archive or remove — frees capacity when an engagement ends.',
             ],
             'tips' => [
                 'Set PRY correctly at creation — it drives default year filters in Quick Input and reports.',
@@ -142,18 +142,18 @@ return [
         [
             'id' => 'packs',
             'title' => 'Agency packs & billing',
-            'summary' => 'Wholesale pricing for multiple client slots.',
+            'summary' => 'Preferential pricing for multiple managed clients.',
             'highlights' => [
                 [
                     'title' => 'Pack card',
                     'variant' => 'pack-card',
                     'theme' => 'consultant',
-                    'caption' => 'Each pack lists client slots, price, and Growth-level exports per client.',
+                    'caption' => 'Request Standard or Enterprise clients — pricing confirmed offline.',
                 ],
             ],
-            'body' => 'Agency packs bundle client slots, export rights, and feature access. Buy or upgrade from Agency packs; pay via Razorpay or Cashfree. Extra slots and year unlocks are available on some plans.',
+            'body' => 'Request managed clients for export rights and feature access. MENetZero confirms rates offline and activates after payment.',
             'steps' => [
-                'Compare packs — slots, features, and price per year.',
+                'Request clients — choose Standard or Enterprise, then how many you need.',
                 'Checkout — select pack and complete payment.',
                 'Renewal — extend before expiry from Renewal in the nav (when due).',
                 'Orders — history of pack purchases.',
@@ -265,7 +265,7 @@ return [
         ],
         [
             'q' => 'How do I add more than one client?',
-            'a' => 'Upgrade to an agency pack with the slot count you need. Each active managed client uses one slot.',
+            'a' => 'Request the number of managed clients you need. Each active managed client uses one place of your capacity.',
         ],
         [
             'q' => 'Can I export the UAE ESG Report for clients?',

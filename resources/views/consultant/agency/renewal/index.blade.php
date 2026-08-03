@@ -8,7 +8,7 @@
 <h1 class="text-2xl font-bold text-gray-900 mb-1">Renew for {{ $nextYear }}</h1>
 <p class="text-sm text-gray-600 mb-6">
     Your {{ $subscription->plan?->plan_name }} contract ends <strong>{{ $subscription->expires_at->format('d M Y') }}</strong>.
-    Choose a pack for {{ $nextYear }} and select which clients continue (max slots per pack).
+    Choose capacity for {{ $nextYear }} and select which clients continue (max clients per plan).
 </p>
 
 @if(!$checkoutAvailable)
@@ -59,7 +59,7 @@
                         </li>
                     @endforeach
                 </ul>
-                <p class="text-xs text-gray-500 mt-3">Unselected clients are archived (read-only). They do not use slots in {{ $nextYear }}.</p>
+                <p class="text-xs text-gray-500 mt-3">Unselected clients are archived (read-only). They do not use capacity in {{ $nextYear }}.</p>
             @endif
         </div>
 
@@ -75,7 +75,7 @@
                         <input type="radio" name="plan_id" value="{{ $plan->id }}" class="plan-radio text-brand" data-slots="{{ $slots }}" @checked($loop->first) required>
                         <span class="flex-1">
                             <span class="font-medium">{{ $plan->plan_name }}</span>
-                            <span class="block text-xs text-gray-500">{{ $slots }} slots · AED {{ number_format($quote['charge_amount'], 0) }}</span>
+                            <span class="block text-xs text-gray-500">{{ $slots }} clients · AED {{ number_format($quote['charge_amount'], 0) }}</span>
                         </span>
                     </label>
                 @endforeach
@@ -124,7 +124,7 @@
         const count = selectedCount();
         const limit = activeSlotLimit();
         if (count > limit) {
-            warning.textContent = `You selected ${count} clients but this pack only has ${limit} slots. Uncheck clients or choose a larger pack.`;
+            warning.textContent = `You selected ${count} clients but this plan only covers ${limit}. Uncheck clients or choose a larger plan.`;
             warning.classList.remove('hidden');
             return false;
         }

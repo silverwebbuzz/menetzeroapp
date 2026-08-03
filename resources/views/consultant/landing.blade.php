@@ -41,7 +41,7 @@
             @foreach([
                 ['One login, many clients', 'Switch between managed SME workspaces without juggling separate accounts or passwords.'],
                 ['Growth-grade per client', 'Paid pack clients receive Growth-equivalent tools — UAE ESG Report, Scorecard, MOCCAE, GHG, IFRS, and GRI exports per reporting year.'],
-                ['Wholesale agency packs', 'Practice pricing for 5, 10, 25 or 50 slots — not retail rates your clients would pay directly.'],
+                ['Preferential client pricing', 'Request managed clients from the consultant portal — MENetZero confirms preferential annual rates offline (no public AED list).'],
                 ['Leads without spam', 'Directory listing routes inquiries through the platform — your phone and email stay private.'],
             ] as $item)
                 <div class="mkt-feature-card">
@@ -67,7 +67,7 @@
                 </div>
                 <p class="text-gray-500 mb-6">One login to run multiple SME carbon accounts from your agency hub.</p>
                 <ul class="space-y-3 text-sm text-gray-600">
-                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Managed client slots (5 / 10 / 25 / 50)</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Multiple managed clients from one practice login</li>
                     <li class="flex items-start"><span class="mkt-checkmark">✓</span> Instant workspace switcher — enter any client in one click</li>
                     <li class="flex items-start"><span class="mkt-checkmark">✓</span> Scope 1 &amp; 2, Scope 3 preview, and disclosure forms per client</li>
                     <li class="flex items-start"><span class="mkt-checkmark">✓</span> Up to 10 locations and 10 users per managed client workspace</li>
@@ -95,8 +95,8 @@
                 </div>
                 <p class="text-gray-500 mb-6">Agency pricing designed for practices — not retail client rates.</p>
                 <ul class="space-y-3 text-sm text-gray-600">
-                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Consultant 5, 10, 25 &amp; 50 slot packs</li>
-                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Extra slots without upgrading pack size</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Request additional managed clients when you grow</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Standard exports per paid client (or Enterprise on request)</li>
                     <li class="flex items-start"><span class="mkt-checkmark">✓</span> Reporting year (PRY) unlocks for existing clients mid-contract</li>
                     <li class="flex items-start"><span class="mkt-checkmark">✓</span> Calendar-year contracts aligned to 31 December</li>
                     <li class="flex items-start"><span class="mkt-checkmark">✓</span> Wholesale pricing visible after you sign in</li>
@@ -110,7 +110,7 @@
     <div class="mkt-container">
         <div class="mkt-section-head">
             <h2>What each paid client workspace includes</h2>
-            <p>Every active slot on an agency pack runs at <strong>Growth-equivalent</strong> entitlements for that reporting year — the same deliverables a direct Growth subscriber receives</p>
+            <p>Every paid managed client runs at the <strong>Standard</strong> profile by default — Scope 1 &amp; 2, clean GHG/MOCCAE/Excel/IEQT (Enterprise available on request)</p>
         </div>
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach([
@@ -119,7 +119,7 @@
                 ['UAE compliance', ['GHG inventory PDF', 'MOCCAE Scope 1 & 2 PDF', 'IEQT export for mrv.ae', 'Excel results export']],
                 ['Disclosure &amp; ESG', ['Integrated UAE ESG Report PDF', 'ESG Scorecard with 3-year KPI tables', 'IFRS S1 / S2 + GRI PDF + SASB index', 'Full help guide including disclosures']],
                 ['Your workflow', ['Enter client data on their behalf', 'Review calculations before sign-off', 'Export client-ready working papers', 'Separate workspace per client organisation']],
-                ['Free trial client', ['1 client included at registration', 'Full Scope 1 & 2 + disclosure preview', 'In-app preview — no PDF downloads', 'Upgrade slot when ready to deliver exports']],
+                ['Free trial client', ['1 client included at registration', 'Full Scope 1 & 2 + disclosure preview', 'Watermarked trial downloads', 'Request clients when ready for clean exports']],
             ] as $block)
                 <div class="mkt-feature-card">
                     <h3 class="text-lg font-bold text-gray-900 mb-4">{!! $block[0] !!}</h3>
@@ -142,10 +142,10 @@
         </div>
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach([
-                ['Portfolio dashboard', 'See active clients, slot usage, directory status, and quick actions from one consultant home screen.'],
+                ['Portfolio dashboard', 'See active clients, capacity used, directory status, and quick actions from one consultant home screen.'],
                 ['Client workspace switcher', 'Jump into any managed client workspace, enter data, run reports, then exit back to your agency view.'],
-                ['Managed client onboarding', 'Add a new SME client, assign them to a slot, and provision their workspace under your agency organisation.'],
-                ['Slot &amp; contract management', 'Track how many of your pack slots are in use, renew annually, and add capacity without changing pack tier.'],
+                ['Managed client onboarding', 'Add a new SME client and provision their workspace under your agency organisation.'],
+                ['Capacity &amp; renewals', 'Track how many managed clients you can run, renew annually, and request more when your book grows.'],
                 ['Leads inbox', 'Subscriber intro requests and public directory inquiries arrive in one place — respond when you are ready.'],
                 ['Team on your practice', 'Up to 10 users on your consultant organisation account — colleagues can share the agency hub login model.'],
             ] as $tool)
@@ -207,7 +207,7 @@
     <div class="mkt-container">
         <div class="mkt-section-head">
             <h2>Built for every practice size</h2>
-            <p>From solo consultants to large agencies — scale slots as your client book grows</p>
+            <p>From solo consultants to large agencies — scale managed clients as your book grows</p>
         </div>
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             @foreach([
@@ -277,23 +277,22 @@
                 </div>
             </div>
             <div class="mkt-glass-panel">
-                <h3 class="text-xl font-semibold mb-6 text-white">Agency packs at a glance</h3>
+                <h3 class="text-xl font-semibold mb-6 text-white">Managed clients at a glance</h3>
                 <div class="space-y-0 text-sm">
                     @foreach([
-                        ['Consultant 5', '5 managed client workspaces'],
-                        ['Consultant 10', '10 managed client workspaces'],
-                        ['Consultant 25', '25 managed client workspaces'],
-                        ['Consultant 50', '50 managed client workspaces'],
-                        ['Extra slot', 'Add capacity without changing pack'],
-                        ['Free trial', '1 client · data entry & preview'],
+                        ['Free trial', '1 managed client'],
+                        ['Standard', 'Paid clients · GHG / MOCCAE / Excel / IEQT'],
+                        ['Enterprise', 'White-label / custom'],
+                        ['Grow mid-year', 'Request more managed clients anytime'],
+                        ['Pricing', 'Confirmed offline — no public AED list'],
                     ] as $i => $row)
-                        <div class="flex justify-between gap-4 py-3 {{ $i < 5 ? 'border-b border-white/10' : '' }}">
+                        <div class="flex justify-between gap-4 py-3 {{ $i < 4 ? 'border-b border-white/10' : '' }}">
                             <span class="text-slate-300 shrink-0">{{ $row[0] }}</span>
-                            <span class="font-semibold text-right {{ $i === 5 ? 'text-teal-300' : 'text-white' }}">{{ $row[1] }}</span>
+                            <span class="font-semibold text-right text-white">{{ $row[1] }}</span>
                         </div>
                     @endforeach
                 </div>
-                <p class="text-xs text-slate-400 mt-4">Pack pricing is visible after you create a consultant account and sign in.</p>
+                <p class="text-xs text-slate-400 mt-4">Request clients from the consultant portal after you sign in.</p>
                 <a href="{{ route('consultant.register') }}" class="mkt-btn mkt-btn-primary mkt-btn-block mt-4">Get started free</a>
             </div>
         </div>
@@ -335,10 +334,10 @@
         <div class="space-y-4">
             @foreach([
                 ['Is the directory listing mandatory?', 'No. You can use MenetZero purely as an agency hub for managed clients. The public directory is optional — apply when you want platform leads.'],
-                ['What does the free trial client include?', 'One managed workspace on Free limits: Scope 1 & 2, Scope 3 (one entry each), watermarked trial downloads. Clean Standard exports unlock after paid entities are activated.'],
+                ['What does the free trial client include?', 'One managed workspace on Free limits: Scope 1 & 2, Scope 3 (one entry each), watermarked trial downloads. Clean Standard exports unlock after paid clients are activated.'],
                 ['Do my clients need their own MenetZero login?', 'You work inside managed workspaces on their behalf. Your clients do not need separate subscriptions for the work you perform in their workspace.'],
-                ['Can I add more clients mid-year?', 'Yes. Request more managed-client entities from the consultant portal. MENetZero confirms preferential rates offline and activates after payment.'],
-                ['How is this different from company Explore Free?', 'Explore Free on the public site is for businesses tracking their own emissions. Consultants request entities for client workspaces after consultant sign-in — no public AED list.'],
+                ['Can I add more clients mid-year?', 'Yes. Request more managed clients from the consultant portal. MENetZero confirms preferential rates offline and activates after payment.'],
+                ['How is this different from company Explore Free?', 'Explore Free on the public site is for businesses tracking their own emissions. Consultants request managed clients after consultant sign-in — no public AED list.'],
             ] as $faq)
                 <details class="mkt-feature-card group" style="padding:1.25rem;">
                     <summary class="font-semibold text-gray-900 cursor-pointer list-none flex justify-between items-center gap-4">

@@ -522,6 +522,8 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
         Route::post('/companies/{company}/grant-subscription', [\App\Http\Controllers\Admin\CompanySubscriptionController::class, 'grant'])->name('companies.grant-subscription');
 
         // Unified admin package assignment (client plans + consultant agency packs) with DB audit
+        Route::get('/price-book', [\App\Http\Controllers\Admin\PriceBookController::class, 'index'])->name('price-book.index');
+        Route::put('/price-book', [\App\Http\Controllers\Admin\PriceBookController::class, 'update'])->name('price-book.update');
         Route::get('/package-assignments', [\App\Http\Controllers\Admin\AdminPackageAssignmentController::class, 'index'])->name('package-assignments.index');
         Route::get('/package-requests', [\App\Http\Controllers\Admin\CompanyPackageRequestController::class, 'index'])->name('package-requests.index');
         Route::put('/package-requests/{packageRequest}', [\App\Http\Controllers\Admin\CompanyPackageRequestController::class, 'update'])->name('package-requests.update');

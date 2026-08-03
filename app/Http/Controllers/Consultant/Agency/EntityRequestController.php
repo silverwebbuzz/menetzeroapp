@@ -50,13 +50,13 @@ class EntityRequestController extends Controller
 
         $profile = $wantsEnterprise ? 'Enterprise' : 'Standard';
 
-        $body = "Entity request (Consultant · {$profile})\n"
+        $body = "Managed client request (Consultant · {$profile})\n"
             . 'Consultant org: ' . $consultantOrg->name . " (ID {$consultantOrg->id})\n"
             . 'Requested by: ' . $user->name . ' <' . $user->email . ">\n"
             . 'Managed clients requested: ' . $record->entity_count . "\n"
-            . 'Current slots: ' . ($slotSummary['used'] ?? 0) . '/' . ($slotSummary['limit'] ?? 0) . "\n"
+            . 'Current capacity: ' . ($slotSummary['used'] ?? 0) . '/' . ($slotSummary['limit'] ?? 0) . "\n"
             . 'Profile: ' . $profile . "\n"
-            . 'Sites over 5 per entity: ' . ($needsSitesOver5 ? 'yes' : 'no') . "\n"
+            . 'Sites over 5 per client: ' . ($needsSitesOver5 ? 'yes' : 'no') . "\n"
             . ($wantsEnterprise
                 ? "Entitlements: custom / white-label (Enterprise)\n"
                 : "Entitlements: Standard (S1&2, ≤5 sites, clean GHG/MOCCAE/Excel/IEQT)\n")
@@ -67,14 +67,14 @@ class EntityRequestController extends Controller
             'name' => $user->name ?: $consultantOrg->name,
             'email' => $user->email,
             'phone' => $user->phone ?? $consultantOrg->phone ?? null,
-            'subject' => "Consultant {$profile} request ×{$record->entity_count} entities",
+            'subject' => "Consultant {$profile} request ×{$record->entity_count} clients",
             'message' => $body,
-            'source' => 'in-app consultant entity request',
+            'source' => 'in-app consultant client request',
             'company' => $consultantOrg->name,
         ]);
 
         if (!$result['ok']) {
-            Log::warning('Consultant entity request saved but sales email failed', [
+            Log::warning('Consultant client request saved but sales email failed', [
                 'request_id' => $record->id,
                 'error' => $result['error'] ?? null,
             ]);
@@ -82,6 +82,6 @@ class EntityRequestController extends Controller
 
         return redirect()
             ->route('consultant.packs.index')
-            ->with('success', 'Request submitted. MENetZero will confirm entity rates offline and activate after payment.');
+            ->with('success', 'Request submitted. MENetZero will confirm rates offline and activate managed clients after payment.');
     }
 }
