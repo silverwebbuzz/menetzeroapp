@@ -257,29 +257,11 @@
 
     @if($canViewReports)
         <div class="nav-section">
-            <div class="nav-section-title">Reports &amp; Compliance</div>
+            <div class="nav-section-title">GHG Inventory</div>
             <a href="{{ route('reports.index') }}" class="nav-link {{ request()->routeIs('reports.*') && !request()->routeIs('settings.reporting*') ? 'active' : '' }}">
                 {!! $svg('doc') !!}
                 GHG Inventory
             </a>
-            @if($canViewDisclosures)
-                <a href="{{ route('disclosures.s2.report.preview') }}" class="nav-link {{ request()->routeIs('disclosures.s2.report.*') ? 'active' : '' }}">
-                    {!! $svg('doc') !!}
-                    IFRS S2 Report
-                </a>
-                <a href="{{ route('disclosures.s1.report.preview') }}" class="nav-link {{ request()->routeIs('disclosures.s1.report.*') ? 'active' : '' }}">
-                    {!! $svg('doc') !!}
-                    IFRS S1 Report
-                </a>
-                <a href="{{ route('disclosures.gri.report.preview') }}" class="nav-link {{ request()->routeIs('disclosures.gri.report.*') ? 'active' : '' }}">
-                    {!! $svg('doc') !!}
-                    GRI Report
-                </a>
-                <a href="{{ route('disclosures.esg-dashboard') }}" class="nav-link {{ request()->routeIs('disclosures.esg-dashboard') ? 'active' : '' }}">
-                    {!! $svg('chart') !!}
-                    ESG Dashboard
-                </a>
-            @endif
             @if($isAdmin)
                 <a href="{{ route('settings.reporting') }}" class="nav-link {{ request()->routeIs('settings.reporting*') ? 'active' : '' }}">
                     {!! $svg('cog') !!}
