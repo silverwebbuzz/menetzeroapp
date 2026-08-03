@@ -69,12 +69,12 @@
                     $showGrowthCta = in_array($planCode, ['client_free', 'client_starter'], true);
                 @endphp
                 @if($showGrowthCta)
-                    <a href="{{ route('subscriptions.upgrade') }}" class="px-4 py-2.5 bg-orange-600 text-white text-sm font-semibold rounded-lg hover:bg-orange-700 text-center">
-                        {{ $planCode === 'client_free' ? 'Upgrade to Starter' : 'Upgrade to Growth' }}
+                    <a href="{{ route('subscriptions.billing') }}" class="px-4 py-2.5 bg-orange-600 text-white text-sm font-semibold rounded-lg hover:bg-orange-700 text-center">
+                        Request a package
                     </a>
                 @else
-                    <a href="{{ route('subscriptions.upgrade') }}" class="px-4 py-2.5 bg-orange-600 text-white text-sm font-semibold rounded-lg hover:bg-orange-700 text-center">
-                        Change plan
+                    <a href="{{ route('subscriptions.billing') }}" class="px-4 py-2.5 bg-orange-600 text-white text-sm font-semibold rounded-lg hover:bg-orange-700 text-center">
+                        Request a package
                     </a>
                 @endif
                 <span class="px-4 py-2.5 bg-gray-100 text-gray-500 text-sm font-medium rounded-lg text-center cursor-not-allowed" title="Consultant packs — coming in Phase B">

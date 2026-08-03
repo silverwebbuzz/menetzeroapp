@@ -7,8 +7,9 @@ return [
         'tips' => [
             'Your Primary Reporting Year (PRY) is the calendar year you report against — most entries are tagged to a location and year.',
             'Permissions depend on your role. Company admins see billing and team settings; other users may only view or enter data.',
-            'Growth unlocks the unified UAE ESG Report PDF, ESG Scorecard, and disclosure exports. Enterprise adds extended indexes, HRIS import, assurance PDF upload, and white-label report covers.',
+            'Growth unlocks the unified UAE ESG Report PDF, ESG Scorecard, and disclosure exports when activated. Enterprise adds extended indexes, HRIS import, assurance PDF upload, and white-label report covers.',
             'If a sustainability consultant manages your account, some billing and team settings may be handled by them.',
+            'On Free you get Scope 1 & 2 fully plus one Scope 3 entry per category. Request a package for official downloads.',
         ],
     ],
 

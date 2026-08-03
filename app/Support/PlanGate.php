@@ -85,7 +85,7 @@ class PlanGate
     public function helpGuideMessage(): string
     {
         return $this->entitlements->canAccessHelpGuide($this->companyId ?? 0)['message']
-            ?? 'Full help guide requires Starter or above.';
+            ?? 'Full help guide requires a paid package.';
     }
 
     public function canExport(string $exportCode, ?int $fiscalYear = null): bool
@@ -120,25 +120,35 @@ class PlanGate
 
     public function agencyLockedMessage(string $featureName = 'This feature'): string
     {
-        return "{$featureName} is only available on paid agency packs.";
+        return "{$featureName} requires paid slots. Use Request slots to ask MENetZero for activation.";
     }
 
     public function upgradeRoute(): string
     {
         if ($this->isAgencyWorkspace()) {
+            // Temporary until Phase 5 Request slots UI; packs page remains the consultant commerce hub.
             return route('consultant.packs.index');
         }
 
-        return route('subscriptions.upgrade');
+        // Temporary until Phase 4 Request a package UI.
+        return route('subscriptions.billing');
     }
 
-    public function upgradeButtonLabel(string $clientLabel = 'View plans'): string
+    public function upgradeButtonLabel(string $clientLabel = 'Request a package'): string
     {
         if ($this->isAgencyWorkspace()) {
-            return 'View agency packs';
+            return 'Request slots';
         }
 
-        return $clientLabel;
+        if (str_contains(strtolower($clientLabel), 'starter')
+            || str_contains(strtolower($clientLabel), 'growth')
+            || str_contains(strtolower($clientLabel), 'upgrade')
+            || str_contains(strtolower($clientLabel), 'view plans')
+            || str_contains(strtolower($clientLabel), 'view upgrade')) {
+            return 'Request a package';
+        }
+
+        return $clientLabel !== '' ? $clientLabel : 'Request a package';
     }
 
     public function lockedFeatureMessage(string $clientMessage, string $featureName = 'This feature'): string
@@ -187,7 +197,7 @@ class PlanGate
     public function disclosureExportMessage(?int $fiscalYear = null): string
     {
         return $this->entitlements->canExportDisclosures($this->companyId ?? 0, $fiscalYear)['message']
-            ?? 'IFRS and GRI downloads require Growth.';
+            ?? 'IFRS and GRI downloads require an activated package.';
     }
 
     public function canDisclosureExportType(string $exportCode, ?int $fiscalYear = null): bool
@@ -266,7 +276,7 @@ class PlanGate
             [
                 'label' => 'Bulk import',
                 'allowed' => $this->canBulkImport(),
-                'hint' => $this->canBulkImport() ? null : 'Starter',
+                'hint' => $this->canBulkImport() ? null : 'Request a package',
             ],
             [
                 'label' => 'Scope 3',
@@ -305,11 +315,7 @@ class PlanGate
             $allowed = $this->canExport($item['code']);
             $hint = null;
             if (!$allowed) {
-                $hint = in_array($item['code'], [
-                    PlanEntitlementService::EXPORT_IFRS_S2_PDF,
-                    PlanEntitlementService::EXPORT_GRI_PDF,
-                    PlanEntitlementService::EXPORT_UAE_ESG_PDF,
-                ], true) ? 'Growth' : 'Starter';
+                $hint = 'Request a package';
             }
 
             return [
@@ -368,12 +374,16 @@ class PlanGate
     protected function scope3EntitlementHint(): ?string
     {
         if ($this->isScope3Locked()) {
-            return 'Unlock on Starter';
+            return 'Request a package';
         }
 
-        $limit = $this->scope3CategoriesLimit();
+        $limit = app(PlanEntitlementService::class)->getScope3RecordsPerFormLimit($this->companyId ?? 0);
 
-        return $limit === -1 ? null : '1 entry / category';
+        if ($limit === -1) {
+            return null;
+        }
+
+        return $limit === 1 ? '1 entry / category' : "{$limit} entries / category";
     }
 
     protected function normalizeLimit(mixed $limit): ?int

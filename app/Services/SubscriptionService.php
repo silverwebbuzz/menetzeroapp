@@ -525,9 +525,17 @@ class SubscriptionService
         $company = Company::find($companyId);
 
         if ($company?->isManagedClient()) {
-            $growth = SubscriptionPlan::where('plan_code', 'client_growth')->first();
+            $planCode = app(ConsultantAgencyEntitlementService::class)
+                ->managedClientLimitsPlanCode($companyId);
 
-            return $growth?->limits ?? [];
+            $defaults = \App\Data\PlanEntitlementDefaults::forPlanCode($planCode);
+            if (is_array($defaults['limits'] ?? null)) {
+                return $defaults['limits'];
+            }
+
+            $plan = SubscriptionPlan::where('plan_code', $planCode)->first();
+
+            return $plan?->limits ?? [];
         }
 
         if ($company?->isConsultantOrg()) {
@@ -647,8 +655,8 @@ class SubscriptionService
                 'allowed' => false,
                 'limit' => $limit,
                 'used' => $used,
-                'message' => "Your plan allows {$limit} entry per Scope 3 category. "
-                    . 'Upgrade to Enterprise for full Scope 3 reporting.',
+                'message' => "Your Free access allows {$limit} entry per Scope 3 category. "
+                    . 'Request a package for higher Scope 3 limits.',
             ];
         }
 

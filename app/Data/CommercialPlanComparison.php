@@ -34,7 +34,7 @@ class CommercialPlanComparison
             [
                 'label' => 'Users',
                 'cells' => [
-                    'client_free' => '1',
+                    'client_free' => '2',
                     'client_starter' => '5',
                     'client_growth' => '10',
                     'client_enterprise' => 'Unlimited',
@@ -70,7 +70,7 @@ class CommercialPlanComparison
             [
                 'label' => 'Scope 3',
                 'cells' => [
-                    'client_free' => 'Locked',
+                    'client_free' => '1 entry / category',
                     'client_starter' => '1 entry / category',
                     'client_growth' => '1 entry / category',
                     'client_enterprise' => 'Unlimited',
@@ -276,7 +276,7 @@ class CommercialPlanComparison
     public static function planLabels(): array
     {
         return [
-            'client_free' => ['name' => 'Free', 'tagline' => 'Try S1&2 + disclosure forms'],
+            'client_free' => ['name' => 'Free', 'tagline' => 'S1&2 full + Scope 3 (1 entry / category)'],
             'client_starter' => ['name' => 'Starter', 'tagline' => 'MOCCAE-ready inventory & IEQT'],
             'client_growth' => ['name' => 'Growth', 'tagline' => 'UAE ESG Report + IFRS & GRI'],
             'client_enterprise' => ['name' => 'Enterprise', 'tagline' => '80+ KPIs, HRIS & white-label PDF'],

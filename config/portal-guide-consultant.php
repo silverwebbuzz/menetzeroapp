@@ -5,9 +5,9 @@ return [
         'title' => 'How the consultant agency portal works',
         'body' => 'The consultant portal is your agency hub: manage client workspaces, purchase agency packs, maintain your public directory profile, and respond to leads. When you enter a client workspace, you use the same emissions tools as a company — this guide covers both sides.',
         'tips' => [
-            'Free trial includes one managed client slot — enough to test the full workflow before buying a pack.',
+            'Free trial includes one managed client slot with Free rules (Scope 1 & 2 full, Scope 3 one entry per category).',
             'Each client has a Primary Reporting Year (PRY) set when you create the engagement.',
-            'Paid packs unlock exports, additional client slots, and Scope 3 for managed clients.',
+            'Request paid slots to unlock exports, additional clients, and Scope 3 beyond the Free trial limits.',
         ],
     ],
 

@@ -8,19 +8,20 @@
 
 @if(!empty($slotSummary['is_trial']))
     <div class="cd-callout mb-6">
-        <strong>Free trial workspace</strong> — this client gets data-entry access only (like a direct Free account): Quick Input and disclosure forms, no PDF exports or annual reports.
-        Upgrade to an agency pack for full Growth features across all clients.
+        <strong>Free trial workspace</strong> — this client gets Free rules: Scope 1 &amp; 2 full, Scope 3 (1 entry per category), disclosure form previews. Official PDF exports unlock after you request slots and MENetZero activates a paid package.
+        <a href="{{ route('consultant.packs.index') }}" class="font-medium underline">Request slots</a>
     </div>
 @endif
 
 @if(!$subscription)
     <div class="cd-notice cd-notice--warning p-6 text-sm">
-        No client slots available. Your one free trial may already be in use — purchase an agency pack to add more clients.
-        <a href="{{ route('consultant.packs.index') }}" class="font-medium underline">View agency packs</a>
+        No client slots available. Your one free trial may already be in use — request additional slots from MENetZero.
+        <a href="{{ route('consultant.packs.index') }}" class="font-medium underline">Request slots</a>
     </div>
 @elseif($slotSummary['remaining'] < 1)
     <div class="cd-notice cd-notice--warning p-6 text-sm">
-        All {{ $slotSummary['limit'] }} slots are in use. Archive a finished client or purchase extra slots.
+        All {{ $slotSummary['limit'] }} slots are in use. Archive a finished client or request extra slots.
+        <a href="{{ route('consultant.packs.index') }}" class="font-medium underline">Request slots</a>
     </div>
 @else
     <form action="{{ route('consultant.clients.store') }}" method="POST" class="bg-white border border-gray-200 rounded-xl p-6 max-w-2xl space-y-5">

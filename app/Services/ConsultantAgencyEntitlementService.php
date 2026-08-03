@@ -238,6 +238,27 @@ class ConsultantAgencyEntitlementService
         return ConsultantAgencyPlanMatrix::managedClientEntitlements();
     }
 
+    /**
+     * Plan code whose limits apply to a managed client (Free on trial, Growth on paid packs).
+     */
+    public function managedClientLimitsPlanCode(int $companyId): string
+    {
+        $engagement = $this->getActiveEngagement($companyId);
+
+        if ($engagement && $this->isTrialEngagement($engagement)) {
+            return 'client_free';
+        }
+
+        return ConsultantAgencyPlanMatrix::MANAGED_CLIENT_TEMPLATE;
+    }
+
+    public function isTrialManagedClient(int $companyId): bool
+    {
+        $engagement = $this->getActiveEngagement($companyId);
+
+        return $engagement !== null && $this->isTrialEngagement($engagement);
+    }
+
     protected function isTrialEngagement(ConsultantClientEngagement $engagement): bool
     {
         $subscription = $engagement->relationLoaded('subscription')

@@ -63,20 +63,21 @@ class PlanEntitlementDefaults
     {
         return [
             'plan_name' => 'Free',
-            'description' => 'Try Scope 1 & 2 and all disclosure forms — upgrade to export reports.',
+            'description' => 'Scope 1 & 2 full, Scope 3 (1 entry per category), disclosure previews. Request a package for clean exports.',
             'price_annual' => 0,
             'currency' => 'AED',
             'sort_order' => 1,
             'limits' => [
                 'locations' => 1,
-                'users' => 1,
+                'users' => 2,
                 'documents' => 10,
-                'scope3_records_per_form' => 0,
+                'scope3_records_per_form' => 1,
                 'annual_report_pdf' => 0,
                 'historical_years' => 1,
             ],
             'entitlements' => [
-                'scope3_mode' => 'locked',
+                // All Scope 3 categories open; capped at 1 entry per category (preview_per_category).
+                'scope3_mode' => 'preview_per_category',
                 'bulk_import' => false,
                 'bulk_export' => false,
                 'help_level' => 'basic',

@@ -9,9 +9,9 @@ return [
         'title' => 'Choose the plan that matches what you need to deliver',
         'body' => 'All plans let you track Scope 1 and 2 emissions in MeNetZero. The difference is what you can download, share with auditors, and how many sites and team members you can use.',
         'tips' => [
-            'Not sure yet? Stay on Free — enter a few months of utility bills and explore the dashboard.',
-            'Need a PDF for MOCCAE or a landlord? Starter includes your GHG inventory report.',
-            'Reporting to investors or preparing an integrated UAE ESG report? Growth unlocks IFRS, GRI, Scorecard, and UAE ESG Report PDFs.',
+            'Not sure yet? Stay on Free — Scope 1 & 2 are included, plus one Scope 3 entry per category.',
+            'Need official PDF downloads? Request a package — MENetZero confirms pricing and activates after offline payment.',
+            'Preparing an integrated UAE ESG report? Ask for an ESG package when you request activation.',
         ],
     ],
 
@@ -97,7 +97,7 @@ return [
     ],
 
     'plan_taglines' => [
-        'client_free' => 'Explore the platform — enter data, preview reports',
+        'client_free' => 'Scope 1 & 2 full + Scope 3 (1 entry / category)',
         'client_starter' => 'Official GHG inventory PDF for regulators & stakeholders',
         'client_growth' => 'Integrated UAE ESG Report + IFRS & GRI downloads',
         'client_enterprise' => '80+ KPI scorecard, HRIS import & white-label PDF',

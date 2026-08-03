@@ -81,7 +81,7 @@ class PlanEntitlementService
         if ($this->isScope3Locked($companyId)) {
             return [
                 'allowed' => false,
-                'message' => 'Scope 3 is available on Starter and above. Upgrade to unlock value-chain emissions.',
+                'message' => 'Scope 3 is not available on your current package. Request a package to unlock value-chain emissions.',
             ];
         }
 
@@ -101,6 +101,20 @@ class PlanEntitlementService
 
         if ($mode === 'full') {
             return -1;
+        }
+
+        // Managed clients: limits come from agency entitlements, not a direct client subscription.
+        if ($this->consultantOrgEntitlements->isManagedClient($companyId)) {
+            $defaults = PlanEntitlementDefaults::forPlanCode(
+                $this->consultantOrgEntitlements->managedClientLimitsPlanCode($companyId)
+            );
+
+            $fromDefaults = $defaults['limits']['scope3_records_per_form'] ?? null;
+            if ($fromDefaults !== null) {
+                return (int) $fromDefaults;
+            }
+
+            return 1;
         }
 
         $subscription = $this->subscriptionService->getActiveSubscription($companyId);
@@ -146,7 +160,7 @@ class PlanEntitlementService
         if (!$canExport) {
             return [
                 'allowed' => false,
-                'message' => 'IFRS and GRI report downloads are available on the Growth plan (AED 2,499/year).',
+                'message' => 'Official IFRS and GRI downloads require an activated package. Request a package to unlock clean exports.',
             ];
         }
 
@@ -195,7 +209,7 @@ class PlanEntitlementService
 
         return [
             'allowed' => false,
-            'message' => 'Bulk CSV/XLS import is available on the Starter plan (AED 1,499/year) and above.',
+            'message' => 'Bulk CSV/XLS import is not included on Free. Request a package to unlock bulk import.',
         ];
     }
 
@@ -210,7 +224,7 @@ class PlanEntitlementService
 
         return [
             'allowed' => false,
-            'message' => 'Bulk data export is available on the Starter plan (AED 1,499/year) and above.',
+            'message' => 'Bulk data export is not included on Free. Request a package to unlock bulk export.',
         ];
     }
 
@@ -227,7 +241,7 @@ class PlanEntitlementService
 
         return [
             'allowed' => false,
-            'message' => 'The full help guide is available on the Starter plan (AED 1,499/year) and above.',
+            'message' => 'The full help guide is included on paid packages. Request a package for full help access.',
         ];
     }
 
@@ -267,7 +281,7 @@ class PlanEntitlementService
         if ($regen === 'none') {
             return [
                 'allowed' => false,
-                'message' => 'Report downloads require a paid plan. Upgrade to Starter from AED 1,499/year.',
+                'message' => 'Official report downloads require an activated package. Request a package after exploring Free.',
             ];
         }
 
@@ -315,33 +329,33 @@ class PlanEntitlementService
         ];
 
         if (in_array($exportCode, $growthOnly, true)) {
-            return 'IFRS, GRI, and UAE ESG report downloads are available on the Growth plan (AED 2,499/year).';
+            return 'IFRS, GRI, and UAE ESG downloads require an activated ESG package. Request a package to unlock clean exports.';
         }
 
         if ($exportCode === self::EXPORT_GRI_CONTENT_INDEX_EXTENDED) {
-            return 'The full GRI content index (80+ disclosures) is available on the Enterprise plan. Contact sales for access.';
+            return 'The full GRI content index (80+ disclosures) is available on higher packages. Request a package or contact us.';
         }
 
         if ($exportCode === self::EXPORT_ESG_SCORECARD_ENTERPRISE) {
-            return 'The enterprise ESG scorecard (80+ KPIs) is available on the Enterprise plan. Contact sales for access.';
+            return 'The enterprise ESG scorecard (80+ KPIs) is available on higher packages. Request a package or contact us.';
         }
 
         if ($exportCode === self::FEATURE_ASSURANCE_UPLOAD) {
-            return 'Independent assurance PDF upload is available on the Enterprise plan. Contact sales for access.';
+            return 'Independent assurance PDF upload is available on higher packages. Request a package or contact us.';
         }
 
         if ($exportCode === self::FEATURE_ENERGY_FROM_ACTIVITY) {
-            return 'Auto energy (GJ) from Quick Input is available on the Enterprise plan. Contact sales for access.';
+            return 'Auto energy (GJ) from Quick Input is available on higher packages. Request a package or contact us.';
         }
 
         if ($exportCode === self::EXPORT_UAE_ESG_PDF_ENTERPRISE) {
-            return 'The white-label UAE ESG Report PDF is available on the Enterprise plan. Contact sales for access.';
+            return 'The white-label UAE ESG Report PDF is available on higher packages. Request a package or contact us.';
         }
 
         if ($exportCode === self::FEATURE_HRIS_KPI_IMPORT) {
-            return 'HRIS / payroll KPI bulk import is available on the Enterprise plan. Contact sales for access.';
+            return 'HRIS / payroll KPI bulk import is available on higher packages. Request a package or contact us.';
         }
 
-        return 'This export is available on the Starter plan (AED 1,499/year) and above.';
+        return 'This export requires an activated package. Request a package to unlock official downloads.';
     }
 }

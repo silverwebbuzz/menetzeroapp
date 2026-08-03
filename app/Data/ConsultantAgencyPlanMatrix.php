@@ -131,7 +131,7 @@ class ConsultantAgencyPlanMatrix
         return [
             'plan_code' => self::FREE_TRIAL_CODE,
             'plan_name' => 'Free trial',
-            'description' => 'One managed client — data entry only, no exports. Upgrade to an agency pack for full Growth workspaces.',
+            'description' => 'One managed client on Free rules (Scope 1 & 2 full, Scope 3 one entry per category). Request slots for paid exports and more clients.',
             'plan_category' => 'consultant_agency',
             'price_annual' => 0,
             'price_per_slot_aed' => 0,
