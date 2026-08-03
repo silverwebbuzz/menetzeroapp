@@ -235,11 +235,15 @@ class ConsultantAgencyEntitlementService
             return ConsultantAgencyPlanMatrix::trialManagedClientEntitlements();
         }
 
+        if ($engagement && $this->isDemoEngagement($engagement)) {
+            return ConsultantAgencyPlanMatrix::demoManagedClientEntitlements();
+        }
+
         return ConsultantAgencyPlanMatrix::managedClientEntitlements();
     }
 
     /**
-     * Plan code whose limits apply to a managed client (Free on trial, Growth on paid packs).
+     * Plan code whose limits apply to a managed client (Free on trial, Starter/Standard on paid).
      */
     public function managedClientLimitsPlanCode(int $companyId): string
     {
@@ -247,6 +251,10 @@ class ConsultantAgencyEntitlementService
 
         if ($engagement && $this->isTrialEngagement($engagement)) {
             return 'client_free';
+        }
+
+        if ($engagement && $this->isDemoEngagement($engagement)) {
+            return 'client_growth';
         }
 
         return ConsultantAgencyPlanMatrix::MANAGED_CLIENT_TEMPLATE;
@@ -266,5 +274,16 @@ class ConsultantAgencyEntitlementService
             : $engagement->subscription()->with('plan')->first();
 
         return $subscription?->isFreeTrial() ?? false;
+    }
+
+    protected function isDemoEngagement(ConsultantClientEngagement $engagement): bool
+    {
+        $subscription = $engagement->relationLoaded('subscription')
+            ? $engagement->subscription
+            : $engagement->subscription()->with('plan')->first();
+
+        $code = $subscription?->plan?->plan_code;
+
+        return $code === ConsultantAgencyPlanMatrix::DEMO_PACK_CODE;
     }
 }

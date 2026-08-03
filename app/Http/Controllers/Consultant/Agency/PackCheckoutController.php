@@ -42,12 +42,18 @@ class PackCheckoutController extends Controller
         $subscription = $this->consultantSubscriptions->getActiveSubscription($consultantOrg->id);
         $slotSummary = $this->consultantSubscriptions->slotSummary($consultantOrg->id, $subscription);
         $contractYear = (int) now()->year;
+        $recentRequests = \App\Models\ConsultantEntityRequest::query()
+            ->where('consultant_company_id', $consultantOrg->id)
+            ->orderByDesc('created_at')
+            ->limit(5)
+            ->get();
 
-        // Phase 3: self-serve pack grid/checkout hidden — request entities offline.
+        // Phase 3–5: self-serve pack grid/checkout hidden — request entities offline.
         return view('consultant.agency.packs.index', compact(
             'subscription',
             'slotSummary',
             'contractYear',
+            'recentRequests',
         ));
     }
 

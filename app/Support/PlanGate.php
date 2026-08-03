@@ -126,7 +126,6 @@ class PlanGate
     public function upgradeRoute(): string
     {
         if ($this->isAgencyWorkspace()) {
-            // Temporary until Phase 5 Request slots UI; packs page remains the consultant commerce hub.
             return route('consultant.packs.index');
         }
 

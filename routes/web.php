@@ -75,6 +75,9 @@ Route::prefix('consultant')->name('consultant.')->group(function () {
 
             Route::prefix('packs')->name('packs.')->group(function () {
                 Route::get('/', [\App\Http\Controllers\Consultant\Agency\PackCheckoutController::class, 'index'])->name('index');
+                Route::post('/request-entities', [\App\Http\Controllers\Consultant\Agency\EntityRequestController::class, 'store'])
+                    ->middleware('throttle:10,1')
+                    ->name('request-entities');
                 Route::post('/checkout', [\App\Http\Controllers\Consultant\Agency\PackCheckoutController::class, 'processCheckout'])->name('checkout');
                 Route::post('/extra-slots', [\App\Http\Controllers\Consultant\Agency\PackCheckoutController::class, 'processExtraSlots'])->name('extra-slots');
                 Route::post('/year-unlock', [\App\Http\Controllers\Consultant\Agency\PackCheckoutController::class, 'processYearUnlock'])->name('year-unlock');
@@ -522,6 +525,8 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
         Route::get('/package-assignments', [\App\Http\Controllers\Admin\AdminPackageAssignmentController::class, 'index'])->name('package-assignments.index');
         Route::get('/package-requests', [\App\Http\Controllers\Admin\CompanyPackageRequestController::class, 'index'])->name('package-requests.index');
         Route::put('/package-requests/{packageRequest}', [\App\Http\Controllers\Admin\CompanyPackageRequestController::class, 'update'])->name('package-requests.update');
+        Route::get('/entity-requests', [\App\Http\Controllers\Admin\ConsultantEntityRequestController::class, 'index'])->name('entity-requests.index');
+        Route::put('/entity-requests/{entityRequest}', [\App\Http\Controllers\Admin\ConsultantEntityRequestController::class, 'update'])->name('entity-requests.update');
         Route::post('/companies/{company}/assign-package', [\App\Http\Controllers\Admin\AdminPackageAssignmentController::class, 'assignToCompany'])->name('companies.assign-package');
 
         // Campaign coupons

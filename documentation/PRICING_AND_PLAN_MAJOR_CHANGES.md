@@ -229,10 +229,15 @@ Align codes · Free S3 · Watermarked exports.
 - [x] Admin inbox (`/admin/package-requests`) with status notes.
 - [x] PlanGate + billing CTA → `subscriptions.request-package`.
 
-### Phase 5 — Consultant Request entities (not old pack grid) · seed Standard entitlements
+### Phase 5 — Consultant Request entities ✅ DONE
+- [x] Entity count form (no AED / no pack grid) on consultant packs page.
+- [x] Persist `consultant_entity_requests` + sales email notify.
+- [x] Admin inbox (`/admin/entity-requests`).
+- [x] Paid managed clients → **Standard** entitlements; demo pack keeps Growth.
+
 ### Phase 6 — Admin quote (band calculator) + activate
 ### Phase 7 — Price book (1,399/1,199 + company packages)
-### Phase 8 — DB seeds (`consultant_entity`, company codes); retire pack checkout paths
+### Phase 8 — DB seeds (`consultant_entity`, company codes); retire pack checkout paths · enforce 5 sites on Standard
 ### Phase 9 — Portal guides + ElevenLabs
 ### Phase 10 — Renewals / optional min-10 reminders later
 
@@ -243,15 +248,14 @@ Align codes · Free S3 · Watermarked exports.
 | Area | Path |
 |------|------|
 | Free defaults | `PlanEntitlementDefaults.php` |
-| Consultant trial / packs | `ConsultantAgencyPlanMatrix.php` (**pack prices legacy for Phase 3 hide**) |
+| Consultant Standard / packs | `ConsultantAgencyPlanMatrix.php` |
 | Watermark | `ExportWatermark.php`, reports export controllers |
 | Public Explore Free | `/pricing`, `public/pricing.blade.php` |
 | Company request | `PackageRequestController`, `CompanyPackageOptions`, `company_package_requests` |
-| Admin request inbox | `Admin\CompanyPackageRequestController` |
-| Company billing | `client/subscriptions/*` (upgrade/checkout redirected) |
+| Consultant request | `EntityRequestController`, `consultant_entity_requests` |
+| Admin inboxes | `CompanyPackageRequestController`, `ConsultantEntityRequestController` |
+| Company billing | `client/subscriptions/*` |
 | Consultant request page | `consultant/agency/packs/*` |
-
-**Phase 3 coding:** hide commerce UIs only — **do not** delete Free or entitlement logic. Pack price numbers in code can remain unused until Phase 8 cleanup.
 
 ---
 
@@ -276,7 +280,8 @@ Logged-in: Request a package / Request slots · features only · pricing offline
 
 | Item | Status |
 |------|--------|
-| Paid consultant entity feature depth | **Locked §6.3 = Standard** (not Growth) |
+| Paid consultant entity feature depth | **Locked §6.3 = Standard** (live in code for paid engagements) |
+| Enforce 5 sites vs Starter’s 3 on activation | Phase 8 / admin assign |
 | Min-10 preferential in software | Deferred |
 | Legacy subscriber mapping | Phase 8 |
 
@@ -290,7 +295,8 @@ Logged-in: Request a package / Request slots · features only · pricing offline
 | Aug 2026 | **Aligned to Ojas commercial proposal:** Consultant Plan per-entity intro pricing; Enterprise custom; Free kept; company xlsx kept; entity = slot ≤5 sites; min-10 sales-only. |
 | Aug 2026 | Phase 3: Explore Free + hide self-serve checkout; §6.3 Standard locked. |
 | Aug 2026 | Phase 4: Company Request a package UI + admin inbox. |
+| Aug 2026 | Phase 5: Consultant Request entities + Standard entitlements for paid managed clients. |
 
 ---
 
-**Next:** Phase 5 (consultant Request entities form + Standard seed prep).
+**Next:** Phase 6 (admin quote / band calculator + activate from request inbox).

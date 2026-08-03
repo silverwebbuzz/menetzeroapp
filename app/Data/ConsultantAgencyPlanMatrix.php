@@ -9,8 +9,9 @@ namespace App\Data;
  * (AED 1,399 / 1,199) documented in documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md §6.
  * Self-serve pack checkout is being hidden (Phase 3). Free trial (1 entity) remains.
  * Managed clients on Free trial use client_free entitlements. Paid entities use
- * **Standard** entitlements (§6.3) — seed in Phase 5/8. Legacy paid packs still
- * call managedClientEntitlements() (currently Growth-shaped) until that seed.
+ * **Standard** via managedClientEntitlements() (§6.3). Demo pack (consultant_1)
+ * still uses Growth via demoManagedClientEntitlements(). Phase 8 may seed
+ * `consultant_entity` plan codes and retire legacy pack rows.
  *
  * Wholesale pack rows below are retained for migration / demo until Phase 8 cleanup.
  */
@@ -49,8 +50,11 @@ class ConsultantAgencyPlanMatrix
     /** Max users on the consultant organisation (not per managed client). */
     public const CONSULTANT_ORG_USER_LIMIT = 10;
 
-    /** Managed client entitlement template — mirrors direct Growth. */
-    public const MANAGED_CLIENT_TEMPLATE = 'client_growth';
+    /** Closest seeded client plan for paid-entity limit lookups until Phase 8 `consultant_entity`. */
+    public const MANAGED_CLIENT_TEMPLATE = 'client_starter';
+
+    /** Standard default sites per paid managed client (§6.3). */
+    public const STANDARD_SITES_PER_ENTITY = 5;
 
     /**
      * @return array<string, array<string, mixed>>
@@ -114,11 +118,41 @@ class ConsultantAgencyPlanMatrix
     }
 
     /**
-     * Entitlements applied to each active managed client engagement (Growth + channel flags).
+     * Entitlements applied to each paid managed client (Standard — §6.3).
+     * Scope 1&2 exports (GHG/MOCCAE/Excel/IEQT), bulk import — not full ESG.
+     * Site limit ≤5 is commercial; use client_starter for limit lookups until Phase 8
+     * seeds consultant_entity (admin activation should set locations to 5).
      *
      * @return array<string, mixed>
      */
     public static function managedClientEntitlements(): array
+    {
+        return self::standardManagedClientEntitlements();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function standardManagedClientEntitlements(): array
+    {
+        $starter = PlanEntitlementDefaults::entitlementsForPlanCode('client_starter') ?? [];
+
+        return array_merge($starter, [
+            'channel' => 'consultant_managed',
+            'consultant_directory' => 'none',
+            'pry_export_only' => true,
+            'package_profile' => 'standard',
+            'export_watermark' => false,
+            'standard_sites_per_entity' => self::STANDARD_SITES_PER_ENTITY,
+        ]);
+    }
+
+    /**
+     * Admin demo pack (consultant_1) — full Growth for special complimentary demos.
+     *
+     * @return array<string, mixed>
+     */
+    public static function demoManagedClientEntitlements(): array
     {
         $growth = PlanEntitlementDefaults::entitlementsForPlanCode('client_growth') ?? [];
 
@@ -126,6 +160,7 @@ class ConsultantAgencyPlanMatrix
             'channel' => 'consultant_managed',
             'consultant_directory' => 'none',
             'pry_export_only' => true,
+            'package_profile' => 'demo_growth',
         ]);
     }
 
