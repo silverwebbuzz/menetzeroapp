@@ -50,6 +50,7 @@ class PackCheckoutController extends Controller
 
         $packages = \App\Data\CompanyPackageOptions::packages();
         $extraOptions = \App\Data\CompanyPackageOptions::extraOptions();
+        $matrix = \App\Data\CompanyPackageOptions::comparisonMatrix();
 
         // Phase 3–5: self-serve pack grid/checkout hidden — request clients offline.
         return view('consultant.agency.packs.index', compact(
@@ -59,6 +60,7 @@ class PackCheckoutController extends Controller
             'recentRequests',
             'packages',
             'extraOptions',
+            'matrix',
         ));
     }
 

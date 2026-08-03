@@ -21,6 +21,7 @@ class PackageRequestController extends Controller
 
         $packages = CompanyPackageOptions::packages();
         $extraOptions = CompanyPackageOptions::extraOptions();
+        $matrix = CompanyPackageOptions::comparisonMatrix();
         $recent = CompanyPackageRequest::query()
             ->where('company_id', $company->id)
             ->orderByDesc('created_at')
@@ -31,6 +32,7 @@ class PackageRequestController extends Controller
             'company',
             'packages',
             'extraOptions',
+            'matrix',
             'recent',
         ));
     }

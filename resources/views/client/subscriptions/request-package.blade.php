@@ -4,13 +4,16 @@
 @section('page-title', 'Request a package')
 
 @section('content')
-<div class="w-full max-w-5xl">
+@php
+    $selectedPackage = old('package_code', 'client_scope_basic');
+@endphp
+<div class="w-full max-w-6xl">
     <div class="mb-6">
         <a href="{{ route('subscriptions.billing') }}" class="text-sm text-brand hover:underline">&larr; Plan &amp; billing</a>
         <h1 class="text-3xl font-bold text-gray-900 mt-2">Request a package</h1>
         <p class="mt-2 text-gray-600">
-            Pick Scope Basic, Scope Pro, an ESG package, or Enterprise by capability — not by price.
-            After you submit, MENetZero confirms the quote offline and activates when payment clears.
+            Compare capabilities across packages, select one, then add extras if needed.
+            MENetZero confirms the quote offline and activates when payment clears — no prices shown here.
         </p>
     </div>
 
@@ -30,31 +33,17 @@
     <form action="{{ route('subscriptions.request-package.store') }}" method="POST" class="space-y-6">
         @csrf
 
-        <div class="grid sm:grid-cols-2 gap-4">
-            @foreach($packages as $code => $pkg)
-                <label class="relative flex flex-col h-full rounded-xl border border-gray-200 bg-white p-5 cursor-pointer hover:border-teal-400 has-[:checked]:border-teal-600 has-[:checked]:ring-2 has-[:checked]:ring-teal-500/30">
-                    <input
-                        type="radio"
-                        name="package_code"
-                        value="{{ $code }}"
-                        class="sr-only"
-                        @checked(old('package_code') === $code)
-                        required
-                    >
-                    <span class="text-lg font-bold text-gray-900">{{ $pkg['name'] }}</span>
-                    <span class="text-xs text-gray-500 mt-1 mb-3">{{ $pkg['summary'] }}</span>
-                    <ul class="space-y-1.5 text-sm text-gray-600 flex-1">
-                        @foreach($pkg['features'] as $feat)
-                            <li class="flex gap-2"><span class="text-teal-600">✓</span> {{ $feat }}</li>
-                        @endforeach
-                    </ul>
-                </label>
-            @endforeach
-        </div>
+        @include('partials.package-request-matrix', [
+            'matrix' => $matrix,
+            'packages' => $packages,
+            'selectedPackage' => $selectedPackage,
+        ])
 
         <div class="bg-white rounded-xl border border-gray-200 p-5">
-            <h2 class="text-sm font-semibold text-gray-900 mb-3">Optional extras</h2>
-            <p class="text-xs text-gray-500 mb-3">Tick anything you may need — we will confirm availability when quoting.</p>
+            <h2 class="text-sm font-semibold text-gray-900 mb-1">Optional extras</h2>
+            <p class="text-xs text-gray-500 mb-3">
+                Tick only what you may need beyond the package defaults. If something is already included in your selection, MENetZero will ignore the duplicate when quoting.
+            </p>
             <div class="grid sm:grid-cols-2 gap-2">
                 @foreach($extraOptions as $key => $label)
                     <label class="flex items-start gap-2 text-sm text-gray-700">
