@@ -14,7 +14,7 @@ class ExportWatermark
     {
         $when = $generatedAt ?? now()->format('Y-m-d H:i');
 
-        return self::SHORT.' — Generated '.$when.' (excl. VAT packages unlock clean files)';
+        return self::SHORT.' — Generated '.$when.' — Paid packages unlock clean, unwatermarked files.';
     }
 
     public static function pdfDiagonal(): string
