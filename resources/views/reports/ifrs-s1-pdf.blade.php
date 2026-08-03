@@ -19,6 +19,9 @@
 </head>
 <body>
     <div class="brand-bar"></div>
+    @if(!empty($companyLogo))
+        <img src="{{ $companyLogo }}" alt="" style="max-height:48px;margin-bottom:12px;">
+    @endif
     <h1 style="font-size:20px;color:#065f46;margin:0;">IFRS S1 General Sustainability-related Disclosures</h1>
     <p class="muted">{{ $report['company']->name }} · FY {{ $report['fiscal_year'] }} · {{ $report['generated_at'] }} · {{ $report['completeness']['percent'] }}% complete</p>
 

@@ -19,6 +19,9 @@
 </head>
 <body>
     <div class="brand-bar"></div>
+    @if(!empty($companyLogo))
+        <img src="{{ $companyLogo }}" alt="" style="max-height:48px;margin-bottom:12px;">
+    @endif
     <h1 style="font-size:20px;color:#065f46;margin:0;">GRI Sustainability Report</h1>
     <p class="muted">{{ $report['company']->name }} · FY {{ $report['fiscal_year'] }} · {{ $report['generated_at'] }}</p>
 
