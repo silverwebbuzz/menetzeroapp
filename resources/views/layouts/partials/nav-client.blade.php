@@ -248,9 +248,41 @@
     @if($canViewDisclosures)
         <div class="nav-section">
             <div class="nav-section-title">Disclosures</div>
-            <a href="{{ route('disclosures.hub') }}" class="nav-link {{ request()->routeIs('disclosures.*') ? 'active' : '' }}">
+            <a href="{{ route('disclosures.hub') }}" class="nav-link {{ request()->routeIs('disclosures.hub') ? 'active' : '' }}">
+                {!! $svg('grid') !!}
+                Overview
+            </a>
+            <a href="{{ route('disclosures.s2.overview') }}" class="nav-link {{ request()->routeIs('disclosures.s2.*') ? 'active' : '' }}">
+                {!! $svg('snowflake') !!}
+                IFRS S2 — Climate
+            </a>
+            <a href="{{ route('disclosures.s1.overview') }}" class="nav-link {{ request()->routeIs('disclosures.s1.*') ? 'active' : '' }}">
                 {!! $svg('shield') !!}
-                Disclosures
+                IFRS S1 — Sustainability
+            </a>
+            <a href="{{ route('disclosures.gri.overview') }}" class="nav-link {{ request()->routeIs('disclosures.gri.*') ? 'active' : '' }}">
+                {!! $svg('list') !!}
+                GRI Standards
+            </a>
+            <a href="{{ route('disclosures.uae-esg.overview') }}" class="nav-link {{ request()->routeIs('disclosures.uae-esg.*') ? 'active' : '' }}">
+                {!! $svg('doc') !!}
+                UAE ESG Report
+            </a>
+            <a href="{{ route('disclosures.esg-dashboard') }}" class="nav-link {{ request()->routeIs('disclosures.esg-dashboard') ? 'active' : '' }}">
+                {!! $svg('chart') !!}
+                ESG Dashboard
+            </a>
+            <a href="{{ route('disclosures.esg-scorecard.index') }}" class="nav-link {{ request()->routeIs('disclosures.esg-scorecard.*') ? 'active' : '' }}">
+                {!! $svg('card') !!}
+                ESG Scorecard
+            </a>
+            <a href="{{ route('disclosures.esg-depth.overview') }}" class="nav-link {{ request()->routeIs('disclosures.esg-depth.*') ? 'active' : '' }}">
+                {!! $svg('users') !!}
+                ESG Depth
+            </a>
+            <a href="{{ route('disclosures.sasb.index') }}" class="nav-link {{ request()->routeIs('disclosures.sasb.*') ? 'active' : '' }}">
+                {!! $svg('pin') !!}
+                SASB Index
             </a>
         </div>
     @endif
