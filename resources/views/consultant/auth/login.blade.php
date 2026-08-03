@@ -48,6 +48,6 @@
     <li class="flex gap-3"><span>✓</span> Manage multiple client workspaces</li>
     <li class="flex gap-3"><span>✓</span> MOCCAE-ready inventories and exports</li>
     <li class="flex gap-3"><span>✓</span> Verified directory listing</li>
-    <li class="flex gap-3"><span>✓</span> Wholesale agency pack pricing</li>
+    <li class="flex gap-3"><span>✓</span> Request clients — pricing offline</li>
 </ul>
 @endsection

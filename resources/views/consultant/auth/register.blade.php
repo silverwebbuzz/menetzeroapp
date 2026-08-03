@@ -64,6 +64,6 @@
     <li class="flex gap-3"><span>✓</span> One login for all client workspaces</li>
     <li class="flex gap-3"><span>✓</span> Directory profile for SME leads</li>
     <li class="flex gap-3"><span>✓</span> IFRS / GRI reporting tools</li>
-    <li class="flex gap-3"><span>✓</span> Scale with agency packs when ready</li>
+    <li class="flex gap-3"><span>✓</span> Request clients when ready to scale</li>
 </ul>
 @endsection

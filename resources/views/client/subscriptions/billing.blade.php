@@ -185,7 +185,7 @@
                     </li>
                 @endforeach
             </ul>
-            <p class="mt-4 text-xs text-gray-500">Disclosure PDF export requires Growth. GHG / IEQT exports require Starter.</p>
+            <p class="mt-4 text-xs text-gray-500">Disclosure PDF export typically needs Scope Pro or an ESG package. Clean GHG / IEQT exports need Scope Basic or higher.</p>
         </div>
     </div>
 

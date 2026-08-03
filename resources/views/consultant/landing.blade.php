@@ -27,7 +27,7 @@
             <a href="{{ route('consultant.register') }}" class="mkt-btn mkt-btn-primary mkt-btn-lg">Create consultant account</a>
             <a href="{{ route('consultant.login') }}" class="mkt-btn mkt-btn-outline mkt-btn-lg">Sign in</a>
         </div>
-        <p class="text-xs text-gray-400 mt-4">Start with 1 free trial client · Agency pack pricing after sign-in · Google or email registration</p>
+        <p class="text-xs text-gray-400 mt-4">Start with 1 free managed client · Request more after sign-in · Pricing offline · Google or email registration</p>
     </div>
 </section>
 
@@ -40,8 +40,8 @@
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             @foreach([
                 ['One login, many clients', 'Switch between managed SME workspaces without juggling separate accounts or passwords.'],
-                ['Growth-grade per client', 'Paid pack clients receive Growth-equivalent tools — UAE ESG Report, Scorecard, MOCCAE, GHG, IFRS, and GRI exports per reporting year.'],
-                ['Preferential client pricing', 'Request managed clients from the consultant portal — MENetZero confirms preferential annual rates offline (no public AED list).'],
+                ['Package depth per client', 'Request Scope Basic through Enterprise for managed clients — inventory exports or full ESG suites, activated offline.'],
+                ['Preferential when you scale', 'Request managed clients from the consultant portal — MENetZero confirms rates offline (no public AED list). Preferential policy may apply at 10+ clients.'],
                 ['Leads without spam', 'Directory listing routes inquiries through the platform — your phone and email stay private.'],
             ] as $item)
                 <div class="mkt-feature-card">
@@ -70,8 +70,8 @@
                     <li class="flex items-start"><span class="mkt-checkmark">✓</span> Multiple managed clients from one practice login</li>
                     <li class="flex items-start"><span class="mkt-checkmark">✓</span> Instant workspace switcher — enter any client in one click</li>
                     <li class="flex items-start"><span class="mkt-checkmark">✓</span> Scope 1 &amp; 2, Scope 3 preview, and disclosure forms per client</li>
-                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Up to 10 locations and 10 users per managed client workspace</li>
-                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> 1 free trial client to explore data entry before you buy a pack</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Site and seat limits follow the package you request</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> 1 free managed client to explore data entry before you request paid capacity</li>
                 </ul>
             </div>
             <div class="mkt-feature-card">
@@ -91,15 +91,15 @@
             <div class="mkt-feature-card">
                 <div class="flex items-center mb-4">
                     <div class="mkt-scope-number">3</div>
-                    <h3 class="text-xl font-bold text-gray-900">Wholesale packs</h3>
+                    <h3 class="text-xl font-bold text-gray-900">Request clients</h3>
                 </div>
-                <p class="text-gray-500 mb-6">Agency pricing designed for practices — not retail client rates.</p>
+                <p class="text-gray-500 mb-6">Choose package depth and how many managed clients — quoted offline.</p>
                 <ul class="space-y-3 text-sm text-gray-600">
-                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Request additional managed clients when you grow</li>
-                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Standard exports per paid client (or Enterprise on request)</li>
-                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Reporting year (PRY) unlocks for existing clients mid-contract</li>
-                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Calendar-year contracts aligned to 31 December</li>
-                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Wholesale pricing visible after you sign in</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Request Scope Basic … Enterprise packages for your clients</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Clean inventory or full ESG exports depending on package</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Grow mid-year by requesting more managed clients</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Calendar-aligned renewals with offline activation</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> No public AED list — rates confirmed after you request</li>
                 </ul>
             </div>
         </div>
@@ -110,14 +110,14 @@
     <div class="mkt-container">
         <div class="mkt-section-head">
             <h2>What each paid client workspace includes</h2>
-            <p>Every paid managed client runs at the <strong>Standard</strong> profile by default — Scope 1 &amp; 2, clean GHG/MOCCAE/Excel/IEQT (Enterprise available on request)</p>
+            <p>Choose package depth per engagement — Scope Basic (clean inventory exports) through ESG packages and Enterprise</p>
         </div>
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach([
-                ['Emissions engine', ['Scope 1 & 2 quick input and calculations', 'Scope 3 preview (one entry per category)', 'MENA-specific emission factors', 'Dashboard with trends and hotspots']],
-                ['Data operations', ['Bulk CSV / Excel import', 'Bulk data export', 'Up to 10 branches per client', '5 years historical data retention']],
-                ['UAE compliance', ['GHG inventory PDF', 'MOCCAE Scope 1 & 2 PDF', 'IEQT export for mrv.ae', 'Excel results export']],
-                ['Disclosure &amp; ESG', ['Integrated UAE ESG Report PDF', 'ESG Scorecard with 3-year KPI tables', 'IFRS S1 / S2 + GRI PDF + SASB index', 'Full help guide including disclosures']],
+                ['Emissions engine', ['Scope 1 & 2 quick input and calculations', 'Scope 3 within package limits', 'MENA-specific emission factors', 'Dashboard with trends and hotspots']],
+                ['Data operations', ['Bulk CSV / Excel import on paid packages', 'Bulk data export', 'Sites per client by package', 'Historical data retention by package']],
+                ['UAE compliance', ['Clean GHG inventory PDF', 'MOCCAE Scope 1 & 2 PDF', 'IEQT export for mrv.ae', 'Excel results export']],
+                ['Disclosure &amp; ESG', ['Available on Scope Pro / ESG packages', 'UAE ESG Report & Scorecard options', 'IFRS / GRI / SASB when package allows', 'Enterprise for white-label / custom']],
                 ['Your workflow', ['Enter client data on their behalf', 'Review calculations before sign-off', 'Export client-ready working papers', 'Separate workspace per client organisation']],
                 ['Free trial client', ['1 client included at registration', 'Full Scope 1 & 2 + disclosure preview', 'Watermarked trial downloads', 'Request clients when ready for clean exports']],
             ] as $block)
@@ -162,36 +162,32 @@
     <div class="mkt-container">
         <div class="mkt-section-head">
             <h2>Reports you can prepare for clients</h2>
-            <p>On paid pack workspaces, export the full compliance toolkit per reporting year</p>
+            <p>Capabilities depend on the package activated for your capacity — Scope Basic for inventory, Scope Pro / ESG for disclosure suites</p>
         </div>
         <div class="mkt-table-wrap max-w-3xl mx-auto">
             <table class="mkt-table">
                 <thead>
                     <tr>
                         <th>Deliverable</th>
-                        <th>Free trial client</th>
-                        <th>Paid pack client</th>
+                        <th>Free client</th>
+                        <th>Scope Basic+</th>
+                        <th>Scope Pro / ESG</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach([
-                        ['Scope 1 & 2 calculations', 'Preview in app', 'Full + exports'],
-                        ['Disclosure forms (IFRS / GRI)', 'Preview only', 'Preview + PDF export'],
-                        ['GHG inventory PDF', '—', '✓'],
-                        ['MOCCAE S1 & 2 PDF', '—', '✓'],
-                        ['IEQT export (mrv.ae)', '—', '✓'],
-                        ['Excel results export', '—', '✓'],
-                        ['IFRS S1 / S2 PDF', '—', '✓'],
-                        ['GRI PDF + content index', '—', '✓'],
-                        ['UAE ESG Report PDF', '—', '✓'],
-                        ['ESG Scorecard Excel', '—', '✓'],
-                        ['SASB index CSV', '—', '✓'],
-                        ['Bulk CSV / XLS import', '—', '✓'],
+                        ['Scope 1 & 2 calculations', 'In-app', '✓', '✓'],
+                        ['Clean GHG / MOCCAE / IEQT / Excel', 'Watermarked', '✓', '✓'],
+                        ['Bulk CSV / Excel import', '—', '✓', '✓'],
+                        ['Disclosure form previews', '✓', '✓', '✓'],
+                        ['UAE ESG / IFRS / GRI PDF exports', '—', '—', '✓'],
+                        ['ESG Scorecard export', '—', '—', '✓'],
                     ] as $row)
                         <tr>
                             <td>{{ $row[0] }}</td>
                             <td>{{ $row[1] }}</td>
                             <td>{{ $row[2] }}</td>
+                            <td>{{ $row[3] }}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -207,14 +203,14 @@
     <div class="mkt-container">
         <div class="mkt-section-head">
             <h2>Built for every practice size</h2>
-            <p>From solo consultants to large agencies — scale managed clients as your book grows</p>
+            <p>Request the package depth and client count you need — no fixed pack sizes for sale</p>
         </div>
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             @foreach([
-                ['Consultant 5', 'Solo consultant', 'Up to 5 managed SME clients. Ideal for freelancers starting a managed-service offering.'],
-                ['Consultant 10', 'Small practice', 'Up to 10 clients. For boutiques with a steady SME portfolio across the UAE.'],
-                ['Consultant 25', 'Growing agency', 'Up to 25 clients. For teams running concurrent reporting cycles across emirates.'],
-                ['Consultant 50', 'Large agency', 'Up to 50 clients. For established practices with dedicated carbon advisory desks.'],
+                ['Free', 'Get started', '1 managed client with Free rules — explore the workflow with watermarked trial downloads.'],
+                ['Scope Basic', 'Inventory clients', 'Clean GHG / MOCCAE / Excel / IEQT for inventory-focused engagements.'],
+                ['Scope Pro / ESG', 'Disclosure work', 'UAE ESG Report, Scorecard, IFRS / GRI when those packages are activated.'],
+                ['Enterprise', 'Custom work', 'White-label and custom deployments — talk through requirements with MENetZero.'],
             ] as $pack)
                 <div class="mkt-feature-card">
                     <h3 class="text-lg font-bold mkt-text-brand mb-1">{{ $pack[0] }}</h3>
@@ -224,7 +220,8 @@
             @endforeach
         </div>
         <p class="text-center text-sm text-gray-500 mt-8">
-            Need a different scale? <a href="{{ route('contact') }}" class="mkt-text-brand hover:underline">Contact us</a> for enterprise agency arrangements.
+            Preferential rates may apply at 10+ managed clients / 12 months — sales confirms offline.
+            Need a custom arrangement? <a href="{{ route('contact') }}" class="mkt-text-brand hover:underline">Contact us</a>.
         </p>
     </div>
 </section>
@@ -238,8 +235,8 @@
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             @foreach([
                 ['01', 'Register', 'Create your consultant account with practice details — Google or email.'],
-                ['02', 'Add a client', 'Start with one free trial workspace or purchase an agency pack when you are ready to export.'],
-                ['03', 'Enter &amp; review', 'Open client workspaces — emissions, disclosures, MOCCAE forms, and downloadable reports.'],
+                ['02', 'Add a client', 'Start with one free managed workspace, then Request clients when you need clean exports or more capacity.'],
+                ['03', 'Enter &amp; review', 'Open client workspaces — emissions, disclosures, MOCCAE forms, and downloads per package.'],
                 ['04', 'Get listed', 'Complete your directory profile, pass verification, and receive platform leads.'],
             ] as $step)
                 <div class="relative">
@@ -268,7 +265,7 @@
                     <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> Public profiles build trust for your practice</li>
                     <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> Subscriber intro requests and public visitor inquiries in one leads view</li>
                     <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> Contact details shared only as qualified leads — never scraped from the listing</li>
-                    <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> MenetZero Growth subscribers get priority intro access to verified consultants</li>
+                    <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> Paid company packages unlock fuller directory connect for introductions</li>
                     <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> Upload trade license and CV for admin verification before going live</li>
                 </ul>
                 <div class="flex flex-wrap gap-3">
@@ -280,10 +277,10 @@
                 <h3 class="text-xl font-semibold mb-6 text-white">Managed clients at a glance</h3>
                 <div class="space-y-0 text-sm">
                     @foreach([
-                        ['Free trial', '1 managed client'],
-                        ['Standard', 'Paid clients · GHG / MOCCAE / Excel / IEQT'],
+                        ['Free', '1 managed client'],
+                        ['Scope Basic+', 'Clean GHG / MOCCAE / Excel / IEQT'],
+                        ['Scope Pro / ESG', 'Disclosure PDF suites'],
                         ['Enterprise', 'White-label / custom'],
-                        ['Grow mid-year', 'Request more managed clients anytime'],
                         ['Pricing', 'Confirmed offline — no public AED list'],
                     ] as $i => $row)
                         <div class="flex justify-between gap-4 py-3 {{ $i < 4 ? 'border-b border-white/10' : '' }}">
@@ -311,7 +308,7 @@
                     <li class="flex items-start"><span class="mkt-checkmark">✓</span> Sustainability consultants &amp; ESG advisors</li>
                     <li class="flex items-start"><span class="mkt-checkmark">✓</span> MOCCAE / GHG Protocol specialists</li>
                     <li class="flex items-start"><span class="mkt-checkmark">✓</span> Agencies managing multiple SME inventories</li>
-                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Practices wanting directory leads + wholesale packs</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Practices wanting directory leads + Request clients capacity</li>
                 </ul>
             </div>
             <div class="mkt-feature-card">
@@ -334,10 +331,11 @@
         <div class="space-y-4">
             @foreach([
                 ['Is the directory listing mandatory?', 'No. You can use MenetZero purely as an agency hub for managed clients. The public directory is optional — apply when you want platform leads.'],
-                ['What does the free trial client include?', 'One managed workspace on Free limits: Scope 1 & 2, Scope 3 (one entry each), watermarked trial downloads. Clean Standard exports unlock after paid clients are activated.'],
+                ['What does the free trial client include?', 'One managed workspace on Free limits: Scope 1 & 2, Scope 3 (one entry each), watermarked trial downloads. Clean exports unlock after paid capacity is activated.'],
                 ['Do my clients need their own MenetZero login?', 'You work inside managed workspaces on their behalf. Your clients do not need separate subscriptions for the work you perform in their workspace.'],
-                ['Can I add more clients mid-year?', 'Yes. Request more managed clients from the consultant portal. MENetZero confirms preferential rates offline and activates after payment.'],
+                ['Can I add more clients mid-year?', 'Yes. Request more managed clients from the consultant portal. MENetZero confirms rates offline and activates after payment.'],
                 ['How is this different from company Explore Free?', 'Explore Free on the public site is for businesses tracking their own emissions. Consultants request managed clients after consultant sign-in — no public AED list.'],
+                ['What packages can I request?', 'Scope Basic, Scope Pro, ESG Starter, ESG Complete, or Enterprise — same capability cards as companies, applied to your managed clients.'],
             ] as $faq)
                 <details class="mkt-feature-card group" style="padding:1.25rem;">
                     <summary class="font-semibold text-gray-900 cursor-pointer list-none flex justify-between items-center gap-4">
@@ -356,7 +354,7 @@
         <h2 class="text-3xl font-bold text-gray-900 mb-4">Ready to run client workspaces from one login?</h2>
         <p class="text-gray-500 mb-8">
             Register once — your agency hub, client portfolio, and directory profile live on the same consultant account.
-            Start free with one trial client, then scale with agency packs when you are ready.
+            Start free with one managed client, then Request clients when you need clean exports or more capacity.
         </p>
         <div class="flex flex-wrap justify-center gap-3">
             <a href="{{ route('consultant.register') }}" class="mkt-btn mkt-btn-primary mkt-btn-lg">Create consultant account</a>

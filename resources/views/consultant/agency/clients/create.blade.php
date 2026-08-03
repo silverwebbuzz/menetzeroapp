@@ -47,9 +47,9 @@
                 class="w-full max-w-xs rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
             <p class="text-xs text-gray-500 mt-1">
                 @if(!empty($slotSummary['is_trial']))
-                    Trial clients can enter data for this year; exports and reports require an agency pack.
+                    Trial clients can enter data for this year; clean exports need paid capacity via Request clients.
                 @else
-                    Full Growth exports apply to this year only. Next year is preview until renewal or year unlock.
+                    Paid exports focus on this PRY. Request renewal / additional capacity when you need the next year unlocked.
                 @endif
             </p>
             @error('primary_reporting_year')<p class="text-xs text-red-600 mt-1">{{ $message }}</p>@enderror

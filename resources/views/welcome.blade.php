@@ -91,8 +91,8 @@
                 <ul class="space-y-3 text-sm text-gray-600">
                     <li class="flex items-start"><span class="mkt-checkmark">✓</span> Business travel, commuting, and logistics</li>
                     <li class="flex items-start"><span class="mkt-checkmark">✓</span> Purchased goods, waste, and supply chain</li>
-                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Preview on Starter &amp; Growth (1 entry per category)</li>
-                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Unlimited Scope 3 on Enterprise</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> One entry per category on Free; more on Scope Pro / ESG packages</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Higher Scope 3 intensity available on request</li>
                 </ul>
             </div>
         </div>
@@ -164,12 +164,12 @@
         </div>
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach([
-                ['Emission calculations', ['Automated Scope 1 & 2 from activity data', 'Built-in emission factor library for MENA', 'Dashboard with totals, trends, and hotspots', 'Historical data retention (2–5 years by plan)']],
+                ['Emission calculations', ['Automated Scope 1 & 2 from activity data', 'Built-in emission factor library for MENA', 'Dashboard with totals, trends, and hotspots', 'Historical data retention by package']],
                 ['UAE & regional compliance', ['GHG Protocol-aligned inventory methodology', 'MOCCAE Scope 1 & 2 report PDFs', 'IEQT export for mrv.ae submission', 'Working papers for your audit trail']],
-                ['ESG disclosures', ['Integrated UAE ESG Report PDF (Growth+)', 'ESG Scorecard with 3-year KPI tables', 'IFRS S1 / S2 and GRI + content index', 'SASB sector index (optional)', 'Preview on Free & Starter — export on Growth']],
-                ['Data management', ['Manual quick-input for every emission source', 'Bulk CSV / Excel import (Starter+)', 'Bulk data export for analysis', 'Document storage per organisation']],
-                ['Multi-location & team access', ['Track emissions per branch or site', 'Invite colleagues with role-based access', 'Up to 10 users on Growth', 'Unlimited users on Enterprise']],
-                ['Consultant marketplace', ['Browse verified UAE consultants publicly', 'Request introductions from your account', 'Optional review packs for professional sign-off', 'Growth subscribers get full directory connect']],
+                ['ESG disclosures', ['Integrated UAE ESG Report PDF (Scope Pro / ESG packages)', 'ESG Scorecard with multi-year KPI tables', 'IFRS S1 / S2 and GRI + content index', 'SASB sector index (optional)', 'Preview on Free & Scope Basic — export on Scope Pro+']],
+                ['Data management', ['Manual quick-input for every emission source', 'Bulk CSV / Excel import (Scope Basic+)', 'Bulk data export for analysis', 'Document storage per organisation']],
+                ['Multi-location & team access', ['Track emissions per branch or site', 'Invite colleagues with role-based access', 'Site and seat limits by package', 'Custom scale on Enterprise']],
+                ['Consultant marketplace', ['Browse verified UAE consultants publicly', 'Request introductions from your account', 'Optional review support for professional sign-off', 'Paid packages unlock fuller directory connect']],
             ] as $block)
                 <div class="mkt-feature-card">
                     <h3 class="text-lg font-bold text-gray-900 mb-4">{{ $block[0] }}</h3>
@@ -187,8 +187,8 @@
 <section class="mkt-section mkt-section-bg">
     <div class="mkt-container">
         <div class="mkt-section-head">
-            <h2>Reports &amp; exports by plan</h2>
-            <p>Know exactly which deliverables unlock at each tier</p>
+            <h2>Reports &amp; exports by package</h2>
+            <p>Capabilities only — no public prices. Request a package from your account when ready.</p>
         </div>
         <div class="mkt-table-wrap">
             <table class="mkt-table">
@@ -196,30 +196,25 @@
                     <tr>
                         <th>Deliverable</th>
                         <th>Free</th>
-                        <th>Starter</th>
-                        <th>Growth</th>
-                        <th>Enterprise</th>
+                        <th>Scope Basic</th>
+                        <th>Scope Pro</th>
+                        <th>ESG Starter</th>
+                        <th>ESG Complete</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach([
-                        ['Scope 1 & 2 calculations', 'In-app', '✓', '✓', '✓'],
-                        ['GHG inventory PDF', '—', '✓', '✓', '✓'],
-                        ['MOCCAE S1 & 2 PDF', '—', '✓', '✓', '✓'],
-                        ['IEQT export (mrv.ae)', '—', '✓', '✓', '✓'],
-                        ['Excel results export', '—', '✓', '✓', '✓'],
-                        ['Bulk CSV / XLS import', '—', '✓', '✓', '✓'],
-                        ['Disclosure forms (IFRS / GRI)', 'Preview', 'Preview', 'Export PDF', 'Full'],
-                        ['IFRS S1 / S2 PDF', '—', '—', '✓', '✓'],
-                        ['GRI PDF + content index', '—', '—', '✓', '✓'],
-                        ['UAE ESG Report PDF', '—', '—', '✓', '✓'],
-                        ['ESG Scorecard Excel', '—', '—', '✓', '80+ KPIs'],
-                        ['SASB index CSV', '—', '—', '✓', '✓'],
-                        ['GRI index 80+ rows', '—', '—', '—', '✓'],
-                        ['Assurance PDF upload', '—', '—', '—', '✓'],
-                        ['White-label UAE ESG PDF', '—', '—', '—', '✓'],
-                        ['HRIS KPI import', '—', '—', '—', '✓'],
-                        ['Scope 3', 'Locked', 'Preview', 'Preview', 'Unlimited'],
+                        ['Sites / branches', '1', 'Up to 3', 'Up to 10', 'Up to 5', 'Up to 10'],
+                        ['Scope 1 & 2 calculations', 'In-app', '✓', '✓', '✓', '✓'],
+                        ['Clean GHG / MOCCAE / IEQT / Excel', 'Watermarked', '✓', '✓', '✓', '✓'],
+                        ['Bulk CSV / Excel import', '—', '✓', '✓', '✓', '✓'],
+                        ['Scope 3 categories', '1 entry each', 'Limited', 'Broader', 'Broad', 'Broad'],
+                        ['Disclosure forms (IFRS / GRI)', 'Preview', 'Preview', 'Export', 'Export', 'Export'],
+                        ['UAE ESG Report PDF', '—', '—', '✓', '✓', '✓'],
+                        ['ESG Scorecard', '—', '—', '✓', '✓', '✓'],
+                        ['IFRS S1 / S2 & GRI exports', '—', '—', '✓', '✓', '✓'],
+                        ['White-label / assurance options', '—', '—', '—', '✓', '✓'],
+                        ['Multi-entity consolidation', '—', '—', '—', '✓', '✓'],
                     ] as $row)
                         <tr>
                             <td>{{ $row[0] }}</td>
@@ -227,12 +222,14 @@
                             <td>{{ $row[2] }}</td>
                             <td>{{ $row[3] }}</td>
                             <td>{{ $row[4] }}</td>
+                            <td>{{ $row[5] }}</td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
         <p class="text-center text-xs text-gray-400 mt-4 max-w-2xl mx-auto">
+            Enterprise is custom (white-label, extended KPIs, implementation) — talk to MENetZero.
             Reports are draft working papers for your compliance workflow. Third-party verification is available through our
             <a href="{{ route('consultant-list.index') }}" class="mkt-text-brand hover:underline">consultant directory</a>.
         </p>
@@ -242,25 +239,15 @@
 <section class="mkt-section">
     <div class="mkt-container">
         <div class="mkt-section-head">
-            <h2>Optional consultant review</h2>
+            <h2>Optional consultant support</h2>
             <p>Software prepares your data — a verified consultant can review, sign off, and add the human trust layer</p>
         </div>
-        <div class="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-            @foreach(\App\Data\CommercialPlanComparison::consultantAddOns() as $addon)
-                <div class="mkt-feature-card">
-                    <div class="flex justify-between items-baseline gap-2 mb-2">
-                        <h3 class="font-bold text-gray-900">{{ $addon['name'] }}</h3>
-                        <span class="text-sm font-semibold text-gray-500">{{ $addon['price'] }}</span>
-                    </div>
-                    <p class="text-xs text-gray-500 mb-2">For {{ $addon['for_plan'] }} plan subscribers</p>
-                    <p class="text-sm text-gray-600 mb-3">{{ $addon['description'] }}</p>
-                    <span class="mkt-btn mkt-btn-coming-soon mkt-btn-sm" style="display:inline-flex;">Checkout coming soon</span>
-                </div>
-            @endforeach
+        <div class="max-w-2xl mx-auto mkt-feature-card text-center">
+            <p class="text-sm text-gray-600 mb-4">
+                Browse verified UAE consultants and request an introduction from your account. Advisory engagement is arranged offline — no public service prices here.
+            </p>
+            <a href="{{ route('consultant-list.index') }}" class="mkt-btn mkt-btn-primary mkt-btn-sm">Browse consultants</a>
         </div>
-        <p class="text-center text-sm text-gray-500 mt-6">
-            <a href="{{ route('consultant-list.index') }}" class="mkt-text-brand hover:underline">Browse verified consultants →</a>
-        </p>
     </div>
 </section>
 
@@ -275,7 +262,7 @@
                 ['01', 'Create your account', 'Company sign up with Google or email — add your organisation and first location.'],
                 ['02', 'Enter emission data', 'Use quick input or bulk import to capture Scope 1 & 2 activity data across your sites.'],
                 ['03', 'Review your dashboard', 'See calculated totals, explore disclosure forms, and identify carbon hotspots.'],
-                ['04', 'Export & report', 'Upgrade to Starter for MOCCAE/GHG exports, or Growth for the integrated UAE ESG Report, Scorecard, IFRS, and GRI deliverables.'],
+                ['04', 'Export & report', 'Request a package for clean MOCCAE/GHG exports, or an ESG package for UAE ESG Report, Scorecard, IFRS, and GRI deliverables.'],
             ] as $step)
                 <div class="relative">
                     <div class="mkt-step-badge">{{ $step[0] }}</div>
@@ -298,7 +285,7 @@
                 <p class="text-lg text-slate-300 mb-6">
                     This home page is for <strong class="text-white">companies</strong> tracking their own emissions.
                     If you manage carbon inventories for multiple clients, the consultant portal is built for you —
-                    agency packs, client workspaces, and a verified directory listing.
+                    agency workspaces, managed clients, and a verified directory listing.
                 </p>
                 <ul class="space-y-3 text-slate-300 mb-8 text-sm">
                     <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> Manage multiple SME workspaces from one login</li>

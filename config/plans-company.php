@@ -1,17 +1,17 @@
 <?php
 
 /**
- * Human-friendly copy for the company subscription upgrade page.
- * Keep language simple — sustainability managers, finance, and ops teams.
+ * Human-friendly copy for company package guidance (legacy upgrade page + helpers).
+ * No public AED. Request a package → offline quote → activate.
  */
 return [
     'intro' => [
-        'title' => 'Choose the plan that matches what you need to deliver',
-        'body' => 'All plans let you track Scope 1 and 2 emissions in MeNetZero. The difference is what you can download, share with auditors, and how many sites and team members you can use.',
+        'title' => 'Choose the package that matches what you need to deliver',
+        'body' => 'All packages include Scope 1 and 2 in MENetZero. The difference is clean exports, Scope 3 depth, disclosure PDFs, and how many sites and teammates you can use.',
         'tips' => [
-            'Not sure yet? Stay on Free — Scope 1 & 2 are included, plus one Scope 3 entry per category.',
-            'Need official PDF downloads? Request a package — MENetZero confirms pricing and activates after offline payment.',
-            'Preparing an integrated UAE ESG report? Ask for an ESG package when you request activation.',
+            'Not sure yet? Stay on Free — Scope 1 & 2 are included, plus one Scope 3 entry per category (watermarked trial downloads).',
+            'Need official PDF downloads? Request a package — MENetZero confirms pricing offline and activates after payment.',
+            'Preparing an integrated UAE ESG report? Request Scope Pro or an ESG package.',
         ],
     ],
 
@@ -20,86 +20,91 @@ return [
             'plan' => 'Free',
             'code' => 'client_free',
             'scenario' => 'A 1-location café wants to understand its electricity and LPG use before committing budget.',
-            'you_get' => 'Enter data, view dashboards and disclosure previews — no paid report downloads.',
+            'you_get' => 'Enter data, view dashboards and disclosure previews — watermarked trial downloads only.',
         ],
         [
-            'plan' => 'Starter',
-            'code' => 'client_starter',
-            'scenario' => 'A logistics SME with 2–3 warehouses must submit a MOCCAE-aligned inventory this year.',
-            'you_get' => 'Up to 3 locations, bulk import, and downloadable GHG inventory PDF.',
+            'plan' => 'Scope Basic',
+            'code' => 'client_scope_basic',
+            'scenario' => 'A logistics SME with a few sites must submit a MOCCAE-aligned inventory this year.',
+            'you_get' => 'Up to 3 sites, bulk import, and clean GHG / MOCCAE / Excel / IEQT exports.',
         ],
         [
-            'plan' => 'Growth',
-            'code' => 'client_growth',
-            'scenario' => 'A manufacturing group preparing an integrated UAE ESG report and investor-ready climate disclosures for 10 sites.',
-            'you_get' => 'UAE ESG Report PDF, ESG Scorecard, IFRS S1/S2 and GRI exports, SASB index, consultant directory access.',
+            'plan' => 'Scope Pro',
+            'code' => 'client_scope_pro',
+            'scenario' => 'A mid-size org needing broader Scope 3 and ESG disclosure PDF exports.',
+            'you_get' => 'Up to 10 sites, broader Scope 3, UAE ESG Report / Scorecard / IFRS / GRI exports.',
+        ],
+        [
+            'plan' => 'ESG Starter',
+            'code' => 'client_esg_starter',
+            'scenario' => 'First integrated UAE ESG delivery with white-label / assurance options.',
+            'you_get' => 'Full ESG report set for mid-size orgs (up to 5 sites) plus assurance / white-label options.',
+        ],
+        [
+            'plan' => 'ESG Complete',
+            'code' => 'client_esg_complete',
+            'scenario' => 'A group needing larger site count and multi-entity consolidation.',
+            'you_get' => 'Full ESG suite at larger scale (up to 10 sites) with consolidation options.',
         ],
         [
             'plan' => 'Enterprise',
             'code' => 'client_enterprise',
-            'scenario' => 'A holding company needing 80+ KPI scorecards, HRIS workforce data, assurance PDF attachment, and white-label report covers.',
-            'you_get' => 'Everything in Growth plus extended GRI index, enterprise scorecard, HRIS CSV import, assurance upload, and branded PDF covers.',
+            'scenario' => 'Custom implementation, extended KPIs, HRIS import, and white-label deployment.',
+            'you_get' => 'Custom sites, seats, and workflows — quoted offline with MENetZero.',
         ],
     ],
 
     'clarifications' => [
         [
-            'title' => 'One payment per year',
-            'body' => 'Plans are billed annually as a single payment (not monthly subscriptions). You choose whether to renew each year — we do not store card mandates.',
-        ],
-        [
-            'title' => 'Upgrades vs downgrades',
-            'body' => 'Upgrading mid-year credits unused time on your current plan toward a full year on the new plan. Downgrading takes effect at your next renewal — we do not refund unused time on the higher plan.',
+            'title' => 'Offline quotes only',
+            'body' => 'There is no public AED grid and no self-serve checkout. Submit Request a package; MENetZero confirms the annual quote and activates after payment.',
         ],
         [
             'title' => 'Free is really free',
-            'body' => 'You can stay on Free indefinitely to learn the platform. Paid plans unlock exports, more locations, and team seats.',
+            'body' => 'You can stay on Free to learn the platform. Paid packages unlock clean exports, more locations, and team seats.',
         ],
         [
-            'title' => 'Scope 3 is separate',
-            'body' => 'Value-chain (Scope 3) reporting is an add-on for most organisations. Starter and Growth include limited Scope 3 entry; full Scope 3 programmes are quoted separately.',
+            'title' => 'Scope 3 depth varies',
+            'body' => 'Free allows one Scope 3 entry per category. Scope Pro and ESG packages expand value-chain capacity; extras can be requested when quoting.',
         ],
     ],
 
     'faq' => [
         [
-            'q' => 'Which plan do I need for the UAE ESG Report?',
-            'a' => 'Growth or Enterprise. Growth includes the integrated UAE ESG Report PDF, ESG Scorecard, and all IFRS/GRI exports. Enterprise adds 80+ KPI packs, HRIS import, assurance PDF upload, and white-label covers.',
+            'q' => 'Which package do I need for the UAE ESG Report?',
+            'a' => 'Typically Scope Pro, ESG Starter, ESG Complete, or Enterprise. Free and Scope Basic usually preview disclosures only. Enterprise adds extended KPI / white-label / assurance options.',
         ],
         [
-            'q' => 'Which plan do I need for MOCCAE reporting?',
-            'a' => 'Starter or above. Starter includes a downloadable GHG inventory PDF aligned for UAE inventory submissions. Growth adds the full integrated UAE ESG Report if you also disclose to investors.',
+            'q' => 'Which package do I need for MOCCAE reporting?',
+            'a' => 'Scope Basic or higher for clean GHG / MOCCAE / Excel / IEQT. Free downloads are watermarked trial files.',
         ],
         [
             'q' => 'Can I try before I pay?',
-            'a' => 'Yes. Free lets you add one location, enter Scope 1 and 2 data, and preview disclosure forms. Upgrade when you need PDF downloads or more locations.',
+            'a' => 'Yes. Free lets you add a location, enter Scope 1 and 2 data, and preview disclosure forms. Request a package when you need clean exports.',
         ],
         [
-            'q' => 'What happens if I upgrade today?',
-            'a' => 'You pay the difference (with credit for unused time on your current plan) and receive a full 12-month term on the new plan from the upgrade date.',
+            'q' => 'Where do I see prices?',
+            'a' => 'You do not publicly. Request a package shows features only; MENetZero confirms AED amounts offline.',
         ],
         [
-            'q' => 'Can I add more users or locations later?',
-            'a' => 'Yes — upgrade to a higher tier when you need more seats or branches. Enterprise is best when limits on Growth are not enough.',
-        ],
-        [
-            'q' => 'Do prices include VAT?',
-            'a' => 'Prices shown are in AED or INR as selected. Any applicable taxes are shown at checkout when online payment is enabled.',
-        ],
-        [
-            'q' => 'We work with a sustainability consultant — do we still need Growth?',
-            'a' => 'If your consultant manages your data in their agency workspace, they may cover exports under their pack. If you use MeNetZero directly as a company, choose the plan that matches your download needs.',
+            'q' => 'We work with a sustainability consultant — do we still need a company package?',
+            'a' => 'If your consultant manages your workspace, they request managed-client capacity. If you use MENetZero directly as a company, request the package that matches your download needs.',
         ],
         [
             'q' => 'Can I cancel or go back to Free?',
-            'a' => 'You can schedule a downgrade to Free at renewal. Your data stays in the account; export features lock according to the Free plan limits.',
+            'a' => 'You can schedule a return to Free at renewal. Your data stays; clean export features follow Free limits.',
         ],
     ],
 
     'plan_taglines' => [
         'client_free' => 'Scope 1 & 2 full + Scope 3 (1 entry / category)',
-        'client_starter' => 'Official GHG inventory PDF for regulators & stakeholders',
-        'client_growth' => 'Integrated UAE ESG Report + IFRS & GRI downloads',
-        'client_enterprise' => '80+ KPI scorecard, HRIS import & white-label PDF',
+        'client_scope_basic' => 'Clean GHG / MOCCAE / Excel / IEQT',
+        'client_scope_pro' => 'Broader scopes + ESG disclosure exports',
+        'client_esg_starter' => 'Full ESG pack for mid-size orgs',
+        'client_esg_complete' => 'Larger portfolios + consolidation',
+        'client_enterprise' => 'Custom / white-label deployment',
+        // Legacy codes (older activations)
+        'client_starter' => 'Official GHG inventory PDF (legacy)',
+        'client_growth' => 'Integrated UAE ESG Report (legacy)',
     ],
 ];

@@ -8,9 +8,9 @@
     <div {{ $attributes->merge(['class' => 'mkt-payments-notice']) }}>
         <strong>Register free today.</strong>
         @if($context === 'consultant')
-            Paid agency packs and upgrades will be available here once online payments go live — explore features and add your free trial client in the meantime.
+            Explore with one free managed client. When you need clean exports or more capacity, Request clients — MENetZero confirms pricing offline (no public AED list).
         @else
-            Explore Scope 1 &amp; 2 and disclosure previews on the Free plan. Paid upgrades (Starter, Growth, Enterprise) are coming soon — you can switch plans from your account when checkout opens.
+            Explore Scope 1 &amp; 2 and disclosure previews on Free. When you need clean exports, Request a package from Plan &amp; billing — pricing is confirmed offline.
         @endif
     </div>
 @endif
