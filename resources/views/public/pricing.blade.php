@@ -1,137 +1,51 @@
 @extends('layouts.public')
 
-@section('title', 'Pricing — ' . ($settings['brand_name'] ?? 'MENetZero'))
+@section('title', 'Explore Free — ' . ($settings['brand_name'] ?? 'MENetZero'))
 
 @section('content')
-@php use App\Services\CurrencyService; @endphp
-
 <section class="mkt-hero">
-    <div class="mkt-container max-w-4xl">
-        <div class="mkt-tagline">For companies · self-serve</div>
-        <h1>Company pricing (AED)</h1>
+    <div class="mkt-container max-w-3xl">
+        <div class="mkt-tagline">No public prices · explore first</div>
+        <h1>Explore Free</h1>
         <p class="mkt-lead">
-            Plans for businesses that want to track and report their own carbon emissions manually on the platform.
-            Register free to try Scope 1 &amp; 2 and disclosure previews — paid upgrades are coming soon.
+            Start with MENetZero Free — measure Scope 1 &amp; 2, try Scope 3 (one entry per category),
+            and download watermarked trial reports. When you need official clean exports or more capacity,
+            request a package from inside your account. Pricing is confirmed offline by our team.
         </p>
-        <x-payments-notice class="mt-6" />
-        <p class="text-sm text-gray-500 mt-4 max-w-2xl mx-auto">
-            Are you a sustainability consultant or agency?
-            <a href="{{ route('consultant.landing') }}" class="mkt-text-brand hover:underline">View consultant features</a>
-            — agency pack pricing is available after you sign in.
+        <div class="flex flex-wrap justify-center gap-3 mt-8">
+            <a href="{{ route('register') }}" class="mkt-btn mkt-btn-primary mkt-btn-lg">Company — Explore Free</a>
+            <a href="{{ route('consultant.register') }}" class="mkt-btn mkt-btn-outline mkt-btn-lg">Consultant — Explore Free</a>
+        </div>
+        <p class="text-sm text-gray-500 mt-6 max-w-xl mx-auto">
+            Already registered?
+            <a href="{{ route('login') }}" class="mkt-text-brand hover:underline">Company sign in</a>
+            ·
+            <a href="{{ route('consultant.login') }}" class="mkt-text-brand hover:underline">Consultant sign in</a>
+        </p>
+        <p class="text-sm text-gray-500 mt-4">
+            Questions?
+            <a href="{{ route('contact') }}" class="mkt-text-brand hover:underline">Contact us</a>
+            for a demo account or package discussion.
         </p>
     </div>
 </section>
 
 <section class="mkt-section pt-0">
-    <div class="mkt-container">
-        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-14">
-            @foreach($comparisonColumns as $code)
-                @php
-                    $plan = $plansByCode[$code] ?? null;
-                    $label = $comparisonLabels[$code] ?? ['name' => $code, 'tagline' => ''];
-                    $isGrowth = $code === 'client_growth';
-                    $isEnterprise = $code === 'client_enterprise';
-                    $isFree = $code === 'client_free';
-                @endphp
-                @if(!$plan && !$isFree)
-                    @continue
-                @endif
-                <div class="mkt-pricing-card {{ $isGrowth ? 'popular' : '' }}">
-                    @if($isGrowth)
-                        <span class="mkt-pricing-badge">MOST POPULAR</span>
-                    @endif
-                    <h3 class="text-lg font-bold text-gray-900">{{ $plan->plan_name ?? $label['name'] }}</h3>
-                    <p class="text-xs text-gray-500 mb-4 min-h-[2.5rem]">{{ $plan->description ?? $label['tagline'] }}</p>
-
-                    <div class="mb-5">
-                        @if($isEnterprise)
-                            <div class="text-2xl font-extrabold text-gray-900">Custom</div>
-                            <div class="text-xs text-gray-500">AED 20,000+ / year</div>
-                        @elseif($isFree || !$plan || (float) ($plan->price_annual ?? 0) <= 0)
-                            <div class="text-2xl font-extrabold text-gray-900">{{ CurrencyService::format(0, $currency) }}</div>
-                            <div class="text-xs text-gray-500">Free forever</div>
-                        @else
-                            @php $price = CurrencyService::displayPrice($plan, $currency); @endphp
-                            <div class="text-2xl font-extrabold text-gray-900">{{ CurrencyService::format($price['amount'], $currency) }}</div>
-                            <div class="text-xs text-gray-500">per year</div>
-                        @endif
-                    </div>
-
-                    <ul class="space-y-2 text-sm text-gray-600 flex-1 mb-5">
-                        @if($isFree)
-                            <li class="flex items-start"><span class="mkt-checkmark">✓</span> Scope 1 &amp; 2 + disclosure forms</li>
-                            <li class="flex items-start"><span class="mkt-checkmark">✓</span> In-app preview (no downloads)</li>
-                            <li class="flex items-start"><span class="text-gray-400 mr-2">—</span> Scope 3 locked</li>
-                        @elseif($code === 'client_starter')
-                            <li class="flex items-start"><span class="mkt-checkmark">✓</span> GHG, MOCCAE, Excel, IEQT</li>
-                            <li class="flex items-start"><span class="mkt-checkmark">✓</span> Bulk import + help guide</li>
-                            <li class="flex items-start"><span class="mkt-checkmark">✓</span> Scope 3 preview</li>
-                        @elseif($isGrowth)
-                            <li class="flex items-start"><span class="mkt-checkmark">✓</span> Everything in Starter</li>
-                            <li class="flex items-start"><span class="mkt-checkmark">✓</span> UAE ESG Report + Scorecard</li>
-                            <li class="flex items-start"><span class="mkt-checkmark">✓</span> IFRS S1/S2, GRI &amp; SASB exports</li>
-                        @else
-                            <li class="flex items-start"><span class="mkt-checkmark">✓</span> Everything in Growth</li>
-                            <li class="flex items-start"><span class="mkt-checkmark">✓</span> 80+ GRI index &amp; KPI scorecard</li>
-                            <li class="flex items-start"><span class="mkt-checkmark">✓</span> HRIS import &amp; white-label PDF</li>
-                        @endif
-                    </ul>
-
-                    <x-plan-purchase-cta
-                        :tier="$isFree ? 'free' : ($isEnterprise ? 'enterprise' : 'paid')"
-                        :highlight="$isGrowth"
-                    />
-                    @if(!$isFree && !\App\Models\PaymentGateway::checkoutAvailable())
-                        <p class="text-xs text-gray-400 text-center mt-2">Register free — upgrade from your account later</p>
-                    @endif
-                </div>
-            @endforeach
+    <div class="mkt-container max-w-3xl">
+        <div class="mkt-section-head">
+            <h2>What’s included on Free</h2>
+            <p>Enough to learn the workflow — not for final regulatory submission without a package</p>
         </div>
-
-        @include('client.subscriptions.partials.comparison-table', [
-            'title' => 'Compare — data & operations',
-            'rows' => $operationsRows,
-            'columns' => $comparisonColumns,
-            'labels' => $comparisonLabels,
-            'plans' => $plansByCode,
-        ])
-
-        @include('client.subscriptions.partials.comparison-table', [
-            'title' => 'Compare — report downloads',
-            'rows' => $downloadRows,
-            'columns' => $comparisonColumns,
-            'labels' => $comparisonLabels,
-            'plans' => $plansByCode,
-        ])
-
-        <div class="mb-12">
-            <div class="mkt-section-head text-left mb-8" style="margin-bottom:2rem;">
-                <h2 class="text-left" style="max-width:none;margin:0;">Consultant review packs</h2>
-                <p class="text-left" style="max-width:none;margin:0.5rem 0 0;">Optional human review via verified UAE consultants — software prepares, consultants sign off.</p>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                @foreach($consultantAddOns as $addon)
-                    <div class="mkt-feature-card" style="padding:1.25rem;">
-                        <div class="flex justify-between items-baseline gap-2 mb-2">
-                            <h3 class="font-bold text-gray-900">{{ $addon['name'] }}</h3>
-                            <span class="text-sm font-semibold text-gray-500">{{ $addon['price'] }}</span>
-                        </div>
-                        <p class="text-sm text-gray-600 mb-3">{{ $addon['description'] }}</p>
-                        <span class="mkt-btn mkt-btn-coming-soon mkt-btn-sm" style="display:inline-flex;">Checkout coming soon</span>
-                    </div>
-                @endforeach
-            </div>
+        <ul class="space-y-3 text-sm text-gray-700 mb-10">
+            <li class="flex gap-2"><span class="mkt-checkmark">✓</span> Scope 1 &amp; 2 data entry (full)</li>
+            <li class="flex gap-2"><span class="mkt-checkmark">✓</span> Scope 3 — all categories, one entry each</li>
+            <li class="flex gap-2"><span class="mkt-checkmark">✓</span> Watermarked GHG / MOCCAE / Excel / IEQT trial downloads</li>
+            <li class="flex gap-2"><span class="mkt-checkmark">✓</span> Disclosure form previews</li>
+            <li class="flex gap-2"><span class="text-gray-400">—</span> Official clean PDF packs after your package is activated</li>
+        </ul>
+        <div class="rounded-xl border border-teal-100 bg-teal-50/60 p-5 text-sm text-teal-950">
+            <strong>Consultants:</strong> Free includes one managed client entity. Request more entities from the consultant portal after you sign in — preferential annual rates are confirmed offline.
         </div>
-
-        <p class="text-center text-sm text-gray-500 max-w-2xl mx-auto">
-            Reports are draft working papers for your compliance workflow.
-            Third-party verification is available through our <a href="{{ route('consultant-list.index') }}" class="text-teal-600 hover:underline">consultant directory</a> — not a substitute for MOCCAE-authorised verification unless contracted.
-        </p>
-        <p class="text-center text-xs text-gray-400 mt-4">
-            Prices exclude applicable taxes.
-            <a href="{{ route('terms') }}" class="underline">Terms</a> ·
-            <a href="{{ route('refunds') }}" class="underline">Refunds</a>
-        </p>
     </div>
 </section>
 @endsection

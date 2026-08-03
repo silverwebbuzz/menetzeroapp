@@ -14,7 +14,7 @@
             <div>
                 <div class="font-semibold text-white mb-3">Product</div>
                 <ul class="space-y-2 text-gray-400">
-                    <li><a href="{{ route('pricing') }}" class="hover:text-white">Company pricing</a></li>
+                    <li><a href="{{ route('pricing') }}" class="hover:text-white">Explore Free</a></li>
                     <li><a href="{{ route('consultant-list.index') }}" class="hover:text-white">Find consultants</a></li>
                     <li><a href="{{ route('consultant.landing') }}" class="hover:text-white">Join as consultant</a></li>
                     <li><a href="{{ route('register') }}" class="hover:text-white">Company sign up</a></li>

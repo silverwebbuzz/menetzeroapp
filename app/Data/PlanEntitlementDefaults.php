@@ -63,7 +63,7 @@ class PlanEntitlementDefaults
     {
         return [
             'plan_name' => 'Free',
-            'description' => 'Scope 1 & 2 full, Scope 3 (1 entry per category), disclosure previews. Request a package for clean exports.',
+            'description' => 'Scope 1 & 2 full, Scope 3 (1 entry per category), disclosure previews, watermarked GHG/Excel/IEQT trial downloads. Request a package for clean exports.',
             'price_annual' => 0,
             'currency' => 'AED',
             'sort_order' => 1,
@@ -82,9 +82,11 @@ class PlanEntitlementDefaults
                 'bulk_export' => false,
                 'help_level' => 'basic',
                 'disclosures' => ['access' => true, 'export' => false],
-                'exports' => [],
+                // Trial downloads — always stamped (see export_watermark).
+                'exports' => ['ghg_pdf', 'moccae_pdf', 'excel', 'ieqt'],
+                'export_watermark' => true,
+                'export_regen' => 'watermarked_trial',
                 'consultant_directory' => 'teaser',
-                'export_regen' => 'none',
             ],
             'features' => ['disclosures_access'],
         ];

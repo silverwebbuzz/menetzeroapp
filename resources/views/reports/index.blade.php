@@ -194,22 +194,33 @@
                 'moccae_only' => $moccaeOnly ? 1 : null,
             ]);
             $reportFyBanner = (int) ($measurement->fiscal_year ?? 0);
-            $previewOnly = !$gate->canExport(($moccaeOnly ?? false) ? 'moccae_pdf' : 'ghg_pdf', $reportFyBanner);
+            $pdfExportCode = ($moccaeOnly ?? false) ? 'moccae_pdf' : 'ghg_pdf';
+            $canDownload = $gate->canExport($pdfExportCode, $reportFyBanner);
+            $previewOnly = !$canDownload;
+            $trialWatermarked = $canDownload && $gate->exportsAreWatermarked();
         @endphp
 
         @if($previewOnly)
             <x-preview-only-banner
-                :message="$gate->lockedFeatureMessage('In-app preview only on Free. Request a package to download official GHG, Excel, and IEQT exports.', 'Report downloads')"
+                :message="$gate->lockedFeatureMessage('In-app preview only. Request a package to download official GHG, Excel, and IEQT exports.', 'Report downloads')"
+                :upgrade-label="$gate->upgradeButtonLabel('Request a package')" />
+        @elseif($trialWatermarked)
+            <x-preview-only-banner
+                :message="$gate->watermarkBannerMessage()"
                 :upgrade-label="$gate->upgradeButtonLabel('Request a package')" />
         @endif
 
         <x-export-readiness-banner :readiness="$exportReadiness ?? null" />
 
         {{-- Report header --}}
-        <div class="card mb-5 {{ $previewOnly ? 'relative' : '' }}">
+        <div class="card mb-5 {{ ($previewOnly || $trialWatermarked) ? 'relative' : '' }}">
             @if($previewOnly)
                 <div class="pointer-events-none absolute inset-0 z-10 flex items-center justify-center overflow-hidden rounded-lg" aria-hidden="true">
                     <span class="text-5xl font-bold uppercase tracking-widest text-slate-200/80 -rotate-12 select-none">Preview</span>
+                </div>
+            @elseif($trialWatermarked)
+                <div class="pointer-events-none absolute inset-0 z-10 flex items-center justify-center overflow-hidden rounded-lg" aria-hidden="true">
+                    <span class="text-4xl font-bold uppercase tracking-widest text-red-200/70 -rotate-12 select-none">Trial watermark</span>
                 </div>
             @endif
             <div class="card-header">
@@ -223,6 +234,11 @@
                         <span class="inline-block mt-1 text-xs font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full {{ $moccaeOnly ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600' }}">
                             {{ $report['export_mode_label'] }}
                         </span>
+                        @if($trialWatermarked)
+                            <span class="inline-block mt-1 ml-1 text-xs font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full bg-red-100 text-red-800">
+                                Watermarked trial download
+                            </span>
+                        @endif
                     </div>
                 </div>
                 @php
@@ -243,7 +259,7 @@
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m-3-3l3 3 3-3M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1"/>
                         </svg>
-                        Download PDF
+                        Download PDF{{ $trialWatermarked ? ' (trial)' : '' }}
                     </x-plan-gated-link>
                     <x-plan-gated-link
                         :allowed="$gate->canExport('excel', $reportFy)"
@@ -254,7 +270,7 @@
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                         </svg>
-                        Export Excel
+                        Export Excel{{ $trialWatermarked ? ' (trial)' : '' }}
                     </x-plan-gated-link>
                     <x-plan-gated-link
                         :allowed="$gate->canExport('ieqt', $reportFy) && !$exportBlocked"
@@ -268,7 +284,7 @@
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
-                        IEQT Export
+                        IEQT Export{{ $trialWatermarked ? ' (trial)' : '' }}
                     </x-plan-gated-link>
                 </div>
             </div>

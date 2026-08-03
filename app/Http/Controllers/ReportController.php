@@ -103,13 +103,16 @@ class ReportController extends Controller
             $moccaeOnly
         );
 
+        $watermark = app(PlanEntitlementService::class)->exportsAreWatermarked($company->id);
+
         return Excel::download(
             new ResultsBreakdownExport(
                 $report['results_breakdown'],
                 $report['display_total_tonnes'],
-                $report['scope_3_categories'] ?? collect()
+                $report['scope_3_categories'] ?? collect(),
+                $watermark
             ),
-            $this->reportFilename($measurement, 'xlsx', $moccaeOnly)
+            $this->reportFilename($measurement, 'xlsx', $moccaeOnly, $watermark)
         );
     }
 
@@ -142,6 +145,7 @@ class ReportController extends Controller
 
         $scopeChart = $this->buildScopeChart($report);
         $sourceChart = $this->buildSourceChart($report);
+        $watermark = app(PlanEntitlementService::class)->exportsAreWatermarked($company->id);
 
         $pdf = Pdf::loadView('reports.pdf', [
             'company' => $company,
@@ -150,13 +154,16 @@ class ReportController extends Controller
             'sourceChart' => $sourceChart,
             'companyLogo' => $company->logoDataUri(),
             'platformLogo' => $this->platformLogoDataUri(),
+            'exportWatermark' => $watermark,
+            'exportWatermarkText' => $watermark ? \App\Support\ExportWatermark::bannerText() : null,
+            'exportWatermarkDiagonal' => $watermark ? \App\Support\ExportWatermark::pdfDiagonal() : null,
         ])->setPaper('a4', 'portrait')->setOptions([
             'isHtml5ParserEnabled' => true,
             'isRemoteEnabled' => true,
             'defaultFont' => 'dejavu sans',
         ]);
 
-        return $pdf->download($this->reportFilename($measurement, 'pdf', $moccaeOnly));
+        return $pdf->download($this->reportFilename($measurement, 'pdf', $moccaeOnly, $watermark));
     }
 
     protected function findMeasurement(Request $request, int $companyId): Measurement
@@ -177,12 +184,13 @@ class ReportController extends Controller
         }
     }
 
-    protected function reportFilename(Measurement $measurement, string $ext, bool $moccaeOnly = false): string
+    protected function reportFilename(Measurement $measurement, string $ext, bool $moccaeOnly = false, bool $watermark = false): string
     {
         $location = preg_replace('/[^a-z0-9]+/i', '-', strtolower($measurement->location->name ?? 'location'));
         $prefix = $moccaeOnly ? 'ghg-inventory-moccae' : 'ghg-inventory';
+        $suffix = $watermark ? \App\Support\ExportWatermark::filenameSuffix() : '';
 
-        return "{$prefix}-{$measurement->fiscal_year}-{$location}.{$ext}";
+        return "{$prefix}-{$measurement->fiscal_year}-{$location}{$suffix}.{$ext}";
     }
 
     protected function buildScopeChart(array $report): ?string

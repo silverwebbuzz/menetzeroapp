@@ -319,7 +319,7 @@
                 <h3 class="font-bold text-gray-900 mb-3">Company self-serve — different product</h3>
                 <p class="text-gray-500 mb-3">If <em>your own company</em> tracks its emissions (not clients'), use the company portal instead.</p>
                 <ul class="space-y-2 text-gray-600 mb-4">
-                    <li class="flex items-start"><span class="text-gray-400 mr-2">→</span> <a href="{{ route('pricing') }}" class="mkt-text-brand hover:underline">Company pricing (AED)</a> — Starter, Growth, Enterprise</li>
+                    <li class="flex items-start"><span class="text-gray-400 mr-2">→</span> <a href="{{ route('pricing') }}" class="mkt-text-brand hover:underline">Explore Free</a> — then request a package from your account</li>
                     <li class="flex items-start"><span class="text-gray-400 mr-2">→</span> <a href="{{ route('register') }}" class="mkt-text-brand hover:underline">Company sign up</a></li>
                 </ul>
             </div>
@@ -335,10 +335,10 @@
         <div class="space-y-4">
             @foreach([
                 ['Is the directory listing mandatory?', 'No. You can use MenetZero purely as an agency hub for managed clients. The public directory is optional — apply when you want platform leads.'],
-                ['What does the free trial client include?', 'One managed workspace with Scope 1 & 2 data entry and disclosure previews in the app. PDF exports unlock when you assign the client to a paid pack slot.'],
+                ['What does the free trial client include?', 'One managed workspace on Free limits: Scope 1 & 2, Scope 3 (one entry each), watermarked trial downloads. Clean Standard exports unlock after paid entities are activated.'],
                 ['Do my clients need their own MenetZero login?', 'You work inside managed workspaces on their behalf. Your clients do not need separate subscriptions for the work you perform in their workspace.'],
-                ['Can I add more clients mid-year?', 'Yes. Buy extra slots pro-rata through 31 December, or unlock a new reporting year for an existing client without upgrading your whole pack.'],
-                ['How is this different from company pricing?', 'Company pricing on our public site is for businesses tracking their own emissions. Consultant packs are wholesale rates for practices managing many clients — shown only after consultant sign-in.'],
+                ['Can I add more clients mid-year?', 'Yes. Request more managed-client entities from the consultant portal. MENetZero confirms preferential rates offline and activates after payment.'],
+                ['How is this different from company Explore Free?', 'Explore Free on the public site is for businesses tracking their own emissions. Consultants request entities for client workspaces after consultant sign-in — no public AED list.'],
             ] as $faq)
                 <details class="mkt-feature-card group" style="padding:1.25rem;">
                     <summary class="font-semibold text-gray-900 cursor-pointer list-none flex justify-between items-center gap-4">

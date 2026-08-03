@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Data\CommercialPlanComparison;
 use App\Models\SitePage;
 use App\Models\SiteSetting;
-use App\Models\SubscriptionPlan;
 use App\Services\CurrencyService;
 use Illuminate\Http\Request;
 
 /**
  * Public marketing + policy pages (Contact, Terms, Refunds, Privacy) and the
- * public pricing page. Required for payment gateway website whitelisting.
+ * Explore Free page (route name `pricing` for back-compat).
  */
 class PageController extends Controller
 {
@@ -33,34 +31,12 @@ class PageController extends Controller
         return view('public.contact', compact('page', 'settings'));
     }
 
-    /** Public pricing page with geo-aware currency. */
+    /** Public Explore Free page (no prices — Phase 3). Route name remains `pricing` for back-compat. */
     public function pricing()
     {
-        $plans = SubscriptionPlan::where('plan_category', 'client')
-            ->where('is_active', true)
-            ->orderBy('sort_order')
-            ->get();
-
-        $currency = 'AED';
         $settings = SiteSetting::allSettings();
-        $plansByCode = $plans->keyBy('plan_code');
-        $comparisonColumns = CommercialPlanComparison::PLAN_COLUMNS;
-        $comparisonLabels = CommercialPlanComparison::planLabels();
-        $operationsRows = CommercialPlanComparison::operationsRows();
-        $downloadRows = CommercialPlanComparison::downloadRows();
-        $consultantAddOns = CommercialPlanComparison::consultantAddOns();
 
-        return view('public.pricing', compact(
-            'plans',
-            'plansByCode',
-            'currency',
-            'settings',
-            'comparisonColumns',
-            'comparisonLabels',
-            'operationsRows',
-            'downloadRows',
-            'consultantAddOns',
-        ));
+        return view('public.pricing', compact('settings'));
     }
 
     /** Switch the display currency and return to the previous page. */

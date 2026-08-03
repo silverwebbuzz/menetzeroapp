@@ -1,22 +1,24 @@
 <?php
 
 /**
- * Human-friendly copy for consultant agency packs page.
+ * Human-friendly copy for consultant agency area.
+ * Paid commercial default (Aug 2026): Request slots / entities — see PRICING_AND_PLAN_MAJOR_CHANGES.md §6.
+ * Pack cards below are legacy until Phase 3 hides self-serve checkout.
  */
 return [
     'intro' => [
-        'title' => 'Agency packs — one subscription, many client workspaces',
-        'body' => 'Each slot is one managed client company. When you open their workspace, you use the same emissions tools they would — and on a paid pack each client gets Growth-level exports for their primary reporting year (PRY).',
+        'title' => 'Consultant portal — manage many client entities from one login',
+        'body' => 'Start with one Free entity to learn the workflow. When you need more client workspaces, request additional entities — MENetZero confirms pricing and activates after offline payment. Paid Consultant Plan entities typically include up to 5 sites each.',
         'tips' => [
-            'Start free with one trial client — enter data and learn the workflow.',
-            'Count how many active clients you expect this calendar year, then pick the smallest pack that fits.',
-            'You can buy extra slots mid-year without changing pack size.',
+            'Free includes one managed client (entity) with Free data rules and watermarked trial exports.',
+            'Request more entities from the portal — no public self-serve pack checkout.',
+            'Enterprise / white-label deployments are quoted separately.',
         ],
     ],
 
     'how_it_works' => [
         [
-            'title' => 'Add a client',
+            'title' => 'Add a client entity',
             'body' => 'Create a managed workspace for each SME you support (e.g. "Al Noor Trading LLC").',
         ],
         [
@@ -24,12 +26,12 @@ return [
             'body' => 'Switch into the client workspace — locations, Quick Input, Scope 1–3, disclosures — as if you were their in-house team.',
         ],
         [
-            'title' => 'Export reports on a paid pack',
-            'body' => 'Paid packs unlock Growth-equivalent PDFs per client for their PRY — including UAE ESG Report, Scorecard, GHG, MOCCAE, IFRS, and GRI. Trial is data entry only — no exports.',
+            'title' => 'Request paid entities when ready',
+            'body' => 'After Free, request additional entities. Clean exports unlock once MENetZero activates your Consultant Plan or Enterprise engagement.',
         ],
         [
-            'title' => 'Renew or grow each calendar year',
-            'body' => 'Contracts run through 31 December. Renew your pack or add slots when you take on more clients.',
+            'title' => 'Renew or grow each year',
+            'body' => 'Annual subscriptions. Preferential consultant rates may apply when you grow your portfolio — confirmed offline with MENetZero.',
         ],
     ],
 

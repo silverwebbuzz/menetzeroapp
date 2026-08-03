@@ -54,6 +54,7 @@ class PlanEntitlementAdminService
     {
         return [
             'none' => 'No downloads',
+            'watermarked_trial' => 'Watermarked trial downloads only',
             'subscription_year_unlimited' => 'Unlimited regen within subscription year',
         ];
     }
@@ -111,6 +112,7 @@ class PlanEntitlementAdminService
             'exports' => $allExports ? array_keys(self::exportOptions()) : $exports,
             'consultant_directory' => $entitlements['consultant_directory'] ?? 'teaser',
             'export_regen' => $entitlements['export_regen'] ?? 'none',
+            'export_watermark' => (bool) ($entitlements['export_watermark'] ?? false),
         ];
     }
 
@@ -123,6 +125,7 @@ class PlanEntitlementAdminService
         $selectedExports = array_values(array_filter((array) ($input['exports'] ?? [])));
 
         $exports = $exportsAll ? ['*'] : $selectedExports;
+        $exportRegen = $input['export_regen'] ?? 'none';
 
         return [
             'scope3_mode' => $input['scope3_mode'] ?? 'locked',
@@ -135,7 +138,8 @@ class PlanEntitlementAdminService
             ],
             'exports' => $exports,
             'consultant_directory' => $input['consultant_directory'] ?? 'teaser',
-            'export_regen' => $input['export_regen'] ?? 'none',
+            'export_regen' => $exportRegen,
+            'export_watermark' => $exportRegen === 'watermarked_trial' || !empty($input['export_watermark']),
         ];
     }
 
@@ -155,7 +159,9 @@ class PlanEntitlementAdminService
             default => 0,
         };
 
-        $annualReportPdf = ($exportRegen === 'subscription_year_unlimited' && $hasGhgExport) ? -1 : 0;
+        $annualReportPdf = (
+            in_array($exportRegen, ['subscription_year_unlimited', 'watermarked_trial'], true) && $hasGhgExport
+        ) ? -1 : 0;
 
         return array_merge($existingLimits, [
             'locations' => (int) ($input['locations'] ?? 1),

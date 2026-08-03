@@ -3,10 +3,16 @@
 namespace App\Data;
 
 /**
- * Consultant agency pack definitions — consultant_5/10/25/50.
+ * Consultant agency pack definitions — legacy self-serve pack sizes (consultant_5/10/25/50).
  *
- * Wholesale pricing — shown only inside the consultant portal, not public /pricing.
- * Managed clients receive Growth-equivalent entitlements per active engagement (PRY).
+ * COMMERCIAL NOTE (Aug 2026): Default paid consultant offer is now per-entity intro pricing
+ * (AED 1,399 / 1,199) documented in documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md §6.
+ * Self-serve pack checkout is being hidden (Phase 3). Free trial (1 entity) remains.
+ * Managed clients on Free trial use client_free entitlements. Paid entities use
+ * **Standard** entitlements (§6.3) — seed in Phase 5/8. Legacy paid packs still
+ * call managedClientEntitlements() (currently Growth-shaped) until that seed.
+ *
+ * Wholesale pack rows below are retained for migration / demo until Phase 8 cleanup.
  */
 class ConsultantAgencyPlanMatrix
 {
@@ -131,7 +137,7 @@ class ConsultantAgencyPlanMatrix
         return [
             'plan_code' => self::FREE_TRIAL_CODE,
             'plan_name' => 'Free trial',
-            'description' => 'One managed client on Free rules (Scope 1 & 2 full, Scope 3 one entry per category). Request slots for paid exports and more clients.',
+            'description' => 'One managed client on Free rules (Scope 1 & 2 full, Scope 3 one entry per category, watermarked GHG/Excel/IEQT trial downloads). Request slots for clean exports and more clients.',
             'plan_category' => 'consultant_agency',
             'price_annual' => 0,
             'price_per_slot_aed' => 0,

@@ -130,8 +130,7 @@ class PlanGate
             return route('consultant.packs.index');
         }
 
-        // Temporary until Phase 4 Request a package UI.
-        return route('subscriptions.billing');
+        return route('subscriptions.request-package');
     }
 
     public function upgradeButtonLabel(string $clientLabel = 'Request a package'): string
@@ -207,6 +206,20 @@ class PlanGate
         }
 
         return $this->canExport($exportCode, $fiscalYear);
+    }
+
+    public function exportsAreWatermarked(): bool
+    {
+        if (!$this->companyId) {
+            return false;
+        }
+
+        return $this->entitlements->exportsAreWatermarked($this->companyId);
+    }
+
+    public function watermarkBannerMessage(): string
+    {
+        return 'These downloads are watermarked Free trial files — draft only, not for regulatory submission or auditor delivery. Request a package for clean official exports.';
     }
 
     /** Starter-tier exports (GHG, MOCCAE, Excel, IEQT). */
@@ -316,6 +329,8 @@ class PlanGate
             $hint = null;
             if (!$allowed) {
                 $hint = 'Request a package';
+            } elseif ($this->exportsAreWatermarked()) {
+                $hint = 'Watermarked trial';
             }
 
             return [

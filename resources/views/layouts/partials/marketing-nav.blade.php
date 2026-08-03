@@ -9,7 +9,7 @@
             </a>
 
             <div class="mkt-desktop-nav">
-                <a href="{{ route('pricing') }}" class="mkt-nav-link {{ request()->routeIs('pricing') ? 'active' : '' }}">Company pricing</a>
+                <a href="{{ route('pricing') }}" class="mkt-nav-link {{ request()->routeIs('pricing') ? 'active' : '' }}">Explore Free</a>
                 <a href="{{ route('consultant-list.index') }}" class="mkt-nav-link {{ request()->routeIs('consultant-list.*') ? 'active' : '' }}">Find consultants</a>
                 <a href="{{ route('consultant.landing') }}" class="mkt-nav-link {{ request()->routeIs('consultant.landing') || request()->routeIs('consultant.register') || request()->routeIs('consultant.login') ? 'active' : '' }}">For consultants</a>
                 <a href="{{ route('contact') }}" class="mkt-nav-link {{ request()->routeIs('contact') ? 'active' : '' }}">Contact</a>
@@ -52,7 +52,7 @@
 
         <div class="mkt-mobile-menu lg:hidden" :class="{ 'is-open': menuOpen }">
             <div class="flex flex-col gap-1 pb-4">
-                <a href="{{ route('pricing') }}" class="mkt-nav-link px-1">Company pricing</a>
+                <a href="{{ route('pricing') }}" class="mkt-nav-link px-1">Explore Free</a>
                 <a href="{{ route('consultant-list.index') }}" class="mkt-nav-link px-1">Find consultants</a>
                 <a href="{{ route('consultant.landing') }}" class="mkt-nav-link px-1">For consultants</a>
                 <a href="{{ route('contact') }}" class="mkt-nav-link px-1">Contact</a>

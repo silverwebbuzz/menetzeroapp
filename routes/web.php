@@ -435,6 +435,8 @@ Route::middleware([
         Route::get('/payment/cashfree/callback', [\App\Http\Controllers\Client\SubscriptionController::class, 'cashfreeCallback'])->name('payment.cashfree');
         Route::get('/payment/stripe/callback', [\App\Http\Controllers\Client\SubscriptionController::class, 'stripeCallback'])->name('payment.stripe');
         Route::get('/billing', [\App\Http\Controllers\Client\SubscriptionController::class, 'billing'])->name('billing');
+        Route::get('/request-package', [\App\Http\Controllers\Client\PackageRequestController::class, 'create'])->name('request-package');
+        Route::post('/request-package', [\App\Http\Controllers\Client\PackageRequestController::class, 'store'])->name('request-package.store');
         Route::get('/payment-history', [\App\Http\Controllers\Client\SubscriptionController::class, 'paymentHistory'])->name('payment-history');
         Route::post('/cancel', [\App\Http\Controllers\Client\SubscriptionController::class, 'cancel'])->name('cancel');
         Route::post('/resume', [\App\Http\Controllers\Client\SubscriptionController::class, 'resume'])->name('resume');
@@ -518,6 +520,8 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
 
         // Unified admin package assignment (client plans + consultant agency packs) with DB audit
         Route::get('/package-assignments', [\App\Http\Controllers\Admin\AdminPackageAssignmentController::class, 'index'])->name('package-assignments.index');
+        Route::get('/package-requests', [\App\Http\Controllers\Admin\CompanyPackageRequestController::class, 'index'])->name('package-requests.index');
+        Route::put('/package-requests/{packageRequest}', [\App\Http\Controllers\Admin\CompanyPackageRequestController::class, 'update'])->name('package-requests.update');
         Route::post('/companies/{company}/assign-package', [\App\Http\Controllers\Admin\AdminPackageAssignmentController::class, 'assignToCompany'])->name('companies.assign-package');
 
         // Campaign coupons

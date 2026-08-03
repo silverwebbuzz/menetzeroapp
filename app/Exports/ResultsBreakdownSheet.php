@@ -16,11 +16,13 @@ class ResultsBreakdownSheet implements FromCollection, WithHeadings, WithStyles,
 {
     protected $resultsBreakdown;
     protected $grandTotal;
+    protected bool $watermark;
 
-    public function __construct($resultsBreakdown, ?float $grandTotal = null)
+    public function __construct($resultsBreakdown, ?float $grandTotal = null, bool $watermark = false)
     {
         $this->resultsBreakdown = $resultsBreakdown;
         $this->grandTotal = $grandTotal;
+        $this->watermark = $watermark;
     }
 
     public function title(): string
@@ -31,6 +33,15 @@ class ResultsBreakdownSheet implements FromCollection, WithHeadings, WithStyles,
     public function collection()
     {
         $data = collect();
+
+        if ($this->watermark) {
+            $data->push([
+                'Scope Name' => \App\Support\ExportWatermark::SHORT,
+                'Emission Source' => 'Draft only — not for regulatory submission',
+                'Results (tCO₂e)' => null,
+            ]);
+        }
+
         $grandTotal = $this->grandTotal ?? 0;
 
         foreach ($this->resultsBreakdown as $scope) {

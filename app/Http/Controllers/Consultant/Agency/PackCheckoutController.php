@@ -41,179 +41,32 @@ class PackCheckoutController extends Controller
         $consultantOrg = $this->consultantCompany();
         $subscription = $this->consultantSubscriptions->getActiveSubscription($consultantOrg->id);
         $slotSummary = $this->consultantSubscriptions->slotSummary($consultantOrg->id, $subscription);
-        $plans = SubscriptionPlan::forConsultantAgency()->active()->orderBy('sort_order')->get();
         $contractYear = (int) now()->year;
-        $planQuotes = $this->consultantSubscriptions->planQuotes($consultantOrg, $plans, $contractYear);
-        $extraSlotQuote = $subscription
-            ? $this->consultantSubscriptions->resolveExtraSlotPurchase($subscription, 1)
-            : null;
 
+        // Phase 3: self-serve pack grid/checkout hidden — request entities offline.
         return view('consultant.agency.packs.index', compact(
             'subscription',
             'slotSummary',
-            'plans',
             'contractYear',
-            'extraSlotQuote',
-            'planQuotes',
         ));
     }
 
     public function processCheckout(Request $request)
     {
-        if (!PaymentGateway::checkoutAvailable()) {
-            return redirect()->route('consultant.packs.index')
-                ->with('error', 'Online payments are not available yet. Agency pack checkout is coming soon.');
-        }
-
-        $consultantOrg = $this->consultantCompany();
-
-        $data = $request->validate([
-            'plan_id' => 'required|exists:subscription_plans,id',
-            'gateway' => 'required|in:razorpay,cashfree,stripe',
-        ]);
-
-        $plan = SubscriptionPlan::where('id', $data['plan_id'])
-            ->where('plan_category', 'consultant_agency')
-            ->firstOrFail();
-
-        $displayCurrency = \App\Services\CurrencyService::displayCurrency();
-        $chargeCurrency = $data['gateway'] === 'razorpay' ? 'INR' : $displayCurrency;
-        $current = $this->consultantSubscriptions->getActiveSubscription($consultantOrg->id);
-
-        try {
-            $this->consultantSubscriptions->validatePackChange($consultantOrg, $plan, $current);
-        } catch (\Throwable $e) {
-            return back()->with('error', $e->getMessage());
-        }
-
-        $quote = $this->consultantSubscriptions->resolvePackPurchase($consultantOrg, $plan, null, $chargeCurrency);
-
-        if (!$quote['requires_payment'] || $quote['charge_amount'] <= 0) {
-            return back()->with('error', 'This pack is not available for online checkout.');
-        }
-
-        return $this->checkout->start(
-            $consultantOrg,
-            'consultant_agency_pack',
-            $data['gateway'],
-            $quote['charge_amount'],
-            $quote['charge_currency'],
-            'Agency pack: ' . $plan->plan_name . ' (' . $quote['contract_year'] . ')',
-            [
-                'plan_id' => $plan->id,
-                'plan_code' => $plan->plan_code,
-                'contract_year' => $quote['contract_year'],
-                'pro_rata' => $quote['pro_rata'],
-            ],
-            fn () => $this->consultantSubscriptions->resolvePackPurchase($consultantOrg, $plan, $quote['contract_year'], 'INR'),
-        );
+        return redirect()->route('consultant.packs.index')
+            ->with('info', 'Self-serve agency pack checkout is unavailable. Request managed-client entities from this page or contact MENetZero — pricing is confirmed offline.');
     }
 
     public function processExtraSlots(Request $request)
     {
-        if (!PaymentGateway::checkoutAvailable()) {
-            return redirect()->route('consultant.packs.index')
-                ->with('error', 'Online payments are not available yet. Extra slot purchases are coming soon.');
-        }
-
-        $consultantOrg = $this->consultantCompany();
-        $subscription = $this->consultantSubscriptions->getActiveSubscription($consultantOrg->id);
-
-        if (!$subscription) {
-            return back()->with('error', 'Purchase an agency pack before adding extra slots.');
-        }
-
-        $data = $request->validate([
-            'quantity' => 'required|integer|min:1|max:50',
-            'gateway' => 'required|in:razorpay,cashfree,stripe',
-        ]);
-
-        $displayCurrency = \App\Services\CurrencyService::displayCurrency();
-        $chargeCurrency = $data['gateway'] === 'razorpay' ? 'INR' : $displayCurrency;
-
-        try {
-            $quote = $this->consultantSubscriptions->resolveExtraSlotPurchase(
-                $subscription,
-                (int) $data['quantity'],
-                $chargeCurrency,
-            );
-        } catch (\Throwable $e) {
-            return back()->with('error', $e->getMessage());
-        }
-
-        return $this->checkout->start(
-            $consultantOrg,
-            'consultant_agency_extra_slot',
-            $data['gateway'],
-            $quote['charge_amount'],
-            $quote['charge_currency'],
-            "Extra slots (×{$quote['quantity']}) through 31 Dec {$quote['contract_year']}",
-            [
-                'consultant_subscription_id' => $subscription->id,
-                'quantity' => $quote['quantity'],
-                'contract_year' => $quote['contract_year'],
-                'pro_rata' => $quote['pro_rata'],
-            ],
-            fn () => $this->consultantSubscriptions->resolveExtraSlotPurchase(
-                $subscription,
-                (int) $data['quantity'],
-                'INR',
-            ),
-        );
+        return redirect()->route('consultant.packs.index')
+            ->with('info', 'Self-serve extra slot checkout is unavailable. Request more entities via MENetZero — activation is offline.');
     }
 
     public function processYearUnlock(Request $request)
     {
-        if (!PaymentGateway::checkoutAvailable()) {
-            return redirect()->route('consultant.packs.index')
-                ->with('error', 'Online payments are not available yet. Reporting year unlocks are coming soon.');
-        }
-
-        $consultantOrg = $this->consultantCompany();
-
-        $data = $request->validate([
-            'engagement_id' => 'required|integer',
-            'reporting_year' => 'required|integer|min:2000|max:2100',
-            'gateway' => 'required|in:razorpay,cashfree,stripe',
-        ]);
-
-        $engagement = $this->managedClients->findForConsultant($consultantOrg->id, (int) $data['engagement_id']);
-
-        $displayCurrency = \App\Services\CurrencyService::displayCurrency();
-        $chargeCurrency = $data['gateway'] === 'razorpay' ? 'INR' : $displayCurrency;
-
-        try {
-            $quote = $this->consultantSubscriptions->resolveYearUnlockPurchase(
-                $engagement,
-                (int) $data['reporting_year'],
-                $chargeCurrency,
-            );
-        } catch (\Throwable $e) {
-            return back()->with('error', $e->getMessage());
-        }
-
-        $clientName = $engagement->display_name ?: $engagement->managedCompany?->name ?: 'Client';
-
-        return $this->checkout->start(
-            $consultantOrg,
-            'consultant_agency_year_unlock',
-            $data['gateway'],
-            $quote['charge_amount'],
-            $quote['charge_currency'],
-            "Year unlock {$quote['reporting_year']}: {$clientName}",
-            [
-                'engagement_id' => $engagement->id,
-                'managed_company_id' => $engagement->managed_company_id,
-                'reporting_year' => $quote['reporting_year'],
-                'contract_year' => $quote['contract_year'],
-                'pro_rata' => $quote['pro_rata'],
-            ],
-            fn () => $this->consultantSubscriptions->resolveYearUnlockPurchase(
-                $engagement,
-                (int) $data['reporting_year'],
-                'INR',
-            ),
-        );
+        return redirect()->route('consultant.packs.index')
+            ->with('info', 'Self-serve year unlock checkout is unavailable. Contact MENetZero to unlock a reporting year after offline payment.');
     }
 
     public function paymentCheckout(int $transaction)

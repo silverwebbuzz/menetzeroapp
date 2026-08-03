@@ -45,6 +45,8 @@ class IeqtExportController extends Controller
             return $redirect;
         }
 
-        return $this->exportService->downloadCsv($company, $location->id, $fiscalYear);
+        $watermark = app(PlanEntitlementService::class)->exportsAreWatermarked($company->id);
+
+        return $this->exportService->downloadCsv($company, $location->id, $fiscalYear, $watermark);
     }
 }

@@ -7,7 +7,7 @@
 <div class="w-full">
     <div class="mb-6">
         <h1 class="text-3xl font-bold text-gray-900">Plan &amp; billing</h1>
-        <p class="mt-2 text-gray-600">Your subscription, usage, entitlements, and payment history.</p>
+        <p class="mt-2 text-gray-600">Your subscription, usage, and entitlements. Paid packages are requested here — pricing is confirmed offline.</p>
     </div>
 
     @if(session('success'))
@@ -50,10 +50,10 @@
                     <div>
                         <div class="text-gray-500">Billing</div>
                         <div class="font-semibold text-gray-900">
-                            @if(!empty($isComplimentary))
-                                Complimentary
+                            @if(!empty($isComplimentary) || empty($isPaidPlan))
+                                Complimentary / Free
                             @else
-                                {{ ucfirst($subscription->billing_cycle) }} · {{ $subscription->plan->currency ?? 'AED' }} {{ number_format($subscription->plan->price_annual ?? 0, 0) }}
+                                {{ ucfirst($subscription->billing_cycle) }} · Confirmed offline
                             @endif
                         </div>
                     </div>
@@ -64,22 +64,10 @@
                 </div>
             </div>
             <div class="flex flex-wrap gap-2 lg:flex-col lg:items-stretch min-w-[200px]">
-                @php
-                    $planCode = $subscription->plan->plan_code ?? '';
-                    $showGrowthCta = in_array($planCode, ['client_free', 'client_starter'], true);
-                @endphp
-                @if($showGrowthCta)
-                    <a href="{{ route('subscriptions.billing') }}" class="px-4 py-2.5 bg-orange-600 text-white text-sm font-semibold rounded-lg hover:bg-orange-700 text-center">
-                        Request a package
-                    </a>
-                @else
-                    <a href="{{ route('subscriptions.billing') }}" class="px-4 py-2.5 bg-orange-600 text-white text-sm font-semibold rounded-lg hover:bg-orange-700 text-center">
-                        Request a package
-                    </a>
-                @endif
-                <span class="px-4 py-2.5 bg-gray-100 text-gray-500 text-sm font-medium rounded-lg text-center cursor-not-allowed" title="Consultant packs — coming in Phase B">
-                    Add consultant pack
-                </span>
+                <a href="{{ route('subscriptions.request-package') }}" class="px-4 py-2.5 bg-orange-600 text-white text-sm font-semibold rounded-lg hover:bg-orange-700 text-center">
+                    Request a package
+                </a>
+                <p class="text-xs text-gray-500 text-center lg:text-left">Features only · no public list price</p>
                 @if(!empty($cancellationScheduled))
                     <form action="{{ route('subscriptions.resume') }}" method="POST">
                         @csrf
@@ -230,6 +218,9 @@
         </div>
         <div class="p-6">
             <div id="transactions-content" class="tab-content">
+                <p class="text-xs text-gray-500 mb-4">
+                    Amounts are confirmed offline with MENetZero. This list tracks request activity and payment status — not a public price list.
+                </p>
                 @if($paymentHistory && $paymentHistory->count() > 0)
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 text-sm">
@@ -237,17 +228,15 @@
                                 <tr>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
                                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Invoice</th>
+                                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Document</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100">
                                 @foreach($paymentHistory as $transaction)
                                     <tr>
                                         <td class="px-4 py-3 whitespace-nowrap">{{ $transaction->created_at->format('M d, Y') }}</td>
-                                        <td class="px-4 py-3">{{ $transaction->description ?? 'Subscription payment' }}</td>
-                                        <td class="px-4 py-3 font-medium">{{ $transaction->currency ?? 'AED' }} {{ number_format($transaction->amount ?? 0, 2) }}</td>
+                                        <td class="px-4 py-3">{{ $transaction->description ?? 'Package payment' }}</td>
                                         <td class="px-4 py-3">
                                             <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100">{{ ucfirst($transaction->status ?? 'pending') }}</span>
                                         </td>
@@ -265,10 +254,10 @@
                     </div>
                 @else
                     <p class="text-sm text-gray-500 py-8 text-center">
-                        @if(!empty($isComplimentary))
-                            No payment history — your plan is complimentary.
+                        @if(!empty($isComplimentary) || empty($isPaidPlan))
+                            No payment records yet — Free / complimentary plans do not show listed amounts here.
                         @else
-                            Payment transactions will appear here after your first purchase.
+                            Payment activity appears here after MENetZero records offline activation.
                         @endif
                     </p>
                 @endif

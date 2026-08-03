@@ -4,11 +4,13 @@
 |---|---|
 | **Version** | 1.0 |
 | **Date** | June 2026 |
-| **Status** | Approved for implementation |
+| **Status** | Mechanics still valid; **commercial rates updated Aug 2026** |
 | **Audience** | Product, sales, development |
-| **Related** | [COMMERCIAL_PLAN_V1.md](./COMMERCIAL_PLAN_V1.md) (direct SME plans), Consultant directory (C9), Marketplace (C10) |
+| **Related** | [PRICING_AND_PLAN_MAJOR_CHANGES.md](./PRICING_AND_PLAN_MAJOR_CHANGES.md) (**consultant paid pricing §6**), [COMMERCIAL_PLAN_V1.md](./COMMERCIAL_PLAN_V1.md) (legacy direct SME plans) |
 
-This document is the **single source of truth** for how **consultants / freelance consultants** provision and manage **multiple end-client workspaces** on MenetZero. Read this before any consultant-channel coding.
+> **Aug 2026 commercial update:** Default paid consultant offer is **AED 1,399 / entity / year** (≤10 entities) or **AED 1,199** (>10), with **up to 5 sites** included per entity, after a **Free 1-entity** trial. Self-serve pack sizes (5/10/25/50) and Essential/Complete slot list prices are **not** the default customer offer anymore. Agency **workspace / PRY / managed-client** mechanics in this document remain the engineering baseline unless superseded explicitly.
+
+This document is the **single source of truth** for how **consultants / freelance consultants** provision and manage **multiple end-client workspaces** on MenetZero. Read **PRICING_AND_PLAN_MAJOR_CHANGES.md** for current Free rules, watermarking, and Request/activation commerce. Read this file before consultant-channel coding for engagements, PRY, and slots.
 
 ---
 

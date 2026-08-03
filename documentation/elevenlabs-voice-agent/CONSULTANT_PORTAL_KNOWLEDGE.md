@@ -145,22 +145,16 @@ For how-to on Locations, Quick Input, DEWA bills, reports, disclosures: open [Co
 
 ## 9. Agency packs, billing & renewal
 
-**Pages:**
-- [Agency packs](https://app.menetzero.com/consultant/packs)
+**Commercial update (Aug 2026):** After Free (1 client), consultants request additional **entities**. Preferential annual rates are confirmed offline (AED 1,399 per entity/year up to 10 entities; AED 1,199 above 10; typically up to 5 sites per entity). Self-serve pack price cards are being removed. Enterprise / white-label is custom.
+
+**Pages (transitional):**
+- [Agency packs](https://app.menetzero.com/consultant/packs) — legacy; prefer request entities / contact MENetZero
 - [Orders](https://app.menetzero.com/consultant/orders)
-- [Renewal](https://app.menetzero.com/consultant/renewal) (when due / shown in nav)
+- [Renewal](https://app.menetzero.com/consultant/renewal)
 
-Agency packs bundle client slots, export rights, and feature access. Payment via supported gateways (e.g. Razorpay, Cashfree, Stripe where configured). Extra slots and year unlocks available on some plans.
+**Trial vs paid:** Free = 1 client with Free rules and watermarked trial exports. Paid Consultant Plan entities unlock clean exports once MENetZero activates them.
 
-Steps:
-1. Compare packs — slots, features, price per year.
-2. Checkout — select pack and pay.
-3. Renewal — extend before expiry from Renewal.
-4. Orders — history of purchases.
-
-**Trial vs paid:** Trial clients can use most data entry; full exports and higher limits typically need a paid pack. Check pack details on Agency packs.
-
-Do not invent exact AED pack prices in voice answers; send users to Agency packs.
+Do not invent old Essential/Complete pack grids in voice answers; guide users to request entities or contact support.
 
 ---
 

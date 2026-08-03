@@ -115,7 +115,7 @@ class CommercialPlanComparison
             [
                 'label' => 'GHG Inventory PDF',
                 'cells' => [
-                    'client_free' => false,
+                    'client_free' => 'Watermarked',
                     'client_starter' => true,
                     'client_growth' => true,
                     'client_enterprise' => true,
@@ -124,7 +124,7 @@ class CommercialPlanComparison
             [
                 'label' => 'MOCCAE S1 & 2 PDF',
                 'cells' => [
-                    'client_free' => false,
+                    'client_free' => 'Watermarked',
                     'client_starter' => true,
                     'client_growth' => true,
                     'client_enterprise' => true,
@@ -133,7 +133,7 @@ class CommercialPlanComparison
             [
                 'label' => 'Excel results export',
                 'cells' => [
-                    'client_free' => false,
+                    'client_free' => 'Watermarked',
                     'client_starter' => true,
                     'client_growth' => true,
                     'client_enterprise' => true,
@@ -142,7 +142,7 @@ class CommercialPlanComparison
             [
                 'label' => 'IEQT export (mrv.ae)',
                 'cells' => [
-                    'client_free' => false,
+                    'client_free' => 'Watermarked',
                     'client_starter' => true,
                     'client_growth' => true,
                     'client_enterprise' => true,

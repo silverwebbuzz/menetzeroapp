@@ -62,7 +62,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
         </svg>
-        Public pricing ↗
+        Explore Free ↗
     </a>
     <a href="{{ route('admin.consultants.index') }}" class="nav-link {{ $isActive('admin.consultants') ? 'active' : '' }}">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,6 +77,13 @@
                   d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
         </svg>
         Payment gateways
+    </a>
+    <a href="{{ route('admin.package-requests.index') }}" class="nav-link {{ $isActive('admin.package-requests') ? 'active' : '' }}">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+        Package requests
     </a>
     <a href="{{ route('admin.package-assignments.index') }}" class="nav-link {{ $isActive('admin.package-assignments') ? 'active' : '' }}">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">

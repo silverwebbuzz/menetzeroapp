@@ -102,7 +102,7 @@ abstract class Controller extends BaseController
         }
 
         throw new HttpResponseException(
-            redirect()->route('subscriptions.upgrade')->with('error', $message)
+            redirect()->route('subscriptions.billing')->with('error', $message)
         );
     }
 

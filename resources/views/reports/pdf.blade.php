@@ -254,7 +254,7 @@
             letter-spacing: 0.3px;
         }
 
-        .mode-badge {
+            .mode-badge {
             display: inline-block;
             background: #ecfdf5;
             color: #065f46;
@@ -266,6 +266,43 @@
             padding: 3px 8px;
             border-radius: 3px;
             margin-top: 6px;
+        }
+
+        .trial-banner {
+            background: #fef2f2;
+            border: 2px solid #ef4444;
+            color: #991b1b;
+            font-size: 9px;
+            font-weight: bold;
+            text-align: center;
+            padding: 8px 10px;
+            margin-bottom: 14px;
+        }
+
+        .trial-watermark {
+            position: fixed;
+            top: 38%;
+            left: 8%;
+            width: 84%;
+            text-align: center;
+            font-size: 36px;
+            font-weight: bold;
+            color: #ef4444;
+            opacity: 0.12;
+            transform: rotate(-32deg);
+            z-index: 1000;
+            line-height: 1.25;
+        }
+
+        .trial-footer {
+            position: fixed;
+            bottom: 10mm;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 8px;
+            color: #b91c1c;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -280,9 +317,19 @@
     $scopeTonnes = $report['scope_tonnes'];
     $scope1 = $scopeTonnes['Scope 1'] ?? 0;
     $scope2 = $scopeTonnes['Scope 2'] ?? 0;
+    $exportWatermark = !empty($exportWatermark);
 @endphp
 
+@if($exportWatermark)
+    <div class="trial-watermark">{!! nl2br(e($exportWatermarkDiagonal ?? \App\Support\ExportWatermark::pdfDiagonal())) !!}</div>
+    <div class="trial-footer">{{ $exportWatermarkText ?? \App\Support\ExportWatermark::bannerText() }}</div>
+@endif
+
 <div class="brand-bar"></div>
+
+@if($exportWatermark)
+    <div class="trial-banner">{{ $exportWatermarkText ?? \App\Support\ExportWatermark::bannerText() }}</div>
+@endif
 
 {{-- Cover / Header --}}
 <div class="report-header">
@@ -314,6 +361,9 @@
         @endif
     </p>
     <span class="mode-badge">{{ $report['export_mode_label'] ?? ($moccaeOnly ? 'MOCCAE Scope 1 & 2' : 'Full inventory') }}</span>
+    @if($exportWatermark)
+        <span class="mode-badge" style="background:#fef2f2;color:#991b1b;border-color:#fecaca;margin-left:6px;">Free trial — watermarked</span>
+    @endif
 
     <table class="meta-grid">
         <tr>

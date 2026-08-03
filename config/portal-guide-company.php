@@ -9,7 +9,7 @@ return [
             'Permissions depend on your role. Company admins see billing and team settings; other users may only view or enter data.',
             'Growth unlocks the unified UAE ESG Report PDF, ESG Scorecard, and disclosure exports when activated. Enterprise adds extended indexes, HRIS import, assurance PDF upload, and white-label report covers.',
             'If a sustainability consultant manages your account, some billing and team settings may be handled by them.',
-            'On Free you get Scope 1 & 2 fully plus one Scope 3 entry per category. Request a package for official downloads.',
+            'On Free you get Scope 1 & 2 fully, one Scope 3 entry per category, and watermarked GHG / Excel / IEQT trial downloads. Request a package for clean official files.',
         ],
     ],
 

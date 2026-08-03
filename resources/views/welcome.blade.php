@@ -15,14 +15,15 @@
             and publish an integrated UAE ESG Report with IFRS / GRI disclosures — without hiring a consultant to do the data entry.
         </p>
         <p class="text-sm text-gray-500 mt-4 max-w-2xl mx-auto">
-            Start free with Scope 1 &amp; 2 and disclosure previews. Paid plan upgrades are coming soon — register now and switch plans from your account when checkout opens.
+            Start free with Scope 1 &amp; 2, try Scope 3 (one entry per category), and download watermarked trial reports.
+            When you need clean exports or more capacity, request a package from inside your account — pricing is confirmed offline.
         </p>
         <x-payments-notice class="mt-6" />
         <div class="flex flex-wrap justify-center gap-3 mt-6">
             <a href="{{ route('register') }}" class="mkt-btn mkt-btn-primary mkt-btn-lg">Company sign up</a>
-            <a href="{{ route('pricing') }}" class="mkt-btn mkt-btn-outline mkt-btn-lg">View company pricing</a>
+            <a href="{{ route('pricing') }}" class="mkt-btn mkt-btn-outline mkt-btn-lg">Explore Free</a>
         </div>
-        <p class="text-xs text-gray-400 mt-4">Free plan available · Annual plans in AED · Google or email registration</p>
+        <p class="text-xs text-gray-400 mt-4">Free for all · Request a package when ready · Google or email registration</p>
     </div>
 </section>
 
@@ -35,8 +36,8 @@
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             @foreach([
                 ['MOCCAE-ready from day one', 'Generate GHG inventories, MOCCAE Scope 1 & 2 PDFs, and IEQT exports aligned with UAE reporting workflows.'],
-                ['Start free, upgrade when ready', 'Try Scope 1 & 2 calculations and disclosure forms at no cost. Pay only when you need PDF exports and bulk data tools.'],
-                ['UAE ESG Report on Growth', 'Build narrative chapters, auto-pull GHG totals, and download the integrated UAE ESG Report PDF plus ESG Scorecard on the Growth plan.'],
+                ['Start free, request when ready', 'Try Scope 1 & 2 and watermarked trial downloads at no cost. Request a package for official clean exports and higher limits.'],
+                ['UAE ESG on higher packages', 'Build narrative chapters, auto-pull GHG totals, and download the integrated UAE ESG Report PDF plus ESG Scorecard on ESG packages.'],
                 ['Human review when you need it', 'Connect with verified UAE consultants from the directory — optional review packs for professional sign-off.'],
             ] as $item)
                 <div class="mkt-feature-card">
@@ -101,58 +102,56 @@
 <section class="mkt-section mkt-section-bg">
     <div class="mkt-container">
         <div class="mkt-section-head">
-            <h2>Plans built for every stage</h2>
-            <p>From free exploration to full ESG disclosure exports — pick the plan that matches your reporting needs</p>
+            <h2>Packages matched to your reporting needs</h2>
+            <p>Explore Free publicly — package details and pricing confirmed offline after you request from your account</p>
         </div>
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             @foreach([
-                ['Free', 'Try before you buy', 'AED 0', 'free', [
-                    'Scope 1 & 2 quick input',
-                    'Disclosure forms — in-app preview',
-                    '1 location · 1 user',
-                    'Scope 3 locked',
+                ['Free', 'Try the workflow', [
+                    'Scope 1 & 2 full entry',
+                    'Scope 3 — one entry per category',
+                    'Watermarked trial downloads',
+                    'Disclosure form previews',
                 ]],
-                ['Starter', 'MOCCAE-ready inventory', 'AED 1,499 / yr', 'paid', [
-                    'GHG, MOCCAE & IEQT PDF exports',
+                ['Scope Basic', 'MOCCAE-ready inventory', [
+                    'Clean GHG, MOCCAE & IEQT exports',
                     'Bulk CSV / Excel import',
-                    '3 locations · 5 users',
-                    'Scope 3 preview (1 per category)',
+                    'Up to 3 sites',
+                    'Request from Plan & billing',
                 ]],
-                ['Growth', 'UAE ESG Report + IFRS & GRI', 'AED 2,499 / yr', 'paid', [
-                    'Everything in Starter',
-                    'UAE ESG Report PDF + ESG Scorecard',
-                    'IFRS S1/S2, GRI & SASB exports',
-                    '10 locations · 10 users',
+                ['Scope Pro / ESG', 'Broader scopes & disclosures', [
+                    'Everything in Scope Basic, expanded',
+                    'UAE ESG Report PDF + scorecard options',
+                    'IFRS / GRI export packages',
+                    'Request from Plan & billing',
                 ]],
-                ['Enterprise', '80+ KPIs & white-label PDF', 'Custom', 'enterprise', [
-                    'Everything in Growth',
-                    '80+ GRI index & KPI scorecard',
-                    'HRIS CSV import & assurance PDF upload',
-                    'White-label UAE ESG PDF covers',
+                ['Enterprise', 'Custom & white-label', [
+                    'Custom implementation',
+                    'White-label report covers',
+                    'Extended KPI / assurance workflows',
+                    'Talk to MENetZero',
                 ]],
             ] as $plan)
-                <div class="mkt-feature-card flex flex-col h-full {{ $plan[0] === 'Growth' ? 'ring-2 ring-teal-500/30' : '' }}">
-                    @if($plan[0] === 'Growth')
-                        <span class="text-xs font-semibold text-teal-700 mb-2">MOST POPULAR</span>
-                    @endif
+                <div class="mkt-feature-card flex flex-col h-full">
                     <h3 class="text-lg font-bold mkt-text-brand mb-1">{{ $plan[0] }}</h3>
-                    <p class="text-xs text-gray-500 mb-3">{{ $plan[1] }}</p>
-                    <div class="text-xl font-extrabold text-gray-900 mb-4">{{ $plan[2] }}</div>
+                    <p class="text-xs text-gray-500 mb-4">{{ $plan[1] }}</p>
                     <ul class="space-y-2 text-sm text-gray-600 flex-1 mb-5">
-                        @foreach($plan[4] as $feat)
+                        @foreach($plan[2] as $feat)
                             <li class="flex items-start"><span class="mkt-checkmark">✓</span> {{ $feat }}</li>
                         @endforeach
                     </ul>
-                    <x-plan-purchase-cta
-                        :tier="$plan[3]"
-                        :highlight="$plan[0] === 'Growth'"
-                        class="mkt-btn-sm"
-                    />
+                    @if($plan[0] === 'Free')
+                        <a href="{{ route('register') }}" class="mkt-btn mkt-btn-primary mkt-btn-sm">Explore Free</a>
+                    @elseif($plan[0] === 'Enterprise')
+                        <a href="{{ route('contact') }}" class="mkt-btn mkt-btn-outline mkt-btn-sm">Contact us</a>
+                    @else
+                        <a href="{{ route('register') }}" class="mkt-btn mkt-btn-outline mkt-btn-sm">Sign up to request</a>
+                    @endif
                 </div>
             @endforeach
         </div>
         <p class="text-center text-sm text-gray-500 mt-8">
-            <a href="{{ route('pricing') }}" class="mkt-text-brand hover:underline">See full plan comparison →</a>
+            <a href="{{ route('pricing') }}" class="mkt-text-brand hover:underline">Learn what’s included on Free →</a>
         </p>
     </div>
 </section>
@@ -303,7 +302,7 @@
                 </p>
                 <ul class="space-y-3 text-slate-300 mb-8 text-sm">
                     <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> Manage multiple SME workspaces from one login</li>
-                    <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> Wholesale agency packs — pricing after consultant sign-in</li>
+                    <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> Preferential entity rates — request after consultant sign-in</li>
                     <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> Qualified leads from subscribers and public directory visitors</li>
                     <li class="flex items-start gap-2"><span class="text-teal-400 mt-0.5">✓</span> 1 free trial client to get started</li>
                 </ul>
@@ -317,12 +316,12 @@
                 <div class="space-y-4 text-sm text-slate-300">
                     <div class="pb-4 border-b border-white/10">
                         <p class="font-semibold text-white mb-1">Company portal — you are here</p>
-                        <p>Your organisation tracks its own emissions. Self-serve plans from Free to Enterprise.</p>
-                        <a href="{{ route('pricing') }}" class="text-teal-300 hover:underline text-xs mt-2 inline-block">Company pricing (AED) →</a>
+                        <p>Your organisation tracks its own emissions. Start Free, then request a package when ready.</p>
+                        <a href="{{ route('pricing') }}" class="text-teal-300 hover:underline text-xs mt-2 inline-block">Explore Free →</a>
                     </div>
                     <div>
                         <p class="font-semibold text-white mb-1">Consultant portal</p>
-                        <p>You run carbon workspaces for multiple client companies. Agency packs and directory leads.</p>
+                        <p>You run carbon workspaces for multiple client companies. Request entities and directory leads.</p>
                         <a href="{{ route('consultant.register') }}" class="text-teal-300 hover:underline text-xs mt-2 inline-block">Create consultant account →</a>
                     </div>
                 </div>
@@ -338,12 +337,12 @@
         </div>
         <div class="space-y-4">
             @foreach([
-                ['Can I really start for free?', 'Yes. The Free plan includes Scope 1 & 2 data entry and disclosure form previews in the app. PDF exports and bulk import unlock on paid plans.'],
-                ['Which plan do I need for MOCCAE reporting?', 'Starter (AED 1,499/year) includes GHG inventory PDF, MOCCAE Scope 1 & 2 PDF, and IEQT export for mrv.ae — plus bulk import and Scope 3 preview.'],
-                ['When do I need Growth?', 'Choose Growth (AED 2,499/year) if you need the integrated UAE ESG Report PDF, ESG Scorecard, IFRS S1/S2 and GRI exports, SASB index, more locations (up to 10), and full consultant directory access.'],
-                ['What does Enterprise add?', 'Enterprise includes everything in Growth plus 80+ GRI index rows, 80+ KPI scorecard export, HRIS CSV import for workforce metrics, assurance PDF upload, and white-label UAE ESG report covers. Contact sales for pricing.'],
+                ['Can I really start for free?', 'Yes. Free includes Scope 1 & 2, Scope 3 (one entry per category), and watermarked trial downloads. Official clean exports unlock after your package is activated.'],
+                ['How do I get a paid package?', 'Sign in, open Plan & billing, and request a package. MENetZero confirms features and pricing offline, then activates after payment.'],
+                ['Which package do I need for MOCCAE?', 'A Scope Basic–style package typically covers clean GHG inventory PDF, MOCCAE Scope 1 & 2 PDF, and IEQT — confirm when you request.'],
+                ['What about full UAE ESG / IFRS / GRI?', 'Those sit on ESG packages (and Enterprise for white-label / custom). Request the package that matches your disclosure needs.'],
                 ['Do I need a consultant to use MenetZero?', 'No. The platform is self-serve for companies. Consultants are optional — for review, sign-off, or if you prefer expert guidance alongside the software.'],
-                ['I manage emissions for clients, not my own company', 'Use the consultant portal instead. Company pricing on this site is for organisations tracking their own footprint. Visit /consultant for agency features.'],
+                ['I manage emissions for clients, not my own company', 'Use the consultant portal instead. Explore Free here is for organisations tracking their own footprint. Visit /consultant for agency features.'],
             ] as $faq)
                 <details class="mkt-feature-card group" style="padding:1.25rem;">
                     <summary class="font-semibold text-gray-900 cursor-pointer list-none flex justify-between items-center gap-4">
@@ -361,15 +360,15 @@
     <div class="mkt-container max-w-3xl text-center">
         <h2 class="text-3xl font-bold text-gray-900 mb-4">Ready to measure your organisation's footprint?</h2>
         <p class="text-gray-500 mb-8">
-            Create your company account in minutes. Start free, explore Scope 1 &amp; 2, and upgrade to paid plans when checkout opens.
+            Create your company account in minutes. Start Free, then request a package when you need clean exports.
         </p>
         <div class="flex flex-wrap justify-center gap-3">
             <a href="{{ route('register') }}" class="mkt-btn mkt-btn-primary mkt-btn-lg">Company sign up</a>
-            <a href="{{ route('pricing') }}" class="mkt-btn mkt-btn-outline mkt-btn-lg">View pricing</a>
+            <a href="{{ route('pricing') }}" class="mkt-btn mkt-btn-outline mkt-btn-lg">Explore Free</a>
             <a href="{{ route('login') }}" class="mkt-btn mkt-btn-outline mkt-btn-lg">Sign in</a>
         </div>
         <p class="mt-8 text-xs text-gray-400 max-w-xl mx-auto">
-            Annual plans priced in AED. Reports are draft working papers for your compliance workflow.
+            No public AED list prices. Reports on Free are watermarked trial working papers.
         </p>
     </div>
 </section>

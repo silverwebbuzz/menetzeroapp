@@ -251,6 +251,19 @@ class PlanEntitlementService
     }
 
     /**
+     * Free / trial packages stamp downloads; paid packages must return false.
+     */
+    public function exportsAreWatermarked(int $companyId): bool
+    {
+        return (bool) ($this->forCompany($companyId)['export_watermark'] ?? false);
+    }
+
+    public function watermarkNotice(): string
+    {
+        return \App\Support\ExportWatermark::bannerText();
+    }
+
+    /**
      * @return array{allowed: bool, message: string|null}
      */
     public function canWriteForReportingYear(int $companyId, int $reportingYear): array
@@ -279,6 +292,18 @@ class PlanEntitlementService
         $regen = (string) ($entitlements['export_regen'] ?? 'none');
 
         if ($regen === 'none') {
+            return [
+                'allowed' => false,
+                'message' => 'Official report downloads require an activated package. Request a package after exploring Free.',
+            ];
+        }
+
+        // Free trial: listed exports are allowed with watermark (no subscription-year window).
+        if ($regen === 'watermarked_trial') {
+            if (! empty($entitlements['export_watermark'])) {
+                return ['allowed' => true, 'message' => null];
+            }
+
             return [
                 'allowed' => false,
                 'message' => 'Official report downloads require an activated package. Request a package after exploring Free.',

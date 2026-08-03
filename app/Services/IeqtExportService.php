@@ -95,7 +95,7 @@ class IeqtExportService
         return $rows;
     }
 
-    public function downloadCsv(Company $company, int $locationId, int $fiscalYear): StreamedResponse
+    public function downloadCsv(Company $company, int $locationId, int $fiscalYear, bool $watermark = false): StreamedResponse
     {
         $measurement = Measurement::with('location')
             ->where('fiscal_year', $fiscalYear)
@@ -104,7 +104,23 @@ class IeqtExportService
             ->firstOrFail();
 
         $rows = $this->buildRows($measurement);
-        $filename = sprintf('ieqt-export-%s-%s-%s.csv', $company->id, $locationId, $fiscalYear);
+
+        if ($watermark) {
+            array_unshift(
+                $rows,
+                ['NOTICE', \App\Support\ExportWatermark::bannerText()],
+                ['NOTICE', 'This IEQT export is a Free trial draft — not for mrv.ae / regulatory submission.'],
+                []
+            );
+        }
+
+        $filename = sprintf(
+            'ieqt-export-%s-%s-%s%s.csv',
+            $company->id,
+            $locationId,
+            $fiscalYear,
+            $watermark ? \App\Support\ExportWatermark::filenameSuffix() : ''
+        );
 
         return response()->streamDownload(function () use ($rows) {
             $out = fopen('php://output', 'w');
