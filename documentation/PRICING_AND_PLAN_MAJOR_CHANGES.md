@@ -257,7 +257,17 @@ Align codes · Free S3 · Watermarked exports.
 - [x] ElevenLabs knowledge + pre-questions synced (company + consultant).
 - [x] Voice prompt: offline pricing; managed client wording; no invented AED grids.
 
-### Phase 10 — Renewals / optional min-10 reminders later
+### Phase 10a — Renewals (offline nudges) ✅ DONE
+- [x] In-app company banner (45-day window) → Request a package.
+- [x] Consultant renewal page retargeted offline → Request clients (no checkout form).
+- [x] Dashboard / nav renewal CTAs copy updated for offline.
+- [x] Email templates `company_renewal_reminder` / `consultant_renewal_reminder` (45/14/3 buckets).
+- [x] Artisan `subscriptions:send-renewal-reminders` + daily schedule 08:00.
+
+### Phase 10b — Min-10 preferential soft reminder ✅ DONE
+- [x] Request clients tip when count &lt; 10 (hides at ≥10) — sales policy only, not a hard minimum.
+- [x] Admin client-request quote note for &lt;10 counts.
+- [x] No software gate / no blocking under 10.
 
 ---
 
@@ -302,7 +312,7 @@ Logged-in: Request a package / Request clients · features only · pricing offli
 |------|--------|
 | Paid consultant client feature depth | **Standard** (5 sites) via `consultant_managed_standard` |
 | Demo / QA 1-client full Growth | **Kept** `consultant_1` (admin-only) |
-| Min-10 preferential in software | Deferred |
+| Min-10 preferential in software | Soft tip only (Phase 10b) — no enforcement |
 | Legacy starter/growth / pack subscribers | Remain; new activations use scope_* / consultant_entity |
 
 ---
@@ -316,7 +326,9 @@ Logged-in: Request a package / Request clients · features only · pricing offli
 | Aug 2026 | Phases 3–7 (Explore Free, requests, quotes, price book) + client terminology |
 | Aug 2026 | Phase 8: seed scope packages + consultant_entity; keep demo QA pack; Standard 5 sites |
 | Aug 2026 | Phase 9: portal guides + ElevenLabs knowledge for Free / Request / Standard / offline pricing |
+| Aug 2026 | Phase 10a: renewal in-app + email nudges (company + consultant) → Request flows |
+| Aug 2026 | Phase 10b: min-10 preferential soft tips (Request clients + admin quote) |
 
 ---
 
-**Next:** Phase 10 (renewals / optional min-10 reminders).
+**Next:** Ops polish / live verification, or new product workstream.

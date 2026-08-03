@@ -200,5 +200,37 @@ HTML,
 HTML,
         ],
 
+        'company_renewal_reminder' => [
+            'name' => 'Company package renewal reminder',
+            'description' => 'Sent within 45/14/3 days of paid company package expiry. Offline Request a package CTA.',
+            'mailer' => 'noreply',
+            'reply_to' => 'help',
+            'subject' => 'Renew {{plan_name}} — expires {{expires_at}}',
+            'placeholders' => ['user_name', 'company_name', 'plan_name', 'expires_at', 'days_left', 'request_url', 'billing_url', 'help_email', 'app_name'],
+            'body' => <<<'HTML'
+<p>Hello {{user_name}},</p>
+<p>Your <strong>{{company_name}}</strong> package <strong>{{plan_name}}</strong> expires on <strong>{{expires_at}}</strong> ({{days_left}} days).</p>
+<p>There is no self-serve checkout. Submit <strong>Request a package</strong> so MENetZero can confirm the renewal quote offline and activate after payment.</p>
+<p style="text-align:center;margin:28px 0;"><a href="{{request_url}}" style="display:inline-block;padding:12px 28px;background:#ea580c;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:600;">Request a package</a></p>
+<p><a href="{{billing_url}}">View Plan &amp; billing</a> · Questions: <a href="mailto:{{help_email}}">{{help_email}}</a></p>
+HTML,
+        ],
+
+        'consultant_renewal_reminder' => [
+            'name' => 'Consultant capacity renewal reminder',
+            'description' => 'Sent within 45/14/3 days of consultant capacity expiry. Offline Request clients CTA.',
+            'mailer' => 'noreply',
+            'reply_to' => 'help',
+            'subject' => 'Renew managed-client capacity for {{next_year}}',
+            'placeholders' => ['user_name', 'company_name', 'plan_name', 'expires_at', 'contract_year', 'next_year', 'days_left', 'request_url', 'renewal_url', 'help_email', 'app_name'],
+            'body' => <<<'HTML'
+<p>Hello {{user_name}},</p>
+<p>Your <strong>{{company_name}}</strong> capacity (<strong>{{plan_name}}</strong>) for {{contract_year}} ends on <strong>{{expires_at}}</strong> ({{days_left}} days).</p>
+<p>Request managed clients for <strong>{{next_year}}</strong> offline — MENetZero confirms pricing and activates after payment. No self-serve checkout.</p>
+<p style="text-align:center;margin:28px 0;"><a href="{{request_url}}" style="display:inline-block;padding:12px 28px;background:#ea580c;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:600;">Request clients</a></p>
+<p><a href="{{renewal_url}}">Open renewal summary</a> · Questions: <a href="mailto:{{help_email}}">{{help_email}}</a></p>
+HTML,
+        ],
+
     ],
 ];

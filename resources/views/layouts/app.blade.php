@@ -256,6 +256,21 @@
                         </div>
                     @endif
 
+                    @if(!empty($companyRenewalNudge['show']))
+                        <div class="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <span>
+                                <strong>Renewal window</strong> —
+                                {{ $companyRenewalNudge['plan_name'] }}
+                                expires {{ $companyRenewalNudge['expires_at']->format('d M Y') }}
+                                ({{ $companyRenewalNudge['days_left'] }} days).
+                                Pricing is confirmed offline.
+                            </span>
+                            <a href="{{ $companyRenewalNudge['request_url'] }}" class="inline-flex justify-center px-3 py-1.5 rounded-md bg-orange-600 text-white text-xs font-semibold hover:bg-orange-700 whitespace-nowrap">
+                                Request a package
+                            </a>
+                        </div>
+                    @endif
+
                     @yield('content')
                 </main>
 

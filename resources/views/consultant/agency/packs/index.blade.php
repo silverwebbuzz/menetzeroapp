@@ -71,7 +71,24 @@
                 value="{{ old('entity_count', max(1, $currentUsed)) }}"
                 class="w-full max-w-xs rounded-lg border-gray-300 text-sm focus:border-teal-500 focus:ring-teal-500"
             >
+            <p id="min10-preferential-tip" class="mt-3 text-xs text-teal-800 bg-teal-50 border border-teal-100 rounded-lg px-3 py-2 {{ (int) old('entity_count', max(1, $currentUsed)) >= 10 ? 'hidden' : '' }}">
+                Preferential rates may apply when you onboard <strong>10+</strong> managed clients in a 12‑month period — sales confirms offline. Asking for fewer than 10 is fine; this is not a hard minimum.
+            </p>
         </div>
+
+        <script>
+            (function () {
+                const input = document.getElementById('entity_count');
+                const tip = document.getElementById('min10-preferential-tip');
+                if (!input || !tip) return;
+                const sync = () => {
+                    const n = parseInt(input.value, 10) || 0;
+                    tip.classList.toggle('hidden', n >= 10);
+                };
+                input.addEventListener('input', sync);
+                sync();
+            })();
+        </script>
 
         <div class="bg-white rounded-xl border border-gray-200 p-5">
             <h2 class="text-sm font-semibold text-gray-900 mb-1">Optional extras</h2>

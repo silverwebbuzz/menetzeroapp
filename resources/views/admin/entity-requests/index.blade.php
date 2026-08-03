@@ -62,6 +62,11 @@
                             </div>
                             <div class="text-xs text-gray-500 mt-1">{{ $sug['breakdown'] }}</div>
                             <div class="text-xs text-gray-400 mt-1">Activate pack → {{ $sug['suggested_pack_code'] ?? '—' }} (+extra clients if needed)</div>
+                            @if(!empty($sug['min10_tip']) || (int) $req->entity_count < 10)
+                                <div class="mt-2 text-xs text-amber-800 bg-amber-50 border border-amber-100 rounded px-2 py-1.5">
+                                    Min‑10 preferential (≥10 clients / 12 months) is <strong>sales policy only</strong> — do not block this request; adjust quote manually if contracted.
+                                </div>
+                            @endif
                         @endif
                     </div>
                     <div>
@@ -107,7 +112,7 @@
                                     <button type="submit" class="text-xs px-3 py-1.5 bg-orange-600 text-white rounded hover:bg-orange-700">Activate</button>
                                 </form>
                             </div>
-                            <p class="text-xs text-gray-500">Uses nearest capacity pack (+ extras) until Phase 8. Standard entitlements apply to paid managed clients.</p>
+                            <p class="text-xs text-gray-500">Grants consultant capacity for the requested client count; managed clients inherit the requested package depth.</p>
                         </div>
                     </div>
                 @endif

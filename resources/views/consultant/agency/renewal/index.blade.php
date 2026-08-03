@@ -1,143 +1,58 @@
 @extends('consultant.layouts.app')
 
-@section('title', 'Renew Agency Pack')
+@section('title', 'Renew capacity')
+@section('page-title', 'Renew capacity')
 
 @section('content')
-@php $checkoutAvailable = \App\Models\PaymentGateway::checkoutAvailable(); @endphp
+<div class="w-full max-w-4xl">
+    <h1 class="text-2xl font-bold text-gray-900 mb-1">Renew for {{ $nextYear }}</h1>
+    <p class="text-sm text-gray-600 mb-6">
+        Your {{ $subscription->plan?->plan_name }} capacity ends
+        <strong>{{ $subscription->expires_at->format('d M Y') }}</strong>.
+        Request capacity for {{ $nextYear }} offline — MENetZero confirms pricing and activates after payment.
+    </p>
 
-<h1 class="text-2xl font-bold text-gray-900 mb-1">Renew for {{ $nextYear }}</h1>
-<p class="text-sm text-gray-600 mb-6">
-    Your {{ $subscription->plan?->plan_name }} contract ends <strong>{{ $subscription->expires_at->format('d M Y') }}</strong>.
-    Choose capacity for {{ $nextYear }} and select which clients continue (max clients per plan).
-</p>
-
-@if(!$checkoutAvailable)
-    <div class="cd-notice cd-notice--warning p-4 mb-6 text-sm">
-        <strong>Renewal checkout coming soon.</strong> Review your renewal options below. Payment will be enabled when online checkout goes live.
+    <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 mb-6">
+        <strong>Offline renewal.</strong>
+        There is no self-serve checkout. Use <em>Request clients</em> to choose package depth and how many managed clients you need for {{ $nextYear }}, then note that this is a renewal.
     </div>
-@endif
-
-<form action="{{ route('consultant.renewal.process') }}" method="POST" id="renewalForm">
-    @csrf
 
     <div class="grid lg:grid-cols-2 gap-6 mb-8">
         <div class="bg-white border border-gray-200 rounded-xl p-6">
-            <h2 class="font-semibold text-gray-900 mb-4">Clients ending {{ $subscription->contract_year }}</h2>
+            <h2 class="font-semibold text-gray-900 mb-4">Current managed clients ({{ $subscription->contract_year }})</h2>
             @if($engagements->isEmpty())
-                <p class="text-sm text-gray-500">No active clients on this contract — you can renew an empty pack or add clients after payment.</p>
+                <p class="text-sm text-gray-500">No active clients on this contract. You can still request capacity for {{ $nextYear }}.</p>
             @else
-                <ul class="space-y-3">
+                <ul class="space-y-2 text-sm">
                     @foreach($engagements as $engagement)
-                        @php
-                            $label = $engagement->display_name ?: $engagement->managedCompany?->name;
-                            $defaultPry = (int) $engagement->primary_reporting_year + 1;
-                        @endphp
-                        <li class="border border-gray-100 rounded-lg p-3">
-                            <label class="flex items-start gap-3 cursor-pointer">
-                                <input type="checkbox"
-                                    name="carry[{{ $engagement->id }}][selected]"
-                                    value="1"
-                                    class="carry-checkbox mt-1 rounded border-gray-300 text-brand"
-                                    checked
-                                    data-engagement-id="{{ $engagement->id }}">
-                                <span class="flex-1">
-                                    <span class="font-medium text-gray-900">{{ $label }}</span>
-                                    <span class="block text-xs text-gray-500">Current PRY {{ $engagement->primary_reporting_year }}</span>
-                                </span>
-                            </label>
-                            <input type="hidden" name="carry[{{ $engagement->id }}][engagement_id]" value="{{ $engagement->id }}">
-                            <div class="mt-2 ml-7">
-                                <label class="text-xs text-gray-500">PRY for {{ $nextYear }}</label>
-                                <select name="carry[{{ $engagement->id }}][primary_reporting_year]" class="form-select w-full max-w-[8rem]">
-                                    @foreach([$defaultPry - 1, $defaultPry, $defaultPry + 1] as $year)
-                                        @if($year >= 2000)
-                                            <option value="{{ $year }}" @selected($year === $defaultPry)>{{ $year }}</option>
-                                        @endif
-                                    @endforeach
-                                </select>
-                            </div>
+                        @php $label = $engagement->display_name ?: $engagement->managedCompany?->name; @endphp
+                        <li class="flex justify-between gap-3 border border-gray-100 rounded-lg px-3 py-2">
+                            <span class="font-medium text-gray-900">{{ $label }}</span>
+                            <span class="text-xs text-gray-500">PRY {{ $engagement->primary_reporting_year }}</span>
                         </li>
                     @endforeach
                 </ul>
-                <p class="text-xs text-gray-500 mt-3">Unselected clients are archived (read-only). They do not use capacity in {{ $nextYear }}.</p>
+                <p class="text-xs text-gray-500 mt-3">
+                    Mention which clients continue in your request notes. After activation for {{ $nextYear }}, keep working in those workspaces under your new capacity.
+                </p>
             @endif
         </div>
 
-        <div class="bg-white border border-gray-200 rounded-xl p-6">
-            <h2 class="font-semibold text-gray-900 mb-4">Pack for {{ $nextYear }}</h2>
-            <div class="space-y-3 mb-4">
-                @foreach($plans as $plan)
-                    @php
-                        $slots = \App\Data\ConsultantAgencyPlanMatrix::slotCountForPlanCode($plan->plan_code);
-                        $quote = $planQuotes[$plan->id] ?? ['charge_amount' => 0, 'pro_rata' => false];
-                    @endphp
-                    <label class="cd-plan-option flex items-center gap-3 border border-gray-200 rounded-lg p-3 cursor-pointer">
-                        <input type="radio" name="plan_id" value="{{ $plan->id }}" class="plan-radio text-brand" data-slots="{{ $slots }}" @checked($loop->first) required>
-                        <span class="flex-1">
-                            <span class="font-medium">{{ $plan->plan_name }}</span>
-                            <span class="block text-xs text-gray-500">{{ $slots }} clients · AED {{ number_format($quote['charge_amount'], 0) }}</span>
-                        </span>
-                    </label>
-                @endforeach
-            </div>
-            <div>
-                <label class="block text-xs text-gray-500 mb-1">Payment</label>
-                <select name="gateway" class="form-select" required>
-                    <option value="cashfree">Cashfree</option>
-                    <option value="razorpay">Razorpay (INR)</option>
-                    <option value="stripe">Stripe</option>
-                </select>
-            </div>
+        <div class="bg-white border border-gray-200 rounded-xl p-6 flex flex-col">
+            <h2 class="font-semibold text-gray-900 mb-2">Next step</h2>
+            <p class="text-sm text-gray-600 mb-4 flex-1">
+                Suggested starting point: request <strong>{{ max(1, $engagements->count()) }}</strong>
+                managed client{{ $engagements->count() === 1 ? '' : 's' }} for {{ $nextYear }}
+                (adjust during Request clients).
+            </p>
+            <a href="{{ route('consultant.packs.index') }}"
+               class="inline-flex justify-center px-4 py-2.5 bg-orange-600 text-white text-sm font-semibold rounded-lg hover:bg-orange-700 text-center">
+                Request clients for {{ $nextYear }}
+            </a>
+            <a href="{{ route('consultant.dashboard') }}" class="mt-3 text-center text-sm text-brand hover:underline">
+                Back to dashboard
+            </a>
         </div>
     </div>
-
-    <p id="slotWarning" class="hidden mb-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-4 py-3"></p>
-
-    <div class="flex gap-3">
-        @if($checkoutAvailable)
-            <button type="submit" class="btn btn-primary">
-                Continue to payment
-            </button>
-        @else
-            <button type="button" disabled class="btn btn-secondary opacity-60 cursor-not-allowed">
-                Coming soon
-            </button>
-        @endif
-        <a href="{{ route('consultant.dashboard') }}" class="btn btn-secondary">Cancel</a>
-    </div>
-</form>
-
-<script>
-    const form = document.getElementById('renewalForm');
-    const warning = document.getElementById('slotWarning');
-
-    function selectedCount() {
-        return document.querySelectorAll('.carry-checkbox:checked').length;
-    }
-
-    function activeSlotLimit() {
-        const plan = document.querySelector('.plan-radio:checked');
-        return plan ? parseInt(plan.dataset.slots, 10) : 0;
-    }
-
-    function validateSlots() {
-        const count = selectedCount();
-        const limit = activeSlotLimit();
-        if (count > limit) {
-            warning.textContent = `You selected ${count} clients but this plan only covers ${limit}. Uncheck clients or choose a larger plan.`;
-            warning.classList.remove('hidden');
-            return false;
-        }
-        warning.classList.add('hidden');
-        return true;
-    }
-
-    form?.addEventListener('submit', (e) => {
-        if (!validateSlots()) e.preventDefault();
-    });
-
-    document.querySelectorAll('.carry-checkbox, .plan-radio').forEach((el) => {
-        el.addEventListener('change', validateSlots);
-    });
-</script>
+</div>
 @endsection

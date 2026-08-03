@@ -158,6 +158,9 @@ class CommercialPriceBook
             }
 
             $total = $unit * $entityCount;
+            $preferential = $entityCount < 10
+                ? ' Note: preferential sales policy may apply at ≥10 managed clients / 12 months — not auto-applied.'
+                : ' Count ≥10 — confirm any preferential override offline if contracted.';
 
             return [
                 'amount_aed' => (float) $total,
@@ -165,9 +168,10 @@ class CommercialPriceBook
                 'rate_aed' => (float) $unit,
                 'entity_count' => $entityCount,
                 'package_code' => $code,
-                'breakdown' => "{$entityCount} × {$label} (AED " . number_format($unit, 0) . ') = AED ' . number_format($total, 0) . ' / year excl. VAT (company package list × clients). Preferential overrides allowed offline.',
+                'breakdown' => "{$entityCount} × {$label} (AED " . number_format($unit, 0) . ') = AED ' . number_format($total, 0) . ' / year excl. VAT (company package list × clients). Preferential overrides allowed offline.' . $preferential,
                 'band' => 'package×clients',
                 'suggested_pack_code' => self::nearestAgencyPackCode($entityCount),
+                'min10_tip' => $entityCount < 10,
             ];
         }
 

@@ -15,7 +15,7 @@
 
 @if(!empty($needsRenewal) && $renewalSubscription)
     <div class="cd-notice mb-4" style="border-color:#fde68a;background:#fffbeb;color:#92400e;">
-        <span><strong>Renewal due</strong> — {{ $renewalSubscription->plan?->plan_name }} ends {{ $renewalSubscription->expires_at->format('d M Y') }}.</span>
+        <span><strong>Renewal due</strong> — {{ $renewalSubscription->plan?->plan_name }} ends {{ $renewalSubscription->expires_at->format('d M Y') }}. Request capacity offline for {{ (int) $renewalSubscription->contract_year + 1 }}.</span>
         <a href="{{ route('consultant.renewal.index') }}" class="btn btn-warning btn-sm">Renew for {{ (int) $renewalSubscription->contract_year + 1 }}</a>
     </div>
 @endif
@@ -129,7 +129,7 @@
                 <span class="ent-label">Renewals due</span>
                 <div class="ent-kpi-value">{{ $revenue['renewals_due'] }}</div>
                 @if(!empty($needsRenewal))
-                    <div class="ent-kpi-card__compare"><a href="{{ route('consultant.renewal.index') }}" class="text-brand hover:underline">Renew now →</a></div>
+                    <div class="ent-kpi-card__compare"><a href="{{ route('consultant.renewal.index') }}" class="text-brand hover:underline">Request renewal →</a></div>
                 @endif
             </div>
             <div class="ent-kpi-card">

@@ -168,4 +168,22 @@ return [
         ],
     ],
 
+    'company_renewal_reminder' => [
+        [
+            'label' => 'Daily schedule — company package expiry window',
+            'file' => 'app/Console/Commands/SendRenewalRemindersCommand.php',
+            'note' => 'subscriptions:send-renewal-reminders (45/14/3-day buckets). CTA = Request a package.',
+            'status' => 'live',
+        ],
+    ],
+
+    'consultant_renewal_reminder' => [
+        [
+            'label' => 'Daily schedule — consultant capacity expiry window',
+            'file' => 'app/Console/Commands/SendRenewalRemindersCommand.php',
+            'note' => 'subscriptions:send-renewal-reminders (45/14/3-day buckets). CTA = Request clients.',
+            'status' => 'live',
+        ],
+    ],
+
 ];

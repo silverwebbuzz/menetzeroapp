@@ -65,7 +65,7 @@
             </div>
             <div class="flex flex-wrap gap-2 lg:flex-col lg:items-stretch min-w-[200px]">
                 <a href="{{ route('subscriptions.request-package') }}" class="px-4 py-2.5 bg-orange-600 text-white text-sm font-semibold rounded-lg hover:bg-orange-700 text-center">
-                    Request a package
+                    {{ ($daysRemaining ?? 999) <= 45 && !empty($isPaidPlan) ? 'Renew — request a package' : 'Request a package' }}
                 </a>
                 <p class="text-xs text-gray-500 text-center lg:text-left">Features only · no public list price</p>
                 @if(!empty($cancellationScheduled))
