@@ -20,6 +20,7 @@ class ConsultantAgencyPlanMatrix
     public const PLAN_CODES = [
         'consultant_trial',
         'consultant_1',
+        'consultant_entity',
         'consultant_5',
         'consultant_10',
         'consultant_25',
@@ -32,12 +33,17 @@ class ConsultantAgencyPlanMatrix
     public const FREE_TRIAL_SLOTS = 1;
 
     /**
-     * Complimentary demo pack — one managed client with FULL Growth access.
-     * Admin-assigned only (not shown on the consultant self-serve packs page).
+     * Complimentary demo / QA pack — one managed client with FULL Growth access.
+     * Admin-assigned only (not shown on self-serve). Keep for testing full access.
      */
     public const DEMO_PACK_CODE = 'consultant_1';
 
     public const DEMO_PACK_SLOTS = 1;
+
+    /** Default paid capacity plan — N managed clients (Standard entitlements). */
+    public const ENTITY_PLAN_CODE = 'consultant_entity';
+
+    public const ENTITY_PLAN_BASE_SLOTS = 1;
 
     public const ENTERPRISE_CODE = 'consultant_enterprise';
 
@@ -50,8 +56,8 @@ class ConsultantAgencyPlanMatrix
     /** Max users on the consultant organisation (not per managed client). */
     public const CONSULTANT_ORG_USER_LIMIT = 10;
 
-    /** Closest seeded client plan for paid-entity limit lookups until Phase 8 `consultant_entity`. */
-    public const MANAGED_CLIENT_TEMPLATE = 'client_starter';
+    /** Limit template for paid managed clients — Standard ≤5 sites (§6.3). */
+    public const MANAGED_CLIENT_TEMPLATE = 'consultant_managed_standard';
 
     /** Standard default sites per paid managed client (§6.3). */
     public const STANDARD_SITES_PER_ENTITY = 5;
@@ -64,10 +70,11 @@ class ConsultantAgencyPlanMatrix
         return [
             'consultant_trial' => self::trialPack(),
             'consultant_1' => self::demoPack(),
-            'consultant_5' => self::pack(5, 1299, 6495, 1, 'Consultant 5', 'Solo consultant — up to 5 managed clients'),
-            'consultant_10' => self::pack(10, 999, 9990, 2, 'Consultant 10', 'Small practice — up to 10 managed clients'),
-            'consultant_25' => self::pack(25, 899, 22475, 3, 'Consultant 25', 'Growing agency — up to 25 managed clients'),
-            'consultant_50' => self::pack(50, 799, 39950, 4, 'Consultant 50', 'Large agency — up to 50 managed clients'),
+            'consultant_entity' => self::entityPack(),
+            'consultant_5' => self::pack(5, 1299, 6495, 1, 'Consultant 5 (legacy)', 'Legacy pack — prefer Consultant Plan (per client)'),
+            'consultant_10' => self::pack(10, 999, 9990, 2, 'Consultant 10 (legacy)', 'Legacy pack — prefer Consultant Plan (per client)'),
+            'consultant_25' => self::pack(25, 899, 22475, 3, 'Consultant 25 (legacy)', 'Legacy pack — prefer Consultant Plan (per client)'),
+            'consultant_50' => self::pack(50, 799, 39950, 4, 'Consultant 50 (legacy)', 'Legacy pack — prefer Consultant Plan (per client)'),
         ];
     }
 
@@ -83,6 +90,10 @@ class ConsultantAgencyPlanMatrix
     {
         if ($planCode === self::FREE_TRIAL_CODE) {
             return self::FREE_TRIAL_SLOTS;
+        }
+
+        if ($planCode === self::ENTITY_PLAN_CODE) {
+            return self::ENTITY_PLAN_BASE_SLOTS;
         }
 
         return (int) (self::forPlanCode($planCode)['consultant_slot_count'] ?? 0);
@@ -135,9 +146,11 @@ class ConsultantAgencyPlanMatrix
      */
     public static function standardManagedClientEntitlements(): array
     {
-        $starter = PlanEntitlementDefaults::entitlementsForPlanCode('client_starter') ?? [];
+        $standard = PlanEntitlementDefaults::entitlementsForPlanCode(self::MANAGED_CLIENT_TEMPLATE)
+            ?? PlanEntitlementDefaults::entitlementsForPlanCode('client_starter')
+            ?? [];
 
-        return array_merge($starter, [
+        return array_merge($standard, [
             'channel' => 'consultant_managed',
             'consultant_directory' => 'none',
             'pry_export_only' => true,
@@ -209,8 +222,8 @@ class ConsultantAgencyPlanMatrix
     {
         return [
             'plan_code' => self::DEMO_PACK_CODE,
-            'plan_name' => 'Consultant 1',
-            'description' => 'One managed client with full Growth access — complimentary demo pack for special consultants (admin-assigned).',
+            'plan_name' => 'Demo / QA — 1 client full access',
+            'description' => 'Admin/QA only: one managed client with full Growth access for testing. Not sold; keep for complimentary demos.',
             'plan_category' => 'consultant_agency',
             'price_annual' => 0,
             'price_per_slot_aed' => 0,
@@ -229,10 +242,47 @@ class ConsultantAgencyPlanMatrix
                 'channel' => 'consultant_agency_pack',
                 'consultant_slot_count' => self::DEMO_PACK_SLOTS,
                 'contract_alignment' => 'calendar_year',
+                'managed_client_template' => 'client_growth',
+                'reporting_year_unlock_price_aed' => self::REPORTING_YEAR_UNLOCK_PRICE_AED,
+                'demo_full_access' => true,
+            ],
+            'features' => ['consultant_agency', 'managed_clients', 'full_demo', 'qa'],
+        ];
+    }
+
+    /**
+     * Default paid Consultant Plan — capacity for N managed clients (Standard per client).
+     *
+     * @return array<string, mixed>
+     */
+    private static function entityPack(): array
+    {
+        return [
+            'plan_code' => self::ENTITY_PLAN_CODE,
+            'plan_name' => 'Consultant Plan',
+            'description' => 'Paid managed-client capacity. Each client gets Standard entitlements (≤5 sites, clean GHG/MOCCAE/Excel/IEQT). Base 1 client; extras added to match request count.',
+            'plan_category' => 'consultant_agency',
+            'price_annual' => 1399,
+            'price_per_slot_aed' => 1399,
+            'consultant_slot_count' => self::ENTITY_PLAN_BASE_SLOTS,
+            'currency' => 'AED',
+            'sort_order' => 8,
+            'billing_cycle' => 'annual',
+            'is_active' => false, // offline request + admin activate only
+            'limits' => [
+                'users' => self::CONSULTANT_ORG_USER_LIMIT,
+                'consultant_slots' => self::ENTITY_PLAN_BASE_SLOTS,
+                'locations' => -1,
+                'documents' => -1,
+            ],
+            'entitlements' => [
+                'channel' => 'consultant_agency_pack',
+                'consultant_slot_count' => self::ENTITY_PLAN_BASE_SLOTS,
+                'contract_alignment' => 'calendar_year',
                 'managed_client_template' => self::MANAGED_CLIENT_TEMPLATE,
                 'reporting_year_unlock_price_aed' => self::REPORTING_YEAR_UNLOCK_PRICE_AED,
             ],
-            'features' => ['consultant_agency', 'managed_clients', 'full_demo'],
+            'features' => ['consultant_agency', 'managed_clients', 'consultant_plan'],
         ];
     }
 
@@ -258,7 +308,7 @@ class ConsultantAgencyPlanMatrix
             'currency' => 'AED',
             'sort_order' => 10 + $sortOrder,
             'billing_cycle' => 'annual',
-            'is_active' => true,
+            'is_active' => false, // Phase 8 — dormant; use Consultant Plan (per client)
             'limits' => [
                 'users' => self::CONSULTANT_ORG_USER_LIMIT,
                 'consultant_slots' => $slots,

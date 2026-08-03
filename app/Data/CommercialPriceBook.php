@@ -24,10 +24,10 @@ class CommercialPriceBook
     public const CONSULTANT_RATE_GT_10 = 1199;
 
     public const COMPANY_LIVE_PLAN_MAP = [
-        'client_scope_basic' => 'client_starter',
-        'client_scope_pro' => 'client_growth',
-        'client_esg_starter' => 'client_growth',
-        'client_esg_complete' => 'client_growth',
+        'client_scope_basic' => 'client_scope_basic',
+        'client_scope_pro' => 'client_scope_pro',
+        'client_esg_starter' => 'client_esg_starter',
+        'client_esg_complete' => 'client_esg_complete',
         'client_enterprise' => 'client_enterprise',
     ];
 
@@ -123,7 +123,7 @@ class CommercialPriceBook
                 'custom' => true,
                 'rate_aed' => null,
                 'entity_count' => $entityCount,
-                'breakdown' => 'Enterprise / white-label — set quote manually. Slot activation still uses nearest agency pack + extras.',
+                'breakdown' => 'Enterprise / white-label — set quote manually. Activation still grants Consultant Plan capacity for the requested client count.',
                 'band' => 'enterprise',
                 'suggested_pack_code' => self::nearestAgencyPackCode($entityCount),
             ];
@@ -146,20 +146,15 @@ class CommercialPriceBook
         ];
     }
 
+    /** Always Consultant Plan — capacity scaled with extras. */
     public static function nearestAgencyPackCode(int $entityCount): string
     {
-        foreach ([5, 10, 25, 50] as $n) {
-            if ($entityCount <= $n) {
-                return 'consultant_' . $n;
-            }
-        }
-
-        return 'consultant_50';
+        return ConsultantAgencyPlanMatrix::ENTITY_PLAN_CODE;
     }
 
     public static function extraSlotsNeeded(int $entityCount, string $packCode): int
     {
-        $base = (int) (ConsultantAgencyPlanMatrix::forPlanCode($packCode)['consultant_slot_count'] ?? 0);
+        $base = ConsultantAgencyPlanMatrix::slotCountForPlanCode($packCode);
 
         return max(0, $entityCount - $base);
     }

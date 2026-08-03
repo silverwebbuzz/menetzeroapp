@@ -250,7 +250,7 @@
       "label": ".nearestAgencyPackCode()",
       "file_type": "code",
       "source_file": "app/Data/CommercialPriceBook.php",
-      "source_location": "L149",
+      "source_location": "L150",
       "id": "data_commercialpricebook_commercialpricebook_nearestagencypackcode",
       "community": 72,
       "norm_label": ".nearestagencypackcode()"
@@ -259,7 +259,7 @@
       "label": ".extraSlotsNeeded()",
       "file_type": "code",
       "source_file": "app/Data/CommercialPriceBook.php",
-      "source_location": "L160",
+      "source_location": "L155",
       "id": "data_commercialpricebook_commercialpricebook_extraslotsneeded",
       "community": 72,
       "norm_label": ".extraslotsneeded()"
@@ -268,7 +268,7 @@
       "label": ".safeFind()",
       "file_type": "code",
       "source_file": "app/Data/CommercialPriceBook.php",
-      "source_location": "L167",
+      "source_location": "L162",
       "id": "data_commercialpricebook_commercialpricebook_safefind",
       "community": 72,
       "norm_label": ".safefind()"
@@ -277,7 +277,7 @@
       "label": "CommercialPriceBookEntry",
       "file_type": "code",
       "source_file": "app/Data/CommercialPriceBook.php",
-      "source_location": "L167",
+      "source_location": "L162",
       "id": "commercialpricebookentry",
       "community": 72,
       "norm_label": "commercialpricebookentry"
@@ -349,7 +349,7 @@
       "label": ".packDefinitions()",
       "file_type": "code",
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
-      "source_location": "L62",
+      "source_location": "L68",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_packdefinitions",
       "community": 20,
       "norm_label": ".packdefinitions()"
@@ -358,7 +358,7 @@
       "label": ".forPlanCode()",
       "file_type": "code",
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
-      "source_location": "L77",
+      "source_location": "L84",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_forplancode",
       "community": 20,
       "norm_label": ".forplancode()"
@@ -367,7 +367,7 @@
       "label": ".slotCountForPlanCode()",
       "file_type": "code",
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
-      "source_location": "L82",
+      "source_location": "L89",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_slotcountforplancode",
       "community": 20,
       "norm_label": ".slotcountforplancode()"
@@ -376,7 +376,7 @@
       "label": ".trialManagedClientEntitlements()",
       "file_type": "code",
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
-      "source_location": "L96",
+      "source_location": "L107",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_trialmanagedcliententitlements",
       "community": 20,
       "norm_label": ".trialmanagedcliententitlements()"
@@ -385,7 +385,7 @@
       "label": ".selectablePacks()",
       "file_type": "code",
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
-      "source_location": "L110",
+      "source_location": "L121",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_selectablepacks",
       "community": 20,
       "norm_label": ".selectablepacks()"
@@ -394,7 +394,7 @@
       "label": ".managedClientEntitlements()",
       "file_type": "code",
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
-      "source_location": "L128",
+      "source_location": "L139",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_managedcliententitlements",
       "community": 20,
       "norm_label": ".managedcliententitlements()"
@@ -403,7 +403,7 @@
       "label": ".standardManagedClientEntitlements()",
       "file_type": "code",
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
-      "source_location": "L136",
+      "source_location": "L147",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_standardmanagedcliententitlements",
       "community": 20,
       "norm_label": ".standardmanagedcliententitlements()"
@@ -412,7 +412,7 @@
       "label": ".demoManagedClientEntitlements()",
       "file_type": "code",
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
-      "source_location": "L155",
+      "source_location": "L168",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_demomanagedcliententitlements",
       "community": 20,
       "norm_label": ".demomanagedcliententitlements()"
@@ -421,7 +421,7 @@
       "label": ".trialPack()",
       "file_type": "code",
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
-      "source_location": "L170",
+      "source_location": "L183",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_trialpack",
       "community": 20,
       "norm_label": ".trialpack()"
@@ -430,16 +430,25 @@
       "label": ".demoPack()",
       "file_type": "code",
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
-      "source_location": "L208",
+      "source_location": "L221",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_demopack",
       "community": 20,
       "norm_label": ".demopack()"
     },
     {
+      "label": ".entityPack()",
+      "file_type": "code",
+      "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
+      "source_location": "L258",
+      "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_entitypack",
+      "community": 20,
+      "norm_label": ".entitypack()"
+    },
+    {
       "label": ".pack()",
       "file_type": "code",
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
-      "source_location": "L242",
+      "source_location": "L292",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_pack",
       "community": 20,
       "norm_label": ".pack()"
@@ -493,7 +502,7 @@
       "label": ".definitions()",
       "file_type": "code",
       "source_file": "app/Data/PlanEntitlementDefaults.php",
-      "source_location": "L23",
+      "source_location": "L29",
       "id": "data_planentitlementdefaults_planentitlementdefaults_definitions",
       "community": 20,
       "norm_label": ".definitions()"
@@ -502,7 +511,7 @@
       "label": ".forPlanCode()",
       "file_type": "code",
       "source_file": "app/Data/PlanEntitlementDefaults.php",
-      "source_location": "L36",
+      "source_location": "L47",
       "id": "data_planentitlementdefaults_planentitlementdefaults_forplancode",
       "community": 20,
       "norm_label": ".forplancode()"
@@ -511,7 +520,7 @@
       "label": ".entitlementsForPlanCode()",
       "file_type": "code",
       "source_file": "app/Data/PlanEntitlementDefaults.php",
-      "source_location": "L44",
+      "source_location": "L55",
       "id": "data_planentitlementdefaults_planentitlementdefaults_entitlementsforplancode",
       "community": 20,
       "norm_label": ".entitlementsforplancode()"
@@ -520,7 +529,7 @@
       "label": ".defaultPriceInr()",
       "file_type": "code",
       "source_file": "app/Data/PlanEntitlementDefaults.php",
-      "source_location": "L54",
+      "source_location": "L65",
       "id": "data_planentitlementdefaults_planentitlementdefaults_defaultpriceinr",
       "community": 20,
       "norm_label": ".defaultpriceinr()"
@@ -529,7 +538,7 @@
       "label": ".free()",
       "file_type": "code",
       "source_file": "app/Data/PlanEntitlementDefaults.php",
-      "source_location": "L62",
+      "source_location": "L73",
       "id": "data_planentitlementdefaults_planentitlementdefaults_free",
       "community": 20,
       "norm_label": ".free()"
@@ -538,7 +547,7 @@
       "label": ".starter()",
       "file_type": "code",
       "source_file": "app/Data/PlanEntitlementDefaults.php",
-      "source_location": "L98",
+      "source_location": "L109",
       "id": "data_planentitlementdefaults_planentitlementdefaults_starter",
       "community": 20,
       "norm_label": ".starter()"
@@ -547,7 +556,7 @@
       "label": ".growth()",
       "file_type": "code",
       "source_file": "app/Data/PlanEntitlementDefaults.php",
-      "source_location": "L131",
+      "source_location": "L142",
       "id": "data_planentitlementdefaults_planentitlementdefaults_growth",
       "community": 20,
       "norm_label": ".growth()"
@@ -556,10 +565,55 @@
       "label": ".enterprise()",
       "file_type": "code",
       "source_file": "app/Data/PlanEntitlementDefaults.php",
-      "source_location": "L176",
+      "source_location": "L187",
       "id": "data_planentitlementdefaults_planentitlementdefaults_enterprise",
       "community": 20,
       "norm_label": ".enterprise()"
+    },
+    {
+      "label": ".scopeBasic()",
+      "file_type": "code",
+      "source_file": "app/Data/PlanEntitlementDefaults.php",
+      "source_location": "L218",
+      "id": "data_planentitlementdefaults_planentitlementdefaults_scopebasic",
+      "community": 20,
+      "norm_label": ".scopebasic()"
+    },
+    {
+      "label": ".scopePro()",
+      "file_type": "code",
+      "source_file": "app/Data/PlanEntitlementDefaults.php",
+      "source_location": "L250",
+      "id": "data_planentitlementdefaults_planentitlementdefaults_scopepro",
+      "community": 20,
+      "norm_label": ".scopepro()"
+    },
+    {
+      "label": ".esgStarter()",
+      "file_type": "code",
+      "source_file": "app/Data/PlanEntitlementDefaults.php",
+      "source_location": "L263",
+      "id": "data_planentitlementdefaults_planentitlementdefaults_esgstarter",
+      "community": 20,
+      "norm_label": ".esgstarter()"
+    },
+    {
+      "label": ".esgComplete()",
+      "file_type": "code",
+      "source_file": "app/Data/PlanEntitlementDefaults.php",
+      "source_location": "L276",
+      "id": "data_planentitlementdefaults_planentitlementdefaults_esgcomplete",
+      "community": 20,
+      "norm_label": ".esgcomplete()"
+    },
+    {
+      "label": ".consultantManagedStandard()",
+      "file_type": "code",
+      "source_file": "app/Data/PlanEntitlementDefaults.php",
+      "source_location": "L292",
+      "id": "data_planentitlementdefaults_planentitlementdefaults_consultantmanagedstandard",
+      "community": 20,
+      "norm_label": ".consultantmanagedstandard()"
     },
     {
       "label": "Scope12HelpGuide.php",
@@ -621,7 +675,7 @@
       "source_file": "app/Data/SubscriptionPlanMatrix.php",
       "source_location": "L1",
       "id": "data_subscriptionplanmatrix",
-      "community": 2,
+      "community": 532,
       "norm_label": "subscriptionplanmatrix.php"
     },
     {
@@ -630,7 +684,7 @@
       "source_file": "app/Data/SubscriptionPlanMatrix.php",
       "source_location": "L20",
       "id": "data_subscriptionplanmatrix_subscriptionplanmatrix",
-      "community": 2,
+      "community": 532,
       "norm_label": "subscriptionplanmatrix"
     },
     {
@@ -639,7 +693,7 @@
       "source_file": "app/Data/SubscriptionPlanMatrix.php",
       "source_location": "L26",
       "id": "data_subscriptionplanmatrix_subscriptionplanmatrix_plans",
-      "community": 2,
+      "community": 532,
       "norm_label": ".plans()"
     },
     {
@@ -648,7 +702,7 @@
       "source_file": "app/Data/SubscriptionPlanMatrix.php",
       "source_location": "L62",
       "id": "data_subscriptionplanmatrix_subscriptionplanmatrix_columns",
-      "community": 2,
+      "community": 532,
       "norm_label": ".columns()"
     },
     {
@@ -657,7 +711,7 @@
       "source_file": "app/Data/SubscriptionPlanMatrix.php",
       "source_location": "L73",
       "id": "data_subscriptionplanmatrix_subscriptionplanmatrix_featurerows",
-      "community": 2,
+      "community": 532,
       "norm_label": ".featurerows()"
     },
     {
@@ -666,7 +720,7 @@
       "source_file": "app/Data/SubscriptionPlanMatrix.php",
       "source_location": "L91",
       "id": "data_subscriptionplanmatrix_subscriptionplanmatrix_defaultfeaturerows",
-      "community": 2,
+      "community": 532,
       "norm_label": ".defaultfeaturerows()"
     },
     {
@@ -675,7 +729,7 @@
       "source_file": "app/Data/SubscriptionPlanMatrix.php",
       "source_location": "L174",
       "id": "data_subscriptionplanmatrix_subscriptionplanmatrix_scope3addons",
-      "community": 2,
+      "community": 532,
       "norm_label": ".scope3addons()"
     },
     {
@@ -684,7 +738,7 @@
       "source_file": "app/Data/SubscriptionPlanMatrix.php",
       "source_location": "L192",
       "id": "data_subscriptionplanmatrix_subscriptionplanmatrix_defaultscope3addons",
-      "community": 2,
+      "community": 532,
       "norm_label": ".defaultscope3addons()"
     },
     {
@@ -720,7 +774,7 @@
       "source_file": "",
       "source_location": "",
       "id": "withheadings",
-      "community": 53,
+      "community": 407,
       "norm_label": "withheadings"
     },
     {
@@ -774,7 +828,7 @@
       "source_file": "app/Exports/ResultsBreakdownExport.php",
       "source_location": "L1",
       "id": "exports_resultsbreakdownexport",
-      "community": 38,
+      "community": 523,
       "norm_label": "resultsbreakdownexport.php"
     },
     {
@@ -783,7 +837,7 @@
       "source_file": "app/Exports/ResultsBreakdownExport.php",
       "source_location": "L14",
       "id": "exports_resultsbreakdownexport_resultsbreakdownexport",
-      "community": 38,
+      "community": 523,
       "norm_label": "resultsbreakdownexport"
     },
     {
@@ -792,7 +846,7 @@
       "source_file": "",
       "source_location": "",
       "id": "withmultiplesheets",
-      "community": 38,
+      "community": 523,
       "norm_label": "withmultiplesheets"
     },
     {
@@ -801,7 +855,7 @@
       "source_file": "app/Exports/ResultsBreakdownExport.php",
       "source_location": "L21",
       "id": "exports_resultsbreakdownexport_resultsbreakdownexport_construct",
-      "community": 38,
+      "community": 523,
       "norm_label": ".__construct()"
     },
     {
@@ -810,7 +864,7 @@
       "source_file": "app/Exports/ResultsBreakdownExport.php",
       "source_location": "L21",
       "id": "app_exports_resultsbreakdownexport_php_collection",
-      "community": 38,
+      "community": 523,
       "norm_label": "collection"
     },
     {
@@ -819,7 +873,7 @@
       "source_file": "app/Exports/ResultsBreakdownExport.php",
       "source_location": "L33",
       "id": "exports_resultsbreakdownexport_resultsbreakdownexport_sheets",
-      "community": 38,
+      "community": 523,
       "norm_label": ".sheets()"
     },
     {
@@ -828,7 +882,7 @@
       "source_file": "app/Exports/ResultsBreakdownSheet.php",
       "source_location": "L1",
       "id": "exports_resultsbreakdownsheet",
-      "community": 53,
+      "community": 407,
       "norm_label": "resultsbreakdownsheet.php"
     },
     {
@@ -837,7 +891,7 @@
       "source_file": "app/Exports/ResultsBreakdownSheet.php",
       "source_location": "L15",
       "id": "exports_resultsbreakdownsheet_resultsbreakdownsheet",
-      "community": 53,
+      "community": 407,
       "norm_label": "resultsbreakdownsheet"
     },
     {
@@ -846,7 +900,7 @@
       "source_file": "",
       "source_location": "",
       "id": "fromcollection",
-      "community": 53,
+      "community": 407,
       "norm_label": "fromcollection"
     },
     {
@@ -855,7 +909,7 @@
       "source_file": "",
       "source_location": "",
       "id": "withstyles",
-      "community": 53,
+      "community": 407,
       "norm_label": "withstyles"
     },
     {
@@ -864,7 +918,7 @@
       "source_file": "app/Exports/ResultsBreakdownSheet.php",
       "source_location": "L21",
       "id": "exports_resultsbreakdownsheet_resultsbreakdownsheet_construct",
-      "community": 53,
+      "community": 407,
       "norm_label": ".__construct()"
     },
     {
@@ -873,7 +927,7 @@
       "source_file": "app/Exports/ResultsBreakdownSheet.php",
       "source_location": "L28",
       "id": "exports_resultsbreakdownsheet_resultsbreakdownsheet_title",
-      "community": 53,
+      "community": 407,
       "norm_label": ".title()"
     },
     {
@@ -882,7 +936,7 @@
       "source_file": "app/Exports/ResultsBreakdownSheet.php",
       "source_location": "L33",
       "id": "exports_resultsbreakdownsheet_resultsbreakdownsheet_collection",
-      "community": 53,
+      "community": 407,
       "norm_label": ".collection()"
     },
     {
@@ -891,7 +945,7 @@
       "source_file": "app/Exports/ResultsBreakdownSheet.php",
       "source_location": "L82",
       "id": "exports_resultsbreakdownsheet_resultsbreakdownsheet_headings",
-      "community": 53,
+      "community": 407,
       "norm_label": ".headings()"
     },
     {
@@ -900,7 +954,7 @@
       "source_file": "app/Exports/ResultsBreakdownSheet.php",
       "source_location": "L87",
       "id": "exports_resultsbreakdownsheet_resultsbreakdownsheet_styles",
-      "community": 53,
+      "community": 407,
       "norm_label": ".styles()"
     },
     {
@@ -909,7 +963,7 @@
       "source_file": "app/Exports/ResultsBreakdownSheet.php",
       "source_location": "L87",
       "id": "app_exports_resultsbreakdownsheet_php_worksheet",
-      "community": 53,
+      "community": 407,
       "norm_label": "worksheet"
     },
     {
@@ -918,7 +972,7 @@
       "source_file": "app/Exports/Scope12BulkTemplateExport.php",
       "source_location": "L1",
       "id": "exports_scope12bulktemplateexport",
-      "community": 38,
+      "community": 523,
       "norm_label": "scope12bulktemplateexport.php"
     },
     {
@@ -927,7 +981,7 @@
       "source_file": "app/Exports/Scope12BulkTemplateExport.php",
       "source_location": "L8",
       "id": "exports_scope12bulktemplateexport_scope12bulktemplateexport",
-      "community": 38,
+      "community": 523,
       "norm_label": "scope12bulktemplateexport"
     },
     {
@@ -936,7 +990,7 @@
       "source_file": "app/Exports/Scope12BulkTemplateExport.php",
       "source_location": "L10",
       "id": "exports_scope12bulktemplateexport_scope12bulktemplateexport_construct",
-      "community": 38,
+      "community": 523,
       "norm_label": ".__construct()"
     },
     {
@@ -945,7 +999,7 @@
       "source_file": "app/Exports/Scope12BulkTemplateExport.php",
       "source_location": "L14",
       "id": "exports_scope12bulktemplateexport_scope12bulktemplateexport_sheets",
-      "community": 38,
+      "community": 523,
       "norm_label": ".sheets()"
     },
     {
@@ -990,7 +1044,7 @@
       "source_file": "app/Exports/Scope12DataSheet.php",
       "source_location": "L1",
       "id": "exports_scope12datasheet",
-      "community": 53,
+      "community": 407,
       "norm_label": "scope12datasheet.php"
     },
     {
@@ -999,7 +1053,7 @@
       "source_file": "app/Exports/Scope12DataSheet.php",
       "source_location": "L12",
       "id": "exports_scope12datasheet_scope12datasheet",
-      "community": 53,
+      "community": 538,
       "norm_label": "scope12datasheet"
     },
     {
@@ -1008,7 +1062,7 @@
       "source_file": "app/Exports/Scope12DataSheet.php",
       "source_location": "L14",
       "id": "exports_scope12datasheet_scope12datasheet_construct",
-      "community": 53,
+      "community": 538,
       "norm_label": ".__construct()"
     },
     {
@@ -1017,7 +1071,7 @@
       "source_file": "app/Exports/Scope12DataSheet.php",
       "source_location": "L19",
       "id": "exports_scope12datasheet_scope12datasheet_array",
-      "community": 53,
+      "community": 538,
       "norm_label": ".array()"
     },
     {
@@ -1026,7 +1080,7 @@
       "source_file": "app/Exports/Scope12DataSheet.php",
       "source_location": "L24",
       "id": "exports_scope12datasheet_scope12datasheet_headings",
-      "community": 53,
+      "community": 538,
       "norm_label": ".headings()"
     },
     {
@@ -1035,7 +1089,7 @@
       "source_file": "app/Exports/Scope12DataSheet.php",
       "source_location": "L29",
       "id": "exports_scope12datasheet_scope12datasheet_title",
-      "community": 53,
+      "community": 538,
       "norm_label": ".title()"
     },
     {
@@ -1044,7 +1098,7 @@
       "source_file": "app/Exports/Scope12DataSheet.php",
       "source_location": "L34",
       "id": "exports_scope12datasheet_scope12datasheet_styles",
-      "community": 53,
+      "community": 538,
       "norm_label": ".styles()"
     },
     {
@@ -1053,7 +1107,7 @@
       "source_file": "app/Exports/Scope12DataSheet.php",
       "source_location": "L34",
       "id": "app_exports_scope12datasheet_php_worksheet",
-      "community": 53,
+      "community": 538,
       "norm_label": "worksheet"
     },
     {
@@ -1080,7 +1134,7 @@
       "source_file": "app/Exports/Scope12InstructionsSheet.php",
       "source_location": "L11",
       "id": "exports_scope12instructionssheet_scope12instructionssheet_array",
-      "community": 53,
+      "community": 38,
       "norm_label": ".array()"
     },
     {
@@ -1170,7 +1224,7 @@
       "source_file": "app/Exports/Scope12ReferenceSheet.php",
       "source_location": "L11",
       "id": "exports_scope12referencesheet_scope12referencesheet_array",
-      "community": 38,
+      "community": 53,
       "norm_label": ".array()"
     },
     {
@@ -1188,7 +1242,7 @@
       "source_file": "app/Exports/Scope3CategorySheet.php",
       "source_location": "L1",
       "id": "exports_scope3categorysheet",
-      "community": 53,
+      "community": 407,
       "norm_label": "scope3categorysheet.php"
     },
     {
@@ -1197,7 +1251,7 @@
       "source_file": "app/Exports/Scope3CategorySheet.php",
       "source_location": "L16",
       "id": "exports_scope3categorysheet_scope3categorysheet",
-      "community": 53,
+      "community": 407,
       "norm_label": "scope3categorysheet"
     },
     {
@@ -1206,7 +1260,7 @@
       "source_file": "app/Exports/Scope3CategorySheet.php",
       "source_location": "L21",
       "id": "exports_scope3categorysheet_scope3categorysheet_construct",
-      "community": 53,
+      "community": 407,
       "norm_label": ".__construct()"
     },
     {
@@ -1215,7 +1269,7 @@
       "source_file": "app/Exports/Scope3CategorySheet.php",
       "source_location": "L21",
       "id": "app_exports_scope3categorysheet_php_collection",
-      "community": 53,
+      "community": 407,
       "norm_label": "collection"
     },
     {
@@ -1224,7 +1278,7 @@
       "source_file": "app/Exports/Scope3CategorySheet.php",
       "source_location": "L26",
       "id": "exports_scope3categorysheet_scope3categorysheet_title",
-      "community": 53,
+      "community": 407,
       "norm_label": ".title()"
     },
     {
@@ -1233,7 +1287,7 @@
       "source_file": "app/Exports/Scope3CategorySheet.php",
       "source_location": "L31",
       "id": "exports_scope3categorysheet_scope3categorysheet_collection",
-      "community": 53,
+      "community": 407,
       "norm_label": ".collection()"
     },
     {
@@ -1242,7 +1296,7 @@
       "source_file": "app/Exports/Scope3CategorySheet.php",
       "source_location": "L57",
       "id": "exports_scope3categorysheet_scope3categorysheet_headings",
-      "community": 53,
+      "community": 407,
       "norm_label": ".headings()"
     },
     {
@@ -1251,7 +1305,7 @@
       "source_file": "app/Exports/Scope3CategorySheet.php",
       "source_location": "L62",
       "id": "exports_scope3categorysheet_scope3categorysheet_styles",
-      "community": 53,
+      "community": 407,
       "norm_label": ".styles()"
     },
     {
@@ -1260,7 +1314,7 @@
       "source_file": "app/Exports/Scope3CategorySheet.php",
       "source_location": "L62",
       "id": "app_exports_scope3categorysheet_php_worksheet",
-      "community": 53,
+      "community": 407,
       "norm_label": "worksheet"
     },
     {
@@ -1269,7 +1323,7 @@
       "source_file": "app/Exports/TrialWatermarkNoticeSheet.php",
       "source_location": "L1",
       "id": "exports_trialwatermarknoticesheet",
-      "community": 53,
+      "community": 520,
       "norm_label": "trialwatermarknoticesheet.php"
     },
     {
@@ -1278,7 +1332,7 @@
       "source_file": "app/Exports/TrialWatermarkNoticeSheet.php",
       "source_location": "L13",
       "id": "exports_trialwatermarknoticesheet_trialwatermarknoticesheet",
-      "community": 53,
+      "community": 520,
       "norm_label": "trialwatermarknoticesheet"
     },
     {
@@ -1287,7 +1341,7 @@
       "source_file": "app/Exports/TrialWatermarkNoticeSheet.php",
       "source_location": "L15",
       "id": "exports_trialwatermarknoticesheet_trialwatermarknoticesheet_title",
-      "community": 53,
+      "community": 520,
       "norm_label": ".title()"
     },
     {
@@ -1296,7 +1350,7 @@
       "source_file": "app/Exports/TrialWatermarkNoticeSheet.php",
       "source_location": "L20",
       "id": "exports_trialwatermarknoticesheet_trialwatermarknoticesheet_array",
-      "community": 53,
+      "community": 520,
       "norm_label": ".array()"
     },
     {
@@ -1305,7 +1359,7 @@
       "source_file": "app/Exports/TrialWatermarkNoticeSheet.php",
       "source_location": "L32",
       "id": "exports_trialwatermarknoticesheet_trialwatermarknoticesheet_styles",
-      "community": 53,
+      "community": 520,
       "norm_label": ".styles()"
     },
     {
@@ -1314,7 +1368,7 @@
       "source_file": "app/Exports/TrialWatermarkNoticeSheet.php",
       "source_location": "L32",
       "id": "app_exports_trialwatermarknoticesheet_php_worksheet",
-      "community": 53,
+      "community": 520,
       "norm_label": "worksheet"
     },
     {
@@ -1521,7 +1575,7 @@
       "source_file": "app/Http/Controllers/Admin/CompanyPackageRequestController.php",
       "source_location": "L1",
       "id": "admin_companypackagerequestcontroller",
-      "community": 23,
+      "community": 518,
       "norm_label": "companypackagerequestcontroller.php"
     },
     {
@@ -1530,7 +1584,7 @@
       "source_file": "app/Http/Controllers/Admin/CompanyPackageRequestController.php",
       "source_location": "L11",
       "id": "admin_companypackagerequestcontroller_companypackagerequestcontroller",
-      "community": 23,
+      "community": 518,
       "norm_label": "companypackagerequestcontroller"
     },
     {
@@ -1539,7 +1593,7 @@
       "source_file": "app/Http/Controllers/Admin/CompanyPackageRequestController.php",
       "source_location": "L13",
       "id": "admin_companypackagerequestcontroller_companypackagerequestcontroller_construct",
-      "community": 23,
+      "community": 518,
       "norm_label": ".__construct()"
     },
     {
@@ -1548,7 +1602,7 @@
       "source_file": "app/Http/Controllers/Admin/CompanyPackageRequestController.php",
       "source_location": "L18",
       "id": "admin_companypackagerequestcontroller_companypackagerequestcontroller_index",
-      "community": 23,
+      "community": 518,
       "norm_label": ".index()"
     },
     {
@@ -1557,7 +1611,7 @@
       "source_file": "app/Http/Controllers/Admin/CompanyPackageRequestController.php",
       "source_location": "L18",
       "id": "app_http_controllers_admin_companypackagerequestcontroller_php_request",
-      "community": 23,
+      "community": 518,
       "norm_label": "request"
     },
     {
@@ -1566,7 +1620,7 @@
       "source_file": "app/Http/Controllers/Admin/CompanyPackageRequestController.php",
       "source_location": "L37",
       "id": "admin_companypackagerequestcontroller_companypackagerequestcontroller_update",
-      "community": 23,
+      "community": 518,
       "norm_label": ".update()"
     },
     {
@@ -1575,7 +1629,7 @@
       "source_file": "app/Http/Controllers/Admin/CompanyPackageRequestController.php",
       "source_location": "L37",
       "id": "app_http_controllers_admin_companypackagerequestcontroller_php_companypackagerequest",
-      "community": 23,
+      "community": 518,
       "norm_label": "companypackagerequest"
     },
     {
@@ -1584,7 +1638,7 @@
       "source_file": "app/Http/Controllers/Admin/CompanyPackageRequestController.php",
       "source_location": "L53",
       "id": "admin_companypackagerequestcontroller_companypackagerequestcontroller_savequote",
-      "community": 23,
+      "community": 518,
       "norm_label": ".savequote()"
     },
     {
@@ -1593,7 +1647,7 @@
       "source_file": "app/Http/Controllers/Admin/CompanyPackageRequestController.php",
       "source_location": "L84",
       "id": "admin_companypackagerequestcontroller_companypackagerequestcontroller_markpaid",
-      "community": 23,
+      "community": 518,
       "norm_label": ".markpaid()"
     },
     {
@@ -1602,7 +1656,7 @@
       "source_file": "app/Http/Controllers/Admin/CompanyPackageRequestController.php",
       "source_location": "L91",
       "id": "admin_companypackagerequestcontroller_companypackagerequestcontroller_activate",
-      "community": 23,
+      "community": 518,
       "norm_label": ".activate()"
     },
     {
@@ -2232,7 +2286,7 @@
       "source_file": "app/Http/Controllers/Admin/EmissionManagementController.php",
       "source_location": "L1",
       "id": "admin_emissionmanagementcontroller",
-      "community": 0,
+      "community": 508,
       "norm_label": "emissionmanagementcontroller.php"
     },
     {
@@ -2601,7 +2655,7 @@
       "source_file": "app/Http/Controllers/Admin/PaymentGatewayController.php",
       "source_location": "L1",
       "id": "admin_paymentgatewaycontroller",
-      "community": 407,
+      "community": 2,
       "norm_label": "paymentgatewaycontroller.php"
     },
     {
@@ -2610,7 +2664,7 @@
       "source_file": "app/Http/Controllers/Admin/PaymentGatewayController.php",
       "source_location": "L12",
       "id": "admin_paymentgatewaycontroller_paymentgatewaycontroller",
-      "community": 407,
+      "community": 2,
       "norm_label": "paymentgatewaycontroller"
     },
     {
@@ -2619,7 +2673,7 @@
       "source_file": "app/Http/Controllers/Admin/PaymentGatewayController.php",
       "source_location": "L14",
       "id": "admin_paymentgatewaycontroller_paymentgatewaycontroller_index",
-      "community": 407,
+      "community": 2,
       "norm_label": ".index()"
     },
     {
@@ -2628,7 +2682,7 @@
       "source_file": "app/Http/Controllers/Admin/PaymentGatewayController.php",
       "source_location": "L21",
       "id": "admin_paymentgatewaycontroller_paymentgatewaycontroller_update",
-      "community": 407,
+      "community": 2,
       "norm_label": ".update()"
     },
     {
@@ -2637,7 +2691,7 @@
       "source_file": "app/Http/Controllers/Admin/PaymentGatewayController.php",
       "source_location": "L21",
       "id": "app_http_controllers_admin_paymentgatewaycontroller_php_request",
-      "community": 407,
+      "community": 2,
       "norm_label": "request"
     },
     {
@@ -2907,7 +2961,7 @@
       "source_file": "app/Http/Controllers/Admin/SiteContentController.php",
       "source_location": "L1",
       "id": "admin_sitecontentcontroller",
-      "community": 4,
+      "community": 517,
       "norm_label": "sitecontentcontroller.php"
     },
     {
@@ -2916,7 +2970,7 @@
       "source_file": "app/Http/Controllers/Admin/SiteContentController.php",
       "source_location": "L14",
       "id": "admin_sitecontentcontroller_sitecontentcontroller",
-      "community": 4,
+      "community": 517,
       "norm_label": "sitecontentcontroller"
     },
     {
@@ -2925,7 +2979,7 @@
       "source_file": "app/Http/Controllers/Admin/SiteContentController.php",
       "source_location": "L23",
       "id": "admin_sitecontentcontroller_sitecontentcontroller_index",
-      "community": 4,
+      "community": 517,
       "norm_label": ".index()"
     },
     {
@@ -2934,7 +2988,7 @@
       "source_file": "app/Http/Controllers/Admin/SiteContentController.php",
       "source_location": "L31",
       "id": "admin_sitecontentcontroller_sitecontentcontroller_updatesettings",
-      "community": 4,
+      "community": 517,
       "norm_label": ".updatesettings()"
     },
     {
@@ -2943,7 +2997,7 @@
       "source_file": "app/Http/Controllers/Admin/SiteContentController.php",
       "source_location": "L31",
       "id": "app_http_controllers_admin_sitecontentcontroller_php_request",
-      "community": 4,
+      "community": 517,
       "norm_label": "request"
     },
     {
@@ -2952,7 +3006,7 @@
       "source_file": "app/Http/Controllers/Admin/SiteContentController.php",
       "source_location": "L58",
       "id": "admin_sitecontentcontroller_sitecontentcontroller_editpage",
-      "community": 4,
+      "community": 517,
       "norm_label": ".editpage()"
     },
     {
@@ -2961,7 +3015,7 @@
       "source_file": "app/Http/Controllers/Admin/SiteContentController.php",
       "source_location": "L65",
       "id": "admin_sitecontentcontroller_sitecontentcontroller_updatepage",
-      "community": 4,
+      "community": 517,
       "norm_label": ".updatepage()"
     },
     {
@@ -3195,7 +3249,7 @@
       "source_file": "app/Http/Controllers/Auth/ForgotPasswordController.php",
       "source_location": "L1",
       "id": "auth_forgotpasswordcontroller",
-      "community": 38,
+      "community": 531,
       "norm_label": "forgotpasswordcontroller.php"
     },
     {
@@ -3204,7 +3258,7 @@
       "source_file": "app/Http/Controllers/Auth/ForgotPasswordController.php",
       "source_location": "L13",
       "id": "auth_forgotpasswordcontroller_forgotpasswordcontroller",
-      "community": 38,
+      "community": 531,
       "norm_label": "forgotpasswordcontroller"
     },
     {
@@ -3213,7 +3267,7 @@
       "source_file": "app/Http/Controllers/Auth/ForgotPasswordController.php",
       "source_location": "L18",
       "id": "auth_forgotpasswordcontroller_forgotpasswordcontroller_showforgotpasswordform",
-      "community": 38,
+      "community": 531,
       "norm_label": ".showforgotpasswordform()"
     },
     {
@@ -3222,7 +3276,7 @@
       "source_file": "app/Http/Controllers/Auth/ForgotPasswordController.php",
       "source_location": "L26",
       "id": "auth_forgotpasswordcontroller_forgotpasswordcontroller_sendresetlinkemail",
-      "community": 38,
+      "community": 531,
       "norm_label": ".sendresetlinkemail()"
     },
     {
@@ -3231,7 +3285,7 @@
       "source_file": "app/Http/Controllers/Auth/ForgotPasswordController.php",
       "source_location": "L26",
       "id": "app_http_controllers_auth_forgotpasswordcontroller_php_request",
-      "community": 38,
+      "community": 531,
       "norm_label": "request"
     },
     {
@@ -3240,7 +3294,7 @@
       "source_file": "app/Http/Controllers/Auth/ForgotPasswordController.php",
       "source_location": "L53",
       "id": "auth_forgotpasswordcontroller_forgotpasswordcontroller_resetsuccess",
-      "community": 38,
+      "community": 531,
       "norm_label": ".resetsuccess()"
     },
     {
@@ -3249,7 +3303,7 @@
       "source_file": "app/Http/Controllers/Auth/ForgotPasswordController.php",
       "source_location": "L68",
       "id": "auth_forgotpasswordcontroller_forgotpasswordcontroller_showresetform",
-      "community": 38,
+      "community": 531,
       "norm_label": ".showresetform()"
     },
     {
@@ -3258,7 +3312,7 @@
       "source_file": "app/Http/Controllers/Auth/ForgotPasswordController.php",
       "source_location": "L79",
       "id": "auth_forgotpasswordcontroller_forgotpasswordcontroller_reset",
-      "community": 38,
+      "community": 531,
       "norm_label": ".reset()"
     },
     {
@@ -3735,7 +3789,7 @@
       "source_file": "app/Http/Controllers/Client/SubscriptionController.php",
       "source_location": "L67",
       "id": "client_subscriptioncontroller_subscriptioncontroller_upgrade",
-      "community": 2,
+      "community": 532,
       "norm_label": ".upgrade()"
     },
     {
@@ -6642,7 +6696,7 @@
       "source_file": "app/Http/Controllers/EmissionBoundaryController.php",
       "source_location": "L1",
       "id": "controllers_emissionboundarycontroller",
-      "community": 0,
+      "community": 542,
       "norm_label": "emissionboundarycontroller.php"
     },
     {
@@ -6651,7 +6705,7 @@
       "source_file": "app/Http/Controllers/EmissionBoundaryController.php",
       "source_location": "L11",
       "id": "controllers_emissionboundarycontroller_emissionboundarycontroller",
-      "community": 0,
+      "community": 542,
       "norm_label": "emissionboundarycontroller"
     },
     {
@@ -6660,7 +6714,7 @@
       "source_file": "app/Http/Controllers/EmissionBoundaryController.php",
       "source_location": "L16",
       "id": "controllers_emissionboundarycontroller_emissionboundarycontroller_index",
-      "community": 0,
+      "community": 542,
       "norm_label": ".index()"
     },
     {
@@ -6669,7 +6723,7 @@
       "source_file": "app/Http/Controllers/EmissionBoundaryController.php",
       "source_location": "L16",
       "id": "app_http_controllers_emissionboundarycontroller_php_location",
-      "community": 0,
+      "community": 542,
       "norm_label": "location"
     },
     {
@@ -6678,7 +6732,7 @@
       "source_file": "app/Http/Controllers/EmissionBoundaryController.php",
       "source_location": "L50",
       "id": "controllers_emissionboundarycontroller_emissionboundarycontroller_store",
-      "community": 0,
+      "community": 542,
       "norm_label": ".store()"
     },
     {
@@ -6687,7 +6741,7 @@
       "source_file": "app/Http/Controllers/EmissionBoundaryController.php",
       "source_location": "L50",
       "id": "app_http_controllers_emissionboundarycontroller_php_request",
-      "community": 0,
+      "community": 542,
       "norm_label": "request"
     },
     {
@@ -6723,7 +6777,7 @@
       "source_file": "app/Http/Controllers/IeqtExportController.php",
       "source_location": "L1",
       "id": "controllers_ieqtexportcontroller",
-      "community": 94,
+      "community": 544,
       "norm_label": "ieqtexportcontroller.php"
     },
     {
@@ -6732,7 +6786,7 @@
       "source_file": "app/Http/Controllers/IeqtExportController.php",
       "source_location": "L12",
       "id": "controllers_ieqtexportcontroller_ieqtexportcontroller",
-      "community": 94,
+      "community": 544,
       "norm_label": "ieqtexportcontroller"
     },
     {
@@ -6741,7 +6795,7 @@
       "source_file": "app/Http/Controllers/IeqtExportController.php",
       "source_location": "L14",
       "id": "controllers_ieqtexportcontroller_ieqtexportcontroller_construct",
-      "community": 94,
+      "community": 544,
       "norm_label": ".__construct()"
     },
     {
@@ -6750,7 +6804,7 @@
       "source_file": "app/Http/Controllers/IeqtExportController.php",
       "source_location": "L20",
       "id": "controllers_ieqtexportcontroller_ieqtexportcontroller_export",
-      "community": 94,
+      "community": 544,
       "norm_label": ".export()"
     },
     {
@@ -6759,7 +6813,7 @@
       "source_file": "app/Http/Controllers/IeqtExportController.php",
       "source_location": "L20",
       "id": "app_http_controllers_ieqtexportcontroller_php_request",
-      "community": 94,
+      "community": 544,
       "norm_label": "request"
     },
     {
@@ -7326,7 +7380,7 @@
       "source_file": "app/Http/Controllers/QuickInputController.php",
       "source_location": "L1",
       "id": "controllers_quickinputcontroller",
-      "community": 0,
+      "community": 539,
       "norm_label": "quickinputcontroller.php"
     },
     {
@@ -7335,7 +7389,7 @@
       "source_file": "app/Http/Controllers/QuickInputController.php",
       "source_location": "L24",
       "id": "controllers_quickinputcontroller_quickinputcontroller",
-      "community": 0,
+      "community": 508,
       "norm_label": "quickinputcontroller"
     },
     {
@@ -7344,7 +7398,7 @@
       "source_file": "app/Http/Controllers/QuickInputController.php",
       "source_location": "L32",
       "id": "controllers_quickinputcontroller_quickinputcontroller_construct",
-      "community": 0,
+      "community": 539,
       "norm_label": ".__construct()"
     },
     {
@@ -7353,7 +7407,7 @@
       "source_file": "app/Http/Controllers/QuickInputController.php",
       "source_location": "L32",
       "id": "emissioncalculationservice",
-      "community": 0,
+      "community": 539,
       "norm_label": "emissioncalculationservice"
     },
     {
@@ -7362,7 +7416,7 @@
       "source_file": "app/Http/Controllers/QuickInputController.php",
       "source_location": "L32",
       "id": "measurementservice",
-      "community": 0,
+      "community": 539,
       "norm_label": "measurementservice"
     },
     {
@@ -7371,7 +7425,7 @@
       "source_file": "app/Http/Controllers/QuickInputController.php",
       "source_location": "L32",
       "id": "quickinputformbuilder",
-      "community": 0,
+      "community": 539,
       "norm_label": "quickinputformbuilder"
     },
     {
@@ -7380,7 +7434,7 @@
       "source_file": "app/Http/Controllers/QuickInputController.php",
       "source_location": "L32",
       "id": "app_http_controllers_quickinputcontroller_php_subscriptionservice",
-      "community": 0,
+      "community": 539,
       "norm_label": "subscriptionservice"
     },
     {
@@ -7389,7 +7443,7 @@
       "source_file": "app/Http/Controllers/QuickInputController.php",
       "source_location": "L32",
       "id": "measurementdocumentservice",
-      "community": 0,
+      "community": 539,
       "norm_label": "measurementdocumentservice"
     },
     {
@@ -7398,7 +7452,7 @@
       "source_file": "app/Http/Controllers/QuickInputController.php",
       "source_location": "L48",
       "id": "controllers_quickinputcontroller_quickinputcontroller_index",
-      "community": 0,
+      "community": 508,
       "norm_label": ".index()"
     },
     {
@@ -7416,7 +7470,7 @@
       "source_file": "app/Http/Controllers/QuickInputController.php",
       "source_location": "L167",
       "id": "controllers_quickinputcontroller_quickinputcontroller_helpguide",
-      "community": 0,
+      "community": 508,
       "norm_label": ".helpguide()"
     },
     {
@@ -7425,7 +7479,7 @@
       "source_file": "app/Http/Controllers/QuickInputController.php",
       "source_location": "L194",
       "id": "controllers_quickinputcontroller_quickinputcontroller_show",
-      "community": 0,
+      "community": 508,
       "norm_label": ".show()"
     },
     {
@@ -7434,7 +7488,7 @@
       "source_file": "app/Http/Controllers/QuickInputController.php",
       "source_location": "L326",
       "id": "controllers_quickinputcontroller_quickinputcontroller_getformfieldsforvehicle",
-      "community": 0,
+      "community": 513,
       "norm_label": ".getformfieldsforvehicle()"
     },
     {
@@ -7461,7 +7515,7 @@
       "source_file": "app/Http/Controllers/QuickInputController.php",
       "source_location": "L838",
       "id": "controllers_quickinputcontroller_quickinputcontroller_view",
-      "community": 0,
+      "community": 508,
       "norm_label": ".view()"
     },
     {
@@ -7470,7 +7524,7 @@
       "source_file": "app/Http/Controllers/QuickInputController.php",
       "source_location": "L862",
       "id": "controllers_quickinputcontroller_quickinputcontroller_downloadsupportingdocument",
-      "community": 0,
+      "community": 508,
       "norm_label": ".downloadsupportingdocument()"
     },
     {
@@ -7479,7 +7533,7 @@
       "source_file": "app/Http/Controllers/QuickInputController.php",
       "source_location": "L892",
       "id": "controllers_quickinputcontroller_quickinputcontroller_edit",
-      "community": 0,
+      "community": 508,
       "norm_label": ".edit()"
     },
     {
@@ -7497,7 +7551,7 @@
       "source_file": "app/Http/Controllers/QuickInputController.php",
       "source_location": "L1095",
       "id": "controllers_quickinputcontroller_quickinputcontroller_destroy",
-      "community": 0,
+      "community": 508,
       "norm_label": ".destroy()"
     },
     {
@@ -7506,7 +7560,7 @@
       "source_file": "app/Http/Controllers/QuickInputController.php",
       "source_location": "L1144",
       "id": "controllers_quickinputcontroller_quickinputcontroller_export",
-      "community": 0,
+      "community": 508,
       "norm_label": ".export()"
     },
     {
@@ -7515,7 +7569,7 @@
       "source_file": "app/Http/Controllers/QuickInputController.php",
       "source_location": "L1233",
       "id": "controllers_quickinputcontroller_quickinputcontroller_getfuelcategories",
-      "community": 0,
+      "community": 508,
       "norm_label": ".getfuelcategories()"
     },
     {
@@ -7524,7 +7578,7 @@
       "source_file": "app/Http/Controllers/QuickInputController.php",
       "source_location": "L1261",
       "id": "controllers_quickinputcontroller_quickinputcontroller_getfueltypes",
-      "community": 0,
+      "community": 508,
       "norm_label": ".getfueltypes()"
     },
     {
@@ -7533,7 +7587,7 @@
       "source_file": "app/Http/Controllers/QuickInputController.php",
       "source_location": "L1291",
       "id": "controllers_quickinputcontroller_quickinputcontroller_getvehicletypes",
-      "community": 0,
+      "community": 508,
       "norm_label": ".getvehicletypes()"
     },
     {
@@ -7542,7 +7596,7 @@
       "source_file": "app/Http/Controllers/QuickInputController.php",
       "source_location": "L1321",
       "id": "controllers_quickinputcontroller_quickinputcontroller_getvehiclefueltypes",
-      "community": 0,
+      "community": 508,
       "norm_label": ".getvehiclefueltypes()"
     },
     {
@@ -7551,7 +7605,7 @@
       "source_file": "app/Http/Controllers/QuickInputController.php",
       "source_location": "L1355",
       "id": "controllers_quickinputcontroller_quickinputcontroller_getvehicleuoms",
-      "community": 0,
+      "community": 508,
       "norm_label": ".getvehicleuoms()"
     },
     {
@@ -7641,7 +7695,7 @@
       "source_file": "app/Http/Controllers/QuickInputController.php",
       "source_location": "L1561",
       "id": "emissionfactor",
-      "community": 0,
+      "community": 508,
       "norm_label": "emissionfactor"
     },
     {
@@ -7704,7 +7758,7 @@
       "source_file": "app/Http/Controllers/QuickInputController.php",
       "source_location": "L1703",
       "id": "controllers_quickinputcontroller_quickinputcontroller_getunits",
-      "community": 0,
+      "community": 508,
       "norm_label": ".getunits()"
     },
     {
@@ -7965,7 +8019,7 @@
       "source_file": "app/Http/Controllers/Scope12BulkImportController.php",
       "source_location": "L1",
       "id": "controllers_scope12bulkimportcontroller",
-      "community": 38,
+      "community": 537,
       "norm_label": "scope12bulkimportcontroller.php"
     },
     {
@@ -7974,7 +8028,7 @@
       "source_file": "app/Http/Controllers/Scope12BulkImportController.php",
       "source_location": "L13",
       "id": "controllers_scope12bulkimportcontroller_scope12bulkimportcontroller",
-      "community": 38,
+      "community": 537,
       "norm_label": "scope12bulkimportcontroller"
     },
     {
@@ -7983,7 +8037,7 @@
       "source_file": "app/Http/Controllers/Scope12BulkImportController.php",
       "source_location": "L15",
       "id": "controllers_scope12bulkimportcontroller_scope12bulkimportcontroller_construct",
-      "community": 38,
+      "community": 537,
       "norm_label": ".__construct()"
     },
     {
@@ -7992,7 +8046,7 @@
       "source_file": "app/Http/Controllers/Scope12BulkImportController.php",
       "source_location": "L23",
       "id": "controllers_scope12bulkimportcontroller_scope12bulkimportcontroller_downloadtemplate",
-      "community": 38,
+      "community": 537,
       "norm_label": ".downloadtemplate()"
     },
     {
@@ -8001,7 +8055,7 @@
       "source_file": "app/Http/Controllers/Scope12BulkImportController.php",
       "source_location": "L23",
       "id": "app_http_controllers_scope12bulkimportcontroller_php_request",
-      "community": 38,
+      "community": 537,
       "norm_label": "request"
     },
     {
@@ -8010,7 +8064,7 @@
       "source_file": "app/Http/Controllers/Scope12BulkImportController.php",
       "source_location": "L61",
       "id": "controllers_scope12bulkimportcontroller_scope12bulkimportcontroller_downloadcsv",
-      "community": 38,
+      "community": 537,
       "norm_label": ".downloadcsv()"
     },
     {
@@ -8019,7 +8073,7 @@
       "source_file": "app/Http/Controllers/Scope12BulkImportController.php",
       "source_location": "L61",
       "id": "app_http_controllers_scope12bulkimportcontroller_php_streamedresponse",
-      "community": 38,
+      "community": 537,
       "norm_label": "streamedresponse"
     },
     {
@@ -8028,7 +8082,7 @@
       "source_file": "app/Http/Controllers/Scope12BulkImportController.php",
       "source_location": "L95",
       "id": "controllers_scope12bulkimportcontroller_scope12bulkimportcontroller_import",
-      "community": 38,
+      "community": 537,
       "norm_label": ".import()"
     },
     {
@@ -8919,7 +8973,7 @@
       "source_file": "app/Mail/Concerns/AppliesGlobalBcc.php",
       "source_location": "L1",
       "id": "concerns_appliesglobalbcc",
-      "community": 413,
+      "community": 4,
       "norm_label": "appliesglobalbcc.php"
     },
     {
@@ -8928,7 +8982,7 @@
       "source_file": "app/Mail/Concerns/AppliesGlobalBcc.php",
       "source_location": "L9",
       "id": "concerns_appliesglobalbcc_globalbccaddress",
-      "community": 413,
+      "community": 4,
       "norm_label": "globalbccaddress()"
     },
     {
@@ -8937,7 +8991,7 @@
       "source_file": "app/Mail/Concerns/AppliesGlobalBcc.php",
       "source_location": "L19",
       "id": "concerns_appliesglobalbcc_applyglobalbcc",
-      "community": 413,
+      "community": 4,
       "norm_label": "applyglobalbcc()"
     },
     {
@@ -9207,7 +9261,7 @@
       "source_file": "app/Models/Admin.php",
       "source_location": "L1",
       "id": "models_admin",
-      "community": 10,
+      "community": 6,
       "norm_label": "admin.php"
     },
     {
@@ -9216,7 +9270,7 @@
       "source_file": "app/Models/Admin.php",
       "source_location": "L9",
       "id": "models_admin_admin",
-      "community": 10,
+      "community": 6,
       "norm_label": "admin"
     },
     {
@@ -9243,7 +9297,7 @@
       "source_file": "",
       "source_location": "",
       "id": "notifiable",
-      "community": 10,
+      "community": 6,
       "norm_label": "notifiable"
     },
     {
@@ -9252,7 +9306,7 @@
       "source_file": "app/Models/Admin.php",
       "source_location": "L47",
       "id": "models_admin_admin_casts",
-      "community": 10,
+      "community": 6,
       "norm_label": ".casts()"
     },
     {
@@ -9720,7 +9774,7 @@
       "source_file": "app/Models/ClimateRisk.php",
       "source_location": "L1",
       "id": "models_climaterisk",
-      "community": 7,
+      "community": 545,
       "norm_label": "climaterisk.php"
     },
     {
@@ -9729,7 +9783,7 @@
       "source_file": "app/Models/ClimateRisk.php",
       "source_location": "L8",
       "id": "models_climaterisk_climaterisk",
-      "community": 7,
+      "community": 545,
       "norm_label": "climaterisk"
     },
     {
@@ -9738,7 +9792,7 @@
       "source_file": "app/Models/ClimateRisk.php",
       "source_location": "L21",
       "id": "models_climaterisk_climaterisk_company",
-      "community": 7,
+      "community": 545,
       "norm_label": ".company()"
     },
     {
@@ -9747,7 +9801,7 @@
       "source_file": "app/Models/ClimateRisk.php",
       "source_location": "L21",
       "id": "app_models_climaterisk_php_belongsto",
-      "community": 7,
+      "community": 545,
       "norm_label": "belongsto"
     },
     {
@@ -10206,7 +10260,7 @@
       "source_file": "app/Models/CompanyDisclosure.php",
       "source_location": "L1",
       "id": "models_companydisclosure",
-      "community": 520,
+      "community": 7,
       "norm_label": "companydisclosure.php"
     },
     {
@@ -10215,7 +10269,7 @@
       "source_file": "app/Models/CompanyDisclosure.php",
       "source_location": "L8",
       "id": "models_companydisclosure_companydisclosure",
-      "community": 520,
+      "community": 7,
       "norm_label": "companydisclosure"
     },
     {
@@ -10224,7 +10278,7 @@
       "source_file": "app/Models/CompanyDisclosure.php",
       "source_location": "L20",
       "id": "models_companydisclosure_companydisclosure_company",
-      "community": 520,
+      "community": 7,
       "norm_label": ".company()"
     },
     {
@@ -10233,7 +10287,7 @@
       "source_file": "app/Models/CompanyDisclosure.php",
       "source_location": "L20",
       "id": "app_models_companydisclosure_php_belongsto",
-      "community": 520,
+      "community": 7,
       "norm_label": "belongsto"
     },
     {
@@ -10242,7 +10296,7 @@
       "source_file": "app/Models/CompanyDisclosure.php",
       "source_location": "L25",
       "id": "models_companydisclosure_companydisclosure_editor",
-      "community": 520,
+      "community": 7,
       "norm_label": ".editor()"
     },
     {
@@ -10350,7 +10404,7 @@
       "source_file": "app/Models/CompanyPackageRequest.php",
       "source_location": "L1",
       "id": "models_companypackagerequest",
-      "community": 23,
+      "community": 543,
       "norm_label": "companypackagerequest.php"
     },
     {
@@ -10359,7 +10413,7 @@
       "source_file": "app/Models/CompanyPackageRequest.php",
       "source_location": "L9",
       "id": "models_companypackagerequest_companypackagerequest",
-      "community": 23,
+      "community": 543,
       "norm_label": "companypackagerequest"
     },
     {
@@ -10368,7 +10422,7 @@
       "source_file": "app/Models/CompanyPackageRequest.php",
       "source_location": "L36",
       "id": "models_companypackagerequest_companypackagerequest_company",
-      "community": 23,
+      "community": 543,
       "norm_label": ".company()"
     },
     {
@@ -10377,7 +10431,7 @@
       "source_file": "app/Models/CompanyPackageRequest.php",
       "source_location": "L36",
       "id": "app_models_companypackagerequest_php_belongsto",
-      "community": 23,
+      "community": 543,
       "norm_label": "belongsto"
     },
     {
@@ -10386,7 +10440,7 @@
       "source_file": "app/Models/CompanyPackageRequest.php",
       "source_location": "L41",
       "id": "models_companypackagerequest_companypackagerequest_user",
-      "community": 23,
+      "community": 543,
       "norm_label": ".user()"
     },
     {
@@ -10395,7 +10449,7 @@
       "source_file": "app/Models/CompanyPackageRequest.php",
       "source_location": "L46",
       "id": "models_companypackagerequest_companypackagerequest_packagelabel",
-      "community": 23,
+      "community": 543,
       "norm_label": ".packagelabel()"
     },
     {
@@ -10944,7 +10998,7 @@
       "source_file": "app/Models/ConsultantPublicInquiry.php",
       "source_location": "L1",
       "id": "models_consultantpublicinquiry",
-      "community": 39,
+      "community": 7,
       "norm_label": "consultantpublicinquiry.php"
     },
     {
@@ -10953,7 +11007,7 @@
       "source_file": "app/Models/ConsultantPublicInquiry.php",
       "source_location": "L8",
       "id": "models_consultantpublicinquiry_consultantpublicinquiry",
-      "community": 39,
+      "community": 7,
       "norm_label": "consultantpublicinquiry"
     },
     {
@@ -10962,7 +11016,7 @@
       "source_file": "app/Models/ConsultantPublicInquiry.php",
       "source_location": "L21",
       "id": "models_consultantpublicinquiry_consultantpublicinquiry_consultant",
-      "community": 39,
+      "community": 7,
       "norm_label": ".consultant()"
     },
     {
@@ -10971,7 +11025,7 @@
       "source_file": "app/Models/ConsultantPublicInquiry.php",
       "source_location": "L21",
       "id": "app_models_consultantpublicinquiry_php_belongsto",
-      "community": 39,
+      "community": 7,
       "norm_label": "belongsto"
     },
     {
@@ -11466,7 +11520,7 @@
       "source_file": "app/Models/EmissionSourceFormField.php",
       "source_location": "L1",
       "id": "models_emissionsourceformfield",
-      "community": 6,
+      "community": 513,
       "norm_label": "emissionsourceformfield.php"
     },
     {
@@ -11475,7 +11529,7 @@
       "source_file": "app/Models/EmissionSourceFormField.php",
       "source_location": "L9",
       "id": "models_emissionsourceformfield_emissionsourceformfield",
-      "community": 6,
+      "community": 513,
       "norm_label": "emissionsourceformfield"
     },
     {
@@ -11484,7 +11538,7 @@
       "source_file": "app/Models/EmissionSourceFormField.php",
       "source_location": "L35",
       "id": "models_emissionsourceformfield_emissionsourceformfield_emissionsource",
-      "community": 6,
+      "community": 513,
       "norm_label": ".emissionsource()"
     },
     {
@@ -11493,7 +11547,7 @@
       "source_file": "app/Models/EmissionSourceFormField.php",
       "source_location": "L43",
       "id": "models_emissionsourceformfield_emissionsourceformfield_getfieldsforsource",
-      "community": 6,
+      "community": 513,
       "norm_label": ".getfieldsforsource()"
     },
     {
@@ -11502,7 +11556,7 @@
       "source_file": "app/Models/EmissionSourceFormField.php",
       "source_location": "L53",
       "id": "models_emissionsourceformfield_emissionsourceformfield_resolvedhelptext",
-      "community": 6,
+      "community": 513,
       "norm_label": ".resolvedhelptext()"
     },
     {
@@ -11601,7 +11655,7 @@
       "source_file": "app/Models/EnergyData.php",
       "source_location": "L1",
       "id": "models_energydata",
-      "community": 7,
+      "community": 6,
       "norm_label": "energydata.php"
     },
     {
@@ -11610,7 +11664,7 @@
       "source_file": "app/Models/EnergyData.php",
       "source_location": "L8",
       "id": "models_energydata_energydata",
-      "community": 7,
+      "community": 6,
       "norm_label": "energydata"
     },
     {
@@ -11619,7 +11673,7 @@
       "source_file": "app/Models/EnergyData.php",
       "source_location": "L18",
       "id": "models_energydata_energydata_facility",
-      "community": 7,
+      "community": 6,
       "norm_label": ".facility()"
     },
     {
@@ -11664,7 +11718,7 @@
       "source_file": "app/Models/EsgSustainabilityTarget.php",
       "source_location": "L1",
       "id": "models_esgsustainabilitytarget",
-      "community": 513,
+      "community": 7,
       "norm_label": "esgsustainabilitytarget.php"
     },
     {
@@ -11673,7 +11727,7 @@
       "source_file": "app/Models/EsgSustainabilityTarget.php",
       "source_location": "L8",
       "id": "models_esgsustainabilitytarget_esgsustainabilitytarget",
-      "community": 513,
+      "community": 7,
       "norm_label": "esgsustainabilitytarget"
     },
     {
@@ -11682,7 +11736,7 @@
       "source_file": "app/Models/EsgSustainabilityTarget.php",
       "source_location": "L48",
       "id": "models_esgsustainabilitytarget_esgsustainabilitytarget_company",
-      "community": 513,
+      "community": 7,
       "norm_label": ".company()"
     },
     {
@@ -11691,7 +11745,7 @@
       "source_file": "app/Models/EsgSustainabilityTarget.php",
       "source_location": "L48",
       "id": "app_models_esgsustainabilitytarget_php_belongsto",
-      "community": 513,
+      "community": 7,
       "norm_label": "belongsto"
     },
     {
@@ -11853,7 +11907,7 @@
       "source_file": "app/Models/IndustrialData.php",
       "source_location": "L1",
       "id": "models_industrialdata",
-      "community": 6,
+      "community": 7,
       "norm_label": "industrialdata.php"
     },
     {
@@ -11862,7 +11916,7 @@
       "source_file": "app/Models/IndustrialData.php",
       "source_location": "L8",
       "id": "models_industrialdata_industrialdata",
-      "community": 6,
+      "community": 7,
       "norm_label": "industrialdata"
     },
     {
@@ -11871,7 +11925,7 @@
       "source_file": "app/Models/IndustrialData.php",
       "source_location": "L18",
       "id": "models_industrialdata_industrialdata_facility",
-      "community": 6,
+      "community": 7,
       "norm_label": ".facility()"
     },
     {
@@ -12645,7 +12699,7 @@
       "source_file": "app/Models/Permission.php",
       "source_location": "L1",
       "id": "models_permission",
-      "community": 6,
+      "community": 540,
       "norm_label": "permission.php"
     },
     {
@@ -12654,7 +12708,7 @@
       "source_file": "app/Models/Permission.php",
       "source_location": "L8",
       "id": "models_permission_permission",
-      "community": 6,
+      "community": 540,
       "norm_label": "permission"
     },
     {
@@ -12663,7 +12717,7 @@
       "source_file": "app/Models/Permission.php",
       "source_location": "L29",
       "id": "models_permission_permission_roletemplates",
-      "community": 6,
+      "community": 540,
       "norm_label": ".roletemplates()"
     },
     {
@@ -12672,7 +12726,7 @@
       "source_file": "app/Models/Permission.php",
       "source_location": "L38",
       "id": "models_permission_permission_companycustomroles",
-      "community": 6,
+      "community": 540,
       "norm_label": ".companycustomroles()"
     },
     {
@@ -12681,7 +12735,7 @@
       "source_file": "app/Models/Permission.php",
       "source_location": "L47",
       "id": "models_permission_permission_scopeactive",
-      "community": 6,
+      "community": 540,
       "norm_label": ".scopeactive()"
     },
     {
@@ -12690,7 +12744,7 @@
       "source_file": "app/Models/Permission.php",
       "source_location": "L55",
       "id": "models_permission_permission_scopeformodule",
-      "community": 6,
+      "community": 540,
       "norm_label": ".scopeformodule()"
     },
     {
@@ -12699,7 +12753,7 @@
       "source_file": "app/Models/Permission.php",
       "source_location": "L63",
       "id": "models_permission_permission_getgroupedbymodule",
-      "community": 6,
+      "community": 540,
       "norm_label": ".getgroupedbymodule()"
     },
     {
@@ -12870,7 +12924,7 @@
       "source_file": "app/Models/RoleTemplatePermission.php",
       "source_location": "L1",
       "id": "models_roletemplatepermission",
-      "community": 7,
+      "community": 6,
       "norm_label": "roletemplatepermission.php"
     },
     {
@@ -12879,7 +12933,7 @@
       "source_file": "app/Models/RoleTemplatePermission.php",
       "source_location": "L8",
       "id": "models_roletemplatepermission_roletemplatepermission",
-      "community": 7,
+      "community": 6,
       "norm_label": "roletemplatepermission"
     },
     {
@@ -12888,7 +12942,7 @@
       "source_file": "app/Models/RoleTemplatePermission.php",
       "source_location": "L20",
       "id": "models_roletemplatepermission_roletemplatepermission_roletemplate",
-      "community": 7,
+      "community": 6,
       "norm_label": ".roletemplate()"
     },
     {
@@ -12897,7 +12951,7 @@
       "source_file": "app/Models/RoleTemplatePermission.php",
       "source_location": "L28",
       "id": "models_roletemplatepermission_roletemplatepermission_permission",
-      "community": 7,
+      "community": 6,
       "norm_label": ".permission()"
     },
     {
@@ -12933,7 +12987,7 @@
       "source_file": "app/Models/SitePage.php",
       "source_location": "L1",
       "id": "models_sitepage",
-      "community": 4,
+      "community": 517,
       "norm_label": "sitepage.php"
     },
     {
@@ -12942,7 +12996,7 @@
       "source_file": "app/Models/SitePage.php",
       "source_location": "L7",
       "id": "models_sitepage_sitepage",
-      "community": 4,
+      "community": 517,
       "norm_label": "sitepage"
     },
     {
@@ -12951,7 +13005,7 @@
       "source_file": "app/Models/SitePage.php",
       "source_location": "L18",
       "id": "models_sitepage_sitepage_renderedbody",
-      "community": 4,
+      "community": 517,
       "norm_label": ".renderedbody()"
     },
     {
@@ -13167,7 +13221,7 @@
       "source_file": "app/Models/SubscriptionPlan.php",
       "source_location": "L1",
       "id": "models_subscriptionplan",
-      "community": 6,
+      "community": 541,
       "norm_label": "subscriptionplan.php"
     },
     {
@@ -13176,7 +13230,7 @@
       "source_file": "app/Models/SubscriptionPlan.php",
       "source_location": "L8",
       "id": "models_subscriptionplan_subscriptionplan",
-      "community": 6,
+      "community": 541,
       "norm_label": "subscriptionplan"
     },
     {
@@ -13185,7 +13239,7 @@
       "source_file": "app/Models/SubscriptionPlan.php",
       "source_location": "L40",
       "id": "models_subscriptionplan_subscriptionplan_clientsubscriptions",
-      "community": 6,
+      "community": 541,
       "norm_label": ".clientsubscriptions()"
     },
     {
@@ -13194,7 +13248,7 @@
       "source_file": "app/Models/SubscriptionPlan.php",
       "source_location": "L48",
       "id": "models_subscriptionplan_subscriptionplan_scopeactive",
-      "community": 6,
+      "community": 541,
       "norm_label": ".scopeactive()"
     },
     {
@@ -13203,7 +13257,7 @@
       "source_file": "app/Models/SubscriptionPlan.php",
       "source_location": "L56",
       "id": "models_subscriptionplan_subscriptionplan_scopeforclients",
-      "community": 6,
+      "community": 541,
       "norm_label": ".scopeforclients()"
     },
     {
@@ -13212,7 +13266,7 @@
       "source_file": "app/Models/SubscriptionPlan.php",
       "source_location": "L64",
       "id": "models_subscriptionplan_subscriptionplan_scopeforconsultantagency",
-      "community": 6,
+      "community": 541,
       "norm_label": ".scopeforconsultantagency()"
     },
     {
@@ -13221,7 +13275,7 @@
       "source_file": "app/Models/SubscriptionPlan.php",
       "source_location": "L69",
       "id": "models_subscriptionplan_subscriptionplan_isconsultantagencypack",
-      "community": 6,
+      "community": 541,
       "norm_label": ".isconsultantagencypack()"
     },
     {
@@ -13428,7 +13482,7 @@
       "source_file": "app/Models/User.php",
       "source_location": "L1",
       "id": "models_user",
-      "community": 10,
+      "community": 6,
       "norm_label": "user.php"
     },
     {
@@ -13716,7 +13770,7 @@
       "source_file": "app/Models/UserActiveContext.php",
       "source_location": "L1",
       "id": "models_useractivecontext",
-      "community": 7,
+      "community": 6,
       "norm_label": "useractivecontext.php"
     },
     {
@@ -13725,7 +13779,7 @@
       "source_file": "app/Models/UserActiveContext.php",
       "source_location": "L8",
       "id": "models_useractivecontext_useractivecontext",
-      "community": 7,
+      "community": 6,
       "norm_label": "useractivecontext"
     },
     {
@@ -13734,7 +13788,7 @@
       "source_file": "app/Models/UserActiveContext.php",
       "source_location": "L27",
       "id": "models_useractivecontext_useractivecontext_user",
-      "community": 7,
+      "community": 6,
       "norm_label": ".user()"
     },
     {
@@ -13743,7 +13797,7 @@
       "source_file": "app/Models/UserActiveContext.php",
       "source_location": "L35",
       "id": "models_useractivecontext_useractivecontext_activecompany",
-      "community": 7,
+      "community": 6,
       "norm_label": ".activecompany()"
     },
     {
@@ -13966,7 +14020,7 @@
       "label": "AdminRequestActivationService",
       "file_type": "code",
       "source_file": "app/Services/AdminRequestActivationService.php",
-      "source_location": "L18",
+      "source_location": "L19",
       "id": "services_adminrequestactivationservice_adminrequestactivationservice",
       "community": 72,
       "norm_label": "adminrequestactivationservice"
@@ -13975,7 +14029,7 @@
       "label": ".__construct()",
       "file_type": "code",
       "source_file": "app/Services/AdminRequestActivationService.php",
-      "source_location": "L20",
+      "source_location": "L21",
       "id": "services_adminrequestactivationservice_adminrequestactivationservice_construct",
       "community": 72,
       "norm_label": ".__construct()"
@@ -13984,7 +14038,7 @@
       "label": ".suggestCompanyQuote()",
       "file_type": "code",
       "source_file": "app/Services/AdminRequestActivationService.php",
-      "source_location": "L29",
+      "source_location": "L30",
       "id": "services_adminrequestactivationservice_adminrequestactivationservice_suggestcompanyquote",
       "community": 72,
       "norm_label": ".suggestcompanyquote()"
@@ -13993,7 +14047,7 @@
       "label": "CompanyPackageRequest",
       "file_type": "code",
       "source_file": "app/Services/AdminRequestActivationService.php",
-      "source_location": "L29",
+      "source_location": "L30",
       "id": "app_services_adminrequestactivationservice_php_companypackagerequest",
       "community": 72,
       "norm_label": "companypackagerequest"
@@ -14002,7 +14056,7 @@
       "label": ".suggestConsultantQuote()",
       "file_type": "code",
       "source_file": "app/Services/AdminRequestActivationService.php",
-      "source_location": "L37",
+      "source_location": "L38",
       "id": "services_adminrequestactivationservice_adminrequestactivationservice_suggestconsultantquote",
       "community": 72,
       "norm_label": ".suggestconsultantquote()"
@@ -14011,7 +14065,7 @@
       "label": "ConsultantEntityRequest",
       "file_type": "code",
       "source_file": "app/Services/AdminRequestActivationService.php",
-      "source_location": "L37",
+      "source_location": "L38",
       "id": "app_services_adminrequestactivationservice_php_consultantentityrequest",
       "community": 72,
       "norm_label": "consultantentityrequest"
@@ -14020,7 +14074,7 @@
       "label": ".saveCompanyQuote()",
       "file_type": "code",
       "source_file": "app/Services/AdminRequestActivationService.php",
-      "source_location": "L45",
+      "source_location": "L46",
       "id": "services_adminrequestactivationservice_adminrequestactivationservice_savecompanyquote",
       "community": 72,
       "norm_label": ".savecompanyquote()"
@@ -14029,7 +14083,7 @@
       "label": ".saveConsultantQuote()",
       "file_type": "code",
       "source_file": "app/Services/AdminRequestActivationService.php",
-      "source_location": "L67",
+      "source_location": "L68",
       "id": "services_adminrequestactivationservice_adminrequestactivationservice_saveconsultantquote",
       "community": 72,
       "norm_label": ".saveconsultantquote()"
@@ -14038,7 +14092,7 @@
       "label": ".markCompanyPaid()",
       "file_type": "code",
       "source_file": "app/Services/AdminRequestActivationService.php",
-      "source_location": "L87",
+      "source_location": "L88",
       "id": "services_adminrequestactivationservice_adminrequestactivationservice_markcompanypaid",
       "community": 72,
       "norm_label": ".markcompanypaid()"
@@ -14047,7 +14101,7 @@
       "label": ".markConsultantPaid()",
       "file_type": "code",
       "source_file": "app/Services/AdminRequestActivationService.php",
-      "source_location": "L96",
+      "source_location": "L97",
       "id": "services_adminrequestactivationservice_adminrequestactivationservice_markconsultantpaid",
       "community": 72,
       "norm_label": ".markconsultantpaid()"
@@ -14056,7 +14110,7 @@
       "label": ".activateCompanyRequest()",
       "file_type": "code",
       "source_file": "app/Services/AdminRequestActivationService.php",
-      "source_location": "L108",
+      "source_location": "L109",
       "id": "services_adminrequestactivationservice_adminrequestactivationservice_activatecompanyrequest",
       "community": 72,
       "norm_label": ".activatecompanyrequest()"
@@ -14065,7 +14119,7 @@
       "label": ".activateConsultantRequest()",
       "file_type": "code",
       "source_file": "app/Services/AdminRequestActivationService.php",
-      "source_location": "L179",
+      "source_location": "L194",
       "id": "services_adminrequestactivationservice_adminrequestactivationservice_activateconsultantrequest",
       "community": 72,
       "norm_label": ".activateconsultantrequest()"
@@ -14974,7 +15028,7 @@
       "label": ".resolveExtraSlotPurchase()",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L371",
+      "source_location": "L373",
       "id": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_resolveextraslotpurchase",
       "community": 26,
       "norm_label": ".resolveextraslotpurchase()"
@@ -14983,7 +15037,7 @@
       "label": ".completeExtraSlotTransaction()",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L407",
+      "source_location": "L409",
       "id": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_completeextraslottransaction",
       "community": 26,
       "norm_label": ".completeextraslottransaction()"
@@ -14992,7 +15046,7 @@
       "label": ".resolveYearUnlockPurchase()",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L454",
+      "source_location": "L456",
       "id": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_resolveyearunlockpurchase",
       "community": 26,
       "norm_label": ".resolveyearunlockpurchase()"
@@ -15001,7 +15055,7 @@
       "label": "ConsultantClientEngagement",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L454",
+      "source_location": "L456",
       "id": "app_services_consultantagencysubscriptionservice_php_consultantclientengagement",
       "community": 26,
       "norm_label": "consultantclientengagement"
@@ -15010,7 +15064,7 @@
       "label": ".addReportingYearUnlock()",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L502",
+      "source_location": "L504",
       "id": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_addreportingyearunlock",
       "community": 26,
       "norm_label": ".addreportingyearunlock()"
@@ -15019,7 +15073,7 @@
       "label": "ConsultantSubscriptionAddon",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L502",
+      "source_location": "L504",
       "id": "app_services_consultantagencysubscriptionservice_php_consultantsubscriptionaddon",
       "community": 26,
       "norm_label": "consultantsubscriptionaddon"
@@ -15028,7 +15082,7 @@
       "label": ".completeYearUnlockTransaction()",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L533",
+      "source_location": "L535",
       "id": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_completeyearunlocktransaction",
       "community": 26,
       "norm_label": ".completeyearunlocktransaction()"
@@ -15037,7 +15091,7 @@
       "label": ".addExtraSlots()",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L568",
+      "source_location": "L570",
       "id": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_addextraslots",
       "community": 26,
       "norm_label": ".addextraslots()"
@@ -15046,7 +15100,7 @@
       "label": ".archiveEngagement()",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L588",
+      "source_location": "L590",
       "id": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_archiveengagement",
       "community": 26,
       "norm_label": ".archiveengagement()"
@@ -15055,7 +15109,7 @@
       "label": ".slotSummary()",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L601",
+      "source_location": "L603",
       "id": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_slotsummary",
       "community": 26,
       "norm_label": ".slotsummary()"
@@ -15064,7 +15118,7 @@
       "label": ".planQuotes()",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L620",
+      "source_location": "L622",
       "id": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_planquotes",
       "community": 26,
       "norm_label": ".planquotes()"
@@ -15073,7 +15127,7 @@
       "label": ".validatePackChange()",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L636",
+      "source_location": "L638",
       "id": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_validatepackchange",
       "community": 26,
       "norm_label": ".validatepackchange()"
@@ -15082,7 +15136,7 @@
       "label": ".assertConsultantOrg()",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L654",
+      "source_location": "L656",
       "id": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_assertconsultantorg",
       "community": 26,
       "norm_label": ".assertconsultantorg()"
@@ -15642,7 +15696,7 @@
       "source_file": "app/Services/ContactInquiryService.php",
       "source_location": "L1",
       "id": "services_contactinquiryservice",
-      "community": 132,
+      "community": 41,
       "norm_label": "contactinquiryservice.php"
     },
     {
@@ -15651,7 +15705,7 @@
       "source_file": "app/Services/ContactInquiryService.php",
       "source_location": "L10",
       "id": "services_contactinquiryservice_contactinquiryservice",
-      "community": 132,
+      "community": 41,
       "norm_label": "contactinquiryservice"
     },
     {
@@ -15660,7 +15714,7 @@
       "source_file": "app/Services/ContactInquiryService.php",
       "source_location": "L12",
       "id": "services_contactinquiryservice_contactinquiryservice_construct",
-      "community": 132,
+      "community": 41,
       "norm_label": ".__construct()"
     },
     {
@@ -15669,7 +15723,7 @@
       "source_file": "app/Services/ContactInquiryService.php",
       "source_location": "L20",
       "id": "services_contactinquiryservice_contactinquiryservice_submit",
-      "community": 132,
+      "community": 41,
       "norm_label": ".submit()"
     },
     {
@@ -16164,7 +16218,7 @@
       "source_file": "app/Services/EmailDiagnosticService.php",
       "source_location": "L140",
       "id": "services_emaildiagnosticservice_emaildiagnosticservice_samplevariables",
-      "community": 41,
+      "community": 353,
       "norm_label": ".samplevariables()"
     },
     {
@@ -18585,7 +18639,7 @@
       "source_file": "app/Services/QuickInputFormBuilder.php",
       "source_location": "L1",
       "id": "services_quickinputformbuilder",
-      "community": 92,
+      "community": 513,
       "norm_label": "quickinputformbuilder.php"
     },
     {
@@ -18594,7 +18648,7 @@
       "source_file": "app/Services/QuickInputFormBuilder.php",
       "source_location": "L9",
       "id": "services_quickinputformbuilder_quickinputformbuilder",
-      "community": 92,
+      "community": 513,
       "norm_label": "quickinputformbuilder"
     },
     {
@@ -18603,7 +18657,7 @@
       "source_file": "app/Services/QuickInputFormBuilder.php",
       "source_location": "L17",
       "id": "services_quickinputformbuilder_quickinputformbuilder_buildform",
-      "community": 92,
+      "community": 513,
       "norm_label": ".buildform()"
     },
     {
@@ -18612,7 +18666,7 @@
       "source_file": "app/Services/QuickInputFormBuilder.php",
       "source_location": "L31",
       "id": "services_quickinputformbuilder_quickinputformbuilder_validateform",
-      "community": 92,
+      "community": 513,
       "norm_label": ".validateform()"
     },
     {
@@ -18621,7 +18675,7 @@
       "source_file": "app/Services/QuickInputFormBuilder.php",
       "source_location": "L88",
       "id": "services_quickinputformbuilder_quickinputformbuilder_getfieldoptions",
-      "community": 92,
+      "community": 513,
       "norm_label": ".getfieldoptions()"
     },
     {
@@ -18630,7 +18684,7 @@
       "source_file": "app/Services/QuickInputFormBuilder.php",
       "source_location": "L107",
       "id": "services_quickinputformbuilder_quickinputformbuilder_getdefaultvalues",
-      "community": 92,
+      "community": 513,
       "norm_label": ".getdefaultvalues()"
     },
     {
@@ -18639,7 +18693,7 @@
       "source_file": "app/Services/QuickInputFormBuilder.php",
       "source_location": "L128",
       "id": "services_quickinputformbuilder_quickinputformbuilder_formatfieldvalue",
-      "community": 92,
+      "community": 513,
       "norm_label": ".formatfieldvalue()"
     },
     {
@@ -18918,7 +18972,7 @@
       "source_file": "app/Services/Scope12BulkImportService.php",
       "source_location": "L508",
       "id": "services_scope12bulkimportservice_scope12bulkimportservice_extractdatasheet",
-      "community": 38,
+      "community": 531,
       "norm_label": ".extractdatasheet()"
     },
     {
@@ -19575,7 +19629,7 @@
       "source_file": "app/Support/ExportWatermark.php",
       "source_location": "L1",
       "id": "support_exportwatermark",
-      "community": 53,
+      "community": 520,
       "norm_label": "exportwatermark.php"
     },
     {
@@ -19584,7 +19638,7 @@
       "source_file": "app/Support/ExportWatermark.php",
       "source_location": "L9",
       "id": "support_exportwatermark_exportwatermark",
-      "community": 53,
+      "community": 520,
       "norm_label": "exportwatermark"
     },
     {
@@ -19593,7 +19647,7 @@
       "source_file": "app/Support/ExportWatermark.php",
       "source_location": "L13",
       "id": "support_exportwatermark_exportwatermark_bannertext",
-      "community": 53,
+      "community": 520,
       "norm_label": ".bannertext()"
     },
     {
@@ -19602,7 +19656,7 @@
       "source_file": "app/Support/ExportWatermark.php",
       "source_location": "L20",
       "id": "support_exportwatermark_exportwatermark_pdfdiagonal",
-      "community": 53,
+      "community": 520,
       "norm_label": ".pdfdiagonal()"
     },
     {
@@ -19611,7 +19665,7 @@
       "source_file": "app/Support/ExportWatermark.php",
       "source_location": "L25",
       "id": "support_exportwatermark_exportwatermark_filenamesuffix",
-      "community": 53,
+      "community": 520,
       "norm_label": ".filenamesuffix()"
     },
     {
@@ -19701,7 +19755,7 @@
       "source_file": "app/Support/JsonField.php",
       "source_location": "L1",
       "id": "support_jsonfield",
-      "community": 92,
+      "community": 513,
       "norm_label": "jsonfield.php"
     },
     {
@@ -19710,7 +19764,7 @@
       "source_file": "app/Support/JsonField.php",
       "source_location": "L5",
       "id": "support_jsonfield_jsonfield",
-      "community": 92,
+      "community": 513,
       "norm_label": "jsonfield"
     },
     {
@@ -19719,7 +19773,7 @@
       "source_file": "app/Support/JsonField.php",
       "source_location": "L10",
       "id": "support_jsonfield_jsonfield_decode",
-      "community": 92,
+      "community": 513,
       "norm_label": ".decode()"
     },
     {
@@ -20250,7 +20304,7 @@
       "source_file": "app/helpers.php",
       "source_location": "L97",
       "id": "app_helpers_mail_transport_for_mailbox",
-      "community": 132,
+      "community": 41,
       "norm_label": "mail_transport_for_mailbox()"
     },
     {
@@ -22149,7 +22203,7 @@
       "source_file": "database/migrations/2026_06_08_001000_update_site_branding.php",
       "source_location": "L1",
       "id": "migrations_2026_06_08_001000_update_site_branding",
-      "community": 4,
+      "community": 517,
       "norm_label": "2026_06_08_001000_update_site_branding.php"
     },
     {
@@ -22158,7 +22212,7 @@
       "source_file": "database/migrations/2026_06_08_001000_update_site_branding.php",
       "source_location": "L14",
       "id": "migrations_2026_06_08_001000_update_site_branding_up",
-      "community": 4,
+      "community": 517,
       "norm_label": "up()"
     },
     {
@@ -22167,7 +22221,7 @@
       "source_file": "database/migrations/2026_06_08_001000_update_site_branding.php",
       "source_location": "L62",
       "id": "migrations_2026_06_08_001000_update_site_branding_down",
-      "community": 4,
+      "community": 517,
       "norm_label": "down()"
     },
     {
@@ -22437,7 +22491,7 @@
       "source_file": "database/migrations/2026_06_10_100000_commercial_plan_v1_entitlements.php",
       "source_location": "L1",
       "id": "migrations_2026_06_10_100000_commercial_plan_v1_entitlements",
-      "community": 20,
+      "community": 546,
       "norm_label": "2026_06_10_100000_commercial_plan_v1_entitlements.php"
     },
     {
@@ -22446,7 +22500,7 @@
       "source_file": "database/migrations/2026_06_10_100000_commercial_plan_v1_entitlements.php",
       "source_location": "L19",
       "id": "migrations_2026_06_10_100000_commercial_plan_v1_entitlements_up",
-      "community": 20,
+      "community": 546,
       "norm_label": "up()"
     },
     {
@@ -22455,7 +22509,7 @@
       "source_file": "database/migrations/2026_06_10_100000_commercial_plan_v1_entitlements.php",
       "source_location": "L71",
       "id": "migrations_2026_06_10_100000_commercial_plan_v1_entitlements_down",
-      "community": 20,
+      "community": 546,
       "norm_label": "down()"
     },
     {
@@ -22464,7 +22518,7 @@
       "source_file": "database/migrations/2026_06_10_100000_commercial_plan_v1_entitlements.php",
       "source_location": "L102",
       "id": "migrations_2026_06_10_100000_commercial_plan_v1_entitlements_legacyplansnapshot",
-      "community": 20,
+      "community": 546,
       "norm_label": "legacyplansnapshot()"
     },
     {
@@ -22725,7 +22779,7 @@
       "source_file": "database/migrations/2026_06_15_120000_update_site_contact_details.php",
       "source_location": "L1",
       "id": "migrations_2026_06_15_120000_update_site_contact_details",
-      "community": 413,
+      "community": 4,
       "norm_label": "2026_06_15_120000_update_site_contact_details.php"
     },
     {
@@ -22734,7 +22788,7 @@
       "source_file": "database/migrations/2026_06_15_120000_update_site_contact_details.php",
       "source_location": "L12",
       "id": "migrations_2026_06_15_120000_update_site_contact_details_up",
-      "community": 413,
+      "community": 4,
       "norm_label": "up()"
     },
     {
@@ -22743,7 +22797,7 @@
       "source_file": "database/migrations/2026_06_15_120000_update_site_contact_details.php",
       "source_location": "L25",
       "id": "migrations_2026_06_15_120000_update_site_contact_details_down",
-      "community": 413,
+      "community": 4,
       "norm_label": "down()"
     },
     {
@@ -23296,12 +23350,39 @@
       "norm_label": "down()"
     },
     {
+      "label": "2026_08_03_160000_phase8_seed_scope_and_consultant_entity.php",
+      "file_type": "code",
+      "source_file": "database/migrations/2026_08_03_160000_phase8_seed_scope_and_consultant_entity.php",
+      "source_location": "L1",
+      "id": "migrations_2026_08_03_160000_phase8_seed_scope_and_consultant_entity",
+      "community": 20,
+      "norm_label": "2026_08_03_160000_phase8_seed_scope_and_consultant_entity.php"
+    },
+    {
+      "label": "up()",
+      "file_type": "code",
+      "source_file": "database/migrations/2026_08_03_160000_phase8_seed_scope_and_consultant_entity.php",
+      "source_location": "L18",
+      "id": "migrations_2026_08_03_160000_phase8_seed_scope_and_consultant_entity_up",
+      "community": 20,
+      "norm_label": "up()"
+    },
+    {
+      "label": "down()",
+      "file_type": "code",
+      "source_file": "database/migrations/2026_08_03_160000_phase8_seed_scope_and_consultant_entity.php",
+      "source_location": "L107",
+      "id": "migrations_2026_08_03_160000_phase8_seed_scope_and_consultant_entity_down",
+      "community": 20,
+      "norm_label": "down()"
+    },
+    {
       "label": "AdminSeeder.php",
       "file_type": "code",
       "source_file": "database/seeders/AdminSeeder.php",
       "source_location": "L1",
       "id": "seeders_adminseeder",
-      "community": 0,
+      "community": 413,
       "norm_label": "adminseeder.php"
     },
     {
@@ -23310,7 +23391,7 @@
       "source_file": "database/seeders/AdminSeeder.php",
       "source_location": "L9",
       "id": "seeders_adminseeder_adminseeder",
-      "community": 0,
+      "community": 413,
       "norm_label": "adminseeder"
     },
     {
@@ -23319,7 +23400,7 @@
       "source_file": "",
       "source_location": "",
       "id": "seeder",
-      "community": 0,
+      "community": 413,
       "norm_label": "seeder"
     },
     {
@@ -23328,7 +23409,7 @@
       "source_file": "database/seeders/AdminSeeder.php",
       "source_location": "L14",
       "id": "seeders_adminseeder_adminseeder_run",
-      "community": 0,
+      "community": 413,
       "norm_label": ".run()"
     },
     {
@@ -23337,7 +23418,7 @@
       "source_file": "database/seeders/BasicDataSeeder.php",
       "source_location": "L1",
       "id": "seeders_basicdataseeder",
-      "community": 0,
+      "community": 413,
       "norm_label": "basicdataseeder.php"
     },
     {
@@ -23346,7 +23427,7 @@
       "source_file": "database/seeders/BasicDataSeeder.php",
       "source_location": "L18",
       "id": "seeders_basicdataseeder_basicdataseeder",
-      "community": 0,
+      "community": 536,
       "norm_label": "basicdataseeder"
     },
     {
@@ -23355,7 +23436,7 @@
       "source_file": "database/seeders/BasicDataSeeder.php",
       "source_location": "L20",
       "id": "seeders_basicdataseeder_basicdataseeder_run",
-      "community": 0,
+      "community": 536,
       "norm_label": ".run()"
     },
     {
@@ -23364,7 +23445,7 @@
       "source_file": "database/seeders/BasicDataSeeder.php",
       "source_location": "L179",
       "id": "seeders_basicdataseeder_basicdataseeder_getrandomemirate",
-      "community": 0,
+      "community": 536,
       "norm_label": ".getrandomemirate()"
     },
     {
@@ -23373,7 +23454,7 @@
       "source_file": "database/seeders/BasicDataSeeder.php",
       "source_location": "L185",
       "id": "seeders_basicdataseeder_basicdataseeder_getrandomsector",
-      "community": 0,
+      "community": 536,
       "norm_label": ".getrandomsector()"
     },
     {
@@ -23382,7 +23463,7 @@
       "source_file": "database/seeders/BasicDataSeeder.php",
       "source_location": "L191",
       "id": "seeders_basicdataseeder_basicdataseeder_getrandomindustry",
-      "community": 0,
+      "community": 536,
       "norm_label": ".getrandomindustry()"
     },
     {
@@ -23391,7 +23472,7 @@
       "source_file": "database/seeders/BasicDataSeeder.php",
       "source_location": "L197",
       "id": "seeders_basicdataseeder_basicdataseeder_getrandomcity",
-      "community": 0,
+      "community": 536,
       "norm_label": ".getrandomcity()"
     },
     {
@@ -23400,7 +23481,7 @@
       "source_file": "database/seeders/BasicDataSeeder.php",
       "source_location": "L203",
       "id": "seeders_basicdataseeder_basicdataseeder_getrandomlocation",
-      "community": 0,
+      "community": 536,
       "norm_label": ".getrandomlocation()"
     },
     {
@@ -23409,7 +23490,7 @@
       "source_file": "database/seeders/BasicDataSeeder.php",
       "source_location": "L212",
       "id": "seeders_basicdataseeder_basicdataseeder_getrandomfacilitytype",
-      "community": 0,
+      "community": 536,
       "norm_label": ".getrandomfacilitytype()"
     },
     {
@@ -23418,7 +23499,7 @@
       "source_file": "database/seeders/BasicDataSeeder.php",
       "source_location": "L218",
       "id": "seeders_basicdataseeder_basicdataseeder_getrandomlicense",
-      "community": 0,
+      "community": 536,
       "norm_label": ".getrandomlicense()"
     },
     {
@@ -23427,7 +23508,7 @@
       "source_file": "database/seeders/ConsultantDemoSeeder.php",
       "source_location": "L1",
       "id": "seeders_consultantdemoseeder",
-      "community": 0,
+      "community": 413,
       "norm_label": "consultantdemoseeder.php"
     },
     {
@@ -23436,7 +23517,7 @@
       "source_file": "database/seeders/ConsultantDemoSeeder.php",
       "source_location": "L10",
       "id": "seeders_consultantdemoseeder_consultantdemoseeder",
-      "community": 0,
+      "community": 413,
       "norm_label": "consultantdemoseeder"
     },
     {
@@ -23445,7 +23526,7 @@
       "source_file": "database/seeders/ConsultantDemoSeeder.php",
       "source_location": "L14",
       "id": "seeders_consultantdemoseeder_consultantdemoseeder_run",
-      "community": 0,
+      "community": 413,
       "norm_label": ".run()"
     },
     {
@@ -23454,7 +23535,7 @@
       "source_file": "database/seeders/ConsultantFullDemoSeeder.php",
       "source_location": "L1",
       "id": "seeders_consultantfulldemoseeder",
-      "community": 0,
+      "community": 413,
       "norm_label": "consultantfulldemoseeder.php"
     },
     {
@@ -23508,7 +23589,7 @@
       "source_file": "database/seeders/DatabaseSeeder.php",
       "source_location": "L1",
       "id": "seeders_databaseseeder",
-      "community": 0,
+      "community": 413,
       "norm_label": "databaseseeder.php"
     },
     {
@@ -23517,7 +23598,7 @@
       "source_file": "database/seeders/DatabaseSeeder.php",
       "source_location": "L9",
       "id": "seeders_databaseseeder_databaseseeder",
-      "community": 0,
+      "community": 413,
       "norm_label": "databaseseeder"
     },
     {
@@ -23526,7 +23607,7 @@
       "source_file": "database/seeders/DatabaseSeeder.php",
       "source_location": "L14",
       "id": "seeders_databaseseeder_databaseseeder_run",
-      "community": 0,
+      "community": 413,
       "norm_label": ".run()"
     },
     {
@@ -23535,7 +23616,7 @@
       "source_file": "database/seeders/EmailTemplateSeeder.php",
       "source_location": "L1",
       "id": "seeders_emailtemplateseeder",
-      "community": 0,
+      "community": 413,
       "norm_label": "emailtemplateseeder.php"
     },
     {
@@ -23544,7 +23625,7 @@
       "source_file": "database/seeders/EmailTemplateSeeder.php",
       "source_location": "L8",
       "id": "seeders_emailtemplateseeder_emailtemplateseeder",
-      "community": 0,
+      "community": 413,
       "norm_label": "emailtemplateseeder"
     },
     {
@@ -23553,7 +23634,7 @@
       "source_file": "database/seeders/EmailTemplateSeeder.php",
       "source_location": "L10",
       "id": "seeders_emailtemplateseeder_emailtemplateseeder_run",
-      "community": 0,
+      "community": 413,
       "norm_label": ".run()"
     },
     {
@@ -23562,7 +23643,7 @@
       "source_file": "database/seeders/SimpleUaeSeeder.php",
       "source_location": "L1",
       "id": "seeders_simpleuaeseeder",
-      "community": 0,
+      "community": 413,
       "norm_label": "simpleuaeseeder.php"
     },
     {
@@ -23571,7 +23652,7 @@
       "source_file": "database/seeders/SimpleUaeSeeder.php",
       "source_location": "L18",
       "id": "seeders_simpleuaeseeder_simpleuaeseeder",
-      "community": 0,
+      "community": 413,
       "norm_label": "simpleuaeseeder"
     },
     {
@@ -23580,7 +23661,7 @@
       "source_file": "database/seeders/SimpleUaeSeeder.php",
       "source_location": "L20",
       "id": "seeders_simpleuaeseeder_simpleuaeseeder_run",
-      "community": 0,
+      "community": 413,
       "norm_label": ".run()"
     },
     {
@@ -28411,19 +28492,19 @@
       "norm_label": "phase 7 \u2014 price book \u2705 done"
     },
     {
-      "label": "Phase 8 \u2014 DB seeds (`consultant_entity`, company codes); retire pack checkout paths \u00b7 enforce 5 sites on Standard",
+      "label": "Phase 8 \u2014 Live plan seeds \u2705 DONE",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
       "source_location": "L247",
-      "id": "documentation_pricing_and_plan_major_changes_phase_8_db_seeds_consultant_entity_company_codes_retire_pack_checkout_paths_enforce_5_sites_on_standard",
+      "id": "documentation_pricing_and_plan_major_changes_phase_8_live_plan_seeds_done",
       "community": 45,
-      "norm_label": "phase 8 \u2014 db seeds (`consultant_entity`, company codes); retire pack checkout paths \u00b7 enforce 5 sites on standard"
+      "norm_label": "phase 8 \u2014 live plan seeds \u2705 done"
     },
     {
       "label": "Phase 9 \u2014 Portal guides + ElevenLabs",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L248",
+      "source_location": "L254",
       "id": "documentation_pricing_and_plan_major_changes_phase_9_portal_guides_elevenlabs",
       "community": 45,
       "norm_label": "phase 9 \u2014 portal guides + elevenlabs"
@@ -28432,7 +28513,7 @@
       "label": "Phase 10 \u2014 Renewals / optional min-10 reminders later",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L249",
+      "source_location": "L255",
       "id": "documentation_pricing_and_plan_major_changes_phase_10_renewals_optional_min_10_reminders_later",
       "community": 45,
       "norm_label": "phase 10 \u2014 renewals / optional min-10 reminders later"
@@ -28441,7 +28522,7 @@
       "label": "13. Code touchpoints",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L253",
+      "source_location": "L259",
       "id": "documentation_pricing_and_plan_major_changes_13_code_touchpoints",
       "community": 59,
       "norm_label": "13. code touchpoints"
@@ -28450,7 +28531,7 @@
       "label": "14. Front messaging",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L271",
+      "source_location": "L276",
       "id": "documentation_pricing_and_plan_major_changes_14_front_messaging",
       "community": 59,
       "norm_label": "14. front messaging"
@@ -28459,7 +28540,7 @@
       "label": "15. Success criteria",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L278",
+      "source_location": "L284",
       "id": "documentation_pricing_and_plan_major_changes_15_success_criteria",
       "community": 59,
       "norm_label": "15. success criteria"
@@ -28468,7 +28549,7 @@
       "label": "16. Open items",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L288",
+      "source_location": "L294",
       "id": "documentation_pricing_and_plan_major_changes_16_open_items",
       "community": 59,
       "norm_label": "16. open items"
@@ -28477,7 +28558,7 @@
       "label": "17. Document history",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L300",
+      "source_location": "L305",
       "id": "documentation_pricing_and_plan_major_changes_17_document_history",
       "community": 59,
       "norm_label": "17. document history"
@@ -32245,6 +32326,15 @@
       "norm_label": "elevenlabs setup checklist"
     },
     {
+      "label": "Phase 8 \u2014 DB seeds (`consultant_entity`, company codes); retire pack checkout paths \u00b7 enforce 5 sites on Standard",
+      "file_type": "document",
+      "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
+      "source_location": "L247",
+      "community": 45,
+      "norm_label": "phase 8 \u2014 db seeds (`consultant_entity`, company codes); retire pack checkout paths \u00b7 enforce 5 sites on standard",
+      "id": "documentation_pricing_and_plan_major_changes_phase_8_db_seeds_consultant_entity_company_codes_retire_pack_checkout_paths_enforce_5_sites_on_standard"
+    },
+    {
       "label": "Phase 7 \u2014 Price book (1,399/1,199 + company packages)",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
@@ -32258,7 +32348,7 @@
       "file_type": "code",
       "source_file": "app/Http/Controllers/Admin/CompanyPackageRequestController.php",
       "source_location": "L25",
-      "community": 23,
+      "community": 518,
       "norm_label": "companypackagerequest",
       "id": "companypackagerequest"
     },
@@ -33053,9 +33143,9 @@
       "source_file": "app/Data/CommercialPriceBook.php",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "data_commercialpricebook",
-      "target": "commercialpricebookentry",
-      "confidence_score": 1.0
+      "target": "commercialpricebookentry"
     },
     {
       "relation": "contains",
@@ -33073,9 +33163,9 @@
       "source_file": "app/Data/CommercialPriceBook.php",
       "source_location": "L34",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "data_commercialpricebook_commercialpricebook",
-      "target": "data_commercialpricebook_commercialpricebook_companyamountaed",
-      "confidence_score": 1.0
+      "target": "data_commercialpricebook_commercialpricebook_companyamountaed"
     },
     {
       "relation": "method",
@@ -33083,9 +33173,9 @@
       "source_file": "app/Data/CommercialPriceBook.php",
       "source_location": "L50",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "data_commercialpricebook_commercialpricebook",
-      "target": "data_commercialpricebook_commercialpricebook_consultantrateaed",
-      "confidence_score": 1.0
+      "target": "data_commercialpricebook_commercialpricebook_consultantrateaed"
     },
     {
       "relation": "method",
@@ -33113,9 +33203,9 @@
       "source_file": "app/Data/CommercialPriceBook.php",
       "source_location": "L167",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "data_commercialpricebook_commercialpricebook",
-      "target": "data_commercialpricebook_commercialpricebook_safefind",
-      "confidence_score": 1.0
+      "target": "data_commercialpricebook_commercialpricebook_safefind"
     },
     {
       "relation": "method",
@@ -33199,9 +33289,9 @@
       "source_file": "app/Data/CommercialPriceBook.php",
       "source_location": "L167",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "data_commercialpricebook_commercialpricebook_safefind",
-      "target": "commercialpricebookentry",
-      "confidence_score": 1.0
+      "target": "commercialpricebookentry"
     },
     {
       "relation": "imports",
@@ -33210,9 +33300,9 @@
       "source_file": "app/Http/Controllers/Admin/PriceBookController.php",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "admin_pricebookcontroller",
-      "target": "commercialpricebookentry",
-      "confidence_score": 1.0
+      "target": "commercialpricebookentry"
     },
     {
       "relation": "imports",
@@ -33221,9 +33311,9 @@
       "source_file": "database/migrations/2026_08_03_150000_phase7_commercial_price_book.php",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "migrations_2026_08_03_150000_phase7_commercial_price_book",
-      "target": "commercialpricebookentry",
-      "confidence_score": 1.0
+      "target": "commercialpricebookentry"
     },
     {
       "relation": "contains",
@@ -33327,6 +33417,16 @@
       "confidence_score": 1.0,
       "source": "data_consultantagencyplanmatrix_consultantagencyplanmatrix",
       "target": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_demopack"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
+      "source_location": "L258",
+      "weight": 1.0,
+      "source": "data_consultantagencyplanmatrix_consultantagencyplanmatrix",
+      "target": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_entitypack",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -33460,6 +33560,17 @@
       "source_location": "L35",
       "weight": 1.0,
       "source": "migrations_2026_08_03_100000_phase1_free_plan_scope3_preview_up",
+      "target": "data_consultantagencyplanmatrix_consultantagencyplanmatrix"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "database/migrations/2026_08_03_160000_phase8_seed_scope_and_consultant_entity.php",
+      "source_location": "L84",
+      "weight": 1.0,
+      "source": "migrations_2026_08_03_160000_phase8_seed_scope_and_consultant_entity_up",
       "target": "data_consultantagencyplanmatrix_consultantagencyplanmatrix"
     },
     {
@@ -33661,6 +33772,16 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Data/PlanEntitlementDefaults.php",
+      "source_location": "L292",
+      "weight": 1.0,
+      "source": "data_planentitlementdefaults_planentitlementdefaults",
+      "target": "data_planentitlementdefaults_planentitlementdefaults_consultantmanagedstandard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "app/Data/PlanEntitlementDefaults.php",
       "source_location": "L54",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -33701,6 +33822,26 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Data/PlanEntitlementDefaults.php",
+      "source_location": "L276",
+      "weight": 1.0,
+      "source": "data_planentitlementdefaults_planentitlementdefaults",
+      "target": "data_planentitlementdefaults_planentitlementdefaults_esgcomplete",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "app/Data/PlanEntitlementDefaults.php",
+      "source_location": "L263",
+      "weight": 1.0,
+      "source": "data_planentitlementdefaults_planentitlementdefaults",
+      "target": "data_planentitlementdefaults_planentitlementdefaults_esgstarter",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "app/Data/PlanEntitlementDefaults.php",
       "source_location": "L36",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -33726,6 +33867,26 @@
       "confidence_score": 1.0,
       "source": "data_planentitlementdefaults_planentitlementdefaults",
       "target": "data_planentitlementdefaults_planentitlementdefaults_growth"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "app/Data/PlanEntitlementDefaults.php",
+      "source_location": "L218",
+      "weight": 1.0,
+      "source": "data_planentitlementdefaults_planentitlementdefaults",
+      "target": "data_planentitlementdefaults_planentitlementdefaults_scopebasic",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "app/Data/PlanEntitlementDefaults.php",
+      "source_location": "L250",
+      "weight": 1.0,
+      "source": "data_planentitlementdefaults_planentitlementdefaults",
+      "target": "data_planentitlementdefaults_planentitlementdefaults_scopepro",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -33779,6 +33940,17 @@
       "source_location": "L19",
       "weight": 1.0,
       "source": "migrations_2026_08_03_110000_phase2_free_watermarked_exports_up",
+      "target": "data_planentitlementdefaults_planentitlementdefaults"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "database/migrations/2026_08_03_160000_phase8_seed_scope_and_consultant_entity.php",
+      "source_location": "L33",
+      "weight": 1.0,
+      "source": "migrations_2026_08_03_160000_phase8_seed_scope_and_consultant_entity_up",
       "target": "data_planentitlementdefaults_planentitlementdefaults"
     },
     {
@@ -38609,9 +38781,9 @@
       "source_file": "app/Http/Controllers/Admin/PriceBookController.php",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "admin_pricebookcontroller",
-      "target": "admin_pricebookcontroller_pricebookcontroller",
-      "confidence_score": 1.0
+      "target": "admin_pricebookcontroller_pricebookcontroller"
     },
     {
       "relation": "imports",
@@ -38620,9 +38792,9 @@
       "source_file": "app/Http/Controllers/Admin/PriceBookController.php",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "admin_pricebookcontroller",
-      "target": "app_http_controllers_admin_pricebookcontroller_php_request",
-      "confidence_score": 1.0
+      "target": "app_http_controllers_admin_pricebookcontroller_php_request"
     },
     {
       "relation": "imports",
@@ -38631,9 +38803,9 @@
       "source_file": "app/Http/Controllers/Admin/PriceBookController.php",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "admin_pricebookcontroller",
-      "target": "controllers_controller_controller",
-      "confidence_score": 1.0
+      "target": "controllers_controller_controller"
     },
     {
       "relation": "method",
@@ -38641,9 +38813,9 @@
       "source_file": "app/Http/Controllers/Admin/PriceBookController.php",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "admin_pricebookcontroller_pricebookcontroller",
-      "target": "admin_pricebookcontroller_pricebookcontroller_index",
-      "confidence_score": 1.0
+      "target": "admin_pricebookcontroller_pricebookcontroller_index"
     },
     {
       "relation": "method",
@@ -38651,9 +38823,9 @@
       "source_file": "app/Http/Controllers/Admin/PriceBookController.php",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "admin_pricebookcontroller_pricebookcontroller",
-      "target": "admin_pricebookcontroller_pricebookcontroller_update",
-      "confidence_score": 1.0
+      "target": "admin_pricebookcontroller_pricebookcontroller_update"
     },
     {
       "relation": "inherits",
@@ -38661,9 +38833,9 @@
       "source_file": "app/Http/Controllers/Admin/PriceBookController.php",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "admin_pricebookcontroller_pricebookcontroller",
-      "target": "controllers_controller_controller",
-      "confidence_score": 1.0
+      "target": "controllers_controller_controller"
     },
     {
       "relation": "references",
@@ -38672,9 +38844,9 @@
       "source_location": "L23",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "admin_pricebookcontroller_pricebookcontroller_update",
-      "target": "app_http_controllers_admin_pricebookcontroller_php_request",
-      "confidence_score": 1.0
+      "target": "app_http_controllers_admin_pricebookcontroller_php_request"
     },
     {
       "relation": "contains",
@@ -54835,9 +55007,9 @@
       "source_file": "app/Models/CommercialPriceBookEntry.php",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "models_commercialpricebookentry",
-      "target": "model",
-      "confidence_score": 1.0
+      "target": "model"
     },
     {
       "relation": "inherits",
@@ -54845,9 +55017,9 @@
       "source_file": "app/Models/CommercialPriceBookEntry.php",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "models_commercialpricebookentry_commercialpricebookentry",
-      "target": "model",
-      "confidence_score": 1.0
+      "target": "model"
     },
     {
       "relation": "imports",
@@ -56606,9 +56778,9 @@
       "source_file": "app/Models/CommercialPriceBookEntry.php",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "models_commercialpricebookentry",
-      "target": "models_commercialpricebookentry_commercialpricebookentry",
-      "confidence_score": 1.0
+      "target": "models_commercialpricebookentry_commercialpricebookentry"
     },
     {
       "relation": "method",
@@ -56616,9 +56788,9 @@
       "source_file": "app/Models/CommercialPriceBookEntry.php",
       "source_location": "L41",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "models_commercialpricebookentry_commercialpricebookentry",
-      "target": "models_commercialpricebookentry_commercialpricebookentry_allcached",
-      "confidence_score": 1.0
+      "target": "models_commercialpricebookentry_commercialpricebookentry_allcached"
     },
     {
       "relation": "method",
@@ -56626,9 +56798,9 @@
       "source_file": "app/Models/CommercialPriceBookEntry.php",
       "source_location": "L32",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "models_commercialpricebookentry_commercialpricebookentry",
-      "target": "models_commercialpricebookentry_commercialpricebookentry_booted",
-      "confidence_score": 1.0
+      "target": "models_commercialpricebookentry_commercialpricebookentry_booted"
     },
     {
       "relation": "method",
@@ -56636,9 +56808,9 @@
       "source_file": "app/Models/CommercialPriceBookEntry.php",
       "source_location": "L48",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "models_commercialpricebookentry_commercialpricebookentry",
-      "target": "models_commercialpricebookentry_commercialpricebookentry_findbycode",
-      "confidence_score": 1.0
+      "target": "models_commercialpricebookentry_commercialpricebookentry_findbycode"
     },
     {
       "relation": "references",
@@ -56647,9 +56819,9 @@
       "source_location": "L48",
       "weight": 1.0,
       "context": "return_type",
+      "confidence_score": 1.0,
       "source": "models_commercialpricebookentry_commercialpricebookentry_findbycode",
-      "target": "app_models_commercialpricebookentry_php_self",
-      "confidence_score": 1.0
+      "target": "app_models_commercialpricebookentry_php_self"
     },
     {
       "relation": "contains",
@@ -79006,9 +79178,9 @@
       "source_file": "database/migrations/2026_08_03_150000_phase7_commercial_price_book.php",
       "source_location": "L49",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "migrations_2026_08_03_150000_phase7_commercial_price_book",
-      "target": "migrations_2026_08_03_150000_phase7_commercial_price_book_down",
-      "confidence_score": 1.0
+      "target": "migrations_2026_08_03_150000_phase7_commercial_price_book_down"
     },
     {
       "relation": "contains",
@@ -79016,8 +79188,28 @@
       "source_file": "database/migrations/2026_08_03_150000_phase7_commercial_price_book.php",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "migrations_2026_08_03_150000_phase7_commercial_price_book",
-      "target": "migrations_2026_08_03_150000_phase7_commercial_price_book_up",
+      "target": "migrations_2026_08_03_150000_phase7_commercial_price_book_up"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "database/migrations/2026_08_03_160000_phase8_seed_scope_and_consultant_entity.php",
+      "source_location": "L107",
+      "weight": 1.0,
+      "source": "migrations_2026_08_03_160000_phase8_seed_scope_and_consultant_entity",
+      "target": "migrations_2026_08_03_160000_phase8_seed_scope_and_consultant_entity_down",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "database/migrations/2026_08_03_160000_phase8_seed_scope_and_consultant_entity.php",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "migrations_2026_08_03_160000_phase8_seed_scope_and_consultant_entity",
+      "target": "migrations_2026_08_03_160000_phase8_seed_scope_and_consultant_entity_up",
       "confidence_score": 1.0
     },
     {
@@ -83201,9 +83393,9 @@
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
       "source_location": "L243",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "documentation_pricing_and_plan_major_changes_12_phased_checklist",
-      "target": "documentation_pricing_and_plan_major_changes_phase_7_price_book_done",
-      "confidence_score": 1.0
+      "target": "documentation_pricing_and_plan_major_changes_phase_7_price_book_done"
     },
     {
       "relation": "contains",
@@ -83224,6 +83416,16 @@
       "confidence_score": 1.0,
       "source": "documentation_pricing_and_plan_major_changes_12_phased_checklist",
       "target": "documentation_pricing_and_plan_major_changes_phase_8_db_seeds_consultant_entity_company_codes_retire_pack_checkout_paths_enforce_5_sites_on_standard"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
+      "source_location": "L247",
+      "weight": 1.0,
+      "source": "documentation_pricing_and_plan_major_changes_12_phased_checklist",
+      "target": "documentation_pricing_and_plan_major_changes_phase_8_live_plan_seeds_done",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -87587,5 +87789,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "c9a29c083b233680c3038084be3700911935b54f"
+  "built_at_commit": "de6672f9e85869ea97eee11e3bd4a137150cee6a"
 }

@@ -244,7 +244,13 @@ Align codes · Free S3 · Watermarked exports.
 - [x] `commercial_price_book_entries` seeded (company xlsx + consultant 1,399/1,199 + extras).
 - [x] Admin **Price book** UI edits amounts; quote calculator reads DB with constant fallbacks.
 
-### Phase 8 — DB seeds (`consultant_entity`, company codes); retire pack checkout paths · enforce 5 sites on Standard
+### Phase 8 — Live plan seeds ✅ DONE
+- [x] Seed `client_scope_basic` / `pro` / `esg_starter` / `esg_complete` (+ keep legacy starter/growth).
+- [x] Seed `consultant_entity` (Consultant Plan); deactivate legacy 5/10/25/50 packs.
+- [x] Keep **`consultant_1` Demo / QA — 1 client full Growth** for admin testing.
+- [x] Paid managed clients use `consultant_managed_standard` limits (**5 sites**).
+- [x] Activation maps request codes → live plans; consultant activate → `consultant_entity` + extras.
+
 ### Phase 9 — Portal guides + ElevenLabs
 ### Phase 10 — Renewals / optional min-10 reminders later
 
@@ -254,31 +260,31 @@ Align codes · Free S3 · Watermarked exports.
 
 | Area | Path |
 |------|------|
-| Free defaults | `PlanEntitlementDefaults.php` |
-| Consultant Standard / packs | `ConsultantAgencyPlanMatrix.php` |
+| Free defaults / new packages | `PlanEntitlementDefaults.php` |
+| Consultant Standard / entity plan | `ConsultantAgencyPlanMatrix.php` |
 | Price book | `CommercialPriceBookEntry`, `CommercialPriceBook.php`, `Admin\PriceBookController` |
 | Quotes / activate | `AdminRequestActivationService.php` |
+| Phase 8 seed | `2026_08_03_160000_phase8_seed_scope_and_consultant_entity.php` |
 | Watermark | `ExportWatermark.php`, reports export controllers |
 | Public Explore Free | `/pricing`, `public/pricing.blade.php` |
-| Company request | `PackageRequestController`, `CompanyPackageOptions`, `company_package_requests` |
-| Consultant request | `EntityRequestController`, `consultant_entity_requests` |
-| Admin inboxes | `CompanyPackageRequestController`, `ConsultantEntityRequestController` |
-| Company billing | `client/subscriptions/*` |
-| Consultant request page | `consultant/agency/packs/*` |
+| Company request | `PackageRequestController`, `CompanyPackageOptions` |
+| Consultant request | `EntityRequestController` |
+| Admin inboxes | package / client request controllers |
 
 ---
 
 ## 14. Front messaging
 
 Public: Explore Free · Book demo · no AED.  
-Logged-in: Request a package / Request slots · features only · pricing offline.
+Logged-in: Request a package / Request clients · features only · pricing offline.  
+**App UI term:** managed client(s). Sales docs may still say entity.
 
 ---
 
 ## 15. Success criteria
 
 1. No public AED.  
-2. Free works (company + 1 consultant entity).  
+2. Free works (company + 1 consultant client).  
 3. Paid = Request → offline → Activate.  
 4. Consultant quotes use §6.2 by default.  
 5. Company quotes use §5 xlsx.
@@ -289,11 +295,10 @@ Logged-in: Request a package / Request slots · features only · pricing offline
 
 | Item | Status |
 |------|--------|
-| Paid consultant entity feature depth | **Locked §6.3 = Standard** (live in code for paid engagements) |
-| Enforce 5 sites vs Starter’s 3 on activation | Phase 8 / admin assign |
-| Seed `client_scope_*` / `consultant_entity` | Phase 8 (activate maps to starter/growth/packs for now) |
+| Paid consultant client feature depth | **Standard** (5 sites) via `consultant_managed_standard` |
+| Demo / QA 1-client full Growth | **Kept** `consultant_1` (admin-only) |
 | Min-10 preferential in software | Deferred |
-| Legacy subscriber mapping | Phase 8 |
+| Legacy starter/growth / pack subscribers | Remain; new activations use scope_* / consultant_entity |
 
 ---
 
@@ -302,13 +307,10 @@ Logged-in: Request a package / Request slots · features only · pricing offline
 | Date | Change |
 |------|--------|
 | Aug 2026 | Initial doc + Phases 0–2 |
-| Aug 2026 | **Aligned to Ojas commercial proposal:** Consultant Plan per-entity intro pricing; Enterprise custom; Free kept; company xlsx kept; entity = slot ≤5 sites; min-10 sales-only. |
-| Aug 2026 | Phase 3: Explore Free + hide self-serve checkout; §6.3 Standard locked. |
-| Aug 2026 | Phase 4: Company Request a package UI + admin inbox. |
-| Aug 2026 | Phase 5: Consultant Request entities + Standard entitlements for paid managed clients. |
-| Aug 2026 | Phase 6: Admin quote calculator + mark paid + activate from request inboxes. |
-| Aug 2026 | Phase 7: Admin commercial price book (editable; drives quotes). |
+| Aug 2026 | **Aligned to Ojas commercial proposal** |
+| Aug 2026 | Phases 3–7 (Explore Free, requests, quotes, price book) + client terminology |
+| Aug 2026 | Phase 8: seed scope packages + consultant_entity; keep demo QA pack; Standard 5 sites |
 
 ---
 
-**Next:** Phase 8 (seed live `client_scope_*` / `consultant_entity` codes; enforce Standard 5 sites).
+**Next:** Phase 9 (portal guides + ElevenLabs sync).

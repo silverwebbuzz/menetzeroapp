@@ -15,6 +15,12 @@ class PlanEntitlementDefaults
         'client_starter',
         'client_growth',
         'client_enterprise',
+        'client_scope_basic',
+        'client_scope_pro',
+        'client_esg_starter',
+        'client_esg_complete',
+        // Limit template for paid consultant-managed clients (Standard · ≤5 sites).
+        'consultant_managed_standard',
     ];
 
     /**
@@ -27,6 +33,11 @@ class PlanEntitlementDefaults
             'client_starter' => self::starter(),
             'client_growth' => self::growth(),
             'client_enterprise' => self::enterprise(),
+            'client_scope_basic' => self::scopeBasic(),
+            'client_scope_pro' => self::scopePro(),
+            'client_esg_starter' => self::esgStarter(),
+            'client_esg_complete' => self::esgComplete(),
+            'consultant_managed_standard' => self::consultantManagedStandard(),
         ];
     }
 
@@ -200,6 +211,113 @@ class PlanEntitlementDefaults
                 'export_regen' => 'subscription_year_unlimited',
             ],
             'features' => ['disclosures_access', 'ifrs_s2', 'ifrs_s1', 'gri'],
+        ];
+    }
+
+    /** Company package — Scope Basic (xlsx §5). */
+    private static function scopeBasic(): array
+    {
+        return [
+            'plan_name' => 'Scope Basic',
+            'description' => 'MOCCAE-ready Scope 1 & 2: clean GHG / MOCCAE / Excel / IEQT, bulk import, up to 3 sites.',
+            'price_annual' => 2500,
+            'currency' => 'AED',
+            'sort_order' => 12,
+            'limits' => [
+                'locations' => 3,
+                'users' => 5,
+                'documents' => 50,
+                'scope3_records_per_form' => 1,
+                'annual_report_pdf' => -1,
+                'historical_years' => 2,
+            ],
+            'entitlements' => [
+                'scope3_mode' => 'preview_per_category',
+                'bulk_import' => true,
+                'bulk_export' => true,
+                'help_level' => 'full',
+                'disclosures' => ['access' => true, 'export' => false],
+                'exports' => ['ghg_pdf', 'moccae_pdf', 'excel', 'ieqt'],
+                'consultant_directory' => 'partial',
+                'export_regen' => 'subscription_year_unlimited',
+                'export_watermark' => false,
+            ],
+            'features' => ['disclosures_access'],
+        ];
+    }
+
+    /** Company package — Scope Pro (xlsx §5). */
+    private static function scopePro(): array
+    {
+        $growth = self::growth();
+        $growth['plan_name'] = 'Scope Pro';
+        $growth['description'] = 'Broader scopes + ESG disclosure suite exports. Up to 10 sites.';
+        $growth['price_annual'] = 4999;
+        $growth['sort_order'] = 13;
+        $growth['limits']['locations'] = 10;
+
+        return $growth;
+    }
+
+    /** Company package — ESG Starter (xlsx §5). */
+    private static function esgStarter(): array
+    {
+        $growth = self::growth();
+        $growth['plan_name'] = 'ESG Starter';
+        $growth['description'] = 'Full ESG report set for mid-size orgs. Up to 5 sites.';
+        $growth['price_annual'] = 18000;
+        $growth['sort_order'] = 14;
+        $growth['limits']['locations'] = 5;
+
+        return $growth;
+    }
+
+    /** Company package — ESG Complete (xlsx §5). */
+    private static function esgComplete(): array
+    {
+        $growth = self::growth();
+        $growth['plan_name'] = 'ESG Complete';
+        $growth['description'] = 'Larger portfolios and multi-entity options. Up to 10 sites.';
+        $growth['price_annual'] = 36000;
+        $growth['sort_order'] = 15;
+        $growth['limits']['locations'] = 10;
+
+        return $growth;
+    }
+
+    /**
+     * Paid consultant-managed client limit/entitlement template (Standard · §6.3).
+     * Not sold as a direct company plan — used for managed-client limit lookups.
+     */
+    private static function consultantManagedStandard(): array
+    {
+        return [
+            'plan_name' => 'Consultant Standard (managed client)',
+            'description' => 'Standard profile per paid managed client: S1&2, ≤5 sites, clean GHG/MOCCAE/Excel/IEQT.',
+            'price_annual' => 0,
+            'currency' => 'AED',
+            'sort_order' => 90,
+            'limits' => [
+                'locations' => 5,
+                'users' => 5,
+                'documents' => 50,
+                'scope3_records_per_form' => 1,
+                'annual_report_pdf' => -1,
+                'historical_years' => 2,
+            ],
+            'entitlements' => [
+                'scope3_mode' => 'preview_per_category',
+                'bulk_import' => true,
+                'bulk_export' => true,
+                'help_level' => 'full',
+                'disclosures' => ['access' => true, 'export' => false],
+                'exports' => ['ghg_pdf', 'moccae_pdf', 'excel', 'ieqt'],
+                'consultant_directory' => 'none',
+                'export_regen' => 'subscription_year_unlimited',
+                'export_watermark' => false,
+                'package_profile' => 'standard',
+            ],
+            'features' => ['disclosures_access', 'consultant_managed'],
         ];
     }
 }

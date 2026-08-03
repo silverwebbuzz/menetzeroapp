@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Data\CommercialPriceBook;
+use App\Data\ConsultantAgencyPlanMatrix;
 use App\Models\AdminPackageAssignment;
 use App\Models\Company;
 use App\Models\CompanyPackageRequest;
@@ -129,8 +130,22 @@ class AdminRequestActivationService
             ->where('plan_category', 'client')
             ->first();
 
+        // Fallback for pre-Phase-8 DBs that only have starter/growth.
         if (!$plan) {
-            throw new RuntimeException("Live plan `{$liveCode}` not found. Seed plans or assign manually.");
+            $legacy = [
+                'client_scope_basic' => 'client_starter',
+                'client_scope_pro' => 'client_growth',
+                'client_esg_starter' => 'client_growth',
+                'client_esg_complete' => 'client_growth',
+            ][$liveCode] ?? null;
+            if ($legacy) {
+                $plan = SubscriptionPlan::where('plan_code', $legacy)->where('plan_category', 'client')->first();
+                $liveCode = $legacy;
+            }
+        }
+
+        if (!$plan) {
+            throw new RuntimeException("Live plan `{$liveCode}` not found. Run Phase 8 migrations or assign manually.");
         }
 
         $expiresAt = Carbon::now()->addMonths(max(1, $durationMonths));
@@ -193,15 +208,17 @@ class AdminRequestActivationService
 
         $needed = max(1, (int) $request->entity_count);
         $contractYear = $contractYear ?? (int) now()->year;
-        $packCode = CommercialPriceBook::nearestAgencyPackCode($needed);
 
-        return DB::transaction(function () use ($request, $org, $needed, $packCode, $note, $adminId, $contractYear) {
+        return DB::transaction(function () use ($request, $org, $needed, $note, $adminId, $contractYear) {
             $active = $this->consultantSubscriptions->getActiveSubscription($org->id);
             $subscription = null;
 
             $isPaidActive = $active && !$active->isFreeTrial();
 
             if (!$isPaidActive) {
+                $packCode = ConsultantAgencyPlanMatrix::ENTITY_PLAN_CODE;
+                $extras = CommercialPriceBook::extraSlotsNeeded($needed, $packCode);
+
                 $subscription = $this->consultantSubscriptions->grantPackSubscription(
                     $org,
                     $packCode,
@@ -209,14 +226,11 @@ class AdminRequestActivationService
                     [
                         'provision_note' => $note,
                         'consultant_entity_request_id' => $request->id,
+                        'requested_clients' => $needed,
                     ],
                     $adminId,
+                    $extras,
                 );
-
-                $extras = CommercialPriceBook::extraSlotsNeeded($needed, $packCode);
-                if ($extras > 0) {
-                    $subscription = $this->consultantSubscriptions->addExtraSlots($subscription, $extras);
-                }
 
                 $plan = SubscriptionPlan::where('plan_code', $packCode)->first();
                 AdminPackageAssignment::create([
@@ -235,6 +249,7 @@ class AdminRequestActivationService
                         'quote_amount_aed' => $request->quote_amount_aed,
                         'wants_enterprise' => $request->wants_enterprise,
                         'slot_limit' => $subscription->slot_limit,
+                        'plan_code' => $packCode,
                     ],
                 ]);
             } else {

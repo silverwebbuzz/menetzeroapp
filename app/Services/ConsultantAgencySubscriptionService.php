@@ -343,11 +343,13 @@ class ConsultantAgencySubscriptionService
         int $contractYear,
         array $metadata = [],
         ?int $adminId = null,
+        int $extraSlotsPurchased = 0,
     ): ConsultantSubscription {
         $plan = SubscriptionPlan::where('plan_code', $planCode)->where('plan_category', 'consultant_agency')->firstOrFail();
 
         return $this->activatePackSubscription($consultantOrg, $plan, [
             'contract_year' => $contractYear,
+            'extra_slots_purchased' => max(0, $extraSlotsPurchased),
             'metadata' => array_merge($metadata, array_filter([
                 'provision_type' => 'admin_grant',
                 'granted_by' => $adminId,
