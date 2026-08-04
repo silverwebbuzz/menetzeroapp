@@ -33,7 +33,7 @@ class ManagedClientController extends Controller
         return view('consultant.agency.clients.index', compact('engagements', 'slotSummary'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $consultantOrg = $this->consultantCompany();
         $this->subscriptions->ensureFreeTrialSubscription($consultantOrg);
@@ -41,9 +41,17 @@ class ManagedClientController extends Controller
         $slotSummary = $this->subscriptions->slotSummary($consultantOrg->id, $subscription);
         $capacityOptions = $this->subscriptions->availableCapacityBuckets($consultantOrg->id);
         $defaultPry = $slotSummary['contract_year'] ?? (int) now()->year;
-        $defaultSubscriptionId = count($capacityOptions) === 1
-            ? $capacityOptions[0]['subscription_id']
-            : old('consultant_subscription_id');
+
+        $availableIds = collect($capacityOptions)->pluck('subscription_id')->map(fn ($id) => (int) $id)->all();
+        $requestedId = (int) $request->query('subscription', 0);
+        $fromQuery = $requestedId > 0 && in_array($requestedId, $availableIds, true)
+            ? $requestedId
+            : null;
+
+        $defaultSubscriptionId = old(
+            'consultant_subscription_id',
+            $fromQuery ?? (count($capacityOptions) === 1 ? $capacityOptions[0]['subscription_id'] : null)
+        );
 
         return view('consultant.agency.clients.create', compact(
             'subscription',
