@@ -82,7 +82,7 @@ class ConsultantFullDemoSeeder extends Seeder
             'slots' => 5,
             'firms' => [
                 ['name' => 'Marina Hotels LLC', 'display' => 'Marina Hotels', 'emirate' => 'Dubai', 'sector' => 'Hospitality', 'industry' => 'Hotels'],
-                ['name' => 'Barakah Farms LLC', 'display' => 'Barakah Farms', 'emirate' => 'Al Ain', 'sector' => 'Agriculture', 'industry' => 'Farming'],
+                ['name' => 'Barakah Farms LLC', 'display' => 'Barakah Farms', 'emirate' => 'Abu Dhabi', 'sector' => 'Agriculture', 'industry' => 'Farming'],
                 ['name' => 'Noor Properties PJSC', 'display' => 'Noor Properties', 'emirate' => 'Abu Dhabi', 'sector' => 'Real Estate', 'industry' => 'Property'],
                 ['name' => 'Gulf Pack Industries', 'display' => 'Gulf Pack', 'emirate' => 'Ras Al Khaimah', 'sector' => 'Manufacturing', 'industry' => 'Packaging'],
                 ['name' => 'Horizon Schools FZE', 'display' => 'Horizon Schools', 'emirate' => 'Dubai', 'sector' => 'Education', 'industry' => 'K-12'],
