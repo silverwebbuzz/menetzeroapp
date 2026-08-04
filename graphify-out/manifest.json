@@ -220,8 +220,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Consultant/Agency/WorkspaceController.php": {
-    "mtime": 1781089286.1675043,
-    "ast_hash": "d9bf7f2e29f39e218251a3bbb2522162",
+    "mtime": 1785845982.559539,
+    "ast_hash": "e15bda80fe3f42e2fc366109bfc5bec8",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Consultant/AuthController.php": {
@@ -830,8 +830,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/ConsultantAgencyWorkspaceService.php": {
-    "mtime": 1781090300.0966969,
-    "ast_hash": "29af3a83ab5e6c44c20bcaecba42b787",
+    "mtime": 1785845959.1758268,
+    "ast_hash": "c3afec4602d6baa0d697da2159f1ec63",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/ConsultantDashboardService.php": {
@@ -1375,8 +1375,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/database/seeders/ConsultantFullDemoSeeder.php": {
-    "mtime": 1785845383.2018685,
-    "ast_hash": "50c5c2383fa5d4926e9ff373adf5f418",
+    "mtime": 1785845666.7306864,
+    "ast_hash": "f28a3faae5434c091b098b7b225c6d9f",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/database/seeders/DatabaseSeeder.php": {
@@ -1825,8 +1825,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/consultant/agency/workspace/switcher.blade.php": {
-    "mtime": 1781099307.1194932,
-    "ast_hash": "de0a9092b49bbe734fa15c7b5b564c25",
+    "mtime": 1785845982.5596156,
+    "ast_hash": "2b044cdb66842b01d81b61a870de3835",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/consultant/auth/login.blade.php": {
@@ -2915,8 +2915,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/elevenlabs-voice-agent/CONSULTANT_PRE_QUESTIONS.md": {
-    "mtime": 1785845501.8754873,
-    "ast_hash": "a40fa6a61c94655259f50a0ffff56aec",
+    "mtime": 1785845536.861912,
+    "ast_hash": "b3b9f3117881384a1c973cc998cd9aa9",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/elevenlabs-voice-agent/README.md": {

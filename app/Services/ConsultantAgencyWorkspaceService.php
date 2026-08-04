@@ -148,7 +148,7 @@ class ConsultantAgencyWorkspaceService
         }
 
         return ConsultantClientEngagement::query()
-            ->with('managedCompany')
+            ->with(['managedCompany', 'subscription.plan'])
             ->forConsultant($consultantOrg->id)
             ->active()
             ->orderByDesc('id')
