@@ -238,6 +238,17 @@ Request form continues to use **company** codes for depth choice; activation wri
 - [x] Point `PRICING_AND_PLAN_MAJOR_CHANGES.md` §6 toward multi-row capacity + this doc.
 - [x] Run: `php artisan db:seed --class=ConsultantFullDemoSeeder` (login `demo.full@menetzero.com` / `FullDemo1!`)
 
+### Phase 6 — Workspace UX (sections + open seats) ✅ / merge polish
+- [x] Workspace grouped by capacity row; empty seats as `+` cards → create on that row.
+- [x] Merge same `plan_code` rows into one visual section (sum seats; expiry range + per-purchase chips). DB stays multi-row. `+` still targets a specific `subscription_id` (soonest-expiring spare first).
+
+### Phase 7 — Seat move / retention (consultant-driven) — **not started**
+See **§14**. Coding deferred until product walks the checklist below.
+
+### Phase 8 — Multi-row renew (replace legacy P20 single-sub renew) — **not started**
+See **§14**.
+
+**Note — `extra_slots_purchased` removed (Aug 2026):** Capacity is only **`slot_limit`** on each `consultant_subscriptions` row. Need more seats → Request clients again → admin activates a **new** row. Migration: `2026_08_04_180000_drop_consultant_extra_slots_purchased.php`. Legacy checkout `addExtraSlots` now creates a new depth row (or bumps `slot_limit` on free/demo only).
 ---
 
 ## 11. Success criteria
@@ -246,7 +257,8 @@ Request form continues to use **company** codes for depth choice; activation wri
 2. One agency can have several active depth subscriptions with different counts and expiries.  
 3. Request Basic×5 + ESG×5 activates **two** rows; clients can be created under each depth independently.  
 4. Old pack SKUs gone from day-to-day ops; demo no longer on `consultant_50`.  
-5. Company xlsx packages unchanged for selling; growth remapped.
+5. Company xlsx packages unchanged for selling; growth remapped.  
+6. (**§14**) Consultant can renew with fewer seats, keep existing company data, park leavers, upgrade some firms, and leave open seats for new clients — without re-keying emissions.
 
 ---
 
@@ -258,6 +270,9 @@ Request form continues to use **company** codes for depth choice; activation wri
 | Sites &gt;5 on an entity | Extras / offline quote (unchanged) |
 | New full demo after Phase 4–5 | **Done** — `ConsultantFullDemoSeeder` (5 depths × 5 slots × full data) |
 | Exact wipe scope for company_id 17 | Done in Phase 2; re-seed recreates Silver Webbuzz demo org |
+| Merge same-plan workspace sections | **Done** (Phase 6) — display merge; DB multi-row |
+| Seat move + multi-row renew | Locked in §14; build Phases 7–8 |
+| `extra_slots_purchased` | **Dropped** — use `slot_limit` + new purchase rows |
 
 ---
 
@@ -271,3 +286,128 @@ Request form continues to use **company** codes for depth choice; activation wri
 | Aug 2026 | Phase 3 shipped: multi-line request + Σ quote + one depth subscription row per line |
 | Aug 2026 | Phase 4 shipped: capacity buckets + create-client depth picker + entitlements from subscription plan |
 | Aug 2026 | Phase 5 shipped: guides/ElevenLabs/§6 update + multi-package full demo seeder (25 clients) |
+| Aug 2026 | **§14 locked** — consultant-driven renew / seat assign / leave / upgrade; Phases 7–8 checklist (coding later) |
+| Aug 2026 | Phase 6 polish: workspace merges same plan_code; note on `extra_slots_purchased` vs `slot_limit` |
+| Aug 2026 | Dropped `extra_slots_purchased` column; mid-term seats = new capacity row |
+
+---
+
+## 14. Renewals, seat moves, and “keep 3 of 8” (locked product rules)
+
+### 14.1 You’re right — consultant decides
+
+Capacity purchases and renewals only create/expire **subscription rows** (seats).  
+**Who** sits in those seats is always a **consultant** decision:
+
+| Possibility | What happens |
+|-------------|--------------|
+| Same depth, continue | Move continuing client onto a new (or still-valid) seat of the same plan |
+| Upgrade | Move client onto a **higher** depth seat (e.g. Scope Pro → ESG) once capacity exists |
+| Downgrade | Move onto a lower depth seat (if sold / residual capacity allows) |
+| Leave forever | Archive that engagement; company + historical year data stay for read-only history |
+| New client | Use an empty seat (`+`) — create engagement; brand-new company (or rarely attach cleaned shell) |
+| Buy more mid-year | New subscription **row** again; consultant assigns who uses the new seats |
+
+Many combinations are valid in one renew season (e.g. of 8: 5 upgrade, 3 leave; or renew only 4 seats: 3 retain + 1 reserved for a new client).
+
+### 14.2 Worked example (your numbers)
+
+**Year N — two purchases (fine as 2 DB rows):**
+
+| Row | Plan | Slots | Expires |
+|-----|------|------:|---------|
+| A | Scope Pro | 5 | June |
+| B | Scope Pro | 3 | August |
+
+Workspace may show **two sections** today (one per row). Optional later UX: one merged “Scope Pro (8)” with expiry range.
+
+**Year N+1 — renew smaller: 3 + 1 → again 2 new rows:**
+
+| New row | Plan | Slots | Notes |
+|---------|------|------:|-------|
+| C | Scope Pro | 3 | New term |
+| D | Scope Pro | 1 | New term |
+
+Rows A/B expire (or stay until term ends). History of A/B remains.
+
+**Seat use of those 4:**
+
+| Seat on C/D | Consultant choice | Company / emissions |
+|-------------|-------------------|---------------------|
+| 1–3 | Assign **3 existing** managed companies to continue | **Same `companies` row**; emissions history stays. New `consultant_client_engagements` (or re-bind) for new PRY/subscription — **no re-typing inventory** |
+| 4 | Leave empty → later **Add client** for a **new** firm | Fresh company + empty modules |
+| (not chosen) | Remaining old clients → **archive / leave** | Read-only past year; no active seat |
+
+If some of the continuing 3 should actually be **ESG** next year: consultant also requests ESG seats, then **moves** those companies onto ESG capacity (Phase 7) instead of onto Scope Pro C/D.
+
+### 14.3 What must never happen
+
+1. Deleting the managed `companies` row just because a seat expired (lose GHG history).  
+2. Forcing consultants to re-enter all Scope data for a retained firm.  
+3. Auto-picking which clients survive when seats shrink (platform must not guess).  
+4. Merging two purchase rows into one DB row solely because the plan name matches (expires differ; audit needs separate rows).
+
+### 14.4 What already exists vs gap
+
+| Piece | Today | Gap for §14 |
+|-------|--------|-------------|
+| Multi-row purchase | `grantDepthSubscription` additive | OK |
+| Create on chosen seat | `consultant_subscription_id` on create | OK |
+| Archive frees a seat | Managed client archive | OK |
+| Legacy renew (`ConsultantAgencyRenewalService`) | P20: **one** primary pack, carry-forward list, mostly redirected to offline Request | Assumes single pack / fixed slot matrix; **not** multi-row 3+1, not mid-year move, not upgrade-as-move |
+| Move client A → seat on package X | Not a first-class action | **Phase 7** |
+| Renew: buy lines × qty, then assign retainers | Offline activate rows only | **Phase 8** — renew UX after capacity exists |
+
+### 14.5 Target operating procedure (ops + product)
+
+```text
+1. Consultant decides outcomes for each active client:
+   retain same depth | upgrade | downgrade | leave forever | (optional) replace with new firm.
+2. Consultant Requests capacity lines for what they need next
+   (e.g. Scope Pro ×3 + Scope Pro ×1, and/or ESG ×5) — offline quote & pay.
+3. Admin activates → new consultant_subscriptions rows (additive; old rows expire by term or on renew complete).
+4. Consultant assigns seats (Phase 7 UI):
+   - Pick continuing client → Choose empty seat (which subscription row) → Confirm PRY.
+   - System rebinds engagement (or creates successor engagement with previous_engagement_id).
+   - Archive unassigned leavers when their old row expires / on explicit leave.
+5. Empty seats remain as + on workspace for brand-new clients.
+```
+
+**Provision for retained companies** = seat assignment + new PRY engagement path — **not** “create company again.”
+
+### 14.6 Display rules (workspace)
+
+| Rule | Choice |
+|------|--------|
+| DB | Always **one row per purchase/term** |
+| Workspace sections | v1: one section per active row (shipped). v1.1 optional: merge by `plan_code`, show “8 places · expires Jun–Aug” + still one `+` per empty seat across merged rows |
+| Assign target | Consultant always picks a **specific subscription_id** (seat pool), even if the UI groups by plan name |
+
+### 14.7 Build phases (coding later)
+
+#### Phase 7 — Seat assign / move
+- [ ] Action: **Move / assign client to capacity** (from client show + renew board).
+- [ ] Inputs: `engagement_id`, target `consultant_subscription_id`, optional new `primary_reporting_year`.
+- [ ] Rules: target row active, spare remaining slots, depth may differ (upgrade/downgrade = change of mirrored entitlements from that row’s plan).
+- [ ] Persist: update `consultant_subscription_id` **or** create successor engagement (`previous_engagement_id`) + archive predecessor when year rolls.
+- [ ] Do **not** clone emissions; same `managed_company_id`.
+- [ ] Audit log: who moved whom, from_sub → to_sub.
+- [ ] Guard: cannot overfill target; cannot move archived without restore path.
+
+#### Phase 8 — Multi-row renew flow
+- [ ] Replace / sideline single-sub P20 assumptions (`getActiveSubscription` as sole renew target).
+- [ ] Renew board lists **all** clients on rows inside renewal window (per row expiry).
+- [ ] Consultant marks each: Retain → pick target seat/plan · Leave · Upgrade (needs target capacity).
+- [ ] Capacity shortage → deep-link to Request clients with suggested lines (counts by outcome).
+- [ ] After admin activates new rows, board only enables Assign until seat counts match selections.
+- [ ] On complete: archive leavers’ engagements; expire emptied old rows when policy says (end of term).
+- [ ] Offline-first payment stays; online checkout only if we revive paid renew later.
+
+#### Phase 6 remnant — merge-by-plan UI
+- [ ] Workspace: group buckets by `plan_code` for display; keep per-row expiry chips; `+` still opens create with a chosen `subscription` (prefer soonest-expiring row with remaining, or explicit picker).
+
+### 14.8 Non-goals (this pass)
+
+- Auto-renew all clients without consultant selection.  
+- Collapsing purchase history into one subscription row.  
+- Billing PRY data entry again for retained firms.

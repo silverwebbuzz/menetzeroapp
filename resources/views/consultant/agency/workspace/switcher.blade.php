@@ -5,7 +5,7 @@
 @section('content')
 <h1 class="text-2xl font-bold text-gray-900 mb-1">Switch client workspace</h1>
 <p class="text-sm text-gray-600 mb-8">
-    Each section is a package you hold. Filled boxes are clients; empty <span class="font-medium text-gray-800">+</span> boxes add a new client on that package.
+    Each section is a package. Filled boxes are clients; empty <span class="font-medium text-gray-800">+</span> boxes add a new client on that package (tied to the next open purchase term).
 </p>
 
 @if($acting)
@@ -24,12 +24,12 @@
 
 @forelse($sections as $section)
     @php
-        $remaining = max(0, (int) $section['remaining']);
-        $addUrl = route('consultant.clients.create', ['subscription' => $section['subscription_id']]);
+        $emptyTargets = $section['empty_seat_targets'] ?? [];
+        $purchaseRows = $section['purchase_rows'] ?? [];
         $subtitleParts = [];
         $subtitleParts[] = $section['used'].'/'.$section['slot_limit'].' places used';
-        if (!empty($section['expires_at'])) {
-            $subtitleParts[] = 'expires '.$section['expires_at'];
+        if (!empty($section['expires_label'])) {
+            $subtitleParts[] = $section['expires_label'];
         }
         if (!empty($section['client_package_code'])) {
             $subtitleParts[] = $section['client_package_code'];
@@ -55,6 +55,16 @@
                 @endif
             </h2>
             <p class="text-sm text-gray-500 mt-0.5">{{ implode(' · ', $subtitleParts) }}</p>
+            @if(count($purchaseRows) > 1)
+                <ul class="mt-2 flex flex-wrap gap-2">
+                    @foreach($purchaseRows as $row)
+                        <li class="text-[11px] text-gray-600 bg-gray-50 border border-gray-200 rounded-md px-2 py-1">
+                            {{ $row['used'] }}/{{ $row['slot_limit'] }} seats
+                            @if(!empty($row['expires_at'])) · exp {{ $row['expires_at'] }} @endif
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
         </div>
 
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
@@ -86,16 +96,16 @@
                 </div>
             @endforeach
 
-            @for($i = 0; $i < $remaining; $i++)
+            @foreach($emptyTargets as $subscriptionId)
                 <a
-                    href="{{ $addUrl }}"
+                    href="{{ route('consultant.clients.create', ['subscription' => $subscriptionId]) }}"
                     class="group bg-white border-2 border-dashed border-gray-200 hover:border-teal-400 hover:bg-teal-50/40 rounded-xl p-4 flex flex-col items-center justify-center min-h-[9.5rem] text-center transition-colors"
                 >
                     <span class="w-10 h-10 rounded-full bg-gray-50 group-hover:bg-teal-100 text-gray-400 group-hover:text-teal-700 flex items-center justify-center text-2xl font-light leading-none mb-2 transition-colors" aria-hidden="true">+</span>
                     <span class="text-sm font-medium text-gray-600 group-hover:text-teal-800">Add client</span>
                     <span class="text-xs text-gray-400 mt-0.5">Open seat</span>
                 </a>
-            @endfor
+            @endforeach
         </div>
     </section>
 @empty

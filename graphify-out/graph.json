@@ -171,7 +171,7 @@
       "source_file": "app/Data/CommercialPlanComparison.php",
       "source_location": "L1",
       "id": "data_commercialplancomparison",
-      "community": 374,
+      "community": 9,
       "norm_label": "commercialplancomparison.php"
     },
     {
@@ -180,7 +180,7 @@
       "source_file": "app/Data/CommercialPlanComparison.php",
       "source_location": "L10",
       "id": "data_commercialplancomparison_commercialplancomparison",
-      "community": 374,
+      "community": 9,
       "norm_label": "commercialplancomparison"
     },
     {
@@ -189,7 +189,7 @@
       "source_file": "app/Data/CommercialPlanComparison.php",
       "source_location": "L22",
       "id": "data_commercialplancomparison_commercialplancomparison_operationsrows",
-      "community": 374,
+      "community": 9,
       "norm_label": ".operationsrows()"
     },
     {
@@ -198,7 +198,7 @@
       "source_file": "app/Data/CommercialPlanComparison.php",
       "source_location": "L112",
       "id": "data_commercialplancomparison_commercialplancomparison_downloadrows",
-      "community": 374,
+      "community": 9,
       "norm_label": ".downloadrows()"
     },
     {
@@ -207,7 +207,7 @@
       "source_file": "app/Data/CommercialPlanComparison.php",
       "source_location": "L240",
       "id": "data_commercialplancomparison_commercialplancomparison_consultantaddons",
-      "community": 374,
+      "community": 9,
       "norm_label": ".consultantaddons()"
     },
     {
@@ -216,7 +216,7 @@
       "source_file": "app/Data/CommercialPlanComparison.php",
       "source_location": "L262",
       "id": "data_commercialplancomparison_commercialplancomparison_consultantpackbytype",
-      "community": 374,
+      "community": 9,
       "norm_label": ".consultantpackbytype()"
     },
     {
@@ -225,7 +225,7 @@
       "source_file": "app/Data/CommercialPlanComparison.php",
       "source_location": "L276",
       "id": "data_commercialplancomparison_commercialplancomparison_planlabels",
-      "community": 374,
+      "community": 9,
       "norm_label": ".planlabels()"
     },
     {
@@ -243,7 +243,7 @@
       "source_file": "app/Data/CommercialPriceBook.php",
       "source_location": "L12",
       "id": "data_commercialpricebook_commercialpricebook",
-      "community": 373,
+      "community": 23,
       "norm_label": "commercialpricebook"
     },
     {
@@ -252,7 +252,7 @@
       "source_file": "app/Data/CommercialPriceBook.php",
       "source_location": "L34",
       "id": "data_commercialpricebook_commercialpricebook_companyamountaed",
-      "community": 373,
+      "community": 23,
       "norm_label": ".companyamountaed()"
     },
     {
@@ -261,7 +261,7 @@
       "source_file": "app/Data/CommercialPriceBook.php",
       "source_location": "L50",
       "id": "data_commercialpricebook_commercialpricebook_consultantrateaed",
-      "community": 373,
+      "community": 23,
       "norm_label": ".consultantrateaed()"
     },
     {
@@ -288,7 +288,7 @@
       "source_file": "app/Data/CommercialPriceBook.php",
       "source_location": "L153",
       "id": "data_commercialpricebook_commercialpricebook_suggestconsultantlinesquote",
-      "community": 373,
+      "community": 23,
       "norm_label": ".suggestconsultantlinesquote()"
     },
     {
@@ -297,7 +297,7 @@
       "source_file": "app/Data/CommercialPriceBook.php",
       "source_location": "L257",
       "id": "data_commercialpricebook_commercialpricebook_suggestedconsultantplancode",
-      "community": 373,
+      "community": 23,
       "norm_label": ".suggestedconsultantplancode()"
     },
     {
@@ -306,7 +306,7 @@
       "source_file": "app/Data/CommercialPriceBook.php",
       "source_location": "L272",
       "id": "data_commercialpricebook_commercialpricebook_nearestagencypackcode",
-      "community": 373,
+      "community": 23,
       "norm_label": ".nearestagencypackcode()"
     },
     {
@@ -315,7 +315,7 @@
       "source_file": "app/Data/CommercialPriceBook.php",
       "source_location": "L277",
       "id": "data_commercialpricebook_commercialpricebook_extraslotsneeded",
-      "community": 373,
+      "community": 23,
       "norm_label": ".extraslotsneeded()"
     },
     {
@@ -396,7 +396,7 @@
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
       "source_location": "L1",
       "id": "data_consultantagencyplanmatrix",
-      "community": 54,
+      "community": 20,
       "norm_label": "consultantagencyplanmatrix.php"
     },
     {
@@ -405,7 +405,7 @@
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
       "source_location": "L16",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix",
-      "community": 54,
+      "community": 20,
       "norm_label": "consultantagencyplanmatrix"
     },
     {
@@ -414,7 +414,7 @@
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
       "source_location": "L108",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_consultantplanforclientdepth",
-      "community": 54,
+      "community": 20,
       "norm_label": ".consultantplanforclientdepth()"
     },
     {
@@ -423,7 +423,7 @@
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
       "source_location": "L113",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_clientdepthforconsultantplan",
-      "community": 54,
+      "community": 20,
       "norm_label": ".clientdepthforconsultantplan()"
     },
     {
@@ -432,7 +432,7 @@
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
       "source_location": "L118",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_isdepthplan",
-      "community": 54,
+      "community": 20,
       "norm_label": ".isdepthplan()"
     },
     {
@@ -441,7 +441,7 @@
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
       "source_location": "L123",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_isfreeplan",
-      "community": 54,
+      "community": 20,
       "norm_label": ".isfreeplan()"
     },
     {
@@ -450,7 +450,7 @@
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
       "source_location": "L131",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_packdefinitions",
-      "community": 54,
+      "community": 20,
       "norm_label": ".packdefinitions()"
     },
     {
@@ -459,7 +459,7 @@
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
       "source_location": "L154",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_forplancode",
-      "community": 54,
+      "community": 20,
       "norm_label": ".forplancode()"
     },
     {
@@ -468,7 +468,7 @@
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
       "source_location": "L159",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_slotcountforplancode",
-      "community": 54,
+      "community": 20,
       "norm_label": ".slotcountforplancode()"
     },
     {
@@ -486,7 +486,7 @@
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
       "source_location": "L200",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_selectablepacks",
-      "community": 54,
+      "community": 20,
       "norm_label": ".selectablepacks()"
     },
     {
@@ -504,7 +504,7 @@
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
       "source_location": "L238",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_managedcliententitlementsforpackage",
-      "community": 20,
+      "community": 550,
       "norm_label": ".managedcliententitlementsforpackage()"
     },
     {
@@ -513,7 +513,7 @@
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
       "source_location": "L270",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_standardmanagedcliententitlements",
-      "community": 54,
+      "community": 550,
       "norm_label": ".standardmanagedcliententitlements()"
     },
     {
@@ -522,7 +522,7 @@
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
       "source_location": "L292",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_demomanagedcliententitlements",
-      "community": 54,
+      "community": 20,
       "norm_label": ".demomanagedcliententitlements()"
     },
     {
@@ -531,7 +531,7 @@
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
       "source_location": "L311",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_legacytrialaliaspack",
-      "community": 54,
+      "community": 20,
       "norm_label": ".legacytrialaliaspack()"
     },
     {
@@ -540,7 +540,7 @@
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
       "source_location": "L328",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_freepack",
-      "community": 54,
+      "community": 20,
       "norm_label": ".freepack()"
     },
     {
@@ -549,7 +549,7 @@
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
       "source_location": "L364",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_demopack",
-      "community": 54,
+      "community": 20,
       "norm_label": ".demopack()"
     },
     {
@@ -558,7 +558,7 @@
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
       "source_location": "L402",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_depthpack",
-      "community": 54,
+      "community": 20,
       "norm_label": ".depthpack()"
     },
     {
@@ -567,7 +567,7 @@
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
       "source_location": "L450",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_entitypack",
-      "community": 54,
+      "community": 20,
       "norm_label": ".entitypack()"
     },
     {
@@ -576,7 +576,7 @@
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
       "source_location": "L484",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_pack",
-      "community": 54,
+      "community": 20,
       "norm_label": ".pack()"
     },
     {
@@ -612,7 +612,7 @@
       "source_file": "app/Data/PlanEntitlementDefaults.php",
       "source_location": "L1",
       "id": "data_planentitlementdefaults",
-      "community": 20,
+      "community": 550,
       "norm_label": "planentitlementdefaults.php"
     },
     {
@@ -621,7 +621,7 @@
       "source_file": "app/Data/PlanEntitlementDefaults.php",
       "source_location": "L11",
       "id": "data_planentitlementdefaults_planentitlementdefaults",
-      "community": 20,
+      "community": 550,
       "norm_label": "planentitlementdefaults"
     },
     {
@@ -630,7 +630,7 @@
       "source_file": "app/Data/PlanEntitlementDefaults.php",
       "source_location": "L29",
       "id": "data_planentitlementdefaults_planentitlementdefaults_definitions",
-      "community": 20,
+      "community": 550,
       "norm_label": ".definitions()"
     },
     {
@@ -639,7 +639,7 @@
       "source_file": "app/Data/PlanEntitlementDefaults.php",
       "source_location": "L47",
       "id": "data_planentitlementdefaults_planentitlementdefaults_forplancode",
-      "community": 20,
+      "community": 550,
       "norm_label": ".forplancode()"
     },
     {
@@ -648,7 +648,7 @@
       "source_file": "app/Data/PlanEntitlementDefaults.php",
       "source_location": "L55",
       "id": "data_planentitlementdefaults_planentitlementdefaults_entitlementsforplancode",
-      "community": 20,
+      "community": 550,
       "norm_label": ".entitlementsforplancode()"
     },
     {
@@ -657,7 +657,7 @@
       "source_file": "app/Data/PlanEntitlementDefaults.php",
       "source_location": "L65",
       "id": "data_planentitlementdefaults_planentitlementdefaults_defaultpriceinr",
-      "community": 20,
+      "community": 550,
       "norm_label": ".defaultpriceinr()"
     },
     {
@@ -666,7 +666,7 @@
       "source_file": "app/Data/PlanEntitlementDefaults.php",
       "source_location": "L73",
       "id": "data_planentitlementdefaults_planentitlementdefaults_free",
-      "community": 20,
+      "community": 550,
       "norm_label": ".free()"
     },
     {
@@ -675,7 +675,7 @@
       "source_file": "app/Data/PlanEntitlementDefaults.php",
       "source_location": "L109",
       "id": "data_planentitlementdefaults_planentitlementdefaults_starter",
-      "community": 20,
+      "community": 550,
       "norm_label": ".starter()"
     },
     {
@@ -684,7 +684,7 @@
       "source_file": "app/Data/PlanEntitlementDefaults.php",
       "source_location": "L142",
       "id": "data_planentitlementdefaults_planentitlementdefaults_growth",
-      "community": 20,
+      "community": 550,
       "norm_label": ".growth()"
     },
     {
@@ -693,7 +693,7 @@
       "source_file": "app/Data/PlanEntitlementDefaults.php",
       "source_location": "L187",
       "id": "data_planentitlementdefaults_planentitlementdefaults_enterprise",
-      "community": 20,
+      "community": 550,
       "norm_label": ".enterprise()"
     },
     {
@@ -702,7 +702,7 @@
       "source_file": "app/Data/PlanEntitlementDefaults.php",
       "source_location": "L218",
       "id": "data_planentitlementdefaults_planentitlementdefaults_scopebasic",
-      "community": 20,
+      "community": 550,
       "norm_label": ".scopebasic()"
     },
     {
@@ -711,7 +711,7 @@
       "source_file": "app/Data/PlanEntitlementDefaults.php",
       "source_location": "L250",
       "id": "data_planentitlementdefaults_planentitlementdefaults_scopepro",
-      "community": 20,
+      "community": 550,
       "norm_label": ".scopepro()"
     },
     {
@@ -720,7 +720,7 @@
       "source_file": "app/Data/PlanEntitlementDefaults.php",
       "source_location": "L263",
       "id": "data_planentitlementdefaults_planentitlementdefaults_esgstarter",
-      "community": 20,
+      "community": 550,
       "norm_label": ".esgstarter()"
     },
     {
@@ -729,7 +729,7 @@
       "source_file": "app/Data/PlanEntitlementDefaults.php",
       "source_location": "L276",
       "id": "data_planentitlementdefaults_planentitlementdefaults_esgcomplete",
-      "community": 20,
+      "community": 550,
       "norm_label": ".esgcomplete()"
     },
     {
@@ -738,7 +738,7 @@
       "source_file": "app/Data/PlanEntitlementDefaults.php",
       "source_location": "L292",
       "id": "data_planentitlementdefaults_planentitlementdefaults_consultantmanagedstandard",
-      "community": 20,
+      "community": 550,
       "norm_label": ".consultantmanagedstandard()"
     },
     {
@@ -2268,7 +2268,7 @@
       "source_file": "app/Http/Controllers/Admin/EmailTemplateController.php",
       "source_location": "L1",
       "id": "admin_emailtemplatecontroller",
-      "community": 51,
+      "community": 353,
       "norm_label": "emailtemplatecontroller.php"
     },
     {
@@ -2277,7 +2277,7 @@
       "source_file": "app/Http/Controllers/Admin/EmailTemplateController.php",
       "source_location": "L12",
       "id": "admin_emailtemplatecontroller_emailtemplatecontroller",
-      "community": 51,
+      "community": 353,
       "norm_label": "emailtemplatecontroller"
     },
     {
@@ -2286,7 +2286,7 @@
       "source_file": "app/Http/Controllers/Admin/EmailTemplateController.php",
       "source_location": "L14",
       "id": "admin_emailtemplatecontroller_emailtemplatecontroller_index",
-      "community": 51,
+      "community": 353,
       "norm_label": ".index()"
     },
     {
@@ -2295,7 +2295,7 @@
       "source_file": "app/Http/Controllers/Admin/EmailTemplateController.php",
       "source_location": "L28",
       "id": "admin_emailtemplatecontroller_emailtemplatecontroller_edit",
-      "community": 51,
+      "community": 353,
       "norm_label": ".edit()"
     },
     {
@@ -2304,7 +2304,7 @@
       "source_file": "app/Http/Controllers/Admin/EmailTemplateController.php",
       "source_location": "L28",
       "id": "app_http_controllers_admin_emailtemplatecontroller_php_emailtemplate",
-      "community": 51,
+      "community": 353,
       "norm_label": "emailtemplate"
     },
     {
@@ -2313,7 +2313,7 @@
       "source_file": "app/Http/Controllers/Admin/EmailTemplateController.php",
       "source_location": "L41",
       "id": "admin_emailtemplatecontroller_emailtemplatecontroller_update",
-      "community": 51,
+      "community": 353,
       "norm_label": ".update()"
     },
     {
@@ -2322,7 +2322,7 @@
       "source_file": "app/Http/Controllers/Admin/EmailTemplateController.php",
       "source_location": "L41",
       "id": "app_http_controllers_admin_emailtemplatecontroller_php_request",
-      "community": 51,
+      "community": 353,
       "norm_label": "request"
     },
     {
@@ -2331,7 +2331,7 @@
       "source_file": "app/Http/Controllers/Admin/EmailTemplateController.php",
       "source_location": "L62",
       "id": "admin_emailtemplatecontroller_emailtemplatecontroller_preview",
-      "community": 51,
+      "community": 353,
       "norm_label": ".preview()"
     },
     {
@@ -2340,7 +2340,7 @@
       "source_file": "app/Http/Controllers/Admin/EmailTemplateController.php",
       "source_location": "L62",
       "id": "emailtemplateservice",
-      "community": 51,
+      "community": 353,
       "norm_label": "emailtemplateservice"
     },
     {
@@ -3555,7 +3555,7 @@
       "source_file": "app/Http/Controllers/Client/ConsultantDirectoryController.php",
       "source_location": "L1",
       "id": "client_consultantdirectorycontroller",
-      "community": 374,
+      "community": 9,
       "norm_label": "consultantdirectorycontroller.php"
     },
     {
@@ -3564,7 +3564,7 @@
       "source_file": "app/Http/Controllers/Client/ConsultantDirectoryController.php",
       "source_location": "L15",
       "id": "client_consultantdirectorycontroller_consultantdirectorycontroller",
-      "community": 374,
+      "community": 9,
       "norm_label": "consultantdirectorycontroller"
     },
     {
@@ -3573,7 +3573,7 @@
       "source_file": "app/Http/Controllers/Client/ConsultantDirectoryController.php",
       "source_location": "L17",
       "id": "client_consultantdirectorycontroller_consultantdirectorycontroller_construct",
-      "community": 374,
+      "community": 9,
       "norm_label": ".__construct()"
     },
     {
@@ -3582,7 +3582,7 @@
       "source_file": "app/Http/Controllers/Client/ConsultantDirectoryController.php",
       "source_location": "L21",
       "id": "client_consultantdirectorycontroller_consultantdirectorycontroller_index",
-      "community": 374,
+      "community": 9,
       "norm_label": ".index()"
     },
     {
@@ -3591,7 +3591,7 @@
       "source_file": "app/Http/Controllers/Client/ConsultantDirectoryController.php",
       "source_location": "L21",
       "id": "app_http_controllers_client_consultantdirectorycontroller_php_plangate",
-      "community": 374,
+      "community": 9,
       "norm_label": "plangate"
     },
     {
@@ -3600,7 +3600,7 @@
       "source_file": "app/Http/Controllers/Client/ConsultantDirectoryController.php",
       "source_location": "L45",
       "id": "client_consultantdirectorycontroller_consultantdirectorycontroller_show",
-      "community": 374,
+      "community": 9,
       "norm_label": ".show()"
     },
     {
@@ -3609,7 +3609,7 @@
       "source_file": "app/Http/Controllers/Client/ConsultantDirectoryController.php",
       "source_location": "L45",
       "id": "app_http_controllers_client_consultantdirectorycontroller_php_consultant",
-      "community": 374,
+      "community": 9,
       "norm_label": "consultant"
     },
     {
@@ -3618,7 +3618,7 @@
       "source_file": "app/Http/Controllers/Client/ConsultantDirectoryController.php",
       "source_location": "L65",
       "id": "client_consultantdirectorycontroller_consultantdirectorycontroller_requestintro",
-      "community": 374,
+      "community": 9,
       "norm_label": ".requestintro()"
     },
     {
@@ -3627,7 +3627,7 @@
       "source_file": "app/Http/Controllers/Client/ConsultantDirectoryController.php",
       "source_location": "L65",
       "id": "app_http_controllers_client_consultantdirectorycontroller_php_request",
-      "community": 374,
+      "community": 9,
       "norm_label": "request"
     },
     {
@@ -3789,7 +3789,7 @@
       "source_file": "app/Http/Controllers/Client/PackageRequestController.php",
       "source_location": "L1",
       "id": "client_packagerequestcontroller",
-      "community": 23,
+      "community": 377,
       "norm_label": "packagerequestcontroller.php"
     },
     {
@@ -3798,7 +3798,7 @@
       "source_file": "app/Http/Controllers/Client/PackageRequestController.php",
       "source_location": "L13",
       "id": "client_packagerequestcontroller_packagerequestcontroller",
-      "community": 23,
+      "community": 377,
       "norm_label": "packagerequestcontroller"
     },
     {
@@ -3807,7 +3807,7 @@
       "source_file": "app/Http/Controllers/Client/PackageRequestController.php",
       "source_location": "L15",
       "id": "client_packagerequestcontroller_packagerequestcontroller_create",
-      "community": 23,
+      "community": 377,
       "norm_label": ".create()"
     },
     {
@@ -3816,7 +3816,7 @@
       "source_file": "app/Http/Controllers/Client/PackageRequestController.php",
       "source_location": "L40",
       "id": "client_packagerequestcontroller_packagerequestcontroller_store",
-      "community": 23,
+      "community": 377,
       "norm_label": ".store()"
     },
     {
@@ -3825,7 +3825,7 @@
       "source_file": "app/Http/Controllers/Client/PackageRequestController.php",
       "source_location": "L40",
       "id": "app_http_controllers_client_packagerequestcontroller_php_request",
-      "community": 23,
+      "community": 377,
       "norm_label": "request"
     },
     {
@@ -3834,7 +3834,7 @@
       "source_file": "app/Http/Controllers/Client/PackageRequestController.php",
       "source_location": "L40",
       "id": "app_http_controllers_client_packagerequestcontroller_php_contactinquiryservice",
-      "community": 23,
+      "community": 377,
       "norm_label": "contactinquiryservice"
     },
     {
@@ -4257,7 +4257,7 @@
       "source_file": "app/Http/Controllers/Consultant/Agency/ManagedClientController.php",
       "source_location": "L1",
       "id": "agency_managedclientcontroller",
-      "community": 12,
+      "community": 51,
       "norm_label": "managedclientcontroller.php"
     },
     {
@@ -4266,7 +4266,7 @@
       "source_file": "app/Http/Controllers/Consultant/Agency/ManagedClientController.php",
       "source_location": "L14",
       "id": "agency_managedclientcontroller_managedclientcontroller",
-      "community": 12,
+      "community": 51,
       "norm_label": "managedclientcontroller"
     },
     {
@@ -4275,7 +4275,7 @@
       "source_file": "app/Http/Controllers/Consultant/Agency/ManagedClientController.php",
       "source_location": "L18",
       "id": "agency_managedclientcontroller_managedclientcontroller_construct",
-      "community": 12,
+      "community": 51,
       "norm_label": ".__construct()"
     },
     {
@@ -4284,7 +4284,7 @@
       "source_file": "app/Http/Controllers/Consultant/Agency/ManagedClientController.php",
       "source_location": "L25",
       "id": "agency_managedclientcontroller_managedclientcontroller_index",
-      "community": 12,
+      "community": 51,
       "norm_label": ".index()"
     },
     {
@@ -4293,7 +4293,7 @@
       "source_file": "app/Http/Controllers/Consultant/Agency/ManagedClientController.php",
       "source_location": "L36",
       "id": "agency_managedclientcontroller_managedclientcontroller_create",
-      "community": 12,
+      "community": 51,
       "norm_label": ".create()"
     },
     {
@@ -4302,7 +4302,7 @@
       "source_file": "app/Http/Controllers/Consultant/Agency/ManagedClientController.php",
       "source_location": "L36",
       "id": "app_http_controllers_consultant_agency_managedclientcontroller_php_request",
-      "community": 12,
+      "community": 51,
       "norm_label": "request"
     },
     {
@@ -4311,7 +4311,7 @@
       "source_file": "app/Http/Controllers/Consultant/Agency/ManagedClientController.php",
       "source_location": "L65",
       "id": "agency_managedclientcontroller_managedclientcontroller_store",
-      "community": 12,
+      "community": 51,
       "norm_label": ".store()"
     },
     {
@@ -4320,7 +4320,7 @@
       "source_file": "app/Http/Controllers/Consultant/Agency/ManagedClientController.php",
       "source_location": "L106",
       "id": "agency_managedclientcontroller_managedclientcontroller_show",
-      "community": 12,
+      "community": 51,
       "norm_label": ".show()"
     },
     {
@@ -4329,7 +4329,7 @@
       "source_file": "app/Http/Controllers/Consultant/Agency/ManagedClientController.php",
       "source_location": "L138",
       "id": "agency_managedclientcontroller_managedclientcontroller_edit",
-      "community": 12,
+      "community": 51,
       "norm_label": ".edit()"
     },
     {
@@ -4338,7 +4338,7 @@
       "source_file": "app/Http/Controllers/Consultant/Agency/ManagedClientController.php",
       "source_location": "L146",
       "id": "agency_managedclientcontroller_managedclientcontroller_update",
-      "community": 12,
+      "community": 51,
       "norm_label": ".update()"
     },
     {
@@ -4347,7 +4347,7 @@
       "source_file": "app/Http/Controllers/Consultant/Agency/ManagedClientController.php",
       "source_location": "L169",
       "id": "agency_managedclientcontroller_managedclientcontroller_destroy",
-      "community": 12,
+      "community": 51,
       "norm_label": ".destroy()"
     },
     {
@@ -4554,7 +4554,7 @@
       "source_file": "app/Http/Controllers/Consultant/Agency/WorkspaceController.php",
       "source_location": "L1",
       "id": "agency_workspacecontroller",
-      "community": 71,
+      "community": 12,
       "norm_label": "workspacecontroller.php"
     },
     {
@@ -4563,7 +4563,7 @@
       "source_file": "app/Http/Controllers/Consultant/Agency/WorkspaceController.php",
       "source_location": "L14",
       "id": "agency_workspacecontroller_workspacecontroller",
-      "community": 71,
+      "community": 12,
       "norm_label": "workspacecontroller"
     },
     {
@@ -4572,7 +4572,7 @@
       "source_file": "app/Http/Controllers/Consultant/Agency/WorkspaceController.php",
       "source_location": "L18",
       "id": "agency_workspacecontroller_workspacecontroller_construct",
-      "community": 71,
+      "community": 12,
       "norm_label": ".__construct()"
     },
     {
@@ -4581,43 +4581,43 @@
       "source_file": "app/Http/Controllers/Consultant/Agency/WorkspaceController.php",
       "source_location": "L24",
       "id": "agency_workspacecontroller_workspacecontroller_switcher",
-      "community": 71,
+      "community": 12,
       "norm_label": ".switcher()"
     },
     {
       "label": ".enter()",
       "file_type": "code",
       "source_file": "app/Http/Controllers/Consultant/Agency/WorkspaceController.php",
-      "source_location": "L58",
+      "source_location": "L105",
       "id": "agency_workspacecontroller_workspacecontroller_enter",
-      "community": 71,
+      "community": 12,
       "norm_label": ".enter()"
     },
     {
       "label": "Request",
       "file_type": "code",
       "source_file": "app/Http/Controllers/Consultant/Agency/WorkspaceController.php",
-      "source_location": "L58",
+      "source_location": "L105",
       "id": "app_http_controllers_consultant_agency_workspacecontroller_php_request",
-      "community": 71,
+      "community": 12,
       "norm_label": "request"
     },
     {
       "label": ".enterReadOnly()",
       "file_type": "code",
       "source_file": "app/Http/Controllers/Consultant/Agency/WorkspaceController.php",
-      "source_location": "L74",
+      "source_location": "L121",
       "id": "agency_workspacecontroller_workspacecontroller_enterreadonly",
-      "community": 71,
+      "community": 12,
       "norm_label": ".enterreadonly()"
     },
     {
       "label": ".exit()",
       "file_type": "code",
       "source_file": "app/Http/Controllers/Consultant/Agency/WorkspaceController.php",
-      "source_location": "L90",
+      "source_location": "L137",
       "id": "agency_workspacecontroller_workspacecontroller_exit",
-      "community": 71,
+      "community": 12,
       "norm_label": ".exit()"
     },
     {
@@ -4626,7 +4626,7 @@
       "source_file": "app/Http/Controllers/Consultant/AuthController.php",
       "source_location": "L1",
       "id": "consultant_authcontroller",
-      "community": 413,
+      "community": 353,
       "norm_label": "authcontroller.php"
     },
     {
@@ -4635,7 +4635,7 @@
       "source_file": "app/Http/Controllers/Consultant/AuthController.php",
       "source_location": "L13",
       "id": "consultant_authcontroller_authcontroller",
-      "community": 413,
+      "community": 353,
       "norm_label": "authcontroller"
     },
     {
@@ -4644,7 +4644,7 @@
       "source_file": "app/Http/Controllers/Consultant/AuthController.php",
       "source_location": "L15",
       "id": "consultant_authcontroller_authcontroller_shouldcompleteprofile",
-      "community": 413,
+      "community": 353,
       "norm_label": ".shouldcompleteprofile()"
     },
     {
@@ -4653,7 +4653,7 @@
       "source_file": "app/Http/Controllers/Consultant/AuthController.php",
       "source_location": "L15",
       "id": "app_http_controllers_consultant_authcontroller_php_consultant",
-      "community": 413,
+      "community": 353,
       "norm_label": "consultant"
     },
     {
@@ -4662,7 +4662,7 @@
       "source_file": "app/Http/Controllers/Consultant/AuthController.php",
       "source_location": "L25",
       "id": "consultant_authcontroller_authcontroller_postloginredirect",
-      "community": 413,
+      "community": 353,
       "norm_label": ".postloginredirect()"
     },
     {
@@ -4671,7 +4671,7 @@
       "source_file": "app/Http/Controllers/Consultant/AuthController.php",
       "source_location": "L35",
       "id": "consultant_authcontroller_authcontroller_landing",
-      "community": 413,
+      "community": 353,
       "norm_label": ".landing()"
     },
     {
@@ -4680,7 +4680,7 @@
       "source_file": "app/Http/Controllers/Consultant/AuthController.php",
       "source_location": "L49",
       "id": "consultant_authcontroller_authcontroller_showregister",
-      "community": 413,
+      "community": 353,
       "norm_label": ".showregister()"
     },
     {
@@ -4689,7 +4689,7 @@
       "source_file": "app/Http/Controllers/Consultant/AuthController.php",
       "source_location": "L61",
       "id": "consultant_authcontroller_authcontroller_register",
-      "community": 413,
+      "community": 353,
       "norm_label": ".register()"
     },
     {
@@ -4698,7 +4698,7 @@
       "source_file": "app/Http/Controllers/Consultant/AuthController.php",
       "source_location": "L61",
       "id": "app_http_controllers_consultant_authcontroller_php_request",
-      "community": 413,
+      "community": 353,
       "norm_label": "request"
     },
     {
@@ -4707,7 +4707,7 @@
       "source_file": "app/Http/Controllers/Consultant/AuthController.php",
       "source_location": "L90",
       "id": "consultant_authcontroller_authcontroller_showlogin",
-      "community": 413,
+      "community": 353,
       "norm_label": ".showlogin()"
     },
     {
@@ -4716,7 +4716,7 @@
       "source_file": "app/Http/Controllers/Consultant/AuthController.php",
       "source_location": "L102",
       "id": "consultant_authcontroller_authcontroller_login",
-      "community": 413,
+      "community": 353,
       "norm_label": ".login()"
     },
     {
@@ -4725,7 +4725,7 @@
       "source_file": "app/Http/Controllers/Consultant/AuthController.php",
       "source_location": "L129",
       "id": "consultant_authcontroller_authcontroller_logout",
-      "community": 413,
+      "community": 353,
       "norm_label": ".logout()"
     },
     {
@@ -5067,7 +5067,7 @@
       "source_file": "app/Http/Controllers/Controller.php",
       "source_location": "L88",
       "id": "planentitlementservice",
-      "community": 358,
+      "community": 398,
       "norm_label": "planentitlementservice"
     },
     {
@@ -5220,7 +5220,7 @@
       "source_file": "app/Http/Controllers/Disclosure/ClimateOpportunityController.php",
       "source_location": "L1",
       "id": "disclosure_climateopportunitycontroller",
-      "community": 422,
+      "community": 57,
       "norm_label": "climateopportunitycontroller.php"
     },
     {
@@ -5229,7 +5229,7 @@
       "source_file": "app/Http/Controllers/Disclosure/ClimateOpportunityController.php",
       "source_location": "L8",
       "id": "disclosure_climateopportunitycontroller_climateopportunitycontroller",
-      "community": 422,
+      "community": 57,
       "norm_label": "climateopportunitycontroller"
     },
     {
@@ -5238,7 +5238,7 @@
       "source_file": "app/Http/Controllers/Disclosure/ClimateOpportunityController.php",
       "source_location": "L10",
       "id": "disclosure_climateopportunitycontroller_climateopportunitycontroller_index",
-      "community": 422,
+      "community": 57,
       "norm_label": ".index()"
     },
     {
@@ -5247,7 +5247,7 @@
       "source_file": "app/Http/Controllers/Disclosure/ClimateOpportunityController.php",
       "source_location": "L10",
       "id": "app_http_controllers_disclosure_climateopportunitycontroller_php_request",
-      "community": 422,
+      "community": 57,
       "norm_label": "request"
     },
     {
@@ -5256,7 +5256,7 @@
       "source_file": "app/Http/Controllers/Disclosure/ClimateOpportunityController.php",
       "source_location": "L24",
       "id": "disclosure_climateopportunitycontroller_climateopportunitycontroller_store",
-      "community": 422,
+      "community": 57,
       "norm_label": ".store()"
     },
     {
@@ -5265,7 +5265,7 @@
       "source_file": "app/Http/Controllers/Disclosure/ClimateOpportunityController.php",
       "source_location": "L44",
       "id": "disclosure_climateopportunitycontroller_climateopportunitycontroller_update",
-      "community": 422,
+      "community": 57,
       "norm_label": ".update()"
     },
     {
@@ -5274,7 +5274,7 @@
       "source_file": "app/Http/Controllers/Disclosure/ClimateOpportunityController.php",
       "source_location": "L44",
       "id": "climateopportunity",
-      "community": 422,
+      "community": 57,
       "norm_label": "climateopportunity"
     },
     {
@@ -5283,7 +5283,7 @@
       "source_file": "app/Http/Controllers/Disclosure/ClimateOpportunityController.php",
       "source_location": "L62",
       "id": "disclosure_climateopportunitycontroller_climateopportunitycontroller_destroy",
-      "community": 422,
+      "community": 57,
       "norm_label": ".destroy()"
     },
     {
@@ -5292,7 +5292,7 @@
       "source_file": "app/Http/Controllers/Disclosure/ClimateOpportunityController.php",
       "source_location": "L72",
       "id": "disclosure_climateopportunitycontroller_climateopportunitycontroller_assertowned",
-      "community": 422,
+      "community": 57,
       "norm_label": ".assertowned()"
     },
     {
@@ -5301,7 +5301,7 @@
       "source_file": "app/Http/Controllers/Disclosure/ClimateRiskController.php",
       "source_location": "L1",
       "id": "disclosure_climateriskcontroller",
-      "community": 422,
+      "community": 71,
       "norm_label": "climateriskcontroller.php"
     },
     {
@@ -5310,7 +5310,7 @@
       "source_file": "app/Http/Controllers/Disclosure/ClimateRiskController.php",
       "source_location": "L8",
       "id": "disclosure_climateriskcontroller_climateriskcontroller",
-      "community": 422,
+      "community": 71,
       "norm_label": "climateriskcontroller"
     },
     {
@@ -5319,7 +5319,7 @@
       "source_file": "app/Http/Controllers/Disclosure/ClimateRiskController.php",
       "source_location": "L10",
       "id": "disclosure_climateriskcontroller_climateriskcontroller_index",
-      "community": 422,
+      "community": 71,
       "norm_label": ".index()"
     },
     {
@@ -5328,7 +5328,7 @@
       "source_file": "app/Http/Controllers/Disclosure/ClimateRiskController.php",
       "source_location": "L10",
       "id": "app_http_controllers_disclosure_climateriskcontroller_php_request",
-      "community": 422,
+      "community": 71,
       "norm_label": "request"
     },
     {
@@ -5337,7 +5337,7 @@
       "source_file": "app/Http/Controllers/Disclosure/ClimateRiskController.php",
       "source_location": "L25",
       "id": "disclosure_climateriskcontroller_climateriskcontroller_store",
-      "community": 422,
+      "community": 71,
       "norm_label": ".store()"
     },
     {
@@ -5346,7 +5346,7 @@
       "source_file": "app/Http/Controllers/Disclosure/ClimateRiskController.php",
       "source_location": "L50",
       "id": "disclosure_climateriskcontroller_climateriskcontroller_update",
-      "community": 422,
+      "community": 71,
       "norm_label": ".update()"
     },
     {
@@ -5355,7 +5355,7 @@
       "source_file": "app/Http/Controllers/Disclosure/ClimateRiskController.php",
       "source_location": "L50",
       "id": "climaterisk",
-      "community": 422,
+      "community": 71,
       "norm_label": "climaterisk"
     },
     {
@@ -5364,7 +5364,7 @@
       "source_file": "app/Http/Controllers/Disclosure/ClimateRiskController.php",
       "source_location": "L72",
       "id": "disclosure_climateriskcontroller_climateriskcontroller_destroy",
-      "community": 422,
+      "community": 71,
       "norm_label": ".destroy()"
     },
     {
@@ -5373,7 +5373,7 @@
       "source_file": "app/Http/Controllers/Disclosure/ClimateRiskController.php",
       "source_location": "L82",
       "id": "disclosure_climateriskcontroller_climateriskcontroller_assertowned",
-      "community": 422,
+      "community": 71,
       "norm_label": ".assertowned()"
     },
     {
@@ -5472,7 +5472,7 @@
       "source_file": "app/Http/Controllers/Disclosure/EsgDepthController.php",
       "source_location": "L1",
       "id": "disclosure_esgdepthcontroller",
-      "community": 543,
+      "community": 522,
       "norm_label": "esgdepthcontroller.php"
     },
     {
@@ -5481,7 +5481,7 @@
       "source_file": "app/Http/Controllers/Disclosure/EsgDepthController.php",
       "source_location": "L11",
       "id": "disclosure_esgdepthcontroller_esgdepthcontroller",
-      "community": 543,
+      "community": 522,
       "norm_label": "esgdepthcontroller"
     },
     {
@@ -5490,7 +5490,7 @@
       "source_file": "app/Http/Controllers/Disclosure/EsgDepthController.php",
       "source_location": "L13",
       "id": "disclosure_esgdepthcontroller_esgdepthcontroller_construct",
-      "community": 543,
+      "community": 522,
       "norm_label": ".__construct()"
     },
     {
@@ -5499,7 +5499,7 @@
       "source_file": "app/Http/Controllers/Disclosure/EsgDepthController.php",
       "source_location": "L18",
       "id": "disclosure_esgdepthcontroller_esgdepthcontroller_overview",
-      "community": 543,
+      "community": 522,
       "norm_label": ".overview()"
     },
     {
@@ -5508,7 +5508,7 @@
       "source_file": "app/Http/Controllers/Disclosure/EsgDepthController.php",
       "source_location": "L18",
       "id": "app_http_controllers_disclosure_esgdepthcontroller_php_request",
-      "community": 543,
+      "community": 522,
       "norm_label": "request"
     },
     {
@@ -5634,7 +5634,7 @@
       "source_file": "app/Http/Controllers/Disclosure/EsgSustainabilityTargetController.php",
       "source_location": "L1",
       "id": "disclosure_esgsustainabilitytargetcontroller",
-      "community": 517,
+      "community": 522,
       "norm_label": "esgsustainabilitytargetcontroller.php"
     },
     {
@@ -5643,7 +5643,7 @@
       "source_file": "app/Http/Controllers/Disclosure/EsgSustainabilityTargetController.php",
       "source_location": "L8",
       "id": "disclosure_esgsustainabilitytargetcontroller_esgsustainabilitytargetcontroller",
-      "community": 517,
+      "community": 522,
       "norm_label": "esgsustainabilitytargetcontroller"
     },
     {
@@ -5652,7 +5652,7 @@
       "source_file": "app/Http/Controllers/Disclosure/EsgSustainabilityTargetController.php",
       "source_location": "L10",
       "id": "disclosure_esgsustainabilitytargetcontroller_esgsustainabilitytargetcontroller_index",
-      "community": 517,
+      "community": 522,
       "norm_label": ".index()"
     },
     {
@@ -5661,7 +5661,7 @@
       "source_file": "app/Http/Controllers/Disclosure/EsgSustainabilityTargetController.php",
       "source_location": "L10",
       "id": "app_http_controllers_disclosure_esgsustainabilitytargetcontroller_php_request",
-      "community": 517,
+      "community": 522,
       "norm_label": "request"
     },
     {
@@ -5670,7 +5670,7 @@
       "source_file": "app/Http/Controllers/Disclosure/EsgSustainabilityTargetController.php",
       "source_location": "L28",
       "id": "disclosure_esgsustainabilitytargetcontroller_esgsustainabilitytargetcontroller_store",
-      "community": 517,
+      "community": 522,
       "norm_label": ".store()"
     },
     {
@@ -5679,7 +5679,7 @@
       "source_file": "app/Http/Controllers/Disclosure/EsgSustainabilityTargetController.php",
       "source_location": "L40",
       "id": "disclosure_esgsustainabilitytargetcontroller_esgsustainabilitytargetcontroller_update",
-      "community": 517,
+      "community": 522,
       "norm_label": ".update()"
     },
     {
@@ -5688,7 +5688,7 @@
       "source_file": "app/Http/Controllers/Disclosure/EsgSustainabilityTargetController.php",
       "source_location": "L40",
       "id": "esgsustainabilitytarget",
-      "community": 517,
+      "community": 522,
       "norm_label": "esgsustainabilitytarget"
     },
     {
@@ -5697,7 +5697,7 @@
       "source_file": "app/Http/Controllers/Disclosure/EsgSustainabilityTargetController.php",
       "source_location": "L50",
       "id": "disclosure_esgsustainabilitytargetcontroller_esgsustainabilitytargetcontroller_destroy",
-      "community": 517,
+      "community": 522,
       "norm_label": ".destroy()"
     },
     {
@@ -5706,7 +5706,7 @@
       "source_file": "app/Http/Controllers/Disclosure/EsgSustainabilityTargetController.php",
       "source_location": "L60",
       "id": "disclosure_esgsustainabilitytargetcontroller_esgsustainabilitytargetcontroller_validatetarget",
-      "community": 517,
+      "community": 522,
       "norm_label": ".validatetarget()"
     },
     {
@@ -5715,7 +5715,7 @@
       "source_file": "app/Http/Controllers/Disclosure/EsgSustainabilityTargetController.php",
       "source_location": "L76",
       "id": "disclosure_esgsustainabilitytargetcontroller_esgsustainabilitytargetcontroller_assertowned",
-      "community": 517,
+      "community": 522,
       "norm_label": ".assertowned()"
     },
     {
@@ -6084,7 +6084,7 @@
       "source_file": "app/Http/Controllers/Disclosure/OverviewController.php",
       "source_location": "L1",
       "id": "disclosure_overviewcontroller",
-      "community": 528,
+      "community": 503,
       "norm_label": "overviewcontroller.php"
     },
     {
@@ -6093,7 +6093,7 @@
       "source_file": "app/Http/Controllers/Disclosure/OverviewController.php",
       "source_location": "L9",
       "id": "disclosure_overviewcontroller_overviewcontroller",
-      "community": 528,
+      "community": 503,
       "norm_label": "overviewcontroller"
     },
     {
@@ -6102,7 +6102,7 @@
       "source_file": "app/Http/Controllers/Disclosure/OverviewController.php",
       "source_location": "L11",
       "id": "disclosure_overviewcontroller_overviewcontroller_construct",
-      "community": 528,
+      "community": 503,
       "norm_label": ".__construct()"
     },
     {
@@ -6111,7 +6111,7 @@
       "source_file": "app/Http/Controllers/Disclosure/OverviewController.php",
       "source_location": "L17",
       "id": "disclosure_overviewcontroller_overviewcontroller_hub",
-      "community": 528,
+      "community": 503,
       "norm_label": ".hub()"
     },
     {
@@ -6120,7 +6120,7 @@
       "source_file": "app/Http/Controllers/Disclosure/OverviewController.php",
       "source_location": "L17",
       "id": "app_http_controllers_disclosure_overviewcontroller_php_request",
-      "community": 528,
+      "community": 503,
       "norm_label": "request"
     },
     {
@@ -6129,7 +6129,7 @@
       "source_file": "app/Http/Controllers/Disclosure/OverviewController.php",
       "source_location": "L31",
       "id": "disclosure_overviewcontroller_overviewcontroller_s2",
-      "community": 528,
+      "community": 503,
       "norm_label": ".s2()"
     },
     {
@@ -6138,7 +6138,7 @@
       "source_file": "app/Http/Controllers/Disclosure/OverviewController.php",
       "source_location": "L43",
       "id": "disclosure_overviewcontroller_overviewcontroller_s1",
-      "community": 528,
+      "community": 503,
       "norm_label": ".s1()"
     },
     {
@@ -6147,7 +6147,7 @@
       "source_file": "app/Http/Controllers/Disclosure/OverviewController.php",
       "source_location": "L55",
       "id": "disclosure_overviewcontroller_overviewcontroller_gri",
-      "community": 528,
+      "community": 503,
       "norm_label": ".gri()"
     },
     {
@@ -6156,7 +6156,7 @@
       "source_file": "app/Http/Controllers/Disclosure/OverviewController.php",
       "source_location": "L67",
       "id": "disclosure_overviewcontroller_overviewcontroller_uaeesg",
-      "community": 528,
+      "community": 503,
       "norm_label": ".uaeesg()"
     },
     {
@@ -6552,7 +6552,7 @@
       "source_file": "app/Http/Controllers/Disclosure/SupplyChainSupplierController.php",
       "source_location": "L1",
       "id": "disclosure_supplychainsuppliercontroller",
-      "community": 526,
+      "community": 522,
       "norm_label": "supplychainsuppliercontroller.php"
     },
     {
@@ -6561,7 +6561,7 @@
       "source_file": "app/Http/Controllers/Disclosure/SupplyChainSupplierController.php",
       "source_location": "L8",
       "id": "disclosure_supplychainsuppliercontroller_supplychainsuppliercontroller",
-      "community": 526,
+      "community": 522,
       "norm_label": "supplychainsuppliercontroller"
     },
     {
@@ -6570,7 +6570,7 @@
       "source_file": "app/Http/Controllers/Disclosure/SupplyChainSupplierController.php",
       "source_location": "L10",
       "id": "disclosure_supplychainsuppliercontroller_supplychainsuppliercontroller_index",
-      "community": 526,
+      "community": 522,
       "norm_label": ".index()"
     },
     {
@@ -6579,7 +6579,7 @@
       "source_file": "app/Http/Controllers/Disclosure/SupplyChainSupplierController.php",
       "source_location": "L10",
       "id": "app_http_controllers_disclosure_supplychainsuppliercontroller_php_request",
-      "community": 526,
+      "community": 522,
       "norm_label": "request"
     },
     {
@@ -6588,7 +6588,7 @@
       "source_file": "app/Http/Controllers/Disclosure/SupplyChainSupplierController.php",
       "source_location": "L28",
       "id": "disclosure_supplychainsuppliercontroller_supplychainsuppliercontroller_store",
-      "community": 526,
+      "community": 522,
       "norm_label": ".store()"
     },
     {
@@ -6597,7 +6597,7 @@
       "source_file": "app/Http/Controllers/Disclosure/SupplyChainSupplierController.php",
       "source_location": "L40",
       "id": "disclosure_supplychainsuppliercontroller_supplychainsuppliercontroller_update",
-      "community": 526,
+      "community": 522,
       "norm_label": ".update()"
     },
     {
@@ -6606,7 +6606,7 @@
       "source_file": "app/Http/Controllers/Disclosure/SupplyChainSupplierController.php",
       "source_location": "L40",
       "id": "supplychainsupplier",
-      "community": 526,
+      "community": 522,
       "norm_label": "supplychainsupplier"
     },
     {
@@ -6615,7 +6615,7 @@
       "source_file": "app/Http/Controllers/Disclosure/SupplyChainSupplierController.php",
       "source_location": "L50",
       "id": "disclosure_supplychainsuppliercontroller_supplychainsuppliercontroller_destroy",
-      "community": 526,
+      "community": 522,
       "norm_label": ".destroy()"
     },
     {
@@ -6624,7 +6624,7 @@
       "source_file": "app/Http/Controllers/Disclosure/SupplyChainSupplierController.php",
       "source_location": "L60",
       "id": "disclosure_supplychainsuppliercontroller_supplychainsuppliercontroller_validatesupplier",
-      "community": 526,
+      "community": 522,
       "norm_label": ".validatesupplier()"
     },
     {
@@ -6633,7 +6633,7 @@
       "source_file": "app/Http/Controllers/Disclosure/SupplyChainSupplierController.php",
       "source_location": "L82",
       "id": "disclosure_supplychainsuppliercontroller_supplychainsuppliercontroller_assertowned",
-      "community": 526,
+      "community": 522,
       "norm_label": ".assertowned()"
     },
     {
@@ -6876,7 +6876,7 @@
       "source_file": "app/Http/Controllers/HomeController.php",
       "source_location": "L1",
       "id": "controllers_homecontroller",
-      "community": 22,
+      "community": 515,
       "norm_label": "homecontroller.php"
     },
     {
@@ -6885,7 +6885,7 @@
       "source_file": "app/Http/Controllers/HomeController.php",
       "source_location": "L7",
       "id": "controllers_homecontroller_homecontroller",
-      "community": 22,
+      "community": 515,
       "norm_label": "homecontroller"
     },
     {
@@ -6894,7 +6894,7 @@
       "source_file": "app/Http/Controllers/HomeController.php",
       "source_location": "L9",
       "id": "controllers_homecontroller_homecontroller_index",
-      "community": 22,
+      "community": 515,
       "norm_label": ".index()"
     },
     {
@@ -6903,7 +6903,7 @@
       "source_file": "app/Http/Controllers/IeqtExportController.php",
       "source_location": "L1",
       "id": "controllers_ieqtexportcontroller",
-      "community": 94,
+      "community": 398,
       "norm_label": "ieqtexportcontroller.php"
     },
     {
@@ -6912,7 +6912,7 @@
       "source_file": "app/Http/Controllers/IeqtExportController.php",
       "source_location": "L12",
       "id": "controllers_ieqtexportcontroller_ieqtexportcontroller",
-      "community": 94,
+      "community": 398,
       "norm_label": "ieqtexportcontroller"
     },
     {
@@ -6921,7 +6921,7 @@
       "source_file": "app/Http/Controllers/IeqtExportController.php",
       "source_location": "L14",
       "id": "controllers_ieqtexportcontroller_ieqtexportcontroller_construct",
-      "community": 94,
+      "community": 398,
       "norm_label": ".__construct()"
     },
     {
@@ -6930,7 +6930,7 @@
       "source_file": "app/Http/Controllers/IeqtExportController.php",
       "source_location": "L20",
       "id": "controllers_ieqtexportcontroller_ieqtexportcontroller_export",
-      "community": 94,
+      "community": 398,
       "norm_label": ".export()"
     },
     {
@@ -6939,7 +6939,7 @@
       "source_file": "app/Http/Controllers/IeqtExportController.php",
       "source_location": "L20",
       "id": "app_http_controllers_ieqtexportcontroller_php_request",
-      "community": 94,
+      "community": 398,
       "norm_label": "request"
     },
     {
@@ -6948,7 +6948,7 @@
       "source_file": "app/Http/Controllers/InvitationController.php",
       "source_location": "L1",
       "id": "controllers_invitationcontroller",
-      "community": 506,
+      "community": 5,
       "norm_label": "invitationcontroller.php"
     },
     {
@@ -6957,7 +6957,7 @@
       "source_file": "app/Http/Controllers/InvitationController.php",
       "source_location": "L10",
       "id": "controllers_invitationcontroller_invitationcontroller",
-      "community": 506,
+      "community": 5,
       "norm_label": "invitationcontroller"
     },
     {
@@ -6966,7 +6966,7 @@
       "source_file": "app/Http/Controllers/InvitationController.php",
       "source_location": "L14",
       "id": "controllers_invitationcontroller_invitationcontroller_construct",
-      "community": 506,
+      "community": 5,
       "norm_label": ".__construct()"
     },
     {
@@ -6975,7 +6975,7 @@
       "source_file": "app/Http/Controllers/InvitationController.php",
       "source_location": "L14",
       "id": "app_http_controllers_invitationcontroller_php_companyinvitationservice",
-      "community": 506,
+      "community": 5,
       "norm_label": "companyinvitationservice"
     },
     {
@@ -6984,7 +6984,7 @@
       "source_file": "app/Http/Controllers/InvitationController.php",
       "source_location": "L22",
       "id": "controllers_invitationcontroller_invitationcontroller_accept",
-      "community": 506,
+      "community": 5,
       "norm_label": ".accept()"
     },
     {
@@ -6993,7 +6993,7 @@
       "source_file": "app/Http/Controllers/InvitationController.php",
       "source_location": "L97",
       "id": "controllers_invitationcontroller_invitationcontroller_processaccept",
-      "community": 506,
+      "community": 5,
       "norm_label": ".processaccept()"
     },
     {
@@ -7002,7 +7002,7 @@
       "source_file": "app/Http/Controllers/InvitationController.php",
       "source_location": "L97",
       "id": "app_http_controllers_invitationcontroller_php_request",
-      "community": 506,
+      "community": 5,
       "norm_label": "request"
     },
     {
@@ -7011,7 +7011,7 @@
       "source_file": "app/Http/Controllers/InvitationController.php",
       "source_location": "L240",
       "id": "controllers_invitationcontroller_invitationcontroller_setuppassword",
-      "community": 506,
+      "community": 5,
       "norm_label": ".setuppassword()"
     },
     {
@@ -7020,7 +7020,7 @@
       "source_file": "app/Http/Controllers/InvitationController.php",
       "source_location": "L273",
       "id": "controllers_invitationcontroller_invitationcontroller_processsetuppassword",
-      "community": 506,
+      "community": 5,
       "norm_label": ".processsetuppassword()"
     },
     {
@@ -7317,7 +7317,7 @@
       "source_file": "app/Http/Controllers/PortalGuideController.php",
       "source_location": "L1",
       "id": "controllers_portalguidecontroller",
-      "community": 22,
+      "community": 545,
       "norm_label": "portalguidecontroller.php"
     },
     {
@@ -7326,7 +7326,7 @@
       "source_file": "app/Http/Controllers/PortalGuideController.php",
       "source_location": "L5",
       "id": "controllers_portalguidecontroller_portalguidecontroller",
-      "community": 22,
+      "community": 545,
       "norm_label": "portalguidecontroller"
     },
     {
@@ -7335,7 +7335,7 @@
       "source_file": "app/Http/Controllers/PortalGuideController.php",
       "source_location": "L7",
       "id": "controllers_portalguidecontroller_portalguidecontroller_company",
-      "community": 22,
+      "community": 545,
       "norm_label": ".company()"
     },
     {
@@ -7344,7 +7344,7 @@
       "source_file": "app/Http/Controllers/PortalGuideController.php",
       "source_location": "L18",
       "id": "controllers_portalguidecontroller_portalguidecontroller_consultant",
-      "community": 22,
+      "community": 545,
       "norm_label": ".consultant()"
     },
     {
@@ -7353,7 +7353,7 @@
       "source_file": "app/Http/Controllers/ProfileController.php",
       "source_location": "L1",
       "id": "controllers_profilecontroller",
-      "community": 51,
+      "community": 353,
       "norm_label": "profilecontroller.php"
     },
     {
@@ -7362,7 +7362,7 @@
       "source_file": "app/Http/Controllers/ProfileController.php",
       "source_location": "L16",
       "id": "controllers_profilecontroller_profilecontroller",
-      "community": 51,
+      "community": 353,
       "norm_label": "profilecontroller"
     },
     {
@@ -7371,7 +7371,7 @@
       "source_file": "app/Http/Controllers/ProfileController.php",
       "source_location": "L18",
       "id": "controllers_profilecontroller_profilecontroller_index",
-      "community": 51,
+      "community": 353,
       "norm_label": ".index()"
     },
     {
@@ -7380,7 +7380,7 @@
       "source_file": "app/Http/Controllers/ProfileController.php",
       "source_location": "L50",
       "id": "controllers_profilecontroller_profilecontroller_updatepersonal",
-      "community": 51,
+      "community": 353,
       "norm_label": ".updatepersonal()"
     },
     {
@@ -7389,7 +7389,7 @@
       "source_file": "app/Http/Controllers/ProfileController.php",
       "source_location": "L50",
       "id": "app_http_controllers_profilecontroller_php_request",
-      "community": 51,
+      "community": 353,
       "norm_label": "request"
     },
     {
@@ -7398,7 +7398,7 @@
       "source_file": "app/Http/Controllers/ProfileController.php",
       "source_location": "L71",
       "id": "controllers_profilecontroller_profilecontroller_updatepassword",
-      "community": 51,
+      "community": 353,
       "norm_label": ".updatepassword()"
     },
     {
@@ -7407,7 +7407,7 @@
       "source_file": "app/Http/Controllers/ProfileController.php",
       "source_location": "L109",
       "id": "controllers_profilecontroller_profilecontroller_updatecompany",
-      "community": 51,
+      "community": 353,
       "norm_label": ".updatecompany()"
     },
     {
@@ -8046,7 +8046,7 @@
       "source_file": "app/Http/Controllers/RoleManagementController.php",
       "source_location": "L1",
       "id": "controllers_rolemanagementcontroller",
-      "community": 501,
+      "community": 30,
       "norm_label": "rolemanagementcontroller.php"
     },
     {
@@ -8055,7 +8055,7 @@
       "source_file": "app/Http/Controllers/RoleManagementController.php",
       "source_location": "L11",
       "id": "controllers_rolemanagementcontroller_rolemanagementcontroller",
-      "community": 501,
+      "community": 30,
       "norm_label": "rolemanagementcontroller"
     },
     {
@@ -8064,7 +8064,7 @@
       "source_file": "app/Http/Controllers/RoleManagementController.php",
       "source_location": "L13",
       "id": "controllers_rolemanagementcontroller_rolemanagementcontroller_construct",
-      "community": 501,
+      "community": 30,
       "norm_label": ".__construct()"
     },
     {
@@ -8073,7 +8073,7 @@
       "source_file": "app/Http/Controllers/RoleManagementController.php",
       "source_location": "L19",
       "id": "controllers_rolemanagementcontroller_rolemanagementcontroller_index",
-      "community": 501,
+      "community": 30,
       "norm_label": ".index()"
     },
     {
@@ -8082,7 +8082,7 @@
       "source_file": "app/Http/Controllers/RoleManagementController.php",
       "source_location": "L55",
       "id": "controllers_rolemanagementcontroller_rolemanagementcontroller_create",
-      "community": 501,
+      "community": 30,
       "norm_label": ".create()"
     },
     {
@@ -8091,7 +8091,7 @@
       "source_file": "app/Http/Controllers/RoleManagementController.php",
       "source_location": "L73",
       "id": "controllers_rolemanagementcontroller_rolemanagementcontroller_store",
-      "community": 501,
+      "community": 30,
       "norm_label": ".store()"
     },
     {
@@ -8100,7 +8100,7 @@
       "source_file": "app/Http/Controllers/RoleManagementController.php",
       "source_location": "L73",
       "id": "app_http_controllers_rolemanagementcontroller_php_request",
-      "community": 501,
+      "community": 30,
       "norm_label": "request"
     },
     {
@@ -8109,7 +8109,7 @@
       "source_file": "app/Http/Controllers/RoleManagementController.php",
       "source_location": "L103",
       "id": "controllers_rolemanagementcontroller_rolemanagementcontroller_edit",
-      "community": 501,
+      "community": 30,
       "norm_label": ".edit()"
     },
     {
@@ -8118,7 +8118,7 @@
       "source_file": "app/Http/Controllers/RoleManagementController.php",
       "source_location": "L103",
       "id": "companycustomrole",
-      "community": 501,
+      "community": 30,
       "norm_label": "companycustomrole"
     },
     {
@@ -8127,7 +8127,7 @@
       "source_file": "app/Http/Controllers/RoleManagementController.php",
       "source_location": "L122",
       "id": "controllers_rolemanagementcontroller_rolemanagementcontroller_update",
-      "community": 501,
+      "community": 30,
       "norm_label": ".update()"
     },
     {
@@ -8136,7 +8136,7 @@
       "source_file": "app/Http/Controllers/RoleManagementController.php",
       "source_location": "L150",
       "id": "controllers_rolemanagementcontroller_rolemanagementcontroller_destroy",
-      "community": 501,
+      "community": 30,
       "norm_label": ".destroy()"
     },
     {
@@ -8217,7 +8217,7 @@
       "source_file": "app/Http/Controllers/StaffManagementController.php",
       "source_location": "L1",
       "id": "controllers_staffmanagementcontroller",
-      "community": 79,
+      "community": 5,
       "norm_label": "staffmanagementcontroller.php"
     },
     {
@@ -8226,7 +8226,7 @@
       "source_file": "app/Http/Controllers/StaffManagementController.php",
       "source_location": "L17",
       "id": "controllers_staffmanagementcontroller_staffmanagementcontroller",
-      "community": 79,
+      "community": 5,
       "norm_label": "staffmanagementcontroller"
     },
     {
@@ -8235,7 +8235,7 @@
       "source_file": "app/Http/Controllers/StaffManagementController.php",
       "source_location": "L22",
       "id": "controllers_staffmanagementcontroller_staffmanagementcontroller_construct",
-      "community": 79,
+      "community": 5,
       "norm_label": ".__construct()"
     },
     {
@@ -8244,7 +8244,7 @@
       "source_file": "app/Http/Controllers/StaffManagementController.php",
       "source_location": "L22",
       "id": "app_http_controllers_staffmanagementcontroller_php_companyinvitationservice",
-      "community": 79,
+      "community": 5,
       "norm_label": "companyinvitationservice"
     },
     {
@@ -8253,7 +8253,7 @@
       "source_file": "app/Http/Controllers/StaffManagementController.php",
       "source_location": "L22",
       "id": "app_http_controllers_staffmanagementcontroller_php_subscriptionservice",
-      "community": 79,
+      "community": 5,
       "norm_label": "subscriptionservice"
     },
     {
@@ -8262,7 +8262,7 @@
       "source_file": "app/Http/Controllers/StaffManagementController.php",
       "source_location": "L34",
       "id": "controllers_staffmanagementcontroller_staffmanagementcontroller_index",
-      "community": 79,
+      "community": 5,
       "norm_label": ".index()"
     },
     {
@@ -8271,7 +8271,7 @@
       "source_file": "app/Http/Controllers/StaffManagementController.php",
       "source_location": "L78",
       "id": "controllers_staffmanagementcontroller_staffmanagementcontroller_create",
-      "community": 79,
+      "community": 5,
       "norm_label": ".create()"
     },
     {
@@ -8280,7 +8280,7 @@
       "source_file": "app/Http/Controllers/StaffManagementController.php",
       "source_location": "L102",
       "id": "controllers_staffmanagementcontroller_staffmanagementcontroller_store",
-      "community": 79,
+      "community": 5,
       "norm_label": ".store()"
     },
     {
@@ -8289,7 +8289,7 @@
       "source_file": "app/Http/Controllers/StaffManagementController.php",
       "source_location": "L102",
       "id": "app_http_controllers_staffmanagementcontroller_php_request",
-      "community": 79,
+      "community": 5,
       "norm_label": "request"
     },
     {
@@ -8298,7 +8298,7 @@
       "source_file": "app/Http/Controllers/StaffManagementController.php",
       "source_location": "L249",
       "id": "controllers_staffmanagementcontroller_staffmanagementcontroller_updaterole",
-      "community": 79,
+      "community": 5,
       "norm_label": ".updaterole()"
     },
     {
@@ -8307,7 +8307,7 @@
       "source_file": "app/Http/Controllers/StaffManagementController.php",
       "source_location": "L282",
       "id": "controllers_staffmanagementcontroller_staffmanagementcontroller_destroy",
-      "community": 91,
+      "community": 5,
       "norm_label": ".destroy()"
     },
     {
@@ -8316,7 +8316,7 @@
       "source_file": "app/Http/Controllers/StaffManagementController.php",
       "source_location": "L380",
       "id": "controllers_staffmanagementcontroller_staffmanagementcontroller_invitationsuccess",
-      "community": 79,
+      "community": 5,
       "norm_label": ".invitationsuccess()"
     },
     {
@@ -8325,7 +8325,7 @@
       "source_file": "app/Http/Controllers/StaffManagementController.php",
       "source_location": "L481",
       "id": "controllers_staffmanagementcontroller_staffmanagementcontroller_resendinvitation",
-      "community": 79,
+      "community": 5,
       "norm_label": ".resendinvitation()"
     },
     {
@@ -8334,7 +8334,7 @@
       "source_file": "app/Http/Controllers/StaffManagementController.php",
       "source_location": "L481",
       "id": "app_http_controllers_staffmanagementcontroller_php_companyinvitation",
-      "community": 79,
+      "community": 5,
       "norm_label": "companyinvitation"
     },
     {
@@ -8343,7 +8343,7 @@
       "source_file": "app/Http/Controllers/StaffManagementController.php",
       "source_location": "L517",
       "id": "controllers_staffmanagementcontroller_staffmanagementcontroller_cancelinvitation",
-      "community": 79,
+      "community": 5,
       "norm_label": ".cancelinvitation()"
     },
     {
@@ -8406,7 +8406,7 @@
       "source_file": "app/Http/Middleware/CheckDisclosureAccess.php",
       "source_location": "L1",
       "id": "middleware_checkdisclosureaccess",
-      "community": 112,
+      "community": 415,
       "norm_label": "checkdisclosureaccess.php"
     },
     {
@@ -8415,7 +8415,7 @@
       "source_file": "app/Http/Middleware/CheckDisclosureAccess.php",
       "source_location": "L10",
       "id": "middleware_checkdisclosureaccess_checkdisclosureaccess",
-      "community": 112,
+      "community": 415,
       "norm_label": "checkdisclosureaccess"
     },
     {
@@ -8424,7 +8424,7 @@
       "source_file": "app/Http/Middleware/CheckDisclosureAccess.php",
       "source_location": "L12",
       "id": "middleware_checkdisclosureaccess_checkdisclosureaccess_handle",
-      "community": 112,
+      "community": 415,
       "norm_label": ".handle()"
     },
     {
@@ -8433,7 +8433,7 @@
       "source_file": "app/Http/Middleware/CheckDisclosureAccess.php",
       "source_location": "L12",
       "id": "app_http_middleware_checkdisclosureaccess_php_request",
-      "community": 112,
+      "community": 415,
       "norm_label": "request"
     },
     {
@@ -8442,7 +8442,7 @@
       "source_file": "app/Http/Middleware/CheckDisclosureAccess.php",
       "source_location": "L12",
       "id": "app_http_middleware_checkdisclosureaccess_php_closure",
-      "community": 112,
+      "community": 415,
       "norm_label": "closure"
     },
     {
@@ -8451,7 +8451,7 @@
       "source_file": "app/Http/Middleware/CheckDisclosureAccess.php",
       "source_location": "L12",
       "id": "app_http_middleware_checkdisclosureaccess_php_response",
-      "community": 112,
+      "community": 415,
       "norm_label": "response"
     },
     {
@@ -9108,7 +9108,7 @@
       "source_file": "app/Mail/Concerns/AppliesGlobalBcc.php",
       "source_location": "L1",
       "id": "concerns_appliesglobalbcc",
-      "community": 415,
+      "community": 4,
       "norm_label": "appliesglobalbcc.php"
     },
     {
@@ -9117,7 +9117,7 @@
       "source_file": "app/Mail/Concerns/AppliesGlobalBcc.php",
       "source_location": "L9",
       "id": "concerns_appliesglobalbcc_globalbccaddress",
-      "community": 415,
+      "community": 4,
       "norm_label": "globalbccaddress()"
     },
     {
@@ -9126,7 +9126,7 @@
       "source_file": "app/Mail/Concerns/AppliesGlobalBcc.php",
       "source_location": "L19",
       "id": "concerns_appliesglobalbcc_applyglobalbcc",
-      "community": 415,
+      "community": 4,
       "norm_label": "applyglobalbcc()"
     },
     {
@@ -9549,7 +9549,7 @@
       "source_file": "app/Models/AgricultureData.php",
       "source_location": "L1",
       "id": "models_agriculturedata",
-      "community": 6,
+      "community": 7,
       "norm_label": "agriculturedata.php"
     },
     {
@@ -9558,7 +9558,7 @@
       "source_file": "app/Models/AgricultureData.php",
       "source_location": "L8",
       "id": "models_agriculturedata_agriculturedata",
-      "community": 6,
+      "community": 7,
       "norm_label": "agriculturedata"
     },
     {
@@ -9567,7 +9567,7 @@
       "source_file": "app/Models/AgricultureData.php",
       "source_location": "L18",
       "id": "models_agriculturedata_agriculturedata_facility",
-      "community": 6,
+      "community": 7,
       "norm_label": ".facility()"
     },
     {
@@ -9738,7 +9738,7 @@
       "source_file": "app/Models/ClientBillingMethod.php",
       "source_location": "L1",
       "id": "models_clientbillingmethod",
-      "community": 6,
+      "community": 91,
       "norm_label": "clientbillingmethod.php"
     },
     {
@@ -9747,7 +9747,7 @@
       "source_file": "app/Models/ClientBillingMethod.php",
       "source_location": "L8",
       "id": "models_clientbillingmethod_clientbillingmethod",
-      "community": 6,
+      "community": 91,
       "norm_label": "clientbillingmethod"
     },
     {
@@ -9756,7 +9756,7 @@
       "source_file": "app/Models/ClientBillingMethod.php",
       "source_location": "L45",
       "id": "models_clientbillingmethod_clientbillingmethod_company",
-      "community": 6,
+      "community": 91,
       "norm_label": ".company()"
     },
     {
@@ -9765,7 +9765,7 @@
       "source_file": "app/Models/ClientBillingMethod.php",
       "source_location": "L53",
       "id": "models_clientbillingmethod_clientbillingmethod_addedby",
-      "community": 6,
+      "community": 91,
       "norm_label": ".addedby()"
     },
     {
@@ -9774,7 +9774,7 @@
       "source_file": "app/Models/ClientBillingMethod.php",
       "source_location": "L61",
       "id": "models_clientbillingmethod_clientbillingmethod_scopeactive",
-      "community": 6,
+      "community": 91,
       "norm_label": ".scopeactive()"
     },
     {
@@ -9783,7 +9783,7 @@
       "source_file": "app/Models/ClientBillingMethod.php",
       "source_location": "L69",
       "id": "models_clientbillingmethod_clientbillingmethod_scopedefault",
-      "community": 6,
+      "community": 91,
       "norm_label": ".scopedefault()"
     },
     {
@@ -9792,7 +9792,7 @@
       "source_file": "app/Models/ClientBillingMethod.php",
       "source_location": "L77",
       "id": "models_clientbillingmethod_clientbillingmethod_getcarddisplayattribute",
-      "community": 6,
+      "community": 91,
       "norm_label": ".getcarddisplayattribute()"
     },
     {
@@ -9801,7 +9801,7 @@
       "source_file": "app/Models/ClientBillingMethod.php",
       "source_location": "L88",
       "id": "models_clientbillingmethod_clientbillingmethod_getexpirationdateattribute",
-      "community": 6,
+      "community": 91,
       "norm_label": ".getexpirationdateattribute()"
     },
     {
@@ -9810,7 +9810,7 @@
       "source_file": "app/Models/ClientSubscription.php",
       "source_location": "L1",
       "id": "models_clientsubscription",
-      "community": 515,
+      "community": 6,
       "norm_label": "clientsubscription.php"
     },
     {
@@ -9819,7 +9819,7 @@
       "source_file": "app/Models/ClientSubscription.php",
       "source_location": "L8",
       "id": "models_clientsubscription_clientsubscription",
-      "community": 515,
+      "community": 6,
       "norm_label": "clientsubscription"
     },
     {
@@ -9828,7 +9828,7 @@
       "source_file": "app/Models/ClientSubscription.php",
       "source_location": "L36",
       "id": "models_clientsubscription_clientsubscription_company",
-      "community": 515,
+      "community": 6,
       "norm_label": ".company()"
     },
     {
@@ -9837,7 +9837,7 @@
       "source_file": "app/Models/ClientSubscription.php",
       "source_location": "L44",
       "id": "models_clientsubscription_clientsubscription_plan",
-      "community": 515,
+      "community": 6,
       "norm_label": ".plan()"
     },
     {
@@ -9846,7 +9846,7 @@
       "source_file": "app/Models/ClientSubscription.php",
       "source_location": "L52",
       "id": "models_clientsubscription_clientsubscription_isactive",
-      "community": 515,
+      "community": 6,
       "norm_label": ".isactive()"
     },
     {
@@ -9855,7 +9855,7 @@
       "source_file": "app/Models/ClientSubscription.php",
       "source_location": "L60",
       "id": "models_clientsubscription_clientsubscription_isexpired",
-      "community": 515,
+      "community": 6,
       "norm_label": ".isexpired()"
     },
     {
@@ -9864,7 +9864,7 @@
       "source_file": "app/Models/ClientSubscription.php",
       "source_location": "L68",
       "id": "models_clientsubscription_clientsubscription_scopeactive",
-      "community": 515,
+      "community": 6,
       "norm_label": ".scopeactive()"
     },
     {
@@ -9909,7 +9909,7 @@
       "source_file": "app/Models/ClimateRisk.php",
       "source_location": "L1",
       "id": "models_climaterisk",
-      "community": 7,
+      "community": 502,
       "norm_label": "climaterisk.php"
     },
     {
@@ -9918,7 +9918,7 @@
       "source_file": "app/Models/ClimateRisk.php",
       "source_location": "L8",
       "id": "models_climaterisk_climaterisk",
-      "community": 7,
+      "community": 502,
       "norm_label": "climaterisk"
     },
     {
@@ -9927,7 +9927,7 @@
       "source_file": "app/Models/ClimateRisk.php",
       "source_location": "L21",
       "id": "models_climaterisk_climaterisk_company",
-      "community": 7,
+      "community": 502,
       "norm_label": ".company()"
     },
     {
@@ -9936,7 +9936,7 @@
       "source_file": "app/Models/ClimateRisk.php",
       "source_location": "L21",
       "id": "app_models_climaterisk_php_belongsto",
-      "community": 7,
+      "community": 502,
       "norm_label": "belongsto"
     },
     {
@@ -10395,7 +10395,7 @@
       "source_file": "app/Models/CompanyDisclosure.php",
       "source_location": "L1",
       "id": "models_companydisclosure",
-      "community": 7,
+      "community": 508,
       "norm_label": "companydisclosure.php"
     },
     {
@@ -10404,7 +10404,7 @@
       "source_file": "app/Models/CompanyDisclosure.php",
       "source_location": "L8",
       "id": "models_companydisclosure_companydisclosure",
-      "community": 7,
+      "community": 508,
       "norm_label": "companydisclosure"
     },
     {
@@ -10413,7 +10413,7 @@
       "source_file": "app/Models/CompanyDisclosure.php",
       "source_location": "L20",
       "id": "models_companydisclosure_companydisclosure_company",
-      "community": 7,
+      "community": 508,
       "norm_label": ".company()"
     },
     {
@@ -10422,7 +10422,7 @@
       "source_file": "app/Models/CompanyDisclosure.php",
       "source_location": "L20",
       "id": "app_models_companydisclosure_php_belongsto",
-      "community": 7,
+      "community": 508,
       "norm_label": "belongsto"
     },
     {
@@ -10431,7 +10431,7 @@
       "source_file": "app/Models/CompanyDisclosure.php",
       "source_location": "L25",
       "id": "models_companydisclosure_companydisclosure_editor",
-      "community": 7,
+      "community": 508,
       "norm_label": ".editor()"
     },
     {
@@ -11160,7 +11160,7 @@
       "source_file": "app/Models/ConsultantPublicInquiry.php",
       "source_location": "L1",
       "id": "models_consultantpublicinquiry",
-      "community": 547,
+      "community": 7,
       "norm_label": "consultantpublicinquiry.php"
     },
     {
@@ -11169,7 +11169,7 @@
       "source_file": "app/Models/ConsultantPublicInquiry.php",
       "source_location": "L8",
       "id": "models_consultantpublicinquiry_consultantpublicinquiry",
-      "community": 547,
+      "community": 7,
       "norm_label": "consultantpublicinquiry"
     },
     {
@@ -11178,7 +11178,7 @@
       "source_file": "app/Models/ConsultantPublicInquiry.php",
       "source_location": "L21",
       "id": "models_consultantpublicinquiry_consultantpublicinquiry_consultant",
-      "community": 547,
+      "community": 7,
       "norm_label": ".consultant()"
     },
     {
@@ -11187,7 +11187,7 @@
       "source_file": "app/Models/ConsultantPublicInquiry.php",
       "source_location": "L21",
       "id": "app_models_consultantpublicinquiry_php_belongsto",
-      "community": 547,
+      "community": 7,
       "norm_label": "belongsto"
     },
     {
@@ -11212,7 +11212,7 @@
       "label": ".consultantCompany()",
       "file_type": "code",
       "source_file": "app/Models/ConsultantSubscription.php",
-      "source_location": "L36",
+      "source_location": "L34",
       "id": "models_consultantsubscription_consultantsubscription_consultantcompany",
       "community": 42,
       "norm_label": ".consultantcompany()"
@@ -11221,7 +11221,7 @@
       "label": "BelongsTo",
       "file_type": "code",
       "source_file": "app/Models/ConsultantSubscription.php",
-      "source_location": "L36",
+      "source_location": "L34",
       "id": "app_models_consultantsubscription_php_belongsto",
       "community": 42,
       "norm_label": "belongsto"
@@ -11230,7 +11230,7 @@
       "label": ".plan()",
       "file_type": "code",
       "source_file": "app/Models/ConsultantSubscription.php",
-      "source_location": "L41",
+      "source_location": "L39",
       "id": "models_consultantsubscription_consultantsubscription_plan",
       "community": 42,
       "norm_label": ".plan()"
@@ -11239,7 +11239,7 @@
       "label": ".paymentTransaction()",
       "file_type": "code",
       "source_file": "app/Models/ConsultantSubscription.php",
-      "source_location": "L46",
+      "source_location": "L44",
       "id": "models_consultantsubscription_consultantsubscription_paymenttransaction",
       "community": 42,
       "norm_label": ".paymenttransaction()"
@@ -11248,7 +11248,7 @@
       "label": ".engagements()",
       "file_type": "code",
       "source_file": "app/Models/ConsultantSubscription.php",
-      "source_location": "L51",
+      "source_location": "L49",
       "id": "models_consultantsubscription_consultantsubscription_engagements",
       "community": 42,
       "norm_label": ".engagements()"
@@ -11257,7 +11257,7 @@
       "label": "HasMany",
       "file_type": "code",
       "source_file": "app/Models/ConsultantSubscription.php",
-      "source_location": "L51",
+      "source_location": "L49",
       "id": "app_models_consultantsubscription_php_hasmany",
       "community": 42,
       "norm_label": "hasmany"
@@ -11266,7 +11266,7 @@
       "label": ".addons()",
       "file_type": "code",
       "source_file": "app/Models/ConsultantSubscription.php",
-      "source_location": "L56",
+      "source_location": "L54",
       "id": "models_consultantsubscription_consultantsubscription_addons",
       "community": 42,
       "norm_label": ".addons()"
@@ -11275,7 +11275,7 @@
       "label": ".isActive()",
       "file_type": "code",
       "source_file": "app/Models/ConsultantSubscription.php",
-      "source_location": "L61",
+      "source_location": "L59",
       "id": "models_consultantsubscription_consultantsubscription_isactive",
       "community": 42,
       "norm_label": ".isactive()"
@@ -11284,7 +11284,7 @@
       "label": ".isFreeTrial()",
       "file_type": "code",
       "source_file": "app/Models/ConsultantSubscription.php",
-      "source_location": "L66",
+      "source_location": "L64",
       "id": "models_consultantsubscription_consultantsubscription_isfreetrial",
       "community": 42,
       "norm_label": ".isfreetrial()"
@@ -11293,7 +11293,7 @@
       "label": ".scopeActive()",
       "file_type": "code",
       "source_file": "app/Models/ConsultantSubscription.php",
-      "source_location": "L83",
+      "source_location": "L81",
       "id": "models_consultantsubscription_consultantsubscription_scopeactive",
       "community": 42,
       "norm_label": ".scopeactive()"
@@ -11302,7 +11302,7 @@
       "label": ".scopeForConsultant()",
       "file_type": "code",
       "source_file": "app/Models/ConsultantSubscription.php",
-      "source_location": "L89",
+      "source_location": "L87",
       "id": "models_consultantsubscription_consultantsubscription_scopeforconsultant",
       "community": 42,
       "norm_label": ".scopeforconsultant()"
@@ -11682,7 +11682,7 @@
       "source_file": "app/Models/EmissionSourceFormField.php",
       "source_location": "L1",
       "id": "models_emissionsourceformfield",
-      "community": 516,
+      "community": 0,
       "norm_label": "emissionsourceformfield.php"
     },
     {
@@ -11691,7 +11691,7 @@
       "source_file": "app/Models/EmissionSourceFormField.php",
       "source_location": "L9",
       "id": "models_emissionsourceformfield_emissionsourceformfield",
-      "community": 516,
+      "community": 0,
       "norm_label": "emissionsourceformfield"
     },
     {
@@ -11700,7 +11700,7 @@
       "source_file": "app/Models/EmissionSourceFormField.php",
       "source_location": "L35",
       "id": "models_emissionsourceformfield_emissionsourceformfield_emissionsource",
-      "community": 516,
+      "community": 0,
       "norm_label": ".emissionsource()"
     },
     {
@@ -11709,7 +11709,7 @@
       "source_file": "app/Models/EmissionSourceFormField.php",
       "source_location": "L43",
       "id": "models_emissionsourceformfield_emissionsourceformfield_getfieldsforsource",
-      "community": 516,
+      "community": 0,
       "norm_label": ".getfieldsforsource()"
     },
     {
@@ -11718,7 +11718,7 @@
       "source_file": "app/Models/EmissionSourceFormField.php",
       "source_location": "L53",
       "id": "models_emissionsourceformfield_emissionsourceformfield_resolvedhelptext",
-      "community": 516,
+      "community": 0,
       "norm_label": ".resolvedhelptext()"
     },
     {
@@ -11817,7 +11817,7 @@
       "source_file": "app/Models/EnergyData.php",
       "source_location": "L1",
       "id": "models_energydata",
-      "community": 6,
+      "community": 7,
       "norm_label": "energydata.php"
     },
     {
@@ -11826,7 +11826,7 @@
       "source_file": "app/Models/EnergyData.php",
       "source_location": "L8",
       "id": "models_energydata_energydata",
-      "community": 6,
+      "community": 7,
       "norm_label": "energydata"
     },
     {
@@ -11835,7 +11835,7 @@
       "source_file": "app/Models/EnergyData.php",
       "source_location": "L18",
       "id": "models_energydata_energydata_facility",
-      "community": 6,
+      "community": 7,
       "norm_label": ".facility()"
     },
     {
@@ -11916,7 +11916,7 @@
       "source_file": "app/Models/Facility.php",
       "source_location": "L1",
       "id": "models_facility",
-      "community": 57,
+      "community": 376,
       "norm_label": "facility.php"
     },
     {
@@ -11925,7 +11925,7 @@
       "source_file": "app/Models/Facility.php",
       "source_location": "L8",
       "id": "models_facility_facility",
-      "community": 57,
+      "community": 376,
       "norm_label": "facility"
     },
     {
@@ -11934,7 +11934,7 @@
       "source_file": "app/Models/Facility.php",
       "source_location": "L16",
       "id": "models_facility_facility_company",
-      "community": 57,
+      "community": 376,
       "norm_label": ".company()"
     },
     {
@@ -11943,7 +11943,7 @@
       "source_file": "app/Models/Facility.php",
       "source_location": "L21",
       "id": "models_facility_facility_energydata",
-      "community": 57,
+      "community": 376,
       "norm_label": ".energydata()"
     },
     {
@@ -11952,7 +11952,7 @@
       "source_file": "app/Models/Facility.php",
       "source_location": "L26",
       "id": "models_facility_facility_transportdata",
-      "community": 57,
+      "community": 376,
       "norm_label": ".transportdata()"
     },
     {
@@ -11961,7 +11961,7 @@
       "source_file": "app/Models/Facility.php",
       "source_location": "L31",
       "id": "models_facility_facility_industrialdata",
-      "community": 57,
+      "community": 376,
       "norm_label": ".industrialdata()"
     },
     {
@@ -11970,7 +11970,7 @@
       "source_file": "app/Models/Facility.php",
       "source_location": "L36",
       "id": "models_facility_facility_wastedata",
-      "community": 57,
+      "community": 376,
       "norm_label": ".wastedata()"
     },
     {
@@ -11979,7 +11979,7 @@
       "source_file": "app/Models/Facility.php",
       "source_location": "L41",
       "id": "models_facility_facility_agriculturedata",
-      "community": 57,
+      "community": 376,
       "norm_label": ".agriculturedata()"
     },
     {
@@ -12186,7 +12186,7 @@
       "source_file": "app/Models/LocationEmissionBoundary.php",
       "source_location": "L1",
       "id": "models_locationemissionboundary",
-      "community": 527,
+      "community": 6,
       "norm_label": "locationemissionboundary.php"
     },
     {
@@ -12195,7 +12195,7 @@
       "source_file": "app/Models/LocationEmissionBoundary.php",
       "source_location": "L8",
       "id": "models_locationemissionboundary_locationemissionboundary",
-      "community": 527,
+      "community": 6,
       "norm_label": "locationemissionboundary"
     },
     {
@@ -12204,7 +12204,7 @@
       "source_file": "app/Models/LocationEmissionBoundary.php",
       "source_location": "L25",
       "id": "models_locationemissionboundary_locationemissionboundary_location",
-      "community": 527,
+      "community": 6,
       "norm_label": ".location()"
     },
     {
@@ -12213,7 +12213,7 @@
       "source_file": "app/Models/LocationEmissionBoundary.php",
       "source_location": "L33",
       "id": "models_locationemissionboundary_locationemissionboundary_emissionsources",
-      "community": 527,
+      "community": 6,
       "norm_label": ".emissionsources()"
     },
     {
@@ -12222,7 +12222,7 @@
       "source_file": "app/Models/LocationEmissionBoundary.php",
       "source_location": "L43",
       "id": "models_locationemissionboundary_locationemissionboundary_hassource",
-      "community": 527,
+      "community": 6,
       "norm_label": ".hassource()"
     },
     {
@@ -12231,7 +12231,7 @@
       "source_file": "app/Models/LocationEmissionBoundary.php",
       "source_location": "L51",
       "id": "models_locationemissionboundary_locationemissionboundary_addsource",
-      "community": 527,
+      "community": 6,
       "norm_label": ".addsource()"
     },
     {
@@ -12240,7 +12240,7 @@
       "source_file": "app/Models/LocationEmissionBoundary.php",
       "source_location": "L63",
       "id": "models_locationemissionboundary_locationemissionboundary_removesource",
-      "community": 527,
+      "community": 6,
       "norm_label": ".removesource()"
     },
     {
@@ -12654,7 +12654,7 @@
       "source_file": "app/Models/MeasurementData.php",
       "source_location": "L1",
       "id": "models_measurementdata",
-      "community": 529,
+      "community": 6,
       "norm_label": "measurementdata.php"
     },
     {
@@ -12663,7 +12663,7 @@
       "source_file": "app/Models/MeasurementData.php",
       "source_location": "L8",
       "id": "models_measurementdata_measurementdata",
-      "community": 529,
+      "community": 6,
       "norm_label": "measurementdata"
     },
     {
@@ -12672,7 +12672,7 @@
       "source_file": "app/Models/MeasurementData.php",
       "source_location": "L59",
       "id": "models_measurementdata_measurementdata_measurement",
-      "community": 529,
+      "community": 6,
       "norm_label": ".measurement()"
     },
     {
@@ -12681,7 +12681,7 @@
       "source_file": "app/Models/MeasurementData.php",
       "source_location": "L67",
       "id": "models_measurementdata_measurementdata_emissionsource",
-      "community": 529,
+      "community": 6,
       "norm_label": ".emissionsource()"
     },
     {
@@ -12690,7 +12690,7 @@
       "source_file": "app/Models/MeasurementData.php",
       "source_location": "L75",
       "id": "models_measurementdata_measurementdata_emissionfactor",
-      "community": 529,
+      "community": 6,
       "norm_label": ".emissionfactor()"
     },
     {
@@ -12699,7 +12699,7 @@
       "source_file": "app/Models/MeasurementData.php",
       "source_location": "L83",
       "id": "models_measurementdata_measurementdata_getdataforsource",
-      "community": 529,
+      "community": 6,
       "norm_label": ".getdataforsource()"
     },
     {
@@ -12708,7 +12708,7 @@
       "source_file": "app/Models/MeasurementData.php",
       "source_location": "L94",
       "id": "models_measurementdata_measurementdata_savedataforsource",
-      "community": 529,
+      "community": 6,
       "norm_label": ".savedataforsource()"
     },
     {
@@ -12861,7 +12861,7 @@
       "source_file": "app/Models/Permission.php",
       "source_location": "L1",
       "id": "models_permission",
-      "community": 513,
+      "community": 94,
       "norm_label": "permission.php"
     },
     {
@@ -12870,7 +12870,7 @@
       "source_file": "app/Models/Permission.php",
       "source_location": "L8",
       "id": "models_permission_permission",
-      "community": 513,
+      "community": 94,
       "norm_label": "permission"
     },
     {
@@ -12879,7 +12879,7 @@
       "source_file": "app/Models/Permission.php",
       "source_location": "L29",
       "id": "models_permission_permission_roletemplates",
-      "community": 513,
+      "community": 94,
       "norm_label": ".roletemplates()"
     },
     {
@@ -12888,7 +12888,7 @@
       "source_file": "app/Models/Permission.php",
       "source_location": "L38",
       "id": "models_permission_permission_companycustomroles",
-      "community": 513,
+      "community": 94,
       "norm_label": ".companycustomroles()"
     },
     {
@@ -12897,7 +12897,7 @@
       "source_file": "app/Models/Permission.php",
       "source_location": "L47",
       "id": "models_permission_permission_scopeactive",
-      "community": 513,
+      "community": 94,
       "norm_label": ".scopeactive()"
     },
     {
@@ -12906,7 +12906,7 @@
       "source_file": "app/Models/Permission.php",
       "source_location": "L55",
       "id": "models_permission_permission_scopeformodule",
-      "community": 513,
+      "community": 94,
       "norm_label": ".scopeformodule()"
     },
     {
@@ -12915,7 +12915,7 @@
       "source_file": "app/Models/Permission.php",
       "source_location": "L63",
       "id": "models_permission_permission_getgroupedbymodule",
-      "community": 513,
+      "community": 94,
       "norm_label": ".getgroupedbymodule()"
     },
     {
@@ -13230,7 +13230,7 @@
       "source_file": "app/Models/StakeholderEngagement.php",
       "source_location": "L1",
       "id": "models_stakeholderengagement",
-      "community": 531,
+      "community": 7,
       "norm_label": "stakeholderengagement.php"
     },
     {
@@ -13239,7 +13239,7 @@
       "source_file": "app/Models/StakeholderEngagement.php",
       "source_location": "L8",
       "id": "models_stakeholderengagement_stakeholderengagement",
-      "community": 531,
+      "community": 7,
       "norm_label": "stakeholderengagement"
     },
     {
@@ -13248,7 +13248,7 @@
       "source_file": "app/Models/StakeholderEngagement.php",
       "source_location": "L34",
       "id": "models_stakeholderengagement_stakeholderengagement_company",
-      "community": 531,
+      "community": 7,
       "norm_label": ".company()"
     },
     {
@@ -13257,7 +13257,7 @@
       "source_file": "app/Models/StakeholderEngagement.php",
       "source_location": "L34",
       "id": "app_models_stakeholderengagement_php_belongsto",
-      "community": 531,
+      "community": 7,
       "norm_label": "belongsto"
     },
     {
@@ -13266,7 +13266,7 @@
       "source_file": "app/Models/SubscriptionCoupon.php",
       "source_location": "L1",
       "id": "models_subscriptioncoupon",
-      "community": 502,
+      "community": 79,
       "norm_label": "subscriptioncoupon.php"
     },
     {
@@ -13275,7 +13275,7 @@
       "source_file": "app/Models/SubscriptionCoupon.php",
       "source_location": "L8",
       "id": "models_subscriptioncoupon_subscriptioncoupon",
-      "community": 502,
+      "community": 79,
       "norm_label": "subscriptioncoupon"
     },
     {
@@ -13284,7 +13284,7 @@
       "source_file": "app/Models/SubscriptionCoupon.php",
       "source_location": "L36",
       "id": "models_subscriptioncoupon_subscriptioncoupon_plan",
-      "community": 502,
+      "community": 79,
       "norm_label": ".plan()"
     },
     {
@@ -13293,7 +13293,7 @@
       "source_file": "app/Models/SubscriptionCoupon.php",
       "source_location": "L41",
       "id": "models_subscriptioncoupon_subscriptioncoupon_redemptions",
-      "community": 502,
+      "community": 79,
       "norm_label": ".redemptions()"
     },
     {
@@ -13302,7 +13302,7 @@
       "source_file": "app/Models/SubscriptionCoupon.php",
       "source_location": "L46",
       "id": "models_subscriptioncoupon_subscriptioncoupon_normalizecode",
-      "community": 502,
+      "community": 79,
       "norm_label": ".normalizecode()"
     },
     {
@@ -13311,7 +13311,7 @@
       "source_file": "app/Models/SubscriptionCoupon.php",
       "source_location": "L51",
       "id": "models_subscriptioncoupon_subscriptioncoupon_generatecode",
-      "community": 502,
+      "community": 79,
       "norm_label": ".generatecode()"
     },
     {
@@ -13320,7 +13320,7 @@
       "source_file": "app/Models/SubscriptionCoupon.php",
       "source_location": "L60",
       "id": "models_subscriptioncoupon_subscriptioncoupon_iswithinwindow",
-      "community": 502,
+      "community": 79,
       "norm_label": ".iswithinwindow()"
     },
     {
@@ -13329,7 +13329,7 @@
       "source_file": "app/Models/SubscriptionCoupon.php",
       "source_location": "L73",
       "id": "models_subscriptioncoupon_subscriptioncoupon_hasusesremaining",
-      "community": 502,
+      "community": 79,
       "norm_label": ".hasusesremaining()"
     },
     {
@@ -13338,7 +13338,7 @@
       "source_file": "app/Models/SubscriptionCoupon.php",
       "source_location": "L78",
       "id": "models_subscriptioncoupon_subscriptioncoupon_typelabel",
-      "community": 502,
+      "community": 79,
       "norm_label": ".typelabel()"
     },
     {
@@ -13527,7 +13527,7 @@
       "source_file": "app/Models/TransitionAction.php",
       "source_location": "L1",
       "id": "models_transitionaction",
-      "community": 422,
+      "community": 538,
       "norm_label": "transitionaction.php"
     },
     {
@@ -13536,7 +13536,7 @@
       "source_file": "app/Models/TransitionAction.php",
       "source_location": "L8",
       "id": "models_transitionaction_transitionaction",
-      "community": 422,
+      "community": 538,
       "norm_label": "transitionaction"
     },
     {
@@ -13545,7 +13545,7 @@
       "source_file": "app/Models/TransitionAction.php",
       "source_location": "L23",
       "id": "models_transitionaction_transitionaction_target",
-      "community": 422,
+      "community": 538,
       "norm_label": ".target()"
     },
     {
@@ -13554,7 +13554,7 @@
       "source_file": "app/Models/TransitionAction.php",
       "source_location": "L23",
       "id": "app_models_transitionaction_php_belongsto",
-      "community": 422,
+      "community": 538,
       "norm_label": "belongsto"
     },
     {
@@ -13563,7 +13563,7 @@
       "source_file": "app/Models/TransitionAction.php",
       "source_location": "L28",
       "id": "models_transitionaction_transitionaction_company",
-      "community": 422,
+      "community": 538,
       "norm_label": ".company()"
     },
     {
@@ -13599,7 +13599,7 @@
       "source_file": "app/Models/UsageTracking.php",
       "source_location": "L1",
       "id": "models_usagetracking",
-      "community": 6,
+      "community": 7,
       "norm_label": "usagetracking.php"
     },
     {
@@ -13608,7 +13608,7 @@
       "source_file": "app/Models/UsageTracking.php",
       "source_location": "L8",
       "id": "models_usagetracking_usagetracking",
-      "community": 6,
+      "community": 7,
       "norm_label": "usagetracking"
     },
     {
@@ -13617,7 +13617,7 @@
       "source_file": "app/Models/UsageTracking.php",
       "source_location": "L31",
       "id": "models_usagetracking_usagetracking_company",
-      "community": 6,
+      "community": 7,
       "norm_label": ".company()"
     },
     {
@@ -13626,7 +13626,7 @@
       "source_file": "app/Models/UsageTracking.php",
       "source_location": "L39",
       "id": "models_usagetracking_usagetracking_scoperesourcetype",
-      "community": 6,
+      "community": 7,
       "norm_label": ".scoperesourcetype()"
     },
     {
@@ -13635,7 +13635,7 @@
       "source_file": "app/Models/UsageTracking.php",
       "source_location": "L47",
       "id": "models_usagetracking_usagetracking_scopeperiod",
-      "community": 6,
+      "community": 7,
       "norm_label": ".scopeperiod()"
     },
     {
@@ -13905,7 +13905,7 @@
       "source_file": "app/Models/User.php",
       "source_location": "L708",
       "id": "models_user_user_getownedcompanies",
-      "community": 91,
+      "community": 5,
       "norm_label": ".getownedcompanies()"
     },
     {
@@ -13932,7 +13932,7 @@
       "source_file": "app/Models/UserActiveContext.php",
       "source_location": "L1",
       "id": "models_useractivecontext",
-      "community": 7,
+      "community": 6,
       "norm_label": "useractivecontext.php"
     },
     {
@@ -13941,7 +13941,7 @@
       "source_file": "app/Models/UserActiveContext.php",
       "source_location": "L8",
       "id": "models_useractivecontext_useractivecontext",
-      "community": 7,
+      "community": 6,
       "norm_label": "useractivecontext"
     },
     {
@@ -13950,7 +13950,7 @@
       "source_file": "app/Models/UserActiveContext.php",
       "source_location": "L27",
       "id": "models_useractivecontext_useractivecontext_user",
-      "community": 7,
+      "community": 6,
       "norm_label": ".user()"
     },
     {
@@ -13959,7 +13959,7 @@
       "source_file": "app/Models/UserActiveContext.php",
       "source_location": "L35",
       "id": "models_useractivecontext_useractivecontext_activecompany",
-      "community": 7,
+      "community": 6,
       "norm_label": ".activecompany()"
     },
     {
@@ -14040,7 +14040,7 @@
       "source_file": "app/Models/UserCompanyRole.php",
       "source_location": "L1",
       "id": "models_usercompanyrole",
-      "community": 91,
+      "community": 5,
       "norm_label": "usercompanyrole.php"
     },
     {
@@ -14049,7 +14049,7 @@
       "source_file": "app/Models/UserCompanyRole.php",
       "source_location": "L8",
       "id": "models_usercompanyrole_usercompanyrole",
-      "community": 91,
+      "community": 5,
       "norm_label": "usercompanyrole"
     },
     {
@@ -14058,7 +14058,7 @@
       "source_file": "app/Models/UserCompanyRole.php",
       "source_location": "L29",
       "id": "models_usercompanyrole_usercompanyrole_user",
-      "community": 91,
+      "community": 5,
       "norm_label": ".user()"
     },
     {
@@ -14067,7 +14067,7 @@
       "source_file": "app/Models/UserCompanyRole.php",
       "source_location": "L37",
       "id": "models_usercompanyrole_usercompanyrole_company",
-      "community": 91,
+      "community": 5,
       "norm_label": ".company()"
     },
     {
@@ -14076,7 +14076,7 @@
       "source_file": "app/Models/UserCompanyRole.php",
       "source_location": "L45",
       "id": "models_usercompanyrole_usercompanyrole_companycustomrole",
-      "community": 91,
+      "community": 5,
       "norm_label": ".companycustomrole()"
     },
     {
@@ -14085,7 +14085,7 @@
       "source_file": "app/Models/UserCompanyRole.php",
       "source_location": "L53",
       "id": "models_usercompanyrole_usercompanyrole_assignedby",
-      "community": 91,
+      "community": 5,
       "norm_label": ".assignedby()"
     },
     {
@@ -14094,7 +14094,7 @@
       "source_file": "app/Models/UserCompanyRole.php",
       "source_location": "L61",
       "id": "models_usercompanyrole_usercompanyrole_scopeactive",
-      "community": 91,
+      "community": 5,
       "norm_label": ".scopeactive()"
     },
     {
@@ -14382,7 +14382,7 @@
       "source_file": "app/Services/CompanyInvitationService.php",
       "source_location": "L1",
       "id": "services_companyinvitationservice",
-      "community": 91,
+      "community": 5,
       "norm_label": "companyinvitationservice.php"
     },
     {
@@ -14391,7 +14391,7 @@
       "source_file": "app/Services/CompanyInvitationService.php",
       "source_location": "L11",
       "id": "services_companyinvitationservice_companyinvitationservice",
-      "community": 91,
+      "community": 5,
       "norm_label": "companyinvitationservice"
     },
     {
@@ -14400,7 +14400,7 @@
       "source_file": "app/Services/CompanyInvitationService.php",
       "source_location": "L16",
       "id": "services_companyinvitationservice_companyinvitationservice_inviteuser",
-      "community": 91,
+      "community": 5,
       "norm_label": ".inviteuser()"
     },
     {
@@ -14409,7 +14409,7 @@
       "source_file": "app/Services/CompanyInvitationService.php",
       "source_location": "L122",
       "id": "services_companyinvitationservice_companyinvitationservice_acceptinvitation",
-      "community": 91,
+      "community": 5,
       "norm_label": ".acceptinvitation()"
     },
     {
@@ -14418,7 +14418,7 @@
       "source_file": "app/Services/CompanyInvitationService.php",
       "source_location": "L245",
       "id": "services_companyinvitationservice_companyinvitationservice_revokeaccess",
-      "community": 91,
+      "community": 5,
       "norm_label": ".revokeaccess()"
     },
     {
@@ -14427,7 +14427,7 @@
       "source_file": "app/Services/CompanyInvitationService.php",
       "source_location": "L255",
       "id": "services_companyinvitationservice_companyinvitationservice_updateaccessrole",
-      "community": 91,
+      "community": 5,
       "norm_label": ".updateaccessrole()"
     },
     {
@@ -14436,7 +14436,7 @@
       "source_file": "app/Services/ConsultantAccountService.php",
       "source_location": "L1",
       "id": "services_consultantaccountservice",
-      "community": 508,
+      "community": 5,
       "norm_label": "consultantaccountservice.php"
     },
     {
@@ -14445,7 +14445,7 @@
       "source_file": "app/Services/ConsultantAccountService.php",
       "source_location": "L15",
       "id": "services_consultantaccountservice_consultantaccountservice",
-      "community": 508,
+      "community": 5,
       "norm_label": "consultantaccountservice"
     },
     {
@@ -14454,7 +14454,7 @@
       "source_file": "app/Services/ConsultantAccountService.php",
       "source_location": "L20",
       "id": "services_consultantaccountservice_consultantaccountservice_ensurelinked",
-      "community": 508,
+      "community": 5,
       "norm_label": ".ensurelinked()"
     },
     {
@@ -14463,7 +14463,7 @@
       "source_file": "app/Services/ConsultantAccountService.php",
       "source_location": "L20",
       "id": "app_services_consultantaccountservice_php_consultant",
-      "community": 508,
+      "community": 5,
       "norm_label": "consultant"
     },
     {
@@ -14472,7 +14472,7 @@
       "source_file": "app/Services/ConsultantAccountService.php",
       "source_location": "L73",
       "id": "services_consultantaccountservice_consultantaccountservice_syncwebsession",
-      "community": 508,
+      "community": 5,
       "norm_label": ".syncwebsession()"
     },
     {
@@ -14481,7 +14481,7 @@
       "source_file": "app/Services/ConsultantAccountService.php",
       "source_location": "L73",
       "id": "app_services_consultantaccountservice_php_user",
-      "community": 508,
+      "community": 5,
       "norm_label": "user"
     },
     {
@@ -14490,7 +14490,7 @@
       "source_file": "app/Services/ConsultantAccountService.php",
       "source_location": "L98",
       "id": "services_consultantaccountservice_consultantaccountservice_ensureownerrole",
-      "community": 508,
+      "community": 5,
       "norm_label": ".ensureownerrole()"
     },
     {
@@ -14499,7 +14499,7 @@
       "source_file": "app/Services/ConsultantAccountService.php",
       "source_location": "L98",
       "id": "app_services_consultantaccountservice_php_company",
-      "community": 508,
+      "community": 5,
       "norm_label": "company"
     },
     {
@@ -14814,7 +14814,7 @@
       "source_file": "app/Services/ConsultantAgencyPaymentService.php",
       "source_location": "L1",
       "id": "services_consultantagencypaymentservice",
-      "community": 419,
+      "community": 9,
       "norm_label": "consultantagencypaymentservice.php"
     },
     {
@@ -14823,7 +14823,7 @@
       "source_file": "app/Services/ConsultantAgencyPaymentService.php",
       "source_location": "L13",
       "id": "services_consultantagencypaymentservice_consultantagencypaymentservice",
-      "community": 419,
+      "community": 9,
       "norm_label": "consultantagencypaymentservice"
     },
     {
@@ -14832,7 +14832,7 @@
       "source_file": "app/Services/ConsultantAgencyPaymentService.php",
       "source_location": "L15",
       "id": "services_consultantagencypaymentservice_consultantagencypaymentservice_construct",
-      "community": 419,
+      "community": 9,
       "norm_label": ".__construct()"
     },
     {
@@ -14841,7 +14841,7 @@
       "source_file": "app/Services/ConsultantAgencyPaymentService.php",
       "source_location": "L23",
       "id": "services_consultantagencypaymentservice_consultantagencypaymentservice_start",
-      "community": 419,
+      "community": 9,
       "norm_label": ".start()"
     },
     {
@@ -14850,7 +14850,7 @@
       "source_file": "app/Services/ConsultantAgencyPaymentService.php",
       "source_location": "L23",
       "id": "app_services_consultantagencypaymentservice_php_company",
-      "community": 419,
+      "community": 9,
       "norm_label": "company"
     },
     {
@@ -14859,7 +14859,7 @@
       "source_file": "app/Services/ConsultantAgencyPaymentService.php",
       "source_location": "L23",
       "id": "app_services_consultantagencypaymentservice_php_redirectresponse",
-      "community": 419,
+      "community": 9,
       "norm_label": "redirectresponse"
     },
     {
@@ -15235,7 +15235,7 @@
       "label": ".grantDepthSubscription()",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L439",
+      "source_location": "L434",
       "id": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_grantdepthsubscription",
       "community": 26,
       "norm_label": ".grantdepthsubscription()"
@@ -15244,7 +15244,7 @@
       "label": ".grantPackSubscription()",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L468",
+      "source_location": "L464",
       "id": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_grantpacksubscription",
       "community": 26,
       "norm_label": ".grantpacksubscription()"
@@ -15253,7 +15253,7 @@
       "label": ".resolveExtraSlotPurchase()",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L516",
+      "source_location": "L515",
       "id": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_resolveextraslotpurchase",
       "community": 26,
       "norm_label": ".resolveextraslotpurchase()"
@@ -15262,7 +15262,7 @@
       "label": ".completeExtraSlotTransaction()",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L552",
+      "source_location": "L551",
       "id": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_completeextraslottransaction",
       "community": 26,
       "norm_label": ".completeextraslottransaction()"
@@ -15271,7 +15271,7 @@
       "label": ".resolveYearUnlockPurchase()",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L599",
+      "source_location": "L598",
       "id": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_resolveyearunlockpurchase",
       "community": 26,
       "norm_label": ".resolveyearunlockpurchase()"
@@ -15280,7 +15280,7 @@
       "label": "ConsultantClientEngagement",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L599",
+      "source_location": "L598",
       "id": "app_services_consultantagencysubscriptionservice_php_consultantclientengagement",
       "community": 26,
       "norm_label": "consultantclientengagement"
@@ -15289,7 +15289,7 @@
       "label": ".addReportingYearUnlock()",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L647",
+      "source_location": "L646",
       "id": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_addreportingyearunlock",
       "community": 26,
       "norm_label": ".addreportingyearunlock()"
@@ -15298,7 +15298,7 @@
       "label": "ConsultantSubscriptionAddon",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L647",
+      "source_location": "L646",
       "id": "app_services_consultantagencysubscriptionservice_php_consultantsubscriptionaddon",
       "community": 26,
       "norm_label": "consultantsubscriptionaddon"
@@ -15307,7 +15307,7 @@
       "label": ".completeYearUnlockTransaction()",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L678",
+      "source_location": "L677",
       "id": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_completeyearunlocktransaction",
       "community": 26,
       "norm_label": ".completeyearunlocktransaction()"
@@ -15316,7 +15316,7 @@
       "label": ".addExtraSlots()",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L713",
+      "source_location": "L716",
       "id": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_addextraslots",
       "community": 26,
       "norm_label": ".addextraslots()"
@@ -15325,7 +15325,7 @@
       "label": ".archiveEngagement()",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L733",
+      "source_location": "L771",
       "id": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_archiveengagement",
       "community": 26,
       "norm_label": ".archiveengagement()"
@@ -15334,7 +15334,7 @@
       "label": ".slotSummary()",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L746",
+      "source_location": "L784",
       "id": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_slotsummary",
       "community": 26,
       "norm_label": ".slotsummary()"
@@ -15343,7 +15343,7 @@
       "label": ".planQuotes()",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L773",
+      "source_location": "L811",
       "id": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_planquotes",
       "community": 26,
       "norm_label": ".planquotes()"
@@ -15352,7 +15352,7 @@
       "label": ".validatePackChange()",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L789",
+      "source_location": "L827",
       "id": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_validatepackchange",
       "community": 26,
       "norm_label": ".validatepackchange()"
@@ -15361,7 +15361,7 @@
       "label": ".assertConsultantOrg()",
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
-      "source_location": "L807",
+      "source_location": "L844",
       "id": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_assertconsultantorg",
       "community": 26,
       "norm_label": ".assertconsultantorg()"
@@ -15795,7 +15795,7 @@
       "source_file": "app/Services/ConsultantMarketplaceService.php",
       "source_location": "L1",
       "id": "services_consultantmarketplaceservice",
-      "community": 377,
+      "community": 9,
       "norm_label": "consultantmarketplaceservice.php"
     },
     {
@@ -15804,7 +15804,7 @@
       "source_file": "app/Services/ConsultantMarketplaceService.php",
       "source_location": "L11",
       "id": "services_consultantmarketplaceservice_consultantmarketplaceservice",
-      "community": 377,
+      "community": 9,
       "norm_label": "consultantmarketplaceservice"
     },
     {
@@ -15813,7 +15813,7 @@
       "source_file": "app/Services/ConsultantMarketplaceService.php",
       "source_location": "L13",
       "id": "services_consultantmarketplaceservice_consultantmarketplaceservice_chargeamount",
-      "community": 4,
+      "community": 9,
       "norm_label": ".chargeamount()"
     },
     {
@@ -15822,7 +15822,7 @@
       "source_file": "app/Services/ConsultantMarketplaceService.php",
       "source_location": "L30",
       "id": "services_consultantmarketplaceservice_consultantmarketplaceservice_commissionrate",
-      "community": 377,
+      "community": 9,
       "norm_label": ".commissionrate()"
     },
     {
@@ -15831,7 +15831,7 @@
       "source_file": "app/Services/ConsultantMarketplaceService.php",
       "source_location": "L37",
       "id": "services_consultantmarketplaceservice_consultantmarketplaceservice_packamountaed",
-      "community": 377,
+      "community": 9,
       "norm_label": ".packamountaed()"
     },
     {
@@ -15840,7 +15840,7 @@
       "source_file": "app/Services/ConsultantMarketplaceService.php",
       "source_location": "L44",
       "id": "services_consultantmarketplaceservice_consultantmarketplaceservice_calculatesplit",
-      "community": 377,
+      "community": 9,
       "norm_label": ".calculatesplit()"
     },
     {
@@ -15849,7 +15849,7 @@
       "source_file": "app/Services/ConsultantMarketplaceService.php",
       "source_location": "L57",
       "id": "services_consultantmarketplaceservice_consultantmarketplaceservice_creatependingorder",
-      "community": 377,
+      "community": 9,
       "norm_label": ".creatependingorder()"
     },
     {
@@ -15858,7 +15858,7 @@
       "source_file": "app/Services/ConsultantMarketplaceService.php",
       "source_location": "L57",
       "id": "app_services_consultantmarketplaceservice_php_consultant",
-      "community": 377,
+      "community": 9,
       "norm_label": "consultant"
     },
     {
@@ -15867,7 +15867,7 @@
       "source_file": "app/Services/ConsultantMarketplaceService.php",
       "source_location": "L57",
       "id": "app_services_consultantmarketplaceservice_php_consultantorder",
-      "community": 377,
+      "community": 9,
       "norm_label": "consultantorder"
     },
     {
@@ -15876,7 +15876,7 @@
       "source_file": "app/Services/ConsultantMarketplaceService.php",
       "source_location": "L83",
       "id": "services_consultantmarketplaceservice_consultantmarketplaceservice_completetransaction",
-      "community": 377,
+      "community": 9,
       "norm_label": ".completetransaction()"
     },
     {
@@ -15885,7 +15885,7 @@
       "source_file": "app/Services/ConsultantMarketplaceService.php",
       "source_location": "L83",
       "id": "app_services_consultantmarketplaceservice_php_paymenttransaction",
-      "community": 377,
+      "community": 9,
       "norm_label": "paymenttransaction"
     },
     {
@@ -15894,7 +15894,7 @@
       "source_file": "app/Services/ConsultantMarketplaceService.php",
       "source_location": "L119",
       "id": "services_consultantmarketplaceservice_consultantmarketplaceservice_markdelivered",
-      "community": 377,
+      "community": 9,
       "norm_label": ".markdelivered()"
     },
     {
@@ -15903,7 +15903,7 @@
       "source_file": "app/Services/ConsultantMarketplaceService.php",
       "source_location": "L129",
       "id": "services_consultantmarketplaceservice_consultantmarketplaceservice_releaseescrow",
-      "community": 377,
+      "community": 9,
       "norm_label": ".releaseescrow()"
     },
     {
@@ -15912,7 +15912,7 @@
       "source_file": "app/Services/ConsultantMarketplaceService.php",
       "source_location": "L144",
       "id": "services_consultantmarketplaceservice_consultantmarketplaceservice_refundescrow",
-      "community": 377,
+      "community": 9,
       "norm_label": ".refundescrow()"
     },
     {
@@ -16056,7 +16056,7 @@
       "source_file": "app/Services/CurrencyService.php",
       "source_location": "L1",
       "id": "services_currencyservice",
-      "community": 398,
+      "community": 9,
       "norm_label": "currencyservice.php"
     },
     {
@@ -16065,7 +16065,7 @@
       "source_file": "app/Services/CurrencyService.php",
       "source_location": "L12",
       "id": "services_currencyservice_currencyservice",
-      "community": 398,
+      "community": 9,
       "norm_label": "currencyservice"
     },
     {
@@ -16074,7 +16074,7 @@
       "source_file": "app/Services/CurrencyService.php",
       "source_location": "L20",
       "id": "services_currencyservice_currencyservice_displaycurrency",
-      "community": 398,
+      "community": 9,
       "norm_label": ".displaycurrency()"
     },
     {
@@ -16083,7 +16083,7 @@
       "source_file": "app/Services/CurrencyService.php",
       "source_location": "L40",
       "id": "services_currencyservice_currencyservice_setdisplaycurrency",
-      "community": 398,
+      "community": 9,
       "norm_label": ".setdisplaycurrency()"
     },
     {
@@ -16092,7 +16092,7 @@
       "source_file": "app/Services/CurrencyService.php",
       "source_location": "L53",
       "id": "services_currencyservice_currencyservice_displayprice",
-      "community": 398,
+      "community": 9,
       "norm_label": ".displayprice()"
     },
     {
@@ -16101,7 +16101,7 @@
       "source_file": "app/Services/CurrencyService.php",
       "source_location": "L53",
       "id": "app_services_currencyservice_php_subscriptionplan",
-      "community": 398,
+      "community": 9,
       "norm_label": "subscriptionplan"
     },
     {
@@ -16110,7 +16110,7 @@
       "source_file": "app/Services/CurrencyService.php",
       "source_location": "L71",
       "id": "services_currencyservice_currencyservice_chargeamount",
-      "community": 398,
+      "community": 9,
       "norm_label": ".chargeamount()"
     },
     {
@@ -16119,7 +16119,7 @@
       "source_file": "app/Services/CurrencyService.php",
       "source_location": "L93",
       "id": "services_currencyservice_currencyservice_symbol",
-      "community": 398,
+      "community": 9,
       "norm_label": ".symbol()"
     },
     {
@@ -16128,7 +16128,7 @@
       "source_file": "app/Services/CurrencyService.php",
       "source_location": "L101",
       "id": "services_currencyservice_currencyservice_format",
-      "community": 398,
+      "community": 9,
       "norm_label": ".format()"
     },
     {
@@ -16776,7 +16776,7 @@
       "source_file": "app/Services/EnergyFromActivityService.php",
       "source_location": "L1",
       "id": "services_energyfromactivityservice",
-      "community": 92,
+      "community": 374,
       "norm_label": "energyfromactivityservice.php"
     },
     {
@@ -16785,7 +16785,7 @@
       "source_file": "app/Services/EnergyFromActivityService.php",
       "source_location": "L11",
       "id": "services_energyfromactivityservice_energyfromactivityservice",
-      "community": 92,
+      "community": 374,
       "norm_label": "energyfromactivityservice"
     },
     {
@@ -16794,7 +16794,7 @@
       "source_file": "app/Services/EnergyFromActivityService.php",
       "source_location": "L13",
       "id": "services_energyfromactivityservice_energyfromactivityservice_totalgj",
-      "community": 92,
+      "community": 374,
       "norm_label": ".totalgj()"
     },
     {
@@ -16803,7 +16803,7 @@
       "source_file": "app/Services/EnergyFromActivityService.php",
       "source_location": "L26",
       "id": "services_energyfromactivityservice_energyfromactivityservice_breakdown",
-      "community": 92,
+      "community": 374,
       "norm_label": ".breakdown()"
     },
     {
@@ -16812,7 +16812,7 @@
       "source_file": "app/Services/EnergyFromActivityService.php",
       "source_location": "L26",
       "id": "app_services_energyfromactivityservice_php_collection",
-      "community": 92,
+      "community": 374,
       "norm_label": "collection"
     },
     {
@@ -16821,7 +16821,7 @@
       "source_file": "app/Services/EnergyFromActivityService.php",
       "source_location": "L66",
       "id": "services_energyfromactivityservice_energyfromactivityservice_isenergyactivity",
-      "community": 92,
+      "community": 374,
       "norm_label": ".isenergyactivity()"
     },
     {
@@ -16830,7 +16830,7 @@
       "source_file": "app/Services/EnergyFromActivityService.php",
       "source_location": "L78",
       "id": "services_energyfromactivityservice_energyfromactivityservice_quantitytogj",
-      "community": 92,
+      "community": 374,
       "norm_label": ".quantitytogj()"
     },
     {
@@ -16839,7 +16839,7 @@
       "source_file": "app/Services/EnergyFromActivityService.php",
       "source_location": "L100",
       "id": "services_energyfromactivityservice_energyfromactivityservice_litregjfactor",
-      "community": 92,
+      "community": 374,
       "norm_label": ".litregjfactor()"
     },
     {
@@ -17046,7 +17046,7 @@
       "source_file": "app/Services/EsgScorecardService.php",
       "source_location": "L1",
       "id": "services_esgscorecardservice",
-      "community": 3,
+      "community": 15,
       "norm_label": "esgscorecardservice.php"
     },
     {
@@ -17703,7 +17703,7 @@
       "source_file": "app/Services/GriReportService.php",
       "source_location": "L1",
       "id": "services_grireportservice",
-      "community": 422,
+      "community": 112,
       "norm_label": "grireportservice.php"
     },
     {
@@ -17712,7 +17712,7 @@
       "source_file": "app/Services/GriReportService.php",
       "source_location": "L9",
       "id": "services_grireportservice_grireportservice",
-      "community": 422,
+      "community": 112,
       "norm_label": "grireportservice"
     },
     {
@@ -17721,7 +17721,7 @@
       "source_file": "app/Services/GriReportService.php",
       "source_location": "L11",
       "id": "services_grireportservice_grireportservice_construct",
-      "community": 422,
+      "community": 112,
       "norm_label": ".__construct()"
     },
     {
@@ -17730,7 +17730,7 @@
       "source_file": "app/Services/GriReportService.php",
       "source_location": "L18",
       "id": "services_grireportservice_grireportservice_build",
-      "community": 422,
+      "community": 112,
       "norm_label": ".build()"
     },
     {
@@ -17739,7 +17739,7 @@
       "source_file": "app/Services/GriReportService.php",
       "source_location": "L18",
       "id": "app_services_grireportservice_php_company",
-      "community": 422,
+      "community": 112,
       "norm_label": "company"
     },
     {
@@ -17748,7 +17748,7 @@
       "source_file": "app/Services/GriReportService.php",
       "source_location": "L71",
       "id": "services_grireportservice_grireportservice_calculateintensity",
-      "community": 422,
+      "community": 112,
       "norm_label": ".calculateintensity()"
     },
     {
@@ -17910,7 +17910,7 @@
       "source_file": "app/Services/IfrsS1ReportService.php",
       "source_location": "L1",
       "id": "services_ifrss1reportservice",
-      "community": 538,
+      "community": 419,
       "norm_label": "ifrss1reportservice.php"
     },
     {
@@ -17919,7 +17919,7 @@
       "source_file": "app/Services/IfrsS1ReportService.php",
       "source_location": "L10",
       "id": "services_ifrss1reportservice_ifrss1reportservice",
-      "community": 538,
+      "community": 419,
       "norm_label": "ifrss1reportservice"
     },
     {
@@ -17928,7 +17928,7 @@
       "source_file": "app/Services/IfrsS1ReportService.php",
       "source_location": "L12",
       "id": "services_ifrss1reportservice_ifrss1reportservice_construct",
-      "community": 538,
+      "community": 419,
       "norm_label": ".__construct()"
     },
     {
@@ -17937,7 +17937,7 @@
       "source_file": "app/Services/IfrsS1ReportService.php",
       "source_location": "L18",
       "id": "services_ifrss1reportservice_ifrss1reportservice_build",
-      "community": 538,
+      "community": 419,
       "norm_label": ".build()"
     },
     {
@@ -17946,7 +17946,7 @@
       "source_file": "app/Services/IfrsS1ReportService.php",
       "source_location": "L18",
       "id": "app_services_ifrss1reportservice_php_company",
-      "community": 538,
+      "community": 419,
       "norm_label": "company"
     },
     {
@@ -17955,7 +17955,7 @@
       "source_file": "app/Services/IfrsS2ReportService.php",
       "source_location": "L1",
       "id": "services_ifrss2reportservice",
-      "community": 422,
+      "community": 413,
       "norm_label": "ifrss2reportservice.php"
     },
     {
@@ -17964,7 +17964,7 @@
       "source_file": "app/Services/IfrsS2ReportService.php",
       "source_location": "L13",
       "id": "services_ifrss2reportservice_ifrss2reportservice",
-      "community": 422,
+      "community": 413,
       "norm_label": "ifrss2reportservice"
     },
     {
@@ -17973,7 +17973,7 @@
       "source_file": "app/Services/IfrsS2ReportService.php",
       "source_location": "L15",
       "id": "services_ifrss2reportservice_ifrss2reportservice_construct",
-      "community": 422,
+      "community": 413,
       "norm_label": ".__construct()"
     },
     {
@@ -17982,7 +17982,7 @@
       "source_file": "app/Services/IfrsS2ReportService.php",
       "source_location": "L21",
       "id": "services_ifrss2reportservice_ifrss2reportservice_build",
-      "community": 422,
+      "community": 413,
       "norm_label": ".build()"
     },
     {
@@ -17991,7 +17991,7 @@
       "source_file": "app/Services/IfrsS2ReportService.php",
       "source_location": "L21",
       "id": "app_services_ifrss2reportservice_php_company",
-      "community": 422,
+      "community": 413,
       "norm_label": "company"
     },
     {
@@ -18000,7 +18000,7 @@
       "source_file": "app/Services/IfrsS2ReportService.php",
       "source_location": "L59",
       "id": "services_ifrss2reportservice_ifrss2reportservice_aggregateghg",
-      "community": 422,
+      "community": 413,
       "norm_label": ".aggregateghg()"
     },
     {
@@ -18864,7 +18864,7 @@
       "source_file": "app/Services/QuickInputFormBuilder.php",
       "source_location": "L1",
       "id": "services_quickinputformbuilder",
-      "community": 92,
+      "community": 0,
       "norm_label": "quickinputformbuilder.php"
     },
     {
@@ -18873,7 +18873,7 @@
       "source_file": "app/Services/QuickInputFormBuilder.php",
       "source_location": "L9",
       "id": "services_quickinputformbuilder_quickinputformbuilder",
-      "community": 92,
+      "community": 0,
       "norm_label": "quickinputformbuilder"
     },
     {
@@ -18882,7 +18882,7 @@
       "source_file": "app/Services/QuickInputFormBuilder.php",
       "source_location": "L17",
       "id": "services_quickinputformbuilder_quickinputformbuilder_buildform",
-      "community": 92,
+      "community": 0,
       "norm_label": ".buildform()"
     },
     {
@@ -18891,7 +18891,7 @@
       "source_file": "app/Services/QuickInputFormBuilder.php",
       "source_location": "L31",
       "id": "services_quickinputformbuilder_quickinputformbuilder_validateform",
-      "community": 92,
+      "community": 0,
       "norm_label": ".validateform()"
     },
     {
@@ -18900,7 +18900,7 @@
       "source_file": "app/Services/QuickInputFormBuilder.php",
       "source_location": "L88",
       "id": "services_quickinputformbuilder_quickinputformbuilder_getfieldoptions",
-      "community": 92,
+      "community": 0,
       "norm_label": ".getfieldoptions()"
     },
     {
@@ -18909,7 +18909,7 @@
       "source_file": "app/Services/QuickInputFormBuilder.php",
       "source_location": "L107",
       "id": "services_quickinputformbuilder_quickinputformbuilder_getdefaultvalues",
-      "community": 92,
+      "community": 0,
       "norm_label": ".getdefaultvalues()"
     },
     {
@@ -18918,7 +18918,7 @@
       "source_file": "app/Services/QuickInputFormBuilder.php",
       "source_location": "L128",
       "id": "services_quickinputformbuilder_quickinputformbuilder_formatfieldvalue",
-      "community": 92,
+      "community": 0,
       "norm_label": ".formatfieldvalue()"
     },
     {
@@ -18927,7 +18927,7 @@
       "source_file": "app/Services/RoleManagementService.php",
       "source_location": "L1",
       "id": "services_rolemanagementservice",
-      "community": 530,
+      "community": 30,
       "norm_label": "rolemanagementservice.php"
     },
     {
@@ -18936,7 +18936,7 @@
       "source_file": "app/Services/RoleManagementService.php",
       "source_location": "L9",
       "id": "services_rolemanagementservice_rolemanagementservice",
-      "community": 530,
+      "community": 30,
       "norm_label": "rolemanagementservice"
     },
     {
@@ -18945,7 +18945,7 @@
       "source_file": "app/Services/RoleManagementService.php",
       "source_location": "L14",
       "id": "services_rolemanagementservice_rolemanagementservice_getavailabletemplates",
-      "community": 530,
+      "community": 30,
       "norm_label": ".getavailabletemplates()"
     },
     {
@@ -18954,7 +18954,7 @@
       "source_file": "app/Services/RoleManagementService.php",
       "source_location": "L29",
       "id": "services_rolemanagementservice_rolemanagementservice_createcustomrole",
-      "community": 530,
+      "community": 30,
       "norm_label": ".createcustomrole()"
     },
     {
@@ -18963,7 +18963,7 @@
       "source_file": "app/Services/RoleManagementService.php",
       "source_location": "L57",
       "id": "services_rolemanagementservice_rolemanagementservice_updatecustomrole",
-      "community": 530,
+      "community": 30,
       "norm_label": ".updatecustomrole()"
     },
     {
@@ -18972,7 +18972,7 @@
       "source_file": "app/Services/RoleManagementService.php",
       "source_location": "L80",
       "id": "services_rolemanagementservice_rolemanagementservice_deletecustomrole",
-      "community": 530,
+      "community": 30,
       "norm_label": ".deletecustomrole()"
     },
     {
@@ -18981,7 +18981,7 @@
       "source_file": "app/Services/RoleManagementService.php",
       "source_location": "L89",
       "id": "services_rolemanagementservice_rolemanagementservice_getpermissionsgroupedbymodule",
-      "community": 530,
+      "community": 30,
       "norm_label": ".getpermissionsgroupedbymodule()"
     },
     {
@@ -19836,7 +19836,7 @@
       "source_file": "app/Services/UaeEsgReportService.php",
       "source_location": "L1",
       "id": "services_uaeesgreportservice",
-      "community": 376,
+      "community": 522,
       "norm_label": "uaeesgreportservice.php"
     },
     {
@@ -19845,7 +19845,7 @@
       "source_file": "app/Services/UaeEsgReportService.php",
       "source_location": "L19",
       "id": "services_uaeesgreportservice_uaeesgreportservice",
-      "community": 376,
+      "community": 522,
       "norm_label": "uaeesgreportservice"
     },
     {
@@ -19854,7 +19854,7 @@
       "source_file": "app/Services/UaeEsgReportService.php",
       "source_location": "L21",
       "id": "services_uaeesgreportservice_uaeesgreportservice_construct",
-      "community": 376,
+      "community": 522,
       "norm_label": ".__construct()"
     },
     {
@@ -19863,7 +19863,7 @@
       "source_file": "app/Services/UaeEsgReportService.php",
       "source_location": "L37",
       "id": "services_uaeesgreportservice_uaeesgreportservice_build",
-      "community": 376,
+      "community": 522,
       "norm_label": ".build()"
     },
     {
@@ -19872,7 +19872,7 @@
       "source_file": "app/Services/UaeEsgReportService.php",
       "source_location": "L37",
       "id": "app_services_uaeesgreportservice_php_company",
-      "community": 376,
+      "community": 522,
       "norm_label": "company"
     },
     {
@@ -19881,7 +19881,7 @@
       "source_file": "app/Services/UaeEsgReportService.php",
       "source_location": "L128",
       "id": "services_uaeesgreportservice_uaeesgreportservice_narrativesections",
-      "community": 376,
+      "community": 522,
       "norm_label": ".narrativesections()"
     },
     {
@@ -19890,7 +19890,7 @@
       "source_file": "app/Services/UaeEsgReportService.php",
       "source_location": "L141",
       "id": "services_uaeesgreportservice_uaeesgreportservice_builddisclosureindex",
-      "community": 376,
+      "community": 522,
       "norm_label": ".builddisclosureindex()"
     },
     {
@@ -19899,7 +19899,7 @@
       "source_file": "app/Services/UaeEsgReportService.php",
       "source_location": "L167",
       "id": "services_uaeesgreportservice_uaeesgreportservice_buildsdgmapping",
-      "community": 376,
+      "community": 522,
       "norm_label": ".buildsdgmapping()"
     },
     {
@@ -19908,7 +19908,7 @@
       "source_file": "app/Services/UaeEsgReportService.php",
       "source_location": "L191",
       "id": "services_uaeesgreportservice_uaeesgreportservice_completeness",
-      "community": 376,
+      "community": 522,
       "norm_label": ".completeness()"
     },
     {
@@ -19917,7 +19917,7 @@
       "source_file": "app/Services/UaeEsgReportService.php",
       "source_location": "L242",
       "id": "services_uaeesgreportservice_uaeesgreportservice_sectioncomplete",
-      "community": 376,
+      "community": 522,
       "norm_label": ".sectioncomplete()"
     },
     {
@@ -19926,7 +19926,7 @@
       "source_file": "app/Services/UaeEsgReportService.php",
       "source_location": "L259",
       "id": "services_uaeesgreportservice_uaeesgreportservice_buildesgdepth",
-      "community": 376,
+      "community": 522,
       "norm_label": ".buildesgdepth()"
     },
     {
@@ -19935,7 +19935,7 @@
       "source_file": "app/Services/UaeEsgReportService.php",
       "source_location": "L289",
       "id": "services_uaeesgreportservice_uaeesgreportservice_publicassurancemeta",
-      "community": 376,
+      "community": 522,
       "norm_label": ".publicassurancemeta()"
     },
     {
@@ -19998,7 +19998,7 @@
       "source_file": "app/Support/EmailTriggerRegistry.php",
       "source_location": "L1",
       "id": "support_emailtriggerregistry",
-      "community": 51,
+      "community": 353,
       "norm_label": "emailtriggerregistry.php"
     },
     {
@@ -20007,7 +20007,7 @@
       "source_file": "app/Support/EmailTriggerRegistry.php",
       "source_location": "L7",
       "id": "support_emailtriggerregistry_emailtriggerregistry",
-      "community": 51,
+      "community": 353,
       "norm_label": "emailtriggerregistry"
     },
     {
@@ -20016,7 +20016,7 @@
       "source_file": "app/Support/EmailTriggerRegistry.php",
       "source_location": "L12",
       "id": "support_emailtriggerregistry_emailtriggerregistry_all",
-      "community": 51,
+      "community": 353,
       "norm_label": ".all()"
     },
     {
@@ -20025,7 +20025,7 @@
       "source_file": "app/Support/EmailTriggerRegistry.php",
       "source_location": "L20",
       "id": "support_emailtriggerregistry_emailtriggerregistry_forslug",
-      "community": 51,
+      "community": 353,
       "norm_label": ".forslug()"
     },
     {
@@ -20088,7 +20088,7 @@
       "source_file": "app/Support/FieldHelp.php",
       "source_location": "L1",
       "id": "support_fieldhelp",
-      "community": 516,
+      "community": 0,
       "norm_label": "fieldhelp.php"
     },
     {
@@ -20097,7 +20097,7 @@
       "source_file": "app/Support/FieldHelp.php",
       "source_location": "L17",
       "id": "support_fieldhelp_fieldhelp",
-      "community": 516,
+      "community": 0,
       "norm_label": "fieldhelp"
     },
     {
@@ -20106,7 +20106,7 @@
       "source_file": "app/Support/FieldHelp.php",
       "source_location": "L19",
       "id": "support_fieldhelp_fieldhelp_field",
-      "community": 516,
+      "community": 0,
       "norm_label": ".field()"
     },
     {
@@ -20115,7 +20115,7 @@
       "source_file": "app/Support/FieldHelp.php",
       "source_location": "L32",
       "id": "support_fieldhelp_fieldhelp_section",
-      "community": 516,
+      "community": 0,
       "norm_label": ".section()"
     },
     {
@@ -20124,7 +20124,7 @@
       "source_file": "app/Support/FieldHelp.php",
       "source_location": "L44",
       "id": "support_fieldhelp_fieldhelp_line",
-      "community": 516,
+      "community": 0,
       "norm_label": ".line()"
     },
     {
@@ -20133,7 +20133,7 @@
       "source_file": "app/Support/FieldHelp.php",
       "source_location": "L57",
       "id": "support_fieldhelp_fieldhelp_forquickinput",
-      "community": 516,
+      "community": 0,
       "norm_label": ".forquickinput()"
     },
     {
@@ -20142,7 +20142,7 @@
       "source_file": "app/Support/FieldHelp.php",
       "source_location": "L81",
       "id": "support_fieldhelp_fieldhelp_quickinputsection",
-      "community": 516,
+      "community": 0,
       "norm_label": ".quickinputsection()"
     },
     {
@@ -20151,7 +20151,7 @@
       "source_file": "app/Support/FieldHelp.php",
       "source_location": "L91",
       "id": "support_fieldhelp_fieldhelp_normalizeslug",
-      "community": 516,
+      "community": 0,
       "norm_label": ".normalizeslug()"
     },
     {
@@ -20160,7 +20160,7 @@
       "source_file": "app/Support/FieldHelp.php",
       "source_location": "L96",
       "id": "support_fieldhelp_fieldhelp_resolve",
-      "community": 516,
+      "community": 0,
       "norm_label": ".resolve()"
     },
     {
@@ -20169,7 +20169,7 @@
       "source_file": "app/Support/JsonField.php",
       "source_location": "L1",
       "id": "support_jsonfield",
-      "community": 92,
+      "community": 0,
       "norm_label": "jsonfield.php"
     },
     {
@@ -20178,7 +20178,7 @@
       "source_file": "app/Support/JsonField.php",
       "source_location": "L5",
       "id": "support_jsonfield_jsonfield",
-      "community": 92,
+      "community": 0,
       "norm_label": "jsonfield"
     },
     {
@@ -20187,7 +20187,7 @@
       "source_file": "app/Support/JsonField.php",
       "source_location": "L10",
       "id": "support_jsonfield_jsonfield_decode",
-      "community": 92,
+      "community": 0,
       "norm_label": ".decode()"
     },
     {
@@ -20196,7 +20196,7 @@
       "source_file": "app/Support/PlanGate.php",
       "source_location": "L1",
       "id": "support_plangate",
-      "community": 16,
+      "community": 501,
       "norm_label": "plangate.php"
     },
     {
@@ -20223,7 +20223,7 @@
       "source_file": "app/Support/PlanGate.php",
       "source_location": "L22",
       "id": "support_plangate_plangate_foruser",
-      "community": 16,
+      "community": 501,
       "norm_label": ".foruser()"
     },
     {
@@ -20232,7 +20232,7 @@
       "source_file": "app/Support/PlanGate.php",
       "source_location": "L22",
       "id": "app_support_plangate_php_user",
-      "community": 16,
+      "community": 501,
       "norm_label": "user"
     },
     {
@@ -20241,7 +20241,7 @@
       "source_file": "app/Support/PlanGate.php",
       "source_location": "L22",
       "id": "app_support_plangate_php_self",
-      "community": 16,
+      "community": 501,
       "norm_label": "self"
     },
     {
@@ -20250,7 +20250,7 @@
       "source_file": "app/Support/PlanGate.php",
       "source_location": "L34",
       "id": "support_plangate_plangate_forcompany",
-      "community": 16,
+      "community": 501,
       "norm_label": ".forcompany()"
     },
     {
@@ -20565,7 +20565,7 @@
       "source_file": "app/Support/UaeUtilityContext.php",
       "source_location": "L1",
       "id": "support_uaeutilitycontext",
-      "community": 92,
+      "community": 54,
       "norm_label": "uaeutilitycontext.php"
     },
     {
@@ -20574,7 +20574,7 @@
       "source_file": "app/Support/UaeUtilityContext.php",
       "source_location": "L11",
       "id": "support_uaeutilitycontext_uaeutilitycontext",
-      "community": 92,
+      "community": 54,
       "norm_label": "uaeutilitycontext"
     },
     {
@@ -20583,7 +20583,7 @@
       "source_file": "app/Support/UaeUtilityContext.php",
       "source_location": "L55",
       "id": "support_uaeutilitycontext_uaeutilitycontext_resolve",
-      "community": 92,
+      "community": 54,
       "norm_label": ".resolve()"
     },
     {
@@ -20592,7 +20592,7 @@
       "source_file": "app/Support/UaeUtilityContext.php",
       "source_location": "L55",
       "id": "app_support_uaeutilitycontext_php_location",
-      "community": 92,
+      "community": 54,
       "norm_label": "location"
     },
     {
@@ -20601,7 +20601,7 @@
       "source_file": "app/Support/UaeUtilityContext.php",
       "source_location": "L55",
       "id": "app_support_uaeutilitycontext_php_company",
-      "community": 92,
+      "community": 54,
       "norm_label": "company"
     },
     {
@@ -20610,7 +20610,7 @@
       "source_file": "app/Support/UaeUtilityContext.php",
       "source_location": "L92",
       "id": "support_uaeutilitycontext_uaeutilitycontext_isuaesite",
-      "community": 92,
+      "community": 54,
       "norm_label": ".isuaesite()"
     },
     {
@@ -20619,7 +20619,7 @@
       "source_file": "app/Support/UaeUtilityContext.php",
       "source_location": "L116",
       "id": "support_uaeutilitycontext_uaeutilitycontext_locationreceivesutilitybills",
-      "community": 92,
+      "community": 54,
       "norm_label": ".locationreceivesutilitybills()"
     },
     {
@@ -20628,7 +20628,7 @@
       "source_file": "app/Support/UaeUtilityContext.php",
       "source_location": "L121",
       "id": "support_uaeutilitycontext_uaeutilitycontext_resolveemiratefromtext",
-      "community": 92,
+      "community": 54,
       "norm_label": ".resolveemiratefromtext()"
     },
     {
@@ -20637,7 +20637,7 @@
       "source_file": "app/Support/UaeUtilityContext.php",
       "source_location": "L134",
       "id": "support_uaeutilitycontext_uaeutilitycontext_normalizeemiratekey",
-      "community": 92,
+      "community": 54,
       "norm_label": ".normalizeemiratekey()"
     },
     {
@@ -23058,7 +23058,7 @@
       "source_file": "database/migrations/2026_06_11_100000_consultant_agency_plans.php",
       "source_location": "L1",
       "id": "migrations_2026_06_11_100000_consultant_agency_plans",
-      "community": 20,
+      "community": 516,
       "norm_label": "2026_06_11_100000_consultant_agency_plans.php"
     },
     {
@@ -23067,7 +23067,7 @@
       "source_file": "database/migrations/2026_06_11_100000_consultant_agency_plans.php",
       "source_location": "L15",
       "id": "migrations_2026_06_11_100000_consultant_agency_plans_up",
-      "community": 20,
+      "community": 516,
       "norm_label": "up()"
     },
     {
@@ -23076,7 +23076,7 @@
       "source_file": "database/migrations/2026_06_11_100000_consultant_agency_plans.php",
       "source_location": "L51",
       "id": "migrations_2026_06_11_100000_consultant_agency_plans_down",
-      "community": 20,
+      "community": 516,
       "norm_label": "down()"
     },
     {
@@ -23121,7 +23121,7 @@
       "source_file": "database/migrations/2026_06_12_100000_consultant_trial_plan.php",
       "source_location": "L1",
       "id": "migrations_2026_06_12_100000_consultant_trial_plan",
-      "community": 54,
+      "community": 20,
       "norm_label": "2026_06_12_100000_consultant_trial_plan.php"
     },
     {
@@ -23130,7 +23130,7 @@
       "source_file": "database/migrations/2026_06_12_100000_consultant_trial_plan.php",
       "source_location": "L14",
       "id": "migrations_2026_06_12_100000_consultant_trial_plan_up",
-      "community": 54,
+      "community": 20,
       "norm_label": "up()"
     },
     {
@@ -23139,7 +23139,7 @@
       "source_file": "database/migrations/2026_06_12_100000_consultant_trial_plan.php",
       "source_location": "L45",
       "id": "migrations_2026_06_12_100000_consultant_trial_plan_down",
-      "community": 54,
+      "community": 20,
       "norm_label": "down()"
     },
     {
@@ -23256,7 +23256,7 @@
       "source_file": "database/migrations/2026_06_15_120000_update_site_contact_details.php",
       "source_location": "L1",
       "id": "migrations_2026_06_15_120000_update_site_contact_details",
-      "community": 415,
+      "community": 4,
       "norm_label": "2026_06_15_120000_update_site_contact_details.php"
     },
     {
@@ -23265,7 +23265,7 @@
       "source_file": "database/migrations/2026_06_15_120000_update_site_contact_details.php",
       "source_location": "L12",
       "id": "migrations_2026_06_15_120000_update_site_contact_details_up",
-      "community": 415,
+      "community": 4,
       "norm_label": "up()"
     },
     {
@@ -23274,7 +23274,7 @@
       "source_file": "database/migrations/2026_06_15_120000_update_site_contact_details.php",
       "source_location": "L25",
       "id": "migrations_2026_06_15_120000_update_site_contact_details_down",
-      "community": 415,
+      "community": 4,
       "norm_label": "down()"
     },
     {
@@ -23643,7 +23643,7 @@
       "source_file": "database/migrations/2026_07_29_110000_consultant_demo_pack.php",
       "source_location": "L1",
       "id": "migrations_2026_07_29_110000_consultant_demo_pack",
-      "community": 54,
+      "community": 20,
       "norm_label": "2026_07_29_110000_consultant_demo_pack.php"
     },
     {
@@ -23652,7 +23652,7 @@
       "source_file": "database/migrations/2026_07_29_110000_consultant_demo_pack.php",
       "source_location": "L15",
       "id": "migrations_2026_07_29_110000_consultant_demo_pack_up",
-      "community": 54,
+      "community": 20,
       "norm_label": "up()"
     },
     {
@@ -23661,7 +23661,7 @@
       "source_file": "database/migrations/2026_07_29_110000_consultant_demo_pack.php",
       "source_location": "L46",
       "id": "migrations_2026_07_29_110000_consultant_demo_pack_down",
-      "community": 54,
+      "community": 20,
       "norm_label": "down()"
     },
     {
@@ -23670,7 +23670,7 @@
       "source_file": "database/migrations/2026_08_03_100000_phase1_free_plan_scope3_preview.php",
       "source_location": "L1",
       "id": "migrations_2026_08_03_100000_phase1_free_plan_scope3_preview",
-      "community": 550,
+      "community": 517,
       "norm_label": "2026_08_03_100000_phase1_free_plan_scope3_preview.php"
     },
     {
@@ -23679,7 +23679,7 @@
       "source_file": "database/migrations/2026_08_03_100000_phase1_free_plan_scope3_preview.php",
       "source_location": "L16",
       "id": "migrations_2026_08_03_100000_phase1_free_plan_scope3_preview_up",
-      "community": 550,
+      "community": 517,
       "norm_label": "up()"
     },
     {
@@ -23688,7 +23688,7 @@
       "source_file": "database/migrations/2026_08_03_100000_phase1_free_plan_scope3_preview.php",
       "source_location": "L48",
       "id": "migrations_2026_08_03_100000_phase1_free_plan_scope3_preview_down",
-      "community": 550,
+      "community": 517,
       "norm_label": "down()"
     },
     {
@@ -23697,7 +23697,7 @@
       "source_file": "database/migrations/2026_08_03_110000_phase2_free_watermarked_exports.php",
       "source_location": "L1",
       "id": "migrations_2026_08_03_110000_phase2_free_watermarked_exports",
-      "community": 20,
+      "community": 550,
       "norm_label": "2026_08_03_110000_phase2_free_watermarked_exports.php"
     },
     {
@@ -23706,7 +23706,7 @@
       "source_file": "database/migrations/2026_08_03_110000_phase2_free_watermarked_exports.php",
       "source_location": "L13",
       "id": "migrations_2026_08_03_110000_phase2_free_watermarked_exports_up",
-      "community": 20,
+      "community": 550,
       "norm_label": "up()"
     },
     {
@@ -23715,7 +23715,7 @@
       "source_file": "database/migrations/2026_08_03_110000_phase2_free_watermarked_exports.php",
       "source_location": "L34",
       "id": "migrations_2026_08_03_110000_phase2_free_watermarked_exports_down",
-      "community": 20,
+      "community": 550,
       "norm_label": "down()"
     },
     {
@@ -23832,7 +23832,7 @@
       "source_file": "database/migrations/2026_08_03_160000_phase8_seed_scope_and_consultant_entity.php",
       "source_location": "L1",
       "id": "migrations_2026_08_03_160000_phase8_seed_scope_and_consultant_entity",
-      "community": 20,
+      "community": 550,
       "norm_label": "2026_08_03_160000_phase8_seed_scope_and_consultant_entity.php"
     },
     {
@@ -23841,7 +23841,7 @@
       "source_file": "database/migrations/2026_08_03_160000_phase8_seed_scope_and_consultant_entity.php",
       "source_location": "L18",
       "id": "migrations_2026_08_03_160000_phase8_seed_scope_and_consultant_entity_up",
-      "community": 20,
+      "community": 550,
       "norm_label": "up()"
     },
     {
@@ -23850,7 +23850,7 @@
       "source_file": "database/migrations/2026_08_03_160000_phase8_seed_scope_and_consultant_entity.php",
       "source_location": "L107",
       "id": "migrations_2026_08_03_160000_phase8_seed_scope_and_consultant_entity_down",
-      "community": 20,
+      "community": 550,
       "norm_label": "down()"
     },
     {
@@ -23886,7 +23886,7 @@
       "source_file": "database/migrations/2026_08_04_150000_phase1_consultant_multi_package_catalog.php",
       "source_location": "L1",
       "id": "migrations_2026_08_04_150000_phase1_consultant_multi_package_catalog",
-      "community": 551,
+      "community": 526,
       "norm_label": "2026_08_04_150000_phase1_consultant_multi_package_catalog.php"
     },
     {
@@ -23895,7 +23895,7 @@
       "source_file": "database/migrations/2026_08_04_150000_phase1_consultant_multi_package_catalog.php",
       "source_location": "L17",
       "id": "migrations_2026_08_04_150000_phase1_consultant_multi_package_catalog_up",
-      "community": 551,
+      "community": 526,
       "norm_label": "up()"
     },
     {
@@ -23904,7 +23904,7 @@
       "source_file": "database/migrations/2026_08_04_150000_phase1_consultant_multi_package_catalog.php",
       "source_location": "L99",
       "id": "migrations_2026_08_04_150000_phase1_consultant_multi_package_catalog_down",
-      "community": 551,
+      "community": 526,
       "norm_label": "down()"
     },
     {
@@ -24049,6 +24049,33 @@
       "source_location": "L55",
       "id": "migrations_2026_08_04_170000_phase3_consultant_entity_request_lines_down",
       "community": 416,
+      "norm_label": "down()"
+    },
+    {
+      "label": "2026_08_04_180000_drop_consultant_extra_slots_purchased.php",
+      "file_type": "code",
+      "source_file": "database/migrations/2026_08_04_180000_drop_consultant_extra_slots_purchased.php",
+      "source_location": "L1",
+      "id": "migrations_2026_08_04_180000_drop_consultant_extra_slots_purchased",
+      "community": 527,
+      "norm_label": "2026_08_04_180000_drop_consultant_extra_slots_purchased.php"
+    },
+    {
+      "label": "up()",
+      "file_type": "code",
+      "source_file": "database/migrations/2026_08_04_180000_drop_consultant_extra_slots_purchased.php",
+      "source_location": "L13",
+      "id": "migrations_2026_08_04_180000_drop_consultant_extra_slots_purchased_up",
+      "community": 527,
+      "norm_label": "up()"
+    },
+    {
+      "label": "down()",
+      "file_type": "code",
+      "source_file": "database/migrations/2026_08_04_180000_drop_consultant_extra_slots_purchased.php",
+      "source_location": "L26",
+      "id": "migrations_2026_08_04_180000_drop_consultant_extra_slots_purchased_down",
+      "community": 527,
       "norm_label": "down()"
     },
     {
@@ -28132,10 +28159,37 @@
       "norm_label": "phase 5 \u2014 guides + seed refresh"
     },
     {
+      "label": "Phase 6 \u2014 Workspace UX (sections + open seats) \u2705 / merge polish",
+      "file_type": "document",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L241",
+      "id": "documentation_consultant_multi_package_plan_phase_6_workspace_ux_sections_open_seats_merge_polish",
+      "community": 49,
+      "norm_label": "phase 6 \u2014 workspace ux (sections + open seats) \u2705 / merge polish"
+    },
+    {
+      "label": "Phase 7 \u2014 Seat move / retention (consultant-driven) \u2014 **not started**",
+      "file_type": "document",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L245",
+      "id": "documentation_consultant_multi_package_plan_phase_7_seat_move_retention_consultant_driven_not_started",
+      "community": 49,
+      "norm_label": "phase 7 \u2014 seat move / retention (consultant-driven) \u2014 **not started**"
+    },
+    {
+      "label": "Phase 8 \u2014 Multi-row renew (replace legacy P20 single-sub renew) \u2014 **not started**",
+      "file_type": "document",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L248",
+      "id": "documentation_consultant_multi_package_plan_phase_8_multi_row_renew_replace_legacy_p20_single_sub_renew_not_started",
+      "community": 49,
+      "norm_label": "phase 8 \u2014 multi-row renew (replace legacy p20 single-sub renew) \u2014 **not started**"
+    },
+    {
       "label": "11. Success criteria",
       "file_type": "document",
       "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
-      "source_location": "L243",
+      "source_location": "L254",
       "id": "documentation_consultant_multi_package_plan_11_success_criteria",
       "community": 49,
       "norm_label": "11. success criteria"
@@ -28144,7 +28198,7 @@
       "label": "12. Open / follow-ups",
       "file_type": "document",
       "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
-      "source_location": "L253",
+      "source_location": "L265",
       "id": "documentation_consultant_multi_package_plan_12_open_follow_ups",
       "community": 49,
       "norm_label": "12. open / follow-ups"
@@ -28153,10 +28207,118 @@
       "label": "13. Changelog",
       "file_type": "document",
       "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
-      "source_location": "L264",
+      "source_location": "L279",
       "id": "documentation_consultant_multi_package_plan_13_changelog",
       "community": 49,
       "norm_label": "13. changelog"
+    },
+    {
+      "label": "14. Renewals, seat moves, and \u201ckeep 3 of 8\u201d (locked product rules)",
+      "file_type": "document",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L295",
+      "id": "documentation_consultant_multi_package_plan_14_renewals_seat_moves_and_keep_3_of_8_locked_product_rules",
+      "community": 49,
+      "norm_label": "14. renewals, seat moves, and \u201ckeep 3 of 8\u201d (locked product rules)"
+    },
+    {
+      "label": "14.1 You\u2019re right \u2014 consultant decides",
+      "file_type": "document",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L297",
+      "id": "documentation_consultant_multi_package_plan_14_1_you_re_right_consultant_decides",
+      "community": 49,
+      "norm_label": "14.1 you\u2019re right \u2014 consultant decides"
+    },
+    {
+      "label": "14.2 Worked example (your numbers)",
+      "file_type": "document",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L313",
+      "id": "documentation_consultant_multi_package_plan_14_2_worked_example_your_numbers",
+      "community": 49,
+      "norm_label": "14.2 worked example (your numbers)"
+    },
+    {
+      "label": "14.3 What must never happen",
+      "file_type": "document",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L343",
+      "id": "documentation_consultant_multi_package_plan_14_3_what_must_never_happen",
+      "community": 49,
+      "norm_label": "14.3 what must never happen"
+    },
+    {
+      "label": "14.4 What already exists vs gap",
+      "file_type": "document",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L350",
+      "id": "documentation_consultant_multi_package_plan_14_4_what_already_exists_vs_gap",
+      "community": 49,
+      "norm_label": "14.4 what already exists vs gap"
+    },
+    {
+      "label": "14.5 Target operating procedure (ops + product)",
+      "file_type": "document",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L361",
+      "id": "documentation_consultant_multi_package_plan_14_5_target_operating_procedure_ops_product",
+      "community": 49,
+      "norm_label": "14.5 target operating procedure (ops + product)"
+    },
+    {
+      "label": "14.6 Display rules (workspace)",
+      "file_type": "document",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L378",
+      "id": "documentation_consultant_multi_package_plan_14_6_display_rules_workspace",
+      "community": 49,
+      "norm_label": "14.6 display rules (workspace)"
+    },
+    {
+      "label": "14.7 Build phases (coding later)",
+      "file_type": "document",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L386",
+      "id": "documentation_consultant_multi_package_plan_14_7_build_phases_coding_later",
+      "community": 49,
+      "norm_label": "14.7 build phases (coding later)"
+    },
+    {
+      "label": "Phase 7 \u2014 Seat assign / move",
+      "file_type": "document",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L388",
+      "id": "documentation_consultant_multi_package_plan_phase_7_seat_assign_move",
+      "community": 49,
+      "norm_label": "phase 7 \u2014 seat assign / move"
+    },
+    {
+      "label": "Phase 8 \u2014 Multi-row renew flow",
+      "file_type": "document",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L397",
+      "id": "documentation_consultant_multi_package_plan_phase_8_multi_row_renew_flow",
+      "community": 49,
+      "norm_label": "phase 8 \u2014 multi-row renew flow"
+    },
+    {
+      "label": "Phase 6 remnant \u2014 merge-by-plan UI",
+      "file_type": "document",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L406",
+      "id": "documentation_consultant_multi_package_plan_phase_6_remnant_merge_by_plan_ui",
+      "community": 49,
+      "norm_label": "phase 6 remnant \u2014 merge-by-plan ui"
+    },
+    {
+      "label": "14.8 Non-goals (this pass)",
+      "file_type": "document",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L409",
+      "id": "documentation_consultant_multi_package_plan_14_8_non_goals_this_pass",
+      "community": 49,
+      "norm_label": "14.8 non-goals (this pass)"
     },
     {
       "label": "DESIGN_DEPLOY_NOTES.md",
@@ -29521,7 +29683,7 @@
       "label": "7. Extras (admin price book)",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L167",
+      "source_location": "L168",
       "id": "documentation_pricing_and_plan_major_changes_7_extras_admin_price_book",
       "community": 59,
       "norm_label": "7. extras (admin price book)"
@@ -29530,7 +29692,7 @@
       "label": "8. Request UX",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L182",
+      "source_location": "L183",
       "id": "documentation_pricing_and_plan_major_changes_8_request_ux",
       "community": 514,
       "norm_label": "8. request ux"
@@ -29539,7 +29701,7 @@
       "label": "Company",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L184",
+      "source_location": "L185",
       "id": "documentation_pricing_and_plan_major_changes_company",
       "community": 514,
       "norm_label": "company"
@@ -29548,7 +29710,7 @@
       "label": "Consultant",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L187",
+      "source_location": "L188",
       "id": "documentation_pricing_and_plan_major_changes_consultant",
       "community": 514,
       "norm_label": "consultant"
@@ -29557,7 +29719,7 @@
       "label": "Replaces",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L190",
+      "source_location": "L191",
       "id": "documentation_pricing_and_plan_major_changes_replaces",
       "community": 514,
       "norm_label": "replaces"
@@ -29566,7 +29728,7 @@
       "label": "9. Admin workflow",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L195",
+      "source_location": "L196",
       "id": "documentation_pricing_and_plan_major_changes_9_admin_workflow",
       "community": 418,
       "norm_label": "9. admin workflow"
@@ -29575,7 +29737,7 @@
       "label": "10\u201311. Free + Watermark",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L203",
+      "source_location": "L204",
       "id": "documentation_pricing_and_plan_major_changes_10_11_free_watermark",
       "community": 59,
       "norm_label": "10\u201311. free + watermark"
@@ -29584,7 +29746,7 @@
       "label": "12. Phased checklist",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L209",
+      "source_location": "L210",
       "id": "documentation_pricing_and_plan_major_changes_12_phased_checklist",
       "community": 45,
       "norm_label": "12. phased checklist"
@@ -29593,7 +29755,7 @@
       "label": "Phase 0\u20132 \u2705 DONE",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L211",
+      "source_location": "L212",
       "id": "documentation_pricing_and_plan_major_changes_phase_0_2_done",
       "community": 45,
       "norm_label": "phase 0\u20132 \u2705 done"
@@ -29602,7 +29764,7 @@
       "label": "Phase 2.5 \u2014 Commercial proposal alignment \u2705 DONE (doc)",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L214",
+      "source_location": "L215",
       "id": "documentation_pricing_and_plan_major_changes_phase_2_5_commercial_proposal_alignment_done_doc",
       "community": 45,
       "norm_label": "phase 2.5 \u2014 commercial proposal alignment \u2705 done (doc)"
@@ -29611,7 +29773,7 @@
       "label": "Phase 3 \u2014 Hide public & self-serve \u2705 DONE",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L219",
+      "source_location": "L220",
       "id": "documentation_pricing_and_plan_major_changes_phase_3_hide_public_self_serve_done",
       "community": 45,
       "norm_label": "phase 3 \u2014 hide public & self-serve \u2705 done"
@@ -29620,7 +29782,7 @@
       "label": "Phase 4 \u2014 Company Request a package \u2705 DONE",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L225",
+      "source_location": "L226",
       "id": "documentation_pricing_and_plan_major_changes_phase_4_company_request_a_package_done",
       "community": 45,
       "norm_label": "phase 4 \u2014 company request a package \u2705 done"
@@ -29629,7 +29791,7 @@
       "label": "Phase 5 \u2014 Consultant Request entities \u2705 DONE",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L231",
+      "source_location": "L232",
       "id": "documentation_pricing_and_plan_major_changes_phase_5_consultant_request_entities_done",
       "community": 45,
       "norm_label": "phase 5 \u2014 consultant request entities \u2705 done"
@@ -29638,7 +29800,7 @@
       "label": "Phase 6 \u2014 Admin quote + activate \u2705 DONE",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L237",
+      "source_location": "L238",
       "id": "documentation_pricing_and_plan_major_changes_phase_6_admin_quote_activate_done",
       "community": 45,
       "norm_label": "phase 6 \u2014 admin quote + activate \u2705 done"
@@ -29647,7 +29809,7 @@
       "label": "Phase 7 \u2014 Price book \u2705 DONE",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L242",
+      "source_location": "L243",
       "id": "documentation_pricing_and_plan_major_changes_phase_7_price_book_done",
       "community": 45,
       "norm_label": "phase 7 \u2014 price book \u2705 done"
@@ -29656,7 +29818,7 @@
       "label": "Phase 8 \u2014 Live plan seeds \u2705 DONE",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L246",
+      "source_location": "L247",
       "id": "documentation_pricing_and_plan_major_changes_phase_8_live_plan_seeds_done",
       "community": 45,
       "norm_label": "phase 8 \u2014 live plan seeds \u2705 done"
@@ -29665,7 +29827,7 @@
       "label": "Phase 9 \u2014 Portal guides + ElevenLabs \u2705 DONE",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L253",
+      "source_location": "L254",
       "id": "documentation_pricing_and_plan_major_changes_phase_9_portal_guides_elevenlabs_done",
       "community": 45,
       "norm_label": "phase 9 \u2014 portal guides + elevenlabs \u2705 done"
@@ -29674,7 +29836,7 @@
       "label": "Phase 10a \u2014 Renewals (offline nudges) \u2705 DONE",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L259",
+      "source_location": "L260",
       "id": "documentation_pricing_and_plan_major_changes_phase_10a_renewals_offline_nudges_done",
       "community": 45,
       "norm_label": "phase 10a \u2014 renewals (offline nudges) \u2705 done"
@@ -29683,7 +29845,7 @@
       "label": "Phase 10b \u2014 Min-10 preferential soft reminder \u2705 DONE",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L266",
+      "source_location": "L267",
       "id": "documentation_pricing_and_plan_major_changes_phase_10b_min_10_preferential_soft_reminder_done",
       "community": 45,
       "norm_label": "phase 10b \u2014 min-10 preferential soft reminder \u2705 done"
@@ -29692,7 +29854,7 @@
       "label": "13. Code touchpoints",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L273",
+      "source_location": "L274",
       "id": "documentation_pricing_and_plan_major_changes_13_code_touchpoints",
       "community": 59,
       "norm_label": "13. code touchpoints"
@@ -29701,7 +29863,7 @@
       "label": "14. Front messaging",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L290",
+      "source_location": "L291",
       "id": "documentation_pricing_and_plan_major_changes_14_front_messaging",
       "community": 59,
       "norm_label": "14. front messaging"
@@ -29710,7 +29872,7 @@
       "label": "15. Success criteria",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L298",
+      "source_location": "L299",
       "id": "documentation_pricing_and_plan_major_changes_15_success_criteria",
       "community": 59,
       "norm_label": "15. success criteria"
@@ -29719,7 +29881,7 @@
       "label": "16. Open items",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L308",
+      "source_location": "L309",
       "id": "documentation_pricing_and_plan_major_changes_16_open_items",
       "community": 59,
       "norm_label": "16. open items"
@@ -29728,7 +29890,7 @@
       "label": "17. Document history",
       "file_type": "document",
       "source_file": "documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md",
-      "source_location": "L319",
+      "source_location": "L320",
       "id": "documentation_pricing_and_plan_major_changes_17_document_history",
       "community": 59,
       "norm_label": "17. document history"
@@ -31971,7 +32133,7 @@
       "source_file": "documentation/archive/SYSTEM_DOCUMENTATION_COMPLETE.md",
       "source_location": "L1919",
       "id": "archive_system_documentation_complete_2_architecture_decisions",
-      "community": 541,
+      "community": 365,
       "norm_label": "2. architecture decisions"
     },
     {
@@ -31980,7 +32142,7 @@
       "source_file": "documentation/archive/SYSTEM_DOCUMENTATION_COMPLETE.md",
       "source_location": "L1921",
       "id": "archive_system_documentation_complete_panel_architecture_hybrid_approach",
-      "community": 541,
+      "community": 365,
       "norm_label": "panel architecture: hybrid approach \u2705"
     },
     {
@@ -31989,7 +32151,7 @@
       "source_file": "documentation/archive/SYSTEM_DOCUMENTATION_COMPLETE.md",
       "source_location": "L1938",
       "id": "archive_system_documentation_complete_data_architecture_separate_tables",
-      "community": 541,
+      "community": 365,
       "norm_label": "data architecture: separate tables \u2705"
     },
     {
@@ -31998,7 +32160,7 @@
       "source_file": "documentation/archive/SYSTEM_DOCUMENTATION_COMPLETE.md",
       "source_location": "L1952",
       "id": "archive_system_documentation_complete_staff_architecture_single_table_access_linking",
-      "community": 541,
+      "community": 365,
       "norm_label": "staff architecture: single table + access linking \u2705"
     },
     {
@@ -32511,7 +32673,7 @@
       "source_file": "documentation/archive/SYSTEM_DOCUMENTATION_COMPLETE.md",
       "source_location": "L2794",
       "id": "archive_system_documentation_complete_8_performance_scalability",
-      "community": 365,
+      "community": 541,
       "norm_label": "8. performance & scalability"
     },
     {
@@ -32520,7 +32682,7 @@
       "source_file": "documentation/archive/SYSTEM_DOCUMENTATION_COMPLETE.md",
       "source_location": "L2796",
       "id": "archive_system_documentation_complete_scale_analysis",
-      "community": 365,
+      "community": 541,
       "norm_label": "scale analysis"
     },
     {
@@ -32529,7 +32691,7 @@
       "source_file": "documentation/archive/SYSTEM_DOCUMENTATION_COMPLETE.md",
       "source_location": "L2804",
       "id": "archive_system_documentation_complete_database_size_estimate",
-      "community": 365,
+      "community": 541,
       "norm_label": "database size estimate"
     },
     {
@@ -32538,7 +32700,7 @@
       "source_file": "documentation/archive/SYSTEM_DOCUMENTATION_COMPLETE.md",
       "source_location": "L2817",
       "id": "archive_system_documentation_complete_query_performance_with_proper_indexing",
-      "community": 365,
+      "community": 541,
       "norm_label": "query performance with proper indexing"
     },
     {
@@ -32547,7 +32709,7 @@
       "source_file": "documentation/archive/SYSTEM_DOCUMENTATION_COMPLETE.md",
       "source_location": "L2841",
       "id": "archive_system_documentation_complete_why_single_table_approach_is_best",
-      "community": 365,
+      "community": 541,
       "norm_label": "why single table approach is best"
     },
     {
@@ -32754,7 +32916,7 @@
       "source_file": "documentation/archive/SYSTEM_DOCUMENTATION_COMPLETE.md",
       "source_location": "L3079",
       "id": "archive_system_documentation_complete_complete_system_flow",
-      "community": 544,
+      "community": 506,
       "norm_label": "complete system flow"
     },
     {
@@ -32763,7 +32925,7 @@
       "source_file": "documentation/archive/SYSTEM_DOCUMENTATION_COMPLETE.md",
       "source_location": "L3081",
       "id": "archive_system_documentation_complete_direct_client_flow",
-      "community": 544,
+      "community": 506,
       "norm_label": "direct client flow"
     },
     {
@@ -32772,7 +32934,7 @@
       "source_file": "documentation/archive/SYSTEM_DOCUMENTATION_COMPLETE.md",
       "source_location": "L3091",
       "id": "archive_system_documentation_complete_partner_external_client_flow",
-      "community": 544,
+      "community": 506,
       "norm_label": "partner external client flow"
     },
     {
@@ -32781,7 +32943,7 @@
       "source_file": "documentation/archive/SYSTEM_DOCUMENTATION_COMPLETE.md",
       "source_location": "L3104",
       "id": "archive_system_documentation_complete_multi_account_staff_flow",
-      "community": 544,
+      "community": 506,
       "norm_label": "multi-account staff flow"
     },
     {
@@ -33536,7 +33698,7 @@
       "file_type": "code",
       "source_file": "app/Data/ConsultantAgencyPlanMatrix.php",
       "source_location": "L308",
-      "community": 54,
+      "community": 20,
       "norm_label": ".trialpack()",
       "id": "data_consultantagencyplanmatrix_consultantagencyplanmatrix_trialpack"
     },
@@ -34157,7 +34319,7 @@
       "file_type": "code",
       "source_file": "app/Http/Controllers/RoleManagementController.php",
       "source_location": "L15",
-      "community": 501,
+      "community": 30,
       "norm_label": "rolemanagementservice",
       "id": "rolemanagementservice"
     },
@@ -34166,7 +34328,7 @@
       "file_type": "code",
       "source_file": "app/Http/Controllers/StaffManagementController.php",
       "source_location": "L473",
-      "community": 79,
+      "community": 5,
       "norm_label": "companyinvitation",
       "id": "companyinvitation"
     },
@@ -34175,7 +34337,7 @@
       "file_type": "code",
       "source_file": "app/Services/ConsultantAgencyPaymentService.php",
       "source_location": "L23",
-      "community": 419,
+      "community": 9,
       "norm_label": "redirectresponse",
       "id": "redirectresponse"
     }
@@ -35212,6 +35374,17 @@
       "source_location": "L248",
       "weight": 1.0,
       "source": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_activatepacksubscription",
+      "target": "data_consultantagencyplanmatrix_consultantagencyplanmatrix"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
+      "source_location": "L731",
+      "weight": 1.0,
+      "source": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_addextraslots",
       "target": "data_consultantagencyplanmatrix_consultantagencyplanmatrix"
     },
     {
@@ -43696,9 +43869,9 @@
       "source_location": "L36",
       "weight": 1.0,
       "context": "parameter_type",
+      "confidence_score": 1.0,
       "source": "agency_managedclientcontroller_managedclientcontroller_create",
-      "target": "app_http_controllers_consultant_agency_managedclientcontroller_php_request",
-      "confidence_score": 1.0
+      "target": "app_http_controllers_consultant_agency_managedclientcontroller_php_request"
     },
     {
       "relation": "calls",
@@ -67940,6 +68113,17 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
+      "source_location": "L734",
+      "weight": 1.0,
+      "source": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_addextraslots",
+      "target": "services_consultantagencysubscriptionservice_consultantagencysubscriptionservice_grantdepthsubscription",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app/Services/ConsultantAgencySubscriptionService.php",
       "source_location": "L402",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -82453,6 +82637,26 @@
       "target": "migrations_2026_08_04_170000_phase3_consultant_entity_request_lines_up"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "database/migrations/2026_08_04_180000_drop_consultant_extra_slots_purchased.php",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "migrations_2026_08_04_180000_drop_consultant_extra_slots_purchased",
+      "target": "migrations_2026_08_04_180000_drop_consultant_extra_slots_purchased_down",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "database/migrations/2026_08_04_180000_drop_consultant_extra_slots_purchased.php",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "migrations_2026_08_04_180000_drop_consultant_extra_slots_purchased",
+      "target": "migrations_2026_08_04_180000_drop_consultant_extra_slots_purchased_up",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -85669,6 +85873,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L291",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "documentation_consultant_multi_package_plan_menetzero_consultant_multi_package_plan_option_c_multi_row",
+      "target": "documentation_consultant_multi_package_plan_14_renewals_seat_moves_and_keep_3_of_8_locked_product_rules"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
       "source_location": "L19",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -85874,6 +86088,146 @@
       "confidence_score": 1.0,
       "source": "documentation_consultant_multi_package_plan_10_phased_checklist",
       "target": "documentation_consultant_multi_package_plan_phase_5_guides_seed_refresh"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L241",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "documentation_consultant_multi_package_plan_10_phased_checklist",
+      "target": "documentation_consultant_multi_package_plan_phase_6_workspace_ux_sections_open_seats_merge_polish"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L245",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "documentation_consultant_multi_package_plan_10_phased_checklist",
+      "target": "documentation_consultant_multi_package_plan_phase_7_seat_move_retention_consultant_driven_not_started"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L248",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "documentation_consultant_multi_package_plan_10_phased_checklist",
+      "target": "documentation_consultant_multi_package_plan_phase_8_multi_row_renew_replace_legacy_p20_single_sub_renew_not_started"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L293",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "documentation_consultant_multi_package_plan_14_renewals_seat_moves_and_keep_3_of_8_locked_product_rules",
+      "target": "documentation_consultant_multi_package_plan_14_1_you_re_right_consultant_decides"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L309",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "documentation_consultant_multi_package_plan_14_renewals_seat_moves_and_keep_3_of_8_locked_product_rules",
+      "target": "documentation_consultant_multi_package_plan_14_2_worked_example_your_numbers"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L339",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "documentation_consultant_multi_package_plan_14_renewals_seat_moves_and_keep_3_of_8_locked_product_rules",
+      "target": "documentation_consultant_multi_package_plan_14_3_what_must_never_happen"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L346",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "documentation_consultant_multi_package_plan_14_renewals_seat_moves_and_keep_3_of_8_locked_product_rules",
+      "target": "documentation_consultant_multi_package_plan_14_4_what_already_exists_vs_gap"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L357",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "documentation_consultant_multi_package_plan_14_renewals_seat_moves_and_keep_3_of_8_locked_product_rules",
+      "target": "documentation_consultant_multi_package_plan_14_5_target_operating_procedure_ops_product"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L374",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "documentation_consultant_multi_package_plan_14_renewals_seat_moves_and_keep_3_of_8_locked_product_rules",
+      "target": "documentation_consultant_multi_package_plan_14_6_display_rules_workspace"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L382",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "documentation_consultant_multi_package_plan_14_renewals_seat_moves_and_keep_3_of_8_locked_product_rules",
+      "target": "documentation_consultant_multi_package_plan_14_7_build_phases_coding_later"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L405",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "documentation_consultant_multi_package_plan_14_renewals_seat_moves_and_keep_3_of_8_locked_product_rules",
+      "target": "documentation_consultant_multi_package_plan_14_8_non_goals_this_pass"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L402",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "documentation_consultant_multi_package_plan_14_7_build_phases_coding_later",
+      "target": "documentation_consultant_multi_package_plan_phase_6_remnant_merge_by_plan_ui"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L384",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "documentation_consultant_multi_package_plan_14_7_build_phases_coding_later",
+      "target": "documentation_consultant_multi_package_plan_phase_7_seat_assign_move"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md",
+      "source_location": "L393",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "documentation_consultant_multi_package_plan_14_7_build_phases_coding_later",
+      "target": "documentation_consultant_multi_package_plan_phase_8_multi_row_renew_flow"
     },
     {
       "relation": "contains",
@@ -92297,5 +92651,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "9f42bb673138f89b76b29f3b97a3be552d826594"
+  "built_at_commit": "475e1da261305114d1c55f45caa47aca83136e04"
 }

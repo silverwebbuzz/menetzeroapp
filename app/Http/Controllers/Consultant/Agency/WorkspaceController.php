@@ -35,7 +35,7 @@ class WorkspaceController extends Controller
             fn (ConsultantClientEngagement $e) => (int) $e->consultant_subscription_id
         );
 
-        $sections = collect($buckets)->map(function (array $bucket) use ($bySubscription) {
+        $rowSections = collect($buckets)->map(function (array $bucket) use ($bySubscription) {
             $id = (int) $bucket['subscription_id'];
             $list = $bySubscription->get($id, collect())->values();
             $bySubscription->forget($id);
@@ -44,6 +44,53 @@ class WorkspaceController extends Controller
                 'engagements' => $list,
             ]);
         })->values();
+
+        // Display: merge same plan_code into one section; DB rows stay separate.
+        $sections = $rowSections
+            ->groupBy(fn (array $row) => $row['plan_code'] ?: ('row-'.$row['subscription_id']))
+            ->map(function ($group) {
+                $rows = $group->sortBy(fn (array $r) => $r['expires_at'] ?? '9999-99-99')->values();
+                $first = $rows->first();
+
+                $emptySeatTargets = [];
+                foreach ($rows as $row) {
+                    $left = max(0, (int) $row['remaining']);
+                    for ($i = 0; $i < $left; $i++) {
+                        $emptySeatTargets[] = (int) $row['subscription_id'];
+                    }
+                }
+
+                $expires = $rows->pluck('expires_at')->filter()->unique()->values();
+                $expiresLabel = null;
+                if ($expires->count() === 1) {
+                    $expiresLabel = 'expires '.$expires->first();
+                } elseif ($expires->count() > 1) {
+                    $expiresLabel = 'expires '.$expires->min().' – '.$expires->max();
+                }
+
+                return [
+                    'plan_code' => $first['plan_code'],
+                    'plan_name' => $first['plan_name'],
+                    'client_package_code' => $first['client_package_code'],
+                    'is_trial' => (bool) $first['is_trial'],
+                    'is_demo' => (bool) $first['is_demo'],
+                    'is_depth' => (bool) $first['is_depth'],
+                    'used' => (int) $rows->sum('used'),
+                    'slot_limit' => (int) $rows->sum('slot_limit'),
+                    'remaining' => (int) $rows->sum('remaining'),
+                    'expires_label' => $expiresLabel,
+                    'purchase_rows' => $rows->map(fn (array $r) => [
+                        'subscription_id' => (int) $r['subscription_id'],
+                        'slot_limit' => (int) $r['slot_limit'],
+                        'used' => (int) $r['used'],
+                        'remaining' => (int) $r['remaining'],
+                        'expires_at' => $r['expires_at'],
+                    ])->all(),
+                    'engagements' => $rows->flatMap(fn (array $r) => $r['engagements'])->values(),
+                    'empty_seat_targets' => $emptySeatTargets,
+                ];
+            })
+            ->values();
 
         // Active clients whose capacity row is no longer active (expired/cancelled).
         $orphanEngagements = $bySubscription->flatten(1)->values();

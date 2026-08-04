@@ -160,7 +160,8 @@ No list price — Talk to us / Enterprise request → `consultant_enterprise` ca
 | Demo / QA | `consultant_1` (admin only) |
 | Depth capacity | `consultant_scope_basic`, `consultant_scope_pro`, `consultant_esg_starter`, `consultant_esg_complete`, `consultant_enterprise` |
 
-Full implementation checklist: `documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md`.
+Full implementation checklist: `documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md`.  
+Renewals / seat moves / keep-fewer-clients: see that doc **§14** (Phases 7–8; coding later).
 
 ---
 

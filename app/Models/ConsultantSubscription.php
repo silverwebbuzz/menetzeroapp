@@ -16,7 +16,6 @@ class ConsultantSubscription extends Model
         'subscription_plan_id',
         'contract_year',
         'slot_limit',
-        'extra_slots_purchased',
         'starts_at',
         'expires_at',
         'status',
@@ -27,7 +26,6 @@ class ConsultantSubscription extends Model
     protected $casts = [
         'contract_year' => 'integer',
         'slot_limit' => 'integer',
-        'extra_slots_purchased' => 'integer',
         'starts_at' => 'date',
         'expires_at' => 'date',
         'metadata' => 'array',
