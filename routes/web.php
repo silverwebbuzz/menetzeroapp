@@ -88,6 +88,10 @@ Route::prefix('consultant')->name('consultant.')->group(function () {
             });
 
             Route::resource('clients', \App\Http\Controllers\Consultant\Agency\ManagedClientController::class);
+            Route::get('/clients/{client}/move', [\App\Http\Controllers\Consultant\Agency\ManagedClientController::class, 'moveForm'])
+                ->name('clients.move');
+            Route::post('/clients/{client}/move', [\App\Http\Controllers\Consultant\Agency\ManagedClientController::class, 'move'])
+                ->name('clients.move.store');
 
             // Team & access (same tables as client companies; consultant free trial = view only)
             Route::prefix('team')->name('team.')->group(function () {

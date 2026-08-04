@@ -126,6 +126,52 @@ class ConsultantAgencyPlanMatrix
     }
 
     /**
+     * Commercial depth ladder for seat moves (Phase 7).
+     * Free &lt; Scope Basic &lt; Scope Pro &lt; ESG Starter &lt; ESG Complete &lt; Enterprise.
+     * Demo QA sits with Free for ranking (may move up into paid).
+     */
+    public static function depthRank(?string $planCode): int
+    {
+        if ($planCode === null || $planCode === '') {
+            return -1;
+        }
+
+        return match ($planCode) {
+            self::FREE_CODE, self::FREE_TRIAL_CODE, self::LEGACY_TRIAL_CODE, self::DEMO_PACK_CODE => 0,
+            'consultant_scope_basic', 'consultant_managed_standard' => 1,
+            'consultant_scope_pro' => 2,
+            'consultant_esg_starter' => 3,
+            'consultant_esg_complete' => 4,
+            self::ENTERPRISE_CODE => 5,
+            default => -1,
+        };
+    }
+
+    public static function isStrictUpgrade(string $fromPlanCode, string $toPlanCode): bool
+    {
+        $from = self::depthRank($fromPlanCode);
+        $to = self::depthRank($toPlanCode);
+
+        return $from >= 0 && $to > $from;
+    }
+
+    public static function isSameDepthTier(string $fromPlanCode, string $toPlanCode): bool
+    {
+        $from = self::depthRank($fromPlanCode);
+        $to = self::depthRank($toPlanCode);
+
+        return $from >= 0 && $from === $to;
+    }
+
+    public static function isDowngrade(string $fromPlanCode, string $toPlanCode): bool
+    {
+        $from = self::depthRank($fromPlanCode);
+        $to = self::depthRank($toPlanCode);
+
+        return $from >= 0 && $to >= 0 && $to < $from;
+    }
+
+    /**
      * @return array<string, array<string, mixed>>
      */
     public static function packDefinitions(): array

@@ -14,6 +14,7 @@
     </div>
     <div class="flex gap-2">
         @if($engagement->isActive())
+            <a href="{{ route('consultant.clients.move', $engagement) }}" class="btn btn-secondary btn-sm">Move package</a>
             <a href="{{ route('consultant.clients.edit', $engagement) }}" class="btn btn-secondary btn-sm">Edit</a>
             <form action="{{ route('consultant.clients.destroy', $engagement) }}" method="POST" onsubmit="return confirm('Archive this client? Capacity frees up; data stays read-only.');">
                 @csrf
@@ -23,6 +24,13 @@
         @endif
     </div>
 </div>
+
+@if(session('success'))
+    <div class="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">{{ session('success') }}</div>
+@endif
+@if(session('error'))
+    <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{{ session('error') }}</div>
+@endif
 
 <div class="grid sm:grid-cols-3 gap-4 mb-8">
     <div class="bg-white border border-gray-200 rounded-xl p-5">
@@ -34,10 +42,29 @@
         <div class="mt-1 font-semibold capitalize">{{ $engagement->status }}</div>
     </div>
     <div class="bg-white border border-gray-200 rounded-xl p-5">
-        <div class="text-xs text-gray-500 uppercase">Contract year</div>
-        <div class="mt-1 text-xl font-bold">{{ $engagement->subscription?->contract_year ?? '—' }}</div>
+        <div class="text-xs text-gray-500 uppercase">Package</div>
+        <div class="mt-1 text-sm font-bold">{{ $engagement->subscription?->plan?->plan_name ?? '—' }}</div>
+        <div class="text-xs text-gray-500 mt-0.5">
+            @if($engagement->subscription?->expires_at)
+                expires {{ $engagement->subscription->expires_at->toDateString() }}
+            @else
+                contract {{ $engagement->subscription?->contract_year ?? '—' }}
+            @endif
+        </div>
     </div>
 </div>
+
+@if($engagement->isActive() && !empty($moveOptions))
+    <div class="cd-callout mb-6">
+        <p class="text-sm">
+            {{ count($moveOptions) }} spare seat{{ count($moveOptions) === 1 ? '' : 's' }} available for upgrade
+            @if(collect($moveOptions)->contains(fn ($o) => ($o['move_kind'] ?? '') === 'same_plan_renew'))
+                or same-plan renew
+            @endif.
+        </p>
+        <a href="{{ route('consultant.clients.move', $engagement) }}" class="btn btn-secondary btn-sm whitespace-nowrap">Move package</a>
+    </div>
+@endif
 
 <div class="bg-white border border-gray-200 rounded-xl p-6 mb-6">
     <h2 class="font-semibold text-gray-900 mb-4">Client details</h2>

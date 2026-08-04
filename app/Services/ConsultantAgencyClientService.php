@@ -15,6 +15,7 @@ class ConsultantAgencyClientService
 {
     public function __construct(
         protected ConsultantAgencySubscriptionService $subscriptions,
+        protected ConsultantAgencyRenewalService $renewals,
     ) {
     }
 
@@ -196,6 +197,166 @@ class ConsultantAgencyClientService
         }
 
         return $this->subscriptions->archiveEngagement($engagement);
+    }
+
+    /**
+     * Capacity rows this engagement may move onto (Phase 7 rules).
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function movableCapacityOptions(ConsultantClientEngagement $engagement): array
+    {
+        if (!$engagement->isActive()) {
+            return [];
+        }
+
+        $engagement->loadMissing('subscription.plan');
+        $fromSub = $engagement->subscription;
+        $fromCode = $fromSub?->plan?->plan_code;
+        if (!$fromCode) {
+            return [];
+        }
+
+        $samePlanAllowed = $this->samePlanMoveAllowed($fromSub);
+        $buckets = $this->subscriptions->availableCapacityBuckets((int) $engagement->consultant_company_id);
+        $options = [];
+
+        foreach ($buckets as $bucket) {
+            $toId = (int) $bucket['subscription_id'];
+            if ($toId === (int) $engagement->consultant_subscription_id) {
+                continue;
+            }
+            $toCode = (string) ($bucket['plan_code'] ?? '');
+            if ($toCode === '') {
+                continue;
+            }
+            if (ConsultantAgencyPlanMatrix::isDowngrade($fromCode, $toCode)) {
+                continue;
+            }
+            if (ConsultantAgencyPlanMatrix::isSameDepthTier($fromCode, $toCode) && !$samePlanAllowed) {
+                continue;
+            }
+            if (!ConsultantAgencyPlanMatrix::isStrictUpgrade($fromCode, $toCode)
+                && !ConsultantAgencyPlanMatrix::isSameDepthTier($fromCode, $toCode)
+            ) {
+                continue;
+            }
+
+            $options[] = array_merge($bucket, [
+                'move_kind' => ConsultantAgencyPlanMatrix::isStrictUpgrade($fromCode, $toCode)
+                    ? 'upgrade'
+                    : 'same_plan_renew',
+            ]);
+        }
+
+        return $options;
+    }
+
+    /**
+     * Mid-term: upgrade only. Same tier: only in renew window / expired source capacity.
+     */
+    public function moveToCapacity(
+        ConsultantClientEngagement $engagement,
+        int $targetSubscriptionId,
+        ?int $actorUserId = null,
+    ): ConsultantClientEngagement {
+        if (!$engagement->isActive()) {
+            throw new RuntimeException('Archived clients cannot be moved. Restore is not available — create a new engagement via renew flow.');
+        }
+
+        return DB::transaction(function () use ($engagement, $targetSubscriptionId, $actorUserId) {
+            $engagement = ConsultantClientEngagement::query()
+                ->with('subscription.plan')
+                ->where('id', $engagement->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $fromSub = $engagement->subscription;
+            $fromCode = $fromSub?->plan?->plan_code;
+            if (!$fromCode) {
+                throw new RuntimeException('Current package on this client is unknown.');
+            }
+
+            if ((int) $engagement->consultant_subscription_id === $targetSubscriptionId) {
+                throw new RuntimeException('Client is already on that capacity row.');
+            }
+
+            $target = ConsultantSubscription::forConsultant((int) $engagement->consultant_company_id)
+                ->with('plan')
+                ->active()
+                ->lockForUpdate()
+                ->where('id', $targetSubscriptionId)
+                ->first();
+
+            if (!$target) {
+                throw new RuntimeException('Target package was not found or is not active.');
+            }
+
+            $toCode = $target->plan?->plan_code;
+            if (!$toCode) {
+                throw new RuntimeException('Target package plan is unknown.');
+            }
+
+            if (ConsultantAgencyPlanMatrix::isDowngrade($fromCode, $toCode)) {
+                throw new RuntimeException('Downgrades are not allowed. Keep the current package or request a higher-tier package.');
+            }
+
+            $isUpgrade = ConsultantAgencyPlanMatrix::isStrictUpgrade($fromCode, $toCode);
+            $isSame = ConsultantAgencyPlanMatrix::isSameDepthTier($fromCode, $toCode);
+
+            if (!$isUpgrade && !$isSame) {
+                throw new RuntimeException('Cannot move to that package.');
+            }
+
+            if ($isSame && !$this->samePlanMoveAllowed($fromSub)) {
+                throw new RuntimeException(
+                    'Same-package moves are only allowed when the current capacity is in its renewal window (or has expired). '
+                    . 'Mid-term, you may only upgrade to a higher tier if you have spare seats.'
+                );
+            }
+
+            $used = ConsultantClientEngagement::query()
+                ->where('consultant_subscription_id', $target->id)
+                ->active()
+                ->count();
+
+            if ($used >= (int) $target->slot_limit) {
+                throw new RuntimeException('No remaining places on the target package.');
+            }
+
+            $history = $engagement->metadata['seat_moves'] ?? [];
+            $history[] = [
+                'at' => now()->toIso8601String(),
+                'by_user_id' => $actorUserId,
+                'from_subscription_id' => (int) $engagement->consultant_subscription_id,
+                'to_subscription_id' => (int) $target->id,
+                'from_plan_code' => $fromCode,
+                'to_plan_code' => $toCode,
+                'kind' => $isUpgrade ? 'upgrade' : 'same_plan_renew',
+            ];
+
+            $engagement->update([
+                'consultant_subscription_id' => $target->id,
+                'metadata' => array_merge($engagement->metadata ?? [], [
+                    'seat_moves' => $history,
+                ]),
+            ]);
+
+            return $engagement->fresh(['managedCompany', 'subscription.plan']);
+        });
+    }
+
+    protected function samePlanMoveAllowed(?ConsultantSubscription $fromSub): bool
+    {
+        if (!$fromSub) {
+            return true;
+        }
+
+        if (!$fromSub->isActive()) {
+            return true;
+        }
+
+        return $this->renewals->subscriptionNeedsRenewalAttention($fromSub);
     }
 
     protected function uniqueManagedEmail(Company $consultantOrg, string $clientName): string

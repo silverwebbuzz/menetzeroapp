@@ -8,6 +8,7 @@ use App\Services\ConsultantAgencyEntitlementService;
 use App\Services\ConsultantAgencyClientService;
 use App\Services\ConsultantAgencySubscriptionService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use RuntimeException;
 
@@ -109,6 +110,9 @@ class ManagedClientController extends Controller
         $engagement = $this->managedClients->findForConsultant($consultantOrg->id, $client);
         $yearUnlockTarget = null;
         $yearUnlockQuote = null;
+        $moveOptions = $engagement->isActive()
+            ? $this->managedClients->movableCapacityOptions($engagement)
+            : [];
 
         if ($engagement->isActive()) {
             $candidateYear = (int) $engagement->primary_reporting_year + 1;
@@ -132,7 +136,54 @@ class ManagedClientController extends Controller
             'engagement',
             'yearUnlockTarget',
             'yearUnlockQuote',
+            'moveOptions',
         ));
+    }
+
+    public function moveForm(int $client)
+    {
+        $consultantOrg = $this->consultantCompany();
+        $engagement = $this->managedClients->findForConsultant($consultantOrg->id, $client);
+
+        if (!$engagement->isActive()) {
+            return redirect()
+                ->route('consultant.clients.show', $engagement)
+                ->with('error', 'Archived clients cannot be moved.');
+        }
+
+        $moveOptions = $this->managedClients->movableCapacityOptions($engagement);
+
+        return view('consultant.agency.clients.move', compact('engagement', 'moveOptions'));
+    }
+
+    public function move(Request $request, int $client)
+    {
+        $consultantOrg = $this->consultantCompany();
+        $engagement = $this->managedClients->findForConsultant($consultantOrg->id, $client);
+        $allowedIds = collect($this->managedClients->movableCapacityOptions($engagement))
+            ->pluck('subscription_id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        $validated = $request->validate([
+            'consultant_subscription_id' => ['required', 'integer', Rule::in($allowedIds)],
+        ]);
+
+        try {
+            $engagement = $this->managedClients->moveToCapacity(
+                $engagement,
+                (int) $validated['consultant_subscription_id'],
+                Auth::id(),
+            );
+        } catch (RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        $planName = $engagement->subscription?->plan?->plan_name ?? 'package';
+
+        return redirect()
+            ->route('consultant.clients.show', $engagement)
+            ->with('success', "Client moved to {$planName}. Emissions data stayed with this company.");
     }
 
     public function edit(int $client)

@@ -18,11 +18,13 @@ class ConsultantClientEngagement extends Model
         'archived_at',
         'previous_engagement_id',
         'display_name',
+        'metadata',
     ];
 
     protected $casts = [
         'primary_reporting_year' => 'integer',
         'archived_at' => 'datetime',
+        'metadata' => 'array',
     ];
 
     public function consultantCompany(): BelongsTo

@@ -242,13 +242,17 @@ Request form continues to use **company** codes for depth choice; activation wri
 - [x] Workspace grouped by capacity row; empty seats as `+` cards → create on that row.
 - [x] Merge same `plan_code` rows into one visual section (sum seats; expiry range + per-purchase chips). DB stays multi-row. `+` still targets a specific `subscription_id` (soonest-expiring spare first).
 
-### Phase 7 — Seat move / retention (consultant-driven) — **not started**
-See **§14**. Coding deferred until product walks the checklist below.
+### Phase 7 — Seat move / retention (consultant-driven) ✅
+- [x] Move package UI on client show + `/clients/{id}/move`.
+- [x] No downgrade; upgrade anytime if spare higher-tier seats; same tier only in renew window / expired source.
+- [x] Rebind `consultant_subscription_id`; emissions stay on company; audit in `metadata.seat_moves`.
+- [x] Migrations: `2026_08_04_181000_phase7_engagement_metadata_for_seat_moves.php`
 
 ### Phase 8 — Multi-row renew (replace legacy P20 single-sub renew) — **not started**
 See **§14**.
 
 **Note — `extra_slots_purchased` removed (Aug 2026):** Capacity is only **`slot_limit`** on each `consultant_subscriptions` row. Need more seats → Request clients again → admin activates a **new** row. Migration: `2026_08_04_180000_drop_consultant_extra_slots_purchased.php`. Legacy checkout `addExtraSlots` now creates a new depth row (or bumps `slot_limit` on free/demo only).
+
 ---
 
 ## 11. Success criteria
@@ -271,7 +275,7 @@ See **§14**.
 | New full demo after Phase 4–5 | **Done** — `ConsultantFullDemoSeeder` (5 depths × 5 slots × full data) |
 | Exact wipe scope for company_id 17 | Done in Phase 2; re-seed recreates Silver Webbuzz demo org |
 | Merge same-plan workspace sections | **Done** (Phase 6) — display merge; DB multi-row |
-| Seat move + multi-row renew | Locked in §14; build Phases 7–8 |
+| Seat move + multi-row renew | Phase 7 **done** (move/upgrade); Phase 8 renew board still open |
 | `extra_slots_purchased` | **Dropped** — use `slot_limit` + new purchase rows |
 
 ---
@@ -289,6 +293,7 @@ See **§14**.
 | Aug 2026 | **§14 locked** — consultant-driven renew / seat assign / leave / upgrade; Phases 7–8 checklist (coding later) |
 | Aug 2026 | Phase 6 polish: workspace merges same plan_code; note on `extra_slots_purchased` vs `slot_limit` |
 | Aug 2026 | Dropped `extra_slots_purchased` column; mid-term seats = new capacity row |
+| Aug 2026 | Phase 7: seat move — upgrade anytime, same-tier near expiry, no downgrade |
 
 ---
 
@@ -386,13 +391,13 @@ If some of the continuing 3 should actually be **ESG** next year: consultant als
 ### 14.7 Build phases (coding later)
 
 #### Phase 7 — Seat assign / move
-- [ ] Action: **Move / assign client to capacity** (from client show + renew board).
-- [ ] Inputs: `engagement_id`, target `consultant_subscription_id`, optional new `primary_reporting_year`.
-- [ ] Rules: target row active, spare remaining slots, depth may differ (upgrade/downgrade = change of mirrored entitlements from that row’s plan).
-- [ ] Persist: update `consultant_subscription_id` **or** create successor engagement (`previous_engagement_id`) + archive predecessor when year rolls.
-- [ ] Do **not** clone emissions; same `managed_company_id`.
-- [ ] Audit log: who moved whom, from_sub → to_sub.
-- [ ] Guard: cannot overfill target; cannot move archived without restore path.
+- [x] Action: **Move / assign client to capacity** (from client show + move form).
+- [x] Inputs: `engagement_id`, target `consultant_subscription_id` (PRY kept on mid-term rebind).
+- [x] Rules: no downgrade; upgrade anytime with spare higher seats; same tier only in renew window / expired source.
+- [x] Persist: update `consultant_subscription_id` (rebind).
+- [x] Do **not** clone emissions; same `managed_company_id`.
+- [x] Audit: `metadata.seat_moves` on engagement.
+- [x] Guard: cannot overfill target; cannot move archived.
 
 #### Phase 8 — Multi-row renew flow
 - [ ] Replace / sideline single-sub P20 assumptions (`getActiveSubscription` as sole renew target).
@@ -404,7 +409,7 @@ If some of the continuing 3 should actually be **ESG** next year: consultant als
 - [ ] Offline-first payment stays; online checkout only if we revive paid renew later.
 
 #### Phase 6 remnant — merge-by-plan UI
-- [ ] Workspace: group buckets by `plan_code` for display; keep per-row expiry chips; `+` still opens create with a chosen `subscription` (prefer soonest-expiring row with remaining, or explicit picker).
+- [x] Workspace merge by `plan_code` (shipped).
 
 ### 14.8 Non-goals (this pass)
 
