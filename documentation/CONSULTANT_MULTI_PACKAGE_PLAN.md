@@ -248,8 +248,13 @@ Request form continues to use **company** codes for depth choice; activation wri
 - [x] Rebind `consultant_subscription_id`; emissions stay on company; audit in `metadata.seat_moves`.
 - [x] Migrations: `2026_08_04_181000_phase7_engagement_metadata_for_seat_moves.php`
 
-### Phase 8 — Multi-row renew (replace legacy P20 single-sub renew) — **not started**
-See **§14**.
+### Phase 8 — Multi-row renew board ✅
+- [x] Renew board lists clients on capacity in the 45-day window (all rows, not one pack).
+- [x] Per client: **Continue** (pick same/higher spare seat + new PRY) or **Leave** (archive → history/read-only only).
+- [x] Capacity shortage → Request clients link; apply validates spare seats batch-wise.
+- [x] Continue = new engagement + archive prior (emissions stay on company); Leave = archive only.
+- [x] Empty remaining seats after apply → available on workspace for **new** clients.
+- [x] Emptied renew-window rows with zero active engagements are expired.
 
 **Note — `extra_slots_purchased` removed (Aug 2026):** Capacity is only **`slot_limit`** on each `consultant_subscriptions` row. Need more seats → Request clients again → admin activates a **new** row. Migration: `2026_08_04_180000_drop_consultant_extra_slots_purchased.php`. Legacy checkout `addExtraSlots` now creates a new depth row (or bumps `slot_limit` on free/demo only).
 
@@ -275,7 +280,7 @@ See **§14**.
 | New full demo after Phase 4–5 | **Done** — `ConsultantFullDemoSeeder` (5 depths × 5 slots × full data) |
 | Exact wipe scope for company_id 17 | Done in Phase 2; re-seed recreates Silver Webbuzz demo org |
 | Merge same-plan workspace sections | **Done** (Phase 6) — display merge; DB multi-row |
-| Seat move + multi-row renew | Phase 7 **done** (move/upgrade); Phase 8 renew board still open |
+| Seat move + multi-row renew | Phase 7 + Phase 8 **done** |
 | `extra_slots_purchased` | **Dropped** — use `slot_limit` + new purchase rows |
 
 ---
@@ -294,6 +299,7 @@ See **§14**.
 | Aug 2026 | Phase 6 polish: workspace merges same plan_code; note on `extra_slots_purchased` vs `slot_limit` |
 | Aug 2026 | Dropped `extra_slots_purchased` column; mid-term seats = new capacity row |
 | Aug 2026 | Phase 7: seat move — upgrade anytime, same-tier near expiry, no downgrade |
+| Aug 2026 | Phase 8: renew board — continue vs leave(history); leave = archive read-only |
 
 ---
 
@@ -400,13 +406,15 @@ If some of the continuing 3 should actually be **ESG** next year: consultant als
 - [x] Guard: cannot overfill target; cannot move archived.
 
 #### Phase 8 — Multi-row renew flow
-- [ ] Replace / sideline single-sub P20 assumptions (`getActiveSubscription` as sole renew target).
-- [ ] Renew board lists **all** clients on rows inside renewal window (per row expiry).
-- [ ] Consultant marks each: Retain → pick target seat/plan · Leave · Upgrade (needs target capacity).
-- [ ] Capacity shortage → deep-link to Request clients with suggested lines (counts by outcome).
-- [ ] After admin activates new rows, board only enables Assign until seat counts match selections.
-- [ ] On complete: archive leavers’ engagements; expire emptied old rows when policy says (end of term).
-- [ ] Offline-first payment stays; online checkout only if we revive paid renew later.
+- [x] Multi-row renew board (`/consultant/renewal`) — not sole `getActiveSubscription`.
+- [x] Per client: Continue (target seat) · Leave (archive → history / read-only / no new reports).
+- [x] Shortage → Request clients CTA; batch seat validation.
+- [x] Continue creates successor engagement (`previous_engagement_id`); archives prior.
+- [x] Leave archives without successor — past data viewable read-only only.
+- [x] Remaining open seats = new clients via workspace `+`.
+- [x] Offline-first purchase unchanged (Request → activate rows → then board assign).
+
+**Leave = history (locked):** If they buy 10 seats but only continue 4 of 8 prior clients, the other 4 are archived. History remains; **no edit / no new exports** on those engagements (otherwise unpaid report generation). The 6 unused of 10 seats stay empty for new firms.
 
 #### Phase 6 remnant — merge-by-plan UI
 - [x] Workspace merge by `plan_code` (shipped).
