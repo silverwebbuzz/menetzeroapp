@@ -11,7 +11,7 @@ namespace App\Data;
  *   (own slot_limit + expiry); entitlements mirror matching client_* packages.
  *
  * Legacy packs (consultant_5/10/25/50, consultant_entity, consultant_managed_standard)
- * remain in definitions only for migration / deactivate until Phase 2 cleanup.
+ * remain in definitions only for historical forPlanCode lookups (inactive / deleted from DB in Phase 2).
  */
 class ConsultantAgencyPlanMatrix
 {
@@ -26,10 +26,9 @@ class ConsultantAgencyPlanMatrix
         'consultant_50',
     ];
 
-    /** Live catalog after Phase 1–2 (trial renamed in Phase 2). */
+    /** Live catalog after Phase 1–2. */
     public const TARGET_PLAN_CODES = [
         'consultant_free',
-        'consultant_trial', // until Phase 2 rename
         'consultant_1',
         'consultant_scope_basic',
         'consultant_scope_pro',
@@ -66,11 +65,13 @@ class ConsultantAgencyPlanMatrix
         'consultant_trial' => 'client_free',
     ];
 
-    /** Still `consultant_trial` until Phase 2 renames to consultant_free. */
-    public const FREE_TRIAL_CODE = 'consultant_trial';
+    /** Canonical free plan (renamed from consultant_trial in Phase 2). */
+    public const FREE_TRIAL_CODE = 'consultant_free';
 
-    /** Target free code after Phase 2. */
     public const FREE_CODE = 'consultant_free';
+
+    /** @deprecated Removed from DB in Phase 2 — kept for historical string matches only */
+    public const LEGACY_TRIAL_CODE = 'consultant_trial';
 
     public const FREE_TRIAL_SLOTS = 1;
 
@@ -121,7 +122,7 @@ class ConsultantAgencyPlanMatrix
 
     public static function isFreePlan(string $planCode): bool
     {
-        return in_array($planCode, [self::FREE_TRIAL_CODE, self::FREE_CODE], true);
+        return in_array($planCode, [self::FREE_CODE, self::FREE_TRIAL_CODE, self::LEGACY_TRIAL_CODE], true);
     }
 
     /**
@@ -130,7 +131,6 @@ class ConsultantAgencyPlanMatrix
     public static function packDefinitions(): array
     {
         return [
-            'consultant_trial' => self::trialPack(),
             'consultant_free' => self::freePack(),
             'consultant_1' => self::demoPack(),
             'consultant_scope_basic' => self::depthPack('consultant_scope_basic', 'client_scope_basic', 20),
@@ -138,7 +138,8 @@ class ConsultantAgencyPlanMatrix
             'consultant_esg_starter' => self::depthPack('consultant_esg_starter', 'client_esg_starter', 22),
             'consultant_esg_complete' => self::depthPack('consultant_esg_complete', 'client_esg_complete', 23),
             'consultant_enterprise' => self::depthPack('consultant_enterprise', 'client_enterprise', 24),
-            // Legacy — seeded inactive only
+            // Legacy definitions (inactive) — for migrations / historical forPlanCode lookups
+            'consultant_trial' => self::legacyTrialAliasPack(),
             'consultant_entity' => self::entityPack(),
             'consultant_5' => self::pack(5, 1299, 6495, 1, 'Consultant 5 (legacy)', 'Legacy pack — retired; use consultant_scope_* rows'),
             'consultant_10' => self::pack(10, 999, 9990, 2, 'Consultant 10 (legacy)', 'Legacy pack — retired; use consultant_scope_* rows'),
@@ -303,20 +304,39 @@ class ConsultantAgencyPlanMatrix
     }
 
     /**
+     * @deprecated Historical alias for forPlanCode('consultant_trial') lookups only.
+     *
      * @return array<string, mixed>
      */
-    private static function trialPack(): array
+    private static function legacyTrialAliasPack(): array
+    {
+        $base = self::freePack();
+        $base['plan_code'] = self::LEGACY_TRIAL_CODE;
+        $base['plan_name'] = 'Free trial (legacy code)';
+        $base['description'] = 'Removed in Phase 2 — use consultant_free.';
+        $base['is_active'] = false;
+        $base['sort_order'] = 99;
+
+        return $base;
+    }
+
+    /**
+     * Free trial — one managed client on client_free rules. Always retained when paid depth rows are added.
+     *
+     * @return array<string, mixed>
+     */
+    private static function freePack(): array
     {
         return [
-            'plan_code' => self::FREE_TRIAL_CODE,
+            'plan_code' => self::FREE_CODE,
             'plan_name' => 'Free trial',
-            'description' => 'One managed client on Free rules (mirrors client_free). Renamed to consultant_free in Phase 2.',
+            'description' => 'One managed client on Free rules (mirrors client_free). Always retained when paid depth rows are added.',
             'plan_category' => 'consultant_agency',
             'price_annual' => 0,
             'price_per_slot_aed' => 0,
             'consultant_slot_count' => self::FREE_TRIAL_SLOTS,
             'currency' => 'AED',
-            'sort_order' => 5,
+            'sort_order' => 4,
             'billing_cycle' => 'annual',
             'is_active' => true,
             'limits' => [
@@ -334,23 +354,6 @@ class ConsultantAgencyPlanMatrix
             ],
             'features' => ['consultant_agency', 'managed_clients', 'free_trial'],
         ];
-    }
-
-    /**
-     * Target free plan (seeded in Phase 1; becomes canonical after Phase 2 rename).
-     *
-     * @return array<string, mixed>
-     */
-    private static function freePack(): array
-    {
-        $base = self::trialPack();
-        $base['plan_code'] = self::FREE_CODE;
-        $base['plan_name'] = 'Free trial';
-        $base['description'] = 'One managed client on Free rules (mirrors client_free). Always retained when paid depth rows are added.';
-        $base['sort_order'] = 4;
-        $base['is_active'] = true;
-
-        return $base;
     }
 
     /**

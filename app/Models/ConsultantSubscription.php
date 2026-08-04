@@ -70,8 +70,9 @@ class ConsultantSubscription extends Model
         }
 
         $freeCodes = [
-            ConsultantAgencyPlanMatrix::FREE_TRIAL_CODE,
             ConsultantAgencyPlanMatrix::FREE_CODE,
+            ConsultantAgencyPlanMatrix::FREE_TRIAL_CODE,
+            ConsultantAgencyPlanMatrix::LEGACY_TRIAL_CODE,
         ];
 
         return $this->relationLoaded('plan')

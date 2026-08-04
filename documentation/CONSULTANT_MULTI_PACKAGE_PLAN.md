@@ -210,10 +210,12 @@ Request form continues to use **company** codes for depth choice; activation wri
 - [x] `CommercialPriceBook::suggestedConsultantPlanCode()` maps client depth → consultant_* plan.
 
 ### Phase 2 — Migrate existing rows + delete demo
-- [ ] Rename `consultant_trial` → `consultant_free` (plan_code + code references).
-- [ ] Delete Silver Webbuzz demo (`consultant_50` + related) per §7.
-- [ ] Remap `client_growth` → `client_scope_pro` for remaining client subscriptions.
-- [ ] Soft-delete / deactivate unused legacy consultant plan codes with zero FKs.
+- [x] Rename `consultant_trial` → `consultant_free` (plan_code + code references).
+- [x] Delete Silver Webbuzz demo (`consultant_50` + related) per §7 — full org wipe.
+- [x] Remap `client_growth` → `client_scope_pro` for remaining client subscriptions.
+- [x] Soft-delete / deactivate unused legacy consultant plan codes with zero FKs.
+- [x] Migration: `2026_08_04_160000_phase2_consultant_multi_package_migrate.php`
+- [x] Disable `ConsultantFullDemoSeeder` until Phase 5 multi-package demo.
 
 ### Phase 3 — Request lines + activate → multi-row
 - [ ] Persist multi-line entity requests (table or JSON lines).
@@ -261,3 +263,4 @@ Request form continues to use **company** codes for depth choice; activation wri
 |------|------|
 | Aug 2026 | Locked Option C multi-row; catalog; inventory; delete consultant_50 demo; remap client_growth → scope_pro |
 | Aug 2026 | Phase 1 shipped: matrix + seed migration + price-book map to consultant_scope_* |
+| Aug 2026 | Phase 2 shipped: trial→free merge, wipe Silver Webbuzz demo org, growth→scope_pro, disable old demo seeder |
