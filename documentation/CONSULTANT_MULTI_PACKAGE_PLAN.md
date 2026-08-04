@@ -226,15 +226,17 @@ Request form continues to use **company** codes for depth choice; activation wri
 - [x] Migration: `2026_08_04_170000_phase3_consultant_entity_request_lines.php`
 
 ### Phase 4 — Create client + entitlements
-- [ ] Create managed client: choose depth with spare capacity → bind `consultant_subscription_id`.
-- [ ] `ConsultantAgencyEntitlementService` resolves depth from engagement’s subscription plan (mirror `client_*`).
-- [ ] Free / demo paths unchanged (`consultant_free`, `consultant_1`).
-- [ ] UI: show remaining slots per depth / per subscription row.
+- [x] Create managed client: choose depth with spare capacity → bind `consultant_subscription_id`.
+- [x] `ConsultantAgencyEntitlementService` resolves depth from engagement’s subscription plan (mirror `client_*`).
+- [x] Free / demo paths unchanged (`consultant_free`, `consultant_1`).
+- [x] UI: capacity by depth on clients index + package picker on create.
+- [x] Aggregate `slotSummary` across all active subscription rows.
 
 ### Phase 5 — Guides + seed refresh
-- [ ] Portal guide / ElevenLabs / pricing copy: multi-package consultant model.
-- [ ] New demo seeder (after delete) with free + sample depth rows — **not** `consultant_50`.
-- [ ] Point `PRICING_AND_PLAN_MAJOR_CHANGES.md` §6 toward this doc for consultant capacity shape.
+- [x] Portal guide / plans-consultant / ElevenLabs: multi-package consultant model.
+- [x] New demo seeder — Free + all five depths × 5 slots + 25 firms with full module data (not `consultant_50`).
+- [x] Point `PRICING_AND_PLAN_MAJOR_CHANGES.md` §6 toward multi-row capacity + this doc.
+- [x] Run: `php artisan db:seed --class=ConsultantFullDemoSeeder` (login `demo.full@menetzero.com` / `FullDemo1!`)
 
 ---
 
@@ -254,8 +256,8 @@ Request form continues to use **company** codes for depth choice; activation wri
 |------|--------|
 | Preferential 1,399 / 1,199 vs list × depth | Still sales/price-book policy; activation shape is multi-row depth |
 | Sites &gt;5 on an entity | Extras / offline quote (unchanged) |
-| New full demo after Phase 4–5 | To be designed once multi-row works |
-| Exact wipe scope for company_id 17 | Confirm demo-only before deleting company row |
+| New full demo after Phase 4–5 | **Done** — `ConsultantFullDemoSeeder` (5 depths × 5 slots × full data) |
+| Exact wipe scope for company_id 17 | Done in Phase 2; re-seed recreates Silver Webbuzz demo org |
 
 ---
 
@@ -267,3 +269,5 @@ Request form continues to use **company** codes for depth choice; activation wri
 | Aug 2026 | Phase 1 shipped: matrix + seed migration + price-book map to consultant_scope_* |
 | Aug 2026 | Phase 2 shipped: trial→free merge, wipe Silver Webbuzz demo org, growth→scope_pro, disable old demo seeder |
 | Aug 2026 | Phase 3 shipped: multi-line request + Σ quote + one depth subscription row per line |
+| Aug 2026 | Phase 4 shipped: capacity buckets + create-client depth picker + entitlements from subscription plan |
+| Aug 2026 | Phase 5 shipped: guides/ElevenLabs/§6 update + multi-package full demo seeder (25 clients) |

@@ -95,9 +95,13 @@ Codes: `client_free`, `client_scope_basic`, `client_scope_pro`, `client_esg_star
 
 ---
 
-## 6. Consultant commercial (Aug 2026 proposal)
+## 6. Consultant commercial capacity (see also CONSULTANT_MULTI_PACKAGE_PLAN.md)
 
-**Applies after Free.** Free remains **1 entity**. Consultant portal only.
+**Applies after Free.** Free remains **1 managed client**. Consultant portal only.
+
+**Product capacity shape (live):** consultants request **one or more package depths × quantities** (multi-line). Offline payment → admin activates **one `consultant_subscriptions` row per line** (`consultant_scope_basic` … `consultant_enterprise`), each with its own `slot_limit` and expiry. Free (`consultant_free`) and Demo QA (`consultant_1`) remain. When adding a managed client, the consultant picks a capacity row with remaining places; entitlements mirror the matching `client_*` package.
+
+Preferential rates below and list × depth quotes are **sales / price-book** tools — not mutual exclusive.
 
 ### 6.1 Free
 
@@ -106,36 +110,31 @@ Codes: `client_free`, `client_scope_basic`, `client_scope_pro`, `client_esg_star
 | Price | AED 0 |
 | Entities | **1** |
 | Client rules | Same as Company Free |
+| Plan code | `consultant_free` |
 
-### 6.2 Consultant Plan (introductory)
+### 6.2 Preferential band (sales / price book — optional override)
 
 | Band | Rate (excl. VAT) |
 |------|------------------|
 | Up to **10 entities** | **AED 1,399 / entity / year** |
 | **More than 10 entities** | **AED 1,199 / entity / year** |
 
+Default in-app quote suggestion for depth requests = **company list × clients** per line (xlsx). Preferential band may still be applied offline.
+
 | Commercial note | Product handling |
 |-----------------|------------------|
 | Special introductory offer | Sales wording; list in admin price book |
-| Preferential pricing if **≥10 companies onboarded in 12 months** | **Sales/contract only** — no app gate yet |
-| Applicable for entities with **up to 5 sites**; **>5 sites** may vary | Default limit **5 locations** per entity; extras quoted |
-| Access only via consultant portal | Keep managed-client / agency model |
+| Preferential pricing if **≥10 companies onboarded in 12 months** | **Sales/contract only** — soft tip in Request clients UI |
+| Sites beyond package default | Extras quoted offline |
+| Access only via consultant portal | Multi-row managed-client / agency model |
 
-**Examples:** 5 × 1,399 = AED 6,995 · 10 × 1,399 = AED 13,990 · 15 × 1,199 = AED 17,985.
+**Examples (preferential band):** 5 × 1,399 = AED 6,995 · 10 × 1,399 = AED 13,990 · 15 × 1,199 = AED 17,985.
 
-### 6.3 Default entitlements per paid entity = **Standard** (locked)
+### 6.3 Default entitlements = package depth of the capacity row
 
-Maps to xlsx **Standard** slot profile (intro rate AED 1,399 ≈ list 1,499):
+Each managed client inherits entitlements from the **consultant depth plan** it is attached to (mirrors `client_scope_*` / ESG / Enterprise). There is no single agency-wide “Standard” metadata key for new activations.
 
-| Area | Included |
-|------|----------|
-| Sites | Up to **5** |
-| Scopes | **1 & 2** (Scope 3 beyond Free trial = extras / higher quote) |
-| Data | Guided Quick Input, bulk CSV/Excel import, evidence trail |
-| Clean exports | GHG Inventory PDF, MOCCAE PDF, IEQT prep, Excel results |
-| Not included by default | Full ESG suite (UAE ESG / IFRS / GRI / SASB), white-label — use **Enterprise** or extras |
-
-Code target (Phase 5/8): seed a Standard template (e.g. mirror former `slot_standard` / Starter-like client exports — **not** Growth `client_growth`).
+Legacy note: older “Standard ≤5 sites” band maps commercially nearest to Scope Basic for sales talk — prefer Scope Basic naming in product UI.
 
 ### 6.4 Enterprise (custom)
 
@@ -143,25 +142,25 @@ Code target (Phase 5/8): seed a Standard template (e.g. mirror former `slot_stan
 - Client branding / consulting **white-label**  
 - Consultant can deploy for clients; **MENetZero invoices consultant**; consultant invoices end-client  
 
-No list price — Talk to us / Enterprise request → admin custom entitlements.
+No list price — Talk to us / Enterprise request → `consultant_enterprise` capacity row with custom quoting.
 
 ### 6.5 What this replaces
 
 | Old (xlsx / packs) | New default |
 |--------------------|-------------|
-| Essential 499 / Standard 1,499 / Complete 4,500 / Complete Plus 7,500 | §6.2 entity rates |
-| Packs of 5 / 10 / 25 / 50 self-checkout | Hide (Phase 3); Request entities instead |
-| Essential min-5 rule in Request UI | **Removed** from default UX |
-
-Old slot codes may remain as rare admin presets only.
+| Essential 499 / Standard 1,499 / Complete packs | Depth packages via company list × clients (or preferential override) |
+| Packs of 5 / 10 / 25 / 50 self-checkout | Retired; multi-line Request clients instead |
+| Single `consultant_entity` + metadata depth | One row per depth purchase |
 
 ### 6.6 Codes
 
 | Name | Code |
 |------|------|
-| Free trial | `consultant_trial` (live) |
-| Paid entity | `consultant_entity` (add in Phase 5/8) |
-| Enterprise | custom / `consultant_enterprise` |
+| Free trial | `consultant_free` |
+| Demo / QA | `consultant_1` (admin only) |
+| Depth capacity | `consultant_scope_basic`, `consultant_scope_pro`, `consultant_esg_starter`, `consultant_esg_complete`, `consultant_enterprise` |
+
+Full implementation checklist: `documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md`.
 
 ---
 

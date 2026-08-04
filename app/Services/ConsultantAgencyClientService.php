@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Data\ConsultantAgencyPlanMatrix;
 use App\Models\Company;
 use App\Models\ConsultantClientEngagement;
 use App\Models\ConsultantSubscription;
@@ -47,6 +48,7 @@ class ConsultantAgencyClientService
      *   name: string,
      *   display_name?: string|null,
      *   primary_reporting_year: int,
+     *   consultant_subscription_id?: int|null,
      *   country?: string|null,
      *   emirate?: string|null,
      *   sector?: string|null,
@@ -64,34 +66,11 @@ class ConsultantAgencyClientService
         return DB::transaction(function () use ($consultantOrg, $data, $reportingYear) {
             $this->subscriptions->ensureFreeTrialSubscription($consultantOrg);
 
-            $subscription = ConsultantSubscription::forConsultant($consultantOrg->id)
-                ->active()
-                ->lockForUpdate()
-                ->orderByDesc('expires_at')
-                ->get()
-                ->first(fn (ConsultantSubscription $sub) => !$sub->isFreeTrial())
-                ?? ConsultantSubscription::forConsultant($consultantOrg->id)
-                    ->active()
-                    ->lockForUpdate()
-                    ->orderByDesc('expires_at')
-                    ->first();
+            $subscription = $this->resolveSubscriptionForCreate(
+                $consultantOrg->id,
+                isset($data['consultant_subscription_id']) ? (int) $data['consultant_subscription_id'] : null,
+            );
 
-            if (!$subscription) {
-                throw new RuntimeException(
-                    'No client slots available. Your free trial may already be used — purchase an agency pack to add more clients.'
-                );
-            }
-
-            $used = ConsultantClientEngagement::query()
-                ->where('consultant_subscription_id', $subscription->id)
-                ->active()
-                ->count();
-
-            if ($used >= (int) $subscription->slot_limit) {
-                throw new RuntimeException(
-                    'All client slots are in use. Add an extra slot or archive a finished engagement.'
-                );
-            }
             $managed = Company::create([
                 'name' => $data['name'],
                 'email' => $this->uniqueManagedEmail($consultantOrg, $data['name']),
@@ -116,6 +95,61 @@ class ConsultantAgencyClientService
                 'display_name' => $data['display_name'] ?? null,
             ]);
         });
+    }
+
+    /**
+     * Lock and pick a capacity row with remaining slots.
+     */
+    protected function resolveSubscriptionForCreate(int $consultantCompanyId, ?int $subscriptionId): ConsultantSubscription
+    {
+        if ($subscriptionId) {
+            $subscription = ConsultantSubscription::forConsultant($consultantCompanyId)
+                ->with('plan')
+                ->active()
+                ->lockForUpdate()
+                ->where('id', $subscriptionId)
+                ->first();
+
+            if (!$subscription) {
+                throw new RuntimeException('Selected capacity package was not found or is not active.');
+            }
+
+            $used = ConsultantClientEngagement::query()
+                ->where('consultant_subscription_id', $subscription->id)
+                ->active()
+                ->count();
+
+            if ($used >= (int) $subscription->slot_limit) {
+                throw new RuntimeException(
+                    'No remaining places on that package. Choose another depth or request more clients.'
+                );
+            }
+
+            return $subscription;
+        }
+
+        $available = $this->subscriptions->availableCapacityBuckets($consultantCompanyId);
+
+        if ($available === []) {
+            throw new RuntimeException(
+                'No client slots available. Your free trial may already be used — request paid capacity from MENetZero.'
+            );
+        }
+
+        if (count($available) > 1) {
+            throw new RuntimeException(
+                'You have capacity on more than one package. Choose which package depth this client should use.'
+            );
+        }
+
+        $pickedId = (int) $available[0]['subscription_id'];
+
+        return ConsultantSubscription::forConsultant($consultantCompanyId)
+            ->with('plan')
+            ->active()
+            ->lockForUpdate()
+            ->where('id', $pickedId)
+            ->firstOrFail();
     }
 
     /**

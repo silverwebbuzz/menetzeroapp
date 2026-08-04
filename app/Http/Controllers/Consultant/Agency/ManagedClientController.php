@@ -8,6 +8,7 @@ use App\Services\ConsultantAgencyEntitlementService;
 use App\Services\ConsultantAgencyClientService;
 use App\Services\ConsultantAgencySubscriptionService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use RuntimeException;
 
 class ManagedClientController extends Controller
@@ -38,19 +39,37 @@ class ManagedClientController extends Controller
         $this->subscriptions->ensureFreeTrialSubscription($consultantOrg);
         $subscription = $this->subscriptions->getActiveSubscription($consultantOrg->id);
         $slotSummary = $this->subscriptions->slotSummary($consultantOrg->id, $subscription);
-        $defaultPry = $subscription?->contract_year ?? (int) now()->year;
+        $capacityOptions = $this->subscriptions->availableCapacityBuckets($consultantOrg->id);
+        $defaultPry = $slotSummary['contract_year'] ?? (int) now()->year;
+        $defaultSubscriptionId = count($capacityOptions) === 1
+            ? $capacityOptions[0]['subscription_id']
+            : old('consultant_subscription_id');
 
-        return view('consultant.agency.clients.create', compact('subscription', 'slotSummary', 'defaultPry'));
+        return view('consultant.agency.clients.create', compact(
+            'subscription',
+            'slotSummary',
+            'capacityOptions',
+            'defaultPry',
+            'defaultSubscriptionId',
+        ));
     }
 
     public function store(Request $request)
     {
         $consultantOrg = $this->consultantCompany();
+        $availableIds = collect($this->subscriptions->availableCapacityBuckets($consultantOrg->id))
+            ->pluck('subscription_id')
+            ->all();
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'display_name' => 'nullable|string|max:255',
             'primary_reporting_year' => 'required|integer|min:2000|max:2100',
+            'consultant_subscription_id' => array_values(array_filter([
+                count($availableIds) > 1 ? 'required' : 'nullable',
+                'integer',
+                $availableIds !== [] ? Rule::in($availableIds) : null,
+            ])),
             'country' => 'nullable|string|max:100',
             'emirate' => 'nullable|string|max:100',
             'sector' => 'nullable|string|max:255',
@@ -59,15 +78,21 @@ class ManagedClientController extends Controller
             'description' => 'nullable|string|max:1000',
         ]);
 
+        if (empty($validated['consultant_subscription_id']) && count($availableIds) === 1) {
+            $validated['consultant_subscription_id'] = $availableIds[0];
+        }
+
         try {
             $engagement = $this->managedClients->create($consultantOrg, $validated);
         } catch (RuntimeException $e) {
             return back()->withInput()->with('error', $e->getMessage());
         }
 
+        $planName = $engagement->subscription?->plan?->plan_name ?? 'capacity';
+
         return redirect()
             ->route('consultant.clients.show', $engagement)
-            ->with('success', 'Managed client added — 1 slot consumed.');
+            ->with('success', "Managed client added under {$planName} — 1 place used.");
     }
 
     public function show(int $client)
@@ -150,5 +175,4 @@ class ManagedClientController extends Controller
             ->route('consultant.clients.index')
             ->with('info', 'Client was already archived.');
     }
-
 }

@@ -75,7 +75,7 @@ Q: What does the consultant dashboard show?
 A: Portfolio emissions, managed-client capacity used, directory status, leads, and quick actions. https://app.menetzero.com/consultant/dashboard
 
 Q: What is client capacity on the dashboard?
-A: Used versus available managed clients on Free or paid capacity.
+A: Used versus available managed clients across Free and any paid package capacity rows you hold.
 
 Q: What is directory status?
 A: Whether your public listing is draft, pending review, approved, or rejected.
@@ -85,13 +85,13 @@ A: Whether your public listing is draft, pending review, approved, or rejected.
 ## Managed clients
 
 Q: How do I add a client?
-A: Managed clients → Add client, or https://app.menetzero.com/consultant/clients/create — set company details and Primary Reporting Year.
+A: Managed clients → Add client, or https://app.menetzero.com/consultant/clients/create — choose a package with remaining places, set company details and Primary Reporting Year.
 
 Q: Where is the client list?
 A: https://app.menetzero.com/consultant/clients
 
 Q: What is a managed client?
-A: An end-company workspace linked to your agency. Each active client uses one place of your capacity.
+A: An end-company workspace linked to your agency. Each active client uses one place on the package capacity row you selected when creating it.
 
 Q: What is PRY / Primary Reporting Year?
 A: The main reporting year for that engagement — set at creation. It drives default year filters in Quick Input and reports.
@@ -109,7 +109,7 @@ Q: How many clients can I have on Free?
 A: Free includes one managed client — enough to test the workflow (watermarked trial exports).
 
 Q: How do I add more than one client?
-A: Request clients — choose package depth and how many you need: https://app.menetzero.com/consultant/packs — pricing offline; MENetZero activates after payment.
+A: Request clients — enter how many you need for each package (you can mix depths, e.g. Basic ×5 and ESG ×5): https://app.menetzero.com/consultant/packs — pricing offline; after activation, Add client and pick a package with remaining places.
 
 Q: Can two consultants share the same managed client data automatically if the SME switches?
 A: No automatic migration. A new engagement under the new consultant is created; the previous consultant keeps archived history as applicable.
@@ -119,7 +119,10 @@ A: No automatic migration. A new engagement under the new consultant is created;
 ## Capacity, Request clients & commercial rules
 
 Q: What is Request clients?
-A: The in-app form on Agency packs where you choose package depth (Scope Basic, Scope Pro, ESG Starter, ESG Complete, or Enterprise) and how many managed clients you need. Features only — no public AED. https://app.menetzero.com/consultant/packs
+A: The in-app form on Agency packs where you enter quantities for one or more packages (Scope Basic, Scope Pro, ESG Starter, ESG Complete, Enterprise — mix allowed). Features only — no public AED. https://app.menetzero.com/consultant/packs
+
+Q: Can I buy Basic and ESG at the same time?
+A: Yes. One request can include several package lines. Activation creates separate capacity rows. When you add a client, choose which package that workspace uses.
 
 Q: What packages can I request as a consultant?
 A: Scope Basic, Scope Pro, ESG Starter, ESG Complete, and Enterprise — capability cards without prices. Same depth options companies use, applied to your managed clients after activation.
@@ -325,7 +328,7 @@ A: https://app.menetzero.com/consultant/company-portal-guide
 ## Concept checks
 
 Q: What is the difference between capacity and Request clients?
-A: Capacity is how many managed clients you may hold. Request clients is how you ask MENetZero to quote and activate more — you pick package depth and client count.
+A: Capacity is how many managed clients you may hold on each package row. Request clients is how you ask MENetZero to quote and activate more — enter quantities per package (mix allowed).
 
 Q: What is the difference between Profile and Documents?
 A: Profile is public listing content. Documents are verification files for approval.

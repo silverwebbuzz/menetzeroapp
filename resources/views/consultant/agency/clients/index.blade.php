@@ -13,11 +13,27 @@
     @endif
 </div>
 
+@if(!empty($slotSummary['buckets']))
+    <div class="mb-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        @foreach($slotSummary['buckets'] as $bucket)
+            <div class="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm">
+                <div class="font-semibold text-gray-900">{{ $bucket['plan_name'] }}</div>
+                <div class="text-xs text-gray-500 mt-1">
+                    {{ $bucket['used'] }}/{{ $bucket['slot_limit'] }} used
+                    · {{ $bucket['remaining'] }} left
+                    @if($bucket['expires_at']) · exp. {{ $bucket['expires_at'] }} @endif
+                </div>
+            </div>
+        @endforeach
+    </div>
+@endif
+
 <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
     <table class="min-w-full text-sm">
         <thead class="bg-gray-50 text-left text-gray-500">
             <tr>
                 <th class="px-4 py-3 font-medium">Client</th>
+                <th class="px-4 py-3 font-medium">Package</th>
                 <th class="px-4 py-3 font-medium">PRY</th>
                 <th class="px-4 py-3 font-medium">Contract</th>
                 <th class="px-4 py-3 font-medium">Status</th>
@@ -30,6 +46,9 @@
                     <td class="px-4 py-3">
                         <div class="font-medium text-gray-900">{{ $engagement->display_name ?: $engagement->managedCompany?->name }}</div>
                         <div class="text-xs text-gray-500">{{ $engagement->managedCompany?->emirate ?? $engagement->managedCompany?->country }}</div>
+                    </td>
+                    <td class="px-4 py-3 text-xs text-gray-700">
+                        {{ $engagement->subscription?->plan?->plan_name ?? '—' }}
                     </td>
                     <td class="px-4 py-3">{{ $engagement->primary_reporting_year }}</td>
                     <td class="px-4 py-3">{{ $engagement->subscription?->contract_year ?? '—' }}</td>
@@ -49,7 +68,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="px-4 py-8 text-center text-gray-500">No managed clients yet.</td>
+                    <td colspan="6" class="px-4 py-8 text-center text-gray-500">No managed clients yet.</td>
                 </tr>
             @endforelse
         </tbody>

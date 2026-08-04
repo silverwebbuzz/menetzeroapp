@@ -7,9 +7,9 @@ return [
         'tips' => [
             'Free includes one managed client with Free rules (Scope 1 & 2 full, Scope 3 one entry per category, watermarked GHG / Excel / IEQT trial downloads).',
             'Each client has a Primary Reporting Year (PRY) set when you create the engagement.',
-            'Request clients — choose Scope Basic, Scope Pro, ESG Starter, ESG Complete, or Enterprise, then how many managed clients you need.',
+            'Request clients — enter how many managed clients you need for each package (you can mix depths, e.g. Scope Basic ×5 and ESG Starter ×5).',
             'Pricing is confirmed offline; MENetZero activates after payment. In-app pages never show AED amounts.',
-            'Each paid request sets package depth for your managed-client workspaces.',
+            'After activation you may hold several capacity rows at once — each with its own package depth, slot count, and expiry. Pick a depth when adding a client.',
         ],
     ],
 
@@ -46,7 +46,7 @@ return [
         ],
         [
             'title' => 'Request clients when ready',
-            'body' => 'Need clean exports or more managed clients? Open Agency packs → Request clients. Pick the package depth (Scope Basic … Enterprise) and how many clients. MENetZero quotes offline and activates after payment.',
+            'body' => 'Need clean exports or more managed clients? Open Agency packs → Request clients. Enter quantities per package (mix allowed). MENetZero quotes offline and activates after payment — one capacity row per package line.',
             'route' => 'consultant.packs.index',
             'link_label' => 'Request clients',
         ],
@@ -151,20 +151,22 @@ return [
                     'title' => 'Request card',
                     'variant' => 'pack-card',
                     'theme' => 'consultant',
-                    'caption' => 'Choose Scope Basic / Pro / ESG packages / Enterprise and how many clients — pricing confirmed offline.',
+                    'caption' => 'Enter qty per package (mix Basic × N and ESG × M). Pricing confirmed offline.',
                 ],
             ],
-            'body' => 'After Free (one managed client), open Agency packs to Request clients. Pick the same package options companies use (Scope Basic through Enterprise), plus how many managed clients. MENetZero confirms rates offline (typically package list × clients) and activates capacity after payment. There is no self-serve checkout.',
+            'body' => 'After Free (one managed client), open Agency packs to Request clients. Enter how many clients you need at each depth (Scope Basic through Enterprise). You can request several packages in one form. MENetZero confirms rates offline (typically package list × clients per line) and activates capacity after payment — creating one subscription row per line with its own expiry. There is no self-serve checkout.',
             'steps' => [
-                'Request clients — choose package, then how many managed clients you need.',
+                'Request clients — enter quantities for one or more packages (mix allowed).',
                 'Optional extras — additional sites, seats, white-label, assurance, or notes for sales.',
                 'Offline payment — MENetZero sends a quote; you pay outside the app.',
-                'Activation — once marked paid, admin activates capacity; managed clients get that package depth.',
+                'Activation — admin creates a capacity row per package line (Free stays).',
+                'Add client — choose which package depth has remaining places for that workspace.',
                 'Orders / renewal — history and renewal prompts when relevant.',
             ],
             'tips' => [
                 'Scope Basic ≈ clean GHG / MOCCAE / Excel / IEQT. Scope Pro and ESG packages add disclosure PDF suites.',
                 'Enterprise is fully custom (branding, implementation, deeper ESG).',
+                'Capacity is per package row — Basic slots cannot be used for an ESG client.',
                 'Never quote exact AED rates in help answers unless MENetZero has confirmed them for that engagement.',
             ],
             'links' => [
@@ -226,7 +228,7 @@ return [
                     'caption' => 'Sidebar lists Scope 1, 2, and 3 forms available for this client.',
                 ],
             ],
-            'body' => 'When you enter a client workspace, use the company Help & guide for detailed steps on locations, Quick Input, reports, and disclosures. Paid managed clients follow the package activated for your agency (Scope Basic through Enterprise).',
+            'body' => 'When you enter a client workspace, use the company Help & guide for detailed steps on locations, Quick Input, reports, and disclosures. Each managed client follows the package depth of the capacity row it was created under (Scope Basic through Enterprise).',
             'steps' => [
                 'Locations & emission boundaries — set up sites and applicable categories.',
                 'Quick Input & bulk import — enter DEWA, fuel, fleet, and Scope 3 data (within package limits).',
@@ -274,11 +276,15 @@ return [
         ],
         [
             'q' => 'How do I add more than one client?',
-            'a' => 'Request the number of managed clients you need and choose package depth (Scope Basic … Enterprise). Each active managed client uses one place of your capacity. Pricing is confirmed offline — no public AED grid.',
+            'a' => 'Request clients with quantities per package (you can mix depths). After activation, Add client and choose a package that still has remaining places. Pricing is confirmed offline — no public AED grid.',
         ],
         [
             'q' => 'What packages can consultants request?',
-            'a' => 'The same capability cards as companies: Scope Basic, Scope Pro, ESG Starter, ESG Complete, and Enterprise. Suggest quote is typically list price × client count; sales may adjust offline.',
+            'a' => 'The same capability cards as companies: Scope Basic, Scope Pro, ESG Starter, ESG Complete, and Enterprise. One request can include multiple lines. Suggest quote is typically list price × clients per line; sales may adjust offline.',
+        ],
+        [
+            'q' => 'Can I hold Basic and ESG capacity at the same time?',
+            'a' => 'Yes. Activation creates separate capacity rows. When you add a client, pick which package depth that workspace should use.',
         ],
         [
             'q' => 'Where do I get help with DEWA bills and bulk import columns?',

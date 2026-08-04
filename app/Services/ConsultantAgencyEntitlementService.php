@@ -49,6 +49,7 @@ class ConsultantAgencyEntitlementService
     public function getActiveEngagement(int $managedCompanyId): ?ConsultantClientEngagement
     {
         return ConsultantClientEngagement::query()
+            ->with(['subscription.plan'])
             ->where('managed_company_id', $managedCompanyId)
             ->active()
             ->orderByDesc('id')
@@ -245,7 +246,8 @@ class ConsultantAgencyEntitlementService
     }
 
     /**
-     * Package profile requested for paid managed clients (from consultant subscription metadata).
+     * Depth for paid managed clients — prefer subscription plan → client_* mirror,
+     * then legacy metadata, then Scope Basic.
      */
     protected function managedClientPackageCode(?ConsultantClientEngagement $engagement): ?string
     {
@@ -255,15 +257,31 @@ class ConsultantAgencyEntitlementService
 
         $subscription = $engagement->relationLoaded('subscription')
             ? $engagement->subscription
-            : $engagement->subscription()->first();
+            : $engagement->subscription()->with('plan')->first();
 
-        $code = $subscription?->metadata['managed_client_package_code'] ?? null;
+        $planCode = $subscription?->plan?->plan_code;
+        if (is_string($planCode) && $planCode !== '') {
+            $fromPlan = ConsultantAgencyPlanMatrix::clientDepthForConsultantPlan($planCode);
+            if ($fromPlan) {
+                return $fromPlan;
+            }
+            if (ConsultantAgencyPlanMatrix::isDepthPlan($planCode)) {
+                return $planCode;
+            }
+        }
 
-        return is_string($code) && $code !== '' ? $code : null;
+        foreach (['client_package_code', 'managed_client_package_code'] as $metaKey) {
+            $code = $subscription?->metadata[$metaKey] ?? null;
+            if (is_string($code) && $code !== '') {
+                return $code;
+            }
+        }
+
+        return 'client_scope_basic';
     }
 
     /**
-     * Plan code whose limits apply to a managed client (Free on trial, package on paid).
+     * Plan code whose limits apply to a managed client (Free on trial, mirrored client_* on paid).
      */
     public function managedClientLimitsPlanCode(int $companyId): string
     {
@@ -284,13 +302,12 @@ class ConsultantAgencyEntitlementService
             'client_esg_starter',
             'client_esg_complete',
             'client_enterprise',
+            'client_free',
         ], true)) {
-            return $packageCode === 'client_scope_basic'
-                ? ConsultantAgencyPlanMatrix::MANAGED_CLIENT_TEMPLATE
-                : $packageCode;
+            return $packageCode;
         }
 
-        return ConsultantAgencyPlanMatrix::MANAGED_CLIENT_TEMPLATE;
+        return 'client_scope_basic';
     }
 
     public function isTrialManagedClient(int $companyId): bool

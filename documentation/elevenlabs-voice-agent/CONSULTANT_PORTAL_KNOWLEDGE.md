@@ -18,7 +18,7 @@ The consultant portal is the **agency hub**: manage client workspaces, **request
 
 When a consultant **enters a client workspace**, they use the same emissions tools as a company (Locations, Quick Input, Reports, Disclosures). For detailed company-tool help, use the Company portal knowledge / Company portal guide.
 
-**Problem it solves:** UAE carbon consultants serve many SMEs. Instead of each SME buying a separate package, the consultant works from **one login**, requests **managed-client capacity** with a package depth (Scope Basic through Enterprise), and switches between **client workspaces**. Pricing is offline — no public AED grid.
+**Problem it solves:** UAE carbon consultants serve many SMEs. Instead of each SME buying a separate package, the consultant works from **one login**, requests **managed-client capacity** (can mix package depths in one request), and switches between **client workspaces**. Each capacity row has its own depth, slot count, and expiry. Pricing is offline — no public AED grid.
 
 ---
 
@@ -54,7 +54,7 @@ Exit a workspace with **Back to Agency Hub** in the header, or leave via Workspa
 | — | Dashboard | Portfolio overview, capacity, directory status | https://app.menetzero.com/consultant/dashboard |
 | Client workspaces | Managed clients | Create and edit client company records | https://app.menetzero.com/consultant/clients |
 | Client workspaces | Workspaces | Enter / switch client portals | https://app.menetzero.com/consultant/workspace |
-| Client workspaces | Agency packs / Request clients | Request Standard or Enterprise capacity (no public prices) | https://app.menetzero.com/consultant/packs |
+| Client workspaces | Agency packs / Request clients | Request capacity — qty per package, mix allowed (no public prices) | https://app.menetzero.com/consultant/packs |
 | Client workspaces | Renewal | Renew when due (after paid activation) | https://app.menetzero.com/consultant/renewal |
 | Directory | Profile | Public listing profile | https://app.menetzero.com/consultant/profile |
 | Directory | Documents | Verification uploads | https://app.menetzero.com/consultant/documents |
@@ -73,14 +73,15 @@ Exit a workspace with **Back to Agency Hub** in the header, or leave via Workspa
 3. **Add first managed client** — create client company, set **Primary Reporting Year (PRY)**, use Free (1 client) or paid capacity after activation. [Add client](https://app.menetzero.com/consultant/clients/create) · [Managed clients](https://app.menetzero.com/consultant/clients)
 4. **Enter the client workspace** — switch into the client portal to work. [Workspaces](https://app.menetzero.com/consultant/workspace)
 5. **Set up locations & input data** — inside workspace: locations, boundaries, Quick Input or bulk import. Use Company portal guide for details.
-6. **Request clients when ready** — more capacity and package depth (Scope Basic, Scope Pro, ESG Starter, ESG Complete, or Enterprise). [Request clients](https://app.menetzero.com/consultant/packs)
+6. **Request clients when ready** — more capacity at one or more package depths (mix allowed). [Request clients](https://app.menetzero.com/consultant/packs)
 
 **Tips:**
 - Free includes **one managed client** — enough to test the workflow (watermarked trial exports).
 - Each client has a **PRY** set when you create the engagement.
 - Say **managed client(s)** / **capacity** in the app. Sales docs may say “entity” — same meaning.
-- Paid requests choose **package depth** for client workspaces: Scope Basic (clean GHG/MOCCAE/Excel/IEQT) through ESG packages (disclosure PDFs) and Enterprise (custom).
-- No self-serve checkout or public AED prices — MENetZero quotes offline (typically package list × client count) and activates after payment.
+- Paid requests can include **multiple package lines** (e.g. Scope Basic ×5 and ESG Starter ×5). Activation creates one capacity row per line.
+- When adding a client, **choose which package** still has remaining places — entitlements follow that row.
+- No self-serve checkout or public AED prices — MENetZero quotes offline (typically package list × client count per line) and activates after payment.
 
 ---
 
@@ -103,21 +104,21 @@ Daily starting point:
 - [Managed clients](https://app.menetzero.com/consultant/clients)
 - [Add client](https://app.menetzero.com/consultant/clients/create)
 
-Each managed client is a separate company workspace. You define name, sector, PRY, and contacts. **One place of capacity is used per active client.**
+Each managed client is a separate company workspace. You define name, sector, PRY, contacts, and **which capacity package** it uses. **One place of that package is used per active client.**
 
 Steps:
-1. Add client — creates company and links to agency.
+1. Add client — pick a package with remaining places, creates company and links to that capacity row.
 2. Edit client — update PRY, display name, engagement settings.
-3. Archive/remove — frees capacity when engagement ends.
+3. Archive/remove — frees a place on that package when engagement ends.
 
-**Critical:** Set PRY correctly at creation — it drives default year filters in Quick Input and reports.
+**Critical:** Set PRY correctly at creation — it drives default year filters in Quick Input and reports. Choose the right package depth so exports match what that client needs.
 
 ### Agency model rules (plain language)
 
 - **Managed client / capacity** = one client company workspace + Primary Reporting Year. (Sales docs may say “entity”.)
-- **Free** = 1 managed client with Free rules (watermarked trial downloads; Scope 3 one entry/category).
-- **Paid packages** = Scope Basic, Scope Pro, ESG Starter, ESG Complete, or Enterprise — same capability options as direct companies; applied to managed client workspaces after activation.
-- Preferential annual rates may still be negotiated offline. Suggested quote is typically **package list × number of clients**. Guide users to Request clients; never invent AED.
+- **Free** = 1 managed client with Free rules (watermarked trial downloads; Scope 3 one entry/category). Free remains when paid rows are added.
+- **Paid packages** = Scope Basic, Scope Pro, ESG Starter, ESG Complete, or Enterprise — same capability options as direct companies. An agency may hold **several capacity rows** at once (different depths and expiries).
+- Preferential annual rates may still be negotiated offline. Suggested quote is typically **package list × number of clients per line**. Guide users to Request clients; never invent AED.
 - Consultant directory is typically **hidden** on managed client workspaces.
 - End SME users: no separate login in the standard agency model (v1).
 - If SME switches consultancy: new engagement under new consultant; no automatic data migration.
@@ -146,20 +147,22 @@ For how-to on Locations, Quick Input, DEWA bills, reports, disclosures: open [Co
 
 ## 9. Request clients, capacity & renewal
 
-**Commercial model:** After Free (1 managed client), consultants **Request clients**. They choose:
-1. Package depth — Scope Basic, Scope Pro, ESG Starter, ESG Complete, or Enterprise
-2. How many managed clients
+**Commercial model:** After Free (1 managed client), consultants **Request clients**. They enter quantities for one or more package depths in a single request (mix allowed), for example:
+1. Scope Basic × 5
+2. ESG Starter × 5
 
-Suggested quote is typically **company package list price × client count** (excl. VAT). Sales may override offline. Enterprise is always custom. There is **no self-serve checkout** and **no public price cards**.
+Suggested quote is typically **company package list price × client count for each line** (excl. VAT), summed. Sales may override offline. Enterprise is always custom. There is **no self-serve checkout** and **no public price cards**.
 
 **Pages:**
 - [Request clients / Agency packs](https://app.menetzero.com/consultant/packs)
 - [Orders](https://app.menetzero.com/consultant/orders)
 - [Renewal](https://app.menetzero.com/consultant/renewal)
 
-**Flow:** Request form → MENetZero quotes offline → payment outside the app → admin activates capacity → managed clients receive that package depth.
+**Flow:** Multi-line request form → MENetZero quotes offline → payment outside the app → admin activates **one capacity row per line** (own slot count + expiry; Free stays) → when adding a client, pick which row to use.
 
-**Free vs paid:** Free = 1 client, watermarked trial exports. Paid packages unlock entitlements matching the chosen cards (Scope Basic ≈ clean inventory exports; Scope Pro / ESG packages add disclosure PDF suites; Enterprise is custom). Do not invent old Essential/Complete pack grids.
+**Free vs paid:** Free = 1 client, watermarked trial exports. Paid packages unlock entitlements matching the chosen depth for that client. Do not invent old Essential/Complete or consultant_5/10/25/50 pack grids.
+
+Product source of truth for multi-row capacity: `documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md`.
 
 ---
 
@@ -184,7 +187,7 @@ Directory statuses: draft, pending review, approved, rejected.
 
 ## 11. Working inside a client workspace (most common tasks)
 
-Paid managed clients follow the **package** activated for the agency (Scope Basic through Enterprise). Scope Basic focuses on clean GHG / MOCCAE / Excel / IEQT. Scope Pro and ESG packages unlock disclosure PDF suites (UAE ESG Report, Scorecard, IFRS/GRI) when those are part of the package. Enterprise adds custom / white-label options.
+Paid managed clients follow the **package of the capacity row** they were created under (Scope Basic through Enterprise). Scope Basic focuses on clean GHG / MOCCAE / Excel / IEQT. Scope Pro and ESG packages unlock disclosure PDF suites when those are part of the package. Enterprise adds custom / white-label options.
 
 Common consultant tasks:
 1. Locations & emission boundaries
@@ -222,8 +225,8 @@ Free may limit team features — check current entitlements.
 | Managed client | End SME workspace linked to the consultant (sales may say “entity”) |
 | Capacity | How many managed clients you may hold |
 | PRY | Primary Reporting Year for that engagement |
-| Request clients | In-app form — package depth + how many managed clients; pricing offline |
-| Package | Scope Basic / Pro / ESG Starter / Complete / Enterprise applied to managed clients |
+| Request clients | In-app form — quantities per package depth (mix allowed); pricing offline |
+| Package / capacity row | Scope Basic / Pro / ESG Starter / Complete / Enterprise capacity with its own slot count and expiry |
 | Standard (legacy term) | Older name for GHG-focused paid client profile — prefer Scope Basic in new answers |
 | Enterprise | Custom / white-label deployment |
 | Directory | Public listing of approved consultants |

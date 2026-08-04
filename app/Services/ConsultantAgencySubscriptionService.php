@@ -165,18 +165,97 @@ class ConsultantAgencySubscriptionService
 
     public function slotsRemaining(int $consultantCompanyId, ?ConsultantSubscription $subscription = null): int
     {
-        $subscription ??= $this->getActiveSubscription($consultantCompanyId);
-
-        if (!$subscription) {
-            return 0;
+        if ($subscription) {
+            return max(0, (int) $subscription->slot_limit - $this->activeSlotUsage($consultantCompanyId, $subscription));
         }
 
-        return max(0, (int) $subscription->slot_limit - $this->activeSlotUsage($consultantCompanyId, $subscription));
+        return array_sum(array_column($this->availableCapacityBuckets($consultantCompanyId), 'remaining'));
     }
 
     public function canConsumeSlot(int $consultantCompanyId): bool
     {
         return $this->slotsRemaining($consultantCompanyId) > 0;
+    }
+
+    /**
+     * Capacity per active subscription row (Free / Demo / each depth purchase).
+     *
+     * @return list<array{
+     *   subscription_id: int,
+     *   plan_code: string|null,
+     *   plan_name: string,
+     *   client_package_code: string|null,
+     *   slot_limit: int,
+     *   used: int,
+     *   remaining: int,
+     *   is_trial: bool,
+     *   is_demo: bool,
+     *   is_depth: bool,
+     *   expires_at: string|null,
+     *   contract_year: int|null
+     * }>
+     */
+    public function capacityBuckets(int $consultantCompanyId): array
+    {
+        $subscriptions = ConsultantSubscription::forConsultant($consultantCompanyId)
+            ->with('plan')
+            ->active()
+            ->orderBy('id')
+            ->get();
+
+        $buckets = [];
+
+        foreach ($subscriptions as $subscription) {
+            $planCode = $subscription->plan?->plan_code;
+            $used = $this->activeSlotUsage($consultantCompanyId, $subscription);
+            $limit = (int) $subscription->slot_limit;
+            $clientCode = $planCode
+                ? ConsultantAgencyPlanMatrix::clientDepthForConsultantPlan($planCode)
+                : null;
+            if (!$clientCode) {
+                $meta = $subscription->metadata['managed_client_package_code']
+                    ?? $subscription->metadata['client_package_code']
+                    ?? null;
+                $clientCode = is_string($meta) ? $meta : null;
+            }
+
+            $buckets[] = [
+                'subscription_id' => (int) $subscription->id,
+                'plan_code' => $planCode,
+                'plan_name' => $subscription->plan?->plan_name ?? 'Capacity',
+                'client_package_code' => $clientCode,
+                'slot_limit' => $limit,
+                'used' => $used,
+                'remaining' => max(0, $limit - $used),
+                'is_trial' => $subscription->isFreeTrial(),
+                'is_demo' => $planCode === ConsultantAgencyPlanMatrix::DEMO_PACK_CODE,
+                'is_depth' => $planCode ? ConsultantAgencyPlanMatrix::isDepthPlan($planCode) : false,
+                'expires_at' => $subscription->expires_at?->toDateString(),
+                'contract_year' => $subscription->contract_year,
+            ];
+        }
+
+        return $buckets;
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function availableCapacityBuckets(int $consultantCompanyId): array
+    {
+        return array_values(array_filter(
+            $this->capacityBuckets($consultantCompanyId),
+            fn (array $b) => $b['remaining'] > 0
+        ));
+    }
+
+    public function findActiveSubscriptionForOrg(int $consultantCompanyId, int $subscriptionId): ?ConsultantSubscription
+    {
+        return ConsultantSubscription::forConsultant($consultantCompanyId)
+            ->with('plan')
+            ->active()
+            ->where('id', $subscriptionId)
+            ->first();
     }
 
     /**
@@ -662,20 +741,28 @@ class ConsultantAgencySubscriptionService
     }
 
     /**
-     * @return array{used: int, limit: int, remaining: int, contract_year: int|null, expires_at: string|null}
+     * @return array{used: int, limit: int, remaining: int, contract_year: int|null, expires_at: string|null, is_trial: bool, buckets: list<array<string, mixed>>}
      */
     public function slotSummary(int $consultantCompanyId, ?ConsultantSubscription $subscription = null): array
     {
-        $subscription ??= $this->getActiveSubscription($consultantCompanyId);
-        $used = $this->activeSlotUsage($consultantCompanyId, $subscription);
+        $buckets = $this->capacityBuckets($consultantCompanyId);
+        $used = array_sum(array_column($buckets, 'used'));
+        $limit = array_sum(array_column($buckets, 'slot_limit'));
+        $remaining = array_sum(array_column($buckets, 'remaining'));
+
+        $primaryBucket = collect($buckets)->first(fn (array $b) => !$b['is_trial'] && $b['remaining'] > 0)
+            ?? collect($buckets)->first();
+
+        $isTrialOnly = $buckets !== [] && collect($buckets)->every(fn (array $b) => $b['is_trial']);
 
         return [
             'used' => $used,
-            'limit' => $subscription?->slot_limit ?? 0,
-            'remaining' => max(0, ($subscription?->slot_limit ?? 0) - $used),
-            'contract_year' => $subscription?->contract_year,
-            'expires_at' => $subscription?->expires_at?->toDateString(),
-            'is_trial' => $subscription?->isFreeTrial() ?? false,
+            'limit' => $limit,
+            'remaining' => $remaining,
+            'contract_year' => $primaryBucket['contract_year'] ?? $subscription?->contract_year,
+            'expires_at' => $primaryBucket['expires_at'] ?? $subscription?->expires_at?->toDateString(),
+            'is_trial' => $isTrialOnly || (($subscription?->isFreeTrial() ?? false) && $remaining <= ($buckets[0]['remaining'] ?? 0)),
+            'buckets' => $buckets,
         ];
     }
 
