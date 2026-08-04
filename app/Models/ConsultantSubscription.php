@@ -69,9 +69,14 @@ class ConsultantSubscription extends Model
             return true;
         }
 
+        $freeCodes = [
+            ConsultantAgencyPlanMatrix::FREE_TRIAL_CODE,
+            ConsultantAgencyPlanMatrix::FREE_CODE,
+        ];
+
         return $this->relationLoaded('plan')
-            ? $this->plan?->plan_code === ConsultantAgencyPlanMatrix::FREE_TRIAL_CODE
-            : $this->plan()->where('plan_code', ConsultantAgencyPlanMatrix::FREE_TRIAL_CODE)->exists();
+            ? in_array($this->plan?->plan_code, $freeCodes, true)
+            : $this->plan()->whereIn('plan_code', $freeCodes)->exists();
     }
 
     public function scopeActive($query)

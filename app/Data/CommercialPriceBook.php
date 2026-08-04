@@ -136,7 +136,7 @@ class CommercialPriceBook
                 'package_code' => 'client_enterprise',
                 'breakdown' => 'Enterprise / white-label — set quote manually. Activation grants Consultant Plan capacity for the requested client count; managed clients use Enterprise-depth entitlements when activated.',
                 'band' => 'enterprise',
-                'suggested_pack_code' => self::nearestAgencyPackCode($entityCount),
+                'suggested_pack_code' => self::suggestedConsultantPlanCode('client_enterprise'),
             ];
         }
 
@@ -151,13 +151,14 @@ class CommercialPriceBook
                     'rate_aed' => null,
                     'entity_count' => $entityCount,
                     'package_code' => $code,
-                    'breakdown' => "{$label} × {$entityCount} clients — custom quote (no list price).",
+                    'breakdown' => "{$label} × {$entityCount} clients — custom quote (no list price). Activates as `".(self::suggestedConsultantPlanCode($code)).'`.',
                     'band' => 'custom',
-                    'suggested_pack_code' => self::nearestAgencyPackCode($entityCount),
+                    'suggested_pack_code' => self::suggestedConsultantPlanCode($code),
                 ];
             }
 
             $total = $unit * $entityCount;
+            $liveConsultant = self::suggestedConsultantPlanCode($code);
             $preferential = $entityCount < 10
                 ? ' Note: preferential sales policy may apply at ≥10 managed clients / 12 months — not auto-applied.'
                 : ' Count ≥10 — confirm any preferential override offline if contracted.';
@@ -168,9 +169,9 @@ class CommercialPriceBook
                 'rate_aed' => (float) $unit,
                 'entity_count' => $entityCount,
                 'package_code' => $code,
-                'breakdown' => "{$entityCount} × {$label} (AED " . number_format($unit, 0) . ') = AED ' . number_format($total, 0) . ' / year excl. VAT (company package list × clients). Preferential overrides allowed offline.' . $preferential,
+                'breakdown' => "{$entityCount} × {$label} (AED " . number_format($unit, 0) . ') = AED ' . number_format($total, 0) . " / year excl. VAT (company package list × clients). Activates as consultant depth `{$liveConsultant}` (one subscription row per line)." . $preferential,
                 'band' => 'package×clients',
-                'suggested_pack_code' => self::nearestAgencyPackCode($entityCount),
+                'suggested_pack_code' => $liveConsultant,
                 'min10_tip' => $entityCount < 10,
             ];
         }
@@ -188,16 +189,33 @@ class CommercialPriceBook
             'rate_aed' => (float) $rate,
             'entity_count' => $entityCount,
             'package_code' => null,
-            'breakdown' => "{$entityCount} × AED " . number_format($rate, 0) . ' = AED ' . number_format($total, 0) . " / year excl. VAT ({$band} · legacy Standard band).",
+            'breakdown' => "{$entityCount} × AED " . number_format($rate, 0) . ' = AED ' . number_format($total, 0) . " / year excl. VAT ({$band} · legacy Standard band). Prefer activating `consultant_scope_basic` × count.",
             'band' => $band,
-            'suggested_pack_code' => self::nearestAgencyPackCode($entityCount),
+            'suggested_pack_code' => ConsultantAgencyPlanMatrix::DEPTH_PLAN_CODES[0],
         ];
     }
 
-    /** Always Consultant Plan — capacity scaled with extras. */
+    /**
+     * Map request company depth → consultant_* plan row to activate (multi-package Phase 1+).
+     */
+    public static function suggestedConsultantPlanCode(?string $clientPackageCode = null): string
+    {
+        if ($clientPackageCode) {
+            $mapped = ConsultantAgencyPlanMatrix::consultantPlanForClientDepth($clientPackageCode);
+            if ($mapped) {
+                return $mapped;
+            }
+        }
+
+        return 'consultant_scope_basic';
+    }
+
+    /**
+     * @deprecated Prefer suggestedConsultantPlanCode($packageCode). Kept for older call sites.
+     */
     public static function nearestAgencyPackCode(int $entityCount): string
     {
-        return ConsultantAgencyPlanMatrix::ENTITY_PLAN_CODE;
+        return self::suggestedConsultantPlanCode('client_scope_basic');
     }
 
     public static function extraSlotsNeeded(int $entityCount, string $packCode): int

@@ -8,7 +8,7 @@
 | **Audience** | Product, engineering, sales, admin ops |
 | **Source — company packages** | `documentation/MENetZero_Features_Pricing.xlsx` |
 | **Source — consultant paid** | Commercial proposal email (Ojas Bohra, Aug 2026) — §6 |
-| **Related** | `CONSULTANT_AGENCY_PLAN_V1.md`, `PlanEntitlementService` / `PlanGate` |
+| **Related** | `CONSULTANT_MULTI_PACKAGE_PLAN.md` (consultant multi-row / depth packages — **current**), `CONSULTANT_AGENCY_PLAN_V1.md` (legacy), `PlanEntitlementService` / `PlanGate` |
 
 Single source of truth for: Free for all → no public prices → logged-in Request flows → offline payment → admin activation.
 
