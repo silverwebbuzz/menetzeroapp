@@ -409,6 +409,11 @@ class Scope12BulkImportService
             throw new \InvalidArgumentException('Fiscal year must be between 2000 and 2100.');
         }
 
+        $write = app(PlanEntitlementService::class)->canWriteForReportingYear($companyId, (int) $row['fiscal_year']);
+        if (!$write['allowed']) {
+            throw new \InvalidArgumentException($write['message'] ?? "Fiscal year {$row['fiscal_year']} is locked for editing.");
+        }
+
         $locationKey = strtolower(trim($row['location_name']));
         $location = $locations->get($locationKey);
         if (!$location) {

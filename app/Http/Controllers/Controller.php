@@ -159,7 +159,15 @@ abstract class Controller extends BaseController
     protected function requireReportingYearWrite(int $companyId, int $reportingYear): void
     {
         $user = \Illuminate\Support\Facades\Auth::user();
-        $check = app(\App\Services\ConsultantAgencyWorkspaceService::class)->canWriteReportingYear($user, $reportingYear);
+        $workspace = app(\App\Services\ConsultantAgencyWorkspaceService::class);
+
+        if ($user && $workspace->isActingAsManagedClient($user) && $workspace->isReadOnlyWorkspace()) {
+            throw new HttpResponseException(
+                back()->with('error', 'This archived client workspace is read-only.')
+            );
+        }
+
+        $check = $this->planEntitlements()->canWriteForReportingYear($companyId, $reportingYear);
 
         if (!$check['allowed']) {
             throw new HttpResponseException(

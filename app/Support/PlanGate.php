@@ -168,14 +168,52 @@ class PlanGate
             ->reportingYearModeForCompany($this->companyId, $fiscalYear);
     }
 
+    /**
+     * Whether Quick Input / disclosures may create or edit data for this fiscal year.
+     */
+    public function canWriteReportingYear(?int $fiscalYear = null): bool
+    {
+        if (!$this->companyId || $fiscalYear === null) {
+            return false;
+        }
+
+        return $this->entitlements->canWriteForReportingYear($this->companyId, $fiscalYear)['allowed'];
+    }
+
+    public function writeReportingYearMessage(?int $fiscalYear = null): string
+    {
+        if (!$this->companyId || $fiscalYear === null) {
+            return 'Select a fiscal year to edit.';
+        }
+
+        return $this->entitlements->canWriteForReportingYear($this->companyId, $fiscalYear)['message']
+            ?? 'This fiscal year is locked for editing.';
+    }
+
     public function managedPreviewBannerMessage(?int $fiscalYear = null): ?string
     {
         if (!$this->companyId) {
             return null;
         }
 
-        return app(ConsultantAgencyEntitlementService::class)
+        $managed = app(ConsultantAgencyEntitlementService::class)
             ->previewBannerMessage($this->companyId, $fiscalYear);
+
+        if ($managed !== null) {
+            return $managed;
+        }
+
+        // Direct company: show banner when FY is outside writable subscription term.
+        if ($fiscalYear === null || $this->isManagedClient()) {
+            return null;
+        }
+
+        $write = $this->entitlements->canWriteForReportingYear($this->companyId, $fiscalYear);
+        if ($write['allowed']) {
+            return null;
+        }
+
+        return $write['message'];
     }
 
     public function canDisclosureExport(?int $fiscalYear = null): bool

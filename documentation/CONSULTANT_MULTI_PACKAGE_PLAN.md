@@ -300,6 +300,7 @@ Request form continues to use **company** codes for depth choice; activation wri
 | Aug 2026 | Dropped `extra_slots_purchased` column; mid-term seats = new capacity row |
 | Aug 2026 | Phase 7: seat move — upgrade anytime, same-tier near expiry, no downgrade |
 | Aug 2026 | Phase 8: renew board — continue vs leave(history); leave = archive read-only |
+| Aug 2026 | **Year lock:** write only PRY (or unlocked year) / direct sub term; history = view+download; future locked |
 
 ---
 
@@ -424,3 +425,18 @@ If some of the continuing 3 should actually be **ESG** next year: consultant als
 - Auto-renew all clients without consultant selection.  
 - Collapsing purchase history into one subscription row.  
 - Billing PRY data entry again for retained firms.
+
+### 14.9 Year lock (edit vs certificates) — locked Aug 2026
+
+One paid term must not unlock unlimited editable years / new certificates.
+
+| Year relative to paid PRY (managed) or subscription term (direct) | Edit / create | Official downloads |
+|------------------------------------------------------------------|---------------|--------------------|
+| **Paid PRY** / year inside direct `started_at`–`expires_at` | Yes | Yes |
+| **History** (before PRY) | No (read-only) | Yes (YoY compare / prior certificates) |
+| **Future / unlocked-not** (after PRY, no year-unlock) | No | No until unlock or renew |
+| **Year unlock** addon | Yes for that year | Yes |
+| **Archived / Leave** engagement | No | Historical view via read-only workspace |
+
+Applies to **all package depths** (Free → Enterprise). Higher tiers unlock features, not free multi-year write.  
+Enforced via `canWriteForReportingYear` / `requireReportingYearWrite` (Quick Input, disclosures, bulk import).

@@ -72,14 +72,12 @@ class ConsultantAgencyEntitlementService
             return self::MODE_PRY_FULL;
         }
 
-        if ($reportingYear === $pry + 1) {
-            return self::MODE_PREVIEW;
-        }
-
+        // Past years: compare/history only.
         if ($reportingYear < $pry) {
             return self::MODE_READ_ONLY;
         }
 
+        // Future / PRY+1: locked until year unlock or renew (no free multi-year editing).
         return self::MODE_PREVIEW;
     }
 
@@ -125,21 +123,24 @@ class ConsultantAgencyEntitlementService
 
         $mode = $this->reportingYearMode($engagement, $reportingYear);
 
-        if ($mode === self::MODE_READ_ONLY) {
-            return [
+        return match ($mode) {
+            self::MODE_PRY_FULL => ['allowed' => true, 'message' => null],
+            self::MODE_PREVIEW => [
                 'allowed' => false,
-                'message' => "Fiscal year {$reportingYear} is read-only for this managed client.",
-            ];
-        }
-
-        if ($mode === self::MODE_DENIED) {
-            return [
+                'message' => "Fiscal year {$reportingYear} is locked. "
+                    . "You can edit Primary Reporting Year {$engagement->primary_reporting_year} only. "
+                    . 'Unlock this year or renew the client onto a new PRY to enter data and issue certificates.',
+            ],
+            self::MODE_READ_ONLY => [
+                'allowed' => false,
+                'message' => "Fiscal year {$reportingYear} is history for this client (read-only). "
+                    . "Edit Primary Reporting Year {$engagement->primary_reporting_year}, or unlock/renew for a new year.",
+            ],
+            default => [
                 'allowed' => false,
                 'message' => 'This managed client workspace is not active on the consultant contract.',
-            ];
-        }
-
-        return ['allowed' => true, 'message' => null];
+            ],
+        };
     }
 
     /**
@@ -168,15 +169,13 @@ class ConsultantAgencyEntitlementService
 
         return match ($mode) {
             self::MODE_PRY_FULL => ['allowed' => true, 'message' => null],
+            // Past PRY years: certificates / official downloads allowed for YoY compare; edits stay blocked.
+            self::MODE_READ_ONLY => ['allowed' => true, 'message' => null],
             self::MODE_PREVIEW => [
                 'allowed' => false,
-                'message' => "Fiscal year {$reportingYear} is preview-only. "
-                    . "Downloads are available for Primary Reporting Year {$engagement->primary_reporting_year} "
-                    . 'or after a reporting year unlock / consultant renewal.',
-            ],
-            self::MODE_READ_ONLY => [
-                'allowed' => false,
-                'message' => "Fiscal year {$reportingYear} is read-only for this managed client.",
+                'message' => "Fiscal year {$reportingYear} is locked. "
+                    . "Downloads are available for Primary Reporting Year {$engagement->primary_reporting_year}, "
+                    . 'past history years, or after a reporting year unlock / renewal.',
             ],
             default => [
                 'allowed' => false,
@@ -209,9 +208,10 @@ class ConsultantAgencyEntitlementService
         $mode = $this->reportingYearMode($engagement, $reportingYear);
 
         return match ($mode) {
-            self::MODE_PREVIEW => "Preview only for fiscal year {$reportingYear}. "
-                . "Full IFRS/GRI and report downloads are enabled for PRY {$engagement->primary_reporting_year} only.",
-            self::MODE_READ_ONLY => "Fiscal year {$reportingYear} is read-only for this managed client.",
+            self::MODE_PREVIEW => "Fiscal year {$reportingYear} is locked (not your Primary Reporting Year {$engagement->primary_reporting_year}). "
+                . 'No edits or new certificates until you unlock this year or renew onto a new PRY.',
+            self::MODE_READ_ONLY => "Fiscal year {$reportingYear} is history — view and download prior reports, but editing is closed. "
+                . "Active editing applies to PRY {$engagement->primary_reporting_year}.",
             self::MODE_DENIED => 'This client workspace is not active on the current consultant contract.',
             default => null,
         };

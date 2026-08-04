@@ -2,14 +2,19 @@
 
 @php
     $gate = \App\Support\PlanGate::forUser(auth('web')->user());
-    $consultantBannerMessage = $gate->managedPreviewBannerMessage($fiscalYear);
+    $yearBannerMessage = $gate->managedPreviewBannerMessage($fiscalYear);
+    $canWriteYear = $fiscalYear ? $gate->canWriteReportingYear($fiscalYear) : true;
     $canExport = $exportCode
         ? $gate->canDisclosureExportType($exportCode, $fiscalYear)
         : ($fiscalYear ? $gate->canDisclosureExport($fiscalYear) : $gate->canDisclosureExport());
 @endphp
 
-@if($consultantBannerMessage)
-    <x-preview-only-banner :message="$consultantBannerMessage" :show-upgrade="false" />
+@if($yearBannerMessage)
+    <x-preview-only-banner :message="$yearBannerMessage" :show-upgrade="false" />
+@elseif($fiscalYear && !$canWriteYear)
+    <x-preview-only-banner
+        :message="$gate->writeReportingYearMessage($fiscalYear)"
+        :show-upgrade="false" />
 @elseif(!$canExport)
     <x-preview-only-banner
         :message="$gate->lockedFeatureMessage($gate->disclosureExportMessage($fiscalYear), 'Report downloads')"

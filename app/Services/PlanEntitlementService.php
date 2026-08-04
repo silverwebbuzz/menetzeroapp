@@ -264,11 +264,54 @@ class PlanEntitlementService
     }
 
     /**
+     * Write lock: managed clients use PRY/unlock; direct companies use subscription term years.
+     *
      * @return array{allowed: bool, message: string|null}
      */
     public function canWriteForReportingYear(int $companyId, int $reportingYear): array
     {
-        return $this->consultantOrgEntitlements->canWriteForReportingYear($companyId, $reportingYear);
+        if ($this->consultantOrgEntitlements->isManagedClient($companyId)) {
+            return $this->consultantOrgEntitlements->canWriteForReportingYear($companyId, $reportingYear);
+        }
+
+        return $this->canWriteDirectCompanyReportingYear($companyId, $reportingYear);
+    }
+
+    /**
+     * Direct company: editable fiscal years are those covered by the active subscription term.
+     * No active subscription (Free explore): current calendar year only.
+     *
+     * @return array{allowed: bool, message: string|null}
+     */
+    public function canWriteDirectCompanyReportingYear(int $companyId, int $reportingYear): array
+    {
+        $subscription = $this->subscriptionService->getActiveSubscription($companyId);
+
+        if (!$subscription) {
+            $currentYear = (int) now()->year;
+            if ($reportingYear === $currentYear) {
+                return ['allowed' => true, 'message' => null];
+            }
+
+            return [
+                'allowed' => false,
+                'message' => "Without an active package you can only edit fiscal year {$currentYear}. "
+                    . 'Request a package to work other years and download certificates.',
+            ];
+        }
+
+        if ($this->fiscalYearWithinSubscription($subscription, $reportingYear)) {
+            return ['allowed' => true, 'message' => null];
+        }
+
+        $startYear = (int) $subscription->started_at->year;
+        $endYear = (int) $subscription->expires_at->year;
+
+        return [
+            'allowed' => false,
+            'message' => "Fiscal year {$reportingYear} is outside your package term ({$startYear}–{$endYear}). "
+                . 'Renew or extend your package to edit this year and issue certificates.',
+        ];
     }
 
     /**

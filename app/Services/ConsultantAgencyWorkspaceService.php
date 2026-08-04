@@ -113,20 +113,28 @@ class ConsultantAgencyWorkspaceService
      */
     public function canWriteReportingYear(User $user, int $reportingYear): array
     {
-        if (!$this->isActingAsManagedClient($user)) {
-            return ['allowed' => true, 'message' => null];
-        }
-
-        if ($this->isReadOnlyWorkspace()) {
+        if ($this->isReadOnlyWorkspace() && $this->isActingAsManagedClient($user)) {
             return [
                 'allowed' => false,
                 'message' => 'This archived client workspace is read-only.',
             ];
         }
 
-        $managed = $this->resolveActingCompany($user);
+        $managed = $this->isActingAsManagedClient($user)
+            ? $this->resolveActingCompany($user)
+            : null;
 
-        return app(PlanEntitlementService::class)->canWriteForReportingYear((int) $managed->id, $reportingYear);
+        $companyId = $managed?->id;
+        if (!$companyId) {
+            $owned = $user->getActiveCompany() ?? $user->getOwnedCompany();
+            $companyId = $owned?->id;
+        }
+
+        if (!$companyId) {
+            return ['allowed' => false, 'message' => 'No active company found.'];
+        }
+
+        return app(PlanEntitlementService::class)->canWriteForReportingYear((int) $companyId, $reportingYear);
     }
 
     public function purgeInvalidActingSession(User $user): void
