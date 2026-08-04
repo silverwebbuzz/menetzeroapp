@@ -12,7 +12,8 @@
     @endif
 
     <p class="text-sm text-gray-600 mb-4">
-        Workflow: Review → Suggest/edit quote (package list × clients) → Mark paid → Activate (grants capacity; managed clients get the requested package depth).
+        Workflow: Review → Suggest/edit quote (Σ package list × clients per line) → Mark paid → Activate
+        (creates <strong>one subscription row per package line</strong> with its own slot count and expiry).
         Preferential overrides are sales-only.
     </p>
 
@@ -43,15 +44,17 @@
                 <div class="grid md:grid-cols-3 gap-4 mb-4">
                     <div>
                         <div class="text-xs text-gray-500">Requested</div>
-                        <div class="font-medium">{{ $req->entity_count }} managed clients · {{ $req->packageLabel() }}</div>
+                        <div class="font-medium">{{ $req->totalEntityCount() }} managed clients · {{ $req->packageLabel() }}</div>
                         <div class="text-xs text-gray-500 mt-1">
-                            @if($req->package_code)<span class="font-mono">{{ $req->package_code }}</span> · @endif
+                            @foreach($req->normalizedLines() as $line)
+                                <div><span class="font-mono">{{ $line['package_code'] }}</span> ×{{ $line['entity_count'] }}</div>
+                            @endforeach
                             @if($req->needs_sites_over_5)&gt;5 sites / extra sites flagged · @endif
                             {{ $req->message ? \Illuminate\Support\Str::limit($req->message, 140) : 'No message' }}
                         </div>
                     </div>
                     <div>
-                        <div class="text-xs text-gray-500">Suggested (package × clients)</div>
+                        <div class="text-xs text-gray-500">Suggested (Σ package × clients)</div>
                         @if($sug)
                             <div class="font-medium">
                                 @if($sug['custom'])
@@ -61,8 +64,15 @@
                                 @endif
                             </div>
                             <div class="text-xs text-gray-500 mt-1">{{ $sug['breakdown'] }}</div>
-                            <div class="text-xs text-gray-400 mt-1">Activate pack → {{ $sug['suggested_pack_code'] ?? '—' }} (+extra clients if needed)</div>
-                            @if(!empty($sug['min10_tip']) || (int) $req->entity_count < 10)
+                            @if(!empty($sug['suggested_activations']))
+                                <div class="text-xs text-gray-400 mt-1">
+                                    Activate →
+                                    @foreach($sug['suggested_activations'] as $act)
+                                        <code>{{ $act['consultant_plan_code'] }}</code>×{{ $act['entity_count'] }}@if(!$loop->last), @endif
+                                    @endforeach
+                                </div>
+                            @endif
+                            @if(!empty($sug['min10_tip']) || $req->totalEntityCount() < 10)
                                 <div class="mt-2 text-xs text-amber-800 bg-amber-50 border border-amber-100 rounded px-2 py-1.5">
                                     Min‑10 preferential (≥10 clients / 12 months) is <strong>sales policy only</strong> — do not block this request; adjust quote manually if contracted.
                                 </div>
@@ -107,12 +117,12 @@
                                     @csrf
                                     <button type="submit" class="text-xs px-3 py-1.5 border border-green-600 text-green-700 rounded hover:bg-green-50">Mark paid</button>
                                 </form>
-                                <form action="{{ route('admin.entity-requests.activate', $req) }}" method="POST" onsubmit="return confirm('Grant capacity for {{ $req->entity_count }} managed clients?')">
+                                <form action="{{ route('admin.entity-requests.activate', $req) }}" method="POST" onsubmit="return confirm('Create subscription row(s) for: {{ $req->packageLabel() }}?')">
                                     @csrf
                                     <button type="submit" class="text-xs px-3 py-1.5 bg-orange-600 text-white rounded hover:bg-orange-700">Activate</button>
                                 </form>
                             </div>
-                            <p class="text-xs text-gray-500">Grants consultant capacity for the requested client count; managed clients inherit the requested package depth.</p>
+                            <p class="text-xs text-gray-500">Creates one paid depth row per line (keeps Free trial). Managed clients attach to a depth row when created (Phase 4).</p>
                         </div>
                     </div>
                 @endif

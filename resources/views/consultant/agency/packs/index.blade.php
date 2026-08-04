@@ -8,7 +8,7 @@
     $isTrial = $subscription?->isFreeTrial() ?? false;
     $currentUsed = (int) ($slotSummary['used'] ?? 0);
     $currentLimit = $slotSummary['limit'] ?? '—';
-    $selectedPackage = old('package_code', 'client_scope_basic');
+    $oldLines = old('lines', []);
 @endphp
 
 <div class="w-full max-w-6xl">
@@ -16,8 +16,8 @@
         <a href="{{ route('consultant.dashboard') }}" class="text-sm text-brand hover:underline">&larr; Dashboard</a>
         <h1 class="text-3xl font-bold text-gray-900 mt-2">Request managed clients</h1>
         <p class="mt-2 text-gray-600">
-            Compare packages, select the depth your clients need, then enter how many managed clients.
-            Pricing is confirmed offline — nothing checkoutable here.
+            Compare packages, then enter how many managed clients you need at each depth.
+            You can mix packages (e.g. Scope Basic ×5 and ESG Starter ×5). Pricing is confirmed offline.
         </p>
         @if($subscription)
             <p class="mt-2 text-sm text-gray-500">
@@ -45,47 +45,56 @@
         </div>
     @endif
 
-    <form action="{{ route('consultant.packs.request-entities') }}" method="POST" class="space-y-6">
+    <form action="{{ route('consultant.packs.request-entities') }}" method="POST" class="space-y-6" id="request-clients-form">
         @csrf
 
         @include('partials.package-request-matrix', [
             'matrix' => $matrix,
             'packages' => $packages,
-            'selectedPackage' => $selectedPackage,
+            'selectedPackage' => null,
+            'selectionMode' => 'none',
         ])
 
         <div class="bg-white rounded-xl border border-gray-200 p-5">
-            <label for="entity_count" class="block text-sm font-semibold text-gray-900 mb-2">
-                How many managed clients do you need?
-            </label>
-            <p class="text-xs text-gray-500 mb-3">
-                One managed client = one client workspace under the package you selected above.
+            <h2 class="text-sm font-semibold text-gray-900 mb-1">How many managed clients per package?</h2>
+            <p class="text-xs text-gray-500 mb-4">
+                Leave a package at 0 to skip it. One managed client = one client workspace at that package depth.
             </p>
-            <input
-                type="number"
-                id="entity_count"
-                name="entity_count"
-                min="1"
-                max="500"
-                required
-                value="{{ old('entity_count', max(1, $currentUsed)) }}"
-                class="w-full max-w-xs rounded-lg border-gray-300 text-sm focus:border-teal-500 focus:ring-teal-500"
-            >
-            <p id="min10-preferential-tip" class="mt-3 text-xs text-teal-800 bg-teal-50 border border-teal-100 rounded-lg px-3 py-2 {{ (int) old('entity_count', max(1, $currentUsed)) >= 10 ? 'hidden' : '' }}">
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                @foreach($packages as $code => $pkg)
+                    <label class="flex flex-col gap-1 rounded-lg border border-gray-200 p-3 hover:border-teal-300">
+                        <span class="text-sm font-semibold text-gray-900">{{ $pkg['name'] }}</span>
+                        <span class="text-[11px] text-gray-500 leading-snug">{{ $pkg['summary'] }}</span>
+                        <input
+                            type="number"
+                            name="lines[{{ $code }}]"
+                            min="0"
+                            max="500"
+                            value="{{ (int) ($oldLines[$code] ?? 0) }}"
+                            class="mt-2 w-full rounded-lg border-gray-300 text-sm focus:border-teal-500 focus:ring-teal-500 line-qty"
+                            data-package-code="{{ $code }}"
+                        >
+                    </label>
+                @endforeach
+            </div>
+            <p id="min10-preferential-tip" class="mt-4 text-xs text-teal-800 bg-teal-50 border border-teal-100 rounded-lg px-3 py-2">
                 Preferential rates may apply when you onboard <strong>10+</strong> managed clients in a 12‑month period — sales confirms offline. Asking for fewer than 10 is fine; this is not a hard minimum.
             </p>
+            <p class="mt-2 text-xs text-gray-500">Total requested: <span id="lines-total" class="font-semibold text-gray-800">0</span></p>
         </div>
 
         <script>
             (function () {
-                const input = document.getElementById('entity_count');
+                const inputs = document.querySelectorAll('.line-qty');
                 const tip = document.getElementById('min10-preferential-tip');
-                if (!input || !tip) return;
+                const totalEl = document.getElementById('lines-total');
                 const sync = () => {
-                    const n = parseInt(input.value, 10) || 0;
-                    tip.classList.toggle('hidden', n >= 10);
+                    let total = 0;
+                    inputs.forEach((el) => { total += parseInt(el.value, 10) || 0; });
+                    if (totalEl) totalEl.textContent = String(total);
+                    if (tip) tip.classList.toggle('hidden', total >= 10);
                 };
-                input.addEventListener('input', sync);
+                inputs.forEach((el) => el.addEventListener('input', sync));
                 sync();
             })();
         </script>
@@ -141,7 +150,7 @@
                         <tr>
                             <th class="px-4 py-2">Date</th>
                             <th class="px-4 py-2">Clients</th>
-                            <th class="px-4 py-2">Package</th>
+                            <th class="px-4 py-2">Package(s)</th>
                             <th class="px-4 py-2">Status</th>
                         </tr>
                     </thead>
@@ -149,7 +158,7 @@
                         @foreach($recentRequests as $req)
                             <tr>
                                 <td class="px-4 py-2 text-gray-600">{{ $req->created_at->format('d M Y') }}</td>
-                                <td class="px-4 py-2">{{ $req->entity_count }}</td>
+                                <td class="px-4 py-2">{{ $req->totalEntityCount() }}</td>
                                 <td class="px-4 py-2 text-xs text-gray-600">
                                     {{ $req->packageLabel() }}
                                     @if($req->needs_sites_over_5) · extra sites @endif

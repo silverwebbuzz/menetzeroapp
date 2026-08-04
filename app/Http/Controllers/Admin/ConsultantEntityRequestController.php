@@ -94,7 +94,7 @@ class ConsultantEntityRequestController extends Controller
         ]);
 
         $note = $data['note']
-            ?: ('Activated from entity request #' . $entityRequest->id . ' · ×' . $entityRequest->entity_count);
+            ?: ('Activated from entity request #' . $entityRequest->id . ' · ' . $entityRequest->packageLabel());
 
         try {
             $this->activations->activateConsultantRequest(

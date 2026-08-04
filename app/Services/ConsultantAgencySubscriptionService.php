@@ -276,6 +276,11 @@ class ConsultantAgencySubscriptionService
 
     /**
      * Create or replace the active subscription for a contract year.
+     *
+     * Options:
+     * - replace_existing (default true): expire other active rows for same contract year (legacy pack upgrades).
+     * - slot_limit: force absolute slot limit (depth multi-package purchases).
+     * - preserve_engagements (default true when replace_existing): move engagements to the new row.
      */
     public function activatePackSubscription(Company $consultantOrg, SubscriptionPlan $plan, array $options = []): ConsultantSubscription
     {
@@ -288,35 +293,49 @@ class ConsultantAgencySubscriptionService
         $contractYear = (int) ($options['contract_year'] ?? now()->year);
         $baseSlots = ConsultantAgencyPlanMatrix::slotCountForPlanCode($plan->plan_code);
         $extraSlots = (int) ($options['extra_slots_purchased'] ?? 0);
+        $replaceExisting = (bool) ($options['replace_existing'] ?? true);
 
-        return DB::transaction(function () use ($consultantOrg, $plan, $options, $contractYear, $baseSlots, $extraSlots) {
-            $oldSubscriptions = ConsultantSubscription::forConsultant($consultantOrg->id)
-                ->where('contract_year', $contractYear)
-                ->where('status', 'active')
-                ->lockForUpdate()
-                ->get();
-
+        return DB::transaction(function () use ($consultantOrg, $plan, $options, $contractYear, $baseSlots, $extraSlots, $replaceExisting) {
             $carriedExtraSlots = $extraSlots;
             $oldIds = [];
 
-            foreach ($oldSubscriptions as $old) {
-                $oldIds[] = $old->id;
+            if ($replaceExisting) {
+                $oldSubscriptions = ConsultantSubscription::forConsultant($consultantOrg->id)
+                    ->with('plan')
+                    ->where('contract_year', $contractYear)
+                    ->where('status', 'active')
+                    ->lockForUpdate()
+                    ->get();
 
-                if (!array_key_exists('extra_slots_purchased', $options)) {
-                    $carriedExtraSlots += (int) $old->extra_slots_purchased;
+                foreach ($oldSubscriptions as $old) {
+                    // Never expire free / demo when replacing a paid pack in the same year.
+                    if ($old->isFreeTrial() || $old->plan?->plan_code === ConsultantAgencyPlanMatrix::DEMO_PACK_CODE) {
+                        continue;
+                    }
+                    $oldIds[] = $old->id;
+
+                    if (!array_key_exists('extra_slots_purchased', $options)
+                        && !array_key_exists('slot_limit', $options)
+                    ) {
+                        $carriedExtraSlots += (int) $old->extra_slots_purchased;
+                    }
+                }
+
+                if (!empty($oldIds)) {
+                    ConsultantSubscription::whereIn('id', $oldIds)->update(['status' => 'expired']);
                 }
             }
 
-            if (!empty($oldIds)) {
-                ConsultantSubscription::whereIn('id', $oldIds)->update(['status' => 'expired']);
-            }
+            $slotLimit = array_key_exists('slot_limit', $options)
+                ? max(1, (int) $options['slot_limit'])
+                : $baseSlots + $carriedExtraSlots;
 
             $newSubscription = ConsultantSubscription::create([
                 'consultant_company_id' => $consultantOrg->id,
                 'subscription_plan_id' => $plan->id,
                 'contract_year' => $contractYear,
-                'slot_limit' => $baseSlots + $carriedExtraSlots,
-                'extra_slots_purchased' => $carriedExtraSlots,
+                'slot_limit' => $slotLimit,
+                'extra_slots_purchased' => array_key_exists('slot_limit', $options) ? 0 : $carriedExtraSlots,
                 'starts_at' => $options['starts_at'] ?? now()->toDateString(),
                 'expires_at' => $options['expires_at'] ?? $this->contractYearEnd($contractYear)->toDateString(),
                 'status' => 'active',
@@ -324,7 +343,8 @@ class ConsultantAgencySubscriptionService
                 'metadata' => $options['metadata'] ?? null,
             ]);
 
-            if (!empty($oldIds)) {
+            $preserveEngagements = (bool) ($options['preserve_engagements'] ?? $replaceExisting);
+            if ($preserveEngagements && !empty($oldIds)) {
                 ConsultantClientEngagement::whereIn('consultant_subscription_id', $oldIds)
                     ->where('status', 'active')
                     ->update(['consultant_subscription_id' => $newSubscription->id]);
@@ -332,6 +352,35 @@ class ConsultantAgencySubscriptionService
 
             return $newSubscription;
         });
+    }
+
+    /**
+     * Additive capacity row for a depth plan (Phase 3) — does not expire free or other depth rows.
+     */
+    public function grantDepthSubscription(
+        Company $consultantOrg,
+        string $consultantPlanCode,
+        int $slotCount,
+        int $contractYear,
+        array $metadata = [],
+        ?int $adminId = null,
+    ): ConsultantSubscription {
+        $plan = SubscriptionPlan::where('plan_code', $consultantPlanCode)
+            ->where('plan_category', 'consultant_agency')
+            ->firstOrFail();
+
+        return $this->activatePackSubscription($consultantOrg, $plan, [
+            'contract_year' => $contractYear,
+            'slot_limit' => max(1, $slotCount),
+            'extra_slots_purchased' => 0,
+            'replace_existing' => false,
+            'preserve_engagements' => false,
+            'metadata' => array_merge($metadata, array_filter([
+                'provision_type' => 'depth_grant',
+                'granted_by' => $adminId,
+                'granted_at' => now()->toIso8601String(),
+            ], fn ($value) => $value !== null)),
+        ]);
     }
 
     /**
@@ -345,6 +394,21 @@ class ConsultantAgencySubscriptionService
         ?int $adminId = null,
         int $extraSlotsPurchased = 0,
     ): ConsultantSubscription {
+        if (ConsultantAgencyPlanMatrix::isDepthPlan($planCode)
+            || $planCode === ConsultantAgencyPlanMatrix::ENTERPRISE_CODE
+        ) {
+            $slots = max(1, 1 + max(0, $extraSlotsPurchased));
+
+            return $this->grantDepthSubscription(
+                $consultantOrg,
+                $planCode,
+                $slots,
+                $contractYear,
+                $metadata,
+                $adminId,
+            );
+        }
+
         $plan = SubscriptionPlan::where('plan_code', $planCode)->where('plan_category', 'consultant_agency')->firstOrFail();
 
         return $this->activatePackSubscription($consultantOrg, $plan, [

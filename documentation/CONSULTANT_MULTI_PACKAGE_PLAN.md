@@ -218,10 +218,12 @@ Request form continues to use **company** codes for depth choice; activation wri
 - [x] Disable `ConsultantFullDemoSeeder` until Phase 5 multi-package demo.
 
 ### Phase 3 — Request lines + activate → multi-row
-- [ ] Persist multi-line entity requests (table or JSON lines).
-- [ ] Admin quote Σ lines.
-- [ ] Activate creates **one subscription row per line** (consultant depth plan + slot_limit + term).
-- [ ] Do not overwrite a single agency `managed_client_package_code` as sole depth.
+- [x] Persist multi-line entity requests (`lines` JSON + backfill).
+- [x] Admin quote Σ lines (`CommercialPriceBook::suggestConsultantLinesQuote`).
+- [x] Activate creates **one subscription row per line** (`grantDepthSubscription`) — keeps free / demo.
+- [x] Do not overwrite a single agency `managed_client_package_code` as sole depth.
+- [x] Consultant Request clients UI: qty per package (mix Basic ×5 + ESG ×5).
+- [x] Migration: `2026_08_04_170000_phase3_consultant_entity_request_lines.php`
 
 ### Phase 4 — Create client + entitlements
 - [ ] Create managed client: choose depth with spare capacity → bind `consultant_subscription_id`.
@@ -264,3 +266,4 @@ Request form continues to use **company** codes for depth choice; activation wri
 | Aug 2026 | Locked Option C multi-row; catalog; inventory; delete consultant_50 demo; remap client_growth → scope_pro |
 | Aug 2026 | Phase 1 shipped: matrix + seed migration + price-book map to consultant_scope_* |
 | Aug 2026 | Phase 2 shipped: trial→free merge, wipe Silver Webbuzz demo org, growth→scope_pro, disable old demo seeder |
+| Aug 2026 | Phase 3 shipped: multi-line request + Σ quote + one depth subscription row per line |

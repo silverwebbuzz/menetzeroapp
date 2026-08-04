@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Data\CommercialPriceBook;
-use App\Data\ConsultantAgencyPlanMatrix;
 use App\Models\AdminPackageAssignment;
 use App\Models\Company;
 use App\Models\CompanyPackageRequest;
@@ -37,6 +36,11 @@ class AdminRequestActivationService
      */
     public function suggestConsultantQuote(ConsultantEntityRequest $request): array
     {
+        $lines = $request->normalizedLines();
+        if ($lines !== []) {
+            return CommercialPriceBook::suggestConsultantLinesQuote($lines);
+        }
+
         return CommercialPriceBook::suggestConsultantQuote(
             (int) $request->entity_count,
             (bool) $request->wants_enterprise,
@@ -190,7 +194,8 @@ class AdminRequestActivationService
     }
 
     /**
-     * Grant/ensure agency slots for entity count and mark request activated.
+     * Grant one consultant_subscriptions depth row per request line (Phase 3).
+     * Does not overwrite a single agency managed_client_package_code as the sole depth.
      */
     public function activateConsultantRequest(
         ConsultantEntityRequest $request,
@@ -207,92 +212,81 @@ class AdminRequestActivationService
             throw new RuntimeException('Company is not a consultant organisation.');
         }
 
-        $needed = max(1, (int) $request->entity_count);
+        $lines = $request->normalizedLines();
+        if ($lines === []) {
+            throw new RuntimeException('Request has no package lines to activate.');
+        }
+
         $contractYear = $contractYear ?? (int) now()->year;
-        $packageCode = $request->package_code
-            ?? ($request->wants_enterprise ? 'client_enterprise' : 'client_scope_basic');
+        $this->consultantSubscriptions->ensureFreeTrialSubscription($org);
 
-        return DB::transaction(function () use ($request, $org, $needed, $note, $adminId, $contractYear, $packageCode) {
-            $active = $this->consultantSubscriptions->getActiveSubscription($org->id);
-            $subscription = null;
+        return DB::transaction(function () use ($request, $org, $lines, $note, $adminId, $contractYear) {
+            $created = [];
 
-            $isPaidActive = $active && !$active->isFreeTrial();
+            foreach ($lines as $line) {
+                $clientCode = $line['package_code'];
+                $qty = max(1, (int) $line['entity_count']);
+                $packCode = CommercialPriceBook::suggestedConsultantPlanCode($clientCode);
 
-            if (!$isPaidActive) {
-                $packCode = ConsultantAgencyPlanMatrix::ENTITY_PLAN_CODE;
-                $extras = CommercialPriceBook::extraSlotsNeeded($needed, $packCode);
+                $plan = SubscriptionPlan::where('plan_code', $packCode)
+                    ->where('plan_category', 'consultant_agency')
+                    ->first();
 
-                $subscription = $this->consultantSubscriptions->grantPackSubscription(
+                if (!$plan) {
+                    throw new RuntimeException(
+                        "Consultant depth plan `{$packCode}` not found. Run Phase 1 migrations."
+                    );
+                }
+
+                $subscription = $this->consultantSubscriptions->grantDepthSubscription(
                     $org,
                     $packCode,
+                    $qty,
                     $contractYear,
                     [
                         'provision_note' => $note,
                         'consultant_entity_request_id' => $request->id,
-                        'requested_clients' => $needed,
-                        'managed_client_package_code' => $packageCode,
+                        'requested_clients' => $qty,
+                        'client_package_code' => $clientCode,
+                        'managed_client_package_code' => $clientCode,
                     ],
                     $adminId,
-                    $extras,
                 );
 
-                $plan = SubscriptionPlan::where('plan_code', $packCode)->first();
                 AdminPackageAssignment::create([
                     'admin_id' => $adminId,
                     'company_id' => $org->id,
-                    'subscription_plan_id' => $plan?->id,
+                    'subscription_plan_id' => $plan->id,
                     'target_type' => 'consultant',
                     'contract_year' => $contractYear,
-                    'note' => $note,
+                    'note' => $note . " · {$packCode} ×{$qty}",
                     'status' => 'approved',
                     'consultant_subscription_id' => $subscription->id,
                     'metadata' => [
-                        'provision_type' => 'request_activate',
+                        'provision_type' => 'request_activate_depth',
                         'consultant_entity_request_id' => $request->id,
-                        'entity_count' => $needed,
+                        'entity_count' => $qty,
                         'quote_amount_aed' => $request->quote_amount_aed,
-                        'package_code' => $packageCode,
-                        'wants_enterprise' => $request->wants_enterprise,
+                        'package_code' => $clientCode,
+                        'client_package_code' => $clientCode,
                         'slot_limit' => $subscription->slot_limit,
                         'plan_code' => $packCode,
+                        'request_lines' => $request->normalizedLines(),
                     ],
                 ]);
-            } else {
-                $subscription = $active;
-                $shortfall = max(0, $needed - (int) $subscription->slot_limit);
-                if ($shortfall > 0) {
-                    $subscription = $this->consultantSubscriptions->addExtraSlots($subscription, $shortfall);
-                }
 
-                $meta = $subscription->metadata ?? [];
-                $meta['managed_client_package_code'] = $packageCode;
-                $subscription->update(['metadata' => $meta]);
-
-                AdminPackageAssignment::create([
-                    'admin_id' => $adminId,
-                    'company_id' => $org->id,
-                    'subscription_plan_id' => $subscription->subscription_plan_id,
-                    'target_type' => 'consultant',
-                    'contract_year' => $contractYear,
-                    'note' => $note . ($shortfall > 0 ? " (+{$shortfall} slots)" : ' (capacity already sufficient)'),
-                    'status' => 'approved',
-                    'consultant_subscription_id' => $subscription->id,
-                    'metadata' => [
-                        'provision_type' => 'request_activate_slots',
-                        'consultant_entity_request_id' => $request->id,
-                        'entity_count' => $needed,
-                        'slots_added' => $shortfall,
-                        'quote_amount_aed' => $request->quote_amount_aed,
-                        'package_code' => $packageCode,
-                        'slot_limit' => $subscription->slot_limit,
-                    ],
-                ]);
+                $created[] = [
+                    'plan_code' => $packCode,
+                    'slot_limit' => $subscription->slot_limit,
+                    'subscription_id' => $subscription->id,
+                ];
             }
 
             $request->update([
                 'status' => 'activated',
                 'activated_at' => now(),
                 'paid_at' => $request->paid_at ?? now(),
+                'entity_count' => $request->totalEntityCount(),
             ]);
 
             return $request->fresh();

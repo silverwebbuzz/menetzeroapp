@@ -123,75 +123,131 @@ class CommercialPriceBook
         bool $wantsEnterprise = false,
         ?string $packageCode = null,
     ): array {
-        $entityCount = max(1, $entityCount);
-        $code = $packageCode
-            ?? ($wantsEnterprise ? 'client_enterprise' : null);
+        return self::suggestConsultantLinesQuote([
+            [
+                'package_code' => $packageCode
+                    ?? ($wantsEnterprise ? 'client_enterprise' : 'client_scope_basic'),
+                'entity_count' => max(1, $entityCount),
+            ],
+        ]);
+    }
 
-        if ($code === 'client_enterprise' || ($wantsEnterprise && $code === null)) {
+    /**
+     * Multi-line consultant quote (Phase 3) — Σ (list × qty) across depth lines.
+     *
+     * @param  list<array{package_code: string, entity_count: int}>  $lines
+     * @return array{
+     *   amount_aed: float|null,
+     *   custom: bool,
+     *   rate_aed: float|null,
+     *   entity_count: int,
+     *   package_code: string|null,
+     *   breakdown: string,
+     *   band: string,
+     *   suggested_pack_code: string|null,
+     *   suggested_activations: list<array{client_package_code: string, consultant_plan_code: string, entity_count: int}>,
+     *   min10_tip?: bool,
+     *   line_quotes: list<array<string, mixed>>
+     * }
+     */
+    public static function suggestConsultantLinesQuote(array $lines): array
+    {
+        $normalized = [];
+        foreach ($lines as $line) {
+            $code = (string) ($line['package_code'] ?? '');
+            $count = (int) ($line['entity_count'] ?? 0);
+            if ($code === '' || $count < 1) {
+                continue;
+            }
+            if (isset($normalized[$code])) {
+                $normalized[$code] += $count;
+            } else {
+                $normalized[$code] = $count;
+            }
+        }
+
+        if ($normalized === []) {
             return [
                 'amount_aed' => null,
                 'custom' => true,
                 'rate_aed' => null,
-                'entity_count' => $entityCount,
-                'package_code' => 'client_enterprise',
-                'breakdown' => 'Enterprise / white-label — set quote manually. Activation grants Consultant Plan capacity for the requested client count; managed clients use Enterprise-depth entitlements when activated.',
-                'band' => 'enterprise',
-                'suggested_pack_code' => self::suggestedConsultantPlanCode('client_enterprise'),
+                'entity_count' => 0,
+                'package_code' => null,
+                'breakdown' => 'No package lines on this request.',
+                'band' => 'custom',
+                'suggested_pack_code' => null,
+                'suggested_activations' => [],
+                'line_quotes' => [],
             ];
         }
 
-        if ($code && array_key_exists($code, self::COMPANY_LIST_AED)) {
+        $totalClients = array_sum($normalized);
+        $lineQuotes = [];
+        $activations = [];
+        $breakdownParts = [];
+        $sum = 0.0;
+        $anyCustom = false;
+        $singleCode = count($normalized) === 1 ? array_key_first($normalized) : null;
+
+        foreach ($normalized as $code => $count) {
             $unit = self::companyAmountAed($code);
             $label = CompanyPackageOptions::label($code);
+            $consultantPlan = self::suggestedConsultantPlanCode($code);
+            $activations[] = [
+                'client_package_code' => $code,
+                'consultant_plan_code' => $consultantPlan,
+                'entity_count' => $count,
+            ];
 
             if ($unit === null) {
-                return [
+                $anyCustom = true;
+                $lineQuotes[] = [
+                    'package_code' => $code,
+                    'entity_count' => $count,
                     'amount_aed' => null,
                     'custom' => true,
-                    'rate_aed' => null,
-                    'entity_count' => $entityCount,
-                    'package_code' => $code,
-                    'breakdown' => "{$label} × {$entityCount} clients — custom quote (no list price). Activates as `".(self::suggestedConsultantPlanCode($code)).'`.',
-                    'band' => 'custom',
-                    'suggested_pack_code' => self::suggestedConsultantPlanCode($code),
                 ];
+                $breakdownParts[] = "{$count} × {$label} (custom) → `{$consultantPlan}`";
+                continue;
             }
 
-            $total = $unit * $entityCount;
-            $liveConsultant = self::suggestedConsultantPlanCode($code);
-            $preferential = $entityCount < 10
-                ? ' Note: preferential sales policy may apply at ≥10 managed clients / 12 months — not auto-applied.'
-                : ' Count ≥10 — confirm any preferential override offline if contracted.';
-
-            return [
-                'amount_aed' => (float) $total,
-                'custom' => false,
-                'rate_aed' => (float) $unit,
-                'entity_count' => $entityCount,
+            $lineTotal = $unit * $count;
+            $sum += $lineTotal;
+            $lineQuotes[] = [
                 'package_code' => $code,
-                'breakdown' => "{$entityCount} × {$label} (AED " . number_format($unit, 0) . ') = AED ' . number_format($total, 0) . " / year excl. VAT (company package list × clients). Activates as consultant depth `{$liveConsultant}` (one subscription row per line)." . $preferential,
-                'band' => 'package×clients',
-                'suggested_pack_code' => $liveConsultant,
-                'min10_tip' => $entityCount < 10,
+                'entity_count' => $count,
+                'amount_aed' => (float) $lineTotal,
+                'rate_aed' => (float) $unit,
+                'custom' => false,
             ];
+            $breakdownParts[] = "{$count} × {$label} @ AED " . number_format($unit, 0)
+                . ' = AED ' . number_format($lineTotal, 0)
+                . " → `{$consultantPlan}`";
         }
 
-        // Legacy Standard band (§6.2) when package_code missing
-        $rate = self::consultantRateAed($entityCount);
-        $total = $rate * $entityCount;
-        $band = $entityCount > 10
-            ? '>10 @ ' . number_format($rate, 0)
-            : '≤10 @ ' . number_format($rate, 0);
+        $preferential = $totalClients < 10
+            ? ' Preferential ≥10 / 12 months is sales policy only.'
+            : ' Count ≥10 — confirm preferential override offline if contracted.';
+
+        $breakdown = implode(' · ', $breakdownParts)
+            . ($anyCustom
+                ? ' · Total custom — set quote manually.'
+                : ' · Total AED ' . number_format($sum, 0) . ' / yr excl. VAT.')
+            . $preferential
+            . ' Activation creates one consultant_subscriptions row per line (own slot_limit + expiry).';
 
         return [
-            'amount_aed' => (float) $total,
-            'custom' => false,
-            'rate_aed' => (float) $rate,
-            'entity_count' => $entityCount,
-            'package_code' => null,
-            'breakdown' => "{$entityCount} × AED " . number_format($rate, 0) . ' = AED ' . number_format($total, 0) . " / year excl. VAT ({$band} · legacy Standard band). Prefer activating `consultant_scope_basic` × count.",
-            'band' => $band,
-            'suggested_pack_code' => ConsultantAgencyPlanMatrix::DEPTH_PLAN_CODES[0],
+            'amount_aed' => $anyCustom ? null : (float) $sum,
+            'custom' => $anyCustom,
+            'rate_aed' => null,
+            'entity_count' => $totalClients,
+            'package_code' => $singleCode,
+            'breakdown' => $breakdown,
+            'band' => $anyCustom ? 'custom' : 'package×clients',
+            'suggested_pack_code' => $activations[0]['consultant_plan_code'] ?? 'consultant_scope_basic',
+            'suggested_activations' => $activations,
+            'min10_tip' => $totalClients < 10,
+            'line_quotes' => $lineQuotes,
         ];
     }
 

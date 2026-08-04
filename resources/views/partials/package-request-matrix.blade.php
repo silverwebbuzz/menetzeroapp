@@ -6,14 +6,23 @@
 @php
     $inputName = $inputName ?? 'package_code';
     $packages = $packages ?? \App\Data\CompanyPackageOptions::packages();
-    $selectedPackage = $selectedPackage ?? old($inputName, \App\Data\CompanyPackageOptions::CODES[0]);
+    $selectionMode = $selectionMode ?? 'radio'; // radio | none
+    $selectedPackage = $selectionMode === 'none'
+        ? null
+        : ($selectedPackage ?? old($inputName, \App\Data\CompanyPackageOptions::CODES[0]));
     $columns = $matrix['columns'] ?? \App\Data\CompanyPackageOptions::CODES;
 @endphp
 
 <div class="bg-white rounded-xl border border-gray-200 overflow-hidden" id="package-comparison-matrix">
     <div class="px-4 py-3 border-b border-gray-100">
         <h2 class="text-sm font-semibold text-gray-900">Compare packages</h2>
-        <p class="text-xs text-gray-500 mt-0.5">Select a column — capabilities only; pricing is confirmed offline.</p>
+        <p class="text-xs text-gray-500 mt-0.5">
+            @if($selectionMode === 'none')
+                Capabilities only — enter quantities per package below. Pricing is confirmed offline.
+            @else
+                Select a column — capabilities only; pricing is confirmed offline.
+            @endif
+        </p>
     </div>
     <div class="overflow-x-auto">
         <table class="min-w-[720px] w-full text-sm">
@@ -25,19 +34,26 @@
                     @foreach($columns as $code)
                         @php $pkg = $packages[$code] ?? ['name' => $code, 'summary' => '']; @endphp
                         <th scope="col" class="px-2 py-3 text-center min-w-[7.5rem] align-bottom">
-                            <label class="cursor-pointer inline-flex flex-col items-center gap-1.5 group">
-                                <input
-                                    type="radio"
-                                    name="{{ $inputName }}"
-                                    value="{{ $code }}"
-                                    class="rounded-full border-gray-300 text-teal-600 focus:ring-teal-500"
-                                    @checked($selectedPackage === $code)
-                                    required
-                                    data-package-code="{{ $code }}"
-                                >
-                                <span class="text-sm font-bold text-gray-900 group-hover:text-teal-700 leading-tight">{{ $pkg['name'] }}</span>
-                                <span class="text-[10px] font-normal text-gray-500 leading-snug max-w-[7rem] hidden sm:block">{{ $pkg['summary'] }}</span>
-                            </label>
+                            @if($selectionMode === 'radio')
+                                <label class="cursor-pointer inline-flex flex-col items-center gap-1.5 group">
+                                    <input
+                                        type="radio"
+                                        name="{{ $inputName }}"
+                                        value="{{ $code }}"
+                                        class="rounded-full border-gray-300 text-teal-600 focus:ring-teal-500"
+                                        @checked($selectedPackage === $code)
+                                        required
+                                        data-package-code="{{ $code }}"
+                                    >
+                                    <span class="text-sm font-bold text-gray-900 group-hover:text-teal-700 leading-tight">{{ $pkg['name'] }}</span>
+                                    <span class="text-[10px] font-normal text-gray-500 leading-snug max-w-[7rem] hidden sm:block">{{ $pkg['summary'] }}</span>
+                                </label>
+                            @else
+                                <div class="inline-flex flex-col items-center gap-1">
+                                    <span class="text-sm font-bold text-gray-900 leading-tight">{{ $pkg['name'] }}</span>
+                                    <span class="text-[10px] font-normal text-gray-500 leading-snug max-w-[7rem] hidden sm:block">{{ $pkg['summary'] }}</span>
+                                </div>
+                            @endif
                         </th>
                     @endforeach
                 </tr>
