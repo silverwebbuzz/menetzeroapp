@@ -617,6 +617,36 @@ body.portal-auth {
     font-weight: var(--portal-weight-medium);
 }
 
+/* Feature lists can run long — keep the panel inside its column and scroll
+   internally on short screens instead of clipping. Bounded by the parent
+   rather than 100vh, since the footer sits outside the grid. */
+.portal-auth .auth-sidebar-panel {
+    max-height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+}
+
+.portal-auth .auth-sidebar-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.portal-auth .auth-sidebar-panel::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.portal-auth .auth-sidebar-panel::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.35);
+    border-radius: 999px;
+}
+
+/* Group headings above each block of feature bullets. */
+.portal-auth .glass .uppercase.tracking-wider {
+    font-size: var(--portal-12) !important;
+    line-height: var(--portal-lh-12) !important;
+}
+
 .portal-auth--company .brand-gradient {
     background: linear-gradient(135deg, #059669 0%, #10b981 60%, #34d399 100%);
 }

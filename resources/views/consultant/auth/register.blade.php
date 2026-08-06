@@ -60,10 +60,28 @@
 
 @section('sidebar')
 <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-sm font-semibold">Start with a free trial client</span>
-<ul class="mt-6 space-y-4 text-white/90 text-base font-medium">
-    <li class="flex gap-3"><span>✓</span> One login for all client workspaces</li>
-    <li class="flex gap-3"><span>✓</span> Directory profile for SME leads</li>
-    <li class="flex gap-3"><span>✓</span> IFRS / GRI reporting tools</li>
-    <li class="flex gap-3"><span>✓</span> Request clients when ready to scale</li>
+
+<p class="mt-5 mb-1 text-xs font-bold uppercase tracking-wider text-white/60">Get set up</p>
+<ul class="space-y-2.5 text-white/90 text-base font-medium">
+    <li class="flex gap-3"><span>1.</span> Complete your practice profile</li>
+    <li class="flex gap-3"><span>2.</span> Upload trade licence and credentials</li>
+    <li class="flex gap-3"><span>3.</span> Submit for directory verification</li>
+    <li class="flex gap-3"><span>4.</span> Add your first client and enter the workspace</li>
+</ul>
+
+<p class="mt-5 mb-1 text-xs font-bold uppercase tracking-wider text-white/60">Included from day one</p>
+<ul class="space-y-2.5 text-white/90 text-base font-medium">
+    <li class="flex gap-3"><span>✓</span> One managed client free — test the full workflow</li>
+    <li class="flex gap-3"><span>✓</span> Single login across all client workspaces</li>
+    <li class="flex gap-3"><span>✓</span> Locations, Quick Input, bulk import and reports</li>
+    <li class="flex gap-3"><span>✓</span> IFRS S1 &amp; S2, GRI, SASB and UAE ESG disclosures</li>
+    <li class="flex gap-3"><span>✓</span> Your clients don't need their own logins</li>
+</ul>
+
+<p class="mt-5 mb-1 text-xs font-bold uppercase tracking-wider text-white/60">When you're ready to scale</p>
+<ul class="space-y-2.5 text-white/90 text-base font-medium">
+    <li class="flex gap-3"><span>✓</span> Verified directory listing brings inbound leads</li>
+    <li class="flex gap-3"><span>✓</span> Request client capacity — mix package depths</li>
+    <li class="flex gap-3"><span>✓</span> Clean, unwatermarked exports on paid packages</li>
 </ul>
 @endsection

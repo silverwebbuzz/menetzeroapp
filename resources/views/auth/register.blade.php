@@ -51,11 +51,28 @@
 @endsection
 
 @section('sidebar')
-<span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-sm font-semibold">Meet MENetZero's platform</span>
-<ul class="mt-6 space-y-4 text-white/90 text-base font-medium">
-    <li class="flex gap-3"><span>✓</span> Understand your product's emissions</li>
-    <li class="flex gap-3"><span>✓</span> Gain clarity on carbon hotspots</li>
-    <li class="flex gap-3"><span>✓</span> Test changes before production</li>
-    <li class="flex gap-3"><span>✓</span> Make confident low-carbon decisions</li>
+<span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-sm font-semibold">Start free — no card required</span>
+
+<p class="mt-5 mb-1 text-xs font-bold uppercase tracking-wider text-white/60">Set up in four steps</p>
+<ul class="space-y-2.5 text-white/90 text-base font-medium">
+    <li class="flex gap-3"><span>1.</span> Add your company profile and locations</li>
+    <li class="flex gap-3"><span>2.</span> Set emission boundaries per location</li>
+    <li class="flex gap-3"><span>3.</span> Enter bills in Quick Input, or bulk import</li>
+    <li class="flex gap-3"><span>4.</span> Review your GHG Inventory and export</li>
+</ul>
+
+<p class="mt-5 mb-1 text-xs font-bold uppercase tracking-wider text-white/60">What you get</p>
+<ul class="space-y-2.5 text-white/90 text-base font-medium">
+    <li class="flex gap-3"><span>✓</span> Scope 1, 2 &amp; 3 tracking on UAE emission factors</li>
+    <li class="flex gap-3"><span>✓</span> GHG Inventory with Excel, PDF and IEQT exports</li>
+    <li class="flex gap-3"><span>✓</span> IFRS S1 &amp; S2, GRI, SASB and UAE ESG disclosures</li>
+    <li class="flex gap-3"><span>✓</span> Team invites with role-based permissions</li>
+    <li class="flex gap-3"><span>✓</span> Upgrade anytime as your reporting scope grows</li>
+</ul>
+
+<p class="mt-5 mb-1 text-xs font-bold uppercase tracking-wider text-white/60">No expertise needed</p>
+<ul class="space-y-2.5 text-white/90 text-base font-medium">
+    <li class="flex gap-3"><span>✓</span> Start with a utility bill — we handle the maths</li>
+    <li class="flex gap-3"><span>✓</span> Built-in Scope 1 &amp; 2 data guide and help centre</li>
 </ul>
 @endsection

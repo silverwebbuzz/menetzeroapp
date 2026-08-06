@@ -44,10 +44,27 @@
 
 @section('sidebar')
 <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-sm font-semibold">Consultant agency hub</span>
-<ul class="mt-6 space-y-4 text-white/90 text-base font-medium">
-    <li class="flex gap-3"><span>✓</span> Manage multiple client workspaces</li>
-    <li class="flex gap-3"><span>✓</span> MOCCAE-ready inventories and exports</li>
-    <li class="flex gap-3"><span>✓</span> Verified directory listing</li>
-    <li class="flex gap-3"><span>✓</span> Request clients — pricing offline</li>
+
+<p class="mt-5 mb-1 text-xs font-bold uppercase tracking-wider text-white/60">Run your client portfolio</p>
+<ul class="space-y-2.5 text-white/90 text-base font-medium">
+    <li class="flex gap-3"><span>✓</span> One login for every managed client workspace</li>
+    <li class="flex gap-3"><span>✓</span> Enter a client in full or read-only mode</li>
+    <li class="flex gap-3"><span>✓</span> Primary Reporting Year set per engagement</li>
+    <li class="flex gap-3"><span>✓</span> Portfolio emissions and capacity on one dashboard</li>
+    <li class="flex gap-3"><span>✓</span> Invite your team with role-based access</li>
+</ul>
+
+<p class="mt-5 mb-1 text-xs font-bold uppercase tracking-wider text-white/60">Deliver the engagement</p>
+<ul class="space-y-2.5 text-white/90 text-base font-medium">
+    <li class="flex gap-3"><span>✓</span> Locations, boundaries, Quick Input and bulk import</li>
+    <li class="flex gap-3"><span>✓</span> GHG Inventory with Excel, PDF, MOCCAE and IEQT</li>
+    <li class="flex gap-3"><span>✓</span> IFRS S1 &amp; S2, GRI, SASB and UAE ESG Report</li>
+</ul>
+
+<p class="mt-5 mb-1 text-xs font-bold uppercase tracking-wider text-white/60">Grow your practice</p>
+<ul class="space-y-2.5 text-white/90 text-base font-medium">
+    <li class="flex gap-3"><span>✓</span> Verified public directory profile</li>
+    <li class="flex gap-3"><span>✓</span> Inbound leads from companies who find you</li>
+    <li class="flex gap-3"><span>✓</span> Request client capacity — pricing confirmed offline</li>
 </ul>
 @endsection

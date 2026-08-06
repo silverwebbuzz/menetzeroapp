@@ -38,7 +38,7 @@
         <link rel="stylesheet" href="{{ asset('css/consultant-shell.css') }}?v=20260621">
     @endif
     @stack('head')
-    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260621">
+    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260806">
     @include('layouts.partials.google-analytics')
 </head>
 <body class="portal-auth portal-auth--{{ $portalVariant }}">
@@ -57,7 +57,7 @@
 
         <div class="relative brand-gradient text-white hidden lg:block">
             <div class="relative h-full w-full flex items-center justify-center p-10">
-                <div class="glass p-8 w-full max-w-xl">
+                <div class="glass auth-sidebar-panel p-8 w-full max-w-xl">
                     @hasSection('sidebar')
                         @yield('sidebar')
                     @else

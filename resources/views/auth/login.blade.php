@@ -44,11 +44,29 @@
 @endsection
 
 @section('sidebar')
-<span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-sm font-semibold">Meet MENetZero's platform</span>
-<ul class="mt-6 space-y-4 text-white/90 text-base font-medium">
-    <li class="flex gap-3"><span>✓</span> Understand your emissions</li>
-    <li class="flex gap-3"><span>✓</span> Identify carbon hotspots</li>
-    <li class="flex gap-3"><span>✓</span> Simulate and compare reductions</li>
-    <li class="flex gap-3"><span>✓</span> Make confident low-carbon decisions</li>
+<span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-sm font-semibold">Your carbon accounting workspace</span>
+
+<p class="mt-5 mb-1 text-xs font-bold uppercase tracking-wider text-white/60">Measure</p>
+<ul class="space-y-2.5 text-white/90 text-base font-medium">
+    <li class="flex gap-3"><span>✓</span> Quick Input for Scope 1, 2 &amp; 3 activity data</li>
+    <li class="flex gap-3"><span>✓</span> DEWA / ADDC electricity and district cooling</li>
+    <li class="flex gap-3"><span>✓</span> Fuel, fleet, refrigerants and process emissions</li>
+    <li class="flex gap-3"><span>✓</span> Multi-location setup with emission boundaries</li>
+    <li class="flex gap-3"><span>✓</span> Bulk Excel / CSV import and entry export</li>
+</ul>
+
+<p class="mt-5 mb-1 text-xs font-bold uppercase tracking-wider text-white/60">Report</p>
+<ul class="space-y-2.5 text-white/90 text-base font-medium">
+    <li class="flex gap-3"><span>✓</span> GHG Inventory by year, scope and location</li>
+    <li class="flex gap-3"><span>✓</span> Excel, PDF, MOCCAE and IEQT exports</li>
+    <li class="flex gap-3"><span>✓</span> IFRS S1 &amp; S2, GRI, SASB and UAE ESG Report</li>
+    <li class="flex gap-3"><span>✓</span> ESG Scorecard, targets and materiality</li>
+</ul>
+
+<p class="mt-5 mb-1 text-xs font-bold uppercase tracking-wider text-white/60">Manage</p>
+<ul class="space-y-2.5 text-white/90 text-base font-medium">
+    <li class="flex gap-3"><span>✓</span> Team roles with per-module permissions</li>
+    <li class="flex gap-3"><span>✓</span> Dashboard trends and carbon hotspots</li>
+    <li class="flex gap-3"><span>✓</span> Work with a verified MENetZero consultant</li>
 </ul>
 @endsection
