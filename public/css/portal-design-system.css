@@ -645,6 +645,7 @@ body.portal-auth {
 .portal-auth .glass .uppercase.tracking-wider {
     font-size: var(--portal-12) !important;
     line-height: var(--portal-lh-12) !important;
+    color: var(--canvas);
 }
 
 .portal-auth--company .brand-gradient {
