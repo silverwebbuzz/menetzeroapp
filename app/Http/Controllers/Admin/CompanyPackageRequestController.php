@@ -96,7 +96,9 @@ class CompanyPackageRequestController extends Controller
         ]);
 
         $months = (int) ($data['duration_months'] ?? $packageRequest->duration_months ?? 12);
-        $note = $data['note']
+        // 'note' is nullable and the Activate form doesn't post it, so the key is absent
+        // from the validated data entirely — use ?? before ?: to avoid an undefined key.
+        $note = ($data['note'] ?? null)
             ?: ('Activated from package request #' . $packageRequest->id . ' · ' . $packageRequest->packageLabel());
 
         try {

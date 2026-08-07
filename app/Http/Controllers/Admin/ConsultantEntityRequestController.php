@@ -93,7 +93,9 @@ class ConsultantEntityRequestController extends Controller
             'contract_year' => 'nullable|integer|min:2024|max:2100',
         ]);
 
-        $note = $data['note']
+        // 'note' is nullable and the Activate form doesn't post it, so the key is absent
+        // from the validated data entirely — use ?? before ?: to avoid an undefined key.
+        $note = ($data['note'] ?? null)
             ?: ('Activated from entity request #' . $entityRequest->id . ' · ' . $entityRequest->packageLabel());
 
         try {
