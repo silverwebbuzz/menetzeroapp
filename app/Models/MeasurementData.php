@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class MeasurementData extends Model
 {
@@ -52,6 +53,49 @@ class MeasurementData extends Model
         'additional_data' => 'array',
         'entry_date' => 'date',
     ];
+
+    /**
+     * Warn when an entry is written against a retired emission source.
+     *
+     * Deprecated sources (is_active = 0 / is_quick_input = 0) have no subcategory, so
+     * their emissions count toward the cached scope totals while being absent from the
+     * GHG Protocol category breakdown — the report stops reconciling. Quick Input can't
+     * reach these sources, but seeders, imports, and scripts write here directly.
+     *
+     * Logged rather than blocked: refusing the write could break a legitimate historical
+     * backfill, and silently dropping emissions data is worse than recording it loudly.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (self $entry) {
+            if (!$entry->emission_source_id) {
+                return;
+            }
+
+            $source = EmissionSourceMaster::find($entry->emission_source_id);
+
+            if (!$source) {
+                Log::warning('measurement_data written with unknown emission source', [
+                    'emission_source_id' => $entry->emission_source_id,
+                    'measurement_id' => $entry->measurement_id,
+                ]);
+
+                return;
+            }
+
+            if (!$source->is_active || !$source->is_quick_input) {
+                Log::warning('measurement_data written against a deprecated emission source', [
+                    'emission_source_id' => $source->id,
+                    'emission_source_name' => $source->name,
+                    'scope' => $source->scope,
+                    'is_active' => (bool) $source->is_active,
+                    'is_quick_input' => (bool) $source->is_quick_input,
+                    'has_subcategory' => filled($source->subcategory),
+                    'measurement_id' => $entry->measurement_id,
+                ]);
+            }
+        });
+    }
 
     /**
      * Get the measurement that owns this data

@@ -452,14 +452,30 @@ class ConsultantFullDemoSeeder extends Seeder
             $created++;
         }
 
-        $scope3Sources = EmissionSourceMaster::query()->where('scope', 'Scope 3')->limit(6)->get();
+        // Only seed against live quick-input Scope 3 sources. Without these filters the
+        // query picks up deprecated/inactive sources (e.g. "Onsite Wastewater Treatment"),
+        // which carry no subcategory and so never map to a GHG Protocol category — the
+        // headline Scope 3 total would then exceed the sum of the reported categories.
+        $scope3Sources = EmissionSourceMaster::query()
+            ->where('scope', 'Scope 3')
+            ->where('is_quick_input', true)
+            ->where('is_active', true)
+            ->whereNotNull('subcategory')
+            ->orderBy('quick_input_order')
+            ->limit(6)
+            ->get();
 
         foreach ($scope3Sources as $index => $source) {
             $factor = EmissionFactor::query()->where('emission_source_id', $source->id)->where('is_active', true)->first();
+
+            // Never fabricate a CO2e without a factor — an entry with no emission_factor_id
+            // has no auditable methodology behind it.
+            if (!$factor) {
+                continue;
+            }
+
             $quantity = 100 + ($index * 25);
-            $co2e = $factor
-                ? round($quantity * (float) $factor->factor_value, 2)
-                : (1500 + ($index * 250));
+            $co2e = round($quantity * (float) $factor->factor_value, 2);
 
             MeasurementData::create([
                 'measurement_id' => $measurement->id,
@@ -467,10 +483,10 @@ class ConsultantFullDemoSeeder extends Seeder
                 'field_name' => 'quick_input',
                 'field_value' => (string) $quantity,
                 'quantity' => $quantity,
-                'unit' => $factor?->unit ?? 'units',
+                'unit' => $factor->unit,
                 'calculated_co2e' => $co2e,
                 'scope' => 'Scope 3',
-                'emission_factor_id' => $factor?->id,
+                'emission_factor_id' => $factor->id,
                 'entry_date' => $year . '-06-01',
                 'notes' => 'Seeded demo Scope 3 entry (' . $source->category . ')',
                 'created_by' => $userId,

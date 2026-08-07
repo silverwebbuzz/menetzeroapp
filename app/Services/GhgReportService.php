@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\DB;
 
 class GhgReportService
 {
+    /**
+     * Label for Scope 3 emissions that don't map to one of the 15 GHG Protocol
+     * categories. Surfacing these keeps the category breakdown reconciled with
+     * the headline Scope 3 total instead of quietly under-reporting it.
+     */
+    public const UNCATEGORISED_LABEL = 'Uncategorised';
+
     /** All stored CO₂e values in the database are kg CO₂e. */
     public static function kgToTonnes(?float $kg): float
     {
@@ -204,8 +211,26 @@ class GhgReportService
             return collect();
         }
 
-        $categories = $rows->groupBy(fn ($row) => optional($row->emissionSource)->subcategory
-                ?: (optional($row->emissionSource)->name ?? 'Other'))
+        // Every Scope 3 entry must land in one of the 15 GHG Protocol categories, which
+        // is what emission_sources_master.subcategory carries ("Cat 6 – Business Travel").
+        // A row whose source has no subcategory is still counted in measurements.scope_3_co2e,
+        // so it must stay visible here too — otherwise the headline Scope 3 total silently
+        // exceeds the sum of the categories beneath it and the report won't reconcile.
+        // Such rows are grouped under one clearly-labelled bucket rather than being folded
+        // in under a source name that looks like a category but isn't.
+        $categories = $rows->groupBy(function ($row) {
+            $subcategory = optional($row->emissionSource)->subcategory;
+
+            if (filled($subcategory)) {
+                return $subcategory;
+            }
+
+            $sourceName = optional($row->emissionSource)->name;
+
+            return filled($sourceName)
+                ? self::UNCATEGORISED_LABEL . ' — ' . $sourceName
+                : self::UNCATEGORISED_LABEL;
+        })
             ->map(function ($group, $categoryName) {
                 $kg = (float) $group->sum('calculated_co2e');
 
@@ -220,6 +245,7 @@ class GhgReportService
                     'tonnes' => self::kgToTonnes($kg),
                     'data_quality' => $quality,
                     'entry_count' => $group->count(),
+                    'is_uncategorised' => str_starts_with($categoryName, self::UNCATEGORISED_LABEL),
                 ];
             })
             ->filter(fn ($row) => $row['kg'] > 0)
