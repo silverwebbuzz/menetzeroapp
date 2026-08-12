@@ -246,6 +246,10 @@ Route::middleware([
         Route::get('/entries/export', [\App\Http\Controllers\QuickInputController::class, 'export'])->name('export');
         Route::get('/bulk-import/template', [\App\Http\Controllers\Scope12BulkImportController::class, 'downloadTemplate'])->name('bulk-import.template');
         Route::post('/bulk-import', [\App\Http\Controllers\Scope12BulkImportController::class, 'import'])->name('bulk-import.import');
+        // Scope 3 has its own template and importer (2 factor conditions vs 6).
+        // Must stay above the /{scope}/{slug} wildcard below.
+        Route::get('/scope3-bulk-import/template', [\App\Http\Controllers\Scope3BulkImportController::class, 'downloadTemplate'])->name('scope3-bulk-import.template');
+        Route::post('/scope3-bulk-import', [\App\Http\Controllers\Scope3BulkImportController::class, 'import'])->name('scope3-bulk-import.import');
         Route::get('/entries/{id}', [\App\Http\Controllers\QuickInputController::class, 'view'])->name('view');
         Route::get('/entries/{id}/documents/{index}/download', [\App\Http\Controllers\QuickInputController::class, 'downloadSupportingDocument'])->name('documents.download');
         Route::get('/entries/{id}/edit', [\App\Http\Controllers\QuickInputController::class, 'edit'])->name('edit');

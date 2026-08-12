@@ -118,7 +118,9 @@ class PlanEntitlementDefaults
                 'locations' => 3,
                 'users' => 5,
                 'documents' => 50,
-                'scope3_records_per_form' => 1,
+                // 12 = one entry per month per Scope 3 category, so a bulk import can
+                // carry a full year. Free stays at 1 as the upgrade lever.
+                'scope3_records_per_form' => 12,
                 'annual_report_pdf' => -1,
                 'historical_years' => 2,
             ],
@@ -151,7 +153,9 @@ class PlanEntitlementDefaults
                 'locations' => 10,
                 'users' => 10,
                 'documents' => 200,
-                'scope3_records_per_form' => 1,
+                // 12 = one entry per month per Scope 3 category, so a bulk import can
+                // carry a full year. Inherited by Scope Pro / ESG Starter / ESG Complete.
+                'scope3_records_per_form' => 12,
                 'annual_report_pdf' => -1,
                 'historical_years' => 5,
             ],
@@ -227,7 +231,9 @@ class PlanEntitlementDefaults
                 'locations' => 3,
                 'users' => 5,
                 'documents' => 50,
-                'scope3_records_per_form' => 1,
+                // 12 = one entry per month per Scope 3 category, so a bulk import can
+                // carry a full year. Free stays at 1 as the upgrade lever.
+                'scope3_records_per_form' => 12,
                 'annual_report_pdf' => -1,
                 'historical_years' => 2,
             ],
@@ -301,7 +307,9 @@ class PlanEntitlementDefaults
                 'locations' => 5,
                 'users' => 5,
                 'documents' => 50,
-                'scope3_records_per_form' => 1,
+                // 12 = one entry per month per Scope 3 category, matching the direct
+                // client plans this managed-client tier mirrors.
+                'scope3_records_per_form' => 12,
                 'annual_report_pdf' => -1,
                 'historical_years' => 2,
             ],

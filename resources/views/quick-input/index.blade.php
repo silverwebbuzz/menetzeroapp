@@ -118,6 +118,90 @@
         </div>
     </div>
 
+    <!-- Bulk Import — Scope 3 -->
+    <div id="scope3-bulk-import" class="card mb-8">
+        <div class="card-body">
+        @if($gate->isScope3Locked())
+            <div class="callout-panel callout-panel--brand callout-panel--row">
+                <div>
+                    <h2 class="callout-panel__title">Bulk import — Scope 3</h2>
+                    @if($gate->isAgencyWorkspace())
+                        <p class="callout-panel__body">Upload procurement spend, travel, commuting and waste totals in one file. {{ $gate->agencyLockedMessage('Scope 3') }}</p>
+                    @else
+                        <p class="callout-panel__body">Upload procurement spend, travel, commuting and waste totals in one file. Scope 3 is not available on your current package.</p>
+                    @endif
+                </div>
+                <div class="callout-panel__actions">
+                    <a href="{{ $gate->upgradeRoute() }}" class="btn btn-primary btn-sm">{{ $gate->upgradeButtonLabel('Request a package') }}</a>
+                </div>
+            </div>
+        @elseif(!$gate->canBulkImport())
+            <div class="callout-panel callout-panel--brand callout-panel--row">
+                <div>
+                    <h2 class="callout-panel__title">Bulk import — Scope 3</h2>
+                    @if($gate->isAgencyWorkspace())
+                        <p class="callout-panel__body">Upload a year of value-chain data in one Excel file. {{ $gate->agencyLockedMessage('Bulk import') }}</p>
+                    @else
+                        <p class="callout-panel__body">Upload a year of value-chain data in one Excel file. Bulk import is available on paid packages.</p>
+                    @endif
+                </div>
+                <div class="callout-panel__actions">
+                    <a href="{{ $gate->upgradeRoute() }}" class="btn btn-primary btn-sm">{{ $gate->upgradeButtonLabel('Request a package') }}</a>
+                </div>
+            </div>
+        @else
+        <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+            <div class="flex-1">
+                <h2 class="callout-panel__title">Bulk import — Scope 3</h2>
+                <p class="callout-panel__body mb-3">
+                    Report <strong>one total per category</strong> per year — not one row per employee or per flight.
+                    The workbook includes calculators that turn your staff list or trip log into that total.
+                </p>
+                <ul class="text-sm text-gray-600 space-y-1 list-disc list-inside">
+                    <li><strong>Reference sheet</strong> — all 66 valid Category / Activity Type / Unit combinations</li>
+                    <li><strong>Calc: Commuting</strong> — one row per employee → total km</li>
+                    <li><strong>Calc: Flights</strong> — one row per trip → total passenger.km</li>
+                    <li>Copy <strong>Activity Type</strong> and <strong>Unit</strong> exactly — a wrong unit is the most common error</li>
+                </ul>
+            </div>
+            <div class="flex flex-col gap-2 min-w-[220px]">
+                <a href="{{ route('quick-input.scope3-bulk-import.template', ['format' => 'xlsx']) }}"
+                   class="btn btn-primary btn-sm">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    Download Excel template
+                </a>
+                <a href="{{ route('quick-input.scope3-bulk-import.template', ['format' => 'csv', 'variant' => 'blank']) }}"
+                   class="btn btn-secondary btn-sm">
+                    Download blank CSV
+                </a>
+                <a href="{{ route('quick-input.scope3-bulk-import.template', ['format' => 'csv', 'variant' => 'sample']) }}"
+                   class="btn btn-secondary btn-sm">
+                    Download sample CSV (with examples)
+                </a>
+            </div>
+        </div>
+
+        <form action="{{ route('quick-input.scope3-bulk-import.import') }}" method="POST" enctype="multipart/form-data" class="mt-6 pt-6 border-t border-gray-200">
+            @csrf
+            <div class="flex flex-col sm:flex-row sm:items-end gap-4">
+                <div class="flex-1 form-group mb-0">
+                    <label for="scope3_import_file" class="form-label">Upload completed file</label>
+                    <input type="file" name="import_file" id="scope3_import_file" accept=".xlsx,.xls,.csv,.txt" required class="form-control">
+                    <p class="form-help">Excel (.xlsx) or CSV — max 5 MB. Only the <strong>Data Entry</strong> sheet is imported; the calculator sheets are ignored.</p>
+                </div>
+                @if(!empty($canAddEntries))
+                <button type="submit" class="btn btn-primary whitespace-nowrap">
+                    Upload &amp; import
+                </button>
+                @else
+                <p class="text-sm text-gray-500 italic">You need add permission to upload data.</p>
+                @endif
+            </div>
+        </form>
+        @endif
+        </div>
+    </div>
+
     <!-- Input Forms - Grouped by Scope -->
     <div class="mb-8">
         <h2 class="section-heading">Input forms</h2>
