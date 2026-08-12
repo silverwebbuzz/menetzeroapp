@@ -244,16 +244,20 @@ if the cap doesn't move, nothing downstream is usable.
 
 ## 9. Checklist
 
-- [ ] **Phase 0** — cap raised in `PlanEntitlementDefaults.php`
-- [ ] **Phase 0** — cap raised in `subscription_plans.limits` via migration
-- [ ] **Phase 0** — verified on live: paid plan reports cap 12
-- [ ] **Phase 1** — `Scope3BulkImportService` with header mapping + validation
-- [ ] **Phase 2** — 6-sheet template (Instructions / Data Entry / Reference / Locations / 2 calculators)
-- [ ] **Phase 2** — `extractDataSheet()` skips the calculator sheets
-- [ ] **Phase 3** — controller + routes + UI, gated on `canBulkImport`
-- [ ] **Phase 4** — per-row `canAddScope3Record()` with clear messages
-- [ ] **Phase 5** — help guide page
-- [ ] **Phase 5** — `TESTING_CHECKLIST.md` updated
+- [x] **Phase 0** — cap raised in `PlanEntitlementDefaults.php`
+- [x] **Phase 0** — cap raised in `subscription_plans.limits` via migration
+- [ ] **Phase 0** — verified on live: paid plan reports cap 12 *(needs `php artisan migrate`)*
+- [x] **Phase 1** — `Scope3BulkImportService` with header mapping + validation
+- [x] **Phase 2** — 6-sheet template (Instructions / Data Entry / Reference / Locations / 2 calculators)
+- [x] **Phase 2** — `extractDataSheet()` skips the calculator sheets
+- [x] **Phase 3** — controller + routes + UI, gated on `canBulkImport`
+- [x] **Phase 4** — per-row `canAddScope3Record()` with clear messages *(built in Phase 1 — the cap leaks within a single upload otherwise)*
+- [x] **Phase 5** — help guide page
+- [x] **Phase 5** — `TESTING_CHECKLIST.md` updated
+
+**Remaining:** run the two pending migrations on live, then work the checklist.
+Nothing in this build has been executed — there is no PHP runtime in the dev
+environment, so the first template download and upload are the real tests.
 
 ---
 

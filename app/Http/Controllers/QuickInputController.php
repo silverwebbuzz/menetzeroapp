@@ -189,6 +189,35 @@ class QuickInputController extends Controller
     }
 
     /**
+     * Scope 3 data guide — companion to the Scope 3 bulk import template.
+     */
+    public function scope3HelpGuide()
+    {
+        $this->requirePermission('measurements.view', null, ['measurements.*', 'manage_measurements']);
+
+        $user = Auth::user();
+        $company = $user->getActiveCompany();
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+
+        $this->requireScope3Access($company->id);
+        $this->requireHelpGuide($company->id);
+
+        $intro = \App\Data\Scope3HelpGuide::intro();
+        $categories = \App\Data\Scope3HelpGuide::categories();
+        $columns = \App\Data\Scope3HelpGuide::columnHelp();
+        $units = \App\Data\Scope3HelpGuide::unitHelp();
+
+        $locations = Location::where('company_id', $company->id)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->pluck('name');
+
+        return view('quick-input.scope3-help-guide', compact('intro', 'categories', 'columns', 'units', 'locations'));
+    }
+
+    /**
      * Show Quick Input form for a specific emission source
      */
     public function show($scope, $slug, Request $request)

@@ -116,6 +116,60 @@ Paste that block into a conversation with me and I'll fix it.
 - [ ] Delete entry works
 - [ ] Totals roll up to the parent measurement
 
+### Scope 3 bulk import
+
+Run `php artisan migrate` first — the plan-cap migration must be applied or every
+multi-row upload will be rejected. See `SCOPE3_BULK_IMPORT_PLAN.md`.
+
+**Plan gating — the panel on Input Data:**
+- [ ] Free plan → panel shows "Bulk import — Scope 3" locked with upgrade CTA
+- [ ] Paid plan (Scope Basic / Pro / ESG) → panel shows download + upload controls
+- [ ] Company with Scope 3 locked entirely → shows the Scope 3 lock message, not the bulk-import one
+- [ ] Read-only agency workspace → upload is refused with a clear message
+
+**Plan cap (the thing the migration changes):**
+- [ ] Paid plan: add a **second** entry to the same Scope 3 category via the normal form — should now be allowed (cap is 12, was 1)
+- [ ] Free plan: second entry in a category is still blocked
+- [ ] Upload a file with **13+ rows in one category** on a paid plan — rows past 12 are rejected with a clear per-row message, earlier rows still import
+
+**Template download:**
+- [ ] Excel template downloads and opens without a repair prompt
+- [ ] Six sheets present: Instructions · Data Entry · Reference · Your Locations · Calc: Commuting · Calc: Flights
+- [ ] "Your Locations" lists this company's actual active locations
+- [ ] Reference sheet has **66** combination rows
+- [ ] **Calc: Commuting** — entering one-way km / days / people produces a Total km (formula works, not a literal `=IF(...)` string)
+- [ ] **Calc: Flights** — entering km / passengers / legs produces passenger.km, and the per-class SUMIF totals update
+- [ ] Blank CSV downloads; sample CSV includes the 5 example rows and the `#` reference comments
+
+**Upload — happy path:**
+- [ ] Upload the unmodified template (5 sample rows) → 5 entries imported
+- [ ] Entries appear in View Entries tagged Scope 3
+- [ ] CO₂e is non-zero and each row has an emission factor attached
+- [ ] GHG Inventory Scope 3 total increases by the same amount
+- [ ] **Category breakdown still reconciles with the headline Scope 3 figure** (no "Uncategorised" bucket appearing)
+
+**Upload — error handling (each should reject the row, not 500):**
+- [ ] Unknown location name
+- [ ] Wrong unit for the activity (e.g. `km` on a flight row instead of `passenger.km`)
+- [ ] Misspelled activity_type
+- [ ] Category `Cat 16` or other nonsense
+- [ ] Negative or non-numeric quantity
+- [ ] Fiscal year outside 2000–2100, or a year locked by plan
+- [ ] Renamed/removed "Data Entry" sheet → clear error, calculator sheets are never imported as data
+- [ ] Empty file / header-only file
+- [ ] File over 5 MB is refused by validation
+
+**Category input flexibility — all should resolve to Cat 6:**
+- [ ] `6` · `Cat 6` · `Category 6` · `business-travel` · `Business Travel`
+
+### Scope 3 help guide
+
+- [ ] `/quick-input/scope3-help-guide` loads
+- [ ] Linked from the Scope 3 bulk import panel
+- [ ] All 15 categories render with their activity types and units
+- [ ] The activity/unit pairs match the Reference sheet exactly
+- [ ] Locked for a company without Scope 3 access
+
 ### Reports
 
 - [ ] Index page loads with current totals
