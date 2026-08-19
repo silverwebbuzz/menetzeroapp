@@ -1,0 +1,521 @@
+/* =====================================================================
+   Zero AI — in-app ESG assistant
+   Uses the host portal's design tokens, so the company shell renders it
+   emerald and the consultant shell renders it blue with no overrides.
+   ===================================================================== */
+
+[x-cloak] { display: none !important; }
+
+.zai {
+    display: grid;
+    grid-template-columns: 19rem 1fr;
+    gap: 1rem;
+    /* Fill the viewport below the header, minus the content-area padding. */
+    height: calc(100vh - var(--header-height, 4rem) - 3.5rem);
+    min-height: 32rem;
+}
+
+/* ---------- Left rail: suggested questions ---------- */
+
+.zai-rail {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.zai-rail__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 1rem 1rem 0.75rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.zai-rail__title {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0;
+}
+
+.zai-rail__sub {
+    font-size: 0.6875rem;
+    color: var(--ink-subtle);
+    margin: 0.125rem 0 0;
+}
+
+.zai-rail__close {
+    display: none;
+    padding: 0.25rem;
+    border: 0;
+    background: none;
+    color: var(--ink-subtle);
+    cursor: pointer;
+}
+.zai-rail__close svg { width: 1.125rem; height: 1.125rem; }
+
+.zai-rail__search {
+    position: relative;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.zai-rail__search svg {
+    position: absolute;
+    left: 1.625rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0.875rem;
+    height: 0.875rem;
+    color: var(--ink-hint);
+    pointer-events: none;
+}
+
+.zai-rail__search input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.4375rem 0.625rem 0.4375rem 1.875rem;
+    font-size: 0.75rem;
+    color: var(--ink);
+    background: var(--canvas);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    outline: none;
+}
+.zai-rail__search input:focus {
+    border-color: var(--brand);
+    background: var(--surface);
+}
+.zai-rail__search input::-webkit-search-cancel-button { cursor: pointer; }
+
+.zai-rail__list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 0.5rem 0.625rem 0.75rem;
+}
+
+.zai-group { margin-bottom: 0.75rem; }
+.zai-group[hidden] { display: none; }
+
+.zai-group__title {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-hint);
+    margin: 0.5rem 0 0.375rem;
+    padding: 0 0.375rem;
+}
+
+.zai-q {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.4375rem 0.5rem;
+    margin-bottom: 0.125rem;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--ink-muted);
+    background: none;
+    border: 0;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background-color 0.12s ease, color 0.12s ease;
+}
+.zai-q:hover {
+    background: var(--brand-soft);
+    color: var(--brand-darker);
+}
+.zai-q[hidden] { display: none; }
+
+.zai-rail__empty {
+    font-size: 0.75rem;
+    color: var(--ink-hint);
+    text-align: center;
+    padding: 1.5rem 0.5rem;
+    margin: 0;
+}
+
+.zai-rail__foot {
+    padding: 0.875rem 1rem;
+    border-top: 1px solid var(--line);
+    background: var(--brand-soft);
+}
+.zai-upsell__title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--brand-darker);
+    margin: 0 0 0.25rem;
+}
+.zai-upsell__body {
+    font-size: 0.6875rem;
+    line-height: 1.5;
+    color: var(--ink-muted);
+    margin: 0;
+}
+
+.zai-rail__scrim { display: none; }
+
+/* ---------- Main conversation column ---------- */
+
+.zai-main {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.zai-head {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1.25rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.zai-head__menu {
+    display: none;
+    padding: 0.25rem;
+    border: 0;
+    background: none;
+    color: var(--ink-subtle);
+    cursor: pointer;
+}
+.zai-head__menu svg { width: 1.25rem; height: 1.25rem; }
+
+.zai-head__id {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.zai-mark {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+    border-radius: var(--radius);
+    background: var(--brand-soft);
+    color: var(--brand-dark);
+}
+.zai-mark svg { width: 1.125rem; height: 1.125rem; }
+
+.zai-head__title {
+    display: flex;
+    align-items: center;
+    gap: 0.4375rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0;
+}
+
+.zai-badge {
+    font-size: 0.5625rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--brand-darker);
+    background: var(--brand-softer);
+    padding: 0.125rem 0.375rem;
+    border-radius: 999px;
+}
+
+.zai-head__sub {
+    font-size: 0.6875rem;
+    color: var(--ink-subtle);
+    margin: 0.0625rem 0 0;
+}
+
+.zai-head__reset {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: var(--ink-subtle);
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 0.3125rem 0.5625rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.zai-head__reset:hover { background: var(--canvas-deep); color: var(--ink); }
+
+/* ---------- Thread ---------- */
+
+.zai-thread {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 1.25rem;
+    scroll-behavior: smooth;
+}
+
+.zai-welcome {
+    max-width: 34rem;
+    margin: 2rem auto;
+    text-align: center;
+}
+.zai-welcome__mark {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    margin: 0 auto 0.875rem;
+    border-radius: var(--radius-lg);
+    background: var(--brand-soft);
+    color: var(--brand-dark);
+}
+.zai-welcome__mark svg { width: 1.75rem; height: 1.75rem; }
+.zai-welcome h2 {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0 0 0.4375rem;
+}
+.zai-welcome p {
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: var(--ink-subtle);
+    margin: 0 0 1.25rem;
+}
+
+.zai-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    justify-content: center;
+}
+.zai-chip {
+    font-size: 0.75rem;
+    color: var(--ink-muted);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.375rem 0.75rem;
+    cursor: pointer;
+    transition: border-color 0.12s ease, color 0.12s ease;
+}
+.zai-chip:hover {
+    border-color: var(--brand);
+    color: var(--brand-darker);
+}
+
+.zai-msg {
+    display: flex;
+    gap: 0.75rem;
+    max-width: 46rem;
+    margin: 0 auto 1.25rem;
+}
+
+.zai-msg__avatar {
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    flex-shrink: 0;
+    border-radius: var(--radius);
+    font-size: 0.6875rem;
+    font-weight: 600;
+}
+.zai-msg--assistant .zai-msg__avatar {
+    background: var(--brand-soft);
+    color: var(--brand-dark);
+}
+.zai-msg--user .zai-msg__avatar {
+    background: var(--canvas-deep);
+    color: var(--ink-muted);
+}
+.zai-msg__avatar svg { width: 1rem; height: 1rem; }
+
+.zai-msg__body { flex: 1; min-width: 0; }
+
+.zai-msg__who {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--ink-subtle);
+    margin: 0.1875rem 0 0.3125rem;
+}
+
+.zai-msg__text {
+    font-size: 0.8125rem;
+    line-height: 1.65;
+    color: var(--ink-muted);
+    overflow-wrap: anywhere;
+}
+.zai-msg--user .zai-msg__text { color: var(--ink); font-weight: 500; }
+.zai-msg__text a { color: var(--brand-dark); text-decoration: underline; }
+
+.zai-msg__tag {
+    display: inline-block;
+    font-size: 0.625rem;
+    color: var(--ink-hint);
+    background: var(--canvas-deep);
+    border-radius: var(--radius-sm);
+    padding: 0.125rem 0.375rem;
+    margin: 0.5rem 0 0;
+}
+
+.zai-related {
+    margin-top: 0.75rem;
+    padding-top: 0.625rem;
+    border-top: 1px dashed var(--line);
+}
+.zai-related__title {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink-hint);
+    margin: 0 0 0.375rem;
+}
+.zai-related__btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    font-size: 0.75rem;
+    color: var(--brand-dark);
+    background: none;
+    border: 0;
+    padding: 0.25rem 0;
+    cursor: pointer;
+}
+.zai-related__btn:hover { text-decoration: underline; }
+
+.zai-dots { display: flex; gap: 0.25rem; padding: 0.375rem 0; }
+.zai-dots span {
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 50%;
+    background: var(--ink-hint);
+    animation: zai-bounce 1.2s infinite ease-in-out;
+}
+.zai-dots span:nth-child(2) { animation-delay: 0.15s; }
+.zai-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes zai-bounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-0.25rem); opacity: 1; }
+}
+
+/* ---------- Composer ---------- */
+
+.zai-composer {
+    padding: 0.875rem 1.25rem 1rem;
+    border-top: 1px solid var(--line);
+    background: var(--surface);
+}
+
+.zai-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: 0.375rem 0.375rem 0.375rem 0.75rem;
+    background: var(--canvas);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    transition: border-color 0.12s ease;
+}
+.zai-form:focus-within {
+    border-color: var(--brand);
+    background: var(--surface);
+}
+
+.zai-form textarea {
+    flex: 1;
+    border: 0;
+    background: none;
+    outline: none;
+    resize: none;
+    font-family: inherit;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--ink);
+    padding: 0.4375rem 0;
+    max-height: 10rem;
+}
+.zai-form textarea::placeholder { color: var(--ink-hint); }
+
+.zai-form button {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+    border: 0;
+    border-radius: var(--radius);
+    background: var(--brand);
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.12s ease;
+}
+.zai-form button:hover:not(:disabled) { background: var(--brand-dark); }
+.zai-form button:disabled { background: var(--line-strong); cursor: not-allowed; }
+.zai-form button svg { width: 1rem; height: 1rem; }
+
+.zai-disclaimer {
+    max-width: 46rem;
+    margin: 0.5rem auto 0;
+    font-size: 0.625rem;
+    color: var(--ink-hint);
+    text-align: center;
+}
+.zai-disclaimer a { color: var(--ink-subtle); text-decoration: underline; }
+
+/* ---------- Responsive: rail becomes a drawer ---------- */
+
+@media (max-width: 1024px) {
+    .zai {
+        grid-template-columns: 1fr;
+        height: calc(100vh - var(--header-height, 4rem) - 2.5rem);
+    }
+
+    .zai-rail {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: min(20rem, 85vw);
+        z-index: 60;
+        border-radius: 0;
+        transform: translateX(-100%);
+        transition: transform 0.2s ease;
+    }
+    .zai-rail.is-open { transform: translateX(0); }
+
+    .zai-rail__close { display: block; }
+    .zai-head__menu { display: block; }
+
+    .zai-rail__scrim {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 55;
+        background: rgba(15, 23, 42, 0.45);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+    }
+    .zai-rail__scrim.is-open { opacity: 1; pointer-events: auto; }
+}
+
+@media (max-width: 640px) {
+    .zai { height: calc(100vh - var(--header-height, 4rem) - 2rem); }
+    .zai-thread { padding: 1rem 0.875rem; }
+    .zai-composer { padding: 0.75rem 0.875rem 0.875rem; }
+    .zai-head { padding: 0.75rem 0.875rem; }
+    .zai-head__sub { display: none; }
+}

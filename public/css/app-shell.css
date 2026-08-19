@@ -340,6 +340,26 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
 .header-btn:hover { background-color: var(--canvas-deep); color: var(--ink); }
 .header-btn svg { width: 1rem; height: 1rem; color: var(--ink-subtle); }
 
+/* Zero AI — accented so the assistant reads as a feature, not another menu. */
+.header-btn--ai {
+    color: var(--brand-darker);
+    background-color: var(--brand-soft);
+    border-color: var(--brand-softer);
+    text-decoration: none;
+}
+.header-btn--ai:hover {
+    background-color: var(--brand-softer);
+    color: var(--brand-darker);
+    text-decoration: none;
+}
+.header-btn--ai svg { color: var(--brand-dark); }
+.header-btn--ai.is-active {
+    background-color: var(--brand);
+    border-color: var(--brand);
+    color: #fff;
+}
+.header-btn--ai.is-active svg { color: #fff; }
+
 .avatar {
     width: 1.75rem;
     height: 1.75rem;

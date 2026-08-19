@@ -11,6 +11,13 @@ Upload these files to your ElevenLabs Conversational AI agent **Knowledge Base**
 
 These mirror the in-app **Company portal guide** and **Consultant portal guide** (Help & guide in the sidebar). They are written for voice — not PHP config or developer docs.
 
+> **These files now have two consumers.** The pre-question files are also the live
+> source for **Zero AI**, the in-app chat assistant (Zero AI in the portal header →
+> `/zero-ai`). `App\Services\ZeroAiKnowledgeBase` parses them at runtime, so editing a
+> `Q:` / `A:` pair here changes the chat answers on next deploy — no code change, no
+> re-upload. Keep the `## Category` / `Q:` / `A:` line format exactly as it is: the
+> parser keys on those prefixes, and a reflowed answer onto a second line is dropped.
+
 **Last synced with the app:** August 2026 — covers Scope 3 bulk import, the Scope 3 help guide, and the 12-entries-per-category cap on paid plans.
 
 > Re-upload all four files whenever a feature ships that changes what a user can do. Knowledge that lags the app is worse than no knowledge — the agent states outdated limits with full confidence.

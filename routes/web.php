@@ -47,6 +47,12 @@ Route::prefix('consultant')->name('consultant.')->group(function () {
     Route::middleware(['ensureConsultant', 'syncConsultantAgencySession'])->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Consultant\DashboardController::class, 'index'])->name('dashboard');
         Route::get('/help', [\App\Http\Controllers\PortalGuideController::class, 'consultant'])->name('help');
+
+        // Zero AI — free ESG assistant backed by the curated knowledge base.
+        Route::get('/zero-ai', [\App\Http\Controllers\ZeroAiController::class, 'consultant'])->name('zero-ai');
+        Route::post('/zero-ai/ask', [\App\Http\Controllers\ZeroAiController::class, 'askConsultant'])
+            ->middleware('throttle:60,1')
+            ->name('zero-ai.ask');
         Route::get('/company-portal-guide', [\App\Http\Controllers\PortalGuideController::class, 'company'])->name('company-guide');
         Route::get('/support', [\App\Http\Controllers\ContactInquiryController::class, 'createPortal'])->name('support');
         Route::post('/support', [\App\Http\Controllers\ContactInquiryController::class, 'storePortal'])
@@ -214,6 +220,12 @@ Route::middleware([
 ])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('client.dashboard');
     Route::get('/help', [\App\Http\Controllers\PortalGuideController::class, 'company'])->name('client.help');
+
+    // Zero AI — free ESG assistant backed by the curated knowledge base.
+    Route::get('/zero-ai', [\App\Http\Controllers\ZeroAiController::class, 'company'])->name('client.zero-ai');
+    Route::post('/zero-ai/ask', [\App\Http\Controllers\ZeroAiController::class, 'askCompany'])
+        ->middleware('throttle:60,1')
+        ->name('client.zero-ai.ask');
     Route::get('/support', [\App\Http\Controllers\ContactInquiryController::class, 'createPortal'])->name('client.support');
     Route::post('/support', [\App\Http\Controllers\ContactInquiryController::class, 'storePortal'])
         ->middleware('throttle:10,1')
