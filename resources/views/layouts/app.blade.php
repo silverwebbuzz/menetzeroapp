@@ -314,5 +314,17 @@
     </script>
 
     @stack('scripts')
+
+    {{-- ElevenLabs voice help assistant ("Misi").
+         Company + consultant portals only — platform admins have their own tooling
+         and the knowledge base is written for customers, not internal staff.
+         Agent config lives in the ElevenLabs dashboard; the knowledge base files it
+         serves are in documentation/elevenlabs-voice-agent/. --}}
+    @auth
+        @if(config('services.elevenlabs.agent_id') && !auth()->user()->isAdmin())
+            <elevenlabs-convai agent-id="{{ config('services.elevenlabs.agent_id') }}"></elevenlabs-convai>
+            <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
+        @endif
+    @endauth
 </body>
 </html>

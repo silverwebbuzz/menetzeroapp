@@ -45,4 +45,14 @@ return [
         'measurement_id' => env('GOOGLE_ANALYTICS_ID', 'G-WRVEYERGZL'),
     ],
 
+    /*
+     * ElevenLabs conversational help widget ("Misi").
+     * The agent id is public by design — it ships in client-side markup. Abuse is
+     * prevented by the host allowlist in the ElevenLabs dashboard, not by secrecy.
+     * Leave ELEVENLABS_AGENT_ID unset to disable the widget entirely.
+     */
+    'elevenlabs' => [
+        'agent_id' => env('ELEVENLABS_AGENT_ID'),
+    ],
+
 ];
