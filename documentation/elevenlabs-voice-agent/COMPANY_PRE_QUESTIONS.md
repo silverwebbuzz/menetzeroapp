@@ -115,14 +115,14 @@ A: From Input Data open the Scope 3 Help Guide, or https://app.menetzero.com/qui
 Q: Can I export my entries?
 A: Yes. From View Entries you can export filtered CSV for audit or analysis.
 
-Q: What is Scope 1?
-A: Direct emissions you control — on-site fuel, company vehicles, refrigerant top-ups, industrial process.
+Q: What goes under Scope 1 in Quick Input?
+A: On-site fuel, company vehicles, refrigerant top-ups and industrial process. Pick Scope 1 then the activity type that matches your receipt or log.
 
-Q: What is Scope 2?
-A: Purchased energy — grid electricity and district cooling.
+Q: What goes under Scope 2 in Quick Input?
+A: Purchased energy — grid electricity from DEWA or ADDC, and district cooling from Empower or Tabreed. Enter the consumption figure, never the AED amount.
 
-Q: What is Scope 3?
-A: Value-chain emissions such as travel, waste, and purchased goods. Free allows one entry per category; paid packages allow up to 12 per category per year. Request Scope Pro or an ESG package for higher capacity.
+Q: How many Scope 3 entries can I add?
+A: Free allows one entry per category; paid packages allow up to 12 per category per year, one per month. Enterprise is unlimited. Request Scope Pro or an ESG package for higher capacity.
 
 Q: Why is Scope 3 locked or limited?
 A: Free only allows one row per Scope 3 category. Submit Request a package: https://app.menetzero.com/subscriptions/request-package — or if managed by a consultant, they use Request clients (package depth × clients).
@@ -345,14 +345,14 @@ A: Admins see billing, team settings, and consultants. Staff see modules granted
 
 ## Concepts & glossary
 
-Q: What is tCO₂e?
-A: Tonnes of carbon dioxide equivalent — the unit MENetZero uses for emissions totals.
+Q: What unit are my totals shown in?
+A: tCO₂e — tonnes of carbon dioxide equivalent — on the Dashboard, GHG Inventory and all reports.
 
 Q: What is Primary Reporting Year or PRY?
 A: The calendar year you report against. Most entries are tagged to a location and that year.
 
-Q: What is an emission factor?
-A: A conversion that turns activity data (like kWh) into CO₂e. MENetZero applies configured factors automatically when you enter quantity and unit.
+Q: Do I need to apply emission factors myself?
+A: No. MENetZero applies the configured factor automatically once you enter quantity and unit, so you only supply the activity data.
 
 Q: What does the platform calculate automatically?
 A: CO₂e from your activity data after you enter quantity and unit on Quick Input forms.

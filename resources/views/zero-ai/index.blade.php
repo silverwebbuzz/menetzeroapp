@@ -34,7 +34,7 @@
                         <button type="button"
                                 class="zai-q"
                                 data-question="{{ $item['question'] }}"
-                                @click="askPreset(@js($item['question']), @js($item['answer']), @js($item['category']))">
+                                @click="send(@js($item['question']))">
                             {{ $item['question'] }}
                         </button>
                     @endforeach
@@ -44,8 +44,8 @@
         </nav>
 
         <div class="zai-rail__foot">
-            <p class="zai-upsell__title">Need deeper ESG answers?</p>
-            <p class="zai-upsell__body">This free assistant covers the MENetZero platform. Full ESG, GHG Protocol and disclosure guidance is coming to paid plans.</p>
+            <p class="zai-upsell__title">Need answers beyond these?</p>
+            <p class="zai-upsell__body">Zero AI covers the platform plus ESG, GHG Protocol, disclosure standards and UAE reporting rules — free. Tailored analysis of your own data and open-ended ESG advice are coming to paid plans.</p>
         </div>
     </aside>
 
@@ -76,13 +76,13 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l1.9 5.2L19 10l-5.1 1.8L12 17l-1.9-5.2L5 10l5.1-1.8L12 3z" stroke-linejoin="round"/></svg>
                 </span>
                 <h2>Ask me about MENetZero</h2>
-                <p>I answer from our curated knowledge base — how to enter data, run reports, manage locations, and build disclosures. Pick a question on the left or type your own.</p>
+                <p>I answer from our curated knowledge base — using the platform, plus ESG concepts, the GHG Protocol, disclosure standards and UAE reporting rules. Pick a question on the left or type your own.</p>
                 <div class="zai-chips">
                     @foreach($categories->take(6) as $category)
                         @php $seed = $category['questions'][0] ?? null; @endphp
                         @if($seed)
                             <button type="button" class="zai-chip"
-                                    @click="askPreset(@js($seed['question']), @js($seed['answer']), @js($seed['category']))">
+                                    @click="send(@js($seed['question']))">
                                 {{ $seed['question'] }}
                             </button>
                         @endif
@@ -104,6 +104,23 @@
                     <div class="zai-msg__body">
                         <p class="zai-msg__who" x-text="msg.role === 'user' ? 'You' : 'Zero AI'"></p>
                         <div class="zai-msg__text" x-html="msg.html"></div>
+
+                        <template x-if="msg.procedure">
+                            <div class="zai-steps">
+                                <p class="zai-steps__title">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 11l3 3L22 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke-linecap="round"/></svg>
+                                    <span x-text="msg.procedure.title"></span>
+                                </p>
+                                <template x-if="msg.procedure.intro">
+                                    <p class="zai-steps__intro" x-text="msg.procedure.intro"></p>
+                                </template>
+                                <ol class="zai-steps__list">
+                                    <template x-for="(step, si) in msg.procedure.steps" :key="si">
+                                        <li x-html="formatStep(step)"></li>
+                                    </template>
+                                </ol>
+                            </div>
+                        </template>
 
                         <template x-if="msg.category">
                             <p class="zai-msg__tag" x-text="msg.category"></p>
@@ -148,7 +165,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
             </form>
-            <p class="zai-disclaimer">Zero AI answers from the MENetZero knowledge base. For account-specific help, <a href="{{ $portal === 'consultant' ? route('consultant.support') : route('client.support') }}">contact support</a>.</p>
+            <p class="zai-disclaimer">Zero AI answers from the MENetZero knowledge base. Regulatory information is general and dated, not legal advice — verify with <a href="https://www.moccae.gov.ae" target="_blank" rel="noopener">MOCCAE</a> or your adviser. For account-specific help, <a href="{{ $portal === 'consultant' ? route('consultant.support') : route('client.support') }}" target="_blank" rel="noopener">contact support</a>.</p>
         </div>
     </section>
 </div>
@@ -194,22 +211,6 @@ document.addEventListener('alpine:init', () => {
             if (empty) empty.hidden = visible !== 0;
         },
 
-        /** A curated question — the answer is already on the page, so no request. */
-        askPreset(question, answer, category) {
-            this.railOpen = false;
-            this.push('user', question);
-            this.busy = true;
-
-            // Brief pause so the exchange reads as a conversation, not a page jump.
-            setTimeout(() => {
-                this.busy = false;
-                this.push('assistant', answer, { category });
-                this.scroll();
-            }, 260);
-
-            this.scroll();
-        },
-
         async send(text) {
             const question = (text || '').trim();
             if (!question || this.busy) return;
@@ -239,6 +240,7 @@ document.addEventListener('alpine:init', () => {
                 this.push('assistant', data.answer, {
                     category: data.category,
                     related: data.related || [],
+                    procedure: data.procedure || null,
                 });
             } catch (e) {
                 this.busy = false;
@@ -254,6 +256,7 @@ document.addEventListener('alpine:init', () => {
                 html: this.format(text),
                 category: extra.category || null,
                 related: extra.related || [],
+                procedure: extra.procedure || null,
             });
         },
 
@@ -266,7 +269,20 @@ document.addEventListener('alpine:init', () => {
                 .replace(/"/g, '&quot;');
 
             return escaped.replace(/(https?:\/\/[^\s<]+[^\s<.,;:)\]])/g,
-                '<a href="$1" target="_blank" rel="noopener">$1</a>');
+                '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+        },
+
+        /**
+         * Steps carry their destination as "label (url)". A bare URL mid-sentence
+         * is noise, so collapse the parenthesised one into a compact link and leave
+         * the instruction text itself untouched — guessing where the label starts
+         * mangles sentences more often than it helps.
+         */
+        formatStep(step) {
+            return this.format(step).replace(
+                /\s?\((<a ([^>]+)>)(https?:\/\/[^<]+)<\/a>\)/g,
+                (m, openTag, attrs) => ` <a ${attrs} class="zai-steps__link">open \u2197</a>`
+            );
         },
 
         autosize(el) {

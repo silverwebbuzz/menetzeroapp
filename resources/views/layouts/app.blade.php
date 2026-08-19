@@ -122,15 +122,17 @@
                     @include('layouts.partials.header-context', ['portal' => 'company'])
 
                     <div class="header-actions">
+                        @if(Route::has('client.zero-ai'))
                         <!-- Zero AI — free ESG assistant -->
-                        <a href="{{ route('client.zero-ai') }}"
-                           class="header-btn header-btn--ai {{ request()->routeIs('client.zero-ai') ? 'is-active' : '' }}"
-                           aria-label="Open Zero AI assistant">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 3l1.9 5.2L19 10l-5.1 1.8L12 17l-1.9-5.2L5 10l5.1-1.8L12 3z"></path>
-                            </svg>
-                            <span class="header-btn-label">Zero AI</span>
-                        </a>
+                            <a href="{{ route('client.zero-ai') }}"
+                               class="header-btn header-btn--ai {{ request()->routeIs('client.zero-ai') ? 'is-active' : '' }}"
+                               aria-label="Open Zero AI assistant">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 3l1.9 5.2L19 10l-5.1 1.8L12 17l-1.9-5.2L5 10l5.1-1.8L12 3z"></path>
+                                </svg>
+                                <span class="header-btn-label">Zero AI</span>
+                            </a>
+                        @endif
 
                         @if($isConsultantActing)
                         <form action="{{ route('consultant.workspace.exit') }}" method="POST" class="inline">
@@ -331,7 +333,10 @@
          Agent config lives in the ElevenLabs dashboard; the knowledge base files it
          serves are in documentation/elevenlabs-voice-agent/. --}}
     @auth
-        @if(config('services.elevenlabs.agent_id') && !auth()->user()->isAdmin())
+        {{-- Not on the Zero AI page: the floating bubble is fixed bottom-right and
+             covers the chat composer, and a voice assistant is redundant where the
+             user is already typing to one. --}}
+        @if(config('services.elevenlabs.agent_id') && !auth()->user()->isAdmin() && !request()->routeIs('client.zero-ai'))
             <elevenlabs-convai agent-id="{{ config('services.elevenlabs.agent_id') }}"></elevenlabs-convai>
             <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
         @endif

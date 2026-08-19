@@ -8,6 +8,7 @@ Upload these files to your ElevenLabs Conversational AI agent **Knowledge Base**
 | [CONSULTANT_PORTAL_KNOWLEDGE.md](./CONSULTANT_PORTAL_KNOWLEDGE.md) | How the consultant agency portal works — pages, workflows, links |
 | [COMPANY_PRE_QUESTIONS.md](./COMPANY_PRE_QUESTIONS.md) | Company FAQ / pre-answered questions (user phrasing) |
 | [CONSULTANT_PRE_QUESTIONS.md](./CONSULTANT_PRE_QUESTIONS.md) | Consultant FAQ / pre-answered questions (user phrasing) |
+| [ESG_KNOWLEDGE.md](./ESG_KNOWLEDGE.md) | ESG, GHG Protocol, disclosure standards and UAE regulation — shared by both portals |
 
 These mirror the in-app **Company portal guide** and **Consultant portal guide** (Help & guide in the sidebar). They are written for voice — not PHP config or developer docs.
 
@@ -17,6 +18,15 @@ These mirror the in-app **Company portal guide** and **Consultant portal guide**
 > `Q:` / `A:` pair here changes the chat answers on next deploy — no code change, no
 > re-upload. Keep the `## Category` / `Q:` / `A:` line format exactly as it is: the
 > parser keys on those prefixes, and a reflowed answer onto a second line is dropped.
+>
+> `ESG_KNOWLEDGE.md` is loaded **in addition** to whichever portal file applies, so the
+> same standards and regulatory answers reach company and consultant users. Keep concept
+> definitions there and platform mechanics in the portal files — when both files answer
+> the same question the portal one wins, which is wrong for a concept.
+>
+> **Regulatory answers carry an as-at date and point to MOCCAE.** Re-verify them before
+> each release and update the date. A stale legal statement asserted confidently is the
+> worst failure mode this assistant has.
 
 **Last synced with the app:** August 2026 — covers Scope 3 bulk import, the Scope 3 help guide, and the 12-entries-per-category cap on paid plans.
 

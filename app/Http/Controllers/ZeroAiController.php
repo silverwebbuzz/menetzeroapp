@@ -58,6 +58,8 @@ class ZeroAiController extends Controller
                 ? $result['answer']['answer']
                 : "I don't have an answer for that in the free knowledge base yet. Try one of the suggested questions, or contact our team and we'll help directly.",
             'category' => $result['answer']['category'] ?? null,
+            // Numbered walkthrough when the knowledge base has one for this task.
+            'procedure' => $result['answer']['procedure'] ?? null,
             'related' => collect($result['related'])
                 ->map(fn (array $entry) => [
                     'id' => $entry['id'],

@@ -93,9 +93,156 @@ class ZeroAiKnowledgeBase
 
         return [
             'matched' => true,
-            'answer' => $this->strip($best),
+            'answer' => $this->attachProcedure($portal, $this->strip($best), $question),
             'related' => $scored->slice(1, 3)->map(fn ($e) => $this->strip($e))->values()->all(),
         ];
+    }
+
+    /**
+     * Attach the step-by-step procedure that matches an entry, when there is one.
+     *
+     * The portal knowledge files carry "### PROCEDURE:" blocks with numbered steps.
+     * A one-line answer tells the user what to do; the procedure shows them how, so
+     * "how do I …" questions get walked through rather than just pointed at a page.
+     */
+    public function attachProcedure(string $portal, array $entry, string $asked = ''): array
+    {
+        $procedures = $this->procedures($portal);
+
+        if ($procedures === []) {
+            return $entry;
+        }
+
+        // The user's own words matter as much as the matched entry: someone typing
+        // "my import failed" can land on the general bulk-import Q&A, and only their
+        // phrasing says they want the troubleshooting walkthrough.
+        $tokens = $this->tokenize($asked . ' ' . $entry['question'] . ' ' . $entry['answer']);
+        $askedTokens = $this->tokenize($asked);
+        $best = null;
+        $bestScore = 0.0;
+
+        foreach ($procedures as $procedure) {
+            $titleTokens = $this->tokenize($procedure['title']);
+
+            if ($titleTokens === []) {
+                continue;
+            }
+
+            $hits = 0;
+            foreach ($titleTokens as $token) {
+                if ($this->tokenMatches($token, $tokens)) {
+                    $hits++;
+                }
+            }
+
+            // Require most of the procedure title to be present, so a passing word
+            // ("client", "data") never drags in an unrelated walkthrough.
+            $score = $hits / count($titleTokens);
+
+            // Distinctive title words decide between procedures that otherwise
+            // overlap heavily: "Fix a failed Scope 3 import" and "Add Scope 3 data
+            // by bulk import" share most of their words, and only "fix"/"failed"
+            // tell a troubleshooting question apart from a how-to.
+            foreach (['fix', 'failed', 'error'] as $signal) {
+                if (in_array($signal, $titleTokens, true) && $this->tokenMatches($signal, $askedTokens)) {
+                    $score += 0.5;
+                }
+            }
+
+            if ($score > $bestScore && $score >= 0.6) {
+                $bestScore = $score;
+                $best = $procedure;
+            }
+        }
+
+        if ($best !== null) {
+            $entry['procedure'] = $best;
+        }
+
+        return $entry;
+    }
+
+    /**
+     * Numbered walkthroughs parsed from the portal knowledge file.
+     *
+     * @return array<int, array{title: string, intro: ?string, steps: array<int, string>}>
+     */
+    public function procedures(string $portal): array
+    {
+        $file = $this->knowledgeFile($portal);
+
+        if (! $file || ! is_readable($file)) {
+            return [];
+        }
+
+        return Cache::remember(
+            "zero-ai.proc.{$portal}." . filemtime($file),
+            now()->addDay(),
+            fn () => $this->parseProcedures(file_get_contents($file) ?: '')
+        );
+    }
+
+    /** @return array<int, array> */
+    private function parseProcedures(string $markdown): array
+    {
+        $procedures = [];
+        $current = null;
+
+        foreach (preg_split('/\R/u', $markdown) ?: [] as $line) {
+            $trimmed = trim($line);
+
+            if (str_starts_with($trimmed, '### PROCEDURE:')) {
+                if ($current && $current['steps'] !== []) {
+                    $procedures[] = $current;
+                }
+
+                $current = [
+                    'title' => trim(substr($trimmed, 14)),
+                    'intro' => null,
+                    'steps' => [],
+                ];
+                continue;
+            }
+
+            if ($current === null) {
+                continue;
+            }
+
+            // A new heading of any level ends the current procedure.
+            if (str_starts_with($trimmed, '#')) {
+                if ($current['steps'] !== []) {
+                    $procedures[] = $current;
+                }
+                $current = null;
+                continue;
+            }
+
+            if (preg_match('/^(\d+)\.\s+(.*)$/u', $trimmed, $m)) {
+                $current['steps'][] = $this->plainText($m[2]);
+                continue;
+            }
+
+            // Prose before the first numbered step is the procedure's lead-in.
+            if ($trimmed !== '' && $current['steps'] === [] && $current['intro'] === null) {
+                $current['intro'] = $this->plainText($trimmed);
+            }
+        }
+
+        if ($current && $current['steps'] !== []) {
+            $procedures[] = $current;
+        }
+
+        return $procedures;
+    }
+
+    /** Strip the markdown emphasis and links the steps use, keeping the text. */
+    private function plainText(string $text): string
+    {
+        // [label](url) -> label (url), so the destination survives as plain text.
+        $text = preg_replace('/\[([^\]]+)\]\(([^)]+)\)/u', '$1 ($2)', $text) ?? $text;
+        $text = str_replace(['**', '__'], '', $text);
+
+        return trim($text);
     }
 
     /** Suggested starting questions when we have nothing better to offer. */
@@ -237,15 +384,42 @@ class ZeroAiKnowledgeBase
             return [];
         }
 
+        // Platform how-to comes from the portal's own file; ESG, GHG Protocol and
+        // regulatory background is shared, so both portals load it too. Portal
+        // answers come first — a user asking "where is X" wants the screen, not
+        // the standard behind it.
+        $shared = $this->sharedFile();
+        $sharedStamp = $shared && is_readable($shared) ? filemtime($shared) : 0;
+
         return Cache::remember(
-            "zero-ai.kb.{$portal}." . filemtime($file),
+            "zero-ai.kb.{$portal}." . filemtime($file) . ".{$sharedStamp}",
             now()->addDay(),
-            fn () => $this->parse(file_get_contents($file) ?: '')
+            function () use ($file, $shared) {
+                $entries = $this->parse(file_get_contents($file) ?: '');
+
+                if ($shared && is_readable($shared)) {
+                    $entries = array_merge(
+                        $entries,
+                        // Re-key so ids stay unique once the two files are combined.
+                        $this->parse(file_get_contents($shared) ?: '', 'esg')
+                    );
+                }
+
+                return $entries;
+            }
         );
     }
 
+    /** Standards / regulatory Q&A served to both portals. */
+    private function sharedFile(): ?string
+    {
+        $base = $this->basePath ?: base_path('documentation/elevenlabs-voice-agent');
+
+        return $base . '/ESG_KNOWLEDGE.md';
+    }
+
     /** @return array<int, array> */
-    private function parse(string $markdown): array
+    private function parse(string $markdown, string $prefix = 'q'): array
     {
         $entries = [];
         $category = 'General';
@@ -268,7 +442,7 @@ class ZeroAiKnowledgeBase
 
             if (str_starts_with($line, 'A: ') && $pendingQuestion !== null) {
                 $entries[] = [
-                    'id' => 'q' . (++$index),
+                    'id' => $prefix . (++$index),
                     'category' => $category,
                     'question' => $pendingQuestion,
                     'answer' => trim(substr($line, 3)),
@@ -278,6 +452,18 @@ class ZeroAiKnowledgeBase
         }
 
         return $entries;
+    }
+
+    /** The long-form portal guide that carries the PROCEDURE blocks. */
+    private function knowledgeFile(string $portal): ?string
+    {
+        $base = $this->basePath ?: base_path('documentation/elevenlabs-voice-agent');
+
+        return match ($portal) {
+            'consultant' => $base . '/CONSULTANT_PORTAL_KNOWLEDGE.md',
+            'company' => $base . '/COMPANY_PORTAL_KNOWLEDGE.md',
+            default => null,
+        };
     }
 
     private function file(string $portal): ?string
