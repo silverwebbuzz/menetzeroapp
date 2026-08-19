@@ -201,6 +201,52 @@ Point users to: [Company portal guide](https://app.menetzero.com/consultant/comp
 
 ---
 
+## 11b. STEP-BY-STEP PROCEDURES (consultant)
+
+Give ONE step at a time and wait for the user to confirm. Do not recite the whole
+list at once. If they ask for it in writing, list every step as a numbered list.
+
+### PROCEDURE: Add a new managed client
+
+1. Open **Managed clients** in the left sidebar.
+2. Click **Add client**.
+3. Choose which **package capacity row** to use — this sets what the client can do.
+4. Enter the client company name and the primary contact email.
+5. Save. The client workspace is created.
+6. Open the workspace to start adding locations and data.
+
+### PROCEDURE: Enter a client workspace and add data
+
+1. Open **Managed clients**.
+2. Find the client in the list and click **Enter workspace**.
+3. You are now working inside that client's portal. The banner at the top shows whose workspace you are in.
+4. Add **Locations** and set emission boundaries.
+5. Open **Input Data** to enter or bulk import activity data.
+6. Use **GHG Inventory** to review totals and export.
+7. Leave the workspace from the banner when finished.
+
+### PROCEDURE: Bulk import Scope 3 for a client
+
+1. Enter the client workspace from **Managed clients**.
+2. Open **Input Data**.
+3. Scroll to **Bulk import — Scope 3**.
+4. Click **Download Excel template**.
+5. Fill only the **Data Entry** sheet. Copy Activity Type and Unit exactly from the Reference sheet.
+6. Copy location names exactly from the **Your Locations** sheet.
+7. Save, then upload the file in the same panel.
+8. Check the result message for any rejected rows.
+
+### PROCEDURE: Request more client capacity
+
+1. Open **Agency packs** or **Request clients** in the sidebar.
+2. Choose the package depth you need for those clients.
+3. Enter how many clients you need at that depth.
+4. Submit the request. MENetZero replies with an offline quote.
+5. Once paid, the capacity row is activated and appears in your packs.
+6. New clients can then be added against that row.
+
+---
+
 ## 12. Agency Team & Access
 
 **Page:** [Team & Access](https://app.menetzero.com/consultant/team)

@@ -185,6 +185,132 @@ Key rules for voice answers:
 
 ---
 
+## 7b. STEP-BY-STEP PROCEDURES
+
+Read these out as numbered steps, one at a time. Give a step, then wait — do not
+recite the whole list in one breath. If the user is following along, confirm each
+step worked before moving to the next.
+
+### PROCEDURE: Set up a brand new account
+
+1. Open **My Profile** and complete business name, sector, country and contacts.
+2. Open **Locations** and add your first site — name, address and type.
+3. Mark one site as **head office** if you have several.
+4. Open that location and set its **emission boundaries** — tick the activity types that apply.
+5. Open **Input Data** and enter your first entry, usually electricity.
+6. Check the **Dashboard** to see the total appear.
+7. Open **GHG Inventory** for the full breakdown.
+
+### PROCEDURE: Enter a DEWA electricity bill
+
+1. Open **Input Data** in the left sidebar.
+2. Choose **Scope 2**, then **Electricity**.
+3. Select the **reporting year** and the **location**.
+4. Find the total **kWh** on the bill — the consumption or usage figure.
+5. Enter that number. Never enter the AED amount.
+6. Set the region to **Dubai**.
+7. Save. One bill is one row.
+
+### PROCEDURE: Add a new location
+
+1. Open **Locations** in the left sidebar.
+2. Click **Add location**.
+3. Enter the site name, address and type — office, retail, warehouse or industrial.
+4. Save.
+5. Open the new location and set its **emission boundaries**.
+6. Tick every activity type that happens at that site.
+7. Those tick boxes control which forms appear in Input Data.
+
+### PROCEDURE: Add Scope 3 data one entry at a time (no spreadsheet)
+
+Best when the user has only a few numbers.
+
+1. In the left sidebar open **Input Data**.
+2. Choose **Scope 3**, then pick the category — for example **Business Travel**.
+3. Select the **reporting year** and the **location**. The form stays locked until both are set.
+4. Choose the **Activity Type** from the dropdown.
+5. Choose the **Unit** — it must match the activity type.
+6. Enter the **amount** as one total for the whole year.
+7. Add a note saying where the number came from, then **Save**.
+8. Check it appears under **View Entries** at https://app.menetzero.com/quick-input/entries
+
+### PROCEDURE: Add Scope 3 data by bulk import (spreadsheet)
+
+Best when the user has several categories or monthly figures. Needs a paid package.
+
+1. In the left sidebar open **Input Data**.
+2. Scroll to the panel titled **Bulk import — Scope 3**.
+3. Click **Download Excel template**.
+4. Open the workbook. Read the **Instructions** sheet first.
+5. Open the **Reference** sheet — this lists every valid Category, Activity Type and Unit combination.
+6. Type your rows into the **Data Entry** sheet. It is empty on purpose.
+7. For each row, copy the **Activity Type** and **Unit** exactly from the Reference sheet.
+8. Use the **Your Locations** sheet to copy location names exactly.
+9. Save the file.
+10. Go back to **Input Data**, into the **Bulk import — Scope 3** panel.
+11. Click **Upload completed file** and choose your saved workbook.
+12. Click **Upload and import**.
+13. Read the result message. It says how many rows imported and lists any that failed.
+14. Check the entries under **View Entries**.
+
+### PROCEDURE: Which Scope 3 categories to start with
+
+The user does not need all 15. Recommend these five first:
+
+1. **Category 1, Purchased goods and services** — annual supplier spend in AED from finance, excluding VAT.
+2. **Category 3, Fuel and energy related activities** — reuse the same kWh and fuel litres already entered for Scope 1 and 2.
+3. **Category 5, Waste** — tonnes of waste from the waste contractor's annual summary.
+4. **Category 6, Business travel** — flights, from the travel agent report.
+5. **Category 7, Employee commuting** — from a short staff survey.
+
+### PROCEDURE: Turn a staff list into one commuting total
+
+1. Open the downloaded Scope 3 workbook.
+2. Go to the sheet named **Calc: Commuting**.
+3. Enter one row per employee — one-way km, days per week, number of people.
+4. The sheet calculates a **Total km** at the bottom.
+5. Copy that single total.
+6. Paste it into the **Data Entry** sheet as one row, Category 7.
+7. The Calc sheet itself is never imported — only Data Entry is.
+
+### PROCEDURE: Turn a flight log into one travel total
+
+1. Open the Scope 3 workbook.
+2. Go to the sheet named **Calc: Flights**.
+3. Enter one row per trip — km, passengers, number of legs.
+4. The sheet totals **passenger.km** per cabin class.
+5. Copy the total into the **Data Entry** sheet as one row, Category 6.
+6. Use the matching flight Activity Type from the Reference sheet.
+
+### PROCEDURE: Fix a failed Scope 3 import
+
+Ask which message they saw, then follow the matching branch.
+
+**"Location not found"**
+1. Open the **Your Locations** sheet in the workbook.
+2. Compare it to the location_name column in Data Entry.
+3. The names must match exactly, including spaces and capitals.
+4. Correct them, save, and upload again.
+
+**"No emission factor for activity type ... with unit ..."**
+1. Open the **Reference** sheet.
+2. Find the row for that category.
+3. Copy the Activity Type and the Unit exactly as written there.
+4. Paste both into Data Entry, replacing what is there.
+5. Save and upload again. A wrong unit is the most common cause.
+
+**"The uploaded file contains no data rows"**
+1. The **Data Entry** sheet was left empty.
+2. Type the rows into **Data Entry** — not into the Examples sheet.
+3. Examples is only a reference and is never imported.
+
+**"Plan limit reached for this category"**
+1. The plan allows 12 entries per category per year on paid packages, or 1 on Free.
+2. Combine the extra rows into fewer totals, or request a higher package at
+   https://app.menetzero.com/subscriptions/request-package
+
+---
+
 ## 8. GHG Inventory & exports
 
 **Page:** [GHG Inventory](https://app.menetzero.com/reports)
