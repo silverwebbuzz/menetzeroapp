@@ -40,7 +40,7 @@ Consultants should use the consultant portal, not the company login.
 |--------------|------|--------------|------|
 | — | Dashboard | Emissions snapshot and setup progress | https://app.menetzero.com/dashboard |
 | Emissions | Locations | Sites and emission boundaries | https://app.menetzero.com/locations |
-| Quick Input | View Entries | List all activity data entries | https://app.menetzero.com/quick-input |
+| Quick Input | View Entries | List all activity data entries | https://app.menetzero.com/quick-input/entries |
 | Quick Input | Scope 1 / 2 / 3 | Forms for each emission source | Open from sidebar under Quick Input |
 | Disclosures | Disclosures | IFRS, GRI, UAE ESG, Scorecard hub | https://app.menetzero.com/disclosures |
 | Reports & Compliance | GHG Inventory | Aggregated inventory and exports | https://app.menetzero.com/reports |
@@ -67,7 +67,7 @@ Tell users to follow this order (same as the in-app guide):
 1. **Complete company profile** — business name, sector, country, contacts under [My Profile](https://app.menetzero.com/profile). Feeds reports and disclosures.
 2. **Add locations** — each site (office, warehouse, retail). Mark one as head office if applicable. [Locations](https://app.menetzero.com/locations)
 3. **Define emission boundaries** — for each location, tick which activity types apply (electricity, fuel, fleet, etc.). This controls which Quick Input forms appear. [Locations](https://app.menetzero.com/locations)
-4. **Enter activity data** — Quick Input forms or bulk import for Scope 1 & 2. One row per bill or receipt (e.g. monthly DEWA invoice). [Input Data / View Entries](https://app.menetzero.com/quick-input)
+4. **Enter activity data** — Quick Input forms or bulk import for Scope 1 & 2. One row per bill or receipt (e.g. monthly DEWA invoice). [Input Data / View Entries](https://app.menetzero.com/quick-input/entries)
 5. **Review dashboard & GHG inventory** — check totals, then open GHG Inventory for breakdown and exports. [GHG Inventory](https://app.menetzero.com/reports)
 6. **Complete disclosures & export reports** — IFRS S1/S2, GRI, UAE ESG narrative; download PDFs when package allows (typically Scope Pro / ESG packages). [Disclosures](https://app.menetzero.com/disclosures)
 7. **Publish UAE ESG Report (Scope Pro / ESG packages)** — leadership message, strategy, about sections; GHG numbers pull automatically from inventory. Request a package if exports are locked.
@@ -115,8 +115,9 @@ Tips:
 ## 7. Input Data (Quick Input)
 
 **Pages:**
-- [View Entries / Input Data](https://app.menetzero.com/quick-input)
+- [View Entries / Input Data](https://app.menetzero.com/quick-input/entries)
 - [Scope 1 & 2 data guide](https://app.menetzero.com/quick-input/help-guide) (field-by-field help for bills and bulk import)
+- [Scope 3 help guide](https://app.menetzero.com/quick-input/scope3-help-guide) (how to total up value-chain data before importing)
 
 Quick Input is the main data entry area. Choose a source (electricity, fuel, flights, etc.), select **location** and **reporting year**, enter quantity and unit — the platform calculates tCO₂e automatically.
 
@@ -128,14 +129,14 @@ Quick Input is the main data entry area. Choose a source (electricity, fuel, fli
 4. Enter quantity and unit from the bill (not the AED amount).
 5. Save. One row = one bill or period.
 6. Review all rows under **View Entries**. Filter by scope, location, year.
-7. Optional: bulk import Excel/CSV for Scope 1 & 2 (Scope Basic and paid packages).
+7. Optional: bulk import Excel/CSV — **Scope 1 & 2 and Scope 3 each have their own separate import** (Scope Basic and paid packages).
 8. Optional: export CSV of filtered entries for audit.
 
 ### Scope meanings
 
 - **Scope 1** — direct emissions (fuel on site, company vehicles, refrigerants, process).
 - **Scope 2** — purchased energy (electricity, district cooling).
-- **Scope 3** — value chain (travel, waste, purchased goods, etc.). Free allows one entry per category; Request Scope Pro or an ESG package for higher capacity. Managed clients follow consultant entitlements (paid Standard is typically GHG-focused with limited Scope 3).
+- **Scope 3** — value chain (travel, waste, purchased goods, etc.). Free allows one entry per category; paid packages allow up to **12 per category per year** (one per month), and Enterprise is unlimited. Request Scope Pro or an ESG package for higher capacity. Managed clients follow consultant entitlements (paid Standard is typically GHG-focused with limited Scope 3).
 
 ### UAE-focused data tips (Scope 1 & 2)
 
@@ -161,6 +162,26 @@ You do not need to be an environmental expert. Typical office documents:
 **Industrial process (Scope 1):** Factories only — skip for offices/retail.
 
 Bulk import columns (common): location_name (must match Locations), fiscal_year, entry_date (optional), category, sub_type, quantity, unit, region, notes.
+
+### Scope 3 bulk import
+
+Scope 3 has its **own** template and upload box on Input Data — separate from the Scope 1 & 2 one. Read the [Scope 3 help guide](https://app.menetzero.com/quick-input/scope3-help-guide) first.
+
+Three downloads are offered:
+- **Excel template** (recommended) — a workbook with Instructions, an empty **Data Entry** sheet, an **Examples** sheet, a **Reference** sheet listing all 66 valid combinations, **Your Locations**, and two calculators.
+- **Blank CSV** — headers only.
+- **Sample CSV** — headers plus example rows.
+
+Scope 3 columns: location_name, fiscal_year, entry_date (optional), category, activity_type, quantity, unit, notes.
+
+Key rules for voice answers:
+- Report **one total per category per year** — not one row per employee or per flight.
+- **Category** accepts either the number (“6”, “Cat 6”) or the name (“Business Travel”).
+- **Activity Type** and **Unit** must be copied **exactly** from the Reference sheet — a wrong unit is the most common failure.
+- Only the **Data Entry** sheet is imported. Instructions, Examples, Reference, Your Locations and the two **Calc:** sheets are ignored.
+- The two calculators (**Calc: Commuting** — one row per employee, and **Calc: Flights** — one row per trip) turn detailed lists into the single total you paste into Data Entry.
+- Max file size 5 MB (.xlsx, .xls, .csv).
+- Paid plans allow **12 entries per Scope 3 category** per year (one per month). Free allows **1** and has no bulk import.
 
 ---
 

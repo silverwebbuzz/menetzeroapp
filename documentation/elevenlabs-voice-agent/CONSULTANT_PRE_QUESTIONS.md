@@ -190,7 +190,16 @@ Q: How do I enter electricity for a client?
 A: In their workspace: Quick Input → Scope 2 → Electricity → year & location → kWh from DEWA/ADDC — not AED.
 
 Q: How do I bulk import for a client?
-A: Inside workspace Input Data, use bulk import (available on paid packages). Match location_name exactly.
+A: Inside workspace Input Data, use bulk import (available on paid packages). Match location_name exactly. Scope 1 & 2 and Scope 3 are two separate imports with their own templates.
+
+Q: How do I bulk import Scope 3 for a client?
+A: Enter the client workspace, open Input Data, then Bulk import — Scope 3. Download the Excel template, fill only the Data Entry sheet, and upload. Guide: https://app.menetzero.com/quick-input/scope3-help-guide
+
+Q: How much Scope 3 data can a managed client hold?
+A: Depends on the package depth. Free-rule clients get one entry per category and no bulk import; paid depths allow up to 12 per category per year.
+
+Q: A client's Scope 3 import failed on activity type or unit?
+A: Both must be copied exactly from the Reference sheet in the workbook. A wrong unit is the most common cause.
 
 Q: How do I export a client GHG report?
 A: Inside workspace → GHG Inventory → select year → export Excel or PDF.

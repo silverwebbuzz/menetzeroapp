@@ -674,6 +674,10 @@ class Scope3BulkImportService
             }
         }
 
-        return reset($sheets) ?: [];
+        // Every candidate sheet was empty or on the ignore list — typically the official
+        // template uploaded back with nothing typed into Data Entry. Falling through to
+        // the first sheet would hand Instructions to the header mapper and report
+        // "Unrecognised header row", which sends the user hunting for the wrong problem.
+        return [];
     }
 }

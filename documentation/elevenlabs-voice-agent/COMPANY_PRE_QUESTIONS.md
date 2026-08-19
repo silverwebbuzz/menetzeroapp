@@ -89,7 +89,7 @@ A: Yes. Update emission boundaries anytime if operations change.
 ## Quick Input / data entry
 
 Q: What is Quick Input?
-A: Quick Input (Input Data) is where you enter Scope 1, 2, and 3 activity data. Open https://app.menetzero.com/quick-input
+A: Quick Input (Input Data) is where you enter Scope 1, 2, and 3 activity data. Open https://app.menetzero.com/quick-input/entries
 
 Q: What is the difference between Quick Input and GHG Inventory?
 A: Quick Input is raw activity data (kWh, litres, km). GHG Inventory is the aggregated report built from those entries.
@@ -101,13 +101,16 @@ Q: Why is the form locked?
 A: You must select both reporting year and location first. The form stays locked until both are set.
 
 Q: Where do I see all my entries?
-A: Open View Entries under Quick Input: https://app.menetzero.com/quick-input — filter by scope, location, and year.
+A: Open View Entries under Quick Input: https://app.menetzero.com/quick-input/entries — filter by scope, location, and year.
 
 Q: Can I upload Excel or CSV?
-A: Yes for Scope 1 and 2 on Scope Basic and paid packages. Use bulk import from Input Data, and read the Scope 1 & 2 data guide first: https://app.menetzero.com/quick-input/help-guide
+A: Yes on Scope Basic and paid packages. There are two separate bulk imports on Input Data — one for Scope 1 & 2, one for Scope 3. Read the matching guide first: https://app.menetzero.com/quick-input/help-guide
 
 Q: Where is the Scope 1 and 2 help guide?
 A: From Input Data open Scope 1 & 2 data guide, or https://app.menetzero.com/quick-input/help-guide
+
+Q: Where is the Scope 3 help guide?
+A: From Input Data open the Scope 3 Help Guide, or https://app.menetzero.com/quick-input/scope3-help-guide
 
 Q: Can I export my entries?
 A: Yes. From View Entries you can export filtered CSV for audit or analysis.
@@ -119,7 +122,7 @@ Q: What is Scope 2?
 A: Purchased energy — grid electricity and district cooling.
 
 Q: What is Scope 3?
-A: Value-chain emissions such as travel, waste, and purchased goods. Free allows one entry per category; Request Scope Pro or an ESG package for higher capacity.
+A: Value-chain emissions such as travel, waste, and purchased goods. Free allows one entry per category; paid packages allow up to 12 per category per year. Request Scope Pro or an ESG package for higher capacity.
 
 Q: Why is Scope 3 locked or limited?
 A: Free only allows one row per Scope 3 category. Submit Request a package: https://app.menetzero.com/subscriptions/request-package — or if managed by a consultant, they use Request clients (package depth × clients).
@@ -183,6 +186,40 @@ A: location_name must match exactly the name in Locations: https://app.menetzero
 
 Q: One row equals what?
 A: One bill or one month/period of data. Delete example rows that don’t apply.
+
+---
+
+## Scope 3 bulk import
+
+Q: Can I bulk import Scope 3?
+A: Yes, on paid packages. Input Data has a separate Scope 3 bulk import with its own template, below the Scope 1 & 2 one.
+
+Q: How do I import Scope 3 data?
+A: Open Input Data, go to Bulk import — Scope 3, download the Excel template, fill the Data Entry sheet, then upload it in the same box. Guide: https://app.menetzero.com/quick-input/scope3-help-guide
+
+Q: What columns does the Scope 3 template use?
+A: location_name, fiscal_year, entry_date (optional), category, activity_type, quantity, unit, notes.
+
+Q: Do I enter one row per employee or per flight?
+A: No. Report one total per category per year. Use the Calc: Commuting and Calc: Flights sheets in the workbook to turn your staff list or trip log into that single total.
+
+Q: What are the calculator sheets for?
+A: Calc: Commuting takes one row per employee and gives you total km. Calc: Flights takes one row per trip and gives total passenger.km. Copy the total into Data Entry. The calculator sheets themselves are never imported.
+
+Q: My Scope 3 import says no emission factor found?
+A: The activity_type or unit does not match. Copy both exactly from the Reference sheet in the workbook — a wrong unit is the most common cause.
+
+Q: What do I put in the category column?
+A: Either the GHG Protocol number (6, or Cat 6) or the category name (Business Travel). Both are accepted.
+
+Q: Which sheets get imported?
+A: Only Data Entry. Instructions, Examples, Reference, Your Locations and the two Calc: sheets are ignored.
+
+Q: How many Scope 3 rows can I have per category?
+A: Free allows one per category and no bulk import. Paid packages allow 12 per category per year — one per month. Enterprise is unlimited.
+
+Q: My Scope 3 upload said the file contains no data rows?
+A: The Data Entry sheet was left empty. Type your rows into Data Entry — the Examples sheet is not imported.
 
 ---
 
@@ -350,7 +387,7 @@ Q: Where is Locations?
 A: https://app.menetzero.com/locations
 
 Q: Where is Input Data?
-A: https://app.menetzero.com/quick-input
+A: https://app.menetzero.com/quick-input/entries
 
 Q: Where is GHG Inventory?
 A: https://app.menetzero.com/reports

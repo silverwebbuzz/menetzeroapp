@@ -191,7 +191,7 @@ Paid managed clients follow the **package of the capacity row** they were create
 
 Common consultant tasks:
 1. Locations & emission boundaries
-2. Quick Input & bulk import (DEWA, fuel, fleet, Scope 3 within limits)
+2. Quick Input & bulk import (DEWA, fuel, fleet, Scope 3 within limits). Scope 1 & 2 and Scope 3 have separate bulk imports, each with its own template and help guide.
 3. GHG Inventory — review and export Excel/PDF for the client
 4. Disclosures — fill forms where available; PDF exports depend on entitlements
 5. ESG Depth — stakeholders, materiality, suppliers, targets when unlocked

@@ -259,6 +259,25 @@ if the cap doesn't move, nothing downstream is usable.
 Nothing in this build has been executed — there is no PHP runtime in the dev
 environment, so the first template download and upload are the real tests.
 
+### Post-build review — Aug 2026
+
+Two fixes applied after a full-system review:
+
+- [x] **Data Entry no longer ships pre-filled.** `Scope3BulkTemplateExport` put
+  `sampleRows()` directly into the **Data Entry** sheet — the one sheet the importer
+  reads. A user who downloaded the template and uploaded it back re-imported the five
+  examples, and because they reference `Dubai Head Office`, every row failed with
+  "Location not found" for most companies. Now Data Entry ships empty and the samples
+  sit on a separate **Examples** sheet, matching `Scope12BulkTemplateExport`
+  (`extractDataSheet()` already ignores `examples`).
+- [x] **Empty-workbook upload gives an honest error.** `extractDataSheet()` fell back to
+  `reset($sheets)` when no candidate sheet had rows, handing the Instructions sheet to
+  the header mapper and reporting "Unrecognised header row". It now returns `[]`, so
+  `importRows()` reports "The uploaded file contains no data rows."
+
+**Still unverified (needs a PHP runtime):** first real template download, a round-trip
+upload, and confirmation that the paid cap reads 12 after migration.
+
 ---
 
 ## 10. Appendix — the 66 valid combinations

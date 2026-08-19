@@ -134,7 +134,8 @@ multi-row upload will be rejected. See `SCOPE3_BULK_IMPORT_PLAN.md`.
 
 **Template download:**
 - [ ] Excel template downloads and opens without a repair prompt
-- [ ] Six sheets present: Instructions · Data Entry · Reference · Your Locations · Calc: Commuting · Calc: Flights
+- [ ] Seven sheets present: Instructions · Data Entry · Examples · Reference · Your Locations · Calc: Commuting · Calc: Flights
+- [ ] **Data Entry is empty** (headers only) — sample rows live on the **Examples** sheet, which is never imported
 - [ ] "Your Locations" lists this company's actual active locations
 - [ ] Reference sheet has **66** combination rows
 - [ ] **Calc: Commuting** — entering one-way km / days / people produces a Total km (formula works, not a literal `=IF(...)` string)
@@ -142,7 +143,8 @@ multi-row upload will be rejected. See `SCOPE3_BULK_IMPORT_PLAN.md`.
 - [ ] Blank CSV downloads; sample CSV includes the 5 example rows and the `#` reference comments
 
 **Upload — happy path:**
-- [ ] Upload the unmodified template (5 sample rows) → 5 entries imported
+- [ ] **Regression:** upload the template *unmodified* → "The uploaded file contains no data rows." (NOT "Unrecognised header row", and NOT 5 phantom `Dubai Head Office` rows)
+- [ ] Copy the Examples rows into Data Entry, change location to a real one → 5 entries imported
 - [ ] Entries appear in View Entries tagged Scope 3
 - [ ] CO₂e is non-zero and each row has an emission factor attached
 - [ ] GHG Inventory Scope 3 total increases by the same amount

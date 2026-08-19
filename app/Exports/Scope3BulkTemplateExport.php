@@ -24,7 +24,13 @@ class Scope3BulkTemplateExport implements WithMultipleSheets
     {
         $sheets = [
             new Scope3InstructionsSheet(),
-            new Scope3DataSheet('Data Entry', Scope3BulkImportService::sampleRows()),
+            // Data Entry ships EMPTY and the samples live on their own sheet, matching
+            // Scope12BulkTemplateExport. Pre-filling Data Entry meant a user who
+            // downloaded the template and uploaded it back re-imported the examples —
+            // and since they reference a location ("Dubai Head Office") that most
+            // companies do not have, every row failed with "Location not found".
+            new Scope3DataSheet('Data Entry', []),
+            new Scope3DataSheet('Examples', Scope3BulkImportService::sampleRows()),
             new Scope3ReferenceSheet(),
         ];
 

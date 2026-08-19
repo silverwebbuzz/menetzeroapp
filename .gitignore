@@ -28,3 +28,6 @@ yarn-error.log
 # External reference materials (not part of the product)
 final-web---dp-world-esg-2024-eng-v3.pdf
 reference-material/
+
+# Marketing website — separate deliverable, not part of the Laravel app
+/WEBSITE/
