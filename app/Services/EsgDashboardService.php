@@ -10,6 +10,7 @@ class EsgDashboardService
         protected DisclosureService $disclosureService,
         protected IfrsS2ReportService $s2ReportService,
         protected EsgScorecardService $scorecardService,
+        protected ReductionTargetProgressService $targetProgressService,
     ) {
     }
 
@@ -21,6 +22,7 @@ class EsgDashboardService
         $ghg = $this->s2ReportService->build($company, $fiscalYear)['ghg'] ?? [];
         $griContent = $this->disclosureService->griSectionsContent($company->id, $fiscalYear);
         $scorecard = $this->scorecardService->build($company, $fiscalYear);
+        $targets = $this->targetProgressService->build($company, $fiscalYear, $ghg);
 
         $environmental = $this->scoreEnvironmental($gri, $ghg, $griContent);
         $social = $this->scoreSocial($gri, $griContent);
@@ -38,6 +40,8 @@ class EsgDashboardService
                 'ifrs_s1' => $s1,
                 'gri' => $gri,
             ],
+            'targets' => $targets,
+            'next_target' => $this->targetProgressService->nextTarget($targets),
             'ghg_summary' => [
                 'total_tonnes' => $ghg['total_tonnes'] ?? 0,
                 'scope1' => $ghg['scope_tonnes']['Scope 1'] ?? 0,

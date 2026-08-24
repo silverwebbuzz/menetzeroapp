@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Disclosure;
 
 use App\Models\ReductionTarget;
 use App\Models\TransitionAction;
+use App\Services\ReductionTargetProgressService;
 use Illuminate\Http\Request;
 
 class ReductionTargetController extends DisclosureBaseController
@@ -19,6 +20,11 @@ class ReductionTargetController extends DisclosureBaseController
                 ->with('transitionActions')
                 ->orderBy('target_year')
                 ->get(),
+            // Keyed by target id so the list can show the same progress figures
+            // as the ESG dashboard without duplicating the comparison logic.
+            'progress' => collect(app(ReductionTargetProgressService::class)->build($company, $fiscalYear))
+                ->keyBy('id')
+                ->all(),
         ]);
     }
 

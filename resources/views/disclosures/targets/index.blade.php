@@ -37,6 +37,45 @@
                         <span>{{ $target->name }}</span>
                         <span class="text-xs text-gray-500">{{ $target->target_year }} · {{ \App\Models\ReductionTarget::SCOPE_COVERAGE[$target->scope_coverage] ?? $target->scope_coverage }}</span>
                     </summary>
+
+                    {{-- Progress against actual inventory — same figures as the ESG dashboard. --}}
+                    @if($p = ($progress[$target->id] ?? null))
+                        @php
+                            $badge = match($p['status']['key']) {
+                                'achieved', 'on_track' => 'bg-green-100 text-green-800',
+                                'off_track', 'missed' => 'bg-red-100 text-red-800',
+                                'no_data', 'incomplete' => 'bg-gray-100 text-gray-600',
+                                default => 'bg-blue-100 text-blue-800',
+                            };
+                            $barColor = match($p['status']['key']) {
+                                'achieved', 'on_track' => 'bg-green-500',
+                                'off_track', 'missed' => 'bg-red-500',
+                                default => 'bg-brand-500',
+                            };
+                        @endphp
+                        <div class="mt-3 pt-3 border-t border-gray-100">
+                            <div class="flex flex-wrap items-center gap-3 text-sm mb-2">
+                                <span class="px-2 py-1 text-xs font-medium rounded-full {{ $badge }}">{{ $p['status']['label'] }}</span>
+                                <span class="text-gray-500">
+                                    Current {{ $p['current_year'] }}:
+                                    <strong class="text-gray-900">{{ $p['current_tco2e'] !== null ? number_format($p['current_tco2e'], 2) . ' tCO₂e' : '—' }}</strong>
+                                </span>
+                                <span class="text-gray-500">
+                                    Target {{ $p['target_year'] }}:
+                                    <strong class="text-brand-600">{{ $p['target_tco2e'] !== null ? number_format($p['target_tco2e'], 2) . ' tCO₂e' : '—' }}</strong>
+                                </span>
+                                @if($p['remaining_tco2e'] !== null)
+                                    <span class="text-gray-500">Still to reduce: <strong class="text-gray-900">{{ number_format($p['remaining_tco2e'], 2) }} tCO₂e</strong></span>
+                                @endif
+                            </div>
+                            @if($p['achieved_percent'] !== null)
+                                <div class="w-full bg-gray-100 rounded-full h-2">
+                                    <div class="{{ $barColor }} h-2 rounded-full" style="width: {{ $p['achieved_percent'] }}%"></div>
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">{{ $p['achieved_percent'] }}% of required reduction achieved</div>
+                            @endif
+                        </div>
+                    @endif
                     <form method="POST" action="{{ route('disclosures.s2.targets.update', ['reductionTarget' => $target, 'fiscal_year' => $fiscalYear]) }}" class="mt-4 space-y-4">
                         @csrf
                         @method('PUT')

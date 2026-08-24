@@ -60,6 +60,97 @@
         </div>
     </div>
 
+    {{-- Climate targets vs actuals. Targets are captured under Disclosures →
+         Targets; this is where they meet the inventory. --}}
+    <div class="card mb-6">
+        <div class="card-header flex items-center justify-between">
+            <h3 class="card-title">Climate targets vs actual</h3>
+            <a href="{{ route('disclosures.s2.targets.index', ['fiscal_year' => $fiscalYear]) }}" class="text-sm text-brand-600 hover:underline">Manage targets</a>
+        </div>
+        <div class="card-body">
+            @forelse($dashboard['targets'] as $t)
+                @php
+                    $badge = match($t['status']['key']) {
+                        'achieved', 'on_track' => 'bg-green-100 text-green-800',
+                        'off_track', 'missed' => 'bg-red-100 text-red-800',
+                        'no_data', 'incomplete' => 'bg-gray-100 text-gray-600',
+                        default => 'bg-blue-100 text-blue-800',
+                    };
+                    $barColor = match($t['status']['key']) {
+                        'achieved', 'on_track' => 'bg-green-500',
+                        'off_track', 'missed' => 'bg-red-500',
+                        default => 'bg-brand-500',
+                    };
+                @endphp
+                <div class="py-4 {{ !$loop->last ? 'border-b border-gray-100' : '' }}">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <div>
+                            <div class="font-semibold text-gray-900">{{ $t['name'] }}</div>
+                            <div class="text-xs text-gray-500">
+                                Target {{ $t['target_year'] }} · {{ $t['scope_label'] }}
+                                @if($t['sbti_aligned']) · <span class="text-brand-600">SBTi aligned</span> @endif
+                            </div>
+                        </div>
+                        <span class="px-2 py-1 text-xs font-medium rounded-full {{ $badge }}">{{ $t['status']['label'] }}</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-3">
+                        <div>
+                            <div class="text-xs text-gray-500">Baseline{{ $t['base_year'] ? ' ' . $t['base_year'] : '' }}</div>
+                            <div class="font-semibold">
+                                {{ $t['baseline_tco2e'] !== null ? number_format($t['baseline_tco2e'], 2) . ' tCO₂e' : '—' }}
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-gray-500">Current {{ $t['current_year'] }}</div>
+                            <div class="font-semibold">
+                                {{ $t['current_tco2e'] !== null ? number_format($t['current_tco2e'], 2) . ' tCO₂e' : '—' }}
+                            </div>
+                            @if($t['change_vs_baseline_percent'] !== null)
+                                <div class="text-xs {{ $t['change_vs_baseline_percent'] <= 0 ? 'text-green-600' : 'text-red-600' }}">
+                                    {{ $t['change_vs_baseline_percent'] <= 0 ? '▼' : '▲' }}
+                                    {{ number_format(abs($t['change_vs_baseline_percent']), 1) }}% vs baseline
+                                </div>
+                            @endif
+                        </div>
+                        <div>
+                            <div class="text-xs text-gray-500">Target {{ $t['target_year'] }}</div>
+                            <div class="font-semibold text-brand-600">
+                                {{ $t['target_tco2e'] !== null ? number_format($t['target_tco2e'], 2) . ' tCO₂e' : '—' }}
+                            </div>
+                            @if($t['target_is_derived'])
+                                <div class="text-xs text-gray-400">derived from {{ number_format($t['reduction_percent'], 1) }}%</div>
+                            @endif
+                        </div>
+                        <div>
+                            <div class="text-xs text-gray-500">Still to reduce</div>
+                            <div class="font-semibold">
+                                {{ $t['remaining_tco2e'] !== null ? number_format($t['remaining_tco2e'], 2) . ' tCO₂e' : '—' }}
+                            </div>
+                        </div>
+                    </div>
+
+                    @if($t['achieved_percent'] !== null)
+                        <div class="w-full bg-gray-100 rounded-full h-2">
+                            <div class="{{ $barColor }} h-2 rounded-full" style="width: {{ $t['achieved_percent'] }}%"></div>
+                        </div>
+                        <div class="text-xs text-gray-500 mt-1">{{ $t['achieved_percent'] }}% of required reduction achieved</div>
+                    @elseif($t['status']['key'] === 'no_data')
+                        <p class="text-xs text-gray-500">No GHG inventory data for {{ $fiscalYear }} — enter emissions to track progress.</p>
+                    @else
+                        <p class="text-xs text-gray-500">Add a baseline and target value to track progress.</p>
+                    @endif
+                </div>
+            @empty
+                <p class="text-sm text-gray-500">
+                    No reduction targets set.
+                    <a href="{{ route('disclosures.s2.targets.index', ['fiscal_year' => $fiscalYear]) }}" class="text-brand-600 hover:underline">Add a target</a>
+                    to compare your inventory against where you plan to be.
+                </p>
+            @endforelse
+        </div>
+    </div>
+
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         @foreach(['ifrs_s2' => 'IFRS S2', 'ifrs_s1' => 'IFRS S1', 'gri' => 'GRI'] as $key => $label)
             <div class="card">
