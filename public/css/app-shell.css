@@ -1583,39 +1583,24 @@ table.min-w-full tbody tr:hover { background-color: var(--canvas); }
 }
 
 /* ==========================================================================
-   Voice help assistant — docked panel
-   The ElevenLabs widget ships as a custom element that fixes itself to the
-   bottom-right corner, where it covered buttons and text at the end of long
-   pages. Its internals live in a shadow DOM and cannot be restyled from here,
-   but the host element's placement is ours: we pin it inside a panel anchored
-   under the header button, and neutralise its own fixed positioning.
+   Voice help assistant — placement
+   The ElevenLabs embed is a custom element that fixes ITSELF to the viewport
+   via its own shadow DOM, and builds its call UI as positioned children in
+   there. Overriding that positioning collapses the call panel, so we don't:
+   we leave the widget's internals completely alone and only reserve space in
+   the page so its bubble never sits on top of page content.
    ========================================================================== */
-.voice-help-dock {
-    position: fixed;
-    top: calc(var(--header-height) + 0.5rem);
-    right: 1.5rem;
-    z-index: 60; /* above the sticky header (30) */
-    width: min(380px, calc(100vw - 2rem));
-    max-height: calc(100vh - var(--header-height) - 2rem);
-    overflow: visible;
-}
 
-.voice-help-dock[hidden] {
-    display: none;
-}
-
-/* Neutralise the embed's own fixed corner placement so it fills the dock. */
-.voice-help-dock elevenlabs-convai {
-    position: static !important;
-    inset: auto !important;
-    display: block;
-    width: 100%;
+/* Keep the last of the page clear of the floating bubble, so buttons and text
+   at the end of long pages are always reachable. This is the reliable fix:
+   it needs no knowledge of the vendor's internal markup. Overrides the
+   bottom half of the `padding` shorthand set on .content-area above. */
+.content-area {
+    padding-bottom: 6.5rem;
 }
 
 @media (max-width: 640px) {
-    .voice-help-dock {
-        right: 0.75rem;
-        left: 0.75rem;
-        width: auto;
+    .content-area {
+        padding-bottom: 7.5rem;
     }
 }
