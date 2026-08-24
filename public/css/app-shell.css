@@ -1581,3 +1581,41 @@ table.min-w-full tbody tr:hover { background-color: var(--canvas); }
 .plan-comparison-table tbody td.text-center {
     vertical-align: middle;
 }
+
+/* ==========================================================================
+   Voice help assistant — docked panel
+   The ElevenLabs widget ships as a custom element that fixes itself to the
+   bottom-right corner, where it covered buttons and text at the end of long
+   pages. Its internals live in a shadow DOM and cannot be restyled from here,
+   but the host element's placement is ours: we pin it inside a panel anchored
+   under the header button, and neutralise its own fixed positioning.
+   ========================================================================== */
+.voice-help-dock {
+    position: fixed;
+    top: calc(var(--header-height) + 0.5rem);
+    right: 1.5rem;
+    z-index: 60; /* above the sticky header (30) */
+    width: min(380px, calc(100vw - 2rem));
+    max-height: calc(100vh - var(--header-height) - 2rem);
+    overflow: visible;
+}
+
+.voice-help-dock[hidden] {
+    display: none;
+}
+
+/* Neutralise the embed's own fixed corner placement so it fills the dock. */
+.voice-help-dock elevenlabs-convai {
+    position: static !important;
+    inset: auto !important;
+    display: block;
+    width: 100%;
+}
+
+@media (max-width: 640px) {
+    .voice-help-dock {
+        right: 0.75rem;
+        left: 0.75rem;
+        width: auto;
+    }
+}

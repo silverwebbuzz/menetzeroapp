@@ -49,10 +49,10 @@
         <div class="card-body">
             @if($dashboard['ghg_summary']['has_data'])
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                    <div><div class="text-xs text-gray-500">Scope 1</div><div class="font-semibold">{{ number_format($dashboard['ghg_summary']['scope1'], 1) }} t</div></div>
-                    <div><div class="text-xs text-gray-500">Scope 2</div><div class="font-semibold">{{ number_format($dashboard['ghg_summary']['scope2'], 1) }} t</div></div>
-                    <div><div class="text-xs text-gray-500">Scope 3</div><div class="font-semibold">{{ number_format($dashboard['ghg_summary']['scope3'], 1) }} t</div></div>
-                    <div><div class="text-xs text-gray-500">Total</div><div class="font-semibold">{{ number_format($dashboard['ghg_summary']['total_tonnes'], 1) }} t</div></div>
+                    <div><div class="text-xs text-gray-500">Scope 1</div><div class="font-semibold">{{ number_format($dashboard['ghg_summary']['scope1'], 1) }} tCO₂e</div></div>
+                    <div><div class="text-xs text-gray-500">Scope 2</div><div class="font-semibold">{{ number_format($dashboard['ghg_summary']['scope2'], 1) }} tCO₂e</div></div>
+                    <div><div class="text-xs text-gray-500">Scope 3</div><div class="font-semibold">{{ number_format($dashboard['ghg_summary']['scope3'], 1) }} tCO₂e</div></div>
+                    <div><div class="text-xs text-gray-500">Total</div><div class="font-semibold">{{ number_format($dashboard['ghg_summary']['total_tonnes'], 1) }} tCO₂e</div></div>
                 </div>
             @else
                 <p class="text-sm text-gray-500">No GHG data for {{ $fiscalYear }}.</p>
@@ -97,7 +97,12 @@
                     <tbody>
                         @foreach($category['rows'] as $row)
                             <tr class="border-b border-gray-50">
-                                <td class="py-2 pr-4">{{ $row['label'] }}</td>
+                                <td class="py-2 pr-4">
+                                    <div>{{ $row['label'] }}</div>
+                                    @if(!empty($row['unit']))
+                                        <div class="text-xs text-gray-400">{{ $row['unit'] }}</div>
+                                    @endif
+                                </td>
                                 @foreach($dashboard['scorecard']['years'] as $year)
                                     <td class="py-2 px-2 text-right">
                                         @php $val = $row['values'][$year] ?? null; @endphp

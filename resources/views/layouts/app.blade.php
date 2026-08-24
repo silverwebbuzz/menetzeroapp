@@ -51,7 +51,7 @@
     </script>
 
     <!-- App shell styles (portal-design-system loads last so typography always wins) -->
-    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260630">
+    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260824">
     @stack('styles')
     <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260630">
     <link rel="stylesheet" href="{{ asset('css/portal-enterprise.css') }}?v=20260630">
@@ -122,6 +122,19 @@
                     @include('layouts.partials.header-context', ['portal' => 'company'])
 
                     <div class="header-actions">
+                        {{-- Opens the docked voice assistant (markup near </body>). --}}
+                        @if(config('services.elevenlabs.agent_id') && auth()->check() && !auth()->user()->isAdmin() && !request()->routeIs('client.zero-ai'))
+                            <button type="button" id="voice-help-toggle" class="header-btn"
+                                    aria-expanded="false" aria-controls="voice-help-dock"
+                                    aria-label="Open voice help assistant">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 15a3 3 0 003-3V6a3 3 0 10-6 0v6a3 3 0 003 3z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 11a7 7 0 01-14 0M12 18v3"/>
+                                </svg>
+                                <span class="header-btn-label">Need help?</span>
+                            </button>
+                        @endif
+
                         @if(Route::has('client.zero-ai'))
                         <!-- Zero AI — free ESG assistant -->
                             <a href="{{ route('client.zero-ai') }}"
@@ -337,8 +350,65 @@
              covers the chat composer, and a voice assistant is redundant where the
              user is already typing to one. --}}
         @if(config('services.elevenlabs.agent_id') && !auth()->user()->isAdmin() && !request()->routeIs('client.zero-ai'))
-            <elevenlabs-convai agent-id="{{ config('services.elevenlabs.agent_id') }}"></elevenlabs-convai>
+            {{-- Docked to the sticky header instead of floating over the page.
+                 The widget renders in a shadow DOM, so its internals cannot be
+                 restyled from here — but the host element's own position is ours
+                 to control. Anchoring it under the header button keeps it clear of
+                 buttons and text at the bottom of long pages. --}}
+            <div id="voice-help-dock" class="voice-help-dock" hidden>
+                <elevenlabs-convai agent-id="{{ config('services.elevenlabs.agent_id') }}"></elevenlabs-convai>
+            </div>
             <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
+            <script>
+                (function () {
+                    var dock = document.getElementById('voice-help-dock');
+                    var toggle = document.getElementById('voice-help-toggle');
+                    if (!dock || !toggle) return;
+
+                    function close() {
+                        dock.hidden = true;
+                        toggle.setAttribute('aria-expanded', 'false');
+                    }
+
+                    toggle.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        var open = dock.hidden;
+                        dock.hidden = !open;
+                        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+                    });
+
+                    // Click outside / Esc closes the panel.
+                    document.addEventListener('click', function (e) {
+                        if (dock.hidden) return;
+                        if (!dock.contains(e.target) && !toggle.contains(e.target)) close();
+                    });
+                    document.addEventListener('keydown', function (e) {
+                        if (e.key === 'Escape') close();
+                    });
+
+                    // The embed positions itself from inside its own shadow root,
+                    // which outer CSS cannot reach. Inject a stylesheet into that
+                    // root once it exists so the widget sits in our dock rather
+                    // than pinning itself to the viewport corner.
+                    var host = dock.querySelector('elevenlabs-convai');
+                    var tries = 0;
+                    var patch = setInterval(function () {
+                        if (++tries > 40) return clearInterval(patch); // ~10s then give up
+                        if (!host || !host.shadowRoot) return;
+                        clearInterval(patch);
+
+                        // Only neutralise fixed/absolute *positioning* on the
+                        // widget's own top-level wrappers — never a blanket rule,
+                        // which would flatten the widget's internal layout.
+                        var css = document.createElement('style');
+                        css.textContent =
+                            ':host{position:static !important;inset:auto !important;}' +
+                            ':host > *{position:static !important;inset:auto !important;' +
+                            'margin:0 !important;}';
+                        host.shadowRoot.appendChild(css);
+                    }, 250);
+                })();
+            </script>
         @endif
     @endauth
 </body>

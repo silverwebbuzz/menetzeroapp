@@ -47,7 +47,7 @@
         };
     </script>
 
-    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260630">
+    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260824">
     <link rel="stylesheet" href="{{ asset('css/consultant-shell.css') }}?v=20260630">
     @stack('styles')
     <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260630">
