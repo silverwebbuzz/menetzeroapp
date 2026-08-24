@@ -267,6 +267,10 @@ Route::middleware([
         Route::get('/help-guide', [\App\Http\Controllers\QuickInputController::class, 'helpGuide'])->name('help-guide');
         Route::get('/scope3-help-guide', [\App\Http\Controllers\QuickInputController::class, 'scope3HelpGuide'])->name('scope3-help-guide');
         Route::get('/entries/export', [\App\Http\Controllers\QuickInputController::class, 'export'])->name('export');
+        // Bulk import has its own page — the two upload panels used to sit above
+        // the entries table and pushed the listing off-screen.
+        Route::get('/bulk-import', [\App\Http\Controllers\QuickInputController::class, 'bulkImport'])->name('bulk-import.index');
+        Route::delete('/entries/bulk-destroy', [\App\Http\Controllers\QuickInputController::class, 'bulkDestroy'])->name('bulk-destroy');
         Route::get('/bulk-import/template', [\App\Http\Controllers\Scope12BulkImportController::class, 'downloadTemplate'])->name('bulk-import.template');
         Route::post('/bulk-import', [\App\Http\Controllers\Scope12BulkImportController::class, 'import'])->name('bulk-import.import');
         // Scope 3 has its own template and importer (2 factor conditions vs 6).

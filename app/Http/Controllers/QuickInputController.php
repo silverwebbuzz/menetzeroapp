@@ -45,6 +45,25 @@ class QuickInputController extends Controller
     /**
      * Display a listing of Quick Input entries
      */
+    /**
+     * Bulk import page — Scope 1 & 2 and Scope 3 uploads.
+     *
+     * Split out of the entries listing, where the two upload panels added ~160
+     * lines above the table and pushed the entries themselves off-screen.
+     */
+    public function bulkImport()
+    {
+        $this->requirePermission('measurements.view', null, ['measurements.*', 'manage_measurements']);
+
+        $company = Auth::user()->getActiveCompany();
+
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+
+        return view('quick-input.bulk-import');
+    }
+
     public function index(Request $request)
     {
         $this->requirePermission('measurements.view', null, ['measurements.*', 'manage_measurements']);
@@ -158,7 +177,16 @@ class QuickInputController extends Controller
             || $user->hasPermission('manage_measurements', $company->id)
             || $user->hasModulePermission('measurements', 'add', $company->id);
 
-        return view('quick-input.index', compact('entries', 'locations', 'sources', 'summary', 'yearsWithEntries', 'canAddEntries'));
+        // Mirrors $canAddEntries — gates the bulk-select checkboxes so the UI
+        // does not offer an action bulkDestroy() would reject.
+        $canDeleteEntries = $user->isAdmin()
+            || $user->isCompanyAdmin($company->id)
+            || $user->hasPermission('measurements.delete', $company->id)
+            || $user->hasPermission('measurements.*', $company->id)
+            || $user->hasPermission('manage_measurements', $company->id)
+            || $user->hasModulePermission('measurements', 'delete', $company->id);
+
+        return view('quick-input.index', compact('entries', 'locations', 'sources', 'summary', 'yearsWithEntries', 'canAddEntries', 'canDeleteEntries'));
     }
 
     /**
@@ -1121,6 +1149,103 @@ class QuickInputController extends Controller
     /**
      * Delete an entry
      */
+    /**
+     * Delete several entries at once from the listing's checkbox selection.
+     *
+     * Applies the same guards as destroy(): company ownership, delete
+     * permission, and the per-entry reporting-year write lock. Entries in a
+     * locked year are skipped and reported rather than failing the whole batch.
+     */
+    public function bulkDestroy(Request $request)
+    {
+        $this->requirePermission('measurements.delete', null, ['measurements.*', 'manage_measurements']);
+
+        $validated = $request->validate([
+            'entry_ids' => 'required|array|min:1',
+            'entry_ids.*' => 'integer',
+        ]);
+
+        $user = Auth::user();
+        $company = $user->getActiveCompany();
+
+        if (!$company) {
+            abort(403, 'No active company found.');
+        }
+
+        // Scoped to the active company, so ids from another tenant simply
+        // never load rather than erroring.
+        $entries = MeasurementData::with('measurement.location')
+            ->whereHas('measurement.location', function ($q) use ($company) {
+                $q->where('company_id', $company->id);
+            })
+            ->whereIn('id', $validated['entry_ids'])
+            ->get();
+
+        if ($entries->isEmpty()) {
+            return back()->with('error', 'No matching entries were found to delete.');
+        }
+
+        // Read-only agency workspaces cannot delete anything at all; check once
+        // rather than per entry.
+        $workspace = app(\App\Services\ConsultantAgencyWorkspaceService::class);
+        if ($workspace->isActingAsManagedClient($user) && $workspace->isReadOnlyWorkspace()) {
+            return back()->with('error', 'This archived client workspace is read-only.');
+        }
+
+        $deleted = 0;
+        $lockedYears = [];
+        $measurementIds = [];
+        // canWriteForReportingYear() is a plan-entitlement lookup; cache per year
+        // so a 200-row selection does not repeat it for every entry.
+        $yearWritable = [];
+
+        DB::beginTransaction();
+        try {
+            foreach ($entries as $entry) {
+                $year = (int) $entry->measurement->fiscal_year;
+
+                $yearWritable[$year] ??= (bool) ($this->planEntitlements()
+                    ->canWriteForReportingYear($company->id, $year)['allowed'] ?? false);
+
+                if (!$yearWritable[$year]) {
+                    $lockedYears[$year] = $year;
+                    continue;
+                }
+
+                $measurementIds[$entry->measurement_id] = $entry->measurement_id;
+                $entry->delete();
+                $deleted++;
+            }
+
+            foreach ($measurementIds as $measurementId) {
+                $this->measurementService->updateMeasurementTotals($measurementId);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Quick Input Bulk Delete Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'user_id' => Auth::id(),
+                'entry_ids' => $validated['entry_ids'],
+            ]);
+
+            return back()->with('error', 'Could not delete the selected entries. Please try again.');
+        }
+
+        if ($deleted === 0) {
+            return back()->with('error', 'Nothing was deleted — the selected entries are in a closed reporting year.');
+        }
+
+        $message = $deleted . ' ' . ($deleted === 1 ? 'entry' : 'entries') . ' deleted successfully!';
+
+        if ($lockedYears !== []) {
+            $message .= ' ' . count($lockedYears) . ' closed reporting year(s) were skipped: ' . implode(', ', $lockedYears) . '.';
+        }
+
+        return back()->with('success', $message);
+    }
+
     public function destroy($id)
     {
         $this->requirePermission('measurements.delete', null, ['measurements.*', 'manage_measurements']);

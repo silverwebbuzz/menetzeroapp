@@ -159,7 +159,7 @@ class Scope3BulkImportController extends Controller
 
             if ($result['imported'] === 0) {
                 return redirect()
-                    ->route('quick-input.index')
+                    ->route('quick-input.bulk-import.index')
                     ->with('error', 'Scope 3 import failed. ' . implode(' ', array_slice($result['errors'], 0, 5)))
                     ->with('import_errors', $result['errors']);
             }
@@ -182,7 +182,7 @@ class Scope3BulkImportController extends Controller
             report($e);
 
             return redirect()
-                ->route('quick-input.index')
+                ->route('quick-input.bulk-import.index')
                 ->with('error', 'Scope 3 import failed: ' . $e->getMessage());
         }
     }

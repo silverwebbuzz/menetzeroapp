@@ -1604,3 +1604,7 @@ table.min-w-full tbody tr:hover { background-color: var(--canvas); }
         padding-bottom: 7.5rem;
     }
 }
+
+/* Alpine: hide x-cloak elements until Alpine initialises, so conditional UI
+   (e.g. the bulk-actions bar) does not flash on page load. */
+[x-cloak] { display: none !important; }

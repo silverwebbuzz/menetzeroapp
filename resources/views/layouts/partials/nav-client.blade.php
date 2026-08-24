@@ -101,6 +101,7 @@
         'plane'     => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 16l18-6-7 10v-4l-6-2 2 6-4-2z"/>',
         'bus'       => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16V6a2 2 0 012-2h12a2 2 0 012 2v10m-16 0a2 2 0 002 2h12a2 2 0 002-2m-16 0V9h16v7m-11 3v2m6-2v2M8 12h.01M16 12h.01"/>',
         'home'      => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1V10"/>',
+        'upload'    => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0-12l-4 4m4-4l4 4"/>',
         'dot'       => '<circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/>',
     ];
 
@@ -150,6 +151,11 @@
             <a href="{{ route('quick-input.index') }}" class="nav-link {{ request()->routeIs('quick-input.index') ? 'active' : '' }}">
                 {!! $svg('list') !!}
                 View Entries
+            </a>
+
+            <a href="{{ route('quick-input.bulk-import.index') }}" class="nav-link {{ request()->routeIs('quick-input.bulk-import.index') ? 'active' : '' }}">
+                {!! $svg('upload') !!}
+                Bulk Import
             </a>
 
             <div x-data="{
