@@ -123,7 +123,7 @@ return [
         ],
         'consultants' => [
             'provider' => 'consultants',
-            'table' => 'password_reset_tokens',
+            'table' => 'consultant_password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
         ],

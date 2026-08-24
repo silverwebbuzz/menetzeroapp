@@ -61,6 +61,37 @@ class Consultant extends Authenticatable
         ];
     }
 
+    /**
+     * Send the password reset notification using the admin-editable template.
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $resetUrl = url(route('consultant.password.reset', [
+            'token' => $token,
+            'email' => $this->getEmailForPasswordReset(),
+        ], false));
+
+        app(\App\Services\EmailTemplateService::class)->sendToConsultant('consultant_password_reset', $this, [
+            'reset_url' => $resetUrl,
+        ]);
+    }
+
+    /**
+     * ConsultantAccountService mirrors the consultant credential onto a web User
+     * row (same email) for client workspaces. After a reset, push the new hash
+     * across so both logins accept the same password.
+     */
+    public function syncLinkedUserPassword(): void
+    {
+        $user = \App\Models\User::where('email', $this->email)->first();
+
+        if (!$user) {
+            return;
+        }
+
+        $user->forceFill(['password' => $this->getAttributes()['password']])->save();
+    }
+
     public function documents(): HasMany
     {
         return $this->hasMany(ConsultantDocument::class);

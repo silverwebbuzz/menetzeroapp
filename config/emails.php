@@ -85,6 +85,22 @@ HTML,
 HTML,
         ],
 
+        'consultant_password_reset' => [
+            'name' => 'Password reset — consultant',
+            'description' => 'Sent when a consultant requests a password reset link.',
+            'mailer' => 'noreply',
+            'reply_to' => 'help',
+            'subject' => 'Reset your {{app_name}} consultant password',
+            'placeholders' => ['user_name', 'user_email', 'company_name', 'reset_url', 'help_email', 'app_name'],
+            'body' => <<<'HTML'
+<p>Hello {{user_name}},</p>
+<p>We received a request to reset the password for your {{app_name}} consultant account.</p>
+<p style="text-align:center;margin:28px 0;"><a href="{{reset_url}}" style="display:inline-block;padding:12px 28px;background:#2563eb;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:600;">Reset password</a></p>
+<p>If you did not request this, ignore this email — your password will not change.</p>
+<p>This link expires in 60 minutes. Support: <a href="mailto:{{help_email}}">{{help_email}}</a></p>
+HTML,
+        ],
+
         'password_changed' => [
             'name' => 'Password changed',
             'description' => 'Sent after a user successfully updates their password.',

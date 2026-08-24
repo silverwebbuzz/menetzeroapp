@@ -44,6 +44,16 @@ Route::prefix('consultant')->name('consultant.')->group(function () {
     Route::post('/login', [\App\Http\Controllers\Consultant\AuthController::class, 'login'])->name('login.post');
     Route::post('/logout', [\App\Http\Controllers\Consultant\AuthController::class, 'logout'])->name('logout');
 
+    // Consultant password reset (own broker + token table — see config/auth.php)
+    Route::get('/forgot-password', [\App\Http\Controllers\Consultant\ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('/forgot-password', [\App\Http\Controllers\Consultant\ForgotPasswordController::class, 'sendResetLinkEmail'])
+        ->middleware('throttle:6,1')
+        ->name('password.email');
+    Route::get('/reset-password/{token}', [\App\Http\Controllers\Consultant\ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/reset-password', [\App\Http\Controllers\Consultant\ForgotPasswordController::class, 'reset'])
+        ->middleware('throttle:6,1')
+        ->name('password.update');
+
     Route::middleware(['ensureConsultant', 'syncConsultantAgencySession'])->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Consultant\DashboardController::class, 'index'])->name('dashboard');
         Route::get('/help', [\App\Http\Controllers\PortalGuideController::class, 'consultant'])->name('help');

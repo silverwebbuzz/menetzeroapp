@@ -26,9 +26,12 @@
         <label class="form-label" for="password">Password</label>
         <input class="form-input" id="password" type="password" name="password" required placeholder="Enter your password">
     </div>
-    <label class="flex items-center gap-2 text-sm text-gray-600">
-        <input type="checkbox" name="remember" value="1"> Remember me
-    </label>
+    <div class="flex items-center justify-between gap-3">
+        <label class="flex items-center gap-2 text-sm text-gray-600">
+            <input type="checkbox" name="remember" value="1"> Remember me
+        </label>
+        <a href="{{ route('consultant.password.request') }}" class="text-sm text-brand font-semibold hover:underline">Forgot password?</a>
+    </div>
     <button type="submit" class="btn btn-primary btn-full">Sign in</button>
 </form>
 

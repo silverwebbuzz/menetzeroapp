@@ -65,6 +65,16 @@ return [
         ],
     ],
 
+    'consultant_password_reset' => [
+        [
+            'label' => 'Consultant forgot password form',
+            'route' => 'consultant.password.request',
+            'path' => '/consultant/forgot-password',
+            'file' => 'app/Http/Controllers/Consultant/ForgotPasswordController.php',
+            'status' => 'live',
+        ],
+    ],
+
     'password_changed' => [
         [
             'label' => 'Profile → change password',
