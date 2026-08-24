@@ -40,7 +40,11 @@ class ReductionTargetController extends DisclosureBaseController
 
         $this->syncActions($target, $company->id, $request->input('actions', []));
 
-        return $this->fiscalRedirect('disclosures.s2.targets.index', $fiscalYear, 'Reduction target saved.');
+        return $this->fiscalRedirect(
+            'disclosures.s2.targets.index',
+            $fiscalYear,
+            $this->baselineWarning($validated, $company->id) ?? 'Reduction target saved.'
+        );
     }
 
     public function update(Request $request, ReductionTarget $reductionTarget)
@@ -52,7 +56,11 @@ class ReductionTargetController extends DisclosureBaseController
         $reductionTarget->update($validated);
         $this->syncActions($reductionTarget, $company->id, $request->input('actions', []));
 
-        return $this->fiscalRedirect('disclosures.s2.targets.index', $fiscalYear, 'Reduction target updated.');
+        return $this->fiscalRedirect(
+            'disclosures.s2.targets.index',
+            $fiscalYear,
+            $this->baselineWarning($validated, $company->id) ?? 'Reduction target updated.'
+        );
     }
 
     public function destroy(Request $request, ReductionTarget $reductionTarget)
@@ -81,7 +89,54 @@ class ReductionTargetController extends DisclosureBaseController
         ]);
         $validated['sbti_aligned'] = $request->boolean('sbti_aligned');
 
+        // A target year at or before the base year can never show progress.
+        if (!empty($validated['base_year']) && $validated['target_year'] <= $validated['base_year']) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'target_year' => 'Target year must be after the base year.',
+            ]);
+        }
+
+        // A target at or above baseline implies no reduction — almost always a
+        // slip between the two fields.
+        if (isset($validated['baseline_tco2e'], $validated['target_tco2e'])
+            && $validated['baseline_tco2e'] > 0
+            && $validated['target_tco2e'] >= $validated['baseline_tco2e']) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'target_tco2e' => 'Target emissions must be lower than the baseline.',
+            ]);
+        }
+
         return $validated;
+    }
+
+    /**
+     * Warn when a target cannot yet show progress — no baseline figure, or a
+     * base year with no inventory behind it. Saved anyway (a company may set
+     * targets before entering data), but the user is told why the chart will
+     * be empty rather than discovering it later.
+     */
+    protected function baselineWarning(array $data, int $companyId): ?string
+    {
+        $hasBaselineFigure = !empty($data['baseline_tco2e'])
+            || !empty($data['reduction_percent']);
+
+        if (empty($data['base_year'])) {
+            return 'Target saved. Set a base year to track progress against it.';
+        }
+
+        if (!$hasBaselineFigure) {
+            $hasInventory = \App\Models\Measurement::whereHas(
+                'location',
+                fn ($q) => $q->where('company_id', $companyId)
+            )->where('fiscal_year', (int) $data['base_year'])->exists();
+
+            if (!$hasInventory) {
+                return 'Target saved, but ' . $data['base_year'] . ' has no emissions data yet — '
+                    . 'add a baseline figure or enter that year\'s inventory to track progress.';
+            }
+        }
+
+        return null;
     }
 
     protected function syncActions(ReductionTarget $target, int $companyId, array $actions): void

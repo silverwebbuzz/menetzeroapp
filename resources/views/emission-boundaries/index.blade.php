@@ -155,7 +155,15 @@
                 <h5 class="font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-2">Upstream</h5>
                 
                 @php
+                    // Group by type, but keep hold of anything whose type is not
+                    // upstream/downstream — previously those rows rendered
+                    // nowhere at all, so a source could exist in the database
+                    // and be silently missing from this page.
                     $upstreamCategories = $scope3Sources->where('type', 'upstream')->groupBy('category');
+                    $downstreamSources = $scope3Sources->where('type', 'downstream');
+                    $untypedSources = $scope3Sources->filter(
+                        fn ($s) => !in_array($s->type, ['upstream', 'downstream'], true)
+                    );
                 @endphp
                 
                 @foreach($upstreamCategories as $category => $sources)
@@ -183,7 +191,7 @@
                 <h5 class="font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-2 mt-8">Downstream</h5>
                 
                 @php
-                    $downstreamCategories = $scope3Sources->where('type', 'downstream')->groupBy('category');
+                    $downstreamCategories = $downstreamSources->groupBy('category');
                 @endphp
                 
                 @foreach($downstreamCategories as $category => $sources)
@@ -206,6 +214,33 @@
                     </div>
                 </div>
                 @endforeach
+
+                {{-- Scope 3 sources whose type is not upstream/downstream. These
+                     used to render nowhere, so they were invisible on this page
+                     while still existing in the database. --}}
+                @if($untypedSources->isNotEmpty())
+                    <h5 class="font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-2 mt-8">Other Scope 3</h5>
+                    @foreach($untypedSources->groupBy('category') as $category => $sources)
+                    <div class="category-group">
+                        <h5 class="category-title">{{ $category ?: 'Uncategorised' }}</h5>
+                        <div class="space-y-4">
+                            @foreach($sources as $source)
+                            <div class="form-check">
+                                <div class="checkbox-container">
+                                    <input class="form-check-input" type="checkbox" name="emission_sources[]"
+                                           value="{{ $source->id }}" id="scope3_{{ $source->id }}"
+                                           {{ in_array($source->id, $selectedBoundaries) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="scope3_{{ $source->id }}">
+                                        {{ $source->name }}
+                                    </label>
+                                </div>
+                                <div class="emission-description">{{ $source->description }}</div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endforeach
+                @endif
             </div>
 
             <!-- Form Actions -->
