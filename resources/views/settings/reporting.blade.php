@@ -74,6 +74,52 @@
                 </div>
 
                 <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Recalculation threshold (%)</label>
+                    <input type="number" step="0.01" min="0" max="100" name="recalculation_threshold_percent"
+                           value="{{ old('recalculation_threshold_percent', $settings->recalculation_threshold_percent ?? 5) }}"
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                    <p class="text-xs text-gray-500 mt-1">
+                        Cumulative structural change, as a share of base-year emissions, that triggers a base-year
+                        recalculation. 5% is the common GHG Protocol convention.
+                    </p>
+                </div>
+
+                <div class="border-t border-gray-200 pt-4">
+                    <h4 class="text-sm font-semibold text-gray-900 mb-1">Emissions intensity denominator</h4>
+                    <p class="text-xs text-gray-500 mb-3">
+                        Absolute emissions rise as the business grows. Intensity (tCO₂e per unit) shows performance
+                        adjusted for that growth — regulators expect both. Recorded per reporting year.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Denominator</label>
+                            <select name="intensity_denominator_type" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                                <option value="">— none —</option>
+                                @foreach(\App\Models\CompanyReportingSetting::INTENSITY_DENOMINATORS as $denomKey => $denomMeta)
+                                    <option value="{{ $denomKey }}"
+                                        @selected(old('intensity_denominator_type', $settings->intensity_denominator_type) === $denomKey)>
+                                        {{ $denomMeta['label'] }} ({{ $denomMeta['unit'] }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Value for this year</label>
+                            <input type="number" step="0.0001" min="0" name="intensity_denominator_value"
+                                   value="{{ old('intensity_denominator_value', $settings->intensity_denominator_value) }}"
+                                   class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Unit label</label>
+                            <input type="text" name="intensity_denominator_unit" maxlength="40"
+                                   value="{{ old('intensity_denominator_unit', $settings->intensity_denominator_unit) }}"
+                                   placeholder="e.g. AED million"
+                                   class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                        </div>
+                    </div>
+                </div>
+
+                <div>
                     <h4 class="text-sm font-semibold text-gray-900 mb-3">Scope 3 category coverage (GHG Protocol / IFRS S2)</h4>
                     <p class="text-xs text-gray-500 mb-4">Tick categories you measure and report. Unchecked categories need a brief reason for exclusion.</p>
                     <div class="space-y-3">

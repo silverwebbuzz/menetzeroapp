@@ -246,6 +246,39 @@ class DashboardController extends Controller
         $twelveMonth = $insights->twelveMonthTrend($measurements);
         // Year-on-year comparison across ALL years, not just the selected one.
         $yearlyTrend = $insights->yearlyTrend($allMeasurements);
+
+        // Absolute emissions alone mislead when the boundary changed — pair
+        // them with intensity and flag any non-comparable years.
+        $intensityService = app(\App\Services\EmissionsIntensityService::class);
+
+        $tonnesByYear = [];
+        foreach ($yearlyTrend['labels'] as $i => $label) {
+            $tonnesByYear[(int) $label] = (float) ($yearlyTrend['values'][$i] ?? 0);
+        }
+
+        $intensitySeries = $intensityService->series($company, $tonnesByYear);
+        $yearlyTrend['intensity'] = array_values(array_map(
+            fn ($year) => $intensitySeries[(int) $year] ?? null,
+            $yearlyTrend['labels']
+        ));
+        $yearlyTrend['has_intensity'] = collect($yearlyTrend['intensity'])->filter()->isNotEmpty();
+
+        $currentIntensity = $intensityService->forYear(
+            $company,
+            $selectedYear,
+            \App\Services\GhgReportService::kgToTonnes($kpis['total_emissions'] ?? 0)
+        );
+
+        // Compare the selected year against the earliest year on record.
+        $comparabilityBaseYear = !empty($yearlyTrend['labels'])
+            ? (int) $yearlyTrend['labels'][0]
+            : $selectedYear;
+
+        $comparability = $intensityService->comparability(
+            $company,
+            $comparabilityBaseYear,
+            $selectedYear
+        );
         $yearOverYear = $insights->yearOverYear($measurements);
         $compliance = $insights->complianceStatus(
             $company->id,
@@ -275,6 +308,8 @@ class DashboardController extends Controller
             'availableYears',
             'selectedYear',
             'yearlyTrend',
+            'currentIntensity',
+            'comparability',
             'topSources',
             'recentActivity',
             'yearOverYear',

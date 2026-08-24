@@ -50,6 +50,10 @@ class CompanyReportingSettingsController extends Controller
             'base_year' => 'nullable|integer|min:1990|max:2100',
             'base_year_rationale' => 'nullable|string|max:2000',
             'recalculation_policy' => 'nullable|string|max:2000',
+            'recalculation_threshold_percent' => 'nullable|numeric|min:0|max:100',
+            'intensity_denominator_type' => 'nullable|in:revenue,floor_area,employees,production',
+            'intensity_denominator_value' => 'nullable|numeric|min:0',
+            'intensity_denominator_unit' => 'nullable|string|max:40',
             'gwp_version' => 'required|in:AR4,AR5,AR6',
             'scope3_included' => 'nullable|array',
             'scope3_included.*' => 'integer|min:1|max:15',
@@ -76,6 +80,13 @@ class CompanyReportingSettingsController extends Controller
                 'base_year' => $validated['base_year'],
                 'base_year_rationale' => $validated['base_year_rationale'],
                 'recalculation_policy' => $validated['recalculation_policy'],
+                'recalculation_threshold_percent' => $validated['recalculation_threshold_percent'] ?? 5,
+                'intensity_denominator_type' => $validated['intensity_denominator_type'] ?? null,
+                'intensity_denominator_value' => $validated['intensity_denominator_value'] ?? null,
+                // Default the unit label from the chosen denominator so the
+                // dashboard always has something readable to print.
+                'intensity_denominator_unit' => $validated['intensity_denominator_unit']
+                    ?: (CompanyReportingSetting::INTENSITY_DENOMINATORS[$validated['intensity_denominator_type'] ?? '']['unit'] ?? null),
                 'gwp_version' => $validated['gwp_version'],
                 'scope3_category_policy' => $policy,
             ]

@@ -42,11 +42,25 @@ class CompanyReportingSetting extends Model
         'gwp_version',
         'scope3_category_policy',
         'sasb_sector',
+        'intensity_denominator_type',
+        'intensity_denominator_value',
+        'intensity_denominator_unit',
+        'recalculation_threshold_percent',
+    ];
+
+    /** Denominators offered for GHG intensity (tCO2e per unit). */
+    public const INTENSITY_DENOMINATORS = [
+        'revenue' => ['label' => 'Revenue', 'unit' => 'AED million'],
+        'floor_area' => ['label' => 'Floor area', 'unit' => 'm²'],
+        'employees' => ['label' => 'Employees (FTE)', 'unit' => 'FTE'],
+        'production' => ['label' => 'Production output', 'unit' => 'units'],
     ];
 
     protected $casts = [
         'fiscal_year' => 'integer',
         'base_year' => 'integer',
+        'intensity_denominator_value' => 'decimal:4',
+        'recalculation_threshold_percent' => 'decimal:2',
         'scope3_category_policy' => 'array',
     ];
 

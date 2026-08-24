@@ -16,9 +16,13 @@ class EmissionBoundaryController extends Controller
     public function index(Location $location)
     {
         $user = Auth::user();
-        
-        // Check if user has access to this location
-        if ($location->company_id !== $user->company_id) {
+
+        // getActiveCompany() resolves the workspace a consultant is acting in.
+        // $user->company_id is the consultant's own agency org, so comparing
+        // against it 403s on every managed-client location.
+        $company = $user->getActiveCompany();
+
+        if (!$company || $location->company_id !== $company->id) {
             abort(403, 'Unauthorized access to this location.');
         }
 
@@ -50,9 +54,13 @@ class EmissionBoundaryController extends Controller
     public function store(Request $request, Location $location)
     {
         $user = Auth::user();
-        
-        // Check if user has access to this location
-        if ($location->company_id !== $user->company_id) {
+
+        // getActiveCompany() resolves the workspace a consultant is acting in.
+        // $user->company_id is the consultant's own agency org, so comparing
+        // against it 403s on every managed-client location.
+        $company = $user->getActiveCompany();
+
+        if (!$company || $location->company_id !== $company->id) {
             abort(403, 'Unauthorized access to this location.');
         }
 

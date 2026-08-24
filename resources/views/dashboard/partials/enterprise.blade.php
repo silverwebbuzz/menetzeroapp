@@ -79,6 +79,23 @@
         </div>
     </div>
 
+    {{-- Boundary-change warning. Absolute emissions across years with a
+         different organisational boundary are not like-for-like (GHG Protocol
+         Ch.5) — say so rather than letting the user read a false trend. --}}
+    @if(!($comparability['comparable'] ?? true) && !empty($comparability['reasons']))
+        <div class="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3">
+            <p class="text-sm font-semibold text-amber-900">
+                {{ ($comparability['requires_recalculation'] ?? false) ? 'Base year recalculation may be required' : 'Years are not directly comparable' }}
+            </p>
+            <p class="text-sm text-amber-900 mt-1">{{ $comparability['message'] }}</p>
+            <ul class="list-disc list-inside text-xs text-amber-800 mt-2">
+                @foreach($comparability['reasons'] as $reason)
+                    <li>{{ $reason }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     {{-- Row 1: KPI cards --}}
     <div class="ent-grid-4">
         @foreach($kpiCards as $card)
@@ -132,8 +149,19 @@
             </div>
             <div class="ent-netzero-metrics">
                 <div>
-                    <div class="ent-label">Current emissions</div>
+                    <div class="ent-label">Current emissions (absolute)</div>
                     <div class="ent-kpi-value" style="font-size:1.25rem;">{{ $netZeroProgress['current'] ?? 0 }}<span class="ent-kpi-unit">tCO₂e</span></div>
+                    {{-- Intensity normalises for growth: a company that added
+                         sites can still show real improvement per unit. --}}
+                    @if($currentIntensity ?? null)
+                        <div class="ent-card-subtitle mt-1">
+                            {{ number_format($currentIntensity['value'], 4) }} tCO₂e / {{ $currentIntensity['unit'] }}
+                        </div>
+                    @else
+                        <div class="ent-card-subtitle mt-1">
+                            <a href="{{ route('settings.reporting') }}" class="hover:underline">Set an intensity denominator</a>
+                        </div>
+                    @endif
                 </div>
                 <div>
                     <div class="ent-label">Reduction</div>
@@ -252,6 +280,13 @@ document.addEventListener('DOMContentLoaded', function () {
             ->map(fn ($v) => is_numeric($v) ? round((float) $v, 2) : 0)
             ->values()
             ->all();
+
+        // Intensity overlays the yearly bars on a second axis, so growth-
+        // adjusted performance is readable next to the absolute total.
+        $showIntensity = $useYearly && ($yearlyTrend['has_intensity'] ?? false);
+        $intensityValues = $showIntensity
+            ? collect($yearlyTrend['intensity'] ?? [])->map(fn ($v) => is_numeric($v) ? round((float) $v, 4) : null)->values()->all()
+            : [];
     @endphp
     const monthlyCtx = document.getElementById('monthlyEmissionsChart');
     if (monthlyCtx && typeof Chart !== 'undefined') {
@@ -270,18 +305,44 @@ document.addEventListener('DOMContentLoaded', function () {
                     pointBackgroundColor: chartGreen[0],
                     borderRadius: 6,
                     maxBarThickness: 72,
-                }],
+                    order: 2,
+                }
+                @if($showIntensity)
+                , {
+                    label: 'Intensity (tCO₂e per {{ $currentIntensity['unit'] ?? 'unit' }})',
+                    data: {!! json_encode($intensityValues) !!},
+                    type: 'line',
+                    yAxisID: 'yIntensity',
+                    borderColor: '#0f766e',
+                    backgroundColor: '#0f766e',
+                    tension: 0.35,
+                    fill: false,
+                    pointRadius: 4,
+                    order: 1,
+                }
+                @endif
+                ],
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
+                plugins: { legend: { display: {!! $showIntensity ? 'true' : 'false' !!}, position: 'bottom' } },
                 scales: {
                     y: {
                         beginAtZero: true,
                         grid: { color: 'rgba(15, 23, 42, 0.06)' },
                         ticks: { font: { size: 12 } },
+                        title: { display: {!! $showIntensity ? 'true' : 'false' !!}, text: 'Absolute (tCO₂e)' },
                     },
+                    @if($showIntensity)
+                    yIntensity: {
+                        position: 'right',
+                        beginAtZero: true,
+                        grid: { display: false },
+                        ticks: { font: { size: 12 } },
+                        title: { display: true, text: 'Intensity' },
+                    },
+                    @endif
                     x: {
                         grid: { display: false },
                         ticks: { font: { size: 12 } },
