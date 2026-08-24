@@ -37,6 +37,15 @@ class AppServiceProvider extends ServiceProvider
             PlanGateComposer::class
         );
 
+        // Reporting-year dropdown options for the disclosure pages.
+        View::composer(
+            [
+                'disclosures.*',
+                'reports.*',
+            ],
+            \App\Http\View\Composers\ReportingYearsComposer::class
+        );
+
         View::composer('consultant.layouts.app', ConsultantAgencyComposer::class);
     }
 }

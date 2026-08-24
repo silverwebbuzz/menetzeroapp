@@ -54,6 +54,55 @@ class DashboardInsightsService
     /**
      * @return array{current_year: float, previous_year: float, change_pct: float|null}
      */
+    /**
+     * Totals per fiscal year, oldest first — the multi-year comparison chart.
+     *
+     * Annual measurements carry period_start = start of their fiscal year, so
+     * a month-bucketed trend puts a whole year on a single point and leaves the
+     * other eleven at zero. Comparing year against year is the shape this data
+     * actually has.
+     *
+     * @return array{labels: array<int, string>, values: array<int, float>,
+     *               scope1: array<int, float>, scope2: array<int, float>,
+     *               scope3: array<int, float>, has_multiple: bool}
+     */
+    public function yearlyTrend(Collection $measurements): array
+    {
+        $years = $measurements
+            ->pluck('fiscal_year')
+            ->map(fn ($y) => (int) $y)
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values();
+
+        $labels = [];
+        $values = [];
+        $scope1 = [];
+        $scope2 = [];
+        $scope3 = [];
+
+        foreach ($years as $year) {
+            $rows = $measurements->where('fiscal_year', $year);
+
+            $labels[] = (string) $year;
+            $values[] = GhgReportService::kgToTonnes((float) $rows->sum('total_co2e'));
+            $scope1[] = GhgReportService::kgToTonnes((float) $rows->sum('scope_1_co2e'));
+            $scope2[] = GhgReportService::kgToTonnes((float) $rows->sum('scope_2_co2e'));
+            $scope3[] = GhgReportService::kgToTonnes((float) $rows->sum('scope_3_co2e'));
+        }
+
+        return [
+            'labels' => $labels,
+            'values' => $values,
+            'scope1' => $scope1,
+            'scope2' => $scope2,
+            'scope3' => $scope3,
+            // The view keeps the monthly chart when there is nothing to compare.
+            'has_multiple' => count($labels) > 1,
+        ];
+    }
+
     public function yearOverYear(Collection $measurements): array
     {
         $currentYear = now()->year;

@@ -18,12 +18,10 @@
             <p class="text-sm text-gray-500">3-year KPI performance tables</p>
             <h2 class="text-xl font-semibold text-gray-900">{{ $company->name }}</h2>
         </div>
-        <form method="GET" action="{{ route('disclosures.esg-scorecard.index') }}" class="flex items-center gap-2">
-            <label class="text-sm text-gray-600">Reporting year</label>
-            <input type="hidden" name="category" value="{{ $activeCategory }}">
-            <input type="number" name="fiscal_year" value="{{ $fiscalYear }}" min="2000" max="2100"
-                   class="w-28 border border-gray-300 rounded-lg px-3 py-2 text-sm" onchange="this.form.submit()">
-        </form>
+        @include('disclosures.partials.year-select', [
+            'action' => route('disclosures.esg-scorecard.index'),
+            'hidden' => ['category' => $activeCategory],
+        ])
     </div>
 
     <nav class="flex flex-wrap gap-2 mb-6 border-b border-gray-200 pb-3 text-sm">

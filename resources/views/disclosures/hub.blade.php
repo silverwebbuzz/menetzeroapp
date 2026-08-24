@@ -10,11 +10,9 @@
             <p class="text-sm text-gray-500">ISSB disclosure workspace</p>
             <h2 class="text-xl font-semibold text-gray-900">{{ $company->name }}</h2>
         </div>
-        <form method="GET" action="{{ route('disclosures.hub') }}" class="flex items-center gap-2">
-            <label class="text-sm text-gray-600">Reporting year</label>
-            <input type="number" name="fiscal_year" value="{{ $fiscalYear }}" min="2000" max="2100"
-                   class="w-28 border border-gray-300 rounded-lg px-3 py-2 text-sm" onchange="this.form.submit()">
-        </form>
+        @include('disclosures.partials.year-select', [
+            'action' => route('disclosures.hub'),
+        ])
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

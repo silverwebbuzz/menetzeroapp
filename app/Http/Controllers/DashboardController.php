@@ -195,22 +195,45 @@ class DashboardController extends Controller
         }
         // If user is staff, skip company setup check - they don't need to add company info
         
-        // Get all measurements for the user's active company
-        $measurements = Measurement::whereHas('location', function($query) use ($company) {
+        // Every year the company has measurements for — drives the year filter.
+        $availableYears = Measurement::whereHas('location', function ($query) use ($company) {
+                $query->where('company_id', $company->id);
+            })
+            ->distinct()
+            ->orderByDesc('fiscal_year')
+            ->pluck('fiscal_year')
+            ->map(fn ($y) => (int) $y)
+            ->filter()
+            ->values()
+            ->all();
+
+        // Selected year: an explicit ?fiscal_year=, else the newest year with
+        // data, else the current calendar year. Only years that actually exist
+        // are honoured, so a stale bookmark cannot show an empty dashboard.
+        $requestedYear = (int) request()->input('fiscal_year', 0);
+        $selectedYear = in_array($requestedYear, $availableYears, true)
+            ? $requestedYear
+            : ($availableYears[0] ?? (int) now()->year);
+
+        $allMeasurements = Measurement::whereHas('location', function ($query) use ($company) {
                 $query->where('company_id', $company->id);
             })
             ->with('location')
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // Scoped to the selected year so KPIs describe one reporting period
+        // rather than summing every year the company has ever recorded.
+        $measurements = $allMeasurements->where('fiscal_year', $selectedYear)->values();
+
         // Calculate KPIs
-        $kpis = $this->calculateKPIs($measurements);
+        $kpis = $this->calculateKPIs($measurements, $selectedYear);
         
         // Get chart data
         $chartData = $this->getChartData($measurements);
         
         // Get UAE Net Zero progress
-        $netZeroProgress = $this->calculateNetZeroProgress($kpis['total_emissions']);
+        $netZeroProgress = $this->calculateNetZeroProgress($kpis['total_emissions'], $company, $selectedYear, $kpis);
         
         // Get top emission sources
         $topSources = $this->getTopEmissionSources($measurements);
@@ -219,8 +242,10 @@ class DashboardController extends Controller
         $recentActivity = $measurements->take(5);
 
         $insights = app(DashboardInsightsService::class);
-        $fiscalYear = (int) ($kpis['period'] ?? now()->year);
+        $fiscalYear = $selectedYear;
         $twelveMonth = $insights->twelveMonthTrend($measurements);
+        // Year-on-year comparison across ALL years, not just the selected one.
+        $yearlyTrend = $insights->yearlyTrend($allMeasurements);
         $yearOverYear = $insights->yearOverYear($measurements);
         $compliance = $insights->complianceStatus(
             $company->id,
@@ -237,7 +262,8 @@ class DashboardController extends Controller
             ? round((1 - ($netZeroProgress['current'] / $netZeroProgress['baseline'])) * 100, 1)
             : 0;
         $netZeroProgress['reduction_pct'] = max(0, $reductionPct);
-        $netZeroProgress['target_year'] = 2050;
+        // target_year comes from the company's own target when one exists —
+        // don't overwrite it with the 2050 default.
         $netZeroProgress['projected_achievement'] = $netZeroProgress['progress'] >= 80
             ? 'On track'
             : ($netZeroProgress['progress'] >= 40 ? 'Needs acceleration' : 'Early stage');
@@ -246,6 +272,9 @@ class DashboardController extends Controller
             'kpis',
             'chartData',
             'netZeroProgress',
+            'availableYears',
+            'selectedYear',
+            'yearlyTrend',
             'topSources',
             'recentActivity',
             'yearOverYear',
@@ -255,12 +284,14 @@ class DashboardController extends Controller
         ));
     }
 
-    private function calculateKPIs($measurements)
+    private function calculateKPIs($measurements, ?int $selectedYear = null)
     {
-        // Get current year data
-        $currentYear = now()->year;
+        // $measurements is already scoped to the selected year by index(); the
+        // filter below is a safety net for any other caller. Filtering on
+        // now()->year here would zero the KPIs whenever a past year is selected.
+        $currentYear = $selectedYear ?? now()->year;
         $currentYearMeasurements = $measurements->filter(function($measurement) use ($currentYear) {
-            return $measurement->period_start->year == $currentYear;
+            return (int) $measurement->fiscal_year === (int) $currentYear;
         });
 
         $totalEmissions = $currentYearMeasurements->sum('total_co2e') ?? 0;
@@ -369,22 +400,98 @@ class DashboardController extends Controller
         ];
     }
 
-    private function calculateNetZeroProgress($totalEmissions)
+    /**
+     * Net zero progress for the selected year.
+     *
+     * Prefers the company's own active ReductionTarget (Disclosures → Targets)
+     * so this card agrees with the ESG dashboard. Falls back to the UAE Net Zero
+     * 2050 pathway with a nominal baseline only when no target has been set —
+     * without that fallback a company with no targets would show nothing.
+     */
+    private function calculateNetZeroProgress($totalEmissions, $company = null, ?int $selectedYear = null, array $kpis = [])
     {
-        // UAE Net Zero 2050 target: Assume baseline of 1000 tonnes CO2e per company
-        $baseline = 1000; // tonnes CO2e
-        $target = 0; // Net zero
         $current = GhgReportService::kgToTonnes($totalEmissions);
-        
+
+        $target = null;
+
+        if ($company) {
+            $target = \App\Models\ReductionTarget::where('company_id', $company->id)
+                ->where('status', 'active')
+                ->whereNotNull('baseline_tco2e')
+                ->orderBy('target_year')
+                ->first();
+        }
+
+        if ($target) {
+            $baseline = (float) $target->baseline_tco2e;
+
+            // Compare like with like: a Scope 1 & 2 target must be measured
+            // against Scope 1 + 2 actuals, not a total that includes Scope 3.
+            $current = GhgReportService::kgToTonnes(
+                $this->emissionsForCoverage($target->scope_coverage, $kpis, $totalEmissions)
+            );
+
+            $targetTonnes = $target->target_tco2e !== null
+                ? (float) $target->target_tco2e
+                : ($target->reduction_percent !== null
+                    ? $baseline * (1 - ((float) $target->reduction_percent / 100))
+                    : 0.0);
+
+            $targetYear = (int) $target->target_year;
+            $required = $baseline - $targetTonnes;
+
+            // A target at or above baseline implies no reduction — treat as
+            // unset rather than dividing by zero or a negative.
+            $progress = $required > 0
+                ? max(0, min(100, (($baseline - $current) / $required) * 100))
+                : 0;
+
+            return [
+                'current' => round($current, 2),
+                'baseline' => round($baseline, 2),
+                'target' => round($targetTonnes, 2),
+                'target_name' => $target->name,
+                'scope_label' => \App\Models\ReductionTarget::SCOPE_COVERAGE[$target->scope_coverage] ?? null,
+                'has_target' => true,
+                'progress' => round($progress, 1),
+                'target_year' => $targetYear,
+                'years_remaining' => max(0, $targetYear - ($selectedYear ?? (int) now()->year)),
+            ];
+        }
+
+        // No target set — UAE Net Zero 2050 pathway against a nominal baseline.
+        $baseline = 1000; // tonnes CO2e
         $progress = max(0, min(100, (($baseline - $current) / $baseline) * 100));
-        
+
         return [
             'current' => round($current, 2),
             'baseline' => $baseline,
-            'target' => $target,
+            'target' => 0,
+            'target_name' => null,
+            'has_target' => false,
             'progress' => round($progress, 1),
-            'years_remaining' => 2050 - now()->year,
+            'target_year' => 2050,
+            'years_remaining' => max(0, 2050 - ($selectedYear ?? (int) now()->year)),
         ];
+    }
+
+    /**
+     * Emissions (kg) for the scopes a reduction target covers.
+     */
+    private function emissionsForCoverage(?string $coverage, array $kpis, $totalEmissions)
+    {
+        $scope1 = (float) ($kpis['scope1_total'] ?? 0);
+        $scope2 = (float) ($kpis['scope2_total'] ?? 0);
+        $scope3 = (float) ($kpis['scope3_total'] ?? 0);
+
+        return match ($coverage) {
+            'scope1' => $scope1,
+            'scope2' => $scope2,
+            'scope12' => $scope1 + $scope2,
+            'scope3' => $scope3,
+            'scope123' => $scope1 + $scope2 + $scope3,
+            default => (float) $totalEmissions,
+        };
     }
 
     private function getTopEmissionSources($measurements)
