@@ -32,7 +32,8 @@ class ConsultantAccountService
         }
 
         return DB::transaction(function () use ($consultant) {
-            $company = $consultant->agencyCompany;
+            $company = $consultant->agencyCompany
+                ?: Company::where('email', $consultant->email)->lockForUpdate()->first();
 
             if (!$company) {
                 $company = Company::create([
@@ -45,10 +46,12 @@ class ConsultantAccountService
                     'license_no' => $consultant->trade_license_number,
                     'description' => $consultant->bio,
                 ]);
-
-                $consultant->update(['agency_company_id' => $company->id]);
             } elseif ($company->company_type !== 'consultant') {
                 $company->update(['company_type' => 'consultant']);
+            }
+
+            if ((int) $consultant->agency_company_id !== (int) $company->id) {
+                $consultant->update(['agency_company_id' => $company->id]);
             }
 
             $user = User::where('email', $consultant->email)->first();
