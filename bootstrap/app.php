@@ -26,6 +26,14 @@ return Application::configure(basePath: dirname(__DIR__))
             'restrictManagedClientWorkspace' => \App\Http\Middleware\RestrictManagedClientWorkspace::class,
         ]);
 
+        // Theme resolution for the MENetZero 2.0 redesign (Phase 0).
+        // Reads ?theme= and persists it to the session so the choice is
+        // sticky across navigation. Only ever writes a session value —
+        // it does not touch routing, auth, or authorisation.
+        $middleware->web(append: [
+            \App\Http\Middleware\ResolveTheme::class,
+        ]);
+
         // Payment gateway webhooks are authenticated by signature, not CSRF.
         $middleware->validateCsrfTokens(except: [
             'webhooks/payments/*',

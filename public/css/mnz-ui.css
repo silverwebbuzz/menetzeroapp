@@ -1,0 +1,244 @@
+/* ============================================================
+   mnz-ui.css — MeNetZero portal UI, single stylesheet
+   Drop in public/css/mnz-ui.css and load ONCE in the layout.
+   Replaces: Tailwind CDN + app-shell.css + portal-design-system.css
+             + portal-enterprise.css
+   No build step, no runtime CSS engine, ~14 KB gzipped.
+   ============================================================ */
+
+/* ---------- 1. Tokens ---------- */
+:root{
+  /* neutrals */
+  --ink:#14161a; --ink-2:#5a6068; --ink-3:#8b9199; --ink-4:#a4a9ae;
+  --line:#e5e6e3; --line-2:#f0f0ee; --line-3:#d6d7d3;
+  --surface:#fff; --canvas:#fafaf9; --canvas-2:#f4f4f2;
+
+  /* pillar hues — matched lightness/chroma */
+  --e:#0f7a4a; --e-tint:#eef6f1; --e-line:#cfe6da;
+  --s:#1a6c9e; --s-tint:#eef3f8; --s-line:#cfdfeb;
+  --g:#5b5aa8; --g-tint:#f1f1fa; --g-line:#dcdcef;
+
+  /* state */
+  --ok:#0f7a4a; --ok-tint:#eef6f1; --ok-line:#cfe6da;
+  --warn:#8a6118; --warn-tint:#fdf5e8; --warn-line:#ecdcbd;
+  --bad:#b4402b; --bad-tint:#fbf0ed; --bad-line:#eed3cb;
+
+  /* geometry */
+  --r:6px; --r-lg:8px;
+  --topbar-h:56px; --tabbar-h:42px; --side-w:236px;
+
+  /* type */
+  --sans:'Inter Tight',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+/* pillar scoping: put data-pillar="e|s|g" on <body> or any section */
+[data-pillar=e]{--accent:var(--e);--accent-tint:var(--e-tint);--accent-line:var(--e-line)}
+[data-pillar=s]{--accent:var(--s);--accent-tint:var(--s-tint);--accent-line:var(--s-line)}
+[data-pillar=g]{--accent:var(--g);--accent-tint:var(--g-tint);--accent-line:var(--g-line)}
+[data-pillar=neutral],:root{--accent:var(--ink);--accent-tint:var(--canvas-2);--accent-line:var(--line)}
+
+/* ---------- 2. Base ---------- */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:var(--sans);font-size:13.5px;line-height:1.45;color:var(--ink);
+  background:var(--canvas);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{margin:0;font-weight:600;letter-spacing:-0.02em}
+h1{font-size:26px;letter-spacing:-0.03em}
+h2{font-size:17px}
+h3{font-size:14px;letter-spacing:-0.01em}
+p{margin:0}
+a{color:var(--e);text-decoration:none}
+a:hover{color:#0b6039;text-decoration:underline}
+img,svg{display:block;max-width:100%}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+
+/* ---------- 3. Shell ---------- */
+.mnz-app{min-height:100vh;display:flex;flex-direction:column}
+.mnz-topbar{background:var(--surface);border-bottom:1px solid var(--line);flex-shrink:0}
+.mnz-topbar__row{height:var(--topbar-h);display:flex;align-items:center;gap:20px;padding:0 24px}
+.mnz-topbar__logo{height:26px;width:auto}
+.mnz-rule-v{width:1px;height:22px;background:var(--line)}
+.mnz-spacer{margin-left:auto}
+
+.mnz-tabs{display:flex;align-items:stretch;gap:2px;padding:0 24px;height:var(--tabbar-h)}
+.mnz-tab{border:0;background:none;cursor:pointer;padding:0 13px;display:flex;align-items:center;gap:7px;
+  font:500 13px var(--sans);color:var(--ink-2);white-space:nowrap}
+.mnz-tab__dot{width:6px;height:6px;border-radius:2px;background:var(--line-3)}
+.mnz-tab:hover{color:var(--ink)}
+.mnz-tab.is-active{color:var(--ink);font-weight:600;box-shadow:inset 0 -2px 0 0 var(--accent)}
+.mnz-tab.is-active .mnz-tab__dot{background:var(--accent)}
+.mnz-tabs__meta{margin-left:auto;display:flex;align-items:center;gap:10px;
+  font:500 10.5px var(--mono);letter-spacing:.06em;color:var(--ink-3)}
+
+.mnz-body{flex:1;display:flex;align-items:stretch;min-height:0}
+.mnz-side{width:var(--side-w);flex:0 0 var(--side-w);background:var(--surface);
+  border-right:1px solid var(--line);padding:20px 0 24px;display:flex;flex-direction:column}
+.mnz-side__head{padding:0 20px 14px}
+.mnz-side__group{padding:10px 8px 0}
+.mnz-side__foot{margin:auto 8px 0;padding:16px 12px 0;border-top:1px solid var(--line)}
+.mnz-nav{width:100%;text-align:left;display:flex;align-items:center;gap:9px;border:0;background:none;
+  font:500 13px var(--sans);color:var(--ink-2);padding:6px 12px;border-radius:var(--r);cursor:pointer;margin:1px 0}
+.mnz-nav__dot{width:5px;height:5px;border-radius:999px;background:var(--line-3);flex-shrink:0}
+.mnz-nav__label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mnz-nav__meta{font:500 10.5px var(--mono);color:var(--ink-3)}
+.mnz-nav:hover{background:var(--canvas-2);color:var(--ink)}
+.mnz-nav.is-active{background:var(--canvas-2);color:var(--ink);font-weight:600}
+.mnz-nav.is-active .mnz-nav__dot{background:var(--accent)}
+.mnz-main{flex:1;min-width:0;padding:26px 32px 40px}
+
+/* ---------- 4. Type utilities ---------- */
+.mnz-kicker{font:500 10.5px var(--mono);letter-spacing:.1em;color:var(--ink-4);text-transform:uppercase}
+.mnz-label{font:500 10.5px var(--mono);letter-spacing:.08em;color:var(--ink-4);text-transform:uppercase}
+.mnz-lead{color:var(--ink-2);font-size:13.5px;max-width:72ch;text-wrap:pretty}
+.mnz-muted{color:var(--ink-3)}
+.mnz-num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.mnz-mono{font-family:var(--mono);font-weight:500}
+
+/* ---------- 5. Page head ---------- */
+.mnz-pagehead{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;
+  border-bottom:1px solid var(--line);padding-bottom:18px;flex-wrap:wrap}
+.mnz-pagehead__actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+
+/* ---------- 6. Buttons ---------- */
+.mnz-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:32px;padding:0 12px;
+  border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:var(--r);
+  font:500 12.5px var(--sans);cursor:pointer;white-space:nowrap;flex-shrink:0;
+  transition:background .12s,border-color .12s}
+.mnz-btn:hover{background:var(--canvas-2);text-decoration:none}
+.mnz-btn--primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.mnz-btn--primary:hover{background:#000;color:#fff}
+.mnz-btn--accent{background:var(--accent);border-color:var(--accent);color:#fff}
+.mnz-btn--accent:hover{filter:brightness(.92);color:#fff}
+.mnz-btn--soft{background:var(--accent-tint);border-color:var(--accent-line);color:var(--accent)}
+.mnz-btn--ghost{border-color:transparent;background:none;color:var(--ink-2)}
+.mnz-btn--dashed{border-style:dashed;border-color:var(--line-3);color:var(--ink-2)}
+.mnz-btn--lg{height:38px;padding:0 16px;font-size:13.5px}
+.mnz-btn[disabled]{opacity:.45;cursor:not-allowed}
+
+/* ---------- 7. Panels & seam grids ---------- */
+.mnz-panel{border:1px solid var(--line);background:var(--surface)}
+.mnz-panel__head{padding:16px 20px;border-bottom:1px solid var(--line);
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.mnz-panel__body{padding:18px 20px 20px}
+.mnz-panel__foot{padding:12px 20px;border-top:1px solid var(--line);display:flex;
+  align-items:center;justify-content:space-between;gap:12px}
+.mnz-panel--dashed{border-style:dashed;border-color:var(--line-3);padding:20px}
+
+/* hairline seam grid: children separated by 1px, no shadows, no gaps */
+.mnz-seam{display:grid;gap:1px;background:var(--line);border:1px solid var(--line)}
+.mnz-seam > *{background:var(--surface)}
+.mnz-seam--2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.mnz-seam--3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.mnz-seam--4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:1180px){.mnz-seam--4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:900px){.mnz-seam--3,.mnz-seam--2{grid-template-columns:1fr}}
+
+.mnz-cols{display:grid;gap:24px}
+.mnz-cols--main{grid-template-columns:1.5fr 1fr}
+.mnz-cols--half{grid-template-columns:1fr 1fr}
+@media (max-width:1080px){.mnz-cols--main,.mnz-cols--half{grid-template-columns:1fr}}
+.mnz-stack{display:flex;flex-direction:column;gap:24px}
+
+/* ---------- 8. KPI ---------- */
+.mnz-kpi{padding:18px 20px}
+.mnz-kpi__value{display:flex;align-items:baseline;gap:5px;margin-top:9px;white-space:nowrap}
+.mnz-kpi__value b{font-size:26px;font-weight:600;letter-spacing:-.035em;line-height:1}
+.mnz-kpi__unit{font-size:11.5px;color:var(--ink-3)}
+.mnz-kpi__delta{font:500 10.5px var(--mono);margin-top:8px;color:var(--ink-2)}
+.mnz-kpi__delta--good{color:var(--ok)}
+.mnz-kpi__delta--warn{color:var(--warn)}
+.mnz-kpi__delta--bad{color:var(--bad)}
+
+/* ---------- 9. Meter ---------- */
+.mnz-meter{height:4px;background:var(--line-2)}
+.mnz-meter > i{display:block;height:100%;background:var(--accent)}
+.mnz-meter--thin{height:3px}
+
+/* ---------- 10. Data table (CSS grid rows, no <table> reflow cost) ---------- */
+.mnz-table{--cols:2fr 1fr 1fr 96px}
+.mnz-table__head,.mnz-table__row{display:grid;grid-template-columns:var(--cols);column-gap:16px;padding:0 20px;align-items:center}
+.mnz-table__head{min-height:34px;border-bottom:1px solid var(--line);
+  font:500 10.5px var(--mono);letter-spacing:.08em;color:var(--ink-4);text-transform:uppercase}
+.mnz-table__row{min-height:44px;border-bottom:1px solid var(--line-2);font-size:12.5px}
+.mnz-table__row:hover{background:#fcfcfb}
+.mnz-table__row--edit{background:#fcfcfb}
+.mnz-table span{min-width:0}
+.mnz-table .t-name{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mnz-table .t-r{text-align:right}
+/* real <table> fallback keeps the same look */
+table.mnz-table{width:100%;border-collapse:collapse}
+table.mnz-table th{text-align:left;padding:9px 16px;border-bottom:1px solid var(--line);
+  font:500 10.5px var(--mono);letter-spacing:.08em;color:var(--ink-4);text-transform:uppercase}
+table.mnz-table td{padding:11px 16px;border-bottom:1px solid var(--line-2);font-size:12.5px}
+
+/* ---------- 11. Status chip ---------- */
+.mnz-chip{display:inline-block;font:500 10px var(--mono);letter-spacing:.05em;text-transform:uppercase;
+  padding:2px 6px;border:1px solid var(--line);background:var(--canvas-2);color:var(--ink-3)}
+.mnz-chip--ok{background:var(--ok-tint);border-color:var(--ok-line);color:var(--ok)}
+.mnz-chip--warn{background:var(--warn-tint);border-color:var(--warn-line);color:var(--warn)}
+.mnz-chip--bad{background:var(--bad-tint);border-color:var(--bad-line);color:var(--bad)}
+.mnz-dot{width:6px;height:6px;border-radius:2px;display:inline-block;background:var(--accent)}
+.mnz-dot--e{background:var(--e)}.mnz-dot--s{background:var(--s)}.mnz-dot--g{background:var(--g)}
+
+/* ---------- 12. Forms ---------- */
+.mnz-field{display:flex;flex-direction:column;gap:6px}
+.mnz-field > label{font-size:12.5px;font-weight:500}
+.mnz-input,.mnz-select,.mnz-textarea{width:100%;height:32px;padding:0 10px;border:1px solid var(--line);
+  border-radius:var(--r);background:var(--surface);font:400 12.5px var(--sans);color:var(--ink)}
+.mnz-textarea{height:auto;min-height:96px;padding:8px 10px;line-height:1.5;resize:vertical}
+.mnz-input:focus,.mnz-select:focus,.mnz-textarea:focus{outline:none;border-color:var(--accent);
+  box-shadow:0 0 0 3px color-mix(in oklab,var(--accent) 14%,transparent)}
+.mnz-input--cell{height:28px;text-align:right;min-width:74px}
+.mnz-input--cell.is-dirty{background:var(--accent-tint);border-color:var(--accent-line)}
+.mnz-help{font-size:12px;color:var(--ink-3)}
+.mnz-switch{width:34px;height:20px;border-radius:999px;background:var(--line-3);border:0;
+  position:relative;cursor:pointer;flex-shrink:0}
+.mnz-switch::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:999px;
+  background:#fff;transition:transform .14s}
+.mnz-switch[aria-checked=true]{background:var(--accent)}
+.mnz-switch[aria-checked=true]::after{transform:translateX(14px)}
+
+/* ---------- 13. Section list (disclosure editors) ---------- */
+.mnz-sec{border-bottom:1px solid var(--line-2)}
+.mnz-sec__btn{width:100%;display:flex;align-items:center;gap:12px;padding:13px 20px;border:0;background:none;
+  cursor:pointer;text-align:left;font:500 13px var(--sans);color:var(--ink)}
+.mnz-sec__btn:hover{background:#fcfcfb}
+.mnz-sec__panel{padding:0 20px 18px;display:none}
+.mnz-sec.is-open .mnz-sec__panel{display:block}
+.mnz-sec.is-open .mnz-sec__chev{transform:rotate(180deg)}
+.mnz-sec__chev{transition:transform .14s;color:var(--ink-4)}
+
+/* ---------- 14. Report preview page ---------- */
+.mnz-doc{background:#fff;border:1px solid var(--line);padding:56px 64px;max-width:820px;margin:0 auto;
+  font-size:13.5px;line-height:1.6}
+.mnz-doc h1{font-size:28px;margin-bottom:8px}
+.mnz-doc h2{font-size:16px;margin:28px 0 8px;padding-top:18px;border-top:1px solid var(--line-2)}
+.mnz-doc p{margin:0 0 12px;color:var(--ink-2);text-wrap:pretty}
+
+/* ---------- 15. Empty state ---------- */
+.mnz-empty{padding:28px 20px;text-align:center}
+.mnz-empty__title{font-size:14px;font-weight:600;margin-top:6px}
+.mnz-empty__text{font-size:12.5px;color:var(--ink-3);margin:6px auto 14px;max-width:44ch}
+
+/* ---------- 16. Chart box (reserve height => zero layout shift) ---------- */
+.mnz-chart{position:relative;height:224px}
+.mnz-chart--sm{height:190px}
+.mnz-chart canvas{position:absolute;inset:0}
+
+/* ---------- 17. Responsive shell ---------- */
+@media (max-width:1024px){
+  .mnz-side{position:fixed;inset:calc(var(--topbar-h) + var(--tabbar-h)) auto 0 0;z-index:40;
+    transform:translateX(-100%);transition:transform .2s;box-shadow:0 8px 24px rgba(20,22,26,.12)}
+  .mnz-side.is-open{transform:none}
+  .mnz-main{padding:20px 16px 32px}
+  .mnz-tabs{overflow-x:auto;scrollbar-width:none}
+  .mnz-tabs__meta{display:none}
+}
+
+/* ---------- 18. Print ---------- */
+@media print{
+  .mnz-topbar,.mnz-side,.mnz-pagehead__actions{display:none!important}
+  .mnz-main{padding:0}
+  .mnz-panel,.mnz-seam{border-color:#ccc}
+  body{background:#fff}
+}

@@ -62,10 +62,24 @@
     <!-- Alpine.js for dropdowns + sidebar -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
+    {{-- MENetZero 2.0 theme layer (Phase 0). Loads only under the new theme.
+         The old stylesheets above stay loaded on purpose: fallback pages
+         that have not been migrated yet still need them to render correctly
+         (see redesign.md risk R-3). mnz-ui.css is entirely `mnz-` prefixed,
+         so it cannot collide with the existing portal stylesheets. --}}
+    @theme('new')
+        @foreach ($themeAssets['css'] ?? [] as $themeCss)
+            <link rel="stylesheet" href="{{ $themeCss }}">
+        @endforeach
+        @foreach ($themeAssets['js'] ?? [] as $themeJs)
+            <script defer src="{{ $themeJs }}"></script>
+        @endforeach
+    @endtheme
+
     @stack('head')
     @include('layouts.partials.google-analytics')
 </head>
-<body class="antialiased company-portal">
+<body class="antialiased company-portal @theme('new') mnz-theme mnz-body @endtheme">
     <div class="app-shell" x-data="{ sidebarOpen: false }">
         @auth('web')
             @php

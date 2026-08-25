@@ -55,10 +55,23 @@
 
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
+    {{-- MENetZero 2.0 theme layer (Phase 0). Loads only under the new theme.
+         Existing stylesheets stay loaded so unmigrated fallback pages still
+         render correctly (redesign.md risk R-3). mnz-ui.css is `mnz-`
+         prefixed throughout and cannot collide with them. --}}
+    @theme('new')
+        @foreach ($themeAssets['css'] ?? [] as $themeCss)
+            <link rel="stylesheet" href="{{ $themeCss }}">
+        @endforeach
+        @foreach ($themeAssets['js'] ?? [] as $themeJs)
+            <script defer src="{{ $themeJs }}"></script>
+        @endforeach
+    @endtheme
+
     @stack('head')
     @include('layouts.partials.google-analytics')
 </head>
-<body class="antialiased consultant-portal">
+<body class="antialiased consultant-portal @theme('new') mnz-theme mnz-body @endtheme">
     @php
         $consultant = auth('consultant')->user();
         $userInitial = strtoupper(substr($consultant->name ?? '?', 0, 1));

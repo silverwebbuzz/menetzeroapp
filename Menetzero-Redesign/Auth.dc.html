@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0}
+@keyframes mnzDrift{from{background-position:0 0,0 0}to{background-position:56px 56px,56px 56px}}
+@keyframes mnzSweep{0%,100%{transform:translateX(-45%);opacity:0}50%{transform:translateX(45%);opacity:.6}}
+@keyframes mnzPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.8)}}
+@keyframes mnzRise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+@keyframes mnzHalo{0%,100%{r:9;opacity:.2}50%{r:5;opacity:.42}}
+@keyframes mnzFade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+body{font-family:'Inter Tight',system-ui,-apple-system,sans-serif;font-size:13.5px;line-height:1.45;color:#14161a;background:#fafaf9;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+*,*::before,*::after{box-sizing:border-box}
+a{color:#0f7a4a;text-decoration:none}
+a:hover{color:#0b6039}
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;flex-direction:column;background:#fafaf9">
+
+  <div style="background:#fff;border-bottom:1px solid #e5e6e3;padding:14px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:sticky;top:0;z-index:10">
+    <div>
+      <div style="font:500 10.5px 'IBM Plex Mono',monospace;letter-spacing:0.1em;color:#a4a9ae;text-transform:uppercase">Mockups · Auth</div>
+      <div style="font-size:15px;font-weight:600;letter-spacing:-0.015em;margin-top:2px">{{ currentTitle }}</div>
+    </div>
+    <div style="display:flex;gap:2px;margin-left:auto;flex-wrap:wrap">
+      <sc-for list="{{ portalTabs }}" as="p" hint-placeholder-count="3">
+        <button type="button" onClick="{{ p.go }}" style="height:30px;padding:0 11px;border:1px solid {{ p.border }};background:{{ p.bg }};color:{{ p.color }};border-radius:6px;font:{{ p.weight }} 12.5px 'Inter Tight';cursor:pointer;white-space:nowrap">{{ p.label }}</button>
+      </sc-for>
+    </div>
+    <div style="display:flex;gap:2px;flex-wrap:wrap;width:100%">
+      <sc-for list="{{ screenTabs }}" as="s" hint-placeholder-count="8">
+        <button type="button" onClick="{{ s.go }}" style="height:28px;padding:0 10px;border:0;background:{{ s.bg }};color:{{ s.color }};border-radius:5px;font:{{ s.weight }} 12px 'Inter Tight';cursor:pointer;white-space:nowrap">{{ s.label }}</button>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="flex:1;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));min-height:640px">
+
+    <div style="display:flex;flex-direction:column;padding:44px 56px;background:#fff;min-width:0">
+      <img src="assets/menetzero.svg" alt="MeNetZero" style="height:28px;width:auto;align-self:flex-start;flex-shrink:0">
+
+      <div style="margin:auto 0;padding:40px 0;max-width:400px;width:100%">
+        <sc-if value="{{ isConsultant }}" hint-placeholder-val="{{ false }}">
+          <div style="display:inline-flex;align-items:center;gap:7px;border:1px solid #cfdfeb;background:#eef3f8;padding:3px 9px;border-radius:999px;margin-bottom:18px">
+            <span style="width:6px;height:6px;border-radius:2px;background:#1a6c9e"></span>
+            <span style="font:500 10.5px 'IBM Plex Mono',monospace;letter-spacing:0.08em;color:#1a6c9e;text-transform:uppercase">Consultant portal</span>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+          <div style="display:inline-flex;align-items:center;gap:7px;border:1px solid #d6d7d3;background:#f4f4f2;padding:3px 9px;border-radius:999px;margin-bottom:18px">
+            <span style="width:6px;height:6px;border-radius:2px;background:#14161a"></span>
+            <span style="font:500 10.5px 'IBM Plex Mono',monospace;letter-spacing:0.08em;color:#14161a;text-transform:uppercase">Platform administration</span>
+          </div>
+        </sc-if>
+
+        <h1 style="font-size:27px;font-weight:600;letter-spacing:-0.03em;margin:0">{{ heading }}</h1>
+        <p style="margin:7px 0 0;color:#5a6068;font-size:13.5px;text-wrap:pretty">{{ blurb }}</p>
+
+        <sc-if value="{{ showMeta }}" hint-placeholder-val="{{ false }}">
+          <div style="border:1px solid #e5e6e3;background:#fafaf9;padding:12px 14px;margin-top:22px;display:flex;flex-direction:column;gap:5px">
+            <sc-for list="{{ metaRows }}" as="m" hint-placeholder-count="2">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
+                <span style="font:500 10.5px 'IBM Plex Mono',monospace;letter-spacing:0.08em;color:#a4a9ae;text-transform:uppercase">{{ m.k }}</span>
+                <span style="font-size:12.5px;font-weight:500;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ m.v }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ showAlert }}" hint-placeholder-val="{{ false }}">
+          <div style="border:1px solid {{ alertBorder }};background:{{ alertBg }};padding:11px 13px;margin-top:22px;display:flex;gap:10px;align-items:flex-start">
+            <span style="width:6px;height:6px;border-radius:2px;background:{{ alertHue }};margin-top:5px;flex-shrink:0"></span>
+            <span style="font-size:12.5px;color:{{ alertHue }};text-wrap:pretty">{{ alertText }}</span>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ showSso }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:26px">
+            <button type="button" style="width:100%;height:40px;border:1px solid #e5e6e3;border-radius:6px;background:#fff;color:#14161a;font:500 13.5px 'Inter Tight';cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px">
+              <svg viewBox="0 0 18 18" style="width:16px;height:16px;flex-shrink:0"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 01-1.8 2.72v2.26h2.91c1.7-1.57 2.69-3.88 2.69-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.91-2.26c-.81.54-1.84.86-3.05.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.34A9 9 0 009 18z"/><path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 010-3.44V4.94H.96a9 9 0 000 8.12l3.01-2.34z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58A9 9 0 00.96 4.94l3.01 2.34C4.68 5.16 6.66 3.58 9 3.58z"/></svg>
+              Continue with Google
+            </button>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:18px">
+              <span style="flex:1;height:1px;background:#f0f0ee"></span>
+              <span style="font:500 10.5px 'IBM Plex Mono',monospace;letter-spacing:0.08em;color:#a4a9ae;text-transform:uppercase">or</span>
+              <span style="flex:1;height:1px;background:#f0f0ee"></span>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="display:flex;flex-direction:column;gap:14px;margin-top:26px">
+          <sc-for list="{{ fields }}" as="f" hint-placeholder-count="2">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+                <label style="font-size:12.5px;font-weight:500">{{ f.label }}</label>
+                <sc-if value="{{ f.aside }}" hint-placeholder-val="{{ false }}">
+                  <a href="#" style="font-size:12px;color:#5a6068">{{ f.aside }}</a>
+                </sc-if>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;height:38px;padding:0 11px;border:1px solid {{ f.border }};border-radius:6px;background:{{ f.bg }};box-shadow:{{ f.ring }}">
+                <span style="flex:1;min-width:0;font-size:13px;color:{{ f.valueColor }};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:{{ f.tracking }}">{{ f.value }}</span>
+                <sc-if value="{{ f.trailing }}" hint-placeholder-val="{{ false }}">
+                  <span style="font:500 11px 'IBM Plex Mono',monospace;color:#a4a9ae;flex-shrink:0">{{ f.trailing }}</span>
+                </sc-if>
+              </div>
+              <sc-if value="{{ f.help }}" hint-placeholder-val="{{ false }}">
+                <span style="font-size:12px;color:#8b9199">{{ f.help }}</span>
+              </sc-if>
+            </div>
+          </sc-for>
+
+          <sc-if value="{{ showCode }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <label style="font-size:12.5px;font-weight:500">6-digit code</label>
+              <div style="display:flex;gap:8px">
+                <sc-for list="{{ codeCells }}" as="c" hint-placeholder-count="6">
+                  <div style="flex:1;height:48px;border:1px solid {{ c.border }};border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center;font:600 19px 'IBM Plex Mono',monospace;color:{{ c.color }};box-shadow:{{ c.ring }}">{{ c.v }}</div>
+                </sc-for>
+              </div>
+              <span style="font-size:12px;color:#8b9199">From your authenticator app. Codes expire after 30 seconds.</span>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showCheck }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:9px;margin-top:2px">
+              <span style="width:15px;height:15px;border:1px solid #d6d7d3;border-radius:3px;flex-shrink:0"></span>
+              <span style="font-size:12.5px;color:#5a6068">{{ checkLabel }}</span>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showStrength }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <div style="display:flex;gap:4px">
+                <sc-for list="{{ strengthBars }}" as="b" hint-placeholder-count="4">
+                  <div style="flex:1;height:3px;background:{{ b }}"></div>
+                </sc-for>
+              </div>
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-top:6px">
+                <span style="font-size:12px;color:#8b9199">12+ characters, one number, one symbol</span>
+                <span style="font:500 10.5px 'IBM Plex Mono',monospace;color:#0f7a4a">STRONG</span>
+              </div>
+            </div>
+          </sc-if>
+
+          <button type="button" style="height:40px;border:0;border-radius:6px;background:{{ ctaBg }};color:#fff;font:500 13.5px 'Inter Tight';cursor:pointer;margin-top:6px">{{ ctaLabel }}</button>
+
+          <sc-if value="{{ ctaSecondary }}" hint-placeholder-val="{{ false }}">
+            <button type="button" style="height:40px;border:1px solid #e5e6e3;border-radius:6px;background:#fff;color:#14161a;font:500 13.5px 'Inter Tight';cursor:pointer">{{ ctaSecondary }}</button>
+          </sc-if>
+
+          <sc-if value="{{ footNote }}" hint-placeholder-val="{{ false }}">
+            <p style="font-size:12.5px;color:#5a6068;margin:6px 0 0;text-align:center;text-wrap:pretty">{{ footNote }}</p>
+          </sc-if>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-top:20px;border-top:1px solid #f0f0ee">
+        <span style="font-size:12px;color:#a4a9ae">© 2026 MeNetZero — a brand of Silver Webbuzz PVT Ltd</span>
+        <span style="display:flex;gap:14px;font-size:12px"><a href="#" style="color:#8b9199">Privacy</a><a href="#" style="color:#8b9199">Terms</a><a href="#" style="color:#8b9199">Support</a></span>
+      </div>
+    </div>
+
+    <div style="background:#14161a;color:#fff;padding:44px 56px;display:flex;flex-direction:column;min-width:0;position:relative;overflow:hidden">
+      <div style="position:absolute;inset:0;background-image:linear-gradient(#ffffff0d 1px,transparent 1px),linear-gradient(90deg,#ffffff0d 1px,transparent 1px);background-size:56px 56px;animation:mnzDrift 40s linear infinite"></div>
+      <div style="position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,{{ panelHue }},transparent);animation:mnzSweep 8s ease-in-out infinite"></div>
+
+      <div style="position:relative;display:flex;align-items:center;gap:9px">
+        <span style="width:7px;height:7px;border-radius:2px;background:{{ panelHue }};animation:mnzPulse 2.8s ease-in-out infinite"></span>
+        <span style="font:500 10.5px 'IBM Plex Mono',monospace;letter-spacing:0.12em;color:#8b9199;text-transform:uppercase">{{ panelKicker }}</span>
+      </div>
+
+      <div style="position:relative;margin:auto 0;padding:32px 0">
+        <div style="font-size:64px;font-weight:600;letter-spacing:-0.05em;line-height:1;min-height:64px">{{ animatedStat }}</div>
+        <div style="font-size:15px;color:#c9cbc7;margin-top:10px;max-width:34ch;text-wrap:pretty">{{ panelStatLabel }}</div>
+        <div style="margin-top:24px">{{ panelChart }}</div>
+        <p style="font-size:13.5px;color:#8b9199;margin:22px 0 0;max-width:40ch;text-wrap:pretty">{{ panelBody }}</p>
+      </div>
+
+      <div style="position:relative;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,120px),1fr));gap:1px;background:#ffffff14;border:1px solid #ffffff14">
+        <sc-for list="{{ panelStats }}" as="p" hint-placeholder-count="3">
+          <div style="background:#14161a;padding:14px 16px;opacity:0;animation:mnzRise .55s cubic-bezier(.22,.7,.3,1) forwards;animation-delay:{{ p.delay }}">
+            <div style="font:500 10px 'IBM Plex Mono',monospace;letter-spacing:0.1em;color:#8b9199;text-transform:uppercase">{{ p.k }}</div>
+            <div style="font-size:17px;font-weight:600;letter-spacing:-0.02em;margin-top:4px;white-space:nowrap">{{ p.v }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="position:relative;margin-top:22px;font:500 10.5px 'IBM Plex Mono',monospace;letter-spacing:0.08em;color:#5a6068;text-transform:uppercase">{{ panelFoot }}</div>
+    </div>
+
+  </div>
+
+  <div style="background:#fff;border-top:1px solid #e5e6e3;padding:14px 24px;display:flex;gap:12px;align-items:flex-start">
+    <span style="font:500 10.5px 'IBM Plex Mono',monospace;letter-spacing:0.08em;color:#8a6118;background:#fdf5e8;border:1px solid #ecdcbd;padding:2px 6px;text-transform:uppercase;flex-shrink:0;margin-top:1px">Assumption</span>
+    <span style="font-size:12.5px;color:#5a6068;text-wrap:pretty">{{ assumption }}</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:860}}">
+const E = '#0f7a4a', S = '#1a6c9e', INK = '#14161a', MID = '#5a6068', DIM = '#8b9199', LINE = '#e5e6e3';
+const RING = accent => `0 0 0 3px ${accent}22`;
+
+const FIELD = (label, value, opts = {}) => ({
+  label, value,
+  aside: opts.aside || false, help: opts.help || false, trailing: opts.trailing || false,
+  border: opts.focus ? opts.accent || E : LINE,
+  ring: opts.focus ? RING(opts.accent || E) : 'none',
+  bg: '#fff',
+  valueColor: opts.placeholder ? '#a4a9ae' : INK,
+  tracking: opts.mask ? '0.18em' : 'normal',
+});
+
+function CountUp({ value, duration }) {
+  const [n, setN] = React.useState(0);
+  React.useEffect(() => {
+    const target = parseFloat(String(value).replace(/,/g, '')) || 0;
+    let raf, start;
+    const step = t => {
+      if (!start) start = t;
+      const p = Math.min((t - start) / (duration || 900), 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setN(target * eased);
+      if (p < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [value, duration]);
+  const hasComma = String(value).indexOf(',') > -1;
+  const out = hasComma ? Math.round(n).toLocaleString('en-US') : String(Math.round(n));
+  return React.createElement('span', { style: { fontVariantNumeric: 'tabular-nums' } }, out);
+}
+
+function DrawLine({ points, hue, w, h }) {
+  const ref = React.useRef(null);
+  const [len, setLen] = React.useState(0);
+  React.useEffect(() => {
+    if (ref.current) setLen(ref.current.getTotalLength());
+  }, [points]);
+  const max = Math.max.apply(null, points), min = Math.min.apply(null, points);
+  const range = Math.max(max - min, 0.001);
+  const inset = 11;
+  const xy = points.map((v, i) => [
+    (i / (points.length - 1)) * (w - inset),
+    h - ((v - min) / range) * (h - 10) - 5,
+  ]);
+  const d = xy.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+  const area = d + ' L' + (w - inset) + ' ' + h + ' L0 ' + h + ' Z';
+  const last = xy[xy.length - 1];
+  const gid = 'g' + String(hue).replace('#', '');
+  return React.createElement('svg', { viewBox: '0 0 ' + w + ' ' + h, style: { width: '100%', height: h + 'px', overflow: 'visible' } },
+    React.createElement('defs', null,
+      React.createElement('linearGradient', { id: gid, x1: '0', y1: '0', x2: '0', y2: '1' },
+        React.createElement('stop', { offset: '0%', stopColor: hue, stopOpacity: '0.28' }),
+        React.createElement('stop', { offset: '100%', stopColor: hue, stopOpacity: '0' }))),
+    React.createElement('path', { d: area, fill: 'url(#' + gid + ')', style: { opacity: 0, animation: 'mnzFade .9s ease .5s forwards' } }),
+    React.createElement('path', {
+      ref, d, fill: 'none', stroke: hue, strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round',
+      style: len ? { strokeDasharray: len, strokeDashoffset: 0, animation: 'none', transition: 'stroke-dashoffset 1.4s cubic-bezier(.3,.8,.3,1)' } : { strokeDasharray: 1000, strokeDashoffset: 1000 },
+    }),
+    React.createElement('circle', { cx: last[0], cy: last[1], r: '9', fill: hue, style: { opacity: 0.2, animation: 'mnzHalo 2.6s ease-in-out infinite' } }),
+    React.createElement('circle', { cx: last[0], cy: last[1], r: '3.2', fill: hue }));
+}
+
+class Component extends DCLogic {
+  state = { portal: 'company', screen: 'login' };
+
+  go(portal, screen) { return () => this.setState(s => ({ portal: portal || s.portal, screen: screen || s.screen })); }
+
+  renderVals() {
+    const { portal, screen } = this.state;
+    const accent = portal === 'consultant' ? S : portal === 'admin' ? INK : E;
+
+    const portalTabs = [['company', 'Company'], ['consultant', 'Consultant'], ['admin', 'Admin']].map(([k, label]) => {
+      const on = portal === k;
+      return { label, go: this.go(k, null), bg: on ? INK : '#fff', color: on ? '#fff' : MID, border: on ? INK : LINE, weight: on ? 600 : 500 };
+    });
+
+    const screenDefs = [
+      ['login', 'Login'], ['register', 'Register'], ['forgot', 'Forgot password'],
+      ['reset', 'Reset password'], ['success', 'Reset success'], ['invite', 'Invitation'],
+      ['twofa', 'Two-factor'], ['expired', 'Session expired'],
+    ];
+    const screenTabs = screenDefs.map(([k, label]) => {
+      const on = screen === k;
+      return { label, go: this.go(null, k), bg: on ? '#f4f4f2' : 'transparent', color: on ? INK : DIM, weight: on ? 600 : 500 };
+    });
+
+    const audience = portal === 'consultant' ? 'consultant' : portal === 'admin' ? 'admin' : 'company';
+
+    const screens = {
+      login: {
+        heading: audience === 'admin' ? 'Platform sign in' : audience === 'consultant' ? 'Consultant sign in' : 'Sign in',
+        blurb: audience === 'admin'
+          ? 'Administrator access is logged and restricted to Silver Webbuzz staff.'
+          : audience === 'consultant'
+            ? 'Manage your client portfolio, deadlines and advisory findings.'
+            : 'Access your ESG workspace, inventory and disclosures.',
+        fields: [
+          FIELD('Business email', audience === 'admin' ? 'r.mehta@silverwebbuzz.com' : audience === 'consultant' ? 'layla@haddad.example' : 'rashid@almaktoum.ae', { accent, focus: true }),
+          FIELD('Password', '••••••••••••', { aside: 'Forgot password?', mask: true }),
+        ],
+        sso: audience !== 'admin',
+        check: 'Keep me signed in on this device',
+        cta: audience === 'admin' ? 'Sign in to platform' : 'Sign in',
+        foot: audience === 'company' ? 'No account yet? Create one — free while you set up your first inventory.' : audience === 'consultant' ? 'Not a consultant? Sign in to your company workspace instead.' : false,
+        assumption: audience === 'admin'
+          ? 'Admin login is a separate route and guard in the codebase; drawn deliberately plainer so staff can tell at a glance they are not in a customer account.'
+          : 'Fields match resources/views/auth/login.blade.php (business email, password, Google SSO). The repo shares one login view between company and consultant via an isConsultantLogin flag; drawn as two entry points so the accent colour signals which portal you are entering before you type.',
+      },
+      register: audience === 'admin' ? {
+        heading: 'Administrators are created internally',
+        blurb: 'There is no self-service registration for platform staff. An existing administrator creates the account, which arrives as an invitation.',
+        alert: { text: 'If you need platform access, ask an existing administrator to invite you. Requests cannot be raised from this screen.', kind: 'warn' },
+        cta: 'Back to platform sign in',
+        assumption: 'The repo has no admin registration route — only admin.login and admin.logout. Drawn as an explicit dead end rather than omitting the screen, so nobody builds a signup form that should not exist.',
+      } : {
+        heading: audience === 'consultant' ? 'Consultant sign up' : 'Company sign up',
+        blurb: audience === 'consultant'
+          ? 'Consultant accounts are reviewed before activation — usually within one business day.'
+          : 'Create an account to track and report your organisation\u2019s carbon emissions.',
+        fields: audience === 'consultant'
+          ? [FIELD('Your name', 'Layla Haddad', { accent, focus: true }), FIELD('Practice / company name', 'Haddad Advisory FZ-LLC'), FIELD('Email', 'layla@haddad.example'), FIELD('Phone (optional)', 'Phone number', { placeholder: true }), FIELD('Password', 'Create password', { placeholder: true }), FIELD('Confirm password', 'Repeat password', { placeholder: true })]
+          : [FIELD('Full name', 'Rashid Al Falasi', { accent, focus: true }), FIELD('Business email', 'rashid@almaktoum.ae'), FIELD('Password', 'Create password', { placeholder: true }), FIELD('Confirm password', 'Repeat password', { placeholder: true })],
+        strength: true,
+        sso: true,
+        check: 'I agree to the terms and privacy policy',
+        cta: 'Create account',
+        foot: audience === 'consultant' ? 'Already have an account? Consultant sign in.' : 'Already have an account? Company sign in. Sustainability consultant? Consultant sign up.',
+        assumption: audience === 'consultant'
+          ? 'Fields match resources/views/consultant/auth/register.blade.php exactly (name, practice, email, optional phone, password + confirm). Only the visual treatment is new.'
+          : 'Fields match resources/views/auth/register.blade.php and RegisterController validation exactly (name, email, password + confirmed) including Google SSO. Company legal name and country are NOT collected here today — they are captured in onboarding; adding them here would be a product change.',
+      },
+      forgot: {
+        heading: 'Reset your password',
+        blurb: 'Enter the email on your account and we will send a reset link. The link is valid for 60 minutes.',
+        fields: [FIELD('Business email', audience === 'admin' ? 'r.mehta@silverwebbuzz.com' : audience === 'consultant' ? 'layla@haddad.example' : 'rashid@almaktoum.ae', { accent, focus: true })],
+        cta: 'Send reset link',
+        secondary: 'Back to sign in',
+        assumption: 'Company and consultant password resets use separate token tables and brokers in the codebase, so a consultant must start this flow from the consultant sign-in page. The copy names the portal to avoid a dead end.',
+      },
+      reset: {
+        heading: 'Choose a new password',
+        blurb: 'You are resetting the password for rashid@almaktoum.ae.',
+        fields: [FIELD('New password', '••••••••••••••', { accent, focus: true, mask: true }), FIELD('Confirm password', '••••••••••••••', { mask: true })],
+        strength: true,
+        cta: 'Set new password and sign in',
+        assumption: 'Signing the user in directly after reset saves a step; if security policy requires re-authentication, this becomes a redirect to sign in instead.',
+      },
+      success: {
+        heading: 'Password updated',
+        blurb: 'Your password was changed. Any other sessions on this account have been signed out.',
+        alert: { text: 'If you did not make this change, contact support immediately — your account may be compromised.', kind: 'warn' },
+        cta: 'Continue to sign in',
+        assumption: audience === 'admin'
+          ? 'Staff password changes should always invalidate other sessions — there is no legitimate reason for a shared administrator session.'
+          : 'Invalidating other sessions on password change is an assumption — worth confirming, since it will sign out a consultant mid-work if they share credentials.',
+      },
+      invite: {
+        heading: 'Set your password',
+        blurb: audience === 'admin'
+          ? 'An existing administrator created your platform account. Choose a password to activate it.'
+          : 'Welcome to Al Maktoum Industries. Choose a password to activate your account.',
+        meta: audience === 'admin'
+          ? [['Email', 'a.khan@silverwebbuzz.com'], ['Organisation', 'Silver Webbuzz PVT Ltd'], ['Role', 'Platform administrator'], ['Access', 'All companies · audit logged']]
+          : [['Email', 'priya@almaktoum.ae'], ['Company', 'Al Maktoum Industries LLC'], ['Role', 'HR contributor'], ['Access', 'Social pillar only']],
+        fields: [FIELD('New password', 'Enter your password (min. 8 characters)', { accent, focus: true, placeholder: true }), FIELD('Confirm password', 'Confirm your password', { placeholder: true })],
+        strength: true,
+        cta: 'Set password and continue',
+        assumption: 'Email, company and role are read-only here, matching resources/views/invitations/setup-password.blade.php. The Access row is the one addition — per-pillar permissions mean an invitee should see what scope they are being granted before accepting.',
+      },
+      twofa: {
+        heading: 'Two-step verification',
+        blurb: audience === 'admin'
+          ? 'Required for all platform administrators.'
+          : 'Enter the code from your authenticator app to finish signing in.',
+        code: true,
+        check: 'Trust this device for 30 days',
+        cta: 'Verify and continue',
+        foot: 'Lost your device? Use a recovery code.',
+        assumption: 'Two-factor does not exist in the codebase yet. Drawn because admin and reviewer accounts reach financial-grade data; suggest making it mandatory for admin and consultant, optional for company users.',
+      },
+      expired: {
+        heading: 'Your session ended',
+        blurb: audience === 'admin'
+          ? 'Administrator sessions end after 15 minutes of inactivity. Sign in again to continue.'
+          : 'You were signed out after 30 minutes of inactivity. Unsaved data-entry rows were kept as a draft.',
+        alert: audience === 'admin'
+          ? { text: 'Shorter timeout for staff accounts is deliberate — an unattended admin session can reach every customer workspace.', kind: 'warn' }
+          : { text: '3 unsaved rows in Scope 2 — Electricity were recovered and will be waiting when you sign back in.', kind: 'ok' },
+        fields: [FIELD('Password', '••••••••••••', { accent, focus: true, mask: true, help: audience === 'admin' ? 'Signed in as r.mehta@silverwebbuzz.com' : 'Signed in as rashid@almaktoum.ae' })],
+        cta: 'Unlock and continue',
+        secondary: 'Sign in as someone else',
+        assumption: 'Draft recovery is a design proposal, not current behaviour. Without it, a timeout during a long Quick Input session loses the work — the most likely cause of user distrust in the product.',
+      },
+    };
+
+    const sc = screens[screen];
+    const panelByPortal = {
+      company: {
+        kicker: 'Why teams use MeNetZero', hue: E, stat: '4,182',
+        statLabel: 'tCO₂e measured across 7 sites in the current reporting year',
+        body: 'One inventory feeds every framework. Answer a disclosure question once and it flows into IFRS S2, GRI and the UAE ESG report.',
+        stats: [['Frameworks', '5'], ['Sites', '7'], ['Assurance', 'Limited']],
+        foot: 'GHG Protocol · IFRS S1 & S2 · GRI · SASB · UAE ESG',
+        series: [5102, 4980, 4860, 4702, 4498, 4361, 4240, 4183],
+      },
+      consultant: {
+        kicker: 'Consultant portfolio', hue: S, stat: '12',
+        statLabel: 'client workspaces with a filing deadline in the next 60 days',
+        body: 'Work across clients from one queue, act inside a client workspace when you need to, and publish findings they can action.',
+        stats: [['Clients', '28'], ['Due <30d', '5'], ['Overdue', '2']],
+        foot: 'Portfolio · deadlines · advisory findings',
+        series: [14, 17, 16, 21, 23, 22, 26, 28],
+      },
+      admin: {
+        kicker: 'Platform administration', hue: '#8b9199', stat: '341',
+        statLabel: 'company workspaces active on the platform this month',
+        body: 'Curate the emission-factor library, review consultant applications, and manage plans. Every action here is written to the audit log.',
+        stats: [['Companies', '341'], ['Consultants', '46'], ['Open reviews', '7']],
+        foot: 'All administrator actions are logged',
+        series: [188, 214, 236, 261, 284, 303, 323, 341],
+      },
+    };
+    const panel = panelByPortal[portal];
+
+    const codeCells = ['4', '7', '2', '9', '', ''].map((v, i) => ({
+      v, border: i === 4 ? accent : LINE, ring: i === 4 ? RING(accent) : 'none', color: v ? INK : '#a4a9ae',
+    }));
+
+    const alertKinds = { warn: ['#fdf5e8', '#ecdcbd', '#8a6118'], ok: ['#eef6f1', '#cfe6da', '#0f7a4a'] };
+    const al = sc.alert ? alertKinds[sc.alert.kind] : null;
+
+    return {
+      portalTabs, screenTabs,
+      currentTitle: (screenDefs.find(d => d[0] === screen) || [, ''])[1] + ' · ' + (portal === 'company' ? 'Company portal' : portal === 'consultant' ? 'Consultant portal' : 'Admin'),
+      isConsultant: portal === 'consultant', isAdmin: portal === 'admin',
+      heading: sc.heading, blurb: sc.blurb,
+      fields: sc.fields || [],
+      showMeta: !!sc.meta, metaRows: (sc.meta || []).map(([k, v]) => ({ k, v })),
+      showAlert: !!sc.alert, alertText: sc.alert ? sc.alert.text : '',
+      alertBg: al ? al[0] : '#fff', alertBorder: al ? al[1] : LINE, alertHue: al ? al[2] : MID,
+      showCheck: !!sc.check, checkLabel: sc.check || '', showSso: !!sc.sso,
+      showStrength: !!sc.strength,
+      strengthBars: [accent, accent, accent, '#f0f0ee'],
+      showCode: !!sc.code, codeCells,
+      ctaLabel: sc.cta, ctaBg: accent, ctaSecondary: sc.secondary || false, footNote: sc.foot || false,
+      panelKicker: panel.kicker, panelHue: panel.hue, panelStat: panel.stat,
+      panelStatLabel: panel.statLabel, panelBody: panel.body, panelFoot: panel.foot,
+      panelStats: panel.stats.map(([k, v], i) => ({ k, v, delay: (0.55 + i * 0.12).toFixed(2) + 's' })),
+      animatedStat: React.createElement(CountUp, { key: portal + panel.stat, value: panel.stat, duration: 1100 }),
+      panelChart: React.createElement(DrawLine, { key: portal, points: panel.series, hue: panel.hue, w: 300, h: 64 }),
+      assumption: sc.assumption,
+    };
+  }
+}
+</script>
+</body>
+</html>

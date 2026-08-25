@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0}
+body{font-family:'Inter Tight',system-ui,-apple-system,sans-serif;font-size:13.5px;line-height:1.45;color:#14161a;background:#f4f4f2;-webkit-font-smoothing:antialiased}
+*,*::before,*::after{box-sizing:border-box}
+a{color:#0f7a4a}
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;flex-direction:column;background:#f4f4f2">
+
+  <div style="background:#fff;border-bottom:1px solid #e5e6e3;padding:13px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:sticky;top:0;z-index:20">
+    <div style="min-width:0">
+      <div style="font:500 10.5px 'IBM Plex Mono',monospace;letter-spacing:0.1em;color:#a4a9ae;text-transform:uppercase">Mockups · Transactional email</div>
+      <div style="font-size:15px;font-weight:600;letter-spacing:-0.015em;margin-top:2px;white-space:nowrap">{{ currentTitle }}</div>
+    </div>
+    <div style="display:flex;gap:3px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="6">
+        <button type="button" onClick="{{ n.go }}" style="height:28px;padding:0 10px;border:1px solid {{ n.border }};background:{{ n.bg }};color:{{ n.color }};border-radius:5px;font:{{ n.weight }} 12px 'Inter Tight';cursor:pointer;white-space:nowrap;flex-shrink:0">{{ n.label }}</button>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="flex:1;padding:28px 24px 44px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:24px;align-items:start;max-width:1180px;margin:0 auto;width:100%">
+
+    <div>
+      <div style="font:500 10.5px 'IBM Plex Mono',monospace;letter-spacing:0.08em;color:#8b9199;text-transform:uppercase;margin-bottom:10px">Rendered — 600px, table layout</div>
+
+      <div style="background:#fff;border:1px solid #e5e6e3">
+        <div style="border-bottom:1px solid #f0f0ee;padding:14px 20px;background:#fcfcfb">
+          <div style="display:flex;gap:10px;font-size:12px;padding:2px 0"><span style="width:52px;color:#a4a9ae;flex-shrink:0">From</span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">MeNetZero &lt;no-reply@menetzero.com&gt;</span></div>
+          <div style="display:flex;gap:10px;font-size:12px;padding:2px 0"><span style="width:52px;color:#a4a9ae;flex-shrink:0">To</span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ toLine }}</span></div>
+          <div style="display:flex;gap:10px;font-size:12px;padding:2px 0"><span style="width:52px;color:#a4a9ae;flex-shrink:0">Subject</span><span style="font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ subject }}</span></div>
+          <div style="display:flex;gap:10px;font-size:12px;padding:2px 0"><span style="width:52px;color:#a4a9ae;flex-shrink:0">Preview</span><span style="color:#8b9199;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ preheader }}</span></div>
+        </div>
+
+        <div style="padding:28px 20px;background:#f4f4f2">
+          <div style="max-width:600px;margin:0 auto;background:#fff;border:1px solid #e5e6e3">
+
+            <div style="padding:22px 32px;border-bottom:2px solid #14161a">
+              <img src="assets/menetzero.svg" alt="MeNetZero" style="height:24px;width:auto">
+            </div>
+
+            <div style="padding:30px 32px 8px">
+              <div style="font:600 10.5px 'IBM Plex Mono',monospace;letter-spacing:0.12em;color:{{ hue }};text-transform:uppercase">{{ eyebrow }}</div>
+              <h1 style="font-size:22px;font-weight:600;letter-spacing:-0.025em;margin:9px 0 0;line-height:1.25">{{ heading }}</h1>
+              <p style="font-size:14px;line-height:1.6;color:#5a6068;margin:12px 0 0;text-wrap:pretty">{{ body }}</p>
+            </div>
+
+            <sc-if value="{{ hasFacts }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:20px 32px 4px">
+                <div style="border:1px solid #e5e6e3;background:#fcfcfb">
+                  <sc-for list="{{ facts }}" as="f" hint-placeholder-count="3">
+                    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding:11px 16px;border-bottom:1px solid #f0f0ee">
+                      <span style="font:500 10.5px 'IBM Plex Mono',monospace;letter-spacing:0.08em;color:#a4a9ae;text-transform:uppercase;flex-shrink:0">{{ f.k }}</span>
+                      <span style="font-size:13px;font-weight:600;text-align:right;min-width:0">{{ f.v }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ hasList }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:18px 32px 0">
+                <sc-for list="{{ listItems }}" as="l" hint-placeholder-count="3">
+                  <div style="display:flex;gap:11px;padding:7px 0;font-size:13.5px;line-height:1.55;color:#5a6068">
+                    <span style="width:5px;height:5px;border-radius:2px;background:{{ hue }};flex-shrink:0;margin-top:7px"></span>
+                    <span style="text-wrap:pretty">{{ l }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <div style="padding:24px 32px 6px">
+              <a href="#" style="display:inline-block;background:{{ ctaBg }};color:#fff;text-decoration:none;padding:13px 24px;font-size:14px;font-weight:600;letter-spacing:-0.005em">{{ cta }}</a>
+              <sc-if value="{{ ctaNote }}" hint-placeholder-val="{{ false }}">
+                <p style="font-size:12.5px;color:#8b9199;margin:12px 0 0">{{ ctaNote }}</p>
+              </sc-if>
+            </div>
+
+            <div style="padding:22px 32px 26px">
+              <p style="font-size:12.5px;line-height:1.6;color:#8b9199;margin:0;padding-top:18px;border-top:1px solid #f0f0ee;text-wrap:pretty">{{ fallback }}</p>
+            </div>
+
+            <div style="padding:20px 32px;background:#fcfcfb;border-top:1px solid #e5e6e3">
+              <p style="font-size:11.5px;line-height:1.6;color:#a4a9ae;margin:0">MeNetZero — a brand of Silver Webbuzz PVT Ltd<br>You received this because you have an account at app.menetzero.com.</p>
+              <p style="font-size:11.5px;color:#a4a9ae;margin:8px 0 0"><a href="#" style="color:#8b9199">Email preferences</a> · <a href="#" style="color:#8b9199">Privacy</a> · <a href="#" style="color:#8b9199">Support</a></p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div style="background:#fff;border:1px solid #e5e6e3">
+        <div style="padding:15px 20px;border-bottom:1px solid #e5e6e3;font-size:14px;font-weight:600;letter-spacing:-0.01em">Plain-text part</div>
+        <div style="padding:18px 20px;font:400 12.5px/1.7 'IBM Plex Mono',monospace;color:#5a6068;white-space:pre-wrap;overflow-wrap:break-word">{{ plain }}</div>
+      </div>
+
+      <div style="background:#fff;border:1px solid #e5e6e3">
+        <div style="padding:15px 20px;border-bottom:1px solid #e5e6e3;font-size:14px;font-weight:600;letter-spacing:-0.01em">Merge variables</div>
+        <sc-for list="{{ vars }}" as="v" hint-placeholder-count="4">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding:10px 20px;border-bottom:1px solid #f0f0ee">
+            <span style="font:500 12px 'IBM Plex Mono',monospace;color:#14161a;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ v.k }}</span>
+            <span style="font-size:12px;color:#8b9199;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ v.v }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="background:#fff;border:1px solid #e5e6e3">
+        <div style="padding:15px 20px;border-bottom:1px solid #e5e6e3;font-size:14px;font-weight:600;letter-spacing:-0.01em">Sending rules</div>
+        <sc-for list="{{ rules }}" as="r" hint-placeholder-count="3">
+          <div style="padding:12px 20px;border-bottom:1px solid #f0f0ee;display:flex;gap:11px;align-items:flex-start">
+            <span style="width:5px;height:5px;border-radius:2px;background:{{ r.hue }};flex-shrink:0;margin-top:6px"></span>
+            <span style="font-size:12.5px;color:#5a6068;text-wrap:pretty">{{ r.text }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="border:1px solid #e5e6e3;background:#fff;padding:18px 20px;display:flex;gap:12px;align-items:flex-start">
+        <span style="font:500 10.5px 'IBM Plex Mono',monospace;letter-spacing:0.08em;color:#8a6118;background:#fdf5e8;border:1px solid #ecdcbd;padding:2px 6px;text-transform:uppercase;flex-shrink:0;margin-top:1px">Build note</span>
+        <span style="font-size:12.5px;color:#5a6068;text-wrap:pretty">{{ note }}</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:960}}">
+const E = '#0f7a4a', S = '#1a6c9e', G = '#5b5aa8', INK = '#14161a', MID = '#5a6068', DIM = '#8b9199', LINE = '#e5e6e3', WARN = '#8a6118';
+
+class Component extends DCLogic {
+  state = { m: 'welcome' };
+  go(m) { return () => this.setState({ m }); }
+
+  renderVals() {
+    const cur = this.state.m;
+    const NAV = [
+      ['welcome', 'Welcome'], ['invite', 'Team invite'], ['reset', 'Password reset'],
+      ['report', 'Report ready'], ['deadline', 'Deadline reminder'], ['consultant', 'Consultant request'],
+    ];
+    const nav = NAV.map(([k, label]) => {
+      const on = cur === k;
+      return { label, go: this.go(k), bg: on ? INK : '#fff', color: on ? '#fff' : MID, border: on ? INK : LINE, weight: on ? 600 : 500 };
+    });
+
+    const M = {
+      welcome: {
+        to: 'rashid@almaktoum.ae', hue: E, ctaBg: INK,
+        subject: 'Your MeNetZero workspace is ready',
+        preheader: 'Four steps to your first emissions number — about 20 minutes.',
+        eyebrow: 'Welcome',
+        heading: 'Your workspace is ready, Rashid',
+        body: 'You can be looking at a real Scope 2 number in about twenty minutes. The fastest route is a single electricity bill — everything else can follow later.',
+        list: [
+          'Add your company profile and reporting boundary',
+          'Add at least one location',
+          'Enter one utility bill in Quick Input',
+          'Review your GHG inventory and export it',
+        ],
+        cta: 'Start setup',
+        ctaNote: 'Nothing is billed during setup.',
+        fallback: 'If the button does not work, paste this into your browser: https://app.menetzero.com/onboarding',
+        vars: [['{{ user.name }}', 'Rashid'], ['{{ dashboard_url }}', 'app.menetzero.com/onboarding'], ['{{ company.name }}', 'Al Maktoum Industries LLC']],
+        rules: [
+          { text: 'Sent once, immediately after registration. Triggered by RegisterController via EmailTemplateService sendToUser(\u2018welcome\u2019).', hue: E },
+          { text: 'Not resent on subsequent logins — a follow-up nudge at day 3 is a separate template.', hue: DIM },
+        ],
+        note: 'The welcome email already exists in the codebase (EmailTemplateService, welcome template). The four steps mirror the sequence promised on the register page, so the email and the marketing copy agree.',
+      },
+      invite: {
+        to: 'priya@almaktoum.ae', hue: S, ctaBg: INK,
+        subject: 'Sara Nair invited you to Al Maktoum Industries on MeNetZero',
+        preheader: 'You have been given access to the Social pillar.',
+        eyebrow: 'Invitation',
+        heading: 'You have been invited to a workspace',
+        body: 'Sara Nair has invited you to contribute to Al Maktoum Industries\u2019 sustainability reporting. Your access is limited to the areas listed below.',
+        facts: [['Workspace', 'Al Maktoum Industries LLC'], ['Your role', 'HR contributor'], ['Access', 'Social pillar only'], ['Invited by', 'Sara Nair'], ['Expires', '7 days']],
+        cta: 'Accept and set password',
+        ctaNote: 'This link is single-use and expires in 7 days.',
+        fallback: 'Not expecting this? You can ignore this email — no account is created until you accept.',
+        vars: [['{{ invitation.company.name }}', 'Al Maktoum Industries LLC'], ['{{ invitation.customRole.role_name }}', 'HR contributor'], ['{{ inviter.name }}', 'Sara Nair'], ['{{ setup_url }}', '/invitations/{token}/setup-password/{pw}']],
+        rules: [
+          { text: 'Triggered by InvitationController. Token is single-use; the setup-password route validates it before showing the form.', hue: S },
+          { text: 'One reminder at day 4 if unaccepted, then the invite expires silently.', hue: DIM },
+          { text: 'Stating the role and scope up front matters — per-pillar permissions mean the invitee should know what they are accepting.', hue: WARN },
+        ],
+        note: 'Grounded in the invitations routes and setup-password view. Role and access are shown in the email as well as on the landing page so the recipient can judge legitimacy before clicking.',
+      },
+      reset: {
+        to: 'rashid@almaktoum.ae', hue: INK, ctaBg: INK,
+        subject: 'Reset your MeNetZero password',
+        preheader: 'This link expires in 60 minutes.',
+        eyebrow: 'Security',
+        heading: 'Reset your password',
+        body: 'Someone asked to reset the password for this account. If that was you, use the button below. The link expires in 60 minutes and can only be used once.',
+        facts: [['Account', 'rashid@almaktoum.ae'], ['Requested', '25 Aug 2026, 09:41 GST'], ['From', 'Dubai, UAE · Chrome'], ['Expires', '60 minutes']],
+        cta: 'Choose a new password',
+        ctaNote: false,
+        fallback: 'If you did not request this, you can safely ignore this email — your password has not changed. If you get these repeatedly, contact support.',
+        vars: [['{{ user.email }}', 'rashid@almaktoum.ae'], ['{{ reset_url }}', '/reset-password/{token}'], ['{{ requested_at }}', '25 Aug 2026 09:41 GST'], ['{{ request_location }}', 'Dubai, UAE · Chrome']],
+        rules: [
+          { text: 'Company and consultant resets use separate brokers and token tables, so the link must point at the right guard\u2019s route.', hue: WARN },
+          { text: 'Rate-limited to 3 requests per hour per address.', hue: DIM },
+          { text: 'Never reveals whether the address has an account — the request page shows the same confirmation either way.', hue: E },
+        ],
+        note: 'Showing the request time and location is added. It is the cheapest way to let a user recognise an attack, and costs nothing to populate from the request.',
+      },
+      report: {
+        to: 'rashid@almaktoum.ae', hue: E, ctaBg: E,
+        subject: 'Your FY2025 GHG inventory is ready to export',
+        preheader: '4,182.6 tCO₂e · 18% below base year · locked snapshot.',
+        eyebrow: 'Report ready',
+        heading: 'FY2025 GHG inventory is ready',
+        body: 'Your inventory is complete and locked to a data snapshot, so the figures in the export will not shift if someone edits data afterwards.',
+        facts: [['Gross emissions', '4,182.6 tCO₂e'], ['Change vs base year', '−18.0%'], ['Intensity', '0.0284 / AED m'], ['Snapshot locked', '25 Aug 2026, 09:41'], ['Assurance', 'Limited (draft)']],
+        cta: 'Open the report',
+        ctaNote: 'Available as PDF, Excel and IEQT.',
+        fallback: 'This email contains figures from your own workspace. If you were not expecting it, someone on your team may have run the export.',
+        vars: [['{{ report.name }}', 'FY2025 GHG inventory'], ['{{ report.total }}', '4,182.6'], ['{{ report.change }}', '−18.0%'], ['{{ report_url }}', '/reports/{id}'], ['{{ snapshot_at }}', '25 Aug 2026 09:41']],
+        rules: [
+          { text: 'Sent to the requesting user only, not the whole team — the figures are material and should not fan out by default.', hue: WARN },
+          { text: 'Never attach the PDF. Emissions data leaving the platform as an attachment defeats the access controls.', hue: WARN },
+          { text: 'Include the snapshot timestamp so the recipient can tell which version of the data they are looking at.', hue: E },
+        ],
+        note: 'New template. The no-attachment rule is the important one for an enterprise buyer — a report link respects permissions, an attached PDF does not.',
+      },
+      deadline: {
+        to: 'rashid@almaktoum.ae', hue: WARN, ctaBg: INK,
+        subject: 'IFRS S2 filing in 30 days — 3 items outstanding',
+        preheader: 'Scope 3 categories, transition plan, and 3 unevidenced entries.',
+        eyebrow: 'Deadline',
+        heading: '30 days to your IFRS S2 filing',
+        body: 'You are at 78% readiness. Three items are blocking sign-off — the first is the largest by materiality.',
+        list: [
+          'Scope 3 categories 4, 6 and 11 are empty',
+          'Section 2.3 (transition plan) is unanswered',
+          'Three Q3 electricity entries have no evidence attached',
+        ],
+        facts: [['Framework', 'IFRS S2 — Climate'], ['Readiness', '78%'], ['Filing date', '30 Sep 2026'], ['Owner', 'Rashid Al Falasi']],
+        cta: 'See what is missing',
+        ctaNote: false,
+        fallback: 'You are receiving this because you own the IFRS S2 report. Reassign it in Reports to stop these reminders.',
+        vars: [['{{ framework }}', 'IFRS S2 — Climate'], ['{{ days_remaining }}', '30'], ['{{ readiness }}', '78%'], ['{{ blockers }}', 'array of 3'], ['{{ report_url }}', '/disclosures/ifrs-s2']],
+        rules: [
+          { text: 'Sent at 60, 30 and 7 days before the filing date, and only to the report owner.', hue: WARN },
+          { text: 'Suppressed entirely once readiness reaches 100% — no reminder about a finished report.', hue: E },
+          { text: 'Blockers are generated from the same completeness logic as the portal, so the email can never disagree with the screen.', hue: E },
+        ],
+        note: 'New template and the one most likely to drive retention. Naming the specific blockers rather than saying "action required" is what makes it worth opening.',
+      },
+      consultant: {
+        to: 'rashid@almaktoum.ae', hue: S, ctaBg: INK,
+        subject: 'Haddad Advisory is requesting access to your workspace',
+        preheader: 'Review what they would be able to see and change.',
+        eyebrow: 'Access request',
+        heading: 'A consultant is requesting access',
+        body: 'Layla Haddad of Haddad Advisory FZ-LLC has asked for access to Al Maktoum Industries. Nothing is granted until you approve it here.',
+        facts: [['Practice', 'Haddad Advisory FZ-LLC'], ['Contact', 'Layla Haddad'], ['Requested scope', 'All pillars — edit'], ['Verified by', 'MeNetZero · trade licence'], ['Clients on platform', '28']],
+        list: [
+          'They will be able to enter and correct data on your behalf',
+          'Every change they make is recorded against their name, not yours',
+          'You can revoke access at any time in Settings → Consultants',
+        ],
+        cta: 'Review request',
+        ctaNote: 'You can grant read-only access instead.',
+        fallback: 'If you do not recognise this practice, decline the request and tell us — verified practices can still be reported.',
+        vars: [['{{ consultant.company_name }}', 'Haddad Advisory FZ-LLC'], ['{{ consultant.name }}', 'Layla Haddad'], ['{{ requested_scope }}', 'All pillars — edit'], ['{{ review_url }}', '/consultants/requests/{id}']],
+        rules: [
+          { text: 'Sent to company admins only. A contributor cannot approve external access.', hue: WARN },
+          { text: 'Access is never granted by the email itself — approval happens in the portal, where the scope can be reduced.', hue: E },
+          { text: 'Attribution wording is deliberate: the client must understand consultant edits are traceable before agreeing.', hue: E },
+        ],
+        note: 'New template. Consultant relationships exist in the codebase but the consent step does not — without it, a consultant appears inside a client\u2019s data with no explicit record of permission.',
+      },
+    };
+
+    const m = M[cur];
+    const plainOf = () => {
+      const lines = [m.heading.toUpperCase(), '', m.body];
+      if (m.facts) { lines.push(''); m.facts.forEach(([k, v]) => lines.push(k + ': ' + v)); }
+      if (m.list) { lines.push(''); m.list.forEach(l => lines.push('- ' + l)); }
+      lines.push('', m.cta.toUpperCase() + ':', 'https://app.menetzero.com/...', '', '—', 'MeNetZero, a brand of Silver Webbuzz PVT Ltd');
+      return lines.join('\n');
+    };
+
+    return {
+      nav, currentTitle: (NAV.find(n => n[0] === cur) || [, ''])[1],
+      toLine: m.to, subject: m.subject, preheader: m.preheader,
+      eyebrow: m.eyebrow, heading: m.heading, body: m.body, hue: m.hue, ctaBg: m.ctaBg,
+      hasFacts: !!m.facts, facts: (m.facts || []).map(([k, v]) => ({ k, v })),
+      hasList: !!m.list, listItems: m.list || [],
+      cta: m.cta, ctaNote: m.ctaNote || false, fallback: m.fallback,
+      plain: plainOf(),
+      vars: m.vars.map(([k, v]) => ({ k, v })),
+      rules: m.rules, note: m.note,
+    };
+  }
+}
+</script>
+</body>
+</html>

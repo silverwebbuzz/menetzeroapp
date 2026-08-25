@@ -1,4 +1,4 @@
-@extends('layouts.portal-auth')
+@extends($authLayout ?? 'layouts.portal-auth')
 
 @section('title', 'Company Sign In — MENetZero')
 

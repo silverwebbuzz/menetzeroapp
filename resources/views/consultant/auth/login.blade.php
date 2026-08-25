@@ -1,5 +1,5 @@
 @php($portalVariant = 'consultant')
-@extends('layouts.portal-auth')
+@extends($authLayout ?? 'layouts.portal-auth')
 
 @section('title', 'Consultant Sign In — MENetZero')
 

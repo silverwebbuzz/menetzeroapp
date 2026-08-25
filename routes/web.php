@@ -128,6 +128,32 @@ Route::prefix('consultant')->name('consultant.')->group(function () {
         });
 });
 
+// MENetZero 2.0 theme switching (Phase 0 — documentation/redesign.md).
+//
+// Deliberately open to any visitor: the theme changes appearance only, and
+// every route keeps its full middleware stack regardless of theme, so no
+// data access changes. See redesign.md section 7A.1 for why the original
+// Super Admin restriction was overridden (super admins use the 'admin'
+// guard and cannot reach the company portal at all).
+//
+// There is NO theme UI anywhere in the product — this is URL-only.
+// Set THEME_SWITCH_ENABLED=false in .env to disable instantly.
+Route::get('/theme/{theme}', function (string $theme) {
+    $themes = app(\App\Services\ThemeResolver::class);
+
+    if (! $themes->switchEnabled()) {
+        abort(404);
+    }
+
+    if ($theme === 'reset' || $theme === 'default') {
+        $themes->forget();
+    } elseif (! $themes->set($theme)) {
+        abort(404);
+    }
+
+    return redirect()->back()->withInput();
+})->where('theme', '[a-z-]+')->name('theme.switch');
+
 // Authentication routes - Client
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);

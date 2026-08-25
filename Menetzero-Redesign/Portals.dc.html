@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0}
+body{font-family:'Inter Tight',system-ui,-apple-system,sans-serif;font-size:13.5px;line-height:1.45;color:#14161a;background:#fafaf9;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+*,*::before,*::after{box-sizing:border-box}
+a{color:#1a6c9e;text-decoration:none}
+a:hover{color:#155a84}
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;flex-direction:column;background:#fafaf9">
+
+  <sc-if value="{{ showActing }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#8a6118;color:#fff;padding:0 24px;height:38px;display:flex;align-items:center;gap:12px;flex-shrink:0">
+      <span style="width:7px;height:7px;border-radius:2px;background:#fff;flex-shrink:0"></span>
+      <span style="font:600 11px 'IBM Plex Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;flex-shrink:0">Acting as</span>
+      <span style="font-size:12.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Al Maktoum Industries LLC · PRY 2025 — every change is recorded against Layla Haddad, Haddad Advisory</span>
+      <button type="button" style="height:26px;padding:0 10px;border:1px solid #ffffff59;background:#ffffff1f;color:#fff;border-radius:5px;font:500 12px 'Inter Tight';cursor:pointer;white-space:nowrap;flex-shrink:0">Switch client</button>
+      <button type="button" onClick="{{ goClients }}" style="height:26px;padding:0 10px;border:1px solid #ffffff59;background:#ffffff1f;color:#fff;border-radius:5px;font:500 12px 'Inter Tight';cursor:pointer;white-space:nowrap;flex-shrink:0">Back to Agency Hub</button>
+    </div>
+  </sc-if>
+
+  <div style="background:#fff;border-bottom:1px solid #e5e6e3;flex-shrink:0">
+    <div style="height:56px;display:flex;align-items:center;gap:16px;padding:0 24px;overflow:hidden">
+      <img src="assets/menetzero.svg" alt="MeNetZero" style="height:26px;width:auto;flex-shrink:0">
+      <div style="width:1px;height:22px;background:#e5e6e3;flex-shrink:0"></div>
+      <div style="display:inline-flex;align-items:center;gap:7px;border:1px solid {{ badgeBorder }};background:{{ badgeBg }};padding:4px 9px;border-radius:5px;flex-shrink:0">
+        <span style="width:6px;height:6px;border-radius:2px;background:{{ accent }};flex-shrink:0"></span>
+        <span style="font:600 10.5px 'IBM Plex Mono',monospace;letter-spacing:0.1em;color:{{ accent }};text-transform:uppercase;white-space:nowrap">{{ portalBadge }}</span>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <div style="display:flex;align-items:center;gap:6px;border:1px solid #e5e6e3;border-radius:6px;height:32px;padding:0 10px;font:500 11px 'IBM Plex Mono',monospace;letter-spacing:0.04em;color:#5a6068;white-space:nowrap">{{ headerMeta }}</div>
+        <div style="width:28px;height:28px;border-radius:999px;border:1px solid #e5e6e3;background:#f4f4f2;font:600 11px/26px 'IBM Plex Mono',monospace;text-align:center;color:#5a6068;flex-shrink:0">{{ avatar }}</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:stretch;gap:2px;padding:0 24px;height:42px;overflow-x:auto">
+      <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5">
+        <button type="button" onClick="{{ t.go }}" style="border:0;background:transparent;cursor:pointer;padding:0 13px;display:flex;align-items:center;gap:7px;font-size:13px;font-weight:{{ t.weight }};color:{{ t.color }};box-shadow:{{ t.underline }};white-space:nowrap;flex-shrink:0">
+          <span style="width:6px;height:6px;border-radius:2px;background:{{ t.dot }};flex-shrink:0"></span>
+          {{ t.label }}
+        </button>
+      </sc-for>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px;font:500 10.5px 'IBM Plex Mono',monospace;letter-spacing:0.06em;color:#8b9199;flex-shrink:0;padding-left:16px">
+        <span style="white-space:nowrap">{{ tabMeta }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="flex:1;padding:26px 32px 44px">
+
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;border-bottom:1px solid #e5e6e3;padding-bottom:18px;flex-wrap:wrap">
+      <div>
+        <div style="font:500 10.5px 'IBM Plex Mono',monospace;letter-spacing:0.1em;color:#a4a9ae;text-transform:uppercase">{{ kicker }}</div>
+        <h1 style="font-size:26px;font-weight:600;letter-spacing:-0.03em;margin:6px 0 0">{{ title }}</h1>
+        <p style="margin:5px 0 0;color:#5a6068;font-size:13.5px;max-width:78ch;text-wrap:pretty">{{ lead }}</p>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+        <sc-for list="{{ actions }}" as="a" hint-placeholder-count="2">
+          <button type="button" style="height:32px;padding:0 12px;border:{{ a.border }};background:{{ a.bg }};color:{{ a.color }};border-radius:6px;font:500 12.5px 'Inter Tight';cursor:pointer;white-space:nowrap;flex-shrink:0">{{ a.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:1px;background:#e5e6e3;border:1px solid #e5e6e3;margin-top:24px">
+      <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+        <div style="background:#fff;padding:16px 18px">
+          <div style="font:500 10.5px 'IBM Plex Mono',monospace;letter-spacing:0.08em;color:#a4a9ae;text-transform:uppercase">{{ s.k }}</div>
+          <div style="font-size:22px;font-weight:600;letter-spacing:-0.03em;margin-top:5px;white-space:nowrap;color:{{ s.color }}">{{ s.v }}</div>
+          <sc-if value="{{ s.sub }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:12px;color:#8b9199;margin-top:3px">{{ s.sub }}</div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="border:1px solid #e5e6e3;background:#fff;margin-top:24px;overflow-x:auto">
+      <div style="min-width:{{ tableMinWidth }};display:grid;grid-template-columns:{{ tableCols }};column-gap:16px;padding:10px 20px;border-bottom:1px solid #e5e6e3;font:500 10.5px 'IBM Plex Mono',monospace;letter-spacing:0.08em;color:#a4a9ae;text-transform:uppercase">
+        <sc-for list="{{ columns }}" as="c" hint-placeholder-count="5">
+          <span style="text-align:{{ c.align }};min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ c.label }}</span>
+        </sc-for>
+      </div>
+      <sc-for list="{{ rows }}" as="r" hint-placeholder-count="7">
+        <div onClick="{{ r.go }}" style="min-width:{{ tableMinWidth }};display:grid;grid-template-columns:{{ tableCols }};column-gap:16px;padding:0 20px;border-bottom:1px solid #f0f0ee;min-height:50px;align-items:center;font-size:12.5px;cursor:{{ r.cursor }}">
+          <div style="display:flex;align-items:center;gap:10px;min-width:0">
+            <sc-if value="{{ r.initials }}" hint-placeholder-val="{{ false }}">
+              <span style="width:28px;height:28px;border-radius:6px;background:{{ r.avBg }};border:1px solid {{ r.avBorder }};color:{{ r.avColor }};font:600 10px/26px 'IBM Plex Mono',monospace;text-align:center;flex-shrink:0">{{ r.initials }}</span>
+            </sc-if>
+            <div style="min-width:0">
+              <div style="font-weight:600;letter-spacing:-0.01em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.name }}</div>
+              <sc-if value="{{ r.sub }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:11.5px;color:#8b9199;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.sub }}</div>
+              </sc-if>
+            </div>
+          </div>
+          <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="4">
+            <span style="text-align:{{ c.align }};min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:{{ c.color }};font-weight:{{ c.weight }}">
+              <sc-if value="{{ c.isChip }}" hint-placeholder-val="{{ false }}">
+                <span style="font:500 10px 'IBM Plex Mono',monospace;letter-spacing:0.05em;padding:2px 6px;border:1px solid {{ c.border }};color:{{ c.chipColor }};background:{{ c.bg }};text-transform:uppercase;white-space:nowrap">{{ c.v }}</span>
+              </sc-if>
+              <sc-if value="{{ c.isText }}" hint-placeholder-val="{{ true }}">{{ c.v }}</sc-if>
+            </span>
+          </sc-for>
+        </div>
+      </sc-for>
+      <sc-if value="{{ tableFoot }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:12px 20px;font:500 10.5px 'IBM Plex Mono',monospace;letter-spacing:0.06em;color:#8b9199">{{ tableFoot }}</div>
+      </sc-if>
+    </div>
+
+    <sc-if value="{{ showSideNote }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;gap:12px;margin-top:20px;border:1px solid #e5e6e3;background:#fff;padding:18px 20px;align-items:flex-start">
+        <span style="font:500 10.5px 'IBM Plex Mono',monospace;letter-spacing:0.08em;color:#8a6118;background:#fdf5e8;border:1px solid #ecdcbd;padding:2px 6px;text-transform:uppercase;flex-shrink:0;margin-top:1px">Assumption</span>
+        <span style="font-size:12.5px;color:#5a6068;text-wrap:pretty">{{ sideNote }}</span>
+      </div>
+    </sc-if>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:940}}">
+const E = '#0f7a4a', S = '#1a6c9e', G = '#5b5aa8', INK = '#14161a', MID = '#5a6068', DIM = '#8b9199', LINE = '#e5e6e3';
+const OK = { bg: '#eef6f1', border: '#cfe6da', chipColor: E };
+const WARN = { bg: '#fdf5e8', border: '#ecdcbd', chipColor: '#8a6118' };
+const BAD = { bg: '#fbf0ed', border: '#eed3cb', chipColor: '#b4402b' };
+const NONE = { bg: '#f6f6f4', border: LINE, chipColor: DIM };
+
+const txt = (v, opts = {}) => ({ v, isText: true, isChip: false, align: opts.align || 'left', color: opts.color || MID, weight: opts.weight || 400 });
+const chip = (v, kind) => ({ v, isChip: true, isText: false, align: 'right', color: MID, weight: 400, ...(kind || NONE) });
+
+class Component extends DCLogic {
+  state = { portal: 'consultant', tab: 'clients' };
+  go(portal, tab) { return () => this.setState(s => ({ portal: portal || s.portal, tab: tab || s.tab })); }
+
+  renderVals() {
+    const { portal, tab } = this.state;
+    const isAdmin = portal === 'admin';
+    const accent = isAdmin ? INK : S;
+
+    const TABS = isAdmin
+      ? [['companies', 'Companies'], ['consultants', 'Consultants'], ['plans', 'Plans'], ['factors', 'Factor library'], ['audit', 'Audit log'], ['metrics', 'Platform']]
+      : [['clients', 'Clients'], ['queue', 'Work queue'], ['findings', 'Findings'], ['acting', 'Inside a client'], ['billing', 'Billing']];
+
+    const active = TABS.some(t => t[0] === tab) ? tab : TABS[0][0];
+    const tabs = TABS.map(([k, label]) => {
+      const on = k === active;
+      return { label, go: this.go(null, k), weight: on ? 600 : 500, color: on ? INK : MID, dot: on ? accent : '#d6d7d3', underline: on ? `inset 0 -2px 0 0 ${accent}` : 'none' };
+    });
+    // portal switch lives on the two right-most pseudo tabs
+    tabs.push({ label: isAdmin ? '→ Consultant portal' : '→ Admin portal', go: this.go(isAdmin ? 'consultant' : 'admin', isAdmin ? 'clients' : 'companies'), weight: 500, color: '#a4a9ae', dot: '#d6d7d3', underline: 'none' });
+
+    const V = {
+      clients: {
+        kicker: 'Portfolio', title: 'Clients', 
+        lead: 'Twenty-eight workspaces. Sorted by what needs you soonest, not alphabetically — the deadline column is the one that matters.',
+        actions: [{ label: 'Export portfolio', border: '1px solid ' + LINE, bg: '#fff', color: INK }, { label: 'Add client', border: '0', bg: S, color: '#fff' }],
+        stats: [
+          { k: 'Clients', v: '28', color: INK, sub: '3 onboarding' },
+          { k: 'Due in 30 days', v: '5', color: '#8a6118', sub: 'filing deadlines' },
+          { k: 'Overdue', v: '2', color: '#b4402b', sub: 'needs escalation' },
+          { k: 'Awaiting client', v: '7', color: INK, sub: 'blocked on their data' },
+        ],
+        cols: [['Client', 'left'], ['Readiness', 'left'], ['Blocked on', 'left'], ['Next deadline', 'right'], ['State', 'right']],
+        minW: '860px', tableCols: 'minmax(200px,1.8fr) minmax(110px,1.1fr) minmax(130px,1.4fr) minmax(110px,1.1fr) minmax(88px,.9fr)',
+        rows: [
+          { name: 'Gulf Petrochem FZE', sub: 'Manufacturing · 12 sites', initials: 'GP', clickable: true,
+            cells: [txt('42% · IFRS S2'), txt('Scope 3 data from client'), txt('12 Sep 2026', { align: 'right', color: '#b4402b', weight: 600 }), chip('Overdue', BAD)] },
+          { name: 'Emirates Logistics Co', sub: 'Transport · 34 sites', initials: 'EL', clickable: true,
+            cells: [txt('68% · GRI'), txt('Fleet fuel records'), txt('30 Sep 2026', { align: 'right', color: '#8a6118', weight: 600 }), chip('At risk', WARN)] },
+          { name: 'Al Maktoum Industries LLC', sub: 'Manufacturing · 7 sites', initials: 'AM', clickable: true,
+            cells: [txt('78% · IFRS S2'), txt('Transition plan section'), txt('31 Dec 2026', { align: 'right' }), chip('On track', OK)] },
+          { name: 'Desert Solar JV', sub: 'Energy · 3 sites', initials: 'DS', clickable: true,
+            cells: [txt('91% · UAE ESG'), txt('Nothing — ready to file'), txt('31 Dec 2026', { align: 'right' }), chip('Ready', OK)] },
+          { name: 'Northern Foods Trading', sub: 'FMCG · 5 sites', initials: 'NF', clickable: true,
+            cells: [txt('12% · onboarding'), txt('Boundary not set'), txt('Not scheduled', { align: 'right' }), chip('Onboarding', NONE)] },
+          { name: 'Sharjah Cement Co', sub: 'Manufacturing · 2 sites', initials: 'SC', clickable: true,
+            cells: [txt('55% · SASB'), txt('Awaiting kick-off call'), txt('15 Nov 2026', { align: 'right' }), chip('Waiting', NONE)] },
+        ],
+        foot: '28 CLIENTS · 6 SHOWN · SORTED BY DEADLINE',
+        note: 'The consultant portal exists (own guard, consultant/* routes, consultant-shell.css) and the codebase already calls it the Agency Hub with a workspace switcher listing managed engagements. NEW here: the readiness and deadline columns — today the switcher shows only a client name and reporting year, so a consultant cannot tell which client needs them next without opening each one.',
+      },
+      queue: {
+        kicker: 'Portfolio', title: 'Work queue',
+        lead: 'Every open task across all clients in one list. This is the screen a consultant should live in — client-by-client navigation does not scale past ten accounts.',
+        actions: [{ label: 'Filter', border: '1px solid ' + LINE, bg: '#fff', color: INK }, { label: 'Bulk assign', border: '0', bg: S, color: '#fff' }],
+        stats: [
+          { k: 'Open tasks', v: '64', color: INK, sub: 'across 28 clients' },
+          { k: 'Assigned to me', v: '19', color: INK, sub: false },
+          { k: 'Overdue', v: '6', color: '#b4402b', sub: false },
+          { k: 'Waiting on client', v: '23', color: '#8a6118', sub: 'not actionable by you' },
+        ],
+        cols: [['Task', 'left'], ['Client', 'left'], ['Pillar', 'left'], ['Owner', 'right'], ['Due', 'right']],
+        minW: '860px', tableCols: 'minmax(220px,2fr) minmax(140px,1.3fr) minmax(96px,1fr) minmax(96px,1fr) minmax(84px,.9fr)',
+        rows: [
+          { name: 'Chase Scope 3 category 1 spend data', sub: 'Blocked 11 days', initials: false, clickable: true,
+            cells: [txt('Gulf Petrochem'), txt('Environmental'), txt('You', { align: 'right' }), chip('Overdue', BAD)] },
+          { name: 'Draft transition plan narrative', sub: 'IFRS S2 §2.3', initials: false, clickable: true,
+            cells: [txt('Al Maktoum Industries'), txt('Environmental'), txt('You', { align: 'right' }), chip('4 days', WARN)] },
+          { name: 'Review LTIFR calculation method', sub: 'Client used a non-standard basis', initials: false, clickable: true,
+            cells: [txt('Emirates Logistics'), txt('Social'), txt('You', { align: 'right' }), chip('6 days', WARN)] },
+          { name: 'Verify 3 unevidenced electricity entries', sub: 'Q3 · 3 sites', initials: false, clickable: true,
+            cells: [txt('Al Maktoum Industries'), txt('Environmental'), txt('S. Nair', { align: 'right' }), chip('Client', NONE)] },
+          { name: 'Collect board skills matrix', sub: 'IFRS S1 governance', initials: false, clickable: true,
+            cells: [txt('Desert Solar JV'), txt('Governance'), txt('Client', { align: 'right' }), chip('Client', NONE)] },
+          { name: 'Set emission boundaries for 5 sites', sub: 'Onboarding step 3', initials: false, clickable: true,
+            cells: [txt('Northern Foods'), txt('Environmental'), txt('You', { align: 'right' }), chip('14 days', NONE)] },
+        ],
+        foot: '64 OPEN · 23 NOT ACTIONABLE BY YOU',
+        note: 'A cross-client queue does not exist in the repo. It is the single biggest lever on consultant efficiency and assumes tasks are derived from completeness gaps rather than manually created.',
+      },
+      findings: {
+        kicker: 'Advisory', title: 'Findings',
+        lead: 'What you observed, what you advise, and whether the client has acted. Findings are drafted privately and published to the client deliberately.',
+        actions: [{ label: 'Templates', border: '1px solid ' + LINE, bg: '#fff', color: INK }, { label: 'New finding', border: '0', bg: S, color: '#fff' }],
+        stats: [
+          { k: 'Findings', v: '47', color: INK, sub: 'this reporting year' },
+          { k: 'Draft', v: '9', color: '#8a6118', sub: 'not visible to client' },
+          { k: 'Published', v: '38', color: INK, sub: false },
+          { k: 'Actioned by client', v: '21', color: E, sub: '55% of published' },
+        ],
+        cols: [['Finding', 'left'], ['Client', 'left'], ['Severity', 'left'], ['Raised', 'right'], ['State', 'right']],
+        minW: '860px', tableCols: 'minmax(240px,2.2fr) minmax(140px,1.3fr) minmax(90px,.9fr) minmax(90px,.9fr) minmax(96px,1fr)',
+        rows: [
+          { name: 'Scope 2 uses location-based only', sub: 'Market-based required for green tariff claim', initials: false, clickable: true,
+            cells: [txt('Al Maktoum Industries'), txt('High', { color: '#b4402b', weight: 600 }), txt('22 Aug', { align: 'right' }), chip('Published', OK)] },
+          { name: 'Base year not restated after acquisition', sub: 'GHG Protocol requires recalculation',  initials: false, clickable: true,
+            cells: [txt('Gulf Petrochem'), txt('High', { color: '#b4402b', weight: 600 }), txt('19 Aug', { align: 'right' }), chip('Draft', WARN)] },
+          { name: 'Fleet fuel estimated, not metered', sub: 'Weakens assurance readiness', initials: false, clickable: true,
+            cells: [txt('Emirates Logistics'), txt('Medium', { color: '#8a6118' }), txt('14 Aug', { align: 'right' }), chip('Actioned', OK)] },
+          { name: 'No internal carbon price disclosed', sub: 'IFRS S2 metric expected', initials: false, clickable: true,
+            cells: [txt('Desert Solar JV'), txt('Low'), txt('11 Aug', { align: 'right' }), chip('Published', OK)] },
+          { name: 'Water data collected but not reported', sub: 'Quick win for GRI 303', initials: false, clickable: true,
+            cells: [txt('Sharjah Cement'), txt('Low'), txt('04 Aug', { align: 'right' }), chip('Actioned', OK)] },
+        ],
+        foot: false,
+        note: 'Findings are a new concept. Without them a consultant\u2019s advice lives in email and never reaches the audit trail; with them, the platform can show whether advice was acted on — which is what a client actually pays for.',
+      },
+      acting: {
+        kicker: 'Inside a client', title: 'Al Maktoum Industries LLC',
+        lead: 'You are working inside the client\u2019s own workspace. The amber bar above never disappears, and every write is attributed to you rather than to a client user.',
+        actions: [{ label: 'Raise a finding', border: '1px solid ' + LINE, bg: '#fff', color: INK }, { label: 'Leave client', border: '0', bg: '#8a6118', color: '#fff' }],
+        stats: [
+          { k: 'Readiness', v: '78%', color: INK, sub: 'IFRS S2' },
+          { k: 'Your edits today', v: '14', color: INK, sub: 'all attributed to you' },
+          { k: 'Open findings', v: '3', color: '#8a6118', sub: false },
+          { k: 'Client last active', v: '2h ago', color: INK, sub: 'S. Nair' },
+        ],
+        cols: [['Recent activity', 'left'], ['Where', 'left'], ['By', 'left'], ['Attributed', 'right'], ['When', 'right']],
+        minW: '820px', tableCols: 'minmax(220px,2fr) minmax(140px,1.3fr) minmax(110px,1.1fr) minmax(96px,1fr) minmax(84px,.9fr)',
+        rows: [
+          { name: 'Corrected Scope 2 factor to DEWA 2024', sub: false, initials: false, clickable: false,
+            cells: [txt('Environmental · Scope 2'), txt('Layla Haddad'), chip('Consultant', WARN), txt('09:41', { align: 'right' })] },
+          { name: 'Added market-based Scope 2 method', sub: false, initials: false, clickable: false,
+            cells: [txt('Settings · Boundary'), txt('Layla Haddad'), chip('Consultant', WARN), txt('09:36', { align: 'right' })] },
+          { name: 'Uploaded Q3 DEWA bills (3 sites)', sub: false, initials: false, clickable: false,
+            cells: [txt('Environmental · Evidence'), txt('Sara Nair'), chip('Company', NONE), txt('07:52', { align: 'right' })] },
+          { name: 'Answered IFRS S2 governance section', sub: false, initials: false, clickable: false,
+            cells: [txt('Disclosures · IFRS S2'), txt('Layla Haddad'), chip('Consultant', WARN), txt('Yesterday', { align: 'right' })] },
+        ],
+        foot: 'EVERY ROW IS WRITTEN TO THE CLIENT\u2019S AUDIT LOG',
+        note: 'Acting-as ALREADY EXISTS in the codebase: layouts/app.blade.php reads $isConsultantActing, offers a "Back to Agency Hub" button on consultant.workspace.exit, and a managed-client switcher on consultant.workspace.enter showing each engagement\u2019s primary reporting year (PRY). Terminology and the switcher here match that — the product calls it the Agency Hub. What is NEW: promoting the state from two header buttons to a persistent full-width bar (you chose amber; the code currently tints it indigo), and the attribution column, which is what makes a consultant edit defensible to an auditor.',
+      },
+      billing: {
+        kicker: 'Practice', title: 'Billing',
+        lead: 'Both payment models exist, so every client row states who pays. Seats you fund are billed to your practice; client-funded workspaces are not.',
+        actions: [{ label: 'Invoices', border: '1px solid ' + LINE, bg: '#fff', color: INK }, { label: 'Buy seats', border: '0', bg: S, color: '#fff' }],
+        stats: [
+          { k: 'Seats owned', v: '10', color: INK, sub: '7 assigned' },
+          { k: 'Client-funded', v: '21', color: INK, sub: 'no cost to you' },
+          { k: 'Monthly', v: 'AED 7,400', color: INK, sub: false },
+          { k: 'Next invoice', v: '1 Sep', color: INK, sub: false },
+        ],
+        cols: [['Client', 'left'], ['Paid by', 'left'], ['Plan', 'left'], ['Seat cost', 'right'], ['State', 'right']],
+        minW: '800px', tableCols: 'minmax(200px,1.8fr) minmax(110px,1.1fr) minmax(110px,1.1fr) minmax(96px,1fr) minmax(88px,.9fr)',
+        rows: [
+          { name: 'Al Maktoum Industries LLC', sub: false, initials: 'AM', clickable: false,
+            cells: [txt('Company'), txt('Enterprise'), txt('—', { align: 'right' }), chip('Active', OK)] },
+          { name: 'Gulf Petrochem FZE', sub: false, initials: 'GP', clickable: false,
+            cells: [txt('Company'), txt('Enterprise'), txt('—', { align: 'right' }), chip('Active', OK)] },
+          { name: 'Northern Foods Trading', sub: false, initials: 'NF', clickable: false,
+            cells: [txt('Your practice'), txt('Growth'), txt('AED 740 / mo', { align: 'right', weight: 600 }), chip('Active', OK)] },
+          { name: 'Sharjah Cement Co', sub: false, initials: 'SC', clickable: false,
+            cells: [txt('Your practice'), txt('Growth'), txt('AED 740 / mo', { align: 'right', weight: 600 }), chip('Active', OK)] },
+          { name: 'Desert Solar JV', sub: false, initials: 'DS', clickable: false,
+            cells: [txt('Your practice'), txt('Starter'), txt('AED 320 / mo', { align: 'right', weight: 600 }), chip('Trial', WARN)] },
+        ],
+        foot: '3 OF 10 SEATS UNASSIGNED — AED 2,220 / MO UNUSED',
+        note: 'You said both models exist and the UI must show which applies, so "Paid by" is a first-class column. Note the codebase also has a third revenue path this screen does not cover: client-purchased review packs paid into escrow (client.consultants.checkout / orders, admin release and refund). If consultants earn from those, this screen needs an escrow balance too.',
+      },
+
+      companies: {
+        kicker: 'Platform', title: 'Companies',
+        lead: 'Every customer workspace. Plainer chrome than the customer portals on purpose — staff should never be unsure which side of the product they are on.',
+        actions: [{ label: 'Export', border: '1px solid ' + LINE, bg: '#fff', color: INK }, { label: 'Create company', border: '0', bg: INK, color: '#fff' }],
+        stats: [
+          { k: 'Companies', v: '341', color: INK, sub: '+18 this month' },
+          { k: 'Active FY2025', v: '287', color: INK, sub: false },
+          { k: 'Trial', v: '31', color: '#8a6118', sub: '9 expiring this week' },
+          { k: 'Churn risk', v: '12', color: '#b4402b', sub: 'no login in 60 days' },
+        ],
+        cols: [['Company', 'left'], ['Plan', 'left'], ['Consultant', 'left'], ['Last active', 'right'], ['State', 'right']],
+        minW: '860px', tableCols: 'minmax(200px,1.8fr) minmax(100px,1fr) minmax(140px,1.4fr) minmax(100px,1fr) minmax(88px,.9fr)',
+        rows: [
+          { name: 'Al Maktoum Industries LLC', sub: 'UAE · Manufacturing', initials: 'AM', clickable: true,
+            cells: [txt('Enterprise'), txt('Haddad Advisory'), txt('2 hours ago', { align: 'right' }), chip('Active', OK)] },
+          { name: 'Gulf Petrochem FZE', sub: 'UAE · Chemicals', initials: 'GP', clickable: true,
+            cells: [txt('Enterprise'), txt('Haddad Advisory'), txt('Yesterday', { align: 'right' }), chip('Active', OK)] },
+          { name: 'Emirates Logistics Co', sub: 'UAE · Transport', initials: 'EL', clickable: true,
+            cells: [txt('Growth'), txt('Haddad Advisory'), txt('3 days ago', { align: 'right' }), chip('Active', OK)] },
+          { name: 'Northern Foods Trading', sub: 'UAE · FMCG', initials: 'NF', clickable: true,
+            cells: [txt('Growth'), txt('GreenStep'), txt('Today', { align: 'right' }), chip('Trial', WARN)] },
+          { name: 'Riyadh Metals Co', sub: 'KSA · Metals', initials: 'RM', clickable: true,
+            cells: [txt('Starter'), txt('None'), txt('68 days ago', { align: 'right', color: '#b4402b' }), chip('At risk', BAD)] },
+          { name: 'Desert Solar JV', sub: 'UAE · Energy', initials: 'DS', clickable: true,
+            cells: [txt('Starter'), txt('Haddad Advisory'), txt('1 week ago', { align: 'right' }), chip('Active', OK)] },
+        ],
+        foot: '341 COMPANIES · 6 SHOWN',
+        note: 'Grounded in admin/companies views and the admin guard that already exist. The consultant column is added so staff can see the relationship when a support ticket arrives — currently that requires two lookups.',
+      },
+      consultants: {
+        kicker: 'Platform', title: 'Consultants',
+        lead: 'Applications and active practices. Consultant sign-up creates an account that cannot reach client data until approved here.',
+        actions: [{ label: 'All practices', border: '1px solid ' + LINE, bg: '#fff', color: INK }, { label: 'Review queue (7)', border: '0', bg: INK, color: '#fff' }],
+        stats: [
+          { k: 'Practices', v: '46', color: INK, sub: false },
+          { k: 'Awaiting review', v: '7', color: '#8a6118', sub: 'oldest 4 days' },
+          { k: 'Clients managed', v: '198', color: INK, sub: '58% of companies' },
+          { k: 'Suspended', v: '2', color: '#b4402b', sub: false },
+        ],
+        cols: [['Practice', 'left'], ['Clients', 'left'], ['Applied', 'left'], ['Verified', 'right'], ['State', 'right']],
+        minW: '820px', tableCols: 'minmax(200px,1.8fr) minmax(90px,.9fr) minmax(110px,1.1fr) minmax(110px,1.1fr) minmax(96px,1fr)',
+        rows: [
+          { name: 'Haddad Advisory FZ-LLC', sub: 'Layla Haddad · Dubai', initials: 'HA', clickable: true,
+            cells: [txt('28'), txt('Jan 2024'), txt('Trade licence', { align: 'right' }), chip('Active', OK)] },
+          { name: 'GreenStep Consulting', sub: 'Omar Siddiqui · Abu Dhabi', initials: 'GS', clickable: true,
+            cells: [txt('11'), txt('Mar 2025'), txt('Trade licence', { align: 'right' }), chip('Active', OK)] },
+          { name: 'Meridian ESG Partners', sub: 'Fatima Noor · Riyadh', initials: 'MP', clickable: true,
+            cells: [txt('0'), txt('4 days ago'), txt('Not checked', { align: 'right', color: '#8a6118' }), chip('Review', WARN)] },
+          { name: 'CarbonWise MENA', sub: 'Yusuf Rahman · Sharjah', initials: 'CW', clickable: true,
+            cells: [txt('0'), txt('2 days ago'), txt('Not checked', { align: 'right', color: '#8a6118' }), chip('Review', WARN)] },
+          { name: 'Apex Sustainability', sub: 'Withheld · Doha', initials: 'AS', clickable: true,
+            cells: [txt('3'), txt('Aug 2024'), txt('Expired', { align: 'right', color: '#b4402b' }), chip('Suspended', BAD)] },
+        ],
+        foot: false,
+        note: 'An approval gate is implied by the admin consultants controller but the criteria are not defined in code. Trade-licence verification is the assumption — worth confirming, because it is what stops anyone signing up and requesting access to real emissions data.',
+      },
+      plans: {
+        kicker: 'Platform', title: 'Plans & subscriptions',
+        lead: 'Entitlements are enforced per workspace. Changing a plan\u2019s limits affects every company on it, so edits are staged and take effect at the next renewal.',
+        actions: [{ label: 'Revenue report', border: '1px solid ' + LINE, bg: '#fff', color: INK }, { label: 'New plan', border: '0', bg: INK, color: '#fff' }],
+        stats: [
+          { k: 'MRR', v: 'AED 1.42m', color: INK, sub: '+6.1% MoM' },
+          { k: 'Plans', v: '4', color: INK, sub: '1 legacy' },
+          { k: 'Trials converting', v: '61%', color: E, sub: 'last 90 days' },
+          { k: 'Overdue invoices', v: '4', color: '#b4402b', sub: 'AED 118k' },
+        ],
+        cols: [['Plan', 'left'], ['Companies', 'left'], ['Sites', 'left'], ['Price / yr', 'right'], ['State', 'right']],
+        minW: '780px', tableCols: 'minmax(180px,1.6fr) minmax(100px,1fr) minmax(90px,.9fr) minmax(110px,1.1fr) minmax(88px,.9fr)',
+        rows: [
+          { name: 'Enterprise', sub: 'All frameworks · assurance workflow', initials: false, clickable: true,
+            cells: [txt('84'), txt('Up to 25'), txt('AED 42,000', { align: 'right', weight: 600 }), chip('Live', OK)] },
+          { name: 'Growth', sub: 'IFRS S2, GRI, UAE ESG', initials: false, clickable: true,
+            cells: [txt('146'), txt('Up to 10'), txt('AED 18,000', { align: 'right', weight: 600 }), chip('Live', OK)] },
+          { name: 'Starter', sub: 'GHG inventory only', initials: false, clickable: true,
+            cells: [txt('80'), txt('Up to 3'), txt('AED 6,000', { align: 'right', weight: 600 }), chip('Live', OK)] },
+          { name: 'Pilot 2024', sub: 'Legacy — no new signups', initials: false, clickable: true,
+            cells: [txt('31'), txt('Up to 5'), txt('AED 4,200', { align: 'right', weight: 600 }), chip('Legacy', NONE)] },
+        ],
+        foot: false,
+        note: 'Grounded in the subscriptions routes and billing controller. Staging limit changes to the next renewal is an assumption — applying them immediately would silently lock a company out of sites it already reports on.',
+      },
+      factors: {
+        kicker: 'Platform', title: 'Emission factor library',
+        lead: 'Factors are versioned and never edited in place — a change creates a new version, so a report exported last year still reproduces exactly.',
+        actions: [{ label: 'Import factor set', border: '1px solid ' + LINE, bg: '#fff', color: INK }, { label: 'New version', border: '0', bg: INK, color: '#fff' }],
+        stats: [
+          { k: 'Factor sets', v: '14', color: INK, sub: '6 regions' },
+          { k: 'Active', v: '9', color: INK, sub: false },
+          { k: 'Superseded', v: '5', color: DIM, sub: 'kept for reproducibility' },
+          { k: 'Company overrides', v: '23', color: '#8a6118', sub: 'flagged in reports' },
+        ],
+        cols: [['Factor set', 'left'], ['Scope', 'left'], ['Version', 'left'], ['In use by', 'right'], ['State', 'right']],
+        minW: '820px', tableCols: 'minmax(200px,1.8fr) minmax(90px,.9fr) minmax(110px,1.1fr) minmax(100px,1fr) minmax(96px,1fr)',
+        rows: [
+          { name: 'DEWA grid electricity', sub: 'Dubai · location-based', initials: false, clickable: true,
+            cells: [txt('Scope 2'), txt('2024 · v3'), txt('218 companies', { align: 'right' }), chip('Active', OK)] },
+          { name: 'SEWA grid electricity', sub: 'Sharjah · location-based', initials: false, clickable: true,
+            cells: [txt('Scope 2'), txt('2024 · v2'), txt('64 companies', { align: 'right' }), chip('Active', OK)] },
+          { name: 'UAE stationary combustion', sub: 'Natural gas, diesel, LPG', initials: false, clickable: true,
+            cells: [txt('Scope 1'), txt('2024 · v1'), txt('287 companies', { align: 'right' }), chip('Active', OK)] },
+          { name: 'DEFRA business travel', sub: 'Air, rail, hotel', initials: false, clickable: true,
+            cells: [txt('Scope 3'), txt('2025 · v1'), txt('112 companies', { align: 'right' }), chip('Active', OK)] },
+          { name: 'DEWA grid electricity', sub: 'Dubai · location-based', initials: false, clickable: true,
+            cells: [txt('Scope 2'), txt('2023 · v2'), txt('0 · archived', { align: 'right' }), chip('Superseded', NONE)] },
+        ],
+        foot: 'A SUPERSEDED SET IS NEVER DELETED — PAST REPORTS MUST STILL REPRODUCE',
+        note: 'You left the factor-authority question open, so this is drawn as admin-curated with company overrides permitted and flagged. That is the middle option: companies are not blocked from a factor they can justify, but an auditor can always see where they departed from the library.',
+      },
+      audit: {
+        kicker: 'Platform', title: 'Audit log',
+        lead: 'Every privileged action, immutable. Impersonation is logged with the reason the staff member typed before entering.',
+        actions: [{ label: 'Filter', border: '1px solid ' + LINE, bg: '#fff', color: INK }, { label: 'Export range', border: '0', bg: INK, color: '#fff' }],
+        stats: [
+          { k: 'Events (30d)', v: '18,442', color: INK, sub: false },
+          { k: 'Privileged', v: '212', color: '#8a6118', sub: 'staff actions' },
+          { k: 'Impersonations', v: '31', color: '#8a6118', sub: 'all with a reason' },
+          { k: 'Failed logins', v: '96', color: INK, sub: '2 accounts locked' },
+        ],
+        cols: [['Action', 'left'], ['Actor', 'left'], ['Target', 'left'], ['Reason', 'right'], ['When', 'right']],
+        minW: '880px', tableCols: 'minmax(200px,1.8fr) minmax(120px,1.2fr) minmax(140px,1.4fr) minmax(120px,1.2fr) minmax(90px,.9fr)',
+        rows: [
+          { name: 'Impersonated user', sub: false, initials: false, clickable: false,
+            cells: [txt('r.mehta@silverwebbuzz'), txt('Riyadh Metals Co'), txt('Ticket #4182', { align: 'right' }), txt('09:12', { align: 'right' })] },
+          { name: 'Published factor set DEWA 2024 v3', sub: false, initials: false, clickable: false,
+            cells: [txt('a.khan@silverwebbuzz'), txt('218 companies'), txt('Annual update', { align: 'right' }), txt('Yesterday', { align: 'right' })] },
+          { name: 'Approved consultant practice', sub: false, initials: false, clickable: false,
+            cells: [txt('r.mehta@silverwebbuzz'), txt('GreenStep Consulting'), txt('Licence verified', { align: 'right' }), txt('2 days ago', { align: 'right' })] },
+          { name: 'Suspended consultant practice', sub: false, initials: false, clickable: false,
+            cells: [txt('r.mehta@silverwebbuzz'), txt('Apex Sustainability'), txt('Licence expired', { align: 'right' }), txt('5 days ago', { align: 'right' })] },
+          { name: 'Changed plan limits', sub: false, initials: false, clickable: false,
+            cells: [txt('a.khan@silverwebbuzz'), txt('Growth plan'), txt('Sites 8 → 10', { align: 'right' }), txt('1 week ago', { align: 'right' })] },
+        ],
+        foot: 'IMMUTABLE · RETAINED 7 YEARS',
+        note: 'No audit log exists in the repo today. Requiring a typed reason before impersonation is the assumption worth keeping: it is cheap to build and it is the first thing an enterprise security review asks about.',
+      },
+      metrics: {
+        kicker: 'Platform', title: 'Platform health',
+        lead: 'Operational numbers, not vanity metrics. Each one has an action attached to it somewhere in this portal.',
+        actions: [{ label: 'Last 90 days', border: '1px solid ' + LINE, bg: '#fff', color: INK }, { label: 'Export', border: '0', bg: INK, color: '#fff' }],
+        stats: [
+          { k: 'Companies', v: '341', color: INK, sub: '+18 MoM' },
+          { k: 'Weekly active', v: '62%', color: INK, sub: 'of paying accounts' },
+          { k: 'Data entries (30d)', v: '41,208', color: INK, sub: false },
+          { k: 'Reports exported', v: '1,184', color: INK, sub: 'this year' },
+        ],
+        cols: [['Signal', 'left'], ['Now', 'left'], ['Change', 'left'], ['Threshold', 'right'], ['State', 'right']],
+        minW: '780px', tableCols: 'minmax(200px,1.8fr) minmax(90px,.9fr) minmax(100px,1fr) minmax(110px,1.1fr) minmax(88px,.9fr)',
+        rows: [
+          { name: 'Onboarding completion', sub: 'Reaches first real number', initials: false, clickable: false,
+            cells: [txt('58%'), txt('−4 pts', { color: '#b4402b' }), txt('Target 70%', { align: 'right' }), chip('Below', BAD)] },
+          { name: 'Trial → paid conversion', sub: false, initials: false, clickable: false,
+            cells: [txt('61%'), txt('+3 pts', { color: E }), txt('Target 55%', { align: 'right' }), chip('Above', OK)] },
+          { name: 'Scope 3 adoption', sub: 'Any category populated', initials: false, clickable: false,
+            cells: [txt('34%'), txt('+2 pts', { color: E }), txt('Target 50%', { align: 'right' }), chip('Below', WARN)] },
+          { name: 'Support tickets / 100 accounts', sub: false, initials: false, clickable: false,
+            cells: [txt('7.2'), txt('−1.1', { color: E }), txt('Ceiling 10', { align: 'right' }), chip('OK', OK)] },
+          { name: 'Median export time', sub: 'IFRS S2 PDF', initials: false, clickable: false,
+            cells: [txt('4.1s'), txt('+0.6s', { color: '#8a6118' }), txt('Ceiling 5s', { align: 'right' }), chip('Watch', WARN)] },
+        ],
+        foot: false,
+        note: 'Onboarding completion is deliberately first and deliberately red — it is the metric the onboarding wizard in the Internal file is meant to move. A platform dashboard that does not name a failing number is decoration.',
+      },
+    };
+
+    const v = V[active] || V.clients;
+
+    return {
+      tabs,
+      accent, portalBadge: isAdmin ? 'Platform admin' : 'Consultant portal',
+      badgeBg: isAdmin ? '#f4f4f2' : '#eef3f8',
+      badgeBorder: isAdmin ? '#d6d7d3' : '#cfdfeb',
+      headerMeta: isAdmin ? 'STAFF · ALL ACTIONS LOGGED' : 'FY 2025 · 28 CLIENTS',
+      avatar: isAdmin ? 'RM' : 'LH',
+      tabMeta: isAdmin ? 'SILVER WEBBUZZ STAFF' : 'HADDAD ADVISORY FZ-LLC',
+      showActing: active === 'acting',
+      goClients: this.go('consultant', 'clients'),
+      kicker: v.kicker, title: v.title, lead: v.lead, actions: v.actions, stats: v.stats,
+      columns: v.cols.map(([label, align]) => ({ label, align })),
+      tableCols: v.tableCols, tableMinWidth: v.minW, tableFoot: v.foot || false,
+      rows: v.rows.map(r => ({
+        ...r,
+        cursor: r.clickable ? 'pointer' : 'default',
+        avBg: isAdmin ? '#f4f4f2' : '#eef3f8',
+        avBorder: isAdmin ? '#d6d7d3' : '#cfdfeb',
+        avColor: isAdmin ? INK : S,
+        go: () => {},
+      })),
+      showSideNote: true, sideNote: v.note,
+    };
+  }
+}
+</script>
+</body>
+</html>

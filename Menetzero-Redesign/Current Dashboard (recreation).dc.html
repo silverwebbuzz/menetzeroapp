@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<style>
+html,body{margin:0;padding:0}
+body{font-family:'Inter','Poppins',system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:400;font-size:0.875rem;line-height:1.428571;color:#0f172a;background:#f8fafc;-webkit-font-smoothing:antialiased}
+*,*::before,*::after{box-sizing:border-box}
+a{color:#15803d;text-decoration:none}
+a:hover{color:#166534;text-decoration:underline}
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;align-items:stretch;background:#f8fafc">
+
+  <aside style="background:#fff;border-right:1px solid #e2e8f0;width:280px;flex:0 0 280px;display:flex;flex-direction:column;align-self:stretch">
+    <div style="padding:0 1.25rem;border-bottom:1px solid #e2e8f0;height:64px;min-height:64px;display:flex;align-items:center">
+      <a href="#" style="display:flex;align-items:center;gap:0.625rem;text-decoration:none"><img src="assets/menetzero.svg" alt="MIDDLE EAST NET Zero" style="height:1.875rem;width:auto"></a>
+    </div>
+
+    <nav style="margin-top:0.5rem;padding:0 0.25rem;flex:1;display:flex;flex-direction:column">
+      <div style="flex:1;display:flex;flex-direction:column;min-height:0">
+
+        <div style="padding:0.5rem 0.5rem 0.25rem">
+          <a href="#" style="position:relative;display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;font-size:0.875rem;font-weight:600;border-radius:8px;margin:0.125rem 0;background:#dcfce7;color:#166534;text-decoration:none;line-height:1.3">
+            <span style="position:absolute;left:-0.5rem;top:0.375rem;bottom:0.375rem;width:3px;background:#16a34a;border-radius:0 2px 2px 0"></span>
+            <svg fill="none" stroke="#16a34a" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h6v6H4V6zm0 10h6v2H4v-2zm10-10h6v2h-6V6zm0 6h6v6h-6v-6z"/></svg>
+            Dashboard
+          </a>
+        </div>
+
+        <div style="padding:1rem 0.5rem 0.25rem">
+          <div style="font-size:0.875rem;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;color:#94a3b8;padding:0 0.75rem 0.5rem;line-height:1.428571">Emissions</div>
+          <a href="#" style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;font-size:0.875rem;font-weight:500;border-radius:8px;margin:0.125rem 0;color:#64748b;text-decoration:none;line-height:1.3">
+            <svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            Locations
+          </a>
+        </div>
+
+        <div style="padding:1rem 0.5rem 0.25rem">
+          <div style="font-size:0.875rem;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;color:#94a3b8;padding:0 0.75rem 0.5rem;line-height:1.428571">Quick Input</div>
+          <a href="#" style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;font-size:0.875rem;font-weight:500;border-radius:8px;margin:0.125rem 0;color:#64748b;text-decoration:none;line-height:1.3">
+            <svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+            View Entries
+          </a>
+          <a href="#" style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;font-size:0.875rem;font-weight:500;border-radius:8px;margin:0.125rem 0;color:#64748b;text-decoration:none;line-height:1.3">
+            <svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0-12l-4 4m4-4l4 4"/></svg>
+            Bulk Import
+          </a>
+          <button type="button" style="display:flex;width:100%;align-items:center;justify-content:space-between;text-align:left;gap:0.625rem;padding:0.5rem 0.75rem;font-size:0.875rem;font-weight:500;border-radius:8px;margin:0.125rem 0;color:#64748b;background:none;border:none;cursor:pointer;font-family:inherit;line-height:1.3">
+            <span style="display:flex;align-items:center;gap:0.625rem">
+              <svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2C8 6 6 9 6 13a6 6 0 0012 0c0-2-1-4-3-5 0 2-1 3-2 3s-2-2-1-4c.5-1 .5-3 0-5z"/></svg>
+              Scope 1
+            </span>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:0.875rem;height:0.875rem;margin:0"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div style="margin-left:1.25rem;border-left:1px solid #e2e8f0;padding-left:0.5rem;margin-bottom:0.5rem;display:flex;flex-direction:column;gap:0.125rem">
+            <a href="#" style="display:flex;align-items:center;gap:0.625rem;padding:0.375rem 0.75rem;font-size:0.8125rem;font-weight:500;border-radius:8px;color:#64748b;text-decoration:none;line-height:1.3">
+              <svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2C8 6 6 9 6 13a6 6 0 0012 0c0-2-1-4-3-5 0 2-1 3-2 3s-2-2-1-4c.5-1 .5-3 0-5z"/></svg>
+              Natural Gas
+            </a>
+            <a href="#" style="display:flex;align-items:center;gap:0.625rem;padding:0.375rem 0.75rem;font-size:0.8125rem;font-weight:500;border-radius:8px;color:#64748b;text-decoration:none;line-height:1.3">
+              <svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8h11v8H3zM14 11h4l3 3v2h-7zM7 19a2 2 0 104 0 2 2 0 00-4 0zM17 19a2 2 0 104 0 2 2 0 00-4 0z"/></svg>
+              Vehicle Fleet
+            </a>
+            <a href="#" style="display:flex;align-items:center;gap:0.625rem;padding:0.375rem 0.75rem;font-size:0.8125rem;font-weight:500;border-radius:8px;color:#64748b;text-decoration:none;line-height:1.3">
+              <svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v20M4.93 4.93l14.14 14.14M2 12h20M4.93 19.07L19.07 4.93"/></svg>
+              Refrigerants
+            </a>
+          </div>
+          <button type="button" style="display:flex;width:100%;align-items:center;justify-content:space-between;text-align:left;gap:0.625rem;padding:0.5rem 0.75rem;font-size:0.875rem;font-weight:500;border-radius:8px;margin:0.125rem 0;color:#64748b;background:none;border:none;cursor:pointer;font-family:inherit;line-height:1.3">
+            <span style="display:flex;align-items:center;gap:0.625rem">
+              <svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              Scope 2
+            </span>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:0.875rem;height:0.875rem;margin:0"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <button type="button" style="display:flex;width:100%;align-items:center;justify-content:space-between;text-align:left;gap:0.625rem;padding:0.5rem 0.75rem;font-size:0.875rem;font-weight:500;border-radius:8px;margin:0.125rem 0;color:#64748b;background:none;border:none;cursor:pointer;font-family:inherit;line-height:1.3">
+            <span style="display:flex;align-items:center;gap:0.625rem">
+              <svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 16l18-6-7 10v-4l-6-2 2 6-4-2z"/></svg>
+              Scope 3
+            </span>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:0.875rem;height:0.875rem;margin:0"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+        </div>
+
+        <div style="padding:1rem 0.5rem 0.25rem">
+          <div style="font-size:0.875rem;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;color:#94a3b8;padding:0 0.75rem 0.5rem;line-height:1.428571">Disclosures</div>
+          <a href="#" style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;font-size:0.875rem;font-weight:500;border-radius:8px;margin:0.125rem 0;color:#64748b;text-decoration:none;line-height:1.3"><svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h6v6H4V6zm0 10h6v2H4v-2zm10-10h6v2h-6V6zm0 6h6v6h-6v-6z"/></svg>Overview</a>
+          <a href="#" style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;font-size:0.875rem;font-weight:500;border-radius:8px;margin:0.125rem 0;color:#64748b;text-decoration:none;line-height:1.3"><svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v20M4.93 4.93l14.14 14.14M2 12h20M4.93 19.07L19.07 4.93"/></svg>IFRS S2 — Climate</a>
+          <a href="#" style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;font-size:0.875rem;font-weight:500;border-radius:8px;margin:0.125rem 0;color:#64748b;text-decoration:none;line-height:1.3"><svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3l8 4v5c0 5-3.5 8-8 10-4.5-2-8-5-8-10V7l8-4z"/></svg>IFRS S1 — Sustainability</a>
+          <a href="#" style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;font-size:0.875rem;font-weight:500;border-radius:8px;margin:0.125rem 0;color:#64748b;text-decoration:none;line-height:1.3"><svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>GRI Standards</a>
+          <a href="#" style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;font-size:0.875rem;font-weight:500;border-radius:8px;margin:0.125rem 0;color:#64748b;text-decoration:none;line-height:1.3"><svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>UAE ESG Report</a>
+          <a href="#" style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;font-size:0.875rem;font-weight:500;border-radius:8px;margin:0.125rem 0;color:#64748b;text-decoration:none;line-height:1.3"><svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3v18h18"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 14l4-4 4 4 5-7"/></svg>ESG Dashboard</a>
+          <a href="#" style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;font-size:0.875rem;font-weight:500;border-radius:8px;margin:0.125rem 0;color:#64748b;text-decoration:none;line-height:1.3"><svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>ESG Scorecard</a>
+          <a href="#" style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;font-size:0.875rem;font-weight:500;border-radius:8px;margin:0.125rem 0;color:#64748b;text-decoration:none;line-height:1.3"><svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-5.13a4 4 0 11-8 0 4 4 0 018 0zm6 3a3 3 0 11-6 0 3 3 0 016 0z"/></svg>ESG Depth</a>
+          <a href="#" style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;font-size:0.875rem;font-weight:500;border-radius:8px;margin:0.125rem 0;color:#64748b;text-decoration:none;line-height:1.3"><svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>SASB Index</a>
+        </div>
+
+        <div style="padding:1rem 0.5rem 0.25rem">
+          <div style="font-size:0.875rem;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;color:#94a3b8;padding:0 0.75rem 0.5rem;line-height:1.428571">GHG Inventory</div>
+          <a href="#" style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;font-size:0.875rem;font-weight:500;border-radius:8px;margin:0.125rem 0;color:#64748b;text-decoration:none;line-height:1.3"><svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>GHG Inventory</a>
+          <a href="#" style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;font-size:0.875rem;font-weight:500;border-radius:8px;margin:0.125rem 0;color:#64748b;text-decoration:none;line-height:1.3"><svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Reporting Settings</a>
+          <a href="#" style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;font-size:0.875rem;font-weight:500;border-radius:8px;margin:0.125rem 0;color:#64748b;text-decoration:none;line-height:1.3"><svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>My Profile</a>
+        </div>
+
+        <div style="padding:1rem 0.5rem 0.25rem;border-top:1px solid #e2e8f0;padding-top:0.75rem">
+          <div style="font-size:0.875rem;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;color:#94a3b8;padding:0 0.75rem 0.5rem;line-height:1.428571">Settings</div>
+          <a href="#" style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;font-size:0.875rem;font-weight:500;border-radius:8px;margin:0.125rem 0;color:#64748b;text-decoration:none;line-height:1.3"><svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-5.13a4 4 0 11-8 0 4 4 0 018 0zm6 3a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Team &amp; Access</a>
+          <a href="#" style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;font-size:0.875rem;font-weight:500;border-radius:8px;margin:0.125rem 0;color:#64748b;text-decoration:none;line-height:1.3"><svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>Plan &amp; billing</a>
+          <a href="#" style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;font-size:0.875rem;font-weight:500;border-radius:8px;margin:0.125rem 0;color:#64748b;text-decoration:none;line-height:1.3"><svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-5.13a4 4 0 11-8 0 4 4 0 018 0zm6 3a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Consultants</a>
+        </div>
+
+        <div style="padding:1rem 0.5rem 0.25rem;margin-top:auto;border-top:1px solid #e2e8f0;padding-top:0.75rem">
+          <div style="font-size:0.875rem;font-weight:500;text-transform:uppercase;letter-spacing:0.04em;color:#94a3b8;padding:0 0.75rem 0.5rem;line-height:1.428571">Help</div>
+          <a href="#" style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;font-size:0.875rem;font-weight:500;border-radius:8px;margin:0.125rem 0;color:#64748b;text-decoration:none;line-height:1.3"><svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1.125rem;height:1.125rem;flex-shrink:0;stroke-width:2"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Help &amp; guide</a>
+        </div>
+
+      </div>
+    </nav>
+  </aside>
+
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column;background:#f8fafc;min-height:100vh">
+
+    <header style="background:#fff;border-bottom:1px solid #e2e8f0;padding:0 1.5rem;height:72px;min-height:72px;display:flex;align-items:center;gap:0.75rem">
+      <p style="color:#64748b;font-size:0.875rem;font-weight:500;margin:0;line-height:1.3;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><strong style="color:#0f172a;font-weight:600">Al Maktoum Industries LLC</strong></p>
+      <div style="display:flex;align-items:center;gap:0.375rem;margin-left:auto;flex-shrink:0">
+        <a href="#" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.4375rem 0.625rem;border-radius:8px;font-size:0.8125rem;font-weight:500;color:#166534;background:#dcfce7;border:1px solid #bbf7d0;text-decoration:none">
+          <svg fill="none" stroke="#15803d" viewBox="0 0 24 24" style="width:1rem;height:1rem"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 3l1.9 5.2L19 10l-5.1 1.8L12 17l-1.9-5.2L5 10l5.1-1.8L12 3z"/></svg>
+          Zero AI
+        </a>
+        <button type="button" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.4375rem 0.625rem;border-radius:8px;font-size:0.8125rem;font-weight:500;color:#64748b;background:transparent;border:1px solid transparent;cursor:pointer;font-family:inherit">
+          <svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1rem;height:1rem"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+          Al Maktoum Industries LLC
+          <svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1rem;height:1rem"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <button type="button" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.4375rem 0.625rem;border-radius:8px;font-size:0.8125rem;font-weight:500;color:#64748b;background:transparent;border:1px solid transparent;cursor:pointer;font-family:inherit">
+          <span style="width:1.75rem;height:1.75rem;border-radius:9999px;background:#dcfce7;color:#166534;display:inline-flex;align-items:center;justify-content:center;font-weight:600;font-size:0.75rem;border:1px solid #bbf7d0">R</span>
+          Rashid Al Falasi
+          <svg fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="width:1rem;height:1rem"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main style="flex:1;padding:1.75rem 1.5rem;width:100%">
+      <div style="display:flex;flex-direction:column;gap:32px;width:100%;min-width:0">
+
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:8px">
+          <div>
+            <h1 style="font-size:1.75rem;font-weight:700;line-height:1.2;color:#0f172a;letter-spacing:-0.02em;margin:0 0 8px">Dashboard</h1>
+            <p style="font-size:0.875rem;font-weight:400;line-height:1.5;color:#64748b;margin:0">Executive snapshot of emissions performance, net zero progress, and compliance readiness.</p>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem">
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-right:0.25rem">
+              <label style="font-size:0.875rem;color:#4b5563">Year</label>
+              <select style="border:1px solid #cbd5e1;border-radius:8px;padding:0 0.75rem;font-size:0.875rem;min-height:44px;background:#fff;color:#0f172a;font-family:inherit"><option>2025</option><option>2024</option></select>
+            </div>
+            <a href="#" style="display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 24px;border-radius:8px;font-size:0.875rem;font-weight:500;background:#fff;color:#0f172a;border:1px solid #cbd5e1;text-decoration:none">Locations</a>
+            <a href="#" style="display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 24px;border-radius:8px;font-size:0.875rem;font-weight:500;background:#fff;color:#0f172a;border:1px solid #cbd5e1;text-decoration:none">Quick Input</a>
+            <a href="#" style="display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 24px;border-radius:8px;font-size:0.875rem;font-weight:500;background:#16a34a;color:#fff;border:1px solid #16a34a;text-decoration:none">Reports</a>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,14rem),1fr));gap:16px;width:100%">
+          <sc-for list="{{ kpiCards }}" as="c" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;box-shadow:0 1px 2px rgba(15,23,42,0.05);min-width:0;overflow:hidden">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:16px;min-width:0">
+                <span style="font-size:0.8125rem;font-weight:500;color:#64748b;text-transform:uppercase;letter-spacing:0.04em">{{ c.label }}</span>
+                <svg viewBox="0 0 72 28" style="width:72px;height:28px;flex-shrink:0"><polyline points="{{ c.spark }}" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+              </div>
+              <div style="font-size:2.25rem;font-weight:700;line-height:1.1;color:#0f172a;letter-spacing:-0.03em">{{ c.value }}<span style="font-size:0.8125rem;font-weight:500;color:#64748b;margin-left:4px">tCO₂e</span></div>
+              <div style="font-size:0.875rem;font-weight:500;margin-top:8px;color:{{ c.trendColor }}">{{ c.trendText }}</div>
+              <sc-if value="{{ c.compare }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:0.8125rem;color:#64748b;margin-top:4px">{{ c.compare }}</div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 1px 2px rgba(15,23,42,0.05)">
+          <div style="padding:24px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+            <div>
+              <h3 style="font-size:1rem;font-weight:600;line-height:1.35;color:#0f172a;margin:0">Net Zero Progress</h3>
+              <p style="font-size:0.8125rem;line-height:1.4;color:#64748b;margin:4px 0 0">UAE Net Zero 2050 pathway and projected achievement</p>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:1.5rem;font-weight:700;line-height:1.1;color:#0f172a;letter-spacing:-0.03em">18%</div>
+              <div style="font-size:0.8125rem;line-height:1.4;color:#64748b;margin:4px 0 0">toward baseline reduction</div>
+            </div>
+          </div>
+          <div style="padding:24px">
+            <div style="height:8px;background:#f8fafc;border-radius:999px;overflow:hidden"><div style="height:100%;width:18%;background:#16a34a;border-radius:999px"></div></div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,9rem),1fr));gap:24px;margin-top:24px;padding-top:24px;border-top:1px solid #e2e8f0">
+              <div>
+                <div style="font-size:0.8125rem;font-weight:500;color:#64748b;text-transform:uppercase;letter-spacing:0.04em">Current emissions (absolute)</div>
+                <div style="font-size:1.25rem;font-weight:700;line-height:1.1;color:#0f172a;letter-spacing:-0.03em">4,182.64<span style="font-size:0.8125rem;font-weight:500;color:#64748b;margin-left:4px">tCO₂e</span></div>
+                <div style="font-size:0.8125rem;line-height:1.4;color:#64748b;margin-top:4px">0.0284 tCO₂e / AED revenue</div>
+              </div>
+              <div>
+                <div style="font-size:0.8125rem;font-weight:500;color:#64748b;text-transform:uppercase;letter-spacing:0.04em">Reduction</div>
+                <div style="font-size:1.25rem;font-weight:700;line-height:1.1;color:#0f172a;letter-spacing:-0.03em">18%</div>
+              </div>
+              <div>
+                <div style="font-size:0.8125rem;font-weight:500;color:#64748b;text-transform:uppercase;letter-spacing:0.04em">Target year</div>
+                <div style="font-size:1.25rem;font-weight:700;line-height:1.1;color:#0f172a;letter-spacing:-0.03em">2050</div>
+              </div>
+              <div>
+                <div style="font-size:0.8125rem;font-weight:500;color:#64748b;text-transform:uppercase;letter-spacing:0.04em">Projected achievement</div>
+                <div style="font-weight:600;color:#0f172a;margin-top:4px">2047</div>
+                <div style="font-size:0.8125rem;line-height:1.4;color:#64748b;margin:4px 0 0">25 years remaining</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr));gap:24px;width:100%">
+          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 1px 2px rgba(15,23,42,0.05)">
+            <div style="padding:24px;border-bottom:1px solid #e2e8f0">
+              <h3 style="font-size:1rem;font-weight:600;line-height:1.35;color:#0f172a;margin:0">Emissions Trend</h3>
+              <p style="font-size:0.8125rem;line-height:1.4;color:#64748b;margin:4px 0 0">12-month total emissions (tCO₂e)</p>
+            </div>
+            <div style="padding:24px"><div style="height:16rem"><canvas id="monthlyEmissionsChart"></canvas></div></div>
+          </div>
+          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 1px 2px rgba(15,23,42,0.05)">
+            <div style="padding:24px;border-bottom:1px solid #e2e8f0">
+              <h3 style="font-size:1rem;font-weight:600;line-height:1.35;color:#0f172a;margin:0">Scope Breakdown</h3>
+              <p style="font-size:0.8125rem;line-height:1.4;color:#64748b;margin:4px 0 0">Share of total emissions by scope</p>
+            </div>
+            <div style="padding:24px"><div style="height:16rem"><canvas id="emissionsByScopeChart"></canvas></div></div>
+          </div>
+        </div>
+
+        <div>
+          <h3 style="font-size:1rem;font-weight:600;line-height:1.35;color:#0f172a;margin:0 0 12px">Compliance Status</h3>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,14rem),1fr));gap:16px;width:100%">
+            <sc-for list="{{ compliance }}" as="item" hint-placeholder-count="4">
+              <a href="#" style="display:block;padding:24px;border:1px solid #e2e8f0;border-radius:12px;background:#fff;text-decoration:none">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">
+                  <span style="font-weight:600;color:#0f172a">{{ item.title }}</span>
+                  <span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:0.8125rem;font-weight:500;background:{{ item.bg }};color:{{ item.fg }}">{{ item.status }}</span>
+                </div>
+                <div style="height:8px;background:#f8fafc;border-radius:999px;overflow:hidden"><div style="height:100%;background:#16a34a;border-radius:999px;width:{{ item.width }}"></div></div>
+                <div style="font-size:0.8125rem;line-height:1.4;color:#64748b;margin-top:8px">{{ item.pct }}% complete</div>
+              </a>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 1px 2px rgba(15,23,42,0.05)">
+          <div style="padding:24px;border-bottom:1px solid #e2e8f0">
+            <h3 style="font-size:1rem;font-weight:600;line-height:1.35;color:#0f172a;margin:0">AI Recommendations</h3>
+            <p style="font-size:0.8125rem;line-height:1.4;color:#64748b;margin:4px 0 0">Prioritized actions based on your inventory and reporting gaps</p>
+          </div>
+          <div style="padding:24px">
+            <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px">
+              <sc-for list="{{ recommendations }}" as="rec" hint-placeholder-count="3">
+                <li style="display:flex;gap:16px;padding:16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:0.875rem;color:#0f172a">
+                  <svg fill="none" stroke="#16a34a" viewBox="0 0 24 24" style="flex-shrink:0;width:1.125rem;height:1.125rem;margin-top:2px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                  <span>{{ rec }}</span>
+                </li>
+              </sc-for>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <footer style="flex-shrink:0;padding:0.875rem 0;border-top:1px solid #e2e8f0;background:#fff;text-align:center;margin-top:auto">
+      <p style="margin:0;font-size:0.75rem;line-height:1.333333;color:#94a3b8">© 2026 MeNetZero — a brand of <a href="https://www.silverwebbuzz.com" style="color:#64748b;font-weight:500;text-decoration:none">Silver Webbuzz PVT Ltd</a></p>
+    </footer>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  spark(points) {
+    const max = Math.max(...points), min = Math.min(...points);
+    const range = Math.max(max - min, 0.001), w = 72, h = 28, n = points.length;
+    return points.map((v, i) => {
+      const x = n > 1 ? (i / (n - 1)) * w : w / 2;
+      const y = h - ((v - min) / range) * (h - 4) - 2;
+      return `${Math.round(x * 10) / 10},${Math.round(y * 10) / 10}`;
+    }).join(' ');
+  }
+
+  renderVals() {
+    const trend = (pct, compare) => ({
+      trendText: `${pct > 0 ? '↑' : pct < 0 ? '↓' : '→'} ${Math.abs(pct)}% ${compare}`,
+      trendColor: pct > 0 ? '#dc2626' : pct < 0 ? '#16a34a' : '#64748b',
+    });
+    const kpiCards = [
+      { label: 'Total Emissions', value: '4,182.64', spark: this.spark([310, 342, 328, 366, 351, 389, 402, 378, 361, 344, 358, 352]), ...trend(-1.7, 'vs last month'), compare: 'Prior year: 5,102.18 tCO₂e (−18.0% YoY)' },
+      { label: 'Scope 1', value: '1,286.40', spark: this.spark([96, 104, 99, 112, 108, 118, 121, 114, 109, 103, 107, 106]), ...trend(-0.9, 'vs prior month'), compare: null },
+      { label: 'Scope 2', value: '2,014.92', spark: this.spark([148, 162, 158, 176, 170, 188, 194, 182, 174, 166, 172, 170]), ...trend(-1.2, 'vs prior month'), compare: null },
+      { label: 'Scope 3', value: '881.32', spark: this.spark([66, 76, 71, 78, 73, 83, 87, 82, 78, 75, 79, 76]), ...trend(-3.8, 'vs prior month'), compare: null },
+    ];
+    const st = { complete: ['#dcfce7', '#166534'], pending: ['#fef3c7', '#92400e'], draft: ['#f1f5f9', '#475569'] };
+    const comp = [
+      ['GHG Inventory', 'Complete', 100, 'complete'],
+      ['IFRS S1', 'Pending', 62, 'pending'],
+      ['IFRS S2', 'Pending', 78, 'pending'],
+      ['GRI', 'Draft', 24, 'draft'],
+    ].map(([title, status, pct, key]) => ({ title, status, pct, width: pct + '%', bg: st[key][0], fg: st[key][1] }));
+    return {
+      kpiCards,
+      compliance: comp,
+      recommendations: [
+        'Scope 3 is empty for 9 of 15 categories — add business travel, commuting, or purchased goods to complete your value chain footprint.',
+        'Enter electricity or fuel data via Quick Input — start with monthly DEWA bills for UAE offices.',
+        'You have 3 draft measurement(s) — submit or verify entries before external reporting.',
+      ],
+    };
+  }
+
+  componentDidMount() {
+    const start = Date.now();
+    const tick = () => {
+      if (typeof Chart === 'undefined') { if (Date.now() - start < 8000) setTimeout(tick, 120); return; }
+      const green = ['#16a34a', '#10b981', '#22c55e'];
+      const a = document.getElementById('monthlyEmissionsChart');
+      if (a && !a.__done) {
+        a.__done = true;
+        new Chart(a, {
+          type: 'line',
+          data: {
+            labels: ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+            datasets: [{ label: 'Total Emissions (tCO₂e)', data: [310, 342, 328, 366, 351, 389, 402, 378, 361, 344, 358, 352], borderColor: green[0], backgroundColor: 'rgba(22, 163, 74, 0.08)', tension: 0.35, fill: true, pointRadius: 3, pointBackgroundColor: green[0] }],
+          },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(15, 23, 42, 0.06)' }, ticks: { font: { size: 12 } } }, x: { grid: { display: false }, ticks: { font: { size: 12 } } } } },
+        });
+      }
+      const b = document.getElementById('emissionsByScopeChart');
+      if (b && !b.__done) {
+        b.__done = true;
+        new Chart(b, {
+          type: 'doughnut',
+          data: { labels: ['Scope 1', 'Scope 2', 'Scope 3'], datasets: [{ data: [1286.4, 2014.92, 881.32], backgroundColor: green, borderColor: '#ffffff', borderWidth: 2 }] },
+          options: { responsive: true, maintainAspectRatio: false, cutout: '62%', plugins: { legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true, font: { size: 12 } } } } },
+        });
+      }
+    };
+    tick();
+  }
+}
+</script>
+</body>
+</html>

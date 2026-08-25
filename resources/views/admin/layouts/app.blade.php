@@ -32,9 +32,22 @@
     </script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}">
+    {{-- MENetZero 2.0 theme layer (Phase 0). Loads only under the new theme.
+         Existing stylesheets stay loaded so unmigrated fallback pages still
+         render correctly (redesign.md risk R-3). mnz-ui.css is `mnz-`
+         prefixed throughout and cannot collide with them. --}}
+    @theme('new')
+        @foreach ($themeAssets['css'] ?? [] as $themeCss)
+            <link rel="stylesheet" href="{{ $themeCss }}">
+        @endforeach
+        @foreach ($themeAssets['js'] ?? [] as $themeJs)
+            <script defer src="{{ $themeJs }}"></script>
+        @endforeach
+    @endtheme
+
     @stack('head')
 </head>
-<body class="bg-slate-50">
+<body class="bg-slate-50 @theme('new') mnz-theme mnz-body @endtheme">
     <div class="app-shell" x-data="{ sidebarOpen: false }">
         {{-- Mobile overlay --}}
         <div class="mobile-overlay"
