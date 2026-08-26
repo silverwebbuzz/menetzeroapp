@@ -598,7 +598,7 @@ Phase order approved **2026-08-25** — risk-based, company portal last.
 | 1 | Auth | **COMPLETE** — 2 hotfixes 2026-08-26, awaiting re-test |
 | 2 | Emails | **DEFERRED to last** — see §14 |
 | 3 | Consultant | **SHELL COMPLETE** — hotfixed 2026-08-26 |
-| 4 | Admin | Not started |
+| 4 | Admin | **SHELL COMPLETE** — awaiting review |
 | 5 | Company | Not started |
 | 6 | Switch-over | Not started |
 
@@ -991,6 +991,69 @@ The chart colours (`#3b82f6`, `#60a5fa`, `#93c5fd`) are **hardcoded in `consulta
 2. **Check what the shell being replaced actually renders.** The consultant shell ignores `page-title`; the company and admin shells *do* render it. Copying one shell's behaviour to another duplicates or drops headings.
 3. **Watch `body.<portal-class>` rules.** `body.consultant-portal` and `body.company-portal` beat bare `body` on specificity. Omit the class or override explicitly.
 4. **`--ink` / `--canvas` are defined by three stylesheets** with different values. Re-assert them in the shell's inline style.
+
+---
+
+## 17. Phase 4 — Admin Portal: shell record
+
+Shell completed **2026-08-26**. **Zero existing files modified. Zero route changes** (still 372).
+
+### Files added (2)
+
+| File | Purpose |
+|---|---|
+| `themes/new/admin/layouts/app.blade.php` | Admin shell — topbar, sidebar, page head, flash messages |
+| `themes/new/admin/partials/nav.blade.php` | Sidebar nav — 18 routes, 7 sections |
+
+### The four §16 rules, applied
+
+This is the first shell built *after* the Phase 3 hotfix, and each rule changed the outcome:
+
+| Rule | Applied |
+|---|---|
+| **1. Keep old stylesheets** | `app-shell.css`, `portal-design-system.css`, Tailwind CDN, Inter font — all before `mnz-ui.css`. Verified admin pages use `card` (33×), `table`, `btn`, `btn-ghost`, `btn-xs`, all defined in the two kept stylesheets. |
+| **2. Check what the old shell renders** | Admin **does** render `page-title` in its header, and admin pages do **not** render their own `<h1>` — the opposite of the consultant portal. The shell renders it. Dropping it would have lost every heading. |
+| **3. Watch body classes** | `bg-slate-50` is a Tailwind utility with no specificity trap, but it is dropped anyway — the shell paints its own background. |
+| **4. Re-assert tokens** | `app-shell.css` defines `--ink` / `--canvas` on `:root`; re-asserted in the shell's inline `<style>`, which loads last. |
+
+Rule 2 is the one that would have caused a visible bug had it not been recorded — the consultant and admin shells behave in exactly opposite ways here.
+
+### Flash messages preserved
+
+The old admin shell renders a `.flash-stack` block for `session('success')` / `session('error')` above the content. Admin controllers rely on it. Reproduced as `.mnz-flash` in the same position.
+
+### Nav parity verified
+
+```
+diff <(old nav routes) <(new nav routes)  →  no differences
+```
+
+All 18 routes, all 7 sections. Two links leave the admin portal and are preserved with a `↗` marker: **Pricing page** (public, `target="_blank"`) and **Client Portal** (`client.dashboard`).
+
+`$isActive` uses the same `str_starts_with` prefix logic as the original.
+
+### Palette
+
+`data-pillar="neutral"` makes admin read neutral-ink — distinct from company green and consultant blue.
+
+### Phase 0 dead-code cleanup
+
+`admin/layouts/app.blade.php` is now **byte-identical to pre-redesign**, matching the Phase 3 cleanup.
+
+**Remaining:** `layouts/app.blade.php` still carries its Phase 0 block, to be removed when the company shell is built in Phase 5.
+
+### Remaining Phase 4 work
+
+Shell done; all 51 admin **pages** still fall back to their existing views inside the new shell:
+
+| Sub-phase | Scope | Status |
+|---|---|---|
+| 4.1 | Admin shell | **DONE** |
+| 4.2 | Dashboard / statistics | Fallback |
+| 4.3 | Companies / users | Fallback |
+| 4.4 | Consultants / orders | Fallback |
+| 4.5 | Subscriptions / price book / packages | Fallback |
+| 4.6 | Site content / email templates / emissions | Fallback |
 
 ---
 
