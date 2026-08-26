@@ -599,7 +599,7 @@ Phase order approved **2026-08-25** — risk-based, company portal last.
 | 2 | Emails | **DEFERRED to last** — see §14 |
 | 3 | Consultant | **SHELL COMPLETE** — hotfixed 2026-08-26 |
 | 4 | Admin | **SHELL COMPLETE** — awaiting review |
-| 5 | Company | **5.0–5.3 + 5.2 COMPLETE** — Overview migrated |
+| 5 | Company | **5.0–5.3, 5.2, 5.7 COMPLETE** — Overview + Settings migrated |
 | 6 | Switch-over | Not started |
 
 **Each phase stops for review before the next begins.**
@@ -1360,6 +1360,68 @@ The §21 scan flagged `@push` in a Blade comment — same false-positive class a
 ### State
 
 Existing files modified since pre-redesign: **2** — `admin/price-book/index.blade.php` (the `§` fix) and `dashboard/partials/enterprise.blade.php` (script extraction, behaviour-neutral).
+
+---
+
+## 23. Phase 5.7 — Settings (reporting methodology) + automated pre-flight checks
+
+Completed **2026-08-26**.
+
+### Why Settings came before 5.4–5.6
+
+Settings is the smallest remaining cluster and the highest-consequence-per-line: `settings/reporting.blade.php` is a 13-field form whose values are **disclosed alongside the inventory**. A dropped `min`, `step` or `maxlength` is silent data corruption, not a visual glitch.
+
+### Form contract verified field by field
+
+Checked against `CompanyReportingSettingsController::update()`'s 15 validation rules **and** the original view, with a multi-line-aware attribute comparison:
+
+| Check | Result |
+|---|---|
+| Field names | 13 old / 13 new, **0 missing, 0 extra** |
+| `type`, `step`, `min`, `max`, `maxlength`, `rows`, `required` | **All 12 fields match exactly** |
+| `old()` bindings | Preserved, including `old('scope3_reason.'.$cat, …)` |
+| Scope 3 array fields | `scope3_included[]` and `scope3_reason[{cat}]` unchanged |
+
+Nothing was "tidied". `step="0.0001"` on the intensity denominator and `maxlength="40"` on its unit label are load-bearing — they match the controller's `numeric` and `max:40` rules.
+
+### Automated pre-flight checks
+
+The `$tab` failure (§21) and the `allows()` failure (§20) were both in the same family: **things static balance checks cannot see**. Those checks are now a script, `.claude/scripts/check-theme-views.py`:
+
+1. **Undefined variables** — silently null in a boolean test, fatal in a strict comparison
+2. **`mnz-` classes used but never defined** — the Phase 3 unstyled-page failure
+3. **Blade directive balance**
+
+It resolves classes from `mnz-ui.css` **and** each shell's inline `<style>`, since layouts legitimately define their own.
+
+**Run it before reporting any phase complete.** Current state: **18 files, 0 problems.**
+
+### A real bug the checker caught
+
+`mnz-side__title` — the section labels in the six-tab nav — was defined in the consultant and admin shells but **not the company shell**. Every "Environmental" / "Social" / "Governance" label in `nav-client` would have rendered as plain body text.
+
+This is the same failure mode as the Phase 3 unstyled dashboard, caught **before** a screenshot rather than after. Added to the company shell.
+
+### Verification
+
+| Check | Result |
+|---|---|
+| Pre-flight script, 18 theme files | **0 problems** |
+| Form field parity | 13/13, attributes identical |
+| `mnz-` classes in settings view | 19 used, 0 missing |
+| Blade balance | OK |
+
+### Remaining Phase 5 work
+
+| Sub-phase | Status |
+|---|---|
+| 5.0, 5.1, 5.2, 5.3, 5.7 | **DONE** |
+| 5.4 Social bodies | Fallback |
+| 5.5 Governance bodies | Fallback |
+| 5.6 Reports bodies | Fallback |
+| 5.8 Internal states | Not started |
+
+Note 5.7's other three screens (Profile, Team, Billing) are route aliases into existing views and still fall back — only the reporting-methodology page has a themed body.
 
 ---
 

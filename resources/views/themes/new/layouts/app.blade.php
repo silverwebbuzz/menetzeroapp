@@ -93,6 +93,12 @@
             cursor: pointer; white-space: nowrap; flex-shrink: 0; }
 
         .mnz-side { overflow-y: auto; }
+        /* Used by nav-client's six-tab section labels. The consultant and
+           admin shells define this too; without it the labels render as
+           plain body text. */
+        .mnz-side__title { font: 500 10px var(--mono); letter-spacing: .1em;
+            color: var(--ink-4); text-transform: uppercase; padding: 0 12px 6px; }
+        .mnz-side__group + .mnz-side__group { margin-top: 4px; }
         .mnz-menu-btn { display: none; border: 1px solid var(--line);
             background: var(--surface); width: 32px; height: 30px; border-radius: 5px;
             cursor: pointer; align-items: center; justify-content: center; }
