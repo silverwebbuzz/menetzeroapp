@@ -596,8 +596,8 @@ Phase order approved **2026-08-25** — risk-based, company portal last.
 |---|---|---|
 | 0 | Theme Infrastructure | **COMPLETE** — awaiting review |
 | 1 | Auth | **COMPLETE** — 2 hotfixes 2026-08-26, awaiting re-test |
-| 2 | Emails | Not started |
-| 3 | Consultant | Not started |
+| 2 | Emails | **DEFERRED to last** — see §14 |
+| 3 | Consultant | **SHELL COMPLETE** — awaiting review |
 | 4 | Admin | Not started |
 | 5 | Company | Not started |
 | 6 | Switch-over | Not started |
@@ -847,6 +847,103 @@ No other `mnz-ui.css` class is applied anywhere yet.
 ### Lesson for Phases 3–5
 
 `mnz-ui.css` class names describe **position in the portal shell**, not generic roles. Before applying any class from it, check its definition. `.mnz-body`, `.mnz-main`, `.mnz-side` are all structural shell classes, not semantic ones.
+
+---
+
+## 14. Phase 2 — Emails: DEFERRED
+
+Deferred by product owner **2026-08-26**, to run after the portal phases.
+
+### Why the original plan was wrong
+
+Phase 2 was scoped as "6 templates, isolated, no theme flag needed." Inspection showed the email system is **not** Blade-per-template:
+
+- `resources/views/emails/template.blade.php` — one wrapper (header, card, footer)
+- `{!! $bodyHtml !!}` — content injected from the **`email_templates` DB table**, falling back to `config/emails.php`
+- Admins edit those bodies through `/admin/email-templates`
+
+So "6 templates" is **1 wrapper + 6 database rows**. Restyling bodies is a data migration, not a view migration.
+
+### The structural problem
+
+**Emails have no session**, so `?theme=new` cannot preview them. Whatever the wrapper renders is what every customer receives on the next send. This is the only phase that ships straight to customers with no preview — which breaks the core premise of the migration and is why it now runs last.
+
+### When resumed, three options
+
+| Option | Scope | Data risk |
+|---|---|---|
+| **A** | Themed wrapper only; DB bodies untouched | **None** |
+| **B** | A + update `config/emails.php` defaults for the 5 templates that do not exist yet | None (does not touch admin-edited rows) |
+| **C** | A + reseed all 6 DB bodies | **Overwrites admin edits in production** |
+
+Recommended: **A or A+B**. Option C is the only one touching production data.
+
+**Open question for that phase:** the wrapper should be config-driven (follows `THEME_DEFAULT`, flips with everything else at Phase 6) rather than shipping ahead of the portal.
+
+---
+
+## 15. Phase 3 — Consultant Portal: shell record
+
+Shell completed **2026-08-26**. **Zero existing files modified. Zero route changes** (still 372).
+
+### Files added (2)
+
+| File | Purpose |
+|---|---|
+| `themes/new/consultant/layouts/app.blade.php` | Consultant shell — topbar, sidebar, content row |
+| `themes/new/layouts/partials/nav-consultant.blade.php` | Sidebar nav |
+
+### Structure
+
+Follows `mnz-ui.css` shell vocabulary:
+
+```
+.mnz-app > .mnz-topbar + .mnz-body > (.mnz-side + .mnz-main)
+```
+
+`data-pillar="s"` on `<body>` makes the consultant portal read Social-blue via `--accent`, distinct from the company portal's Environmental-green.
+
+### Nav parity verified
+
+Every route reference in the new nav was diffed against the old nav — **identical, route for route**:
+
+```
+diff <(old nav routes) <(new nav routes)  →  no differences
+```
+
+A `consultant.support` link was drafted and then **removed**: the route exists and is in the same middleware group, but the old nav does not link it. Adding it would be an IA change, and IA changes belong to Phase 5.
+
+`$showRenewalNav` (supplied by `ConsultantAgencyComposer`) still gates the Renewal link.
+
+### Risk R-1 (composers) — resolved by the finder
+
+`ConsultantAgencyComposer` binds to the view **name** `consultant.layouts.app`. The finder swaps the *file* behind that name, so the composer fires and `$showRenewalNav` arrives regardless of theme. `withThemeViews()` covers the namespaced form as well. **No composer change needed.**
+
+### Acting-as banner — correctly out of scope
+
+The "Acting as / Back to Agency Hub" banner lives in `layouts/app.blade.php` (the **company** shell), not the consultant shell — a consultant acting on a client sees the *company* portal. That is Phase 5 work. The consultant topbar shows `company_name`, matching what `header-context.blade.php` renders for `portal=consultant`.
+
+### Phase 0 dead-code cleanup
+
+With a full themed shell in place, the `@theme('new')` asset block Phase 0 added to `consultant/layouts/app.blade.php` can never execute — the finder serves the themed file instead. Removed.
+
+`resources/views/consultant/layouts/app.blade.php` is now **byte-identical to pre-redesign**.
+
+**The same cleanup is pending** for `layouts/app.blade.php` and `admin/layouts/app.blade.php` when their themed shells are built in Phases 4 and 5.
+
+### Remaining Phase 3 work
+
+The shell is done; the 5 consultant **pages** still fall back to their existing views inside the new shell:
+
+| Sub-phase | Scope | Status |
+|---|---|---|
+| 3.1 | Consultant shell | **DONE** |
+| 3.2 | Dashboard | Fallback |
+| 3.3 | Clients / workspace switcher | Fallback |
+| 3.4 | Packs / orders / documents | Fallback |
+| 3.5 | Profile / intro-requests | Fallback |
+
+This is the fallback mechanism working as designed — the portal is fully usable with a new shell and old page bodies.
 
 ---
 
