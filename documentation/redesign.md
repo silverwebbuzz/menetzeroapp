@@ -599,7 +599,7 @@ Phase order approved **2026-08-25** — risk-based, company portal last.
 | 2 | Emails | **DEFERRED to last** — see §14 |
 | 3 | Consultant | **SHELL COMPLETE** — hotfixed 2026-08-26 |
 | 4 | Admin | **SHELL COMPLETE** — awaiting review |
-| 5 | Company | **5.0 + 5.1 COMPLETE** — shell built, awaiting review |
+| 5 | Company | **5.0–5.3 COMPLETE** — routes + six-tab nav, awaiting review |
 | 6 | Switch-over | Not started |
 
 **Each phase stops for review before the next begins.**
@@ -1194,6 +1194,81 @@ The real defect was the notes input at `min-w-[14rem]`, too narrow for its conte
 | 5.8 | Internal states | Not started |
 
 **5.3 is where the ~28 new routes land.** The shell must be confirmed working first — a nav regression on top of an unverified shell would be hard to attribute.
+
+---
+
+## 20. Phase 5.3 — Six-tab IA: routes and navigation
+
+Completed **2026-08-26**. Route count **372 → 399**, exactly the figure projected in §3.8.
+
+### Routes added (27)
+
+| Group | Count | Middleware |
+|---|---|---|
+| `/environmental/*` | 9 | company stack; `disclosureAccess` on the 4 disclosure-backed routes |
+| `/social/*` | 4 | company stack + `disclosureAccess` |
+| `/governance/*` | 5 | company stack + `disclosureAccess` |
+| `/settings/*` | 4 | company stack; `restrictManagedClientBilling` on billing |
+| `/reports/*` | 5 | company stack + `disclosureAccess` |
+
+`/dashboard`, `/reports` and `/settings/reporting` are **reused, not re-registered** — as the matrix specified.
+
+### Why `disclosureAccess` is mandatory, not optional
+
+`DisclosureBaseController::resolveContext()` calls:
+
+```php
+$this->requirePermission('disclosures', 'view', [['reports', 'view']]);
+```
+
+An alias without the same gate would 403 inconsistently, or worse, present a route the `/disclosures/*` group would have blocked. Every alias to a `DisclosureBaseController` subclass carries it.
+
+### Decisions implemented
+
+| Decision | Implementation |
+|---|---|
+| D1 | `/environmental/targets` → `ReductionTargetController` |
+| D2 | `/environmental/boundaries` → `LocationController@index` (list → select → existing nested URL), since `EmissionBoundaryController@index` requires a bound Location |
+| D3 | `/governance/policies` → `SectionController@editS1` with `->defaults('section', 'governance')` |
+| D4 | `/governance/risks` → `SustainabilityRiskController`, registers kept separate, **no migration** |
+
+### Non-negotiables verified
+
+| # | Requirement | Result |
+|---|---|---|
+| 2 | `/disclosures/*` intact | **Zero** removed lines |
+| 3 | No `/v2` | Zero occurrences |
+| 10 | Company middleware stack + order | All new routes inside the existing group |
+| 12 | `/measurements` untouched | Zero diff lines |
+| 13 | `/quick-input` ordering | Zero diff lines |
+
+Duplicate route names checked: `social.overview` and `gov.overview` are distinct despite both leaves being `overview`.
+
+### The six-tab nav — and a bug that would have leaked paid features
+
+`themes/new/layouts/partials/nav-client.blade.php` renders the six tabs with contextual sub-navs, and highlights the active tab whether the user arrived via a new 2.0 route **or** an existing `/disclosures/*` URL.
+
+**I initially wrote gating against an invented API**: `$planGate->allows('disclosures')`. Both halves were wrong:
+
+- `PlanGateComposer` shares **`$gate`**, not `$planGate`
+- `PlanGate` has **no `allows()` method** — its API is `isScope3Locked()`, `canBulkImport()`, `canExport()`, and similar
+
+Worse, nav gating is **permission-based, not plan-based**. The old nav computes `$canViewDisclosures`, `$canViewReports`, `$canViewQuickInput`, `$canViewLocations`, `$canViewStaff`, `$canViewRoles` from `hasPermission()` / `hasModulePermission()`.
+
+An undefined variable in Blade is null, so `$can(...)` would have evaluated **truthy by default** — showing every disclosure link to every user regardless of permission. That is risk R-1 realised: exactly the silent, invisible failure the plan warned about.
+
+Fixed by reproducing the permission block **verbatim** from the old nav. All 25 route names in the nav were then verified to exist.
+
+### Remaining Phase 5 work
+
+| Sub-phase | Scope | Status |
+|---|---|---|
+| 5.0–5.3 | Validation, shell, routes, nav | **DONE** |
+| 5.2 | Overview / dashboard body | Fallback |
+| 5.4–5.7 | Social / Governance / Reports / Settings bodies | Fallback |
+| 5.8 | Internal states (onboarding, bulk-import mapping, empty, error) | Not started |
+
+All tabs are navigable now; their pages render existing bodies inside the new shell.
 
 ---
 

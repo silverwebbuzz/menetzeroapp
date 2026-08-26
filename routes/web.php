@@ -455,6 +455,93 @@ Route::middleware([
         });
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | MENetZero 2.0 — six-tab IA (Phase 5.3)
+    |--------------------------------------------------------------------------
+    |
+    | Overview / Environmental / Social / Governance / Reports / Settings.
+    |
+    | These are ADDITIVE entry points into controllers that already exist.
+    | Every /disclosures/* route stays registered and working (requirement 2);
+    | nothing is moved, redirected, or deleted.
+    |
+    | Collision-checked against all 371 existing routes — see the matrix in
+    | documentation/redesign.md section 4.2. The /environmental, /social and
+    | /governance roots are free. /dashboard, /reports and /settings/reporting
+    | already exist and are REUSED rather than re-registered, so they are
+    | absent here by design.
+    |
+    | Routes whose controller extends DisclosureBaseController carry
+    | `disclosureAccess`: resolveContext() calls requirePermission('disclosures')
+    | and would 403 without the same gate the /disclosures/* group applies.
+    |
+    | These sit inside the company middleware stack already opened above
+    | (auth:web, setActiveCompany, ensureConsultantManagedWorkspace,
+    | checkCompanyType:client, restrictManagedClientWorkspace,
+    | ensureOnboardingComplete) — requirement 10.
+    */
+
+    // --- Environmental -----------------------------------------------------
+    Route::prefix('environmental')->name('env.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Disclosure\EsgDashboardController::class, 'index'])
+            ->middleware('disclosureAccess')
+            ->name('overview');
+
+        // Quick Input lives under Environmental > Measure in the new IA.
+        Route::get('/measure', [\App\Http\Controllers\QuickInputController::class, 'index'])->name('measure');
+        Route::get('/measure/entries', [\App\Http\Controllers\QuickInputController::class, 'index'])->name('measure.entries');
+        Route::get('/measure/bulk-import', [\App\Http\Controllers\QuickInputController::class, 'bulkImport'])->name('measure.bulk-import');
+
+        Route::get('/locations', [LocationController::class, 'index'])->name('locations');
+
+        // D2: EmissionBoundaryController@index requires a bound Location, so
+        // this lists locations and links each to the existing nested URL.
+        Route::get('/boundaries', [LocationController::class, 'index'])->name('boundaries');
+
+        Route::middleware('disclosureAccess')->group(function () {
+            Route::get('/climate-risks', [\App\Http\Controllers\Disclosure\ClimateRiskController::class, 'index'])->name('climate-risks');
+            Route::get('/opportunities', [\App\Http\Controllers\Disclosure\ClimateOpportunityController::class, 'index'])->name('opportunities');
+            // D1: the reduction/climate targets surface, not esg-targets.
+            Route::get('/targets', [\App\Http\Controllers\Disclosure\ReductionTargetController::class, 'index'])->name('targets');
+        });
+    });
+
+    // --- Social ------------------------------------------------------------
+    Route::prefix('social')->name('social.')->middleware('disclosureAccess')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Disclosure\EsgDashboardController::class, 'index'])->name('overview');
+        Route::get('/stakeholders', [\App\Http\Controllers\Disclosure\StakeholderEngagementController::class, 'index'])->name('stakeholders');
+        Route::get('/supply-chain', [\App\Http\Controllers\Disclosure\SupplyChainSupplierController::class, 'index'])->name('supply-chain');
+        Route::get('/scorecard', [\App\Http\Controllers\Disclosure\EsgScorecardController::class, 'index'])->name('scorecard');
+    });
+
+    // --- Governance --------------------------------------------------------
+    Route::prefix('governance')->name('gov.')->middleware('disclosureAccess')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Disclosure\EsgDashboardController::class, 'index'])->name('overview');
+        Route::get('/materiality', [\App\Http\Controllers\Disclosure\MaterialityMatrixController::class, 'index'])->name('materiality');
+        // D4: the two risk registers keep their own schemas. Their columns are
+        // in fact identical apart from the discriminator (risk_type vs topic),
+        // so no migration is needed — see redesign.md section 18.
+        Route::get('/risks', [\App\Http\Controllers\Disclosure\SustainabilityRiskController::class, 'index'])->name('risks');
+        Route::get('/sasb', [\App\Http\Controllers\Disclosure\SasbIndexController::class, 'index'])->name('sasb');
+        // D3: defaults to the S1 'governance' section ("Sustainability Governance").
+        Route::get('/policies', [\App\Http\Controllers\Disclosure\SectionController::class, 'editS1'])
+            ->defaults('section', 'governance')
+            ->name('policies');
+    });
+
+    // --- Settings ----------------------------------------------------------
+    // /settings/reporting already exists and is left untouched; this adds the
+    // parent landing page plus aliases into existing screens.
+    Route::prefix('settings')->name('settings.v2.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\CompanyReportingSettingsController::class, 'edit'])->name('index');
+        Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+        Route::get('/team', [\App\Http\Controllers\RoleManagementController::class, 'index'])->name('team');
+        Route::get('/billing', [\App\Http\Controllers\Client\SubscriptionController::class, 'billing'])
+            ->middleware('restrictManagedClientBilling')
+            ->name('billing');
+    });
+
     // Reports routes
     Route::prefix('reports')->name('reports.')->group(function () {
         Route::get('/', [ReportController::class, 'index'])->name('index');
@@ -462,6 +549,17 @@ Route::middleware([
         Route::get('/export/excel', [ReportController::class, 'exportExcel'])->name('export.excel');
         Route::get('/export/pdf', [ReportController::class, 'exportPDF'])->name('export.pdf');
         Route::get('/export/ieqt', [\App\Http\Controllers\IeqtExportController::class, 'export'])->name('export.ieqt');
+
+        // MENetZero 2.0 (Phase 5.3): Reports tab aliases. The existing
+        // /disclosures/*/report URLs keep working unchanged (requirement 2);
+        // these are additional entry points to the same previews.
+        Route::middleware('disclosureAccess')->group(function () {
+            Route::get('/hub', [\App\Http\Controllers\Disclosure\OverviewController::class, 'hub'])->name('hub');
+            Route::get('/ifrs-s1', [\App\Http\Controllers\Disclosure\IfrsS1ReportController::class, 'preview'])->name('s1');
+            Route::get('/ifrs-s2', [\App\Http\Controllers\Disclosure\IfrsS2ReportController::class, 'preview'])->name('s2');
+            Route::get('/gri', [\App\Http\Controllers\Disclosure\GriReportController::class, 'preview'])->name('gri');
+            Route::get('/uae-esg', [\App\Http\Controllers\Disclosure\UaeEsgReportController::class, 'preview'])->name('uae-esg');
+        });
     });
     
     // Role Management routes - EXPLICIT NAMES for client
