@@ -599,7 +599,7 @@ Phase order approved **2026-08-25** — risk-based, company portal last.
 | 2 | Emails | **DEFERRED to last** — see §14 |
 | 3 | Consultant | **SHELL COMPLETE** — hotfixed 2026-08-26 |
 | 4 | Admin | **SHELL COMPLETE** — awaiting review |
-| 5 | Company | **5.0–5.3 COMPLETE** — routes + six-tab nav, awaiting review |
+| 5 | Company | **5.0–5.3 COMPLETE** — hotfixed 2026-08-26 |
 | 6 | Switch-over | Not started |
 
 **Each phase stops for review before the next begins.**
@@ -1269,6 +1269,43 @@ Fixed by reproducing the permission block **verbatim** from the old nav. All 25 
 | 5.8 | Internal states (onboarding, bulk-import mapping, empty, error) | Not started |
 
 All tabs are navigable now; their pages render existing bodies inside the new shell.
+
+---
+
+## 21. Phase 5.3 — Hotfix: orphaned `$tab` variable
+
+Found in production **2026-08-26**: `Undefined variable $tab` — a 500 on `/dashboard`, theme `new`.
+
+### Root cause
+
+While fixing the invented-`allows()` gating (§20), I replaced the nav's whole `@php` block. The original block defined `$tab` via a `match(true)` expression to track the open top-level tab. The replacement block did not — but one reference survived at line 69:
+
+```blade
+class="mnz-nav {{ $tab === 'o' ? 'is-active' : '' }}"
+```
+
+Every other link had already been converted to `$routeName`-based checks; this one was missed.
+
+**Fixed:** `{{ $routeName === 'client.dashboard' ? 'is-active' : '' }}`, matching the pattern used by every other link in the file.
+
+### Why static checks missed it
+
+Balance checks (`@if`/`@endif`, braces, parens) all passed — the file was structurally valid. Nothing in the earlier verification looked for *variables referenced but never defined*.
+
+The irony is instructive: an undefined variable in Blade is normally **silently null**, which is exactly why the `$can()` bug in §20 was dangerous (it would have evaluated truthy and shown gated links). Here PHP 8.3 raised an `ErrorException` instead, because the value was used in a strict `===` comparison rather than a boolean test. **The same class of bug is silent in one position and fatal in another.**
+
+### New standing check
+
+An undefined-variable scan now runs across every theme file:
+
+1. Strip Blade comments (so commented mentions do not count)
+2. Collect definitions from `@php` blocks, inline `@php(...)`, `@foreach ... as $x`, and closure parameters
+3. Add the composer-shared set (`$gate`, `$companyRenewalNudge`, `$activeTheme`, `$isNewTheme`, `$themeAssets`)
+4. Flag anything used but never defined
+
+Run across all 16 theme files: **clean**. Two flagged references in the nav were verified as false positives — `$planGate` appears only inside a comment, `$prefixes` is a closure parameter.
+
+**This check must run before every future phase is reported complete.** Balance checks alone are not sufficient for Blade.
 
 ---
 

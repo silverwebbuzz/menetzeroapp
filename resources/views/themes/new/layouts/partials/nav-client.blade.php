@@ -66,7 +66,7 @@
 
 <div class="mnz-side__group">
     <a href="{{ route('client.dashboard') }}"
-       class="mnz-nav {{ $tab === 'o' ? 'is-active' : '' }}">
+       class="mnz-nav {{ $routeName === 'client.dashboard' ? 'is-active' : '' }}">
         <span class="mnz-nav__dot"></span><span class="mnz-nav__label">Overview</span>
     </a>
 </div>
