@@ -595,7 +595,7 @@ Phase order approved **2026-08-25** — risk-based, company portal last.
 | Phase | Scope | Status |
 |---|---|---|
 | 0 | Theme Infrastructure | **COMPLETE** — awaiting review |
-| 1 | Auth | **COMPLETE** — hotfixed 2026-08-26, awaiting re-test |
+| 1 | Auth | **COMPLETE** — 2 hotfixes 2026-08-26, awaiting re-test |
 | 2 | Emails | Not started |
 | 3 | Consultant | Not started |
 | 4 | Admin | Not started |
@@ -790,6 +790,63 @@ Removed: `ThemeResolver::layout()`, the shared `$authLayout` / `$appLayout` vari
 | Octane **not** installed | Statics reset per request; the guard cannot leak across requests |
 | Apache + PHP-FPM (Webuzo) | Standard per-request lifecycle |
 | `append()` places middleware after `StartSession` | Session available when the finder is configured |
+
+---
+
+## 13. Phase 1 — Hotfix 2: `.mnz-body` misapplied to `<body>`
+
+Found in production testing **2026-08-26**, immediately after Hotfix 1. View resolution was correct (the new view rendered), but the layout was broken: the dark panel stacked below the form instead of beside it, and content was clipped at ~543px.
+
+### Root cause
+
+`mnz-ui.css` line 73:
+
+```css
+.mnz-body{flex:1;display:flex;align-items:stretch;min-height:0}
+```
+
+Despite the name, `.mnz-body` is the **portal shell's content-row class** — the flex row that holds sidebar + main content. It is not a `<body>` class.
+
+I had applied it to the `<body>` element in all four layouts. On `<body>` it turns the page into a flex container, which fought the auth grid and produced the stacked, clipped render.
+
+### Fix
+
+Removed `.mnz-body` from every `<body>` tag — the auth shell and all three Phase 0 layouts. Phases 3–5 will apply it to the correct inner element when those shells are actually built.
+
+Also hardened the auth grid while here:
+
+| Before | After |
+|---|---|
+| `grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr))` | `grid-template-columns: 1fr 1fr` |
+| No explicit single-column rule under 880px | `.mnz-auth { grid-template-columns: 1fr }` added |
+
+`auto-fit` + `minmax` collapsed unpredictably once the parent was a flex child. An explicit two-column grid with an explicit mobile override is deterministic.
+
+### Latent bug caught in Phase 0 layouts
+
+The same `.mnz-body` mistake was present in all three Phase 0 layouts:
+
+- `resources/views/layouts/app.blade.php`
+- `resources/views/consultant/layouts/app.blade.php`
+- `resources/views/admin/layouts/app.blade.php`
+
+It was invisible because those shells have no new-theme views yet. It would have surfaced as a broken portal in Phases 3–5, far from its cause. **Fixed now.**
+
+### Class audit
+
+Audited every `mnz-` class used across all theme views and layouts:
+
+| Class | Status |
+|---|---|
+| `mnz-auth`, `mnz-auth__*` (9 classes) | Mine, defined in the auth shell — no conflict |
+| `mnz-theme` | Not defined in `mnz-ui.css` — inert marker, harmless |
+| `mnz-body` | **Removed** — belonged to the portal shell |
+
+No other `mnz-ui.css` class is applied anywhere yet.
+
+### Lesson for Phases 3–5
+
+`mnz-ui.css` class names describe **position in the portal shell**, not generic roles. Before applying any class from it, check its definition. `.mnz-body`, `.mnz-main`, `.mnz-side` are all structural shell classes, not semantic ones.
 
 ---
 

@@ -71,7 +71,7 @@
     @stack('head')
     @include('layouts.partials.google-analytics')
 </head>
-<body class="antialiased consultant-portal @theme('new') mnz-theme mnz-body @endtheme">
+<body class="antialiased consultant-portal @theme('new') mnz-theme @endtheme">
     @php
         $consultant = auth('consultant')->user();
         $userInitial = strtoupper(substr($consultant->name ?? '?', 0, 1));

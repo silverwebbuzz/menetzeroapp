@@ -55,7 +55,7 @@
         a:hover { opacity: .82; }
 
         .mnz-auth { min-height: 100vh; display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); }
+            grid-template-columns: 1fr 1fr; align-items: stretch; }
         .mnz-auth__form { display: flex; flex-direction: column;
             padding: 44px 56px; background: #fff; min-width: 0; }
         .mnz-auth__inner { margin: auto 0; padding: 40px 0; max-width: 400px; width: 100%; }
@@ -142,6 +142,7 @@
             font-size: 15px; color: #fff; letter-spacing: -.015em; }
 
         @media (max-width: 880px) {
+            .mnz-auth { grid-template-columns: 1fr; }
             .mnz-auth__form { padding: 32px 24px; }
             .mnz-auth__panel { display: none; }
         }
@@ -151,7 +152,7 @@
     @stack('head')
     @include('layouts.partials.google-analytics')
 </head>
-<body class="mnz-theme mnz-body portal-auth portal-auth--{{ $portalVariant }}">
+<body class="mnz-theme portal-auth portal-auth--{{ $portalVariant }}">
 <div class="mnz-auth">
 
     <div class="mnz-auth__form">

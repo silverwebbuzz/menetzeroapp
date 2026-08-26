@@ -79,7 +79,7 @@
     @stack('head')
     @include('layouts.partials.google-analytics')
 </head>
-<body class="antialiased company-portal @theme('new') mnz-theme mnz-body @endtheme">
+<body class="antialiased company-portal @theme('new') mnz-theme @endtheme">
     <div class="app-shell" x-data="{ sidebarOpen: false }">
         @auth('web')
             @php

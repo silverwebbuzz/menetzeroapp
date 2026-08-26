@@ -47,7 +47,7 @@
 
     @stack('head')
 </head>
-<body class="bg-slate-50 @theme('new') mnz-theme mnz-body @endtheme">
+<body class="bg-slate-50 @theme('new') mnz-theme @endtheme">
     <div class="app-shell" x-data="{ sidebarOpen: false }">
         {{-- Mobile overlay --}}
         <div class="mobile-overlay"
