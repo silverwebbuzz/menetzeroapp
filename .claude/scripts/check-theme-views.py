@@ -20,6 +20,9 @@ SHARED = {
     'activeTheme','isNewTheme','themeAssets','gate','companyRenewalNudge',
     'errors','loop','slot','attributes','__env','app','token','email',
     'portalVariant','showRenewalNav',
+    # Alpine.js magic, used inside @click/@submit/@change JS strings. It is
+    # never a Blade variable, so it can never be "undefined" in Blade terms.
+    'event',
     # Controller payload variables are derived at run time in main(); see
     # controller_vars there. Only framework/composer-supplied names belong here.
 }
@@ -28,6 +31,8 @@ def defined_vars(body: str) -> set:
     d = set(SHARED)
     for blk in re.findall(r'@php(.*?)@endphp', body, re.S):
         d |= set(re.findall(r'\$([a-zA-Z_]\w*)\s*=', blk))
+        # PHP out-parameters: preg_match($re, $subj, $matches) DEFINES $matches.
+        d |= set(re.findall(r'preg_match(?:_all)?\s*\([^;]*?,\s*\$([a-zA-Z_]\w*)\s*\)', blk))
         d |= set(re.findall(r'fn\s*\(([^)]*)\)', blk) and
                  re.findall(r'\$([a-zA-Z_]\w*)', ' '.join(re.findall(r'fn\s*\(([^)]*)\)', blk))) or [])
         d |= set(re.findall(r'function\s*\(([^)]*)\)', blk) and

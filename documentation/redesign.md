@@ -1955,3 +1955,101 @@ exposes it.
 outside the repo and only the user can verify that `?theme=new` is not stripped
 or cached across users. A shared cache that ignores the query string would serve
 one visitor's theme to another — worth checking before opting in any real client.
+
+---
+
+## 30. Body migration — Quick Input entries
+
+Completed **2026-08-26**. The first of the high-traffic bodies identified in §29.6,
+and the highest-value one: daily emission data entry.
+
+| File | Status | Lines |
+|---|---|---|
+| `resources/views/quick-input/partials/source-icon.blade.php` | **new** (shared) | 57 |
+| `resources/views/themes/new/quick-input/index.blade.php` | **new** (themed body) | 447 |
+| `resources/views/quick-input/index.blade.php` | modified — extraction only | 449 → 403 |
+| `.claude/scripts/check-theme-views.py` | modified — two false-positive patterns | +6 |
+
+### 30.1 Shared partial — the icon map
+
+48 lines of SVG paths keyed on `quick_input_slug`, extracted **verbatim**
+(`diff`-confirmed) to `quick-input/partials/source-icon`. Duplicating it per theme
+would guarantee drift as emission sources are added. The old view's diff is
+**2 insertions, 48 deletions** — pure extraction, no behaviour change. §22 precedent.
+
+### 30.2 Dependencies verified before writing
+
+**Alpine.js** drives bulk selection (`x-data`, `x-for`, `x-show`, `x-cloak`,
+`x-model.number`, `@click`, `@submit`, `@change`). Checked, not assumed:
+
+- Both shells load Alpine 3.x from CDN — the new shell at line 299.
+- **`[x-cloak]` is defined in `app-shell.css`**, which the new shell loads. Without
+  that rule the bulk-actions bar flashes visible on every page load before Alpine
+  initialises.
+
+### 30.3 Gating preserved — verified mechanically
+
+Diffed against the original: `route()` calls, `name="…"` form fields and
+`<x-…>` components are all **identical sets**. `$gate` call sites match one-for-one
+once the header comment is excluded (a raw grep over-counts because the comment
+documents the same names):
+
+| Gate | Sites | Guards |
+|---|---|---|
+| `canHelpGuide` / `helpGuideMessage` | 1 | Help-guide link |
+| `canBulkExport` / `bulkExportMessage` | 1 | CSV export |
+| `isScope3Locked` | **2** | Badge, and the whole source grid |
+| `isAgencyWorkspace` / `agencyLockedMessage` | 1 | Which upgrade copy shows |
+| `upgradeRoute` / `upgradeButtonLabel` | 1 | Upgrade CTA |
+
+The Scope 3 lock is the sharp one: it replaces the entire source grid with an
+upgrade callout. Rendering the grid unlocked would hand Scope 3 data entry to
+every tier (risk R-1).
+
+`$canDeleteEntries` has **exactly 4 live sites** — select-all column, bulk bar,
+per-row checkbox, and the empty-state `colspan` (10 vs 9). `@csrf` ×2 and
+`@method('DELETE')` ×2 match the original, so both destructive forms are intact.
+
+### 30.4 One real bug caught by the checker
+
+`is-selected` and `qi-source__icon` were both referenced but **undefined**.
+Neither would have thrown — the Alpine `:class` binding would have set a class
+that styles nothing (selected rows showing no highlight), and the icon partial's
+`<svg>` would have rendered at intrinsic size and blown out the grid. Both are the
+invisible-in-a-screenshot kind of regression the checker exists to catch. Fixed by
+defining both in the page's `@push('styles')` block.
+
+### 30.5 Two checker false positives — fixed in the checker, not worked around
+
+The checker flagged `$event` and `$matches` as undefined. Both were verified
+against the original view and are legitimate:
+
+- **`$event`** is Alpine's magic inside `@click` / `@submit` / `@change` JS strings — never a Blade variable.
+- **`$matches`** is `preg_match()`'s third argument, which PHP **assigns by reference**; the checker only recognised `$x = …` as a definition.
+
+Both patterns are now understood by `check-theme-views.py`, so future migrations
+do not hit spurious failures. Suppressing them per-file would have hidden the
+same class of genuine bug later.
+
+### 30.6 Verification
+
+- Routes / form fields / `<x-…>` components — **identical sets** to the original
+- `$gate` and `$canDeleteEntries` call sites — one-for-one
+- Alpine directives — identical once the header comment is excluded
+- All `mnz-`, `qi-` classes and CSS variables resolve
+- Blade directives balanced (`@section=3 / @endsection=1` is the two-argument inline form, as elsewhere)
+- Pre-flight checker: **26 files, 0 problems**
+
+### 30.7 Needs runtime confirmation by the user
+
+- **Bulk delete** — select rows, confirm the count in the dialog matches, and that only those rows go
+- The bulk bar must stay hidden on load (the `x-cloak` path)
+- Scope 3 lock on a tier without Scope 3 — expect the upgrade callout, **not** the source grid
+- A user without delete permission — expect no checkboxes, no bulk bar, and a 9-column empty state
+
+### 30.8 Remaining high-traffic bodies
+
+Still on old markup, in rough order of traffic: `quick-input/show` (767 lines — the
+data-entry form itself, and the largest single body in the app), `locations/*`,
+`profile`, `subscriptions/billing`, `roles`. §29.6's advice stands: migrate these
+before flipping `THEME_DEFAULT`.
