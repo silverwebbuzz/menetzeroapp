@@ -2053,3 +2053,112 @@ Still on old markup, in rough order of traffic: `quick-input/show` (767 lines �
 data-entry form itself, and the largest single body in the app), `locations/*`,
 `profile`, `subscriptions/billing`, `roles`. §29.6's advice stands: migrate these
 before flipping `THEME_DEFAULT`.
+
+---
+
+## 31. Body migration — Quick Input entry page (`quick-input/show`)
+
+Completed **2026-08-26**. The largest body in the app, and the first migration
+done as a **partial re-skin** rather than a full one.
+
+| File | Status | Lines |
+|---|---|---|
+| `resources/views/quick-input/partials/entry-form.blade.php` | **new** (shared, verbatim) | 551 |
+| `resources/views/themes/new/quick-input/show.blade.php` | **new** (themed chrome) | 305 |
+| `resources/views/quick-input/show.blade.php` | modified — extraction + hoist | 768 → 265 |
+| `.claude/scripts/check-theme-views.py` | modified — guarded-variable rule | +25 |
+
+### 31.1 Why the form was deliberately NOT re-skinned
+
+Confirmed with the user before writing any code. `public/js/quick-input.js` is
+**1,360 lines** and is coupled to this markup far more tightly than any page
+migrated so far:
+
+- binds **~35 element ids** (`amount`, `quantity`, `unit`, `fuel_category`, `vehicle_type`, `scope2_method`, `calculate-btn`, `calculation-result`, …)
+- **traverses** `.form-group-stacked` / `.form-group-horizontal` / `.form-group` with `closest()` and `querySelectorAll()` to show and hide fields
+- **injects** `.field-error` and reads `.form-help-text` at runtime — those classes appear **0×** in the view because the JS creates them
+- posts to `/api/quick-input/calculate`, which produces **the emission numbers users save**
+
+Re-skinning would break field show/hide, validation display and the calculation
+preview — and those failures surface as **wrong numbers**, not as visible layout
+breaks. So the form region was extracted **verbatim** to a shared partial that
+both themes include, and the themed page still loads `public/css/quick-input.css`.
+
+The chrome — header, year/location selector, results table, layout — is themed.
+
+Plan gating lives inside the shared partial (the Scope 3 limit branch uses
+`isAgencyWorkspace()`, `agencyLockedMessage()`, `upgradeRoute()`,
+`upgradeButtonLabel()`), so it is preserved automatically and **cannot drift**.
+
+### 31.2 A real regression my own extraction introduced — caught by the checker
+
+`$editFuelCategory`, `$editFuelType`, `$editProcessType` and `$editUnit` are
+defined at original line 161 — **inside the region I extracted** — but the five
+hidden `*_initial_value` inputs that read them live in the parent, after the
+include.
+
+`@include` receives a **copy** of the parent scope; variables set inside a partial
+do not flow back out. Left alone, those inputs would have rendered empty and
+`quick-input.js` would have lost its edit-mode initial values — **silently
+resetting fuel category, fuel type, process type and unit whenever a user edited
+an entry**. No error, no visible breakage, wrong saved data.
+
+Fixed by hoisting the four definitions into **both** parent pages ahead of the
+include, leaving the partial's own copy untouched so it stays verbatim.
+
+### 31.3 A pre-existing bug found, documented, and deliberately NOT fixed
+
+`$industryLabel` is built in `QuickInputController` (line ~282) but is **absent
+from the `compact()`** at line ~364, so it never reaches the view. Because the
+original reads it inside a `??` chain, PHP suppresses the notice and it falls back
+to `$emissionSource->instructions`.
+
+Net effect, **in the live app today**: the industry-specific description, the
+"Common Equipment" panel and the "Typical Units" chip are **dead code that never
+renders**. Reproduced exactly rather than silently fixed — fixing it would change
+what the live page shows, which is a product decision, not a migration one.
+
+**Worth raising separately:** someone wrote three UI features that have never
+appeared. Adding `'industryLabel'` to the controller's `compact()` is a one-word
+change that would switch them all on.
+
+### 31.4 Checker improvement — narrowed, not suppressed
+
+The checker flagged `$industryLabel`. Rather than add a per-file suppression, it
+now understands the actual rule: **a name reached only through `??` / `?->` /
+`isset()` / `empty()` cannot cause a fatal.** The rule is block-aware — uses
+inside an enclosing `@if(isset($x))…@endif` are recognised as guarded, which a
+naive line-based check missed.
+
+Verified the narrowing did not blunt the check: injecting a genuinely unguarded
+`{{ $totallyBogusVar->name }}` is still reported. Removed after the test.
+
+### 31.5 Verification
+
+Because the form moved into a partial, the themed page was verified **composed**
+(themed chrome + shared partial) against the pre-extraction original:
+
+- **element ids — identical set** (this is what `quick-input.js` binds)
+- **routes — identical set**
+- **form field names — identical set**
+- `$gate` calls, `<x-…>` components, `@csrf` / `@method` — identical (the only count differences are header comments)
+- **8 `resolved-field-help` includes and 3 `x-field-help`** — all preserved (the §20 bug class)
+- structural classes the JS traverses — unchanged in live markup
+- extraction verified **byte-identical** by `diff`; parent diff is **4 insertions, 522 deletions**
+- Pre-flight checker: **27 files, 0 problems**
+
+### 31.6 Needs runtime confirmation by the user
+
+This page carries more runtime risk than any other in the migration:
+
+1. **Edit an existing entry** — confirm fuel category, fuel type and unit are pre-filled (this is exactly what 31.2 would have broken).
+2. **The calculate button** — confirm the preview returns a number and it matches what saves.
+3. **Field show/hide** — pick a vehicle source and toggle "know amount of fuel"; fields should appear and disappear as before.
+4. **Validation** — submit an invalid value and confirm the inline error still appears under the field.
+5. Scope 3 limit on a Free plan — expect the upgrade panel instead of the form.
+
+### 31.7 Remaining bodies
+
+`locations/*`, `profile`, `subscriptions/billing`, `roles` — all conventional
+server-rendered pages with no comparable JS coupling, so they should migrate at
+the pace of §30 rather than this one.

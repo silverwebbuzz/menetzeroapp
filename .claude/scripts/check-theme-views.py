@@ -77,6 +77,38 @@ def main() -> int:
         problems = []
 
         undef = sorted(set(re.findall(r'\$([a-zA-Z_]\w*)', body)) - defined_vars(body))
+        # A name reached ONLY through ?? / ?-> / isset() / empty() cannot cause a
+        # fatal: PHP suppresses the notice and the fallback wins. Some such names
+        # are pre-existing dead code in the original view (e.g. $industryLabel in
+        # quick-input/show, built in the controller but absent from its compact()).
+        # Flagging them would train us to ignore this check, so only report a name
+        # that is dereferenced somewhere UNGUARDED.
+        if undef:
+            guarded = []
+            for name in undef:
+                esc = re.escape(name)
+                # Blank out everything inside an @if(isset($name)...)/@endif block,
+                # so uses protected by an enclosing guard are not counted.
+                scan, depth, out = body, 0, []
+                for line in scan.split('\n'):
+                    opens = re.search(r'@if\s*\(.*(?:isset|empty)\s*\(\s*\$' + esc, line)
+                    if depth:
+                        if re.search(r'@if\b', line):
+                            depth += 1
+                        if re.search(r'@endif\b', line):
+                            depth -= 1
+                        continue
+                    if opens:
+                        depth = 1
+                        continue
+                    out.append(line)
+                remaining = '\n'.join(out)
+                uses = re.findall(r'[^\n]*\$' + esc + r'\b[^\n]*', remaining)
+                if uses and all(('??' in u) or ('?->' in u) or
+                                re.search(r'(isset|empty)\s*\(\s*\$' + esc, u)
+                                for u in uses):
+                    guarded.append(name)
+            undef = [n for n in undef if n not in guarded]
         if undef:
             problems.append(f'undefined: {undef}')
 
