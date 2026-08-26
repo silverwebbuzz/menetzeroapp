@@ -1666,3 +1666,104 @@ already covers — belt and braces.
 - The scope/source chart toggle and the accordion, on a report with real data
 - The locked state of all three exports on a tier that cannot download
 - Export-readiness blocking on the MOCCAE PDF and IEQT buttons
+
+---
+
+## 27. Phase 5.8 — Internal states
+
+Completed **2026-08-26**, with two items deliberately scoped out (see 27.4).
+
+### 27.1 The survey premise was wrong — corrected here
+
+`github.md` listed Internal — onboarding and Internal — empty + error states as
+"NEW — no equivalent views in the repo." Verified against the code, that is only
+partly true, and the difference changes the work:
+
+| Item | `github.md` claim | Verified reality |
+|---|---|---|
+| Onboarding | "no view exists" | **Exists.** It is the `$needsCompanySetup` branch of `dashboard/index.blade.php` (lines 6–299, 413 lines of Tailwind) plus a redirect-and-flash flow through `EnsureOnboardingComplete` → `locations.create`. Not a missing page. |
+| Error pages | "no equivalent views" | **Correct.** There is no `resources/views/errors/` at all. 403/404/419/500 render Laravel framework defaults today. 71 `abort()` calls exist across the controllers. |
+| Bulk import | "NEW: the column-mapping step" | **Correct.** `quick-input/bulk-import.blade.php` exists (213 lines, two upload forms — Scope 1&2 and Scope 3). The mapping step is genuinely new. |
+
+### 27.2 Onboarding needs no work — and why
+
+`dashboard/index.blade.php` line 301 includes `dashboard.partials.enterprise`,
+which the finder prepend already resolves to the themed version. So an onboarded
+user is **already** on the new dashboard; the setup branch is what a brand-new
+user sees instead.
+
+That branch is raw Tailwind. It renders correctly in the new shell **only because
+§16 rule 1 was applied when that shell was built** — `themes/new/layouts/app.blade.php`
+loads the Tailwind CDN and all three portal stylesheets (lines 42–46). Verified.
+The setup form therefore works in both themes; it simply looks like the old design.
+
+That is a cosmetic inconsistency, not a breakage, and re-skinning a 413-line form
+with live `/api/industries` and `/api/subcategories` cascades is a body migration
+in its own right — not an "internal state." **Deferred, not forgotten.**
+
+### 27.3 Error pages — built for both themes
+
+Six new files under `resources/views/errors/`. Laravel resolves these by
+convention; no route or config change was needed.
+
+| File | Purpose |
+|---|---|
+| `layout.blade.php` | Standalone shell — see the constraint below |
+| `partials/home-action.blade.php` | Guard-aware "where do I send this user" link |
+| `403` `404` `419` `500` `503` | The pages themselves |
+
+**The load-bearing constraint: these must NOT extend `layouts.app`.**
+`layouts/app.blade.php` line ~339 calls `auth()->user()->isAdmin()` **unguarded**.
+An error page rendered for a guest — a 404 on a public URL, or a 419, which by
+definition means the session is gone — would throw a *second* fatal error while
+rendering the first, producing a blank page or an error loop. So the shell is
+fully standalone: no auth calls, no composers, no CDN, no external CSS or JS,
+all styling inline. It renders identically for guests and signed-in users, and
+whether or not the theme session exists.
+
+**419 gets a different action on purpose.** The session is dead, so linking to a
+dashboard would bounce straight back to login and lose the explanation. It offers
+sign-in and a back link instead.
+
+**`@elseauth` was avoided deliberately.** It was in the first draft, but there is
+no `vendor/` directory here to confirm the directive against and no precedent for
+it anywhere in this codebase. On the one page whose entire job is to not fail, an
+unverifiable directive is not worth the elegance — `home-action.blade.php` uses
+plain `Auth::guard(...)->check()` instead.
+
+**Route names were verified, not assumed.** The first draft linked to
+`consultant.dashboard` and `admin.dashboard`; **neither exists**. A bad `route()`
+call would have thrown inside the error page. Those two now use `url('/consultant')`
+and `url('/admin')`. Only `client.dashboard` and `login` are called by name, and
+both were confirmed present in `routes/web.php`.
+
+The `@hasSection` / `@else` / `@endif` structure matches the existing precedent in
+`layouts/portal-auth.blade.php` lines 61–65.
+
+### 27.4 Scoped out of this phase, by decision
+
+**Bulk-import column mapping — deferred as a feature.** Confirmed with the user.
+Phases 0–5 have been strictly additive *presentation* work. Column mapping needs
+new routes, a controller, session state for the parsed upload, and validation-
+preview logic against `Scope12BulkImportService::HEADERS` / `Scope3BulkImportService`.
+That is new backend surface with its own failure modes; it should be built as its
+own scoped piece after the redesign, not folded into a view-migration phase.
+
+**Onboarding re-skin — deferred** for the reason in 27.2.
+
+Neither is blocked. Both are recorded so they are not silently dropped.
+
+### 27.5 Verification
+
+- Every `route()` call in `errors/` resolves to a real named route (`client.dashboard`, `login`)
+- No `auth()->user()->` chains anywhere in `errors/` — safe for guests
+- Nothing in `errors/` extends `layouts.app`
+- Blade directives balanced in all six files
+- Pre-flight checker: **25 files, 0 problems** (the checker covers `themes/new/`; the error pages are theme-neutral and were verified separately, as above)
+- Repo diff outside the new theme: **`resources/views/errors/` only** — purely additive
+
+### 27.6 Needs runtime confirmation by the user
+
+- Hit a bad URL while **signed out** → expect the branded 404, not a blank page
+- Leave a form open until the session expires, then submit → expect the 419 page
+- Confirm `APP_DEBUG=false` in production, otherwise 500 shows the debug trace rather than `errors/500`
