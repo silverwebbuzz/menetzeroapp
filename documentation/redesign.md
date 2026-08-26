@@ -2378,3 +2378,154 @@ on the menu — same intent, and `[x-cloak]` is defined in `app-shell.css`.
 
 `profile`, `subscriptions/billing`, `roles`. All conventional server-rendered
 pages.
+
+---
+
+## 34. Body migration — My Profile
+
+Completed **2026-08-26**.
+
+| File | Status | Lines |
+|---|---|---|
+| `resources/views/profile/partials/index-scripts.blade.php` | **new** (shared) | 136 |
+| `resources/views/themes/new/profile/index.blade.php` | **new** (themed body) | 382 |
+| `resources/views/profile/index.blade.php` | modified — extraction only | 510 → 404 |
+
+### 34.1 Two scripts extracted, boundaries checked first
+
+The page carried two inline `<script>` blocks. Both are page logic identical in
+either theme, so they moved to one shared partial (§22 precedent):
+
+1. **Sector → industry → subcategory cascade** — reads ids `sector`, `industry`, `business_subcategory` and the `data-id` on each option; calls `/api/industries` and `/api/subcategories`.
+2. **`showTab()`** — drives the Personal / Company / Password tabs. Called from inline `onclick`, so it must stay a global function.
+
+**Applying §31.9's rule paid off immediately.** My first attempt at the cascade
+block took lines 373–486 — which swallowed a stray `@endif` and a closing `</div>`
+belonging to the surrounding markup. That is precisely the defect that caused the
+second production ParseError. Checking the block for self-containment *before*
+extracting caught it; the true boundaries are **373–459** and **488–508**.
+
+### 34.2 The tab contract
+
+`showTab()` needs `.tab-button` / `.tab-content`, the `.active` / `.inactive`
+pair, and id pairs `{name}-tab` / `{name}-content`. The themed page reproduces all
+of them and supplies its own CSS — only the class *names* are shared. Renaming any
+of them stops the tabs switching, so both the partial and the themed page document
+this explicitly.
+
+### 34.3 Verification
+
+Composed (themed page + shared partial) against the pre-extraction original:
+
+| Dimension | Result |
+|---|---|
+| routes | SAME |
+| form field names | SAME |
+| tab + cascade ids | SAME |
+| `data-id` attributes | SAME |
+| `@csrf` (3 forms) | SAME |
+| `showTab()` calls | SAME |
+| `/api/*` endpoints | SAME |
+| `enctype="multipart/form-data"` | SAME |
+
+The enctype check matters: dropping it would break the **logo upload** silently —
+the form would still submit, just without the file.
+
+The old view was also verified composed, and its diff is **2 insertions, 108
+deletions** — pure extraction.
+
+Checker: **29 themed views + 228 non-theme views, 0 problems.**
+
+### 34.4 Noted for later
+
+The cascade script here is ~81 lines in common with the one in
+`dashboard/index.blade.php`'s setup form, but not identical (107 vs 81 significant
+lines). They were **not** merged — after two extraction-caused outages, unifying
+two near-identical blocks is not worth the risk mid-migration. Worth revisiting
+once the redesign is finished.
+
+### 34.5 Remaining bodies
+
+`subscriptions/billing`, `roles`.
+
+---
+
+## 35. Body migration — Plan & billing
+
+Completed **2026-08-26**. One new file; **no existing file modified**.
+
+`resources/views/themes/new/client/subscriptions/billing.blade.php` (396 lines),
+from a 311-line original.
+
+### 35.1 My own §33.4 note was wrong about this one
+
+It listed "`subscriptions/billing`" as a single remaining page. Neither that file
+nor that path exists — the name came from `github.md`, which has been unreliable
+throughout (see §27.1, §28.1). The real surface is
+`resources/views/client/subscriptions/`: **9 files, 1,295 lines** — billing,
+upgrade, checkout, current-plan, payment-history, request-package, index and two
+partials, all revenue-facing.
+
+**Scope decision (user):** migrate `billing.blade.php` only. It is the sole
+nav-reachable page in the cluster — verified, both the old and new nav link
+`subscriptions.billing` and nothing else from that group. The other eight sit
+deeper in the upgrade funnel and keep rendering old bodies inside the new shell,
+which works correctly today.
+
+### 35.2 Two showTab() functions now exist, deliberately
+
+`profile/partials/index-scripts` defines a global `showTab()`; so does this page.
+**They are not the same function:**
+
+| | profile | billing |
+|---|---|---|
+| Panel toggle | `.active` on `.tab-content` | `hidden` on `.tab-content` |
+| Button state | `.active` / `.inactive` | `.active` + Tailwind colour classes |
+
+They never load on the same page, so this is safe — but it is exactly the sort of
+thing that looks like duplication and invites a careless "let's share it". This
+page keeps its own copy, and both files say why. Unifying them would require
+reconciling two different contracts.
+
+The themed copy drops the hard-coded Tailwind colour utilities
+(`border-blue-500` / `text-blue-600`) and drives the same states from the
+`.active` class alone, styled with theme tokens.
+
+### 35.3 Revenue-critical elements verified
+
+| Dimension | Result |
+|---|---|
+| routes (5) | SAME |
+| `@csrf` | SAME |
+| POST forms | SAME |
+| tab ids | SAME |
+| `showTab()` calls | SAME |
+| `onclick` functions | SAME |
+| `@include` targets | SAME |
+| controller variables used | SAME |
+
+The **cancel confirmation is byte-identical**, including the interpolated date:
+
+> `Your plan stays active until {{ $subscription->expires_at->format('F d, Y') }} and will not renew. Continue?`
+
+That string is the user's last checkpoint before a paid plan stops renewing;
+paraphrasing it would change what they consented to.
+
+The billing-method modal is **already shared and self-contained** — its own
+`<script>` defines `openAddBillingMethodModal()` and it owns its ids — so it is
+included unchanged by both themes. No extraction was needed or attempted.
+
+Checker: **30 themed views + 228 non-theme views, 0 problems.**
+
+### 35.4 Needs runtime confirmation by the user
+
+- **Cancel at renewal** — confirm the dialog names the right date, and that cancelling schedules rather than terminating
+- **Keep my plan** (resume) — only appears when a cancellation is already scheduled
+- Both tabs switch, and `session('active_tab')` still lands on the right one after a redirect
+- **Add card** opens the modal
+
+### 35.5 Remaining
+
+`roles/` (team & access) is the last item on the §29.6 list. The eight remaining
+`client/subscriptions/*` bodies are deliberately unmigrated and recorded here so
+they are not mistaken for oversights.
