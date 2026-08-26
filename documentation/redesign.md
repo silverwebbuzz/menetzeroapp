@@ -599,7 +599,7 @@ Phase order approved **2026-08-25** — risk-based, company portal last.
 | 2 | Emails | **DEFERRED to last** — see §14 |
 | 3 | Consultant | **SHELL COMPLETE** — hotfixed 2026-08-26 |
 | 4 | Admin | **SHELL COMPLETE** — awaiting review |
-| 5 | Company | **5.0–5.4, 5.7 COMPLETE** — Overview, Settings, Social migrated |
+| 5 | Company | **5.0–5.5, 5.7 COMPLETE** — only 5.6 Reports + 5.8 remain |
 | 6 | Switch-over | Not started |
 
 **Each phase stops for review before the next begins.**
@@ -1487,6 +1487,62 @@ Three false-positive classes fixed so its output stays actionable:
 - A shell's routes may legitimately live in its nav partial
 
 **Current state: 21 files, 0 problems.**
+
+---
+
+## 25. Phase 5.5 — Governance
+
+Completed **2026-08-26**. Three page bodies migrated. Checker clean throughout: **24 files, 0 problems**.
+
+### Files added (3)
+
+| File | Notable contract |
+|---|---|
+| `themes/new/disclosures/materiality-matrix/index.blade.php` | Bulk-edit nested array |
+| `themes/new/disclosures/sasb/index.blade.php` | Plan-gated CSV export |
+| `themes/new/disclosures/sustainability-risks/index.blade.php` | Per-row inline edit + delete forms |
+
+### Materiality — the nested-array trap
+
+The form posts `topics[{key}][impact_materiality]`, `[financial_materiality]` and `[is_material]`, read by `syncMaterialityMatrix()`.
+
+`{key}` is the **topic key from the controller's `$topics` array**. Re-indexing it — using `$loop->index`, or renaming the loop variable — would write each value against the wrong topic, with no error. Materiality drives which topics appear in the report, so this is a silent-corruption risk. The loop key is used verbatim.
+
+### SASB — plan gating preserved
+
+The CSV export stays wrapped in `x-plan-gated-link` with `$gate->canDisclosureExportType('sasb_index', $fiscalYear)`. A bare link here would hand a paid export to every tier — **risk R-1 in its most direct form**.
+
+Both `PlanGate` methods verified to exist (`canDisclosureExportType`, `disclosureExportMessage`), and the component's `lockedClass` prop confirmed before use, after the `allows()` episode in §20.
+
+### Risks — reusing a partial rather than rewriting it
+
+This page uses `disclosures.partials.header`, not the ESG-depth sub-nav. That partial carries the **reporting-year selector** and depends on `ReportingYearsComposer`, with fallback logic for companies that have no history yet.
+
+**Reused unchanged.** Rewriting it would risk silently changing the user's reporting year — a worse failure than an unstyled control.
+
+The add and edit forms expose only `name`, `topic`, `time_horizon`, `description`. The controller validates five more (`financial_impact`, `likelihood`, `mitigation`, `owner`, `status`) that the UI never sends. **Reproduced as-is** — adding fields is a behaviour change and belongs to a feature phase.
+
+### D4 in practice
+
+Confirmed again while building: the sustainability register stays separate from `climate_risks`. Their schemas are identical apart from the discriminator, so the unified Governance risk presentation needs **no migration**.
+
+### Verification
+
+| Page | Fields | Routes | field-help | Plan gates |
+|---|---|---|---|---|
+| Materiality | 1/1 | ✓ | ✓ | n/a |
+| SASB | 1/1 | ✓ | ✓ | **1/1 preserved** |
+| Risks | 5/5 | ✓ | ✓ | n/a |
+
+Nested-array field names were compared structurally (`topics[][]`) rather than literally, so a re-indexing bug would still surface as a mismatch.
+
+### Remaining
+
+| Sub-phase | Status |
+|---|---|
+| 5.0–5.5, 5.7 | **DONE** |
+| 5.6 Reports bodies | Fallback |
+| 5.8 Internal states | Not started |
 
 ---
 
