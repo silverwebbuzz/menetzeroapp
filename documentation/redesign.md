@@ -599,7 +599,7 @@ Phase order approved **2026-08-25** — risk-based, company portal last.
 | 2 | Emails | **DEFERRED to last** — see §14 |
 | 3 | Consultant | **SHELL COMPLETE** — hotfixed 2026-08-26 |
 | 4 | Admin | **SHELL COMPLETE** — awaiting review |
-| 5 | Company | Not started |
+| 5 | Company | **5.0 + 5.1 COMPLETE** — shell built, awaiting review |
 | 6 | Switch-over | Not started |
 
 **Each phase stops for review before the next begins.**
@@ -1054,6 +1054,146 @@ Shell done; all 51 admin **pages** still fall back to their existing views insid
 | 4.4 | Consultants / orders | Fallback |
 | 4.5 | Subscriptions / price book / packages | Fallback |
 | 4.6 | Site content / email templates / emissions | Fallback |
+
+---
+
+## 18. Phase 5.0 — Decision validation against code
+
+Run **2026-08-26** before writing any Phase 5 route, per the plan's 5.0 gate.
+
+### D1 — `/environmental/targets` → reduction targets: **VALID**
+
+Two distinct controllers exist, both `DisclosureBaseController` subclasses with an `index(Request)` signature:
+
+| Controller | Surface |
+|---|---|
+| `ReductionTargetController` | `/disclosures/ifrs-s2/targets` — climate reduction targets, uses `ReductionTargetProgressService` |
+| `EsgSustainabilityTargetController` | `/disclosures/esg-targets` — broader ESG targets |
+
+D1 selects the reduction/climate surface. Directly aliasable.
+
+### D2 — `/environmental/boundaries` → list then select: **VALID, and the only option**
+
+`EmissionBoundaryController@index(Location $location)` takes a **route-model-bound Location**. A param-less `/environmental/boundaries` cannot call it.
+
+D2's "list → select location → boundaries" is therefore not a preference but the **only workable form**. The new route lists locations and links each to the existing nested URL.
+
+Also noted: the controller resolves company via `$user->getActiveCompany()`, not `$user->company_id`, so consultant-acting workspaces work. Any new route must preserve that.
+
+### D3 — `/governance/policies` → S1 governance section: **VALID**
+
+`config/disclosure.php` defines an S1 `governance` section titled **"Sustainability Governance"**. The section key is `governance`, so `SectionController@editS1` can be reached with that default.
+
+### D4 — risk registers stay separate: **VALID — and cheaper than expected**
+
+`github.md` claimed `sustainability-risks` has 4 columns against `climate-risks`' 7, and that merging needs three fields added. **That claim is wrong.**
+
+Verified against both models and `2026_06_09_200000_phase2_ifrs_s1_disclosure_tables.php`:
+
+```
+ClimateRisk:        company_id fiscal_year name risk_type time_horizon
+                    description financial_impact likelihood mitigation owner status
+SustainabilityRisk: company_id fiscal_year name topic     time_horizon
+                    description financial_impact likelihood mitigation owner status
+```
+
+The schemas are **identical except for the discriminator** — `risk_type` (climate) vs `topic` (sustainability). The 4-vs-7 difference is in what the **views display**, not what the tables store.
+
+**Consequence: D4 requires no migration whatsoever.** A unified Governance risk UI can read both registers and present them together today. The only remaining Phase 5 database work is the Phase 6 `theme` column.
+
+This removes the last item that was ever marked BLOCKED in this document.
+
+### Net effect on Phase 5
+
+| Item | Before validation | After |
+|---|---|---|
+| D1 | Assumed aliasable | Confirmed |
+| D2 | "needs context design" | Confirmed as the only form; `getActiveCompany()` constraint noted |
+| D3 | "needs a default" | Section key confirmed: `governance` |
+| D4 | Feared 3-field migration | **No migration needed** |
+
+---
+
+## 19. Phase 5.1 — Company Portal shell + price-book fix
+
+Completed **2026-08-26**. **Zero route changes** (still 372).
+
+### The company shell is the most stateful of the four
+
+It carries shell state the other portals do not. All of it is preserved:
+
+| State | Purpose |
+|---|---|
+| `isConsultantActing` | Consultant working inside a client workspace |
+| `consultantReadOnly` | Review-only workspace |
+| `consultantActingEngagement` | PRY for the acting banner |
+| `consultantSwitchableClients` | Managed-client switcher |
+| `accessibleCompanies` | Multi-company switcher |
+| `companyRenewalNudge` | Renewal banner (from `PlanGateComposer`) |
+| Flash alerts | `x-alert` component, success/error |
+| Guest branch | `@auth('web')` / `@else` — content renders bare |
+
+The **acting-as bar** is rendered full-width in amber above the topbar, with "Switch client" and "Back to Agency Hub". It must never be missable: a consultant editing the wrong client's inventory is a data-integrity problem.
+
+### Two bugs caught during the build
+
+**1. `getAccessibleCompanies()` returns arrays, not models.**
+
+```php
+$companies->push(['id' => ..., 'name' => ..., 'role_name' => ..., 'company' => $model]);
+```
+
+I first wrote `$company->id`, which would have been a **fatal error** on every multi-company user's page load. The original uses `$company['id']`. Fixed and commented.
+
+Worth noting the method mixes shapes — `'company' => $ownedCompany` is a model nested inside an array — so this is easy to get wrong again.
+
+**2. Chart.js load position.** The original loads it in `<head>`. I initially placed it before `</body>`. Company pages call `new Chart(...)` from body-level scripts, so a bottom load would run too late and break every dashboard chart. Moved to `<head>`.
+
+### Nav deliberately reused
+
+The shell includes `layouts.partials.nav-client` **unchanged** — 21 KB of plan-gated navigation. Replacing it with the six-tab IA is 5.3+ work, not shell work. Doing both at once would make a nav regression indistinguishable from a shell regression.
+
+### §16 rules applied
+
+| Rule | Company portal |
+|---|---|
+| 1. Keep old CSS | `app-shell`, `portal-design-system`, `portal-enterprise`, Tailwind, Inter — plus `@stack('styles')` in its original position between them |
+| 2. page-title | **Not rendered** — company shell ignores it, like consultant, unlike admin |
+| 3. Body class | `company-portal` dropped |
+| 4. Tokens | Re-asserted |
+
+### Phase 0 cleanup complete
+
+`layouts/app.blade.php` is now byte-identical to pre-redesign. **All four layouts are clean** — every existing view file in the repo matches pre-redesign except `admin/price-book/index.blade.php`.
+
+### Price-book `§` fix
+
+Reported as "why am I seeing § across the site". Investigated: **not a bug and not caused by the redesign.** `§` is the section sign, used correctly to cite IFRS clauses (`config/disclosure.php`) and pricing-sheet sections.
+
+The real defect was the notes input at `min-w-[14rem]`, too narrow for its content, so `xlsx §5 up to 3 sites…` clipped to `xls §5 up to 3 sites` and read as a stray symbol.
+
+| Change | Detail |
+|---|---|
+| Notes input | `min-w-[14rem]` → `min-w-[26rem]`, plus `title` attribute for full text on hover |
+| Section headings | `(xlsx §5)` → `(pricing sheet, section 5)`; `(§6.2)` → `(pricing sheet, section 6.2)` |
+
+`§` in `config/disclosure.php` is **left alone** — `IFRS S2 §5–7` is correct regulatory citation.
+
+### Remaining Phase 5 work
+
+| Sub-phase | Scope | Status |
+|---|---|---|
+| 5.0 | Validate D1–D4 | **DONE** (§18) |
+| 5.1 | Company shell | **DONE** |
+| 5.2 | Overview / dashboard | Fallback |
+| 5.3 | Environmental + six-tab nav + Quick Input | Not started |
+| 5.4 | Social | Not started |
+| 5.5 | Governance (unified risk UI, no migration per D4) | Not started |
+| 5.6 | Reports | Not started |
+| 5.7 | Settings / Team / Billing / Profile | Not started |
+| 5.8 | Internal states | Not started |
+
+**5.3 is where the ~28 new routes land.** The shell must be confirmed working first — a nav regression on top of an unverified shell would be hard to attribute.
 
 ---
 

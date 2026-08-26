@@ -19,8 +19,8 @@
 
         @php
             $titles = [
-                'company_package' => 'Company packages (xlsx §5)',
-                'consultant_rate' => 'Consultant Plan rates (§6.2)',
+                'company_package' => 'Company packages (pricing sheet, section 5)',
+                'consultant_rate' => 'Consultant Plan rates (pricing sheet, section 6.2)',
                 'extra' => 'Extras (usually custom)',
             ];
         @endphp
@@ -57,7 +57,7 @@
                                         <input type="checkbox" name="entries[{{ $entry->id }}][is_custom]" value="1" class="rounded" @checked(old('entries.'.$entry->id.'.is_custom', $entry->is_custom))>
                                     </td>
                                     <td class="px-4 py-2">
-                                        <input type="text" name="entries[{{ $entry->id }}][notes]" value="{{ old('entries.'.$entry->id.'.notes', $entry->notes) }}" class="border border-gray-300 rounded text-xs px-2 py-1 w-full min-w-[14rem]">
+                                        <input type="text" name="entries[{{ $entry->id }}][notes]" value="{{ old('entries.'.$entry->id.'.notes', $entry->notes) }}" class="border border-gray-300 rounded text-xs px-2 py-1 w-full min-w-[26rem]" title="{{ old('entries.'.$entry->id.'.notes', $entry->notes) }}">
                                     </td>
                                 </tr>
                             @empty
