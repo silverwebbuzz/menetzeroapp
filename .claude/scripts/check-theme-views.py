@@ -48,6 +48,53 @@ def defined_vars(body: str) -> set:
     d |= set(re.findall(r'=>\s*\$([a-zA-Z_]\w*)\)', body))
     return d
 
+
+BLADE_OPEN = {'@if': '@endif', '@foreach': '@endforeach', '@php': '@endphp',
+              '@forelse': '@endforelse', '@error': '@enderror', '@while': '@endwhile',
+              '@isset': '@endisset', '@unless': '@endunless', '@for': '@endfor',
+              '@switch': '@endswitch', '@push': '@endpush', '@section': '@endsection',
+              '@once': '@endonce', '@verbatim': '@endverbatim', '@auth': '@endauth',
+              '@guest': '@endguest', '@hasSection': '@endif', '@sectionMissing': '@endif',
+              '@prepend': '@endprepend', '@can': '@endcan', '@cannot': '@endcannot'}
+BLADE_CLOSE = {}
+for _o, _c in BLADE_OPEN.items():
+    BLADE_CLOSE.setdefault(_c, set()).add(_o)
+BLADE_BRANCH = {'@else', '@elseif', '@elsecan', '@elseauth', '@elseguest'}
+BLADE_BRANCHABLE = ('@if', '@unless', '@isset', '@hasSection', '@sectionMissing',
+                    '@can', '@cannot', '@auth', '@guest')
+
+
+def blade_structure_errors(src):
+    """Walk Blade directives with a stack; report structural breakage."""
+    stack, errs = [], []
+    for lineno, line in enumerate(src.split('\n'), 1):
+        for t in re.findall(r'@[a-zA-Z]+', line):
+            # Single-line forms that take no closer.
+            if t == '@php' and re.search(r'@php\s*\(', line):
+                continue
+            if t == '@section' and re.search(r'@section\s*\([^)]*,', line):
+                continue
+            # @empty is a @forelse branch, not a block, in that context.
+            if t == '@empty' and stack and stack[-1][0] == '@forelse':
+                continue
+            if t in BLADE_OPEN:
+                stack.append((t, lineno))
+            elif t in BLADE_CLOSE:
+                if stack and stack[-1][0] in BLADE_CLOSE[t]:
+                    stack.pop()
+                else:
+                    inner = f'{stack[-1][0]} (line {stack[-1][1]})' if stack else 'NOTHING'
+                    errs.append(f'line {lineno}: {t} but innermost open is {inner}')
+            elif t in BLADE_BRANCH:
+                if not stack or stack[-1][0] not in BLADE_BRANCHABLE:
+                    inner = f'{stack[-1][0]} (line {stack[-1][1]})' if stack else 'NOTHING'
+                    errs.append(f'line {lineno}: {t} with innermost open = {inner}')
+    for t, lineno in stack:
+        if t != '@section':
+            errs.append(f'unclosed {t} opened at line {lineno}')
+    return errs
+
+
 def main() -> int:
     css = set(re.findall(r'\.(mnz-[a-zA-Z0-9_-]+)',
                          open(os.path.join(ROOT, 'public/css/mnz-ui.css')).read()))
@@ -87,21 +134,7 @@ def main() -> int:
     failures = 0
     for f in shared_partials:
         rel = f.split('resources/views/')[1]
-        src = open(f).read()
-        probs = []
-        P = {'@if': '@endif', '@foreach': '@endforeach', '@php': '@endphp',
-             '@forelse': '@endforelse', '@error': '@enderror', '@push': '@endpush',
-             '@while': '@endwhile', '@isset': '@endisset', '@unless': '@endunless',
-             '@for': '@endfor', '@switch': '@endswitch'}
-        for o, c in P.items():
-            no = len(re.findall(re.escape(o) + r'\b', src))
-            nc = len(re.findall(re.escape(c) + r'\b', src))
-            if o == '@php':
-                no -= len(re.findall(r'@php\s*\(', src))
-            if o == '@if':
-                no += len(re.findall(r'@(?:hasSection|sectionMissing)\b', src))
-            if no != nc:
-                probs.append(f'directive imbalance: {no} {o} vs {nc} {c}')
+        probs = blade_structure_errors(open(f).read())
         if probs:
             failures += 1
             print(f'  FAIL {rel}  (shared partial)')
@@ -116,28 +149,14 @@ def main() -> int:
         body = re.sub(r'\{\{--.*?--\}\}', '', src, flags=re.S)  # strip comments
         problems = []
 
-        # Directive balance, counted the way BLADE counts it: on the raw source,
-        # NOT on the comment-stripped body. Blade compiles directives before it
-        # strips {{-- --}}, so a directive NAME written inside a comment is still
-        # counted by the compiler and silently unbalances the file. That is what
-        # produced the ParseError in quick-input/partials/entry-form (redesign.md
-        # section 31.8), which a comment-stripped balance check had reported clean.
-        PAIRS = {'@if': '@endif', '@foreach': '@endforeach', '@php': '@endphp',
-                 '@forelse': '@endforelse', '@error': '@enderror',
-                 '@push': '@endpush', '@while': '@endwhile', '@isset': '@endisset',
-                 '@unless': '@endunless', '@for': '@endfor', '@switch': '@endswitch'}
-        for o, c in PAIRS.items():
-            no = len(re.findall(re.escape(o) + r'\b', src))
-            nc = len(re.findall(re.escape(c) + r'\b', src))
-            if o == '@php':
-                # @php($x = 1) is the single-line form and takes no @endphp.
-                no -= len(re.findall(r'@php\s*\(', src))
-            if o == '@if':
-                # @hasSection / @sectionMissing also close with @endif.
-                no += len(re.findall(r'@(?:hasSection|sectionMissing)\b', src))
-            if no != nc:
-                problems.append(f'directive imbalance: {no} {o} vs {nc} {c}'
-                                ' (Blade counts directive names inside comments too)')
+        # Directive STRUCTURE, walked with a stack on the raw source.
+        #
+        # Counting open/close pairs is not enough: it reports a file clean when
+        # an @else has no enclosing @if (which is how the second production
+        # ParseError shipped -- see redesign.md section 31.9), because the counts
+        # still balanced. Blade also compiles directives BEFORE stripping
+        # {{-- --}} comments, so this walks src, not the stripped body.
+        problems += blade_structure_errors(src)
 
         undef = sorted(set(re.findall(r'\$([a-zA-Z_]\w*)', body)) - defined_vars(body))
         # A name reached ONLY through ?? / ?-> / isset() / empty() cannot cause a

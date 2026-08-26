@@ -19,11 +19,21 @@
     visible layout breaks. The themed page keeps loading public/css/quick-input.css
     so this region renders exactly as it does today.
 
-    Extracted from quick-input/show.blade.php (file lines 99-620) with no edits.
+    SCOPE: original quick-input/show.blade.php lines 99-604 only. The caller owns
+    the surrounding condition and its else-branch:
+
+        (caller)  if selectedLocationId and selectedFiscalYear and measurement
+        (here)      this partial
+        (caller)  else -> the "Action Required" prompt
+        (caller)  endif
+
+    Pulling the caller's else-branch in here is what caused the production
+    ParseError logged in redesign.md section 31.9. This file must stay a
+    self-contained, balanced block.
 
     NOTE: do not write Blade directive names in this comment. Blade compiles
-    directives before stripping comments, so a directive name here is counted
-    by the compiler and unbalances the file.
+    directives before stripping comments, so a name here is counted by the
+    compiler and unbalances the file.
 
     Expects everything quick-input/show receives from QuickInputController.
 --}}
@@ -533,19 +543,3 @@
         </div>
     </form>
     @endif
-    @else
-    <div class="bg-yellow-50 border-l-4 border-yellow-400 rounded-lg shadow-sm p-5 mb-8">
-        <div class="flex items-start">
-            <div class="flex-shrink-0">
-                <svg class="h-6 w-6 text-yellow-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M8.485 3.493a.75.75 0 00-1.47 0L1.485 16.493a.75.75 0 00.659 1.007h15.712a.75.75 0 00.659-1.007L8.485 3.493zM12 10a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm-1.5 3a.75.75 0 100 1.5.75.75 0 000-1.5z" clip-rule="evenodd" />
-                </svg>
-            </div>
-            <div class="ml-4">
-                <h3 class="text-sm font-semibold text-yellow-800 mb-1">Action Required</h3>
-                <p class="text-sm text-yellow-700">
-                    Please select a <strong>Fiscal Year</strong> and <strong>Location</strong> above to start entering data.
-                </p>
-            </div>
-        </div>
-    </div>
