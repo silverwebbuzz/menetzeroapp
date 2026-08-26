@@ -2283,3 +2283,98 @@ Reintroduced each defect and confirmed the checker reports it, then reverted:
 1. **Never write a Blade directive name inside a Blade comment.** The compiler counts it.
 2. **An extracted partial must be a self-contained, balanced block.** If the caller owns a condition, it owns that condition's branches too.
 3. **Verify structure with a stack, never with counts.** Counts are blind to misplaced branches.
+
+---
+
+## 32. Checker hardening after the two ParseErrors
+
+Before resuming migration, the pre-flight checker was extended to cover the
+failure classes that actually reached production, plus two adjacent ones.
+
+**Note on limits:** this machine has no PHP CLI and no `vendor/`, so nothing here
+truly compiles a template. These checks simulate Blade's compiler closely enough
+to catch structural breakage — which is what both crashes were — but they are not
+a substitute for loading the page.
+
+| Check | Catches | Scope |
+|---|---|---|
+| Directive structure (stack walk) | orphan `@else`, mismatched close, unclosed block, directive names in comments | all 254 views |
+| `@include` target resolves | "View not found" 500s | all 254 views |
+| `@php` brace balance | ParseError from an unclosed `{` | all 254 views |
+| Undefined variables | fatal on unguarded deref | 27 themed views |
+| Dropped routes / fields / field-help | silent feature loss | 27 themed views |
+| CSS class + token defined | invisible styling loss | 27 themed views |
+
+Dynamic includes (`@include('x.' . $step)`) are skipped — they cannot be resolved
+statically and are legitimate. One exists: `emission-form/step.blade.php`.
+
+**Each new check was verified against a deliberately introduced fault, then
+reverted:**
+
+| Injected fault | Reported |
+|---|---|
+| orphan `@else` | `line 546: @else with innermost open = NOTHING` |
+| `@auth` named in a comment | `unclosed @auth opened at line 4` |
+| `@include` of a missing view | `@include target does not exist: '…does-not-exist'` |
+| unclosed `{` in `@php` | `line 270: @php block has unbalanced braces (1 open, 0 close)` |
+
+### 32.1 Re-verification of everything already shipped
+
+Both quick-input partials were rebuilt during the postmortems, so the composed
+output (parent + shared partial) was re-checked against the pre-extraction
+originals for **both themes**:
+
+| Page | Theme | element ids | routes | field names | gate calls |
+|---|---|---|---|---|---|
+| `quick-input/show` | old | OK | OK | OK | OK |
+| `quick-input/show` | new | OK | OK | OK | OK |
+| `quick-input/index` | old | OK | OK | OK | OK |
+| `quick-input/index` | new | OK | OK | OK | OK |
+
+Current state: **254 views, 0 structural problems; 27 themed views, 0 problems.**
+
+---
+
+## 33. Body migration — Business locations
+
+Completed **2026-08-26**. One new file; **no existing file modified**.
+
+`resources/views/themes/new/locations/index.blade.php` (206 lines), from a
+165-line original.
+
+### 33.1 Straightforward, unlike the last two
+
+No external JS, no plan gating (verified: the original has zero `$gate` calls),
+no shared-partial extraction needed. This is the pace §31.7 predicted for the
+remaining bodies.
+
+### 33.2 Dependency checked before writing
+
+The row overflow menu uses Alpine (`x-data` / `x-show` / `x-transition` /
+`@click.away`) and the `.dropdown-menu` / `.dropdown-item` classes.
+
+`portal-design-system.css` scopes its dropdown rules to `.app-shell` /
+`.consultant-shell`, and **the new shell sets neither**. That would have been a
+silent styling loss. It is not a problem here because `app-shell.css` defines
+`.dropdown-menu` / `.dropdown-item` **unscoped** and the new shell loads it — but
+rather than depend on that, the themed page styles its own `.loc-menu` with theme
+tokens.
+
+**Worth remembering for later bodies:** any old markup relying on an
+`.app-shell`-scoped rule will lose it in the new theme. Grep
+`portal-design-system.css` for `.app-shell ` before assuming a class carries over.
+
+### 33.3 Verification
+
+- routes, `name="…"` fields, `@csrf`, `<x-…>` components — **identical sets**
+- Alpine directives — one of each in live markup, matching the original (the raw grep over-counts by 1 because the header comment names them)
+- both POST toggles (`locations.toggle-head-office`, `locations.toggle-status`) preserved with their csrf tokens
+- Pre-flight checker: **28 themed views + 227 non-theme views, 0 problems**
+
+Deliberate change: `x-cloak` replaces the original's inline `style="display:none"`
+on the menu — same intent, and `[x-cloak]` is defined in `app-shell.css`.
+
+### 33.4 Remaining bodies
+
+`profile`, `subscriptions/billing`, `roles`. All conventional server-rendered
+pages.

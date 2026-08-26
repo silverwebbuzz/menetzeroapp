@@ -95,6 +95,40 @@ def blade_structure_errors(src):
     return errs
 
 
+
+def blade_include_errors(src, known_views):
+    """@include targets that cannot resolve -> 'View not found' at runtime (500).
+
+    Dynamic names (concatenated with a variable) are skipped: they cannot be
+    resolved statically and are legitimate, e.g. emission-form/step.blade.php.
+    """
+    errs = []
+    for m in re.finditer(r"@(?:include|includeIf|includeWhen|includeFirst|each)\s*\(\s*'([^']+)'(\s*\.)?", src):
+        name, concat = m.group(1), m.group(2)
+        if concat:
+            continue
+        if name.split('::')[-1] not in known_views:
+            errs.append(f"@include target does not exist: '{name}'")
+    return errs
+
+
+def blade_php_brace_errors(src):
+    """Unbalanced braces inside @php blocks -> ParseError, same failure class
+    as the two structural crashes (redesign.md 31.8 / 31.9)."""
+    errs = []
+    for m in re.finditer(r'@php\b(?!\s*\()(.*?)@endphp', src, re.S):
+        blk = m.group(1)
+        blk = re.sub(r'/\*.*?\*/', '', blk, flags=re.S)
+        blk = re.sub(r'//[^\n]*', '', blk)
+        blk = re.sub(r"'(?:\\.|[^'\\])*'", "''", blk)
+        blk = re.sub(r'"(?:\\.|[^"\\])*"', '""', blk)
+        if blk.count('{') != blk.count('}'):
+            line = src[:m.start()].count('\n') + 1
+            errs.append(f'line {line}: @php block has unbalanced braces '
+                        f'({blk.count("{")} open, {blk.count("}")} close)')
+    return errs
+
+
 def main() -> int:
     css = set(re.findall(r'\.(mnz-[a-zA-Z0-9_-]+)',
                          open(os.path.join(ROOT, 'public/css/mnz-ui.css')).read()))
@@ -108,6 +142,11 @@ def main() -> int:
     # 500, so there is no reason to scope this check narrowly. The variable and
     # CSS checks stay scoped to themes/ — a partial legitimately relies on
     # variables its parent defines.
+    all_views = {}
+    for _f in glob.glob(os.path.join(ROOT, 'resources/views/**/*.blade.php'), recursive=True):
+        _rel = _f.split('resources/views/')[1][:-len('.blade.php')].replace('/', '.')
+        all_views[_rel] = _f
+
     structural = sorted(f for f in glob.glob(
         os.path.join(ROOT, 'resources/views/**/*.blade.php'), recursive=True)
         if '/themes/' not in f)
@@ -130,7 +169,10 @@ def main() -> int:
     failures = 0
     structural_failures = 0
     for f in structural:
-        probs = blade_structure_errors(open(f).read())
+        _src = open(f).read()
+        probs = (blade_structure_errors(_src)
+                 + blade_include_errors(_src, all_views)
+                 + blade_php_brace_errors(_src))
         if probs:
             structural_failures += 1
             failures += 1
@@ -154,6 +196,8 @@ def main() -> int:
         # still balanced. Blade also compiles directives BEFORE stripping
         # {{-- --}} comments, so this walks src, not the stripped body.
         problems += blade_structure_errors(src)
+        problems += blade_include_errors(src, all_views)
+        problems += blade_php_brace_errors(src)
 
         undef = sorted(set(re.findall(r'\$([a-zA-Z_]\w*)', body)) - defined_vars(body))
         # A name reached ONLY through ?? / ?-> / isset() / empty() cannot cause a
