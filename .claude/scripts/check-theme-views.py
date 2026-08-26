@@ -101,20 +101,16 @@ def main() -> int:
     files = sorted(glob.glob(os.path.join(ROOT, 'resources/views/themes/**/*.blade.php'),
                              recursive=True))
 
-    # Shared partials created by the migration live OUTSIDE themes/ because both
-    # themes include them. They were therefore never scanned — which is how the
-    # unbalanced @if in quick-input/partials/entry-form reached production
-    # (redesign.md section 31.8). Directive balance is checked on these too; the
-    # variable and CSS checks are skipped for them, since a partial legitimately
-    # relies on variables its parent defines.
-    shared_partials = sorted(
-        f for f in glob.glob(os.path.join(ROOT, 'resources/views/**/partials/*.blade.php'),
-                             recursive=True)
-        if '/themes/' not in f
-        and os.path.basename(f) in {
-            'entry-form.blade.php', 'source-icon.blade.php',
-            'index-scripts.blade.php', 'enterprise-scripts.blade.php',
-        })
+    # Blade STRUCTURE is checked on every view in the repo, not just themed
+    # ones. Two production ParseErrors (redesign.md 31.8, 31.9) shipped from
+    # files outside themes/: a shared partial this migration created, and an
+    # error-page partial. Structure is cheap to verify and a broken view is a
+    # 500, so there is no reason to scope this check narrowly. The variable and
+    # CSS checks stay scoped to themes/ — a partial legitimately relies on
+    # variables its parent defines.
+    structural = sorted(f for f in glob.glob(
+        os.path.join(ROOT, 'resources/views/**/*.blade.php'), recursive=True)
+        if '/themes/' not in f)
 
     # Variables any controller passes to any view. Derived from the source so
     # this list cannot drift as controllers change — a hand-maintained list
@@ -132,16 +128,17 @@ def main() -> int:
                   for f in files if '/layouts/' in f]
 
     failures = 0
-    for f in shared_partials:
-        rel = f.split('resources/views/')[1]
+    structural_failures = 0
+    for f in structural:
         probs = blade_structure_errors(open(f).read())
         if probs:
+            structural_failures += 1
             failures += 1
-            print(f'  FAIL {rel}  (shared partial)')
+            print(f'  FAIL {f.split("resources/views/")[1]}  (structure)')
             for x in probs:
                 print(f'         {x}')
-        else:
-            print(f'  ok   {rel}  (shared partial)')
+    print(f'  {len(structural)} non-theme views scanned for Blade structure, '
+          f'{structural_failures} broken')
 
     for f in files:
         rel = f.split('resources/views/')[1]

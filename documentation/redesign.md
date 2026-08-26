@@ -2205,3 +2205,81 @@ Three compounding gaps, worth stating plainly:
 
 **Never write a Blade directive name inside a Blade comment.** The compiler counts
 it. The partial's header now says so explicitly, in place of the text that broke it.
+
+---
+
+### 31.9 SECOND POSTMORTEM — `unexpected token "else"`
+
+Reported on `/quick-input/1/natural-gas?edit=28&...` after the §31.8 fix.
+Same file, **different defect**. My §31.8 fix was incomplete.
+
+#### The defect: I cut the region at the wrong boundary
+
+The original structure was:
+
+```
+line  98   @if($selectedLocationId && $selectedFiscalYear && $measurement)
+line  99     @if(($scope3LimitReached ?? false) && !$editEntry)   <-- form region starts
+line 604     @endif                                               <-- form region ends
+line 605   @else                                                  <-- belongs to line 98
+line 620   </div>
+line 621   @endif                                                 <-- closes line 98
+```
+
+I extracted **99–620**, which swallowed the parent's `@else` branch — the
+"Action Required" prompt shown when no year/location is selected. The partial
+then contained an `@else` with no enclosing `@if`.
+
+**The correct region is 99–604.** The caller owns the condition and its
+else-branch.
+
+#### Why §31.8's fix did not catch it
+
+The §31.8 check counted open/close pairs. **The counts still balanced** — one
+`@else` is neither an open nor a close. Counting can never detect a misplaced
+branch; only a stack walk can. I shipped a fix for the symptom I had seen
+rather than for the class of defect.
+
+#### Fixes applied
+
+- Partial rebuilt from lines **99–604**; verified structurally valid.
+- The `@else` branch restored **verbatim** to `quick-input/show.blade.php`, so the old theme again shows "Action Required". The new theme already had its own themed equivalent.
+- **Composed** verification (parent + partial vs the pre-extraction original) for **both** themes: element ids, routes, form field names and field-help includes all **identical sets**.
+- The partial's header now documents the ownership boundary explicitly.
+
+#### The checker was rebuilt, not patched
+
+Counting is gone. It now walks directives with a **stack**, on raw source,
+reporting: a close that does not match the innermost open, a branch
+(`@else` / `@elseif` / …) with no branchable block open, and anything unclosed
+at EOF. It handles the single-line `@php(...)` and two-argument `@section(...)`
+forms, `@hasSection` closing with `@endif`, and `@empty` as a `@forelse` branch.
+
+**Scope widened to the whole repo.** Both ParseErrors came from files *outside*
+`themes/`, which the checker never scanned. It now checks Blade structure on all
+**254** views (227 non-theme + 27 themed).
+
+#### That widened scan immediately found a third latent crash
+
+`resources/views/errors/partials/home-action.blade.php` — written in Phase 5.8 —
+named `@auth/@elseauth` inside its header comment. Blade counted them, leaving an
+**unclosed `@auth`** and a stray `@elseauth`.
+
+**Every 403, 404, 419 and 500 would have thrown a ParseError while rendering the
+error page.** It had not surfaced only because no error page had been hit since.
+Fixed; all seven error views verified clean.
+
+#### Verified against both real bug shapes
+
+Reintroduced each defect and confirmed the checker reports it, then reverted:
+
+| Bug shape | Reported |
+|---|---|
+| orphan `@else` (natural-gas crash) | `line 546: @else with innermost open = NOTHING` |
+| directive name in a comment (refrigerants crash) | `unclosed @auth opened at line 4` |
+
+#### Standing rules
+
+1. **Never write a Blade directive name inside a Blade comment.** The compiler counts it.
+2. **An extracted partial must be a self-contained, balanced block.** If the caller owns a condition, it owns that condition's branches too.
+3. **Verify structure with a stack, never with counts.** Counts are blind to misplaced branches.
