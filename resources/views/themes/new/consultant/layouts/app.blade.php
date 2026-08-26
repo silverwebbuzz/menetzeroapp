@@ -28,11 +28,39 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
+    {{-- FALLBACK CSS — risk R-3 in documentation/redesign.md.
+         Page bodies are migrated one at a time. Until a page has a themed
+         view, it renders its EXISTING markup inside this shell, and that
+         markup depends on the old stylesheets (ent-kpi-card, ent-grid-6,
+         btn, cd-notice) plus Tailwind utilities. Dropping them leaves an
+         unstyled wall of text.
+
+         These stay until Phase 3 page bodies are migrated. mnz-ui.css is
+         `mnz-` prefixed throughout, so it never collides with them, and it
+         loads AFTER so the shell always wins. --}}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260824b">
+    <link rel="stylesheet" href="{{ asset('css/consultant-shell.css') }}?v=20260630">
+    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260630">
+    <link rel="stylesheet" href="{{ asset('css/portal-enterprise.css') }}?v=20260630">
+
     @foreach ($themeAssets['css'] ?? [] as $themeCss)
         <link rel="stylesheet" href="{{ $themeCss }}">
     @endforeach
 
     <style>
+        /* The old stylesheets define --ink / --canvas on :root with their
+           own values, and mnz-ui.css reuses those names. Re-assert the
+           MENetZero 2.0 values here (this <style> loads last) so the shell
+           renders with its own palette while old page bodies keep their
+           class-scoped rules. */
+        :root {
+            --ink: #14161a; --ink-2: #5a6068; --ink-3: #8b9199; --ink-4: #a4a9ae;
+            --line: #e5e6e3; --line-2: #f0f0ee; --line-3: #d6d7d3;
+            --surface: #fff; --canvas: #fafaf9; --canvas-2: #f4f4f2;
+        }
+
         /* Consultant portal reads as Social-blue; the company portal is
            Environmental-green. data-pillar drives --accent in mnz-ui.css. */
         .mnz-topbar__badge { display: inline-flex; align-items: center; gap: 7px;
@@ -84,7 +112,12 @@
     @stack('head')
     @include('layouts.partials.google-analytics')
 </head>
-<body class="mnz-theme consultant-portal" data-pillar="s">
+{{-- No `consultant-portal` class: consultant-shell.css defines
+     `body.consultant-portal` whose specificity beats mnz-ui.css's bare
+     `body`, overriding background and colour regardless of load order.
+     Old page bodies do not need that class — their own `ent-*` and `.btn`
+     rules are class-scoped and still apply. --}}
+<body class="mnz-theme" data-pillar="s">
 <div class="mnz-app" x-data="{ sidebarOpen: false }">
 
     <header class="mnz-topbar">
@@ -130,13 +163,12 @@
         </aside>
 
         <main class="mnz-main">
-            @hasSection('page-title')
-                <div class="mnz-pagehead">
-                    <h1>@yield('page-title')</h1>
-                    <div class="mnz-pagehead__actions">@yield('page-actions')</div>
-                </div>
-            @endif
-
+            {{-- NOTE: page-title is deliberately NOT rendered here.
+                 The consultant shell this replaces ignores it too — consultant
+                 pages render their own <h1 class="ent-page-title"> inside
+                 their content section. Rendering it here duplicated every
+                 heading. Themed page bodies (3.2-3.5) will own their headers
+                 the same way. --}}
             @yield('content')
         </main>
     </div>

@@ -597,7 +597,7 @@ Phase order approved **2026-08-25** — risk-based, company portal last.
 | 0 | Theme Infrastructure | **COMPLETE** — awaiting review |
 | 1 | Auth | **COMPLETE** — 2 hotfixes 2026-08-26, awaiting re-test |
 | 2 | Emails | **DEFERRED to last** — see §14 |
-| 3 | Consultant | **SHELL COMPLETE** — awaiting review |
+| 3 | Consultant | **SHELL COMPLETE** — hotfixed 2026-08-26 |
 | 4 | Admin | Not started |
 | 5 | Company | Not started |
 | 6 | Switch-over | Not started |
@@ -944,6 +944,53 @@ The shell is done; the 5 consultant **pages** still fall back to their existing 
 | 3.5 | Profile / intro-requests | Fallback |
 
 This is the fallback mechanism working as designed — the portal is fully usable with a new shell and old page bodies.
+
+---
+
+## 16. Phase 3 — Hotfix: fallback CSS dropped from the shell
+
+Found in production testing **2026-08-26** on `/consultant/dashboard?theme=new`. Shell rendered correctly; the page body was an unstyled wall of text.
+
+### Root cause — I violated my own risk R-3
+
+R-3 in this document says: *"Fallback pages lose colors (no Tailwind CDN) — mitigation: fallback wrapper keeps old CSS."*
+
+The new consultant shell loaded **only** `mnz-ui.css`. But consultant page bodies are not migrated yet — they render their existing markup, which depends on:
+
+| Dependency | Used for |
+|---|---|
+| `portal-enterprise.css` | `ent-kpi-card`, `ent-grid-6`, `ent-page-title`, `ent-label` |
+| `portal-design-system.css` | `btn`, `btn-primary`, `btn-sm` |
+| `consultant-shell.css` | `cd-notice` |
+| `app-shell.css` | base shell rules |
+| Tailwind CDN | `flex`, `gap-2`, `mb-4`, `items-start` |
+
+Dropping all five left the KPI grid, buttons, and notices completely unstyled.
+
+**A themed shell must keep the old stylesheets until its page bodies are migrated.** They are removed per-portal at the end of that portal's phase, not when its shell is built.
+
+### Three bugs fixed
+
+**1. Fallback CSS restored.** All four stylesheets plus the Tailwind CDN and Inter font now load *before* `mnz-ui.css`, so the shell still wins. Verified: the old stylesheets contain **zero** `mnz-` occurrences, so no collision is possible.
+
+**2. Duplicate page heading.** My shell rendered `@yield('page-title')` in a `.mnz-pagehead`. The consultant shell it replaces **ignores** `page-title` — consultant pages render their own `<h1 class="ent-page-title">` inside `content`. Every heading appeared twice. Removed from the shell.
+
+**3. CSS token collision.** `consultant-shell.css` defines `body.consultant-portal { background-color: var(--canvas); color: var(--ink) }`, whose specificity beats `mnz-ui.css`'s bare `body` **regardless of load order**. Both it and `app-shell.css` also define `--ink` / `--canvas` on `:root` with different values than `mnz-ui.css`.
+
+Fixed two ways:
+- Dropped `consultant-portal` from `<body>` — old page bodies do not need it; their `ent-*` and `.btn` rules are class-scoped and still apply.
+- Re-asserted the MENetZero 2.0 token values in the shell's inline `<style>`, which loads last.
+
+### Not a bug: blue charts
+
+The chart colours (`#3b82f6`, `#60a5fa`, `#93c5fd`) are **hardcoded in `consultant/dashboard.blade.php`**, pre-dating the redesign. They will be restyled when the dashboard body is migrated in 3.2. Chart.js itself is pushed by the page via `@push('head')`, and the new shell provides all three stacks (`styles`, `head`, `scripts`), so charts render correctly.
+
+### Rules for Phases 4 and 5
+
+1. **A themed shell keeps the old stylesheets** until every page body in that portal is migrated.
+2. **Check what the shell being replaced actually renders.** The consultant shell ignores `page-title`; the company and admin shells *do* render it. Copying one shell's behaviour to another duplicates or drops headings.
+3. **Watch `body.<portal-class>` rules.** `body.consultant-portal` and `body.company-portal` beat bare `body` on specificity. Omit the class or override explicitly.
+4. **`--ink` / `--canvas` are defined by three stylesheets** with different values. Re-assert them in the shell's inline style.
 
 ---
 
