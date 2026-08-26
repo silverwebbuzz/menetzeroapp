@@ -54,6 +54,21 @@ def main() -> int:
     files = sorted(glob.glob(os.path.join(ROOT, 'resources/views/themes/**/*.blade.php'),
                              recursive=True))
 
+    # Shared partials created by the migration live OUTSIDE themes/ because both
+    # themes include them. They were therefore never scanned — which is how the
+    # unbalanced @if in quick-input/partials/entry-form reached production
+    # (redesign.md section 31.8). Directive balance is checked on these too; the
+    # variable and CSS checks are skipped for them, since a partial legitimately
+    # relies on variables its parent defines.
+    shared_partials = sorted(
+        f for f in glob.glob(os.path.join(ROOT, 'resources/views/**/partials/*.blade.php'),
+                             recursive=True)
+        if '/themes/' not in f
+        and os.path.basename(f) in {
+            'entry-form.blade.php', 'source-icon.blade.php',
+            'index-scripts.blade.php', 'enterprise-scripts.blade.php',
+        })
+
     # Variables any controller passes to any view. Derived from the source so
     # this list cannot drift as controllers change — a hand-maintained list
     # would go stale and start reporting false failures.
@@ -70,11 +85,59 @@ def main() -> int:
                   for f in files if '/layouts/' in f]
 
     failures = 0
+    for f in shared_partials:
+        rel = f.split('resources/views/')[1]
+        src = open(f).read()
+        probs = []
+        P = {'@if': '@endif', '@foreach': '@endforeach', '@php': '@endphp',
+             '@forelse': '@endforelse', '@error': '@enderror', '@push': '@endpush',
+             '@while': '@endwhile', '@isset': '@endisset', '@unless': '@endunless',
+             '@for': '@endfor', '@switch': '@endswitch'}
+        for o, c in P.items():
+            no = len(re.findall(re.escape(o) + r'\b', src))
+            nc = len(re.findall(re.escape(c) + r'\b', src))
+            if o == '@php':
+                no -= len(re.findall(r'@php\s*\(', src))
+            if o == '@if':
+                no += len(re.findall(r'@(?:hasSection|sectionMissing)\b', src))
+            if no != nc:
+                probs.append(f'directive imbalance: {no} {o} vs {nc} {c}')
+        if probs:
+            failures += 1
+            print(f'  FAIL {rel}  (shared partial)')
+            for x in probs:
+                print(f'         {x}')
+        else:
+            print(f'  ok   {rel}  (shared partial)')
+
     for f in files:
         rel = f.split('resources/views/')[1]
         src = open(f).read()
         body = re.sub(r'\{\{--.*?--\}\}', '', src, flags=re.S)  # strip comments
         problems = []
+
+        # Directive balance, counted the way BLADE counts it: on the raw source,
+        # NOT on the comment-stripped body. Blade compiles directives before it
+        # strips {{-- --}}, so a directive NAME written inside a comment is still
+        # counted by the compiler and silently unbalances the file. That is what
+        # produced the ParseError in quick-input/partials/entry-form (redesign.md
+        # section 31.8), which a comment-stripped balance check had reported clean.
+        PAIRS = {'@if': '@endif', '@foreach': '@endforeach', '@php': '@endphp',
+                 '@forelse': '@endforelse', '@error': '@enderror',
+                 '@push': '@endpush', '@while': '@endwhile', '@isset': '@endisset',
+                 '@unless': '@endunless', '@for': '@endfor', '@switch': '@endswitch'}
+        for o, c in PAIRS.items():
+            no = len(re.findall(re.escape(o) + r'\b', src))
+            nc = len(re.findall(re.escape(c) + r'\b', src))
+            if o == '@php':
+                # @php($x = 1) is the single-line form and takes no @endphp.
+                no -= len(re.findall(r'@php\s*\(', src))
+            if o == '@if':
+                # @hasSection / @sectionMissing also close with @endif.
+                no += len(re.findall(r'@(?:hasSection|sectionMissing)\b', src))
+            if no != nc:
+                problems.append(f'directive imbalance: {no} {o} vs {nc} {c}'
+                                ' (Blade counts directive names inside comments too)')
 
         undef = sorted(set(re.findall(r'\$([a-zA-Z_]\w*)', body)) - defined_vars(body))
         # A name reached ONLY through ?? / ?-> / isset() / empty() cannot cause a

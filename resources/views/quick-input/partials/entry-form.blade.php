@@ -1,32 +1,32 @@
 {{--
-    Quick Input entry form — shared VERBATIM by both themes.
+    Quick Input entry form - shared VERBATIM by both themes.
 
     DO NOT RE-SKIN THIS FILE. It is deliberately excluded from the MENetZero 2.0
     visual migration, and the class names below are load-bearing.
 
     public/js/quick-input.js (1,360 lines) is tightly coupled to this markup:
       - it binds ~35 element IDs (amount, quantity, unit, fuel_category,
-        vehicle_type, scope2_method, calculate-btn, calculation-result, …)
+        vehicle_type, scope2_method, calculate-btn, calculation-result, ...)
       - it TRAVERSES .form-group-stacked / .form-group-horizontal / .form-group
         with closest() and querySelectorAll() to show and hide fields
-      - it INJECTS .field-error and reads .form-help-text at runtime — those
+      - it INJECTS .field-error and reads .form-help-text at runtime - those
         classes appear 0x in this markup because the JS creates them
       - it posts to /api/quick-input/calculate, which produces the emission
         numbers the user actually saves
 
     Re-skinning would therefore break field show/hide, validation display and the
-    calculation preview — and those failures surface as WRONG NUMBERS, not as
+    calculation preview - and those failures surface as WRONG NUMBERS, not as
     visible layout breaks. The themed page keeps loading public/css/quick-input.css
     so this region renders exactly as it does today.
 
     Extracted from quick-input/show.blade.php (file lines 99-620) with no edits.
-    Verified balanced: 28 @if/@endif, 7 @foreach/@endforeach, 9 @php/@endphp,
-    one complete <form>.
+
+    NOTE: do not write Blade directive names in this comment. Blade compiles
+    directives before stripping comments, so a directive name here is counted
+    by the compiler and unbalances the file.
 
     Expects everything quick-input/show receives from QuickInputController.
 --}}
-    @if(($scope3LimitReached ?? false) && !$editEntry)
-    <!-- Scope 3 free-plan limit reached: prompt to upgrade instead of showing the add form -->
     @if(($scope3LimitReached ?? false) && !$editEntry)
     <!-- Scope 3 free-plan limit reached: prompt to upgrade instead of showing the add form -->
     <div class="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-xl shadow-sm p-6 mb-8">

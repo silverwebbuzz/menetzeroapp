@@ -2162,3 +2162,46 @@ This page carries more runtime risk than any other in the migration:
 `locations/*`, `profile`, `subscriptions/billing`, `roles` — all conventional
 server-rendered pages with no comparable JS coupling, so they should migrate at
 the pace of §30 rather than this one.
+
+---
+
+### 31.8 POSTMORTEM — ParseError in production
+
+**Reported by the user** on `/quick-input/1/refrigerants?edit=4&...`:
+`ParseError: syntax error, unexpected end of file` at
+`quick-input/partials/entry-form.blade.php:536`. My extraction shipped broken.
+
+#### Two defects, both mine
+
+1. **A duplicated `@if`.** During the re-extraction in §31 I rebuilt the partial
+   with `sed -n '1,29p'` to keep the header, but the header was 28 lines. Line 29
+   — the region's opening `@if(($scope3LimitReached ?? false) && !$editEntry)` —
+   was kept as part of the "header" **and** re-added by the region append. Result:
+   the directive opened twice and closed once.
+
+2. **Directive names inside a `{{-- --}}` comment.** My header comment contained
+   the literal text `28 @if/@endif`. **Blade compiles directives before it strips
+   comments**, so those names are counted by the compiler. This is what made the
+   file look balanced to my own check while being unbalanced to Blade.
+
+#### Why my verification missed it
+
+Three compounding gaps, worth stating plainly:
+
+- I ran the balance check on the **comment-stripped** body. Blade does not strip first, so my check disagreed with the compiler in exactly the case that mattered.
+- I ran that check on the **region before prepending the header**, so the header's directive names were never counted at all.
+- **The checker never scanned `partials/`.** It globs `resources/views/themes/**` only. Every shared partial the migration created — `entry-form`, `source-icon`, `index-scripts`, `enterprise-scripts` — was outside its scope. The one file class introduced by this project was the one class never checked.
+
+#### Fixes applied
+
+- Partial rebuilt cleanly from the pristine original; verified **byte-identical** to lines 99–620 and balanced 28/28.
+- All six quick-input views verified with a stack-based simulation of Blade's own pairing: **all balanced**.
+- Checker now performs directive balance on **raw source**, matching the compiler.
+- Checker now scans **shared partials outside `themes/`** (directive balance only — a partial legitimately uses variables its parent defines).
+- Rule refined for two real Blade forms it initially misread: `@php(...)` single-line takes no `@endphp`, and `@hasSection` / `@sectionMissing` close with `@endif`.
+- **Verified the fix catches the real bug:** reintroducing one unpaired `@if` in the comment now reports `29 @if vs 28 @endif`. Reverted after the test.
+
+#### Rule for the remaining migration
+
+**Never write a Blade directive name inside a Blade comment.** The compiler counts
+it. The partial's header now says so explicitly, in place of the text that broke it.
