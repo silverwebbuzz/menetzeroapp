@@ -599,7 +599,7 @@ Phase order approved **2026-08-25** — risk-based, company portal last.
 | 2 | Emails | **DEFERRED to last** — see §14 |
 | 3 | Consultant | **SHELL COMPLETE** — hotfixed 2026-08-26 |
 | 4 | Admin | **SHELL COMPLETE** — awaiting review |
-| 5 | Company | **5.0–5.3, 5.2, 5.7 COMPLETE** — Overview + Settings migrated |
+| 5 | Company | **5.0–5.4, 5.7 COMPLETE** — Overview, Settings, Social migrated |
 | 6 | Switch-over | Not started |
 
 **Each phase stops for review before the next begins.**
@@ -1422,6 +1422,71 @@ This is the same failure mode as the Phase 3 unstyled dashboard, caught **before
 | 5.8 Internal states | Not started |
 
 Note 5.7's other three screens (Profile, Team, Billing) are route aliases into existing views and still fall back — only the reporting-methodology page has a themed body.
+
+---
+
+## 24. Phase 5.4 — Social + a parity checker that found real regressions
+
+Completed **2026-08-26**. Two page bodies migrated; the pre-flight checker extended and, in doing so, **nine genuine regressions caught that no screenshot would have revealed**.
+
+### Files added (3)
+
+| File | Purpose |
+|---|---|
+| `themes/new/layouts/partials/nav-disclosures-esg-depth.blade.php` | ESG depth sub-nav, shared by 5.4/5.5 pages |
+| `themes/new/disclosures/stakeholders/index.blade.php` | Stakeholder register |
+| `themes/new/disclosures/supply-chain/index.blade.php` | Supplier register |
+
+Form contracts verified field-for-field against `StakeholderEngagementController::validateEngagement()` (6 fields) and `SupplyChainSupplierController::store()` (9 rules). **6/6 and 8/8 field names match**, routes match, and every action keeps `['fiscal_year' => $fiscalYear]` — without it a record silently lands in the wrong reporting year.
+
+`scope3_category` is validated by the supply-chain controller but has **no input in the view being replaced**. Not added: Phase 5 reproduces the existing contract, and adding a field is a behaviour change.
+
+### The checker now compares against the original
+
+Three new comparisons, each catching something real:
+
+| Check | Found |
+|---|---|
+| **Form fields dropped** | none |
+| **`x-field-help` dropped** | **8** — 6 on stakeholders, 2 on supply chain |
+| **Routes dropped** | **9** on `nav-client`, 1 on the dashboard |
+
+**The `x-field-help` loss is the kind of regression that ships.** Those components render contextual guidance from `config/portal-guide-*`. A themed page without them looks perfect in a screenshot and is quietly worse to use. All 8 restored; both pages now 7/7.
+
+### Nine destinations that would have become unreachable
+
+The six-tab nav had silently dropped links the old nav carries:
+
+| Restored | Where it went |
+|---|---|
+| `disclosures.s1.overview`, `disclosures.s2.overview` | Reports |
+| `disclosures.esg-dashboard`, `disclosures.esg-depth.overview` | Social |
+| `quick-input.bulk-import.index` | Environmental → Measure |
+| `client.consultants.index` | Settings — **revenue-facing marketplace** |
+| `subscriptions.billing` | Settings (was pointing at `subscriptions.index`) |
+| `admin.dashboard` | Settings, admin-only escape hatch |
+
+Every route stayed registered, so nothing 404'd — they were simply **unreachable from the UI**, which is exactly the failure a route-count check cannot see.
+
+### One real omission on the dashboard
+
+The Overview had lost the **emissions-intensity** line under current emissions — the `$currentIntensity` value, and its "Set an intensity denominator" link when unset. Intensity is how growth-adjusted performance is read; a company that added sites can still be improving per unit. Restored.
+
+### Deliberate omission, declared
+
+The old nav expands **every emission source** as its own `quick-input.show` link — dozens of entries. The six-tab IA replaces that with one Measure link. No destination is lost; sources are chosen on-page.
+
+The checker honours a `DELIBERATE OMISSION` marker in a view's header comment, so an intentional change is declared in the file rather than silently tolerated.
+
+### Checker hardening
+
+Three false-positive classes fixed so its output stays actionable:
+
+- Controller payload variables **derived from source** rather than hand-listed — the list cannot go stale
+- `<meta name="viewport">` is not a form field
+- A shell's routes may legitimately live in its nav partial
+
+**Current state: 21 files, 0 problems.**
 
 ---
 

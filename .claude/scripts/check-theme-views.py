@@ -20,12 +20,8 @@ SHARED = {
     'activeTheme','isNewTheme','themeAssets','gate','companyRenewalNudge',
     'errors','loop','slot','attributes','__env','app','token','email',
     'portalVariant','showRenewalNav',
-    # controller payloads
-    'kpis','chartData','netZeroProgress','availableYears','selectedYear',
-    'yearlyTrend','currentIntensity','comparability','topSources',
-    'recentActivity','yearOverYear','compliance','recommendations','company',
-    'needsCompanySetup','sectors','settings','fiscalYear','boundaries',
-    'scope3Categories',
+    # Controller payload variables are derived at run time in main(); see
+    # controller_vars there. Only framework/composer-supplied names belong here.
 }
 
 def defined_vars(body: str) -> set:
@@ -52,6 +48,17 @@ def main() -> int:
                          open(os.path.join(ROOT, 'public/css/mnz-ui.css')).read()))
     files = sorted(glob.glob(os.path.join(ROOT, 'resources/views/themes/**/*.blade.php'),
                              recursive=True))
+
+    # Variables any controller passes to any view. Derived from the source so
+    # this list cannot drift as controllers change — a hand-maintained list
+    # would go stale and start reporting false failures.
+    controller_vars = set()
+    for f in glob.glob(os.path.join(ROOT, 'app/Http/Controllers/**/*.php'), recursive=True):
+        src = open(f).read()
+        controller_vars |= set(re.findall(r"'([a-zA-Z_]\w*)'\s*=>", src))
+        for c in re.findall(r"compact\(([^)]*)\)", src, re.S):
+            controller_vars |= set(re.findall(r"'([a-zA-Z_]\w*)'", c))
+    SHARED.update(controller_vars)
 
     # Classes defined inline by any shell layout — available to wrapped views.
     layout_css = [set(re.findall(r'\.(mnz-[a-zA-Z0-9_-]+)', open(f).read()))
@@ -92,6 +99,31 @@ def main() -> int:
         a = len(re.findall(r'@php\b', body)) - len(re.findall(r'@php\(', body))
         if a != len(re.findall(r'@endphp\b', body)):
             problems.append('unbalanced @php')
+
+        # A themed view must not silently drop form fields, x-field-help
+        # guidance, or route references present in the view it overrides.
+        # Missing helps are invisible in a screenshot but lose real guidance.
+        orig = os.path.join(ROOT, 'resources/views', rel.replace('themes/new/', ''))
+        if 'themes/new/' in rel and os.path.exists(orig):
+            osrc = open(orig).read()
+            # <meta name="…"> is not a form field.
+            src_forms = re.sub(r'<meta\b[^>]*>', '', src)
+            osrc_forms = re.sub(r'<meta\b[^>]*>', '', osrc)
+            for what, pattern in [('form field', r'name="([^"]+)"'),
+                                  ('field-help', r'x-field-help key="([^"]+)"'),
+                                  ('route', r"route\(\s*'([a-z][a-z0-9_-]*(?:\.[a-z0-9_-]+)+)'")]:
+                a, b = (osrc_forms, src_forms) if what == 'form field' else (osrc, src)
+                lost = sorted(set(re.findall(pattern, a)) - set(re.findall(pattern, b)))
+                # A shell's links legitimately live in its nav partial.
+                if what == 'route' and '/layouts/' in rel:
+                    navs = ' '.join(open(n).read() for n in files if '/partials/nav' in n)
+                    lost = [x for x in lost if x not in navs]
+                # A view may declare an intentional omission by naming it after
+                # "DELIBERATE OMISSION" in its header comment.
+                if 'DELIBERATE OMISSION' in src:
+                    lost = [x for x in lost if x not in b]
+                if lost:
+                    problems.append(f'{what} dropped vs original: {lost}')
 
         if problems:
             failures += 1

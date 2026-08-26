@@ -126,6 +126,17 @@
                 <div>
                     <div class="mnz-label">Current emissions</div>
                     <div class="mnz-num">{{ $netZeroProgress['current'] ?? 0 }}<span class="mnz-kpi__unit">tCO₂e</span></div>
+                    {{-- Intensity normalises for growth: a company that added
+                         sites can still show real improvement per unit. --}}
+                    @if ($currentIntensity ?? null)
+                        <div class="mnz-muted">
+                            {{ number_format($currentIntensity['value'], 4) }} tCO₂e / {{ $currentIntensity['unit'] }}
+                        </div>
+                    @else
+                        <div class="mnz-muted">
+                            <a href="{{ route('settings.reporting') }}">Set an intensity denominator</a>
+                        </div>
+                    @endif
                 </div>
                 <div>
                     <div class="mnz-label">Reduction</div>
