@@ -7,7 +7,7 @@
     Same form contract as the original: POST to admin.login.post with
     email, password and an optional remember checkbox.
 --}}
-@extends($authLayout ?? 'layouts.portal-auth', ['portalVariant' => 'admin'])
+@extends('layouts.portal-auth', ['portalVariant' => 'admin'])
 
 @section('title', 'Admin Sign In — MENetZero')
 

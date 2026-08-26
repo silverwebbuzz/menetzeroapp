@@ -1,7 +1,7 @@
 {{-- MENetZero 2.0 — consultant sign in (Phase 1). Contract unchanged:
      email, password, remember → consultant.login.post. --}}
 @php($portalVariant = 'consultant')
-@extends($authLayout ?? 'layouts.portal-auth')
+@extends('layouts.portal-auth')
 
 @section('title', 'Consultant Sign In — MENetZero')
 

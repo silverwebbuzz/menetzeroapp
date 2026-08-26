@@ -29,43 +29,24 @@ class ThemeServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->registerViewNamespaces();
-        $this->registerThemeViewOverrides();
         $this->shareThemeWithViews();
         $this->registerBladeDirectives();
     }
 
     /**
-     * Let a theme override a view without editing the controller that
-     * returns it.
+     * NOTE: the active theme's view directory is prepended to the view
+     * finder by App\Http\Middleware\ResolveTheme, NOT here.
      *
-     * Some views are returned by name from a controller — for example
-     * AdminLoginController does `return view('admin.auth.login')`. Rather
-     * than edit those controllers (which would break rule P3: additive
-     * only), we prepend the theme directory to the view finder's search
-     * paths. Blade then finds resources/views/themes/new/<name> first when
-     * it exists, and the original everywhere else.
+     * boot() runs before session middleware, so the session is empty at
+     * this point and the theme would always resolve to the default. Doing
+     * the prepend here froze the finder on the old theme while the layout
+     * — evaluated later, at render time — correctly switched to the new
+     * one, rendering old page content inside the new shell.
      *
-     * This IS the fallback mechanism for controller-returned views, and it
-     * is why an unmigrated screen can never 404: the original path is still
-     * searched, just second.
+     * Namespace registration below is safe at boot because it is
+     * theme-independent: every namespace is registered regardless of which
+     * theme is active.
      */
-    protected function registerThemeViewOverrides(): void
-    {
-        $themes = $this->app->make(ThemeResolver::class);
-        $active = $themes->current();
-
-        $path = $themes->config($active)['view_path'] ?? null;
-
-        if ($path === null) {
-            return;
-        }
-
-        $absolute = base_path($path);
-
-        if (is_dir($absolute)) {
-            View::getFinder()->prependLocation($absolute);
-        }
-    }
 
     /**
      * Register each theme's view namespace.
@@ -108,11 +89,6 @@ class ThemeServiceProvider extends ServiceProvider
                 'activeTheme' => $themes->current(),
                 'isNewTheme' => $themes->isNew(),
                 'themeAssets' => $themes->assets(),
-                // Layout names, resolved per theme with fallback. Pages use
-                // @extends($authLayout) so no page file needs editing when a
-                // theme ships its own shell.
-                'authLayout' => $themes->layout('layouts.portal-auth'),
-                'appLayout' => $themes->layout('layouts.app'),
             ]);
         });
     }

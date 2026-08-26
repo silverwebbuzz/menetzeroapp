@@ -595,7 +595,7 @@ Phase order approved **2026-08-25** — risk-based, company portal last.
 | Phase | Scope | Status |
 |---|---|---|
 | 0 | Theme Infrastructure | **COMPLETE** — awaiting review |
-| 1 | Auth | **COMPLETE** — awaiting review |
+| 1 | Auth | **COMPLETE** — hotfixed 2026-08-26, awaiting re-test |
 | 2 | Emails | Not started |
 | 3 | Consultant | Not started |
 | 4 | Admin | Not started |
@@ -740,6 +740,56 @@ Every redesigned form posts to the same route with the same field names as the v
 Same limitation as Phase 0: **no PHP runtime and no `vendor/` directory on the development machine.** Static verification only.
 
 One item genuinely needs runtime confirmation: `@hasSection` closes with `@endif` (Laravel's documented behaviour) — correct as written, but unexecuted. **A single page load of `/login?theme=new` confirms the whole phase.**
+
+---
+
+## 12. Phase 1 — Hotfix: view finder ordering
+
+Found in production testing **2026-08-26** on `/login?theme=new`. Old page content rendered inside the new shell.
+
+### Root cause
+
+`registerThemeViewOverrides()` ran in `ThemeServiceProvider::boot()`, which fires **before session middleware**. At that moment the session was empty, so `$themes->current()` returned `'old'`, whose `view_path` is null — the method returned early and **never prepended the theme directory**.
+
+`ResolveTheme` wrote `theme=new` to the session correctly, but that happened *after* boot. The view finder was already frozen on the old theme.
+
+The result was a split render: the **shell** switched (its `@theme('new')` evaluates late, at render time) while the **page view** did not. Symptoms were an unsized Google logo, doubled `—` + `✓` list markers, and old placeholder text.
+
+### Fix
+
+Moved the prepend into `ResolveTheme::pointViewFinderAtTheme()`, which runs after `StartSession`. The middleware is registered with `web(append:)` — **it must stay appended**, since prepending would place it before the session exists and reintroduce the bug. This constraint is now documented at the registration site in `bootstrap/app.php`.
+
+Added two safeguards:
+- **Idempotency guard** (`static $prepended`) — the finder is a singleton and `prependLocation()` does not de-duplicate, so a sub-request would otherwise stack the same path repeatedly.
+- **`$finder->flush()`** after prepending — views resolved earlier in the request are cached against their old paths.
+
+### Simplification the fix enabled
+
+With the finder resolving themes, the `$authLayout` variable became redundant — and actively harmful, since it created two different paths to the same file.
+
+Removed: `ThemeResolver::layout()`, the shared `$authLayout` / `$appLayout` variables, and `@extends($authLayout ?? …)` in every view.
+
+**Consequence: the 8 existing auth views are now byte-identical to pre-redesign** (`git diff c02534a` is empty for them). Phase 1 touches **zero** existing view files — the theme layer needs no page edits at all.
+
+### Files changed by the hotfix
+
+| File | Change |
+|---|---|
+| `app/Http/Middleware/ResolveTheme.php` | Rewritten: +`pointViewFinderAtTheme()`, idempotency guard, flush |
+| `app/Providers/ThemeServiceProvider.php` | Removed `registerThemeViewOverrides()` and layout sharing; note left explaining why it cannot live at boot |
+| `app/Services/ThemeResolver.php` | Removed dead `layout()`; `view()` docblock updated |
+| `bootstrap/app.php` | Documented the append-vs-prepend constraint |
+| 8 existing auth views | **Reverted to original** — zero diff |
+| 9 new theme views | `@extends('layouts.portal-auth')` — plain name |
+
+### Environment facts confirmed
+
+| Fact | Implication |
+|---|---|
+| Laravel 12 | `prependLocation()` and `flush()` are both on `ViewFinderInterface` |
+| Octane **not** installed | Statics reset per request; the guard cannot leak across requests |
+| Apache + PHP-FPM (Webuzo) | Standard per-request lifecycle |
+| `append()` places middleware after `StartSession` | Session available when the finder is configured |
 
 ---
 

@@ -1,6 +1,6 @@
 {{-- MENetZero 2.0 — forgot password (Phase 1). Form contract unchanged:
      POST password.email with an email field. --}}
-@extends($authLayout ?? 'layouts.portal-auth')
+@extends('layouts.portal-auth')
 
 @section('title', 'Reset Password — MENetZero')
 

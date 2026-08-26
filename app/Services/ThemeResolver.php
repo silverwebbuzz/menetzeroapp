@@ -146,9 +146,13 @@ class ThemeResolver
      * Resolve a view name against the current theme, falling back to the
      * existing view when the theme has not built that screen yet.
      *
-     * This is the mechanism behind requirement 11: an unbuilt page renders
-     * existing content rather than producing a broken route. It is what
-     * lets the new theme ship 10%-complete and still work everywhere.
+     * NOTE: the PRIMARY fallback mechanism is the view finder — see
+     * App\Http\Middleware\ResolveTheme, which prepends the active theme's
+     * directory so a plain view('auth.login') resolves to the theme copy
+     * when one exists and the original otherwise. That covers every view,
+     * including controller-returned ones, with no page or controller edits.
+     *
+     * This method remains for explicit namespaced lookups and diagnostics.
      */
     public function view(string $view, ?string $theme = null): string
     {
@@ -161,22 +165,6 @@ class ThemeResolver
         $namespaced = "{$namespace}::{$view}";
 
         return view()->exists($namespaced) ? $namespaced : $view;
-    }
-
-    /**
-     * Resolve a LAYOUT name for @extends().
-     *
-     * Distinct from view() because layouts are resolved by pages via
-     * @extends($themeLayout), which the existing codebase already does in
-     * six places (roles/*, staff/*, zero-ai/*). Returning the theme's own
-     * layout when it exists, and the original otherwise, means an auth page
-     * needs no edit at all — it extends whichever shell is active.
-     *
-     * Shared with every view as $themeLayout by ThemeServiceProvider.
-     */
-    public function layout(string $layout, ?string $theme = null): string
-    {
-        return $this->view($layout, $theme);
     }
 
     /**

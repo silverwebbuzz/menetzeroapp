@@ -1,6 +1,6 @@
 {{-- MENetZero 2.0 — set new password (Phase 1). Field contract unchanged:
      token (hidden), email, password, password_confirmation → password.update. --}}
-@extends($authLayout ?? 'layouts.portal-auth')
+@extends('layouts.portal-auth')
 
 @section('title', 'Set New Password — MENetZero')
 

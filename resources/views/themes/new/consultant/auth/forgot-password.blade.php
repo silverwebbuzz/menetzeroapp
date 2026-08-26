@@ -1,7 +1,7 @@
 {{-- MENetZero 2.0 — consultant forgot password (Phase 1). Consultants use
      their own broker + token table (see config/auth.php). --}}
 @php($portalVariant = 'consultant')
-@extends($authLayout ?? 'layouts.portal-auth')
+@extends('layouts.portal-auth')
 
 @section('title', 'Reset Consultant Password — MENetZero')
 

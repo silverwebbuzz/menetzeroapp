@@ -1,7 +1,7 @@
 {{-- MENetZero 2.0 — company sign in (Phase 1). Overrides auth/login.blade.php
      under the new theme. Form contract unchanged: POST login.post, email +
      password, Google SSO via auth.google. --}}
-@extends($authLayout ?? 'layouts.portal-auth')
+@extends('layouts.portal-auth')
 
 @section('title', 'Company Sign In — MENetZero')
 

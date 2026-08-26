@@ -1,6 +1,6 @@
 {{-- MENetZero 2.0 — company sign up (Phase 1). Field contract unchanged:
      name, email, password, password_confirmation → POST register. --}}
-@extends($authLayout ?? 'layouts.portal-auth')
+@extends('layouts.portal-auth')
 
 @section('title', 'Company Sign Up — MENetZero')
 

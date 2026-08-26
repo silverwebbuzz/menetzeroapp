@@ -26,10 +26,19 @@ return Application::configure(basePath: dirname(__DIR__))
             'restrictManagedClientWorkspace' => \App\Http\Middleware\RestrictManagedClientWorkspace::class,
         ]);
 
-        // Theme resolution for the MENetZero 2.0 redesign (Phase 0).
-        // Reads ?theme= and persists it to the session so the choice is
-        // sticky across navigation. Only ever writes a session value —
-        // it does not touch routing, auth, or authorisation.
+        // Theme resolution for the MENetZero 2.0 redesign (Phase 0/1).
+        //
+        // Reads ?theme=, persists it to the session so the choice is sticky
+        // across navigation, and points the view finder at the active
+        // theme's directory.
+        //
+        // MUST stay appended (not prepended): append() places it after
+        // StartSession, and both jobs need a live session. Prepending it
+        // would run it before the session exists and the theme would always
+        // resolve to the default.
+        //
+        // It only reads the session and configures view paths — it does not
+        // touch routing, auth, or authorisation.
         $middleware->web(append: [
             \App\Http\Middleware\ResolveTheme::class,
         ]);
