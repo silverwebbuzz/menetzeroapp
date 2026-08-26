@@ -24,6 +24,20 @@ class ThemeResolver
     public const THEME_OLD = 'old';
     public const THEME_NEW = 'new';
 
+    /**
+     * Per-request memo for the Tier 2 lookup.
+     *
+     * false = not resolved yet; null = resolved to "no preference".
+     * current() runs on every request via the ResolveTheme middleware and can
+     * be called several times per request (middleware, provider, views), while
+     * User::getActiveCompany() is NOT memoized and issues a Schema::hasTable()
+     * plus a query. Without this memo Phase 6 would add repeated DB round-trips
+     * to every page load.
+     *
+     * @var string|null|false
+     */
+    protected string|null|false $companyThemeMemo = false;
+
     public function __construct(protected Session $session)
     {
     }
@@ -39,7 +53,12 @@ class ThemeResolver
             return $sessionTheme;
         }
 
-        // Tier 2 (company/user preference) lands here in Phase 6.
+        // Tier 2 — per-company opt-in (Phase 6).
+        $companyTheme = $this->companyTheme();
+
+        if ($companyTheme !== null) {
+            return $companyTheme;
+        }
 
         return $this->defaultTheme();
     }
@@ -181,5 +200,42 @@ class ThemeResolver
     protected function sessionKey(): string
     {
         return (string) config('themes.session_key', 'mnz_theme');
+    }
+
+    /**
+     * The active company's theme opt-in, or null.
+     *
+     * Phase 6 Tier 2. Deliberately defensive: this runs on EVERY request that
+     * hits the theme middleware, including guest requests, the admin and
+     * consultant guards, and console-adjacent contexts where no company exists.
+     * Anything unexpected here must degrade to null (falling through to the
+     * config default), never throw — a failure would take down every page.
+     */
+    protected function companyTheme(): ?string
+    {
+        if ($this->companyThemeMemo !== false) {
+            return $this->companyThemeMemo;
+        }
+
+        try {
+            $user = auth('web')->user();
+
+            if ($user === null || ! method_exists($user, 'getActiveCompany')) {
+                return $this->companyThemeMemo = null;
+            }
+
+            $company = $user->getActiveCompany();
+
+            if ($company === null || ! method_exists($company, 'themePreference')) {
+                return $this->companyThemeMemo = null;
+            }
+
+            $theme = $company->themePreference();
+
+            return $this->companyThemeMemo =
+                ($theme !== null && $this->isRegistered($theme)) ? $theme : null;
+        } catch (\Throwable $e) {
+            return $this->companyThemeMemo = null;
+        }
     }
 }

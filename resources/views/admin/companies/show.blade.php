@@ -75,6 +75,54 @@
                 @endif
             </div>
 
+            {{-- MENetZero 2.0 (Phase 6) — per-company theme opt-in.
+
+                 Deliberately the ONLY theme UI in the product. Requirement:
+                 normal users must never see a "Switch Theme" option, so this
+                 lives in super-admin company administration, not in any
+                 company- or consultant-facing screen. --}}
+            @php
+                $mnzCurrentTheme = $company->themePreference();
+                $mnzDefaultLabel = config('themes.themes.' . config('themes.default') . '.label', config('themes.default'));
+            @endphp
+            <div class="bg-white shadow rounded-lg p-4 border-l-4 border-emerald-500">
+                <h2 class="text-md font-semibold text-gray-900 mb-1">Portal theme</h2>
+                <p class="text-xs text-gray-500 mb-4">
+                    Moves this company to the MENetZero 2.0 look. Appearance only — routes,
+                    permissions and plan gating are unchanged. Reversible at any time.
+                </p>
+
+                @if($mnzCurrentTheme === null)
+                    <p class="text-xs text-gray-600 mb-3">
+                        Currently following the system default (<strong>{{ $mnzDefaultLabel }}</strong>).
+                    </p>
+                @else
+                    <p class="text-xs text-gray-600 mb-3">
+                        Pinned to <strong>{{ config('themes.themes.' . $mnzCurrentTheme . '.label', $mnzCurrentTheme) }}</strong>.
+                    </p>
+                @endif
+
+                <form action="{{ route('admin.companies.theme', $company->id) }}" method="POST" class="flex flex-wrap items-end gap-3 text-sm">
+                    @csrf
+                    <div>
+                        <label class="block font-medium text-gray-700 mb-1">Theme</label>
+                        <select name="theme" class="border rounded-lg px-3 py-2">
+                            <option value="default" {{ $mnzCurrentTheme === null ? 'selected' : '' }}>
+                                Follow default ({{ $mnzDefaultLabel }})
+                            </option>
+                            @foreach(config('themes.themes', []) as $mnzKey => $mnzTheme)
+                                <option value="{{ $mnzKey }}" {{ $mnzCurrentTheme === $mnzKey ? 'selected' : '' }}>
+                                    {{ $mnzTheme['label'] ?? $mnzKey }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg px-4 py-2">
+                        Save theme
+                    </button>
+                </form>
+            </div>
+
             @if($company->isConsultantOrg())
             <div class="bg-white shadow rounded-lg p-4 border-l-4 border-indigo-500">
                 <h2 class="text-md font-semibold text-gray-900 mb-1">Assign consultant agency pack</h2>

@@ -1767,3 +1767,191 @@ Neither is blocked. Both are recorded so they are not silently dropped.
 - Hit a bad URL while **signed out** → expect the branded 404, not a blank page
 - Leave a form open until the session expires, then submit → expect the 419 page
 - Confirm `APP_DEBUG=false` in production, otherwise 500 shows the debug trace rather than `errors/500`
+
+---
+
+## 28. Phase 2 — Emails
+
+Completed **2026-08-26**. Deferred to last at the user's request; this closes the
+final build phase before switch-over.
+
+### 28.1 The survey premise was wrong again — corrected
+
+`github.md` said: *"EmailTemplateService.php (welcome exists; the other five are new)."*
+That is not what the code does. The real system is considerably better developed:
+
+- **14 transactional templates** are configured in `config/emails.php`, not one.
+- Templates are **DB-backed with config fallback** — `EmailTemplateService::resolve()`
+  reads `email_templates` by slug and falls back to `config('emails.templates.*')`.
+- Admins can **edit template bodies** (`Admin\EmailTemplateController`, `body_html`).
+- A **plain-text part already exists** (`emails/template-text.blade.php`), so the
+  "add a plain-text part" item was already done.
+
+So the work was not "write five new templates." It was: improve the one shared
+chrome that all of them render through.
+
+### 28.2 Why the wrapper was the whole job
+
+Every transactional email renders through `resources/views/emails/template.blade.php`.
+**Five callers** use it:
+
+| Caller | Purpose |
+|---|---|
+| `TemplateMail::build()` | all 14 configured templates |
+| `ContactInboundMail` | inbound contact form |
+| `RawTestMail` | test sends |
+| `Admin\EmailTemplateController::preview()` | the admin preview |
+| `Admin\EmailTestController` | template test harness |
+
+Restyling that one file improves every transactional email at once — and because
+the admin preview renders the same view, the preview stays accurate for free.
+
+This is option **A** from §14, and the survey there recommended it.
+
+### 28.3 What changed, and what deliberately did not
+
+**Changed — the chrome only.** The previous wrapper laid out with `<div>`s and a
+`<style>` block. Outlook on Windows renders through Word, which ignores much of
+that — `max-width` and `border-radius` especially — so the email lost its 600px
+column and ran the full window width. The new wrapper is table-based with inline
+styles (the standard Outlook-safe pattern) plus an MSO conditional to pin the width,
+and a `@media` query so phones get full-bleed.
+
+**NOT changed — the body.** `{!! $bodyHtml !!}` is admin-editable content. Verified
+before touching anything: **zero `class="` across all 14 templates** — every shipped
+body styles its own elements inline. The chrome therefore owns no body styling, and
+this rewrite cannot alter template content.
+
+**The `<style>` block was kept deliberately**, even though the chrome no longer needs
+it. Admins can edit `body_html`, so a stored body may still reference `.body` or
+`.footer`. Removing the block would silently restyle their content. It is now a
+compatibility shim, not the layout mechanism — and it is commented as such.
+
+**One genuine behaviour change:** the preview text was emitted inside an HTML
+comment (`<!-- preview: … -->`), which many clients ignore. It is now a proper
+hidden preheader div — the pattern clients actually read for the inbox preview
+line. It is escaped with `{{ }}` over `strip_tags` and capped at 140 chars.
+
+### 28.4 Verification
+
+- Blade variables — **identical set** to the original (`diff`)
+- `config()` keys — **identical set** to the original (`diff`)
+- `{!! $bodyHtml !!}` still unescaped — body renders as authored
+- Directives balanced; `<table>` / `<tr>` / `<td>` balanced; 3 MSO conditionals opened and closed
+- Wrapper **parses as well-formed HTML** with no unclosed tags (directives stubbed, then HTML-parsed)
+- `\Illuminate\Support\Str::limit` matches existing precedent in two other views
+- Original preserved at `scratchpad/template-orig.blade.php` for comparison
+
+### 28.5 Needs runtime confirmation by the user
+
+Static checks cannot verify how a mail client renders. Before relying on this:
+
+1. Send a test through **Admin → Email templates → preview / test send**.
+2. Check one in **Outlook on Windows** specifically — that is the renderer this
+   rewrite targets, and the only way to confirm the 600px column holds.
+3. Confirm the inbox **preview line** now shows body text rather than nothing.
+4. Spot-check one template with a DB-edited body, if any exist, to confirm the
+   compatibility shim covers it.
+
+---
+
+## 29. Phase 6 — Switch-over: Tier 2 opt-in
+
+Completed **2026-08-26**. `THEME_DEFAULT` is deliberately **still `old`**.
+
+### 29.1 Coverage reality — read this before flipping anything
+
+Measured, not estimated:
+
+| | Count |
+|---|---|
+| Themed views total | 25 |
+| — shells, navs, partials (chrome) | 9 |
+| — auth pages | 9 |
+| — **real page bodies** | **7** (+1 dashboard partial) |
+| Non-theme page views in the app | ~209 |
+
+So roughly **4% of page bodies are themed.** Everything else renders an *old
+body inside the new shell*.
+
+Verified that this actually works rather than assuming it:
+
+- Non-themed pages `@extends('layouts.app')`, which the finder resolves to the **new** shell.
+- Their `card` / `btn` / `form-control` / `table` classes still resolve, because §16 rule 1 kept the old stylesheets loaded in the new shell.
+- **Navigation coverage is complete**: the new nav links 33 routes vs the old nav's 24 — a superset, no gaps. (A naive diff shows `scope`/`slug` "missing"; both are `request()->route('slug')` calls, not links.)
+
+The result is coherent and shippable, but visually mixed. **That is why the
+default was not flipped** — the user chose Tier 2 opt-in over a global flip.
+
+### 29.2 Tier 2 — the per-company opt-in
+
+`ThemeResolver::current()` had a reserved Tier 2 slot since Phase 0. It is now live:
+
+```
+1. Session      ?theme= choice (unchanged)
+2. Company      NEW — the company's opt-in
+3. Config       themes.default ('old')
+```
+
+**No migration was needed.** `companies.settings` already exists as a nullable
+JSON column cast to array, and is **completely unused** — verified nothing in the
+app reads or writes it. (`CompanyReportingSettingsController` writes a *different*
+model on its own table.) Storing the opt-in there satisfies requirement 8: do not
+modify DB structures unnecessarily. `Company::themePreference()` /
+`setThemePreference()` merge into that array rather than replacing it.
+
+### 29.3 Two problems found and fixed during implementation
+
+**A performance regression I was about to introduce.** `current()` runs on every
+web request through `ResolveTheme`, and can be called several times per request
+(middleware, provider, Blade directives). `User::getActiveCompany()` is **not
+memoized** and issues a `Schema::hasTable()` plus a query. Tier 2 would therefore
+have added repeated DB round-trips to every page load. Fixed with a per-request
+memo (`false` = unresolved, `null` = no preference) written on **every** return
+path. Confirmed `ThemeResolver` is bound as a **singleton**, so the memo holds;
+and `account.switch` is a POST + redirect, so the next request rebuilds the
+container and the memo cannot go stale across a company switch.
+
+**Fail-open, not fail-closed.** `companyTheme()` is wrapped in `try/catch
+(\Throwable)` and guarded with `method_exists()`. It runs on guest requests and
+on the admin and consultant guards, where no company exists. Anything unexpected
+degrades to the config default rather than throwing — a failure here would take
+down every page in the product.
+
+### 29.4 The admin control
+
+`Admin\CompanyThemeController` + `POST /admin/companies/{company}/theme`
+(`admin.companies.theme`), placed inside the existing **`ensureSuperAdmin`** group.
+A new controller rather than an edit to `SuperAdminController`, so the whole
+switch-over surface can be removed in one step later.
+
+The UI is a card on the company detail page offering *Follow default* /
+*MENetZero (current)* / *MENetZero 2.0*. Verified `$company` there is a real
+`Company` model (`Company::with([...])`), not an array — the same bug class as
+the `getAccessibleCompanies()` fatal in §20, so it was checked rather than assumed.
+
+**This is the only theme UI in the product.** The standing constraint — *normal
+users must never see a "Switch Theme" option* — is intact: the control lives in
+super-admin company administration, and nothing company- or consultant-facing
+exposes it.
+
+### 29.5 Verification
+
+- Route count **399 → 400** (exactly the one new route)
+- Pre-flight checker: **25 files, 0 problems**
+- Brace balance verified on all three PHP files; Blade directives balanced in `show.blade.php`
+- `\Throwable` written correctly (the Python heredoc could have mangled the escape)
+- Existing behaviour unchanged: with no opt-in set, `current()` returns the config default exactly as before
+
+### 29.6 The remaining rollout — user-driven from here
+
+1. **Now:** opt one internal company in via the admin card; use it for real work.
+2. **Then:** opt in a friendly client or two. Feedback on the *mixed* state matters most — that is what 96% of pages look like today.
+3. **Before any global flip:** migrate the high-traffic bodies still on old markup — `quick-input/*` (daily data entry), `locations/*`, `profile`, `subscriptions/billing`, `roles`. Flipping `THEME_DEFAULT` while coverage is ~4% would put every user in the mixed state at once.
+4. **Flip:** `THEME_DEFAULT=new` — one env value, instantly reversible.
+5. **Kill-switch, unchanged:** `THEME_SWITCH_ENABLED=false` disables `?theme=` immediately, no deploy.
+
+**Still outstanding for the user (D7):** production nginx / Cloudflare rules are
+outside the repo and only the user can verify that `?theme=new` is not stripped
+or cached across users. A shared cache that ignores the query string would serve
+one visitor's theme to another — worth checking before opting in any real client.

@@ -21,6 +21,43 @@ class Company extends Model
         'company_type', 'is_direct_client', 'consultant_id',
     ];
 
+    /**
+     * MENetZero 2.0 (Phase 6): the per-company theme opt-in.
+     *
+     * Stored inside the existing `settings` JSON column rather than a new
+     * column, per requirement 8 (do not modify DB structures unnecessarily).
+     * The column was already present, cast to array, and unused — verified:
+     * nothing in the app reads or writes companies.settings today.
+     *
+     * Returns null when the company has expressed no preference, which is
+     * what lets ThemeResolver fall through to the config default.
+     */
+    public function themePreference(): ?string
+    {
+        $theme = data_get($this->settings, 'theme');
+
+        return is_string($theme) && $theme !== '' ? $theme : null;
+    }
+
+    /**
+     * Set (or clear, with null) this company's theme opt-in.
+     *
+     * Merges into `settings` rather than replacing it, so any future keys
+     * stored alongside survive.
+     */
+    public function setThemePreference(?string $theme): void
+    {
+        $settings = (array) ($this->settings ?? []);
+
+        if ($theme === null) {
+            unset($settings['theme']);
+        } else {
+            $settings['theme'] = $theme;
+        }
+
+        $this->settings = $settings;
+    }
+
     protected $casts = [
         'is_active' => 'boolean',
         'is_direct_client' => 'boolean',

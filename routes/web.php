@@ -696,6 +696,11 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
         Route::post('/entity-requests/{entityRequest}/activate', [\App\Http\Controllers\Admin\ConsultantEntityRequestController::class, 'activate'])->name('entity-requests.activate');
         Route::post('/companies/{company}/assign-package', [\App\Http\Controllers\Admin\AdminPackageAssignmentController::class, 'assignToCompany'])->name('companies.assign-package');
 
+        // MENetZero 2.0 (Phase 6) — per-company theme opt-in. Super-admin only.
+        // Lets a company be moved to the new theme one at a time, ahead of any
+        // change to THEME_DEFAULT. Removable in one step once migration ends.
+        Route::post('/companies/{company}/theme', [\App\Http\Controllers\Admin\CompanyThemeController::class, 'update'])->name('companies.theme');
+
         // Campaign coupons
         Route::get('/coupons', [\App\Http\Controllers\Admin\CouponController::class, 'index'])->name('coupons.index');
         Route::get('/coupons/create', [\App\Http\Controllers\Admin\CouponController::class, 'create'])->name('coupons.create');
