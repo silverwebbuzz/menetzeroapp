@@ -599,7 +599,7 @@ Phase order approved **2026-08-25** — risk-based, company portal last.
 | 2 | Emails | **DEFERRED to last** — see §14 |
 | 3 | Consultant | **SHELL COMPLETE** — hotfixed 2026-08-26 |
 | 4 | Admin | **SHELL COMPLETE** — awaiting review |
-| 5 | Company | **5.0–5.5, 5.7 COMPLETE** — only 5.6 Reports + 5.8 remain |
+| 5 | Company | **5.0–5.5, 5.7 DONE** — 5.6 surveyed, 5.8 pending |
 | 6 | Switch-over | Not started |
 
 **Each phase stops for review before the next begins.**
@@ -1546,4 +1546,123 @@ Nested-array field names were compared structurally (`topics[][]`) rather than l
 
 ---
 
+## 26. Phase 5.6 — Reports: findings before implementation
+
+Survey completed **2026-08-26**. **Implemented 2026-08-26** — see §26.6 below.
+
+### Why this page is different from 5.2/5.4/5.5
+
+`reports/index.blade.php` is **654 lines** — larger than all five previously migrated bodies combined — and unlike them it carries its own asset blocks:
+
+| Region | Lines | Contents |
+|---|---|---|
+| `@push('styles')` | 5–122 | ~117 lines of page CSS (accordion transitions, card overrides) |
+| `@section('content')` | 124–536 | Form, three gated exports, results |
+| `@push('scripts')` | 537–654 | ~117 lines of page JS |
+
+### Contract to preserve
+
+| Item | Detail |
+|---|---|
+| Form | `GET` → `reports.show`; `fiscal_year` (required), `location_id` (required), `moccae_only` checkbox |
+| Plan gates | **3 × `x-plan-gated-link`** — PDF, Excel, IEQT exports |
+| Cross-link | `client.profile` — logo upload tip for PDF branding |
+
+**The three gated exports are the highest-risk item on the page.** PDF, Excel and IEQT are paid capabilities; rendering any as a bare link hands it to every tier (risk R-1, same shape as the SASB export in §25).
+
+### Recommended approach when resumed
+
+Follow the §22 precedent: the Overview's 126-line chart block was **extracted to a shared partial** included by both themes, rather than duplicated. The same applies here — the ~117-line script block should move to `reports/partials/index-scripts.blade.php` so report logic cannot drift between themes. The CSS block is theme-specific and should **not** be shared; the themed view gets its own.
+
+### Status
+
+| Sub-phase | Status |
+|---|---|
+| 5.0–5.5, 5.7 | **DONE** |
+| 5.6 Reports | **Surveyed, not implemented** |
+| 5.8 Internal states | Not started |
+
+---
+
 *Sections 1–6 are the plan. Sections 7, 7A, 9 record approved decisions.*
+
+---
+
+### 26.6 Phase 5.6 — Reports: implementation record
+
+Completed **2026-08-26**. Three files touched.
+
+| File | Status | Lines |
+|---|---|---|
+| `resources/views/reports/partials/index-scripts.blade.php` | **new** (shared) | 136 |
+| `resources/views/themes/new/reports/index.blade.php` | **new** (themed body) | 523 |
+| `resources/views/reports/index.blade.php` | modified — extraction only | 654 → 542 |
+
+#### The shared script partial
+
+Following the §22 precedent, the ~117-line script block was extracted **verbatim**
+to `reports/partials/index-scripts.blade.php` and is now `@include`d by both themes,
+so report logic cannot drift between them. Verified byte-identical to the original
+(`diff` modulo the 4-space `@push` indent). The old view's diff is **3 insertions,
+116 deletions** — pure extraction, no behaviour change.
+
+The **CSS block was deliberately not shared.** It is presentation, not logic; the old
+theme keeps its `.card-body` / `.report-kpi` block and the new theme gets its own
+`.rpt-*` block. Sharing it would have coupled the two designs.
+
+#### Chart.js version trap — documented in the partial
+
+Both shells load Chart.js **3.9.1** in `<head>`, but this page pushes an *unpinned*
+`chart.js` tag that resolves to **v4**, plus `chartjs-plugin-datalabels@2`. The
+override is what makes `ChartDataLabels` work. Both tags were carried across
+verbatim and the partial header warns against "tidying" them away — removing them
+silently drops the plugin and the chart loses its labels.
+
+#### DOM contract the shared script depends on
+
+The partial documents, and the themed body honours, the exact hooks the script binds:
+`.accordion-header[data-target]`, `.accordion-body` toggled via `hidden`,
+`.accordion-icon`, `#analysisPieChart`, and `#btnScope` / `#btnEmission`.
+
+**The toggle buttons keep `btn-primary` / `btn-secondary` alongside their `mnz-btn`
+classes.** `setActiveButton()` adds and removes those two exact class names. Dropping
+them for pure `mnz-` classes would have left the active-state toggle a no-op — the
+chart would still switch, but neither button would ever look selected.
+
+#### Plan gating — the highest-risk item, verified
+
+All three exports (PDF, Excel, IEQT) are paid capabilities. Each stays wrapped in
+`x-plan-gated-link` with its original `:allowed` / `:message` / `:locked-title` /
+`:locked-href` expressions. Verified mechanically against `c02534a`:
+
+- `route()` calls — **identical set**
+- `<x-…>` components — **identical set and counts** (incl. `x-preview-only-banner`, `x-export-readiness-banner`)
+- `name="…"` form fields — **identical set**
+- `$gate->canExport(…)` — **4 call sites, same order, same arguments** (a raw grep shows 7 in the themed file; the 3 extra are the header comment, not code)
+
+The preview-only overlay, the trial-watermark overlay and both banner branches were
+carried across, re-skinned as `.rpt-watermark` but with the same `$previewOnly` /
+`$trialWatermarked` conditions.
+
+#### Composer coverage
+
+`reports.*` was already registered for both `PlanGateComposer` and
+`ReportingYearsComposer`, and `withThemeViews()` expands it to `theme-new::reports.*`.
+No `AppServiceProvider` change was needed. Note the themed view resolves via the
+**finder prepend** under the view name `reports.index`, which the unexpanded pattern
+already covers — belt and braces.
+
+#### Verification
+
+- Pre-flight checker: **25 files, 0 problems**
+- All 19 CSS custom properties used resolve in `mnz-ui.css` or the shell
+- All 23 `mnz-` classes used are defined
+- Blade directives balanced (`@section=3 / @endsection=1` is correct — two are the
+  two-argument inline form, matching the source view)
+- Repo diff outside the new theme: **one file**, the extraction described above
+
+#### Still needs runtime confirmation by the user
+
+- The scope/source chart toggle and the accordion, on a report with real data
+- The locked state of all three exports on a tier that cannot download
+- Export-readiness blocking on the MOCCAE PDF and IEQT buttons
