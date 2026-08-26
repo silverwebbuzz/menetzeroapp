@@ -18,7 +18,7 @@
     // Permission gating is reproduced VERBATIM from
     // layouts/partials/nav-client.blade.php. It is permission-based, not
     // plan-based: PlanGateComposer shares $gate (a PlanGate) and
-    // $companyRenewalNudge — there is no $planGate and no allows() method.
+    // companyRenewalNudge. There is no planGate variable and no allows() method.
     // A link the old nav hides MUST stay hidden here (risk R-1).
     $user = auth('web')->user();
 

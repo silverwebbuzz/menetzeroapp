@@ -599,7 +599,7 @@ Phase order approved **2026-08-25** — risk-based, company portal last.
 | 2 | Emails | **DEFERRED to last** — see §14 |
 | 3 | Consultant | **SHELL COMPLETE** — hotfixed 2026-08-26 |
 | 4 | Admin | **SHELL COMPLETE** — awaiting review |
-| 5 | Company | **5.0–5.3 COMPLETE** — hotfixed 2026-08-26 |
+| 5 | Company | **5.0–5.3 + 5.2 COMPLETE** — Overview migrated |
 | 6 | Switch-over | Not started |
 
 **Each phase stops for review before the next begins.**
@@ -1306,6 +1306,60 @@ An undefined-variable scan now runs across every theme file:
 Run across all 16 theme files: **clean**. Two flagged references in the nav were verified as false positives — `$planGate` appears only inside a comment, `$prefixes` is a closure parameter.
 
 **This check must run before every future phase is reported complete.** Balance checks alone are not sufficient for Blade.
+
+---
+
+## 22. Phase 5.2 — Overview (company dashboard)
+
+Completed **2026-08-26**. **First migrated page body** in the whole redesign — every prior phase delivered shells only.
+
+### Files
+
+| File | Change |
+|---|---|
+| `themes/new/dashboard/partials/enterprise.blade.php` | **New** — redesigned Overview |
+| `dashboard/partials/enterprise-scripts.blade.php` | **New** — chart config, shared by both themes |
+| `dashboard/partials/enterprise.blade.php` | **Modified** — 126-line script block replaced by an include |
+
+### Chart config extracted rather than duplicated
+
+The original partial carried 126 lines of Chart.js configuration in a `@push('scripts')` block. Copying it into the themed partial would have created two copies that drift — a chart fix applied to one theme and not the other.
+
+Instead it is extracted **verbatim** into `dashboard/partials/enterprise-scripts.blade.php`, which **both** partials include. Verified byte-identical against `c02534a`:
+
+```
+diff <(git show c02534a:…enterprise.blade.php | sed -n '262,387p') \
+     <(sed -n '11,136p' …enterprise-scripts.blade.php)   →  identical
+```
+
+The extraction is behaviour-neutral for the old theme: same content, same `@push('scripts')`, same position in the render.
+
+**Canvas ids are load-bearing.** The shared script binds by `#monthlyEmissionsChart` and `#emissionsByScopeChart`; both themes render those exact ids. Any future theme rendering the Overview must too — noted in the partial's header.
+
+### Data contract unchanged
+
+The redesigned Overview consumes exactly the controller's existing `compact()` payload — 14 variables. **No controller change** (P3 holds). Six sections: page head with year filter, KPI row, net zero progress, charts, compliance, recommendations.
+
+Two details preserved deliberately:
+- **Boundary-change warning** — absolute emissions across years with a different organisational boundary are not like-for-like (GHG Protocol Ch.5). Carried over in full.
+- **Trend direction semantics** — falling emissions are *good*, so a negative trend gets the positive colour. Inverting this would misreport performance.
+
+### Verification
+
+| Check | Result |
+|---|---|
+| Undefined-variable scan (§21), all 17 theme files | **CLEAN** |
+| `mnz-` classes used vs defined in `mnz-ui.css` | 35 used, **0 missing** |
+| Blade balance, 3 touched files | OK |
+| Canvas ids, view vs script | Match |
+| `co2e_t()` helper | Exists in `app/helpers.php`, autoloaded via composer `files` |
+| Script extraction vs pre-redesign | **Byte-identical** |
+
+The §21 scan flagged `@push` in a Blade comment — same false-positive class as `$planGate` earlier. Comment reworded so the scan stays clean.
+
+### State
+
+Existing files modified since pre-redesign: **2** — `admin/price-book/index.blade.php` (the `§` fix) and `dashboard/partials/enterprise.blade.php` (script extraction, behaviour-neutral).
 
 ---
 
