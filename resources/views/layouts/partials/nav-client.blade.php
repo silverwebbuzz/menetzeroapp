@@ -1,48 +1,30 @@
-{{-- Client Navigation Menu --}}
+{{--
+    MENetZero — company sidebar navigation (old / current theme).
+
+    STRUCTURE COMES FROM config/navigation.php — not from this file. The new
+    theme's nav-client.blade.php renders the SAME config with mnz-* markup,
+    so the two themes cannot drift: a page added to the config appears in
+    both, with the same grouping, gate and active-state rules.
+
+    This file keeps the old theme's presentation intact — the SVG icon
+    library, the .nav-section/.nav-link classes, and the Alpine-driven
+    Scope 1/2/3 emission-source tree under Measure. Only the top-level
+    structure moved to config.
+
+    Permission gating now lives in layouts/partials/nav-gates.blade.php,
+    included below. It is the SAME logic that was inline here before, and
+    the new theme includes the identical file — which is what closes the
+    R-1 drift risk (a link hidden here could previously still appear in the
+    new theme).
+
+    CONSULTANTS SEE THIS TOO: layouts/app.blade.php includes nav-client for
+    company workspaces, so a consultant "acting as" a client gets exactly
+    this sidebar.
+--}}
+@include('layouts.partials.nav-gates')
+
 @php
-    // Always use the web guard here so admin users (App\Models\Admin) don't hit client-specific methods
-    $user = auth('web')->user();
-
-    // Check for active company (works for both owners and staff members), only if method exists
-    $activeCompany = ($user && method_exists($user, 'getActiveCompany'))
-        ? $user->getActiveCompany()
-        : null;
-    $hasCompany = $activeCompany !== null;
-    $companyId = $activeCompany ? $activeCompany->id : null;
-    $isManagedClientWorkspace = $activeCompany && $activeCompany->isManagedClient();
-
-    // Check permissions for each module — super admin and company admin have all
-    $isAdmin = $user && ($user->isAdmin() || ($companyId && $user->isCompanyAdmin($companyId)));
-
-    $canViewLocations = $isAdmin || ($hasCompany && (
-        $user->hasPermission('locations.*', $companyId) ||
-        $user->hasPermission('manage_locations', $companyId) ||
-        $user->hasModulePermission('locations', 'view', $companyId)
-    ));
-
-    $canViewQuickInput = $isAdmin || ($hasCompany && (
-        $user->hasPermission('measurements.view', $companyId) ||
-        $user->hasPermission('measurements.*', $companyId) ||
-        $user->hasPermission('manage_measurements', $companyId) ||
-        $user->hasModulePermission('measurements', 'view', $companyId)
-    ));
-
-    $canViewReports = $isAdmin || ($hasCompany && (
-        $user->hasPermission('reports.view', $companyId) ||
-        $user->hasPermission('reports.*', $companyId) ||
-        $user->hasModulePermission('reports', 'view', $companyId)
-    ));
-
-    $canViewDisclosures = $isAdmin || ($hasCompany && (
-        $user->hasPermission('disclosures.view', $companyId) ||
-        $user->hasPermission('disclosures.*', $companyId) ||
-        $user->hasModulePermission('disclosures', 'view', $companyId) ||
-        $canViewReports
-    ));
-
-    $canViewStaff = $isAdmin || ($hasCompany && $user->hasModulePermission('staff_management', 'view', $companyId));
-    $canViewRoles = $isAdmin || ($hasCompany && $user->hasModulePermission('roles_permissions', 'view', $companyId));
-
+    $nav = \App\Support\NavigationMap::build($navGates);
     $scope3Locked = isset($gate) ? $gate->isScope3Locked() : true;
 
     // Route helper for scope icons — each source gets a distinct icon where possible
@@ -111,24 +93,27 @@
     };
 @endphp
 
-<div class="nav-section">
-    <a href="{{ route('client.dashboard') }}" class="nav-link {{ request()->routeIs('client.dashboard') ? 'active' : '' }}">
-        {!! $svg('grid') !!}
-        Dashboard
-    </a>
-</div>
-
-@if($hasCompany)
+@foreach ($nav['groups'] as $group)
     <div class="nav-section">
-        <div class="nav-section-title">Emissions</div>
-        @if($canViewLocations)
-            <a href="{{ route('locations.index') }}" class="nav-link {{ request()->routeIs('locations.*') ? 'active' : '' }}">
-                {!! $svg('pin') !!}
-                Locations
-            </a>
+        @if ($group['title'])
+            <div class="nav-section-title">{{ $group['title'] }}</div>
         @endif
+
+        @foreach ($group['items'] as $item)
+            <a href="{{ $item['url'] }}"
+               class="nav-link {{ $item['active'] ? 'active' : '' }}"
+               @if ($item['active']) aria-current="page" @endif>
+                {!! $svg($item['icon'] ?? 'dot') !!}
+                {{ $item['label'] }}
+            </a>
+        @endforeach
     </div>
 
+    {{-- The Scope 1/2/3 emission-source tree hangs off Environmental, directly
+         under Measure. Preserved verbatim from the pre-config nav: it is a
+         genuinely useful shortcut into quick-input.show and no destination
+         should be lost. --}}
+    @if ($group['key'] === 'environmental')
     @if($canViewQuickInput)
         @php
             $quickInputSources = \App\Models\EmissionSourceMaster::where('is_quick_input', true)
@@ -146,17 +131,9 @@
         @endphp
 
         <div class="nav-section">
-            <div class="nav-section-title">Quick Input</div>
+            <div class="nav-section-title">Emission sources</div>
 
-            <a href="{{ route('quick-input.index') }}" class="nav-link {{ request()->routeIs('quick-input.index') ? 'active' : '' }}">
-                {!! $svg('list') !!}
-                View Entries
-            </a>
 
-            <a href="{{ route('quick-input.bulk-import.index') }}" class="nav-link {{ request()->routeIs('quick-input.bulk-import.index') ? 'active' : '' }}">
-                {!! $svg('upload') !!}
-                Bulk Import
-            </a>
 
             <div x-data="{
                 scope1Open: {{ $currentScope == 1 ? 'true' : 'false' }},
@@ -250,79 +227,26 @@
             </div>
         </div>
     @endif
+    @endif
+@endforeach
 
-    @if($canViewDisclosures)
-        <div class="nav-section">
-            <div class="nav-section-title">Disclosures</div>
-            <a href="{{ route('disclosures.hub') }}" class="nav-link {{ request()->routeIs('disclosures.hub') ? 'active' : '' }}">
-                {!! $svg('grid') !!}
-                Overview
-            </a>
-            <a href="{{ route('disclosures.s2.overview') }}" class="nav-link {{ request()->routeIs('disclosures.s2.*') ? 'active' : '' }}">
-                {!! $svg('snowflake') !!}
-                IFRS S2 — Climate
-            </a>
-            <a href="{{ route('disclosures.s1.overview') }}" class="nav-link {{ request()->routeIs('disclosures.s1.*') ? 'active' : '' }}">
-                {!! $svg('shield') !!}
-                IFRS S1 — Sustainability
-            </a>
-            <a href="{{ route('disclosures.gri.overview') }}" class="nav-link {{ request()->routeIs('disclosures.gri.*') ? 'active' : '' }}">
-                {!! $svg('list') !!}
-                GRI Standards
-            </a>
-            <a href="{{ route('disclosures.uae-esg.overview') }}" class="nav-link {{ request()->routeIs('disclosures.uae-esg.*') ? 'active' : '' }}">
-                {!! $svg('doc') !!}
-                UAE ESG Report
-            </a>
-            <a href="{{ route('disclosures.esg-dashboard') }}" class="nav-link {{ request()->routeIs('disclosures.esg-dashboard') ? 'active' : '' }}">
-                {!! $svg('chart') !!}
-                ESG Dashboard
-            </a>
-            <a href="{{ route('disclosures.esg-scorecard.index') }}" class="nav-link {{ request()->routeIs('disclosures.esg-scorecard.*') ? 'active' : '' }}">
-                {!! $svg('card') !!}
-                ESG Scorecard
-            </a>
-            <a href="{{ route('disclosures.esg-depth.overview') }}" class="nav-link {{ request()->routeIs('disclosures.esg-depth.*') ? 'active' : '' }}">
-                {!! $svg('users') !!}
-                ESG Depth
-            </a>
-            <a href="{{ route('disclosures.sasb.index') }}" class="nav-link {{ request()->routeIs('disclosures.sasb.*') ? 'active' : '' }}">
-                {!! $svg('pin') !!}
-                SASB Index
-            </a>
-        </div>
+<div class="nav-section" style="border-top: 1px solid var(--line); padding-top: 0.75rem;">
+    @if ($nav['footer']['title'])
+        <div class="nav-section-title">{{ $nav['footer']['title'] }}</div>
     @endif
 
-    @if($canViewReports)
-        <div class="nav-section">
-            <div class="nav-section-title">GHG Inventory</div>
-            <a href="{{ route('reports.index') }}" class="nav-link {{ request()->routeIs('reports.*') && !request()->routeIs('settings.reporting*') ? 'active' : '' }}">
-                {!! $svg('doc') !!}
-                GHG Inventory
-            </a>
-            @if($isAdmin)
-                <a href="{{ route('settings.reporting') }}" class="nav-link {{ request()->routeIs('settings.reporting*') ? 'active' : '' }}">
-                    {!! $svg('cog') !!}
-                    Reporting Settings
-                </a>
-            @endif
-            <a href="{{ route('client.profile') }}" class="nav-link {{ request()->routeIs('client.profile') || request()->routeIs('profile.*') ? 'active' : '' }}">
-                {!! $svg('user') !!}
-                My Profile
-            </a>
-        </div>
-    @endif
-@endif
-
-@if(!$hasCompany)
-    <div class="nav-section">
-        <a href="{{ route('client.profile') }}" class="nav-link {{ request()->routeIs('client.profile') || request()->routeIs('profile.*') ? 'active' : '' }}">
-            {!! $svg('user') !!}
-            My Profile
+    @foreach ($nav['footer']['items'] as $item)
+        <a href="{{ $item['url'] }}"
+           class="nav-link {{ $item['active'] ? 'active' : '' }}"
+           @if ($item['active']) aria-current="page" @endif>
+            {!! $svg($item['icon'] ?? 'dot') !!}
+            {{ $item['label'] }}
         </a>
-    </div>
-@endif
+    @endforeach
+</div>
 
+{{-- Escape hatch back to the admin portal. Not in config/navigation.php:
+     it is an admin-only cross-portal link, not part of the company IA. --}}
 @if($user && method_exists($user, 'isAdmin') && $user->isAdmin())
     <div class="nav-section">
         <div class="nav-section-title">System</div>
@@ -332,33 +256,3 @@
         </a>
     </div>
 @endif
-
-@if($hasCompany && !$isManagedClientWorkspace && ($canViewStaff || $canViewRoles || $isAdmin))
-    <div class="nav-section" style="border-top: 1px solid var(--line); padding-top: 0.75rem;">
-        <div class="nav-section-title">Settings</div>
-        @if($canViewStaff || $canViewRoles)
-            <a href="{{ route('roles.index') }}" class="nav-link {{ request()->routeIs('roles.*') || request()->routeIs('staff.*') ? 'active' : '' }}">
-                {!! $svg('users') !!}
-                Team &amp; Access
-            </a>
-        @endif
-        @if($isAdmin && !$isManagedClientWorkspace)
-            <a href="{{ route('subscriptions.billing') }}" class="nav-link {{ request()->routeIs('subscriptions.*') ? 'active' : '' }}">
-                {!! $svg('card') !!}
-                Plan &amp; billing
-            </a>
-            <a href="{{ route('client.consultants.index') }}" class="nav-link {{ request()->routeIs('client.consultants.*') ? 'active' : '' }}">
-                {!! $svg('users') !!}
-                Consultants
-            </a>
-        @endif
-    </div>
-@endif
-
-<div class="nav-section nav-section--help">
-    <div class="nav-section-title">Help</div>
-    <a href="{{ route('client.help') }}" class="nav-link {{ request()->routeIs('client.help') ? 'active' : '' }}">
-        {!! $svg('help') !!}
-        Help &amp; guide
-    </a>
-</div>
