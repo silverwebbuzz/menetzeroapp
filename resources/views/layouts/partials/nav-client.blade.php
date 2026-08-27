@@ -11,20 +11,25 @@
     Scope 1/2/3 emission-source tree under Measure. Only the top-level
     structure moved to config.
 
-    Permission gating now lives in layouts/partials/nav-gates.blade.php,
-    included below. It is the SAME logic that was inline here before, and
-    the new theme includes the identical file — which is what closes the
-    R-1 drift risk (a link hidden here could previously still appear in the
-    new theme).
+    Permission gating now lives in App\Support\NavigationGates. It is the
+    SAME logic that was inline here before, and the new theme calls the
+    identical class — which is what closes the R-1 drift risk (a link hidden
+    here could previously still appear in the new theme).
 
     CONSULTANTS SEE THIS TOO: layouts/app.blade.php includes nav-client for
     company workspaces, so a consultant "acting as" a client gets exactly
     this sidebar.
 --}}
-@include('layouts.partials.nav-gates')
-
 @php
+    // Gates come from App\Support\NavigationGates — a PHP class, not an
+    // @include. Blade renders an included partial in a CHILD scope, so any
+    // variable it defines is discarded when it returns; the including view
+    // never sees it.
+    $navGates = \App\Support\NavigationGates::forUser();
+    $navContext = \App\Support\NavigationGates::context();
     $nav = \App\Support\NavigationMap::build($navGates);
+
+    $canViewQuickInput = $navGates['quick_input'];
     $scope3Locked = isset($gate) ? $gate->isScope3Locked() : true;
 
     // Route helper for scope icons — each source gets a distinct icon where possible
@@ -247,7 +252,7 @@
 
 {{-- Escape hatch back to the admin portal. Not in config/navigation.php:
      it is an admin-only cross-portal link, not part of the company IA. --}}
-@if($user && method_exists($user, 'isAdmin') && $user->isAdmin())
+@if($navContext['is_admin'])
     <div class="nav-section">
         <div class="nav-section-title">System</div>
         <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.*') ? 'active' : '' }}">

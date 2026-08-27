@@ -11,13 +11,13 @@
     This file is presentation only (mnz-* classes). Anything that could be
     wrong — route resolution, active state, fiscal-year propagation,
     permission gating — lives in App\Support\NavigationMap and
-    layouts/partials/nav-gates.blade.php.
+    App\Support\NavigationGates.
 
     CONSULTANTS SEE THIS TOO: both themes' layouts/app.blade.php include
     nav-client for company workspaces, so a consultant "acting as" a client
     gets exactly this sidebar. Nothing consultant-specific belongs here.
 
-    GATING: permission-based, unchanged, now computed once in nav-gates.
+    GATING: permission-based, unchanged, computed once in NavigationGates.
     A link the old nav hides MUST stay hidden here, or a lower tier sees a
     paid feature (risk R-1). PlanGateComposer is bound to both
     'layouts.partials.nav-client' and its theme-new:: form, and shares $gate
@@ -29,9 +29,13 @@
     quick-input.index, where the same sources are chosen on-page. No
     destination is lost; the routes stay registered and reachable.
 --}}
-@include('layouts.partials.nav-gates')
-
 @php
+    // Gates come from App\Support\NavigationGates — a PHP class, not an
+    // @include. Blade renders an included partial in a CHILD scope, so any
+    // variable it defines is discarded when it returns; the including view
+    // never sees it.
+    $navGates = \App\Support\NavigationGates::forUser();
+    $navContext = \App\Support\NavigationGates::context();
     $nav = \App\Support\NavigationMap::build($navGates);
 @endphp
 
@@ -69,7 +73,7 @@
     {{-- Escape hatch back to the admin portal, as in the pre-2.0 nav.
          Not in config/navigation.php: it is an admin-only cross-portal
          link, not part of the company IA. --}}
-    @if ($user && method_exists($user, 'isAdmin') && $user->isAdmin())
+    @if ($navContext['is_admin'])
         <a href="{{ route('admin.dashboard') }}"
            class="mnz-nav {{ str_starts_with(\Illuminate\Support\Facades\Route::currentRouteName() ?? '', 'admin.') ? 'is-active' : '' }}">
             <span class="mnz-nav__dot"></span>

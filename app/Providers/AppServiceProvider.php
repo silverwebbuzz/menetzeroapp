@@ -39,12 +39,6 @@ class AppServiceProvider extends ServiceProvider
             $this->withThemeViews([
                 'layouts.app',
                 'layouts.partials.nav-client',
-                // Shared gate block included by BOTH themes' nav-client.
-                // It does not read $gate today, but binding it here means a
-                // future plan-based gate added to that file cannot silently
-                // evaluate against a missing variable (which would fail OPEN
-                // for an isset() check). See risk R-1.
-                'layouts.partials.nav-gates',
                 'reports.*',
                 'disclosures.*',
                 'quick-input.*',

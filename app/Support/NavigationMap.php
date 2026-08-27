@@ -34,7 +34,7 @@ class NavigationMap
     /**
      * Build the sidebar for the current request.
      *
-     * @param  array<string, bool>  $gates      From nav-gates.blade.php ($navGates).
+     * @param  array<string, bool>  $gates      From NavigationGates::forUser().
      * @param  int|null             $fiscalYear Year to carry on 'year' => true links.
      *                                          Defaults to the session year.
      * @return array{groups: list<array<string, mixed>>, footer: array<string, mixed>}
@@ -161,6 +161,10 @@ class NavigationMap
 
             $out[] = [
                 'label' => $item['label'] ?? '',
+                // The old theme renders this through its SVG icon library;
+                // the new theme ignores it and draws a dot. Passed through
+                // for both so neither theme needs its own icon mapping.
+                'icon' => $item['icon'] ?? 'dot',
                 'url' => route($name, $params),
                 'active' => self::isActive($item, $currentRoute),
             ];
