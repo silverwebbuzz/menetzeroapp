@@ -2914,3 +2914,86 @@ Checker: **40 themed views + 229 non-theme views, 0 problems.**
 ### 40.5 Remaining
 
 `client/consultants/*` (revenue-facing marketplace) and `help/*`.
+
+## 41. Consultant marketplace (`client/consultants/*`)
+
+Five bodies themed, no existing file modified. This is the revenue-facing
+funnel, so tier behaviour and payment contracts were verified, not assumed.
+
+| View | New | Old | Notes |
+|---|---|---|---|
+| `index` | 181 | 87 | directory + teaser upsell |
+| `show` | 203 | 101 | profile, paid pack + free intro |
+| `orders` | 97 | 49 | escrow ledger, read-only |
+| `checkout` | 111 | 44 | gateway selection form |
+| `payment-checkout` | 164 | 100 | 3 payment SDKs |
+
+### 41.1 Two independent layers of name protection
+
+`ConsultantDirectoryService::presentForClient()` already masks the teaser tier
+**server-side** — `blurredName()` turns the name into `A•••••z` and nulls bio,
+specialties, emirates, experience and contact. The `blur-sm` in the original is
+a **second, cosmetic** layer. Dropping it would leak nothing, but the bullet
+string would read as corrupt data instead of a deliberate upsell. Kept as
+`.cd-name--blur`.
+
+### 41.2 Two booleans the controller currently aliases
+
+`canBookPack` and `canRequestIntro` are both set from `canRequestIntro()` today.
+They are read as **two independent flags**, exactly as the original does.
+Collapsing them would look equivalent now and break silently the moment the
+controller stops aliasing them — and the service already has a distinct
+`canSeeFullProfile()` / `canSeeContact()` pair, so divergence is anticipated.
+
+The intro block's `@elseif($level === 'teaser')` is preserved as a real
+`@elseif`: a tier that is neither must render **nothing**, not a broken form.
+
+### 41.3 Payment contracts
+
+`payment-checkout` verified **byte-identical** across the 55-line gateway
+region (Razorpay / Cashfree / Stripe) via `diff` — extracted with `sed`, never
+retyped. All 5 DOM ids (`payBtn`, `razorpayForm`, `rzp_payment_id`,
+`rzp_order_id`, `rzp_signature`) and all 11 `@json` calls match.
+
+`checkout` keeps `@checked($loop->first)` and `required` on the gateway radio.
+Without the former the form has no default and `required` blocks submit — a
+silent conversion drop, not an error. The empty-gateways `@if/@else` is a
+guard: it prevents rendering a submittable form with no gateway.
+
+**Currency asymmetry preserved**: `orders` is AED-fixed at the escrow layer;
+`payment-checkout` is currency-aware via `CurrencyService::symbol()`.
+
+### 41.4 Three defects caught pre-deploy
+
+1. **Invented CSS classes.** First draft used `mnz-note` and `mnz-link` —
+   **neither exists** in `mnz-ui.css`. Silent visual loss. Replaced with the
+   panel-based flash convention the disclosure pages use.
+2. **`@php` inside a Blade comment** in `payment-checkout` — the exact defect
+   behind ParseError #1 and the latent error-page crash. Blade counts the
+   directive name, so this would have thrown an unclosed-`@php` fatal **on the
+   live payment page**. All directive names are now stripped from all five
+   comment headers.
+3. **Wrong attribution for `.hidden`.** The comment claimed `app-shell.css`
+   defines it; it actually comes from the **Tailwind CDN**. Both shells load
+   that CDN so behaviour was correct, but relying on a remote stylesheet to
+   hide a payment relay form is fragile — if the CDN is slow or blocked, four
+   raw inputs flash on screen mid-payment. Added inline `display:none` as a
+   local hide, kept `class="hidden"` for parity.
+
+### 41.5 Verification
+
+274 views (229 non-theme + 45 themed), **0 with problems**. All contract counts
+(`route(` · `@csrf` · POST · `name=` · `id=` · `enctype` · `old(` · `@json` ·
+`@checked` · `required`) SAME across all five, comments excluded. Route names,
+DOM ids and field names compared as **sets**, not just counts — all SAME.
+
+### 41.6 Runtime verification needed
+
+- A **teaser**-tier account: names blurred, "Upgrade to connect", no intro form.
+- A **partial+** account: real names, intro form submits.
+- A real **Razorpay** payment — confirm the SDK still finds `#payBtn` and the
+  relay form submits. This is the one thing static checks cannot prove.
+
+### 41.7 Remaining
+
+`help/*` (3 pages + 3 partials, 547 lines) is the last unthemed nav group.
