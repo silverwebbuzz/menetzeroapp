@@ -2997,3 +2997,103 @@ DOM ids and field names compared as **sets**, not just counts — all SAME.
 ### 41.7 Remaining
 
 `help/*` (3 pages + 3 partials, 547 lines) is the last unthemed nav group.
+
+## 42. Help & guide (`help/*`) — final nav group
+
+Five files themed, one shared partial deliberately left alone.
+
+| View | New | Old | Notes |
+|---|---|---|---|
+| `company` | 33 | 17 | client shell |
+| `consultant` | 32 | 18 | consultant shell |
+| `consultant-company-guide` | 38 | 21 | consultant shell, company content |
+| `partials/guide-body` | 245 | 154 | the substance |
+| `partials/guide-highlight` | 84 | 36 | preview frame |
+| `partials/guide-mock` | — | 301 | **SHARED, untouched** |
+
+### 42.1 Scope decision: the 23 mock variants
+
+`guide-mock` is a switch of 23 miniature UI replicas — a fake KPI card, a fake
+location row, a fake invite form — each imitating a real screen using
+old-theme classes (`ent-kpi-card`, `card`, `btn`, `callout-panel`).
+
+**Decision: share as-is, do not re-skin.** Same call as quick-input's entry
+form and the roles script. Re-skinning would duplicate ~300 lines that must be
+re-synced every time a real screen changes, and a stale mock never throws an
+error — it just quietly shows the wrong UI. Previews look slightly dated
+inside the new shell; that is the accepted trade.
+
+**Verified safe**: both themed shells load exactly the same four stylesheets
+as their old counterparts (`app-shell`, `portal-design-system`,
+`portal-enterprise`, plus `consultant-shell` for the consultant pair), so
+every class the mocks use resolves. `cd-pack-card` is consultant-shell-only
+and is used only by consultant-portal variants.
+
+### 42.2 Three contracts preserved
+
+**Portal flag is not cosmetic.** `portal` flows page → guide-body →
+guide-highlight → guide-mock, where it becomes the mock's *theme*. Drop it and
+the company guide starts showing consultant-flavoured previews.
+`consultant-company-guide` deliberately pairs a **consultant shell** with
+`portal => 'company'` — that mismatch is the point of the page.
+
+**Support route keys off the guard, not the portal.**
+`auth('consultant')->check() ? 'consultant.support' : 'client.support'` — a
+consultant reading the company guide still gets consultant support.
+
+**`is_file()` runs at render time.** A config entry may name a screenshot not
+yet uploaded; the guide silently falls back to a mock. Replacing this with
+`!empty($src)` would emit broken images. Preserved with `public_path()`.
+
+### 42.3 Three defects caught pre-deploy
+
+1. **Wrong include convention.** First draft used a literal
+   `themes.new.help.partials.*` dotted path. It resolves today but bypasses
+   the finder and hard-pins the include to one theme. Switched to the
+   registered `theme-new::` namespace, which every other themed include uses.
+2. **Lost responsive grid.** Renaming the highlights wrapper to `.hg-mocks`
+   dropped `.portal-guide-highlights`, a defined `auto-fit minmax(16rem, 1fr)`
+   grid. Multiple previews in one section would have stacked single-column
+   instead of sitting side by side. Grid restored and the class re-added.
+3. **`@elseif` in a comment** — harmless alone (a branch, not an opener) but
+   it violates the standing rule. Removed.
+
+### 42.4 Checker gap fixed
+
+`guide-highlight` was reported `undefined: ['highlight']`. **False positive** —
+`$highlight` is an `@include` parameter supplied by both call sites, and the
+file guards itself with `@if(!empty($highlight))` on line 1. The checker
+harvested variable names from controllers and services but **not from
+`@include(..., [...])` arrays in views**, so no shared partial's parameters
+were ever recognised.
+
+Fixed by harvesting include-array keys across all views. **Validated both
+ways**: injecting `$totallyBogusVar` is still reported, and breaking an
+include target is still reported.
+
+### 42.5 Pre-existing, not introduced
+
+`.portal-guide` and `.portal-guide-sections` are undefined in the CSS — in the
+**original too**. Inherited no-op hooks, carried across for parity.
+
+### 42.6 Verification
+
+274 views (229 non-theme + 50 themed), **0 with problems**. Parity SAME across
+routes · includes · every conditional · `!empty` guards · `is_file` ·
+`public_path` · `asset(` · `$loop->first` · `Str::slug` · `array_merge` ·
+`site_support_email`. `<details>`/`<summary>` open+close counts, the `open`
+attribute and the deep-link `id` all match at element level.
+
+### 42.7 Runtime verification needed
+
+- `/help` in both portals; confirm the first section is expanded and the rest
+  toggle (native `<details>`, no Alpine).
+- A section with **two or more highlights** — confirm they sit side by side.
+- A config entry naming a **missing screenshot** — confirm it falls back to a
+  mock rather than a broken image.
+
+### 42.8 Status
+
+**All nav-reachable pages are themed.** Remaining unmigrated work is
+deliberate scope: 8 of 9 `client/subscriptions/*` bodies, the onboarding
+re-skin, and bulk-import column mapping.

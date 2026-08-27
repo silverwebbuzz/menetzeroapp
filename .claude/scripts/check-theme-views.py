@@ -169,6 +169,21 @@ def main() -> int:
             controller_vars |= set(re.findall(r"'([a-zA-Z_]\w*)'", c))
     SHARED.update(controller_vars)
 
+    # A partial's variables are supplied by whoever @includes it, so the keys of
+    # every @include(..., [...]) array in any view are legitimate definitions for
+    # the partial being included. Without this, a shared partial like
+    # help/partials/guide-highlight -- whose $highlight ALWAYS arrives from its
+    # two call sites, and which additionally guards itself with
+    # @if(!empty($highlight)) on line 1 -- is reported as undefined.
+    # Harvested across all views, not just themed ones, because a themed partial
+    # can legitimately be included by a shared one and vice versa.
+    include_vars = set()
+    for f in glob.glob(os.path.join(ROOT, 'resources/views/**/*.blade.php'), recursive=True):
+        src = open(f).read()
+        for arr in re.findall(r"@include\s*\([^,]+,\s*\[(.*?)\]\s*\)", src, re.S):
+            include_vars |= set(re.findall(r"'([a-zA-Z_]\w*)'\s*=>", arr))
+    SHARED.update(include_vars)
+
     # Classes defined inline by any shell layout — available to wrapped views.
     layout_css = [set(re.findall(r'\.(mnz-[a-zA-Z0-9_-]+)', open(f).read()))
                   for f in files if '/layouts/' in f]
