@@ -165,8 +165,20 @@ def main() -> int:
             + glob.glob(os.path.join(ROOT, 'app/Services/**/*.php'), recursive=True):
         src = open(f).read()
         controller_vars |= set(re.findall(r"'([a-zA-Z_]\w*)'\s*=>", src))
-        for c in re.findall(r"compact\(([^)]*)\)", src, re.S):
-            controller_vars |= set(re.findall(r"'([a-zA-Z_]\w*)'", c))
+        # Scan from 'compact(' to its MATCHING paren, not to the first ')'.
+        # [^)]* silently truncated at any ')' inside the call -- including one in
+        # a // comment between the arguments -- so every name after it was lost
+        # and reported as undefined in the view.
+        for m in re.finditer(r"compact\(", src):
+            i = m.end()
+            depth = 1
+            while i < len(src) and depth:
+                if src[i] == '(':
+                    depth += 1
+                elif src[i] == ')':
+                    depth -= 1
+                i += 1
+            controller_vars |= set(re.findall(r"'([a-zA-Z_]\w*)'", src[m.end():i]))
     SHARED.update(controller_vars)
 
     # A partial's variables are supplied by whoever @includes it, so the keys of

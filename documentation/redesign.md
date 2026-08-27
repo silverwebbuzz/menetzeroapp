@@ -3097,3 +3097,163 @@ attribute and the deep-link `id` all match at element level.
 **All nav-reachable pages are themed.** Remaining unmigrated work is
 deliberate scope: 8 of 9 `client/subscriptions/*` bodies, the onboarding
 re-skin, and bulk-import column mapping.
+
+## 43. Rollout runbook (Phase 6 operations)
+
+All nav-reachable pages are themed (§42.8). Building is done; what remains is
+operational. This section is the checklist to operate from.
+
+### 43.1 Precedence — and the one trap in it
+
+`ThemeResolver::current()` resolves in strict order:
+
+| # | Tier | Source | Beats |
+|---|---|---|---|
+| 1 | **Session** | `?theme=` → `mnz_theme` | everything |
+| 2 | **Company** | `settings.theme` (admin card) | default |
+| 3 | **Default** | `THEME_DEFAULT` env | — |
+
+**THE TRAP.** Session beats company. Anyone who has ever visited `?theme=new`
+— every developer and tester — has `new` pinned in their session. If a company
+is opted in and then rolled back via the admin card, **those people keep seeing
+the new theme and the card looks broken.**
+
+This precedence is deliberate and correct: an explicit `?theme=` must beat a
+company default, or testing both themes on one account becomes impossible. It
+is a support-response gap, not a bug.
+
+**The fix is one URL:** `/theme/reset` (or `?theme=reset`). `SESSION_LIFETIME`
+is 120 minutes, so a stuck override otherwise survives two hours of inactivity
+— long enough to outlast a rollback and generate a confusing ticket.
+
+**Before judging any rollback, load `/theme/reset` first.**
+
+### 43.2 Rollout order
+
+1. **Opt one internal company in** — admin card on the company page.
+   Confirm from a **fresh session** (not one carrying `?theme=new`).
+2. Run §43.3 against it.
+3. **Friendly clients**, a few at a time, same card.
+4. **Flip `THEME_DEFAULT=new`** once §43.3 is clean.
+
+Reverse at any tier: card → `default`, or env → `old`. Instantly reversible,
+no deploy. Master kill-switch: `THEME_SWITCH_ENABLED=false` kills `?theme=`
+entirely without a deploy.
+
+### 43.3 Runtime verification — accumulated across all phases
+
+Static checks proved structure and contracts; none of this is provable
+statically. **Highest risk first:**
+
+| # | Check | Why it cannot be checked statically |
+|---|---|---|
+| 1 | **One real Razorpay payment** | 3 SDKs bind `#payBtn` + 4 hidden inputs at runtime |
+| 2 | **Edit an entry** — fuel category/type/unit pre-fill | scope-flow regression class (§ entry-form) |
+| 3 | **Edit a role** — permissions pre-ticked | same class |
+| 4 | Calculate button on quick-input | posts to `/api/quick-input/calculate` |
+| 5 | Scope 3 locked on Free | gate shape: locked button vs hidden |
+| 6 | Teaser tier on consultant directory | blur + upsell + no intro form |
+| 7 | Help: 2+ highlights sit side by side | grid regression caught in §42.3 |
+| 8 | Help: missing screenshot → mock, not broken image | `is_file()` at render time |
+| 9 | Bulk delete; cancel-at-renewal date | destructive + date arithmetic |
+| 10 | A 404 **while signed out** | error pages must not call `isAdmin()` on null |
+| 11 | Outlook rendering of the email wrapper | MSO conditional |
+| 12 | **`APP_DEBUG=false` in production** | stack traces leak file paths |
+
+### 43.4 D7 — still outstanding, and the risky half
+
+Production nginx/Cloudflare must be verified on two counts:
+
+- **Stripping** `?theme=new` — annoying, obvious, harmless.
+- **Caching a themed response and serving it to other users** — this is the
+  dangerous one. A cached `theme=new` HTML response served to a user who never
+  asked for it makes the rollout look random and uncontrollable.
+
+Vary/cache-key behaviour on the query string must be confirmed **before**
+opting in any real client. This is environment configuration and cannot be
+verified from the codebase.
+
+### 43.5 Deliberately unmigrated
+
+Not oversights — recorded scope decisions:
+
+- 8 of 9 `client/subscriptions/*` bodies (only `billing` was in scope)
+- Onboarding re-skin (the 413-line `$needsCompanySetup` branch)
+- Bulk-import column mapping (deferred as a feature, not a redesign)
+
+All fall back to the old shell automatically (requirement 11) — they render,
+they just look like the old app.
+
+### 43.6 Open product decision, unrelated to the redesign
+
+`$industryLabel` is built in `QuickInputController` (~line 282) but **absent
+from its `compact()`** (~line 364). Inside `??` chains PHP suppresses the
+notice, so the industry description, the "Common Equipment" panel and the
+"Typical Units" chip are **dead code that has never rendered in production.**
+
+Adding `'industryLabel'` to the `compact()` is a one-word change that switches
+on three built-but-invisible features. That is a product decision, not a
+redesign fix — flagged, not taken.
+
+## 44. `$industryLabel` — the one-word fix (NOT a redesign change)
+
+Applied the change flagged in §43.6. **This is a product change, not part of
+the theme migration**, and it affects BOTH themes identically.
+
+### 44.1 What was wrong
+
+`QuickInputController::show()` built `$industryLabel` at line ~282, directly
+alongside `$userFriendlyName` — which WAS passed. It was simply missing from
+the `compact()` at line ~364.
+
+Three pieces of UI consumed it and therefore **never rendered in production**:
+
+| Feature | View lines (both themes) |
+|---|---|
+| Industry-specific description | falls back to `$emissionSource->instructions` |
+| "Common Equipment" panel | entire block |
+| "Typical Units" chip | entire block |
+
+### 44.2 Why it survived
+
+Every consumption site is guarded — `?->`, `isset()`, truthiness. PHP
+suppresses the notice and the fallback wins, so there was no error, no log
+entry, and no visual defect. The page looked complete because the description
+silently fell back to the generic `instructions` text.
+
+### 44.3 Verified before applying
+
+- `getIndustryLabel()` returns an `EmissionIndustryLabel` **or null** — null
+  when the company has no `industry_category_id`, or no matching label row.
+- All three fields (`user_friendly_description`, `common_equipment`,
+  `typical_units`) exist in the model's `$fillable`.
+- The assignment is at method-body indentation (unconditional), and `show()`
+  has exactly **one** `return view(...)` — so no path reaches the compact with
+  the variable undefined.
+- Both themes already guard with `isset() && $industryLabel && ->field`, so a
+  null renders nothing rather than erroring.
+
+**Diff is 6 lines, one of them functional.**
+
+### 44.4 A checker bug this change exposed
+
+Adding a comment containing `getIndustryLabel()` inside the `compact()` broke
+the checker: it harvested names with `compact\(([^)]*)\)`, and `[^)]*`
+truncates at the **first** `)` — including one inside a comment between the
+arguments. Every name after it was lost, and `editEntry`, `existingEntries`
+and `yearsWithMeasurements` were reported undefined.
+
+Replaced with a **balanced-paren scan** from `compact(` to its matching close.
+
+**Validated both ways:**
+- Removing an *unguarded* variable (`existingEntries`) → still reported.
+- Removing `industryLabel` again → correctly NOT reported, because it is
+  guarded everywhere. That is precisely why this bug went unnoticed for so
+  long, and it is the intended behaviour of the guarded-variable rule.
+
+### 44.5 Runtime verification
+
+Needs a company **with an `industry_category_id`** that has a matching
+`EmissionIndustryLabel` row. On a company without one, nothing changes —
+which is the safe default and also means a quick smoke test may show no
+difference. Check on quick-input for a source that has label data.

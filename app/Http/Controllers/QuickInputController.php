@@ -365,6 +365,12 @@ class QuickInputController extends Controller
             'emissionSource',
             'formFields',
             'userFriendlyName',
+            // Built above alongside $userFriendlyName but previously omitted here,
+            // so quick-input/show's industry description, "Common Equipment" panel
+            // and "Typical Units" chip never rendered. getIndustryLabel() returns
+            // null when the company has no industry category, and the view guards
+            // with isset() + truthiness, so passing it is safe either way.
+            'industryLabel',
             'locations',
             'availableUnits',
             'scope',
