@@ -26,7 +26,6 @@
     // variable it defines is discarded when it returns; the including view
     // never sees it.
     $navGates = \App\Support\NavigationGates::forUser();
-    $navContext = \App\Support\NavigationGates::context();
     $nav = \App\Support\NavigationMap::build($navGates);
 
     $canViewQuickInput = $navGates['quick_input'];
@@ -249,15 +248,3 @@
         </a>
     @endforeach
 </div>
-
-{{-- Escape hatch back to the admin portal. Not in config/navigation.php:
-     it is an admin-only cross-portal link, not part of the company IA. --}}
-@if($navContext['is_admin'])
-    <div class="nav-section">
-        <div class="nav-section-title">System</div>
-        <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.*') ? 'active' : '' }}">
-            {!! $svg('cog') !!}
-            Admin
-        </a>
-    </div>
-@endif

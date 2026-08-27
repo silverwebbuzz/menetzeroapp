@@ -43,6 +43,13 @@ def analyse(path):
             if grp:
                 for mm in re.finditer(r'\$(\w+)', grp):
                     defined.add(mm.group(1))
+    # arrow-fn params:  fn ($y) => ...
+    for m in re.finditer(r'\bfn\s*\(([^)]*)\)', src):
+        for mm in re.finditer(r'\$(\w+)', m.group(1)):
+            defined.add(mm.group(1))
+    # null-coalesced reads are safe by construction:  $x ?? [] , $x ?->
+    for m in re.finditer(r'\$(\w+)\s*\?\?', src):
+        defined.add(m.group(1))
 
     # every read
     reads = {}

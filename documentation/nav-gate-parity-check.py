@@ -2,6 +2,15 @@
 and compare against what the ORIGINAL old-theme nav would have shown.
 
 Guards risk R-1: no link may appear that the old nav hid.
+
+DELIBERATE EXCEPTION: the pre-existing navs showed a "System > Admin" link
+whenever isAdmin() OR isCompanyAdmin() was true. isCompanyAdmin() is true for
+every ordinary company owner (company_custom_role_id 0/NULL) and for a
+consultant acting as a managed client, so that link rendered for normal
+clients — a super-admin surface advertised to everyone. The /admin routes are
+guarded by ensureSuperAdmin so nobody could enter, but the link 403'd and
+should never have been visible. It is now removed from both navs entirely and
+is NOT modelled below.
 """
 import re, sys, itertools
 

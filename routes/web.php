@@ -328,6 +328,12 @@ Route::middleware([
     Route::get('/settings/reporting', [\App\Http\Controllers\CompanyReportingSettingsController::class, 'edit'])->name('settings.reporting');
     Route::post('/settings/reporting', [\App\Http\Controllers\CompanyReportingSettingsController::class, 'update'])->name('settings.reporting.update');
 
+    // Reporting-year context (Phase B). Sets the session year the whole
+    // portal reads, so the year stops depending on every link remembering
+    // to carry ?fiscal_year=. Same session key the disclosure controllers
+    // already use, so the two stay in agreement.
+    Route::post('/reporting-year', [\App\Http\Controllers\ReportingYearController::class, 'update'])->name('reporting-year.update');
+
     // IFRS S1 / S2 disclosures (Phase 1–2)
     Route::prefix('disclosures')->name('disclosures.')->middleware('disclosureAccess')->group(function () {
         Route::get('/', [\App\Http\Controllers\Disclosure\OverviewController::class, 'hub'])->name('hub');

@@ -122,6 +122,9 @@
                     @include('layouts.partials.header-context', ['portal' => 'company'])
 
                     <div class="header-actions">
+                        {{-- Reporting-year context (Phase B): app-level, not per-link. --}}
+                        @include('layouts.partials.reporting-year-switcher')
+
                         @if(Route::has('client.zero-ai'))
                         <!-- Zero AI — free ESG assistant -->
                             <a href="{{ route('client.zero-ai') }}"

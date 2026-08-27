@@ -99,28 +99,4 @@ class NavigationGates
             'admin'       => $isAdmin,
         ];
     }
-
-    /**
-     * The handful of flags the nav partials render directly (the admin
-     * portal escape hatch, the Scope 3 tree). Kept OUT of forUser() so
-     * every key there is a boolean gate and nothing else.
-     *
-     * @return array{user: ?User, is_admin: bool, has_company: bool}
-     */
-    public static function context(?User $user = null): array
-    {
-        $user ??= auth('web')->user();
-
-        $activeCompany = ($user && method_exists($user, 'getActiveCompany'))
-            ? $user->getActiveCompany()
-            : null;
-
-        $companyId = $activeCompany?->id;
-
-        return [
-            'user' => $user,
-            'is_admin' => (bool) ($user && ($user->isAdmin() || ($companyId && $user->isCompanyAdmin($companyId)))),
-            'has_company' => $activeCompany !== null,
-        ];
-    }
 }

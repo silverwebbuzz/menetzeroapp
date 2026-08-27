@@ -46,9 +46,15 @@ class AppServiceProvider extends ServiceProvider
             PlanGateComposer::class
         );
 
-        // Reporting-year dropdown options for the disclosure pages.
+        // Reporting-year dropdown options.
+        //
+        // 'layouts.app' is included so the topbar year selector (Phase B)
+        // has its options on EVERY page, not only disclosure screens — the
+        // reporting year is app-level context, so the control that changes
+        // it must be available wherever the user is.
         View::composer(
             $this->withThemeViews([
+                'layouts.app',
                 'disclosures.*',
                 'reports.*',
             ]),

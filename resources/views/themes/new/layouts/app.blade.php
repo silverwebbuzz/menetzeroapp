@@ -212,6 +212,9 @@
 
             <span class="mnz-topbar__spacer"></span>
 
+            {{-- Reporting-year context (Phase B): app-level, not per-link. --}}
+            @include('layouts.partials.reporting-year-switcher')
+
             @if (Route::has('client.zero-ai'))
                 <a href="{{ route('client.zero-ai') }}" class="mnz-btn mnz-btn--ghost">Zero AI</a>
             @endif

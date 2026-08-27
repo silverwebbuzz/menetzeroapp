@@ -242,3 +242,23 @@ table.mnz-table td{padding:11px 16px;border-bottom:1px solid var(--line-2);font-
   .mnz-panel,.mnz-seam{border-color:#ccc}
   body{background:#fff}
 }
+
+/* ── Reporting-year switcher (topbar) ─────────────────────────────────
+   The reporting year is app-level context, so its control lives in the
+   topbar on every page rather than inside individual disclosure screens. */
+.mnz-yearpick{display:inline-flex;align-items:center;gap:6px;margin:0}
+.mnz-yearpick__label{font:500 12px var(--sans);color:var(--ink-3);
+  text-transform:uppercase;letter-spacing:.04em}
+.mnz-yearpick__select{
+  font:500 13px var(--sans);color:var(--ink);
+  background:var(--surface);border:1px solid var(--line);border-radius:8px;
+  padding:5px 26px 5px 9px;cursor:pointer;line-height:1.2;
+  appearance:none;-webkit-appearance:none;
+  /* Chevron drawn as a data URI so the control needs no extra asset. */
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b9199' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 7px center;background-size:11px}
+.mnz-yearpick__select:hover{border-color:var(--line-3)}
+.mnz-yearpick__select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.mnz-yearpick__go{font:500 12px var(--sans);margin-left:4px;padding:5px 8px;
+  border:1px solid var(--line);border-radius:8px;background:var(--surface);cursor:pointer}
+@media (max-width:640px){.mnz-yearpick__label{display:none}}

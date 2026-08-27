@@ -35,7 +35,6 @@
     // variable it defines is discarded when it returns; the including view
     // never sees it.
     $navGates = \App\Support\NavigationGates::forUser();
-    $navContext = \App\Support\NavigationGates::context();
     $nav = \App\Support\NavigationMap::build($navGates);
 @endphp
 
@@ -69,16 +68,4 @@
             <span class="mnz-nav__label">{{ $item['label'] }}</span>
         </a>
     @endforeach
-
-    {{-- Escape hatch back to the admin portal, as in the pre-2.0 nav.
-         Not in config/navigation.php: it is an admin-only cross-portal
-         link, not part of the company IA. --}}
-    @if ($navContext['is_admin'])
-        <a href="{{ route('admin.dashboard') }}"
-           class="mnz-nav {{ str_starts_with(\Illuminate\Support\Facades\Route::currentRouteName() ?? '', 'admin.') ? 'is-active' : '' }}">
-            <span class="mnz-nav__dot"></span>
-            <span class="mnz-nav__label">Admin portal</span>
-            <span class="mnz-nav__meta">↗</span>
-        </a>
-    @endif
 </div>
