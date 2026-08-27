@@ -2529,3 +2529,388 @@ Checker: **30 themed views + 228 non-theme views, 0 problems.**
 `roles/` (team & access) is the last item on the §29.6 list. The eight remaining
 `client/subscriptions/*` bodies are deliberately unmigrated and recorded here so
 they are not mistaken for oversights.
+
+---
+
+## 36. Body migration — Team & Access (roles)
+
+Completed **2026-08-26**. Script extracted first, then all three bodies.
+
+| File | Status | Lines |
+|---|---|---|
+| `resources/views/roles/partials/index-scripts.blade.php` | **new** (shared, verbatim) | 295 |
+| `resources/views/roles/index.blade.php` | modified — extraction only | 723 → 468 |
+
+### 36.1 This page is dual-context — the defining constraint
+
+`roles/*` renders in **both** the client portal and the consultant portal.
+`TeamAccessService` supplies:
+
+- `layoutFor()` → `'layouts.app'` or `'consultant.layouts.app'` (hence `@extends($teamLayout ?? 'layouts.app')`)
+- `routesFor()` → a **`$teamRoutes` array** that swaps every route name between the two portals
+
+So route names are never hard-coded in these views. **Hard-coding a client route
+name would silently break the consultant portal, and vice versa.** All 8 keys are
+accounted for: 5 in the body, 3 in the shared script.
+
+Checked before extracting: **neither themed shell renders `@yield('page-title')`**,
+and the page provides its own `<h1>`. So one themed body serves both contexts
+without the duplicate-heading bug from §16 rule 2.
+
+### 36.2 The script — 256 lines, 11 globals
+
+Extracted **byte-identical** (`diff`-verified) to a shared partial. Parent diff is
+**2 insertions, 257 deletions**. It defines `openAddUserModal`,
+`closeAddUserModal`, `submitAddUserForm`, `viewUser`, `closeViewUserModal`,
+`editUserRole`, `closeEditUserRoleModal`, `resendInvitation`, `cancelInvitation`,
+`togglePassword` and `showUpgradeMessage` — all called from inline `onclick`
+handlers, so all must stay global.
+
+### 36.3 Accepted limitation: two modals will keep the old look
+
+`viewUser()` and `editUserRole()` **inject their modal markup as JS template
+literals** with hard-coded Tailwind classes. They are not static HTML, so the
+theme cannot restyle them — those two modals will look old in the new theme,
+visible only after clicking View or Edit on a user.
+
+Restyling them means editing JS that drives **role assignment** — the edit-role
+modal posts to `$teamRoutes['staff.update_role']`. Confirmed with the user:
+leave it. A styling inconsistency is cheaper than a mistake in who can access
+what.
+
+### 36.4 Verification so far
+
+- script extraction **byte-identical** to lines 464–720 of the original
+- both files structurally valid
+- all 8 `$teamRoutes` keys still referenced, split 5 (body) / 3 (script)
+- checker: **30 themed views + 229 non-theme views, 0 problems**
+
+### 36.5 What remains for this page
+
+Not yet done, and **not** to be mistaken for finished:
+
+1. `themes/new/roles/index.blade.php` — 467 lines of body (roles grid, staff table, pending invitations, add-user modal). Must keep form fields `email`, `phone`, `notes`, `custom_role_id` and all 7 `onclick` handlers.
+2. `themes/new/roles/create.blade.php` — 143 lines (permission matrix).
+3. `themes/new/roles/edit.blade.php` — 165 lines.
+
+Each must render correctly under **both** shells, and must read route names from
+`$teamRoutes` rather than hard-coding them.
+
+### 36.6 The three bodies — completed
+
+| File | Lines |
+|---|---|
+| `themes/new/roles/index.blade.php` | 419 |
+| `themes/new/roles/create.blade.php` | 153 |
+| `themes/new/roles/edit.blade.php` | 175 |
+
+All three `@extends($teamLayout ?? 'layouts.app')` and read route names from
+`$teamRoutes`, with the same defensive fallbacks the originals used — so a single
+themed body serves both portals.
+
+**Permission matrix (create / edit) — the security-critical part.** The set of
+checked boxes *is* the role's grant. Preserved exactly: `name="permission_ids[]"`
+on every box, the `.module-checkbox` class the select-all script queries,
+`id="selectAll"`, and the view/add/edit/delete column order.
+
+`edit` additionally keeps `@method('PUT')`, the `is_active` toggle, and the
+`$selectedPermissionIds` preselection. **That preselection is what shows an admin
+the role's current grant** — drop it and every box renders unchecked, so a
+careless save would strip the role's permissions.
+
+**Seat-limit gate** on index: `$canAddUser['allowed']` decides between the live
+invite button and `showUpgradeMessage()`. Rendering the live button
+unconditionally would let a company exceed its paid seat count.
+
+Verified for all three, against their originals: form fields, `$teamRoutes` keys,
+`@csrf` / `@method('PUT')`, `.module-checkbox`, `#selectAll`,
+`$selectedPermissionIds`, `is_active`, `@extends` expression, `onclick` handlers
+and required element ids — **all identical sets**.
+
+### 36.7 Checker gap closed: service-provided view payloads
+
+The checker reported `showConsultantTrialNotice` and `userLimitMessage` as
+undefined. Both are real and supplied by `TeamAccessService::viewShared()`
+(lines 189/191), which controllers `array_merge` into the view data — so they
+never appear in a controller `compact()`.
+
+The checker derived its known-variable list from `app/Http/Controllers/**` only.
+It now also scans `app/Services/**`, which fixes this for **any** service that
+assembles a view payload this way, not just this one. Verified the widening did
+not blunt the check: an injected `$neverDefinedAnywhere` is still reported.
+
+**Checker: 33 themed views + 229 non-theme views, 0 problems.**
+
+### 36.8 Needs runtime confirmation by the user
+
+Test in **both** portals — client and consultant — since one body serves both:
+
+1. **Edit an existing role** — confirm its current permissions come up pre-ticked. This is the §36.6 risk.
+2. Save a role and confirm the grant is unchanged when you tick nothing new.
+3. **Invite team member** — the modal opens; on a workspace at its seat limit, the button should be inert and show the limit message.
+4. View / Edit-role modals still open (they will look old — §36.3).
+5. Resend and cancel a pending invitation.
+
+---
+
+## 37. Body migration — ESG dashboard
+
+Completed **2026-08-26**. One new file; **no existing file modified**.
+
+`resources/views/themes/new/disclosures/esg-dashboard.blade.php` (253 lines),
+from a 210-line original.
+
+### 37.1 Why this one next
+
+With the §29.6 list finished, the highest-value remaining target is the landing
+page for the **E / S / G tabs** — users hit it every time they open Environmental,
+Social or Governance. No plan gating and no scripts (verified: zero `$gate` calls,
+zero `<script>` blocks), so it is low-risk relative to its visibility.
+
+### 37.2 The shared year-select partial is included unchanged
+
+`disclosures.partials.year-select` is self-contained: its own form, its own PHP
+block, options from `$availableYears` via `ReportingYearsComposer`, and a
+fallback span for companies with no history. It styles itself with inline
+Tailwind, which the new shell still loads — so it **works correctly but keeps the
+old look**.
+
+Forking it per theme would duplicate the year-fallback logic that several
+disclosure pages depend on. Left shared deliberately.
+
+### 37.3 The checker caught me breaking my own rule
+
+My first draft wrote `@php` inside the header comment while *describing* the
+partial. The structural walk failed it immediately:
+
+```
+FAIL themes/new/disclosures/esg-dashboard.blade.php
+      unclosed @php opened at line 9
+```
+
+This is exactly the §31.8 defect that reached production twice. It is worth
+recording that the rule is easy to break even when you wrote it — the check, not
+the discipline, is what caught it. Fixed by saying "inline PHP block" instead.
+
+### 37.4 Verification
+
+Against the original — all **identical sets**:
+
+| Dimension | Result |
+|---|---|
+| routes | SAME |
+| `@include` targets | SAME |
+| `$dashboard[...]` keys | SAME |
+| `$t[...]` target fields | SAME |
+| `ghg_summary` fields | SAME |
+| `scorecard` fields | SAME |
+| `$row[...]` fields | SAME |
+| target status keys | SAME |
+
+The status keys matter: `achieved`, `on_track`, `off_track`, `missed`, `no_data`,
+`incomplete` drive both the chip colour and the progress-bar colour. Dropping one
+would silently render an off-track target in neutral styling.
+
+Checker: **34 themed views + 229 non-theme views, 0 problems.**
+
+### 37.5 Remaining unthemed nav destinations
+
+Small disclosure landing pages, all 72–203 lines and the same low-risk shape:
+`disclosures/hub` (106), `disclosures/overview` (81), `disclosures/s1-overview`
+(72), `disclosures/gri-overview` (101), `disclosures/uae-esg-overview` (121),
+`disclosures/esg-scorecard` (203). Then `client/consultants/*` and `help/*`.
+
+---
+
+## 38. Body migration — disclosure hub and IFRS overviews
+
+Completed **2026-08-26**. Three new files; **no existing file modified**.
+
+| File | Lines | From |
+|---|---|---|
+| `themes/new/disclosures/hub.blade.php` | 122 | 106 |
+| `themes/new/disclosures/overview.blade.php` (IFRS S2) | 108 | 81 |
+| `themes/new/disclosures/s1-overview.blade.php` | 105 | 72 |
+
+### 38.1 Correction to §37.5
+
+That note said these pages had no gating. **Four of the six do.** Verified
+counts: `overview` 2, `s1-overview` 2, `gri-overview` 7, `uae-esg-overview` 4
+`$gate` calls — all `canDisclosureExportType` / `disclosureExportMessage`
+wrapping `x-plan-gated-link`.
+
+These are **paid disclosure PDF exports**, the same risk class as the SASB export
+(§25) and the Reports exports (§26.6). Both migrated pages keep their
+`x-plan-gated-link` wrapper and export code intact:
+
+| Page | Export code |
+|---|---|
+| `overview` | `ifrs_s2_pdf` |
+| `s1-overview` | `ifrs_s1_pdf` |
+
+The **Preview** link beside each is deliberately ungated, exactly as in the
+originals — only the download is paid.
+
+### 38.2 Shared header partial included unchanged
+
+`disclosures.partials.header` owns the framework label, the reporting-year form
+and the disclosure sub-nav, and is self-contained. Included **unchanged** for the
+same reason as `year-select` in §37.2: every disclosure overview depends on its
+year-fallback logic, and forking it per theme would duplicate that. It keeps the
+old look but works correctly.
+
+### 38.3 Verification
+
+Both overviews, against their originals — all **identical sets**: routes, `$gate`
+calls, export codes, `<x-…>` components, `@include` targets, `$completeness[…]`
+keys, `$item[…]` keys, and the **route-map keys** that link each completeness row
+to its editor (`governance`, `strategy`, `risk_management`, plus the
+framework-specific ones). A dropped route-map key would render a completeness row
+linking to `#`.
+
+`hub` verified on routes, includes and the four `*Completeness` variables.
+
+Checker: **37 themed views + 229 non-theme views, 0 problems.**
+
+### 38.4 Remaining
+
+`gri-overview` (101 lines, **7** gate calls) and `uae-esg-overview` (121 lines,
+4 gate calls) — more gating than the two done here, so they warrant their own
+pass rather than being batched. Then `esg-scorecard` (203), `client/consultants/*`
+and `help/*`.
+
+---
+
+## 39. Body migration — GRI and UAE ESG overviews
+
+Completed **2026-08-26**. Two new files; **no existing file modified**.
+These were held back from §38 because they carry the heaviest gating in the app.
+
+| File | Lines | From | Gate calls |
+|---|---|---|---|
+| `themes/new/disclosures/gri-overview.blade.php` | 158 | 101 | 7 |
+| `themes/new/disclosures/uae-esg-overview.blade.php` | 186 | 121 | 4 |
+
+### 39.1 Three distinct gating shapes — and why they must stay distinct
+
+Both pages mix gating styles, and the difference is user-visible:
+
+| Shape | What a disallowed tier sees |
+|---|---|
+| `x-plan-gated-link` | a **locked button** with an upgrade message |
+| outer `@if($gate->…)` | **nothing at all** |
+
+Collapsing the second into the first would change what those tiers are told
+exists. That is a product decision already made in the original, so both shapes
+were reproduced verbatim rather than "tidied" into one.
+
+**GRI — the Enterprise Index is double-gated on purpose:** an outer `@if` hides
+the button entirely, and the inner `x-plan-gated-link` is then passed
+`:allowed="true"`. Verified: 4 gated links, exactly 1 `:allowed="true"`.
+
+**UAE ESG — three shapes on one page:**
+
+| Entitlement | Shape | Guards |
+|---|---|---|
+| `assurance_upload` | outer `@if` | the **whole** assurance card |
+| `uae_esg_pdf` | `x-plan-gated-link` | standard PDF |
+| `uae_esg_pdf_enterprise` | outer `@if` | Enterprise PDF button |
+
+Verified: 1 gated link vs 2 conditional gates — the counts are what prove the
+shapes were not merged.
+
+### 39.2 The assurance upload block
+
+A multipart upload plus a delete form. Preserved: `enctype="multipart/form-data"`,
+**both** `@csrf` tokens, `@method('DELETE')`, and the `confirm('Remove assurance
+PDF?')` text. Dropping the enctype would break the upload **silently** — the form
+still submits, just without the file (same failure mode as the profile logo,
+§34.3).
+
+### 39.3 Verification
+
+| Dimension | GRI | UAE ESG |
+|---|---|---|
+| routes | SAME | SAME |
+| `$gate` calls | SAME | SAME |
+| export codes | SAME | SAME |
+| route-map keys | 12/12 | 8/8 |
+| `'section' =>` params | SAME | SAME |
+| `<x-plan-gated-link>` count | 4 = 4 | 1 = 1 |
+| conditional gates | — | 2 = 2 |
+| `@csrf` / `@method('DELETE')` / `enctype` | — | 2/1/1, all SAME |
+| `confirm()` text | — | SAME |
+
+Cross-framework route-map entries were checked rather than assumed: GRI's
+`gri_305` links to `reports.index`, and UAE ESG's `materiality` links into the
+**GRI** section editor while `ghg_inventory` links to `reports.index`. All three
+are correct — the frameworks share underlying data.
+
+Checker: **39 themed views + 229 non-theme views, 0 problems.**
+
+### 39.4 Remaining
+
+`esg-scorecard` (203 lines, has gating), `client/consultants/*`, `help/*`.
+
+---
+
+## 40. Body migration — ESG scorecard
+
+Completed **2026-08-26**. One new file; **no existing file modified**.
+
+`themes/new/disclosures/esg-scorecard.blade.php` (270 lines), from 203.
+
+### 40.1 Four gates, four different scopes
+
+The pattern from §39.1 again, but this page has the widest spread of what a gate
+actually hides:
+
+| Entitlement | Shape | Hides |
+|---|---|---|
+| `esg_scorecard` | `x-plan-gated-link` | nothing — shows a **locked** button |
+| `esg_scorecard_enterprise` | outer `@if` | the Export Enterprise **button** |
+| `hris_kpi_import` | outer `@if` | the **entire HRIS card** |
+| `energy_from_activity` | outer `@if` | **one explanatory line** of body copy |
+
+That last one is easy to miss — it is a single `<span>` inside a paragraph,
+telling Enterprise tiers that Quick Input energy feeds their export. Verified
+present. Counts confirm the shapes were not merged: **1 gated link, 3
+conditional gates**.
+
+### 40.2 Four POST forms, two multipart
+
+| Form | Route | enctype |
+|---|---|---|
+| Sync snapshots | `esg-scorecard.sync` | — |
+| Import CSV | `esg-scorecard.import` | **multipart** |
+| Import HRIS CSV | `esg-scorecard.hris-import` | **multipart** |
+| Save manual metrics | `esg-scorecard.update` | — |
+
+Verified 4 `@csrf` and 2 `enctype`. Dropping an enctype breaks that upload
+silently — the form still submits, just without the file (§34.3).
+
+### 40.3 Dynamic field names
+
+The manual-metrics inputs post as `metrics[<row key>]` and repopulate from
+`old('metrics.<key>')`. **Both halves must stay in step** — if the input name and
+the `old()` path diverge, a validation bounce silently discards whatever the user
+typed. Verified both present and matching.
+
+`x-field-help key="scorecard.manual_intro"` preserved — the invisible-in-a-
+screenshot loss class from §20.
+
+### 40.4 Verification
+
+routes · `$gate` calls · export codes · form fields · `@csrf` (4) · `enctype` (2)
+· POST forms (4) · gated links (1) · conditional gates (3) · `x-field-help` ·
+`$scorecard[…]` keys · `$row[…]` keys · `old()` path — **all SAME**.
+
+The `year-select` partial is included unchanged, here carrying
+`'hidden' => ['category' => $activeCategory]` so the active tab survives a year
+change.
+
+Checker: **40 themed views + 229 non-theme views, 0 problems.**
+
+### 40.5 Remaining
+
+`client/consultants/*` (revenue-facing marketplace) and `help/*`.

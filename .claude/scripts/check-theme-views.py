@@ -155,7 +155,14 @@ def main() -> int:
     # this list cannot drift as controllers change — a hand-maintained list
     # would go stale and start reporting false failures.
     controller_vars = set()
-    for f in glob.glob(os.path.join(ROOT, 'app/Http/Controllers/**/*.php'), recursive=True):
+    # Services can also build a view payload. TeamAccessService::viewShared()
+    # returns teamLayout / teamRoutes / userLimitMessage / showConsultantTrialNotice
+    # etc., which controllers array_merge into the view data -- so those names
+    # never appear in a controller compact() and were reported as undefined.
+    # Scanning app/Services alongside the controllers fixes that for any service
+    # that assembles a payload the same way.
+    for f in glob.glob(os.path.join(ROOT, 'app/Http/Controllers/**/*.php'), recursive=True) \
+            + glob.glob(os.path.join(ROOT, 'app/Services/**/*.php'), recursive=True):
         src = open(f).read()
         controller_vars |= set(re.findall(r"'([a-zA-Z_]\w*)'\s*=>", src))
         for c in re.findall(r"compact\(([^)]*)\)", src, re.S):
