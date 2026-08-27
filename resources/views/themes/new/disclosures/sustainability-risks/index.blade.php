@@ -27,7 +27,7 @@
 @section('content')
 <div class="mnz-stack" data-pillar="g">
 
-    @include('disclosures.partials.header', ['framework' => 'ifrs_s1'])
+    @include('disclosures.partials.header', ['framework' => 'ifrs_s1', 'context' => 'register'])
 
     <div class="mnz-pagehead">
         <div>

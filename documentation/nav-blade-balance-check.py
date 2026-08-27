@@ -23,6 +23,36 @@ for path in sys.argv[1:]:
             # @php ... @endphp only when block form (no inline @php($x = 1))
             if d == 'php' and src[m.end():m.end()+1] == '(':
                 continue
+            # @section('title', 'X') is INLINE and self-closing; only the
+            # single-argument @section('content') opens a block.
+            if d == 'section':
+                tail = src[m.end():]
+                depth_p = 0
+                arg = ''
+                for ch in tail:
+                    if ch == '(':
+                        depth_p += 1
+                        if depth_p == 1:
+                            continue
+                    elif ch == ')':
+                        depth_p -= 1
+                        if depth_p == 0:
+                            break
+                    if depth_p >= 1:
+                        arg += ch
+                    elif ch not in ' \t':
+                        break
+                # a comma at paren-depth 1 means a second argument
+                d2 = 0
+                inline = False
+                for ch in arg:
+                    if ch in '([': d2 += 1
+                    elif ch in ')]': d2 -= 1
+                    elif ch == ',' and d2 == 0:
+                        inline = True
+                        break
+                if inline:
+                    continue
             stack.append((d, line))
         elif d in CLOSERS:
             want = CLOSERS[d]

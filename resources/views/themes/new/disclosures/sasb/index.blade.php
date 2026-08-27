@@ -18,7 +18,13 @@
 @section('content')
 <div class="mnz-stack" data-pillar="g">
 
-    @include('theme-new::layouts.partials.nav-disclosures-esg-depth', ['fiscalYear' => $fiscalYear])
+    {{-- Framework tab strip removed: this page is a register owned by
+
+         its pillar, not a section of a framework. The lineage line names
+
+         the reports that read it instead. --}}
+
+    @include('layouts.partials.register-lineage')
 
     <div class="mnz-pagehead">
         <div>

@@ -59,17 +59,38 @@
 |                     and the readiness checklists on framework pages
 |                     (Phase E). Display/metadata only — never gating.
 |
-| NOTE ON DUPLICATE REGISTERS (resolved in Phase C, tracked in
-| documentation/redesign.md section 18):
-|   - Environmental > Targets uses ReductionTargetController (climate
-|     targets), NOT EsgSustainabilityTargetController. The latter is a
-|     SECOND targets table reachable at disclosures.esg-targets.*; it is
-|     deliberately ABSENT from this nav for now so users cannot file a
-|     climate target in the wrong register. Its routes stay registered and
-|     working — nothing is deleted.
-|   - Governance > Risk register uses SustainabilityRiskController, while
-|     Environmental > Climate risks uses ClimateRiskController. Two tables,
-|     near-identical schemas, different discriminators.
+|--------------------------------------------------------------------------
+| The two register pairs (Phase C outcome)
+|--------------------------------------------------------------------------
+|
+| Two pairs of tables look like duplicates. Only one pair actually is, and
+| NEITHER is merged — they are disambiguated by name instead, because
+| merging would lose meaning. Verified against the report services' model
+| imports, not assumed.
+|
+| TARGETS — genuinely different concerns, keep both:
+|   - ReductionTarget ....... carbon only: baseline_tco2e, target_tco2e,
+|     sbti_aligned, scope_coverage, plus a transition_actions child table.
+|     Read by IfrsS2ReportService and GriReportService.
+|     Nav: Environmental > "Climate targets".
+|   - EsgSustainabilityTarget  any metric: metric_label + unit, categories
+|     water/waste/energy/diversity/social/governance/other.
+|     Read by UaeEsgReportService.
+|     Nav: Social > "ESG targets".
+|   Merging these would force tCO2e semantics onto a water target.
+|
+| RISK REGISTERS — a true structural duplicate, but still kept apart:
+|   climate_risks and sustainability_risks are identical column-for-column
+|   except the discriminator: risk_type (closed set: physical|transition)
+|   vs topic (free text, max 50). IfrsS2ReportService reads the first;
+|   IfrsS1ReportService reads the second. Merging would mean one table with
+|   two mutually-exclusive discriminator columns and a framework filter on
+|   every read — more complexity than it removes, for no user benefit.
+|   Nav: Environmental > "Climate risks" / Governance > "Sustainability
+|   risks", so the split is obvious at the point of entry.
+|
+| No data migration is required for any of this: the tables are unchanged
+| and every route stays registered. Only labels and placement moved.
 |
 */
 
@@ -150,7 +171,7 @@ return [
                     'gate' => 'disclosures',
                     'active' => ['disclosures.s2.climate-risks', 'env.climate-risks'],
                     'year' => true,
-                    'feeds' => ['s2', 'uae_esg'],
+                    'feeds' => ['s2'],
                 ],
                 [
                     'label' => 'Opportunities',
@@ -159,16 +180,20 @@ return [
                     'gate' => 'disclosures',
                     'active' => ['disclosures.s2.climate-opportunities', 'env.opportunities'],
                     'year' => true,
-                    'feeds' => ['s2', 'uae_esg'],
+                    'feeds' => ['s2'],
                 ],
                 [
-                    'label' => 'Targets',
+                    // Climate/carbon targets (ReductionTarget: tCO2e baselines,
+                    // SBTi alignment, scope coverage, transition actions).
+                    // Distinct from Social > ESG targets — see the register note
+                    // at the top of this file.
+                    'label' => 'Climate targets',
                     'icon' => 'chart',
                     'route' => 'disclosures.s2.targets.index',
                     'gate' => 'disclosures',
                     'active' => ['disclosures.s2.targets', 'env.targets'],
                     'year' => true,
-                    'feeds' => ['s2', 'gri', 'uae_esg'],
+                    'feeds' => ['s2', 'gri'],
                 ],
             ],
         ],
@@ -193,7 +218,7 @@ return [
                     'gate' => 'disclosures',
                     'active' => ['disclosures.stakeholders', 'social.stakeholders'],
                     'year' => true,
-                    'feeds' => ['gri', 'uae_esg'],
+                    'feeds' => ['uae_esg'],
                 ],
                 [
                     'label' => 'Supply chain',
@@ -202,7 +227,7 @@ return [
                     'gate' => 'disclosures',
                     'active' => ['disclosures.supply-chain', 'social.supply-chain'],
                     'year' => true,
-                    'feeds' => ['gri', 'uae_esg'],
+                    'feeds' => ['uae_esg'],
                 ],
                 [
                     'label' => 'ESG scorecard',
@@ -211,7 +236,20 @@ return [
                     'gate' => 'disclosures',
                     'active' => ['disclosures.esg-scorecard', 'social.scorecard'],
                     'year' => true,
-                    'feeds' => ['gri', 'uae_esg', 'sasb'],
+                    'feeds' => ['sasb', 'uae_esg'],
+                ],
+                [
+                    // Non-carbon targets (EsgSustainabilityTarget: water, waste,
+                    // energy, diversity, social, governance — any metric+unit).
+                    // Read by the UAE ESG report. Distinct from Environmental >
+                    // Climate targets, which is carbon-only.
+                    'label' => 'ESG targets',
+                    'icon' => 'chart',
+                    'route' => 'disclosures.esg-targets.index',
+                    'gate' => 'disclosures',
+                    'active' => ['disclosures.esg-targets'],
+                    'year' => true,
+                    'feeds' => ['uae_esg'],
                 ],
             ],
         ],
@@ -239,13 +277,17 @@ return [
                     'feeds' => ['s1', 'gri', 'uae_esg'],
                 ],
                 [
-                    'label' => 'Risk register',
+                    // Non-climate sustainability risks (SustainabilityRisk,
+                    // free-text 'topic'). Environmental > Climate risks is the
+                    // climate half (ClimateRisk, risk_type physical|transition).
+                    // Same shape, different scope — see the register note above.
+                    'label' => 'Sustainability risks',
                     'icon' => 'shield',
                     'route' => 'disclosures.s1.sustainability-risks.index',
                     'gate' => 'disclosures',
                     'active' => ['disclosures.s1.sustainability-risks', 'gov.risks'],
                     'year' => true,
-                    'feeds' => ['s1', 'uae_esg'],
+                    'feeds' => ['s1'],
                 ],
                 [
                     'label' => 'SASB',

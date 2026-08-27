@@ -16,7 +16,10 @@
         ])
     </div>
 
-    @include('layouts.partials.nav-disclosures-esg-depth', ['fiscalYear' => $fiscalYear])
+    {{-- Tab strip removed: every destination it offered is now in the
+         sidebar under its owning pillar, and the count cards below link
+         to the same registers. Two navigations for one set of pages was
+         the confusion this IA work set out to remove. --}}
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <a href="{{ route('disclosures.stakeholders.index', ['fiscal_year' => $fiscalYear]) }}" class="card hover:border-brand-300 block">

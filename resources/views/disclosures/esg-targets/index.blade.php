@@ -5,7 +5,10 @@
 
 @section('content')
 <div class="w-full">
-    @include('layouts.partials.nav-disclosures-esg-depth', ['fiscalYear' => $fiscalYear])
+    {{-- Framework tab strip removed: this page is a register owned by
+         its pillar, not a section of a framework. The lineage line names
+         the reports that read it instead. --}}
+    @include('layouts.partials.register-lineage')
 
     @if(session('success'))
         <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6">{{ session('success') }}</div>

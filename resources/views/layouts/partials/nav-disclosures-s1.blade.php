@@ -1,3 +1,8 @@
+{{-- IFRS S1 framework tabs.
+
+     The Sustainability Risks tab was REMOVED: that register is owned by the
+     Governance pillar and reached from the sidebar. Material Topics stays —
+     it is the framework's own materiality determination, edited here. --}}
 @php $q = ['fiscal_year' => $fiscalYear]; @endphp
 <nav class="flex flex-wrap gap-2 mb-6 border-b border-gray-200 pb-3 text-sm">
     <a href="{{ route('disclosures.hub', $q) }}" class="px-3 py-1.5 rounded-lg text-gray-600 hover:bg-gray-50">← All disclosures</a>
@@ -11,8 +16,6 @@
        class="px-3 py-1.5 rounded-lg {{ request()->routeIs('disclosures.s1.sections.*') && request()->route('section') === 'strategy' ? 'bg-brand-50 text-brand-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">Strategy</a>
     <a href="{{ route('disclosures.s1.sections.edit', array_merge($q, ['section' => 'risk_management'])) }}"
        class="px-3 py-1.5 rounded-lg {{ request()->routeIs('disclosures.s1.sections.*') && request()->route('section') === 'risk_management' ? 'bg-brand-50 text-brand-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">Risk Management</a>
-    <a href="{{ route('disclosures.s1.sustainability-risks.index', $q) }}"
-       class="px-3 py-1.5 rounded-lg {{ request()->routeIs('disclosures.s1.sustainability-risks.*') ? 'bg-brand-50 text-brand-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">Sustainability Risks</a>
     <a href="{{ route('disclosures.s1.report.preview', $q) }}"
        class="px-3 py-1.5 rounded-lg {{ request()->routeIs('disclosures.s1.report.*') ? 'bg-brand-50 text-brand-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">Generate Report</a>
 </nav>

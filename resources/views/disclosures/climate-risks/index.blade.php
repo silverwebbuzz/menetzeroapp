@@ -5,7 +5,7 @@
 
 @section('content')
 <div class="w-full">
-    @include('disclosures.partials.header')
+    @include('disclosures.partials.header', ['context' => 'register'])
 
     @if(session('success'))
         <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6">{{ session('success') }}</div>
