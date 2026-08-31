@@ -96,33 +96,14 @@
         </div>
     @endif
 
-    {{-- Row 1: KPI cards --}}
-    <div class="ent-grid-4">
-        @foreach($kpiCards as $card)
-            @php
-                $trend = (float) ($card['trend'] ?? 0);
-                $class = $trendClass($trend);
-            @endphp
-            <div class="ent-kpi-card">
-                <div class="ent-kpi-card__head">
-                    <span class="ent-label">{{ $card['label'] }}</span>
-                    <x-ent-sparkline :points="$card['spark']" />
-                </div>
-                <div class="ent-kpi-value">
-                    {{ co2e_t($card['value']) }}<span class="ent-kpi-unit">tCO₂e</span>
-                </div>
-                <div class="ent-kpi-card__trend {{ $class }}">
-                    {{ $trendArrow($trend) }} {{ abs($trend) }}% {{ $card['compare'] }}
-                </div>
-                @if($loop->first && $yoy['change_pct'] !== null)
-                    <div class="ent-kpi-card__compare">
-                        Prior year: {{ number_format($yoy['previous_year'], 2) }} tCO₂e
-                        ({{ $yoy['change_pct'] > 0 ? '+' : '' }}{{ $yoy['change_pct'] }}% YoY)
-                    </div>
-                @endif
-            </div>
-        @endforeach
-    </div>
+    {{-- KPI cards REMOVED: Total / Scope 1 / Scope 2 / Scope 3 now live on
+         the Environmental pillar dashboard (/environmental), which shows the
+         same four figures plus Scope 3 category coverage. Keeping both meant
+         the same numbers in two places, free to drift.
+
+         Net Zero Progress below is NOT a duplicate and stays: the Overview
+         pathway chart is on this page too, and /environmental has no net-zero
+         section. --}}
 
     {{-- Row 2: Net zero progress --}}
     <div class="card">
@@ -180,42 +161,12 @@
         </div>
     </div>
 
-    {{-- Row 3 & 4: Charts --}}
-    <div class="ent-grid-2">
-        <div class="card">
-            <div class="card-header">
-                <div>
-                    <h3 class="ent-card-title">Emissions Trend</h3>
-                    <p class="ent-card-subtitle">
-                        @if($yearlyTrend['has_multiple'] ?? false)
-                            Total emissions by reporting year (tCO₂e)
-                        @else
-                            12-month total emissions (tCO₂e)
-                        @endif
-                    </p>
-                </div>
-            </div>
-            <div class="card-body">
-                <div style="height:16rem;">
-                    <canvas id="monthlyEmissionsChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <div>
-                    <h3 class="ent-card-title">Scope Breakdown</h3>
-                    <p class="ent-card-subtitle">Share of total emissions by scope</p>
-                </div>
-            </div>
-            <div class="card-body">
-                <div style="height:16rem;">
-                    <canvas id="emissionsByScopeChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
+    {{-- Emissions Trend and Scope Breakdown REMOVED: both now live on
+         /environmental, where the trend is stacked by scope and the scope mix
+         is a donut over the same data. The canvases are gone; the shared
+         enterprise-scripts partial guards every binding with
+         `if (ctx && typeof Chart !== 'undefined')`, so its chart code simply
+         no-ops rather than erroring. --}}
 
     {{-- Row 5: Compliance --}}
     <div>

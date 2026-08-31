@@ -3804,3 +3804,56 @@ emission factors, which changes historical figures and has real versioning and
 audit-trail implications under the GHG Protocol (a recalculation must be
 disclosed, not silent). That is a feature with its own design, not a dashboard
 button. Omitted rather than wired to nothing.
+
+## 52. De-duplicating the main dashboard
+
+Three sections removed from `/dashboard` now that `/environmental` owns them.
+**One requested removal was NOT made** — see 52.2.
+
+### 52.1 Removed (both themes)
+
+| Section | Now lives on |
+|---|---|
+| KPI cards — Total / Scope 1 / 2 / 3 | `/environmental` (same four, **plus** Scope 3 category coverage) |
+| Emissions Trend | `/environmental` (stacked by scope) |
+| Scope Breakdown | `/environmental` (donut) |
+
+Both themes have their own `enterprise.blade.php`, so both were edited.
+
+**The chart JS is safe.** `dashboard/partials/enterprise-scripts` is shared by
+both themes and guards every binding with
+`if (ctx && typeof Chart !== 'undefined')`. Removing the canvases makes it
+no-op rather than error. The partial is left in place — it still serves other
+charts and the guards make it inert for the removed ones.
+
+### 52.2 Net Zero Progress KEPT — it is not a duplicate
+
+The request was to remove it "as we moved it". **It was not moved.** The
+Overview pathway chart (§50) is on `/dashboard`, in
+`dashboard/partials/esg-performance` — the same page. `/environmental` has no
+net-zero section at all.
+
+Removing it would have deleted the feature rather than relocating it.
+Verified by grep before acting: `esg-path` appears only in the dashboard
+partial.
+
+### 52.3 Dead code left deliberately
+
+`$kpiCards`, `$trendClass`, `$trendArrow`, `$sparklineTrend` and `$sparklines`
+are now built but unused in both partials. Left in place: `$sparklines` is
+guarded with `?? []`, so they are inert, and deleting assignments inside a
+live `@php` block risks breaking a working page for no user-visible gain.
+
+### 52.4 Trend chart moved and restyled
+
+Moved from above the source/scope-mix row to **full width below it**, as
+requested. At half width the bars were cramped; the previous styling also let
+columns float with no baseline.
+
+- `justify-content: center` with `flex: 0 1 120px` — bars stay a sensible
+  width whether a company has two years or eight
+- Track raised to 168px with a **baseline rule**, so columns sit on something
+- Gap 2rem, wider bars (72px cap), subtle shadow
+
+Verified: both partials balanced (old 40/40 divs, new 41/41), 234 non-theme
+views scan clean, both stylesheets balanced.

@@ -1986,17 +1986,21 @@ table.min-w-full tbody tr:hover { background-color: var(--canvas); }
 .env-legend__val { margin-left: auto; font-weight: 600; color: #14161a;
     font-variant-numeric: tabular-nums; }
 /* ---------- Emissions trend (stacked by scope) ---------- */
-.env-card--trend { margin-bottom: 1rem; }
-.env-trend { display: flex; align-items: flex-end; gap: 0.75rem;
-    padding: 1.5rem 1.25rem 0; min-height: 200px; overflow-x: auto; }
-.env-trend__col { flex: 1 1 0; min-width: 48px; display: flex;
+/* Sits full width BELOW the source table + scope mix row, so the bars have
+   room. Capped so a two-year company does not get two enormous columns. */
+.env-card--trend { margin-top: 1rem; }
+.env-trend { display: flex; align-items: flex-end; justify-content: center;
+    gap: 2rem; padding: 1.75rem 1.5rem 0; overflow-x: auto; }
+.env-trend__col { flex: 0 1 120px; min-width: 64px; display: flex;
     flex-direction: column; align-items: center; }
-/* Fixed-height track so every bar shares one scale. */
-.env-trend__barwrap { width: 100%; height: 150px; display: flex;
-    align-items: flex-end; justify-content: center; }
-.env-trend__bar { width: 100%; max-width: 64px; min-height: 2px;
-    display: flex; flex-direction: column; border-radius: 2px 2px 0 0;
-    overflow: hidden; }
+/* Fixed-height track so every bar shares one scale, with a baseline rule so
+   the columns sit ON something rather than floating. */
+.env-trend__barwrap { width: 100%; height: 168px; display: flex;
+    align-items: flex-end; justify-content: center;
+    border-bottom: 1px solid #e5e6e3; }
+.env-trend__bar { width: 100%; max-width: 72px; min-height: 3px;
+    display: flex; flex-direction: column; border-radius: 3px 3px 0 0;
+    overflow: hidden; box-shadow: 0 1px 2px rgba(20,22,26,.06); }
 .env-trend__bar span { display: block; width: 100%; }
 .env-trend__val { font-size: 0.75rem; font-weight: 600; color: #14161a;
     margin-top: 0.5rem; font-variant-numeric: tabular-nums; }

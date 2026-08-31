@@ -91,22 +91,11 @@
         </div>
     @endif
 
-    {{-- KPI row --}}
-    <div class="mnz-seam mnz-seam--4">
-        @foreach ($kpiCards as $card)
-            @php $trend = (float) ($card['trend'] ?? 0); @endphp
-            <div class="mnz-kpi">
-                <div class="mnz-label">{{ $card['label'] }}</div>
-                <div class="mnz-kpi__value">
-                    {{ co2e_t($card['value']) }}<span class="mnz-kpi__unit">tCO₂e</span>
-                </div>
-                <div class="mnz-kpi__delta {{ $deltaClass($trend) }}">
-                    {{ $deltaArrow($trend) }} {{ abs($trend) }}%
-                    <span class="mnz-muted">{{ $card['compare'] }}</span>
-                </div>
-            </div>
-        @endforeach
-    </div>
+    {{-- KPI row REMOVED: Total / Scope 1 / Scope 2 / Scope 3 now live on the
+         Environmental pillar dashboard (/environmental), which shows the same
+         four figures plus Scope 3 category coverage.
+
+         Net zero progress below is NOT a duplicate and stays. --}}
 
     {{-- Net zero progress --}}
     <div class="mnz-panel">
@@ -154,35 +143,10 @@
         </div>
     </div>
 
-    {{-- Charts. The canvas IDs must match the original exactly — the chart
-         script pushed by the included partial binds to them by id. --}}
-    <div class="mnz-cols mnz-cols--main">
-        <div class="mnz-panel">
-            <div class="mnz-panel__head">
-                <div>
-                    <h3>Emissions trend</h3>
-                    <p class="mnz-muted">
-                        {{ ($yearlyTrend['has_multiple'] ?? false) ? 'Year on year' : 'Rolling months' }}
-                    </p>
-                </div>
-            </div>
-            <div class="mnz-panel__body">
-                <div class="mnz-chart"><canvas id="monthlyEmissionsChart"></canvas></div>
-            </div>
-        </div>
-
-        <div class="mnz-panel">
-            <div class="mnz-panel__head">
-                <div>
-                    <h3>Scope breakdown</h3>
-                    <p class="mnz-muted">Share of total by scope</p>
-                </div>
-            </div>
-            <div class="mnz-panel__body">
-                <div class="mnz-chart mnz-chart--sm"><canvas id="emissionsByScopeChart"></canvas></div>
-            </div>
-        </div>
-    </div>
+    {{-- Charts REMOVED: Emissions trend and Scope breakdown now live on
+         /environmental. The shared enterprise-scripts partial guards each
+         binding with `if (ctx && typeof Chart !== 'undefined')`, so removing
+         the canvases makes its chart code no-op rather than error. --}}
 
     {{-- Compliance --}}
     @if (!empty($compliance))

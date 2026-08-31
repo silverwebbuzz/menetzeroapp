@@ -92,64 +92,6 @@
         </div>
     </div>
 
-    {{-- Emissions trend, stacked by scope. Reuses the SAME yearlyTrend() the
-         main dashboard chart uses, so a year's total here can never disagree
-         with the one shown there. Stacked rather than a single line because
-         the composition shift is the story -- a falling total with rising
-         Scope 3 is a different situation from a falling total overall. --}}
-    @if (!empty($env['trend']['labels']))
-        <section class="env-card env-card--trend">
-            <div class="env-card__head">
-                <h2 class="env-card__title">Emissions trend</h2>
-                <span class="env-card__meta">tCO<sub>2</sub>e by scope</span>
-            </div>
-
-            @if (!$env['trend']['has_multiple'])
-                <div class="env-empty">
-                    Only FY{{ $env['trend']['labels'][0] }} has data. A trend appears once a
-                    second reporting year is recorded.
-                </div>
-            @else
-                @php
-                    $t = $env['trend'];
-                    $tMax = $t['max'];
-                    $inks = ['scope1' => '#1b6b45', 'scope2' => '#3f9068', 'scope3' => '#8fc3a8'];
-                @endphp
-                <div class="env-trend">
-                    @foreach ($t['labels'] as $i => $label)
-                        @php
-                            $yearTotal = (float) ($t['values'][$i] ?? 0);
-                            $colHeight = $tMax > 0 ? ($yearTotal / $tMax) * 100 : 0;
-                        @endphp
-                        <div class="env-trend__col">
-                            <div class="env-trend__barwrap">
-                                <div class="env-trend__bar" style="height:{{ round($colHeight, 2) }}%"
-                                     title="FY{{ $label }} — {{ number_format($yearTotal, 1) }} tCO2e">
-                                    @foreach (['scope3', 'scope2', 'scope1'] as $scopeKey)
-                                        @php
-                                            $part = (float) ($t[$scopeKey][$i] ?? 0);
-                                            $share = $yearTotal > 0 ? ($part / $yearTotal) * 100 : 0;
-                                        @endphp
-                                        @if ($share > 0)
-                                            <span style="height:{{ round($share, 2) }}%;background:{{ $inks[$scopeKey] }}"></span>
-                                        @endif
-                                    @endforeach
-                                </div>
-                            </div>
-                            <div class="env-trend__val">{{ number_format($yearTotal, 0) }}</div>
-                            <div class="env-trend__year">FY{{ substr((string) $label, -2) }}</div>
-                        </div>
-                    @endforeach
-                </div>
-                <ul class="env-legend env-legend--inline">
-                    <li><i style="background:{{ $inks['scope1'] }}"></i><span class="env-legend__name">Scope 1</span></li>
-                    <li><i style="background:{{ $inks['scope2'] }}"></i><span class="env-legend__name">Scope 2</span></li>
-                    <li><i style="background:{{ $inks['scope3'] }}"></i><span class="env-legend__name">Scope 3</span></li>
-                </ul>
-            @endif
-        </section>
-    @endif
-
     <div class="env-row">
         {{-- Emissions by source, this year vs last, largest first. --}}
         <section class="env-card">
@@ -253,6 +195,64 @@
             @endif
         </section>
     </div>
+
+    {{-- Emissions trend, stacked by scope. Reuses the SAME yearlyTrend() the
+         main dashboard chart uses, so a year's total here can never disagree
+         with the one shown there. Stacked rather than a single line because
+         the composition shift is the story -- a falling total with rising
+         Scope 3 is a different situation from a falling total overall. --}}
+    @if (!empty($env['trend']['labels']))
+        <section class="env-card env-card--trend">
+            <div class="env-card__head">
+                <h2 class="env-card__title">Emissions trend</h2>
+                <span class="env-card__meta">tCO<sub>2</sub>e by scope</span>
+            </div>
+
+            @if (!$env['trend']['has_multiple'])
+                <div class="env-empty">
+                    Only FY{{ $env['trend']['labels'][0] }} has data. A trend appears once a
+                    second reporting year is recorded.
+                </div>
+            @else
+                @php
+                    $t = $env['trend'];
+                    $tMax = $t['max'];
+                    $inks = ['scope1' => '#1b6b45', 'scope2' => '#3f9068', 'scope3' => '#8fc3a8'];
+                @endphp
+                <div class="env-trend">
+                    @foreach ($t['labels'] as $i => $label)
+                        @php
+                            $yearTotal = (float) ($t['values'][$i] ?? 0);
+                            $colHeight = $tMax > 0 ? ($yearTotal / $tMax) * 100 : 0;
+                        @endphp
+                        <div class="env-trend__col">
+                            <div class="env-trend__barwrap">
+                                <div class="env-trend__bar" style="height:{{ round($colHeight, 2) }}%"
+                                     title="FY{{ $label }} — {{ number_format($yearTotal, 1) }} tCO2e">
+                                    @foreach (['scope3', 'scope2', 'scope1'] as $scopeKey)
+                                        @php
+                                            $part = (float) ($t[$scopeKey][$i] ?? 0);
+                                            $share = $yearTotal > 0 ? ($part / $yearTotal) * 100 : 0;
+                                        @endphp
+                                        @if ($share > 0)
+                                            <span style="height:{{ round($share, 2) }}%;background:{{ $inks[$scopeKey] }}"></span>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            </div>
+                            <div class="env-trend__val">{{ number_format($yearTotal, 0) }}</div>
+                            <div class="env-trend__year">FY{{ substr((string) $label, -2) }}</div>
+                        </div>
+                    @endforeach
+                </div>
+                <ul class="env-legend env-legend--inline">
+                    <li><i style="background:{{ $inks['scope1'] }}"></i><span class="env-legend__name">Scope 1</span></li>
+                    <li><i style="background:{{ $inks['scope2'] }}"></i><span class="env-legend__name">Scope 2</span></li>
+                    <li><i style="background:{{ $inks['scope3'] }}"></i><span class="env-legend__name">Scope 3</span></li>
+                </ul>
+            @endif
+        </section>
+    @endif
 
 </div>
 @endsection
