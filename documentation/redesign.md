@@ -3713,3 +3713,68 @@ is corrected the target is unreachable.
 
 The projection guard behaved correctly: a rising trend produced **no**
 projected year rather than a fabricated one.
+
+## 51. Environmental pillar dashboard (/environmental)
+
+New `EnvironmentalDashboardService` + `EnvironmentalDashboardController` +
+`environmental/index` view. **Nothing removed.**
+
+### 51.1 Why a new controller
+
+`/environmental` reused `EsgDashboardController`, which answers *"how is my
+whole ESG programme doing"* across all three pillars — so an Environmental URL
+rendered E+S+G content. The new controller answers *"what are my emissions"*.
+
+`EsgDashboardController` is **unchanged** and still serves its own pages. The
+**E+S+G scorecards on /dashboard are untouched** — different controller,
+different view, different partial.
+
+### 51.2 Standard: GHG Protocol Corporate Standard
+
+- **Scope 1/2/3 split** — required reporting.
+- **Scope 2 location-based**, the default presentation. Market-based is a
+  separate disclosure; `buildScope2Split()` already computes both.
+- **Scope 3 against the standard's 15 categories**, using the slug→category
+  mapping already in `buildScope3CoverageMatrix()`. Coverage also counts how
+  many categories the company's **policy** includes — an excluded category is
+  not a gap, and the standard requires exclusions to be justified.
+- **Base-year comparison** from the company's own `ReductionTarget`, never a
+  guessed prior year. Null renders "no baseline set".
+
+### 51.3 Data quality: no invented status
+
+The design shows `VERIFIED / DRAFT / ESTIMATED / MISSING`. The real enum is
+`draft / submitted / under_review / not_verified / verified`.
+
+**"Estimated" was not added.** No estimated-vs-measured flag exists in the
+schema, and inventing one would misrepresent data quality. Flagging estimated
+data *is* a GHG Protocol expectation, so this is a genuine gap — but a schema
+change, not a dashboard one.
+
+**A source line shows the WEAKEST status among its measurements**, not the
+latest: if any measurement feeding a source is still a draft, the line is not
+verified. Reporting the strongest would overstate assurance.
+
+### 51.4 Reuse
+
+`buildResultsBreakdown()` (per-source tonnes by scope) and
+`buildScope3CoverageMatrix()` (15-category mapping) already existed. The
+service merges them across the year's measurements — `buildResultsBreakdown()`
+takes one `Measurement` — and joins prior year by source name, the only stable
+key the breakdown exposes.
+
+### 51.5 Verified
+
+- **Donut geometry**: arcs sum to exactly the circumference (339.29), so no
+  gaps or overlaps; shares reproduce 31/48/21 from the design's numbers.
+- Two wrong assumptions caught: `Measurement::status_label` does not exist
+  (it is **`status_display`**); `SCOPE3_CATEGORIES` confirmed to hold 15.
+- Inline SVG donut, no chart library — three arcs need none, and it keeps the
+  page theme-agnostic.
+- 234 non-theme views scan clean; view balanced 7/7, 3/3, 4/4; service braces
+  22/22; both stylesheets balanced.
+
+### 51.6 Not yet built
+
+Emissions trend over years (`yearlyTrend()` exists — reuse from the
+dashboard), Recalculate action, and per-source drill-through.

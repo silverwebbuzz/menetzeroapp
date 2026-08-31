@@ -490,7 +490,12 @@ Route::middleware([
 
     // --- Environmental -----------------------------------------------------
     Route::prefix('environmental')->name('env.')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Disclosure\EsgDashboardController::class, 'index'])
+        // Emissions dashboard for the pillar. Previously reused
+        // EsgDashboardController, which answers a different question (whole-ESG
+        // programme health) and so rendered E+S+G content under an
+        // Environmental heading. That controller is unchanged and still serves
+        // its own pages.
+        Route::get('/', [\App\Http\Controllers\Disclosure\EnvironmentalDashboardController::class, 'index'])
             ->middleware('disclosureAccess')
             ->name('overview');
 

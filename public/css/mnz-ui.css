@@ -402,3 +402,82 @@ table.mnz-table td{padding:11px 16px;border-bottom:1px solid var(--line-2);font-
 .esg-path__emptymsg { font-size: 0.8125rem; color: #8b9199; text-align: center;
     margin: 0; padding: 0 1rem 1.25rem; line-height: 1.5; }
 .esg-path__emptymsg a { color: #0f7a4a; font-weight: 500; white-space: nowrap; }
+/* ---------- Environmental pillar dashboard (/environmental) ---------- */
+/* Self-contained so one view serves both themes. */
+.env-page { max-width: 100%; }
+.env-head { display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 1.5rem; flex-wrap: wrap; border-bottom: 1px solid #e5e6e3;
+    padding-bottom: 1.25rem; margin-bottom: 1.25rem; }
+.env-kicker { display: inline-flex; align-items: center; gap: 0.375rem;
+    font: 600 0.6875rem 'IBM Plex Mono', ui-monospace, monospace;
+    letter-spacing: 0.1em; text-transform: uppercase; color: #0f7a4a; }
+.env-kicker__dot { width: 8px; height: 8px; border-radius: 2px; background: #0f7a4a; }
+.env-title { font-size: 1.75rem; font-weight: 600; letter-spacing: -0.03em;
+    margin: 0.375rem 0 0; color: #14161a; }
+.env-lead { font-size: 0.875rem; color: #5a6068; margin: 0.375rem 0 0;
+    max-width: 46rem; line-height: 1.5; }
+.env-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+.env-btn { display: inline-flex; align-items: center; height: 2.25rem;
+    padding: 0 0.875rem; border-radius: 6px; font-size: 0.8125rem; font-weight: 500;
+    text-decoration: none; border: 1px solid #e5e6e3; color: #14161a; background: #fff; }
+.env-btn--primary { background: #0f7a4a; border-color: #0f7a4a; color: #fff; }
+.env-btn--primary:hover { background: #0b6039; color: #fff; }
+
+.env-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+    border: 1px solid #e5e6e3; background: #fff; margin-bottom: 1rem; }
+@media (max-width: 960px) { .env-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .env-kpis { grid-template-columns: 1fr; } }
+.env-kpi { padding: 1rem 1.25rem; border-right: 1px solid #e5e6e3; }
+.env-kpi:last-child { border-right: 0; }
+.env-kpi__label { font: 500 0.625rem 'IBM Plex Mono', ui-monospace, monospace;
+    letter-spacing: 0.08em; text-transform: uppercase; color: #8b9199; }
+.env-kpi__value { font-size: 1.625rem; font-weight: 600; letter-spacing: -0.03em;
+    color: #14161a; margin-top: 0.375rem; }
+.env-kpi__unit { font-size: 0.75rem; font-weight: 500; color: #8b9199; margin-left: 0.25rem; }
+.env-kpi__meta { font-size: 0.75rem; color: #8b9199; margin-top: 0.25rem; }
+.env-kpi__meta .is-good { color: #0f7a4a; }
+.env-kpi__meta .is-bad  { color: #a33a2a; }
+.env-kpi__meta .is-warn { color: #8a6118; }
+.env-kpi__meta .is-muted { color: #a4a9ae; }
+
+.env-row { display: grid; grid-template-columns: 1.6fr 1fr; gap: 1rem;
+    align-items: start; }
+@media (max-width: 1100px) { .env-row { grid-template-columns: 1fr; } }
+.env-card { border: 1px solid #e5e6e3; background: #fff; }
+.env-card__head { display: flex; align-items: baseline; justify-content: space-between;
+    gap: 1rem; padding: 1rem 1.25rem; border-bottom: 1px solid #e5e6e3; }
+.env-card__title { font-size: 1rem; font-weight: 600; letter-spacing: -0.02em;
+    margin: 0; color: #14161a; }
+.env-card__meta { font: 500 0.625rem 'IBM Plex Mono', ui-monospace, monospace;
+    letter-spacing: 0.08em; text-transform: uppercase; color: #8b9199; white-space: nowrap; }
+.env-empty { padding: 2rem 1.25rem; text-align: center; font-size: 0.8125rem; color: #8b9199; }
+.env-empty a { color: #0f7a4a; font-weight: 500; white-space: nowrap; }
+
+.env-tablewrap { overflow-x: auto; }
+.env-table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+.env-table th { font: 500 0.625rem 'IBM Plex Mono', ui-monospace, monospace;
+    letter-spacing: 0.08em; text-transform: uppercase; color: #8b9199;
+    text-align: left; padding: 0.625rem 1.25rem; border-bottom: 1px solid #e5e6e3; }
+.env-table td { padding: 0.75rem 1.25rem; border-bottom: 1px solid #f0f0ee; color: #14161a; }
+.env-table tr:last-child td { border-bottom: 0; }
+.env-table .is-num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.env-table .is-status { text-align: right; white-space: nowrap; }
+.env-badge { display: inline-block; font: 500 0.625rem 'IBM Plex Mono', ui-monospace, monospace;
+    letter-spacing: 0.06em; text-transform: uppercase; padding: 0.1875rem 0.4375rem;
+    border-radius: 3px; border: 1px solid; }
+.env-badge--green { color: #0f7a4a; background: #eef6f1; border-color: #cde3d6; }
+.env-badge--blue  { color: #1a6c9e; background: #eef4f9; border-color: #cddfeb; }
+.env-badge--yellow{ color: #8a6118; background: #fbf4e6; border-color: #ecdcb8; }
+.env-badge--red   { color: #a33a2a; background: #fbeeec; border-color: #eccdc7; }
+.env-badge--gray  { color: #8b9199; background: #f4f4f2; border-color: #e5e6e3; }
+
+.env-donut { display: flex; flex-direction: column; align-items: center;
+    gap: 1rem; padding: 1.5rem 1.25rem; }
+.env-donut svg { display: block; }
+.env-legend { list-style: none; margin: 0; padding: 0; width: 100%; }
+.env-legend li { display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.375rem 0; font-size: 0.8125rem; }
+.env-legend i { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+.env-legend__name { color: #5a6068; }
+.env-legend__val { margin-left: auto; font-weight: 600; color: #14161a;
+    font-variant-numeric: tabular-nums; }
