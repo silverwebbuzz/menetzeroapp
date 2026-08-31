@@ -238,18 +238,32 @@ class DisclosureService
             $row = $topics[$key] ?? [];
             $isMaterial = !empty($row['is_material']);
 
+            $attributes = [
+                'is_material' => $isMaterial,
+                'rationale' => $isMaterial
+                    ? ($row['rationale'] ?? null)
+                    : ($row['rationale'] ?? 'Not material for this reporting period'),
+            ];
+
+            // Both this form and the materiality matrix write the SAME row
+            // (company + year + topic_key). This form has no impact/financial
+            // selects, so it must never leave a row claiming "not material"
+            // while still carrying medium/high scores -- the matrix would keep
+            // plotting the topic in the upper right, and the two pages would
+            // disagree permanently. Un-ticking here clears the scores that
+            // produced the tick.
+            if (! $isMaterial) {
+                $attributes['impact_materiality'] = null;
+                $attributes['financial_materiality'] = null;
+            }
+
             MaterialSustainabilityTopic::updateOrCreate(
                 [
                     'company_id' => $companyId,
                     'fiscal_year' => $fiscalYear,
                     'topic_key' => $key,
                 ],
-                [
-                    'is_material' => $isMaterial,
-                    'rationale' => $isMaterial
-                        ? ($row['rationale'] ?? null)
-                        : ($row['rationale'] ?? 'Not material for this reporting period'),
-                ]
+                $attributes
             );
         }
     }
@@ -266,18 +280,38 @@ class DisclosureService
                 || in_array($impact, ['medium', 'high'], true)
                 || in_array($financial, ['medium', 'high'], true);
 
+            $attributes = [
+                'is_material' => $isMaterial,
+                'impact_materiality' => in_array($impact, ['low', 'medium', 'high'], true) ? $impact : null,
+                'financial_materiality' => in_array($financial, ['low', 'medium', 'high'], true) ? $financial : null,
+            ];
+
+            // The matrix form has no rationale field, so a submit must not
+            // blank one typed on the GRI material-topics page -- it is a GRI
+            // 3-2 disclosure and is printed verbatim by reports/gri-pdf and
+            // reports/ifrs-s1-pdf. Only write rationale when this request
+            // actually carried one, or when the topic has just become
+            // immaterial and has no existing explanation to preserve.
+            if (array_key_exists('rationale', $row)) {
+                $attributes['rationale'] = $row['rationale'];
+            } elseif (! $isMaterial) {
+                $existing = MaterialSustainabilityTopic::where('company_id', $companyId)
+                    ->where('fiscal_year', $fiscalYear)
+                    ->where('topic_key', $key)
+                    ->value('rationale');
+
+                if (blank($existing)) {
+                    $attributes['rationale'] = 'Not material for this reporting period';
+                }
+            }
+
             MaterialSustainabilityTopic::updateOrCreate(
                 [
                     'company_id' => $companyId,
                     'fiscal_year' => $fiscalYear,
                     'topic_key' => $key,
                 ],
-                [
-                    'is_material' => $isMaterial,
-                    'impact_materiality' => in_array($impact, ['low', 'medium', 'high'], true) ? $impact : null,
-                    'financial_materiality' => in_array($financial, ['low', 'medium', 'high'], true) ? $financial : null,
-                    'rationale' => $row['rationale'] ?? ($isMaterial ? null : 'Not material for this reporting period'),
-                ]
+                $attributes
             );
         }
     }

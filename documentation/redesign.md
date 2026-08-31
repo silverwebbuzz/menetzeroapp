@@ -4674,3 +4674,63 @@ outlier.
 balanced by stack; no directive name inside any `{{-- --}}` comment; 236
 non-theme views scan clean, 0 broken; 52 theme files, only the pre-existing
 `client.profile` config-route false positive.
+
+## 63. Material topics vs materiality matrix — two forms, one row
+
+`/disclosures/gri/material-topics` and `/disclosures/materiality-matrix` are two
+views of the SAME record. Both write `material_sustainability_topics` keyed on
+(company_id, fiscal_year, topic_key); neither has its own storage, and both read
+through `DisclosureService::materialTopicsForCompany()`.
+
+    material-topics   is it material, and why      -> is_material, rationale
+    materiality-matrix  how material, on two axes  -> is_material (derived),
+                                                      impact_materiality,
+                                                      financial_materiality
+
+The matrix is the fuller assessment (GRI 3 impact + IFRS S1 financial); the GRI
+page is the shorter GRI 3-2 view of the same conclusion. That relationship is
+intended. What was broken is that each form's `updateOrCreate` wrote columns the
+other owned.
+
+**Bug 1 — un-ticking left orphan scores.** `syncMaterialTopics` writes only
+`is_material` and `rationale`. Score Water high/medium in the matrix, then untick
+it on the GRI page: `is_material` went false while the two level columns kept
+high/medium. The matrix carried on plotting Water in the upper right, so the two
+pages disagreed permanently. Fixed: un-ticking now clears the scores that
+produced the tick.
+
+**Bug 2 — saving the matrix wiped the GRI rationale.** `syncMaterialityMatrix`
+wrote `'rationale' => $row['rationale'] ?? ...`, but the matrix form has no
+rationale field, so `$row['rationale']` was always absent and every save blanked
+it. `rationale` is a GRI 3-2 disclosure printed verbatim by `reports/gri-pdf`,
+`reports/ifrs-s1-pdf` and the S1 preview, so this silently emptied a column that
+appears in two PDFs. Fixed with `array_key_exists`: rationale is written only
+when the request actually carried one. The "Not material for this reporting
+period" default is now applied only when the topic is immaterial AND has no
+existing explanation, so a real rationale is never overwritten by boilerplate.
+
+**Traced all consumers before changing anything** — every one reads through
+`materialTopicsForCompany()` and is already null-safe:
+
+    EsgDepthController::matrixComplete   $t['impact'] && $t['financial']
+    GriContentIndexService               !empty(...) -> Reported / Not reported
+    UaeEsgReportService                  $t['impact_materiality'] ?: '—'
+    materiality-matrix/snapshot          ?: 'low' for plotting, ?: '—' in table
+    s1-report-preview, gri-pdf, ifrs-s1-pdf   $topic['rationale'] ?: 'Material'
+
+One intended behaviour change: `matrixComplete` and the GRI index status may
+count fewer topics after an untick. That is correct -- those scores no longer
+exist, and reporting a topic as scored when it is not material would be the
+misstatement.
+
+**Verified by simulating both methods** against four scenarios: score-then-untick
+clears levels; GRI rationale survives a matrix save; a never-material topic still
+gets the boilerplate; and a topic demoted through the matrix keeps its existing
+explanation. Braces/parens/brackets balanced; all four columns are in
+`MaterialSustainabilityTopic::$fillable` (an unfillable key would be silently
+dropped). 236 non-theme views scan clean, 0 broken.
+
+**Not changed:** the matrix form still has no rationale field. Adding one would
+give GRI 3-1's documented-override requirement a home on the assessment page
+itself, but it is a form change on a page users are already filling in, so it is
+left as a separate decision.
