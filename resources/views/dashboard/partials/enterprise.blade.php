@@ -105,61 +105,19 @@
          pathway chart is on this page too, and /environmental has no net-zero
          section. --}}
 
-    {{-- Row 2: Net zero progress --}}
-    <div class="card">
-        <div class="card-header">
-            <div>
-                <h3 class="ent-card-title">Net Zero Progress</h3>
-                <p class="ent-card-subtitle">
-                    @if($netZeroProgress['has_target'] ?? false)
-                        {{ $netZeroProgress['target_name'] }}
-                        @if($netZeroProgress['scope_label'] ?? null) · {{ $netZeroProgress['scope_label'] }} @endif
-                    @else
-                        UAE Net Zero 2050 pathway and projected achievement
-                    @endif
-                </p>
-            </div>
-            <div class="text-right">
-                <div class="ent-kpi-value" style="font-size:1.5rem;">{{ $netZeroProgress['progress'] ?? 0 }}%</div>
-                <div class="ent-card-subtitle">toward baseline reduction</div>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="ent-progress-track">
-                <div class="ent-progress-fill" style="width: {{ min(100, $netZeroProgress['progress'] ?? 0) }}%;"></div>
-            </div>
-            <div class="ent-netzero-metrics">
-                <div>
-                    <div class="ent-label">Current emissions (absolute)</div>
-                    <div class="ent-kpi-value" style="font-size:1.25rem;">{{ $netZeroProgress['current'] ?? 0 }}<span class="ent-kpi-unit">tCO₂e</span></div>
-                    {{-- Intensity normalises for growth: a company that added
-                         sites can still show real improvement per unit. --}}
-                    @if($currentIntensity ?? null)
-                        <div class="ent-card-subtitle mt-1">
-                            {{ number_format($currentIntensity['value'], 4) }} tCO₂e / {{ $currentIntensity['unit'] }}
-                        </div>
-                    @else
-                        <div class="ent-card-subtitle mt-1">
-                            <a href="{{ route('settings.reporting') }}" class="hover:underline">Set an intensity denominator</a>
-                        </div>
-                    @endif
-                </div>
-                <div>
-                    <div class="ent-label">Reduction</div>
-                    <div class="ent-kpi-value" style="font-size:1.25rem;">{{ $netZeroProgress['reduction_pct'] ?? 0 }}%</div>
-                </div>
-                <div>
-                    <div class="ent-label">Target year</div>
-                    <div class="ent-kpi-value" style="font-size:1.25rem;">{{ $netZeroProgress['target_year'] ?? 2050 }}</div>
-                </div>
-                <div>
-                    <div class="ent-label">Projected achievement</div>
-                    <div class="font-semibold text-slate-900 mt-1">{{ $netZeroProgress['projected_achievement'] ?? '—' }}</div>
-                    <div class="ent-card-subtitle">{{ $netZeroProgress['years_remaining'] ?? 25 }} years remaining</div>
-                </div>
-            </div>
-        </div>
-    </div>
+    {{-- Net Zero Progress REMOVED: it duplicated the Overview pathway card
+         rendered directly ABOVE it on this same page (dashboard.partials
+         .esg-performance) -- same reduction target, same baseline, same
+         target year, shown twice.
+
+         Nothing was lost. The three figures only this panel carried are now
+         on the pathway card:
+           progress %  -> "N% toward target" in the card header
+           years left  -> under the projection tile
+           intensity   -> the Environmental dashboard's Intensity KPI
+         Compliance Status is likewise replaced by Framework readiness on the
+         pathway card's row, which covers five frameworks rather than four and
+         links through to each. --}}
 
     {{-- Emissions Trend and Scope Breakdown REMOVED: both now live on
          /environmental, where the trend is stacked by scope and the scope mix
@@ -168,24 +126,10 @@
          `if (ctx && typeof Chart !== 'undefined')`, so its chart code simply
          no-ops rather than erroring. --}}
 
-    {{-- Row 5: Compliance --}}
-    <div>
-        <h3 class="ent-card-title mb-3">Compliance Status</h3>
-        <div class="ent-grid-4">
-            @foreach($compliance ?? [] as $item)
-                <a href="{{ $item['url'] }}" class="ent-compliance-card">
-                    <div class="flex items-center justify-between gap-2 mb-2">
-                        <span class="font-semibold text-slate-900">{{ $item['title'] }}</span>
-                        <span class="ent-status ent-status--{{ $item['status'] }}">{{ ucfirst($item['status']) }}</span>
-                    </div>
-                    <div class="ent-progress-track">
-                        <div class="ent-progress-fill" style="width: {{ min(100, $item['percent']) }}%;"></div>
-                    </div>
-                    <div class="ent-card-subtitle mt-2">{{ $item['percent'] }}% complete</div>
-                </a>
-            @endforeach
-        </div>
-    </div>
+    {{-- Compliance Status REMOVED: replaced by Framework readiness on the
+         Overview cards above, which shows five frameworks rather than four,
+         uses DisclosureService's weighted percentages, and links through to
+         each framework's own page. --}}
 
     {{-- Row 6: AI recommendations --}}
     <div class="card">

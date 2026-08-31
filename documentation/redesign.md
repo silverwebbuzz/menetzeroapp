@@ -3857,3 +3857,33 @@ columns float with no baseline.
 
 Verified: both partials balanced (old 40/40 divs, new 41/41), 234 non-theme
 views scan clean, both stylesheets balanced.
+
+### 52.5 Net Zero Progress and Compliance Status removed — same-page duplication
+
+Correcting §52.2. The earlier note argued Net Zero Progress was not a
+duplicate because `/environmental` lacks it. That missed the actual
+duplication: **it was duplicated on `/dashboard` itself.**
+
+`dashboard/index` includes `esg-performance` (line 306) then `enterprise`
+(308), so the Overview **pathway card renders directly above** Net Zero
+Progress. Same reduction target, same baseline, same target year, twice on one
+screen.
+
+**Nothing was lost.** The three figures only that panel carried are preserved:
+
+| Figure | Now |
+|---|---|
+| Progress % toward baseline reduction | `achieved_percent` → "N% toward target" in the pathway card header |
+| Years remaining | `years_remaining` → under the projection tile |
+| Intensity (tCO2e / AED m) | already the Environmental dashboard's Intensity KPI |
+
+`achieved_percent` comes from `ReductionTargetProgressService`, which the
+pathway card already consumed — no new computation.
+
+**Compliance Status** removed too: Framework readiness on the same Overview row
+supersedes it with five frameworks rather than four, `DisclosureService`
+weighted percentages, and a link to each framework's page.
+
+Verified: no orphaned `$netZeroProgress`, `$compliance` or `$currentIntensity`
+references in either partial; both balanced (old 9/9 divs, new 13/13); 234
+non-theme views scan clean; both stylesheets balanced.

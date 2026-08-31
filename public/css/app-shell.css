@@ -2009,3 +2009,12 @@ table.min-w-full tbody tr:hover { background-color: var(--canvas); }
 .env-legend--inline { display: flex; justify-content: center; gap: 1.25rem;
     padding: 0.75rem 1.25rem 1.25rem; }
 .env-legend--inline li { padding: 0; }
+/* Progress toward target, carried over from the Net Zero Progress panel the
+   pathway card replaced. Sits with the scope/SBTi tags in the card header. */
+.esg-path__progress { display: inline-flex; flex-direction: column;
+    align-items: flex-end; line-height: 1.1; }
+.esg-path__progress-val { font-size: 1.125rem; font-weight: 600;
+    letter-spacing: -0.02em; color: #14161a; }
+.esg-path__progress-lbl { font: 500 0.5625rem 'IBM Plex Mono', ui-monospace, monospace;
+    letter-spacing: 0.06em; text-transform: uppercase; color: #8b9199;
+    margin-top: 0.125rem; }

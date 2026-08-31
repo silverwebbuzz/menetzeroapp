@@ -158,6 +158,12 @@ class EsgPerformanceCardService
             'actual' => $actual,
             'required' => $this->requiredLine($baseYear, $baseline, $targetYear, $targetTonnes),
             'projection' => $this->projectedYear($actual, $targetTonnes),
+            // Carried over from the Net Zero Progress panel this card
+            // replaces, so removing that panel loses nothing:
+            //   achieved_percent -- share of the required reduction delivered
+            //   years_remaining  -- to the target year
+            'achieved_percent' => $target['achieved_percent'] ?? null,
+            'years_remaining' => max(0, $targetYear - $fiscalYear),
         ];
     }
 

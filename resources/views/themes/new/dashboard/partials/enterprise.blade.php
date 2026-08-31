@@ -97,81 +97,21 @@
 
          Net zero progress below is NOT a duplicate and stays. --}}
 
-    {{-- Net zero progress --}}
-    <div class="mnz-panel">
-        <div class="mnz-panel__head">
-            <div>
-                <h3>Net zero progress</h3>
-                <p class="mnz-muted">Reduction against your baseline year</p>
-            </div>
-            <div class="mnz-num">{{ $netZeroProgress['progress'] ?? 0 }}%</div>
-        </div>
-        <div class="mnz-panel__body">
-            <div class="mnz-meter">
-                <span style="width: {{ min(100, $netZeroProgress['progress'] ?? 0) }}%"></span>
-            </div>
+    {{-- Net zero progress REMOVED: it duplicated the Overview pathway card
+         rendered directly ABOVE it on this same page -- same target, same
+         baseline, same target year, twice.
 
-            <div class="mnz-seam mnz-seam--4" style="margin-top:16px">
-                <div>
-                    <div class="mnz-label">Current emissions</div>
-                    <div class="mnz-num">{{ $netZeroProgress['current'] ?? 0 }}<span class="mnz-kpi__unit">tCO₂e</span></div>
-                    {{-- Intensity normalises for growth: a company that added
-                         sites can still show real improvement per unit. --}}
-                    @if ($currentIntensity ?? null)
-                        <div class="mnz-muted">
-                            {{ number_format($currentIntensity['value'], 4) }} tCO₂e / {{ $currentIntensity['unit'] }}
-                        </div>
-                    @else
-                        <div class="mnz-muted">
-                            <a href="{{ route('settings.reporting') }}">Set an intensity denominator</a>
-                        </div>
-                    @endif
-                </div>
-                <div>
-                    <div class="mnz-label">Reduction</div>
-                    <div class="mnz-num">{{ $netZeroProgress['reduction_pct'] ?? 0 }}%</div>
-                </div>
-                <div>
-                    <div class="mnz-label">Target year</div>
-                    <div class="mnz-num">{{ $netZeroProgress['target_year'] ?? 2050 }}</div>
-                </div>
-                <div>
-                    <div class="mnz-label">Years remaining</div>
-                    <div class="mnz-num">{{ $netZeroProgress['years_remaining'] ?? 25 }}</div>
-                </div>
-            </div>
-        </div>
-    </div>
+         Nothing lost: progress % and years remaining are now on the pathway
+         card; intensity is the Environmental dashboard's Intensity KPI. --}}
 
     {{-- Charts REMOVED: Emissions trend and Scope breakdown now live on
          /environmental. The shared enterprise-scripts partial guards each
          binding with `if (ctx && typeof Chart !== 'undefined')`, so removing
          the canvases makes its chart code no-op rather than error. --}}
 
-    {{-- Compliance --}}
-    @if (!empty($compliance))
-        <div>
-            <div class="mnz-kicker" style="margin-bottom:10px">Compliance status</div>
-            <div class="mnz-seam mnz-seam--4">
-                @foreach ($compliance as $item)
-                    <a href="{{ $item['url'] }}" class="mnz-panel" style="display:block">
-                        <div class="mnz-panel__body">
-                            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-                                <strong>{{ $item['title'] }}</strong>
-                                <span class="mnz-chip {{ $item['status'] === 'complete' ? 'mnz-chip--ok' : ($item['status'] === 'pending' ? 'mnz-chip--warn' : '') }}">
-                                    {{ ucfirst($item['status']) }}
-                                </span>
-                            </div>
-                            <div class="mnz-meter mnz-meter--thin" style="margin-top:10px">
-                                <span style="width: {{ min(100, $item['percent']) }}%"></span>
-                            </div>
-                            <div class="mnz-muted" style="margin-top:6px">{{ $item['percent'] }}% complete</div>
-                        </div>
-                    </a>
-                @endforeach
-            </div>
-        </div>
-    @endif
+    {{-- Compliance REMOVED: replaced by Framework readiness on the Overview
+         cards above -- five frameworks rather than four, weighted percentages
+         from DisclosureService, each linking to its own page. --}}
 
     {{-- Recommendations --}}
     @if (!empty($recommendations))

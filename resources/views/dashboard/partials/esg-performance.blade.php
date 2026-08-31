@@ -162,6 +162,14 @@
                     </p>
                 </div>
                 <div class="esg-path__tags">
+                    @if ($pw['achieved_percent'] !== null)
+                        {{-- Share of the REQUIRED reduction delivered so far.
+                             Carried over from the Net Zero Progress panel. --}}
+                        <span class="esg-path__progress">
+                            <span class="esg-path__progress-val">{{ (int) round($pw['achieved_percent']) }}%</span>
+                            <span class="esg-path__progress-lbl">toward target</span>
+                        </span>
+                    @endif
                     @if ($pw['scope_label'])
                         <span class="esg-path__scope">{{ $pw['scope_label'] }}</span>
                     @endif
@@ -228,6 +236,9 @@
                         @else
                             <span class="esg-path__qualifier">not on current trend</span>
                         @endif
+                        <span class="esg-path__qualifier">
+                            {{ $pw['years_remaining'] }} {{ \Illuminate\Support\Str::plural('year', $pw['years_remaining']) }} to {{ $pw['target_year'] }}
+                        </span>
                     </dd>
                 </div>
             </dl>
