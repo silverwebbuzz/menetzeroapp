@@ -4561,3 +4561,64 @@ config-route false positive. No stray `$years` / `$ysYears` / `$ysFy` / `$anchor
 references survive in any edited file, and `esg-scorecard`'s own unrelated
 `$years = $scorecard['years']` was left untouched. No `@include` of the deleted
 partial remains anywhere.
+
+## 61. Framework tab strips — duplicates removed, labels disambiguated
+
+Four navigation layers stacked on a framework page: top pillar tabs, the
+Reports sidebar, the framework tab strip, then content. Layers 2 and 3 did the
+same job — choose a destination inside Reports.
+
+**Two tabs per strip were pure duplicates of the sidebar.** "All disclosures"
+pointed at `disclosures.hub`, and each strip's "Overview" pointed at that
+framework's own overview — the Reports sidebar already lists the disclosure hub
+and all four framework overviews. Removed from all four strips. Verified before
+removing: every one of those five routes is still linked from
+`config/navigation.php` and from `disclosures/hub` in both themes, so no page
+lost its only route.
+
+    GRI      14 -> 12 tabs
+    IFRS S1   7 ->  5
+    IFRS S2   6 ->  4
+    UAE ESG   4 ->  2
+
+**Five labels each appeared in two or more strips pointing at different pages.**
+"Governance" was four distinct destinations — the Governance pillar tab, IFRS S2
+§5–7 climate oversight, IFRS S1 §27–29 sustainability oversight, and GRI 205
+ethics KPIs (numbers, not narrative). Renamed to the section `title` already in
+`config/disclosure.php`, so a tab and the panel heading it opens now agree:
+
+    S2  Governance      -> Climate oversight            (Climate Governance,  S2 §5-7)
+    S2  Strategy        -> Climate strategy             (Climate Strategy,    S2 §8-13)
+    S2  Risk Management -> Climate risk process         (Climate Risk Mgmt,   S2 §14-17)
+    S1  Governance      -> Sustainability oversight     (Sust. Governance,    S1 §27-29)
+    S1  Strategy        -> Sustainability strategy      (Sust. Strategy,      S1 §30-33)
+    S1  Risk Management -> Sustainability risk process  (Sust. Risk Mgmt,     S1 §34-36)
+    S1  Material Topics -> S1 material topics           (::edit)
+    GRI Material Topics -> GRI material topics          (::editGri — different controller method)
+    GRI Governance      -> Ethics & governance KPIs     (GRI 2/205 metrics)
+    S1  Generate Report -> S1 report
+    S2  Generate Report -> S2 report
+
+Zero duplicate labels remain across the four strips. No routes, controllers or
+pages changed — link text only.
+
+These four partials are SHARED by both themes (only `nav-disclosures-esg-depth`
+has a themed twin), so one edit each covers old and new.
+
+**Not done, raised for a decision:** IFRS S1 and S2 governance sections ask
+overlapping questions — "which board committee oversees this?", "which
+management role is accountable?". Falcon answered "Board Sustainability
+Committee" and "Chief Operating Officer" in both, because the app asked twice.
+A "copy from IFRS S2" action on the S1 form would remove the double entry, but
+the two disclosures are separate under the standards and a filer may
+legitimately give different answers, so it needs a product decision rather than
+a quiet default.
+
+Also deferred: grouping GRI's remaining 12 tabs into Setup / Environment /
+Social / Governance rows. Worth reviewing on screen first now that the strip is
+shorter.
+
+**Verified:** 236 non-theme views scan clean, 0 broken; 52 theme files, only the
+pre-existing `client.profile` config-route false positive. No Blade directive
+appears inside any `{{-- --}}` comment in the four edited partials (checked
+explicitly — the header comments were extended, and two strips had none before).
