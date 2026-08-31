@@ -1985,3 +1985,23 @@ table.min-w-full tbody tr:hover { background-color: var(--canvas); }
 .env-legend__name { color: #5a6068; }
 .env-legend__val { margin-left: auto; font-weight: 600; color: #14161a;
     font-variant-numeric: tabular-nums; }
+/* ---------- Emissions trend (stacked by scope) ---------- */
+.env-card--trend { margin-bottom: 1rem; }
+.env-trend { display: flex; align-items: flex-end; gap: 0.75rem;
+    padding: 1.5rem 1.25rem 0; min-height: 200px; overflow-x: auto; }
+.env-trend__col { flex: 1 1 0; min-width: 48px; display: flex;
+    flex-direction: column; align-items: center; }
+/* Fixed-height track so every bar shares one scale. */
+.env-trend__barwrap { width: 100%; height: 150px; display: flex;
+    align-items: flex-end; justify-content: center; }
+.env-trend__bar { width: 100%; max-width: 64px; min-height: 2px;
+    display: flex; flex-direction: column; border-radius: 2px 2px 0 0;
+    overflow: hidden; }
+.env-trend__bar span { display: block; width: 100%; }
+.env-trend__val { font-size: 0.75rem; font-weight: 600; color: #14161a;
+    margin-top: 0.5rem; font-variant-numeric: tabular-nums; }
+.env-trend__year { font: 500 0.625rem 'IBM Plex Mono', ui-monospace, monospace;
+    letter-spacing: 0.06em; color: #8b9199; margin-top: 0.125rem; }
+.env-legend--inline { display: flex; justify-content: center; gap: 1.25rem;
+    padding: 0.75rem 1.25rem 1.25rem; }
+.env-legend--inline li { padding: 0; }

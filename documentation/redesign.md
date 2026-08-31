@@ -3778,3 +3778,29 @@ key the breakdown exposes.
 
 Emissions trend over years (`yearlyTrend()` exists — reuse from the
 dashboard), Recalculate action, and per-source drill-through.
+
+### 51.7 Emissions trend added; Recalculate deliberately not built
+
+**Trend chart** — stacked bars by scope, straight reuse of
+`DashboardInsightsService::yearlyTrend()`, the same computation the main
+dashboard's chart uses. A year's total here therefore cannot disagree with the
+one shown there.
+
+**Stacked, not a single line**, because the composition shift is the story: a
+falling total with rising Scope 3 is a different situation from a falling
+total overall. Shows **all years**, not just up to the selected one — the
+point of a trend is the shape over time.
+
+With one year of data the chart is replaced by "A trend appears once a second
+reporting year is recorded", rather than a lone bar.
+
+Verified: segments sum to exactly 100% per year, the tallest bar fills the
+track, and FY2025's 21.1/48.2/30.8 split matches the donut on the same page.
+
+**"Recalculate" was NOT built.** The design shows the button; the app has **no
+route, no controller method and no service** for it. Building it would mean
+inventing the operation — re-running every measurement against current
+emission factors, which changes historical figures and has real versioning and
+audit-trail implications under the GHG Protocol (a recalculation must be
+disclosed, not silent). That is a feature with its own design, not a dashboard
+button. Omitted rather than wired to nothing.
