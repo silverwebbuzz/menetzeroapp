@@ -3496,3 +3496,84 @@ Reports, Settings) since Blade only emits `data-pillar` for E/S/G.
 
 Verified: 232 non-theme views scan clean, shell `<div>` count 30/30 (one pair
 more than before — the wrapper), CSS braces 314/314.
+
+## 48. ESG performance cards — Overview Pass 1
+
+Three E / S / G cards above the existing dashboard. **Additive** — nothing
+removed; the enterprise panel below is untouched.
+
+### 48.1 Standards audit (asked before building)
+
+9 of 12 designed metrics carry real framework codes and already exist:
+
+| Metric | Standard |
+|---|---|
+| Gross emissions | GHG Protocol / IFRS S2 |
+| Intensity | GRI 305-4 |
+| Renewable share | GRI 302-1 |
+| Headcount | GRI 2-7 |
+| Turnover | GRI 401-1 |
+| LTIFR | **GRI 403-9** |
+| Women in management | **GRI 405-1** |
+| Women on board | GRI 405-1 |
+| Scope 3 coverage | GHG Protocol — 15 categories |
+
+**Three are NOT standard and were withheld:**
+
+1. **Board independence.** The app stores `board_diversity_percent` = *women*
+   on the board. Independence = *non-executive* directors. Different measures.
+   Rendering one under the other's label is **a misstatement in a regulated
+   disclosure**, not a cosmetic slip. Omitted until the field exists.
+2. **Policies "4 of 9".** `gov.policies` is a disclosure **section editor**,
+   not a register — no rows to count, and no standard defines nine.
+3. **"ESG on board agenda: Quarterly".** Not a GRI or SCA metric.
+
+### 48.2 The headline number is completeness, not a rating
+
+The design shows 82 / 47 / 38. There is **no recognised GRI or SCA scoring
+methodology** behind those, and a client would reasonably read "82" as an
+external ESG score.
+
+Shown instead as **"% data complete"**, taken straight from
+`EsgDashboardService::scoreEnvironmental/Social/Governance()`, which already
+computed exactly this from named disclosure checks. Honest, config-derived,
+and it tells the user what is left to fill in.
+
+`+6 vs FY24` is likewise omitted — it implies a rated trend.
+
+### 48.3 Reuse, not reinvention
+
+`EsgDashboardService` **already** returned per-pillar percents, GHG totals and
+the full scorecard. `EsgPerformanceCardService` only reshapes that plus
+`EmissionsIntensityService::forYear()`. No new queries beyond a site count.
+
+**Null renders "not collected" in amber, never 0** — a zero would read as a
+measured result. The design does the same for LTIFR / "not disclosed".
+
+### 48.4 Four wrong assumptions caught by checking
+
+1. `renewable_share_percent` → the real key is **`renewable_energy_percent`**
+2. `Company::reportingSetting` **does not exist** — queried
+   `CompanyReportingSetting` directly, as `EmissionsIntensityService` does
+3. `DashboardController` has **three** `view('dashboard.index')` calls; two
+   are the onboarding path. Only the real one was wired.
+4. The new theme has **no `dashboard/index` override** — it overrides
+   `dashboard.partials.enterprise`. One insertion serves both themes.
+
+### 48.5 Safety
+
+- Service call wrapped in try/catch → `report()` + null. The panel can never
+  take the dashboard down.
+- `@if (!empty($esgCards))` → renders nothing on the onboarding path.
+- CSS is self-contained (no theme tokens) and appended to **both**
+  stylesheets, so one partial serves both shells.
+
+Verified: 233 non-theme views scan clean; partial balanced 2/2/2; controller
+braces 42/42 (+2 for try/catch); both stylesheets brace-balanced.
+
+### 48.6 Next passes
+
+- **Pass 2** (mechanical): Scope 3 coverage `6 of 15`, sites/consolidation in
+  the context line (built, needs data), `Compare FY24` / `Export board pack`.
+- **Pass 3** (needs your decisions): board independence field, ESG agenda
+  enum, policies register.

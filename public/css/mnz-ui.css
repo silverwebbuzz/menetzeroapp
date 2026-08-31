@@ -282,3 +282,46 @@ table.mnz-table td{padding:11px 16px;border-bottom:1px solid var(--line-2);font-
   border-bottom:1px solid var(--line-3);padding-bottom:1px}
 .mnz-lineage__link:hover{color:var(--ink);border-bottom-color:var(--ink-3)}
 .mnz-lineage__sep{color:var(--ink-4)}
+/* ---------- ESG performance cards (Overview, Pass 1) ---------- */
+/* Shared by both themes. Self-contained: no theme tokens, so the same
+   partial renders identically in the old shell and the new one. */
+.esg-cards { margin-bottom: 1.5rem; }
+.esg-cards__head { display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 1.5rem; border-bottom: 1px solid #e5e6e3; padding-bottom: 1.125rem; margin-bottom: 1rem; }
+.esg-cards__title { font-size: 1.625rem; font-weight: 600; letter-spacing: -0.03em;
+    margin: 0; color: #14161a; }
+.esg-cards__ctx { font-size: 0.8125rem; color: #5a6068; margin: 0.375rem 0 0; }
+.esg-cards__grid { display: grid; gap: 0; grid-template-columns: repeat(3, minmax(0, 1fr));
+    border: 1px solid #e5e6e3; background: #fff; }
+@media (max-width: 900px) { .esg-cards__grid { grid-template-columns: 1fr; } }
+.esg-card { padding: 1.25rem; border-right: 1px solid #e5e6e3; }
+.esg-card:last-child { border-right: 0; }
+@media (max-width: 900px) {
+    .esg-card { border-right: 0; border-bottom: 1px solid #e5e6e3; }
+    .esg-card:last-child { border-bottom: 0; }
+}
+.esg-card__top { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+.esg-card__code { display: inline-flex; align-items: center; gap: 0.375rem;
+    font: 600 0.6875rem 'IBM Plex Mono', ui-monospace, monospace; letter-spacing: 0.1em; }
+.esg-card__swatch { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+.esg-card__score { text-align: right; }
+.esg-card__pct { display: block; font-size: 1.75rem; font-weight: 600;
+    letter-spacing: -0.03em; color: #14161a; line-height: 1.1; }
+.esg-card__pctlabel { font: 500 0.625rem 'IBM Plex Mono', ui-monospace, monospace;
+    letter-spacing: 0.06em; color: #8b9199; text-transform: uppercase; }
+.esg-card__name { font-size: 1.0625rem; font-weight: 600; letter-spacing: -0.02em;
+    margin: 0.5rem 0 0; color: #14161a; }
+.esg-card__sub { font-size: 0.8125rem; color: #8b9199; margin: 0.125rem 0 0; }
+.esg-card__bar { height: 4px; background: #eeeeec; margin: 0.875rem 0 0; }
+.esg-card__bar span { display: block; height: 4px; }
+.esg-card__metrics { margin: 0.25rem 0 0; }
+.esg-card__row { display: flex; align-items: baseline; justify-content: space-between;
+    gap: 0.75rem; padding: 0.625rem 0; border-bottom: 1px solid #f0f0ee; }
+.esg-card__row:last-child { border-bottom: 0; }
+.esg-card__row dt { font-size: 0.8125rem; color: #5a6068; margin: 0; min-width: 0; }
+.esg-card__row dd { font-size: 0.8125rem; font-weight: 600; color: #14161a;
+    margin: 0; text-align: right; white-space: nowrap; }
+/* Amber, never zero: an uncollected metric must not read as a measured 0. */
+.esg-card__row dd.is-missing { color: #8a6118; font-weight: 500; }
+.esg-card__code-tag { font: 500 0.625rem 'IBM Plex Mono', ui-monospace, monospace;
+    color: #a4a9ae; margin-left: 0.25rem; }

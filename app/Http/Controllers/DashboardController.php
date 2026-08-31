@@ -301,7 +301,19 @@ class DashboardController extends Controller
             ? 'On track'
             : ($netZeroProgress['progress'] >= 40 ? 'Needs acceleration' : 'Early stage');
 
+        // ESG performance cards (Overview panel, Pass 1). Additive and
+        // defensive: this panel must never take the dashboard down, so any
+        // failure yields null and the view simply omits the panel.
+        $esgCards = null;
+        try {
+            $esgCards = app(\App\Services\EsgPerformanceCardService::class)
+                ->build($company, (int) $selectedYear);
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
         return view('dashboard.index', compact(
+            'esgCards',
             'kpis',
             'chartData',
             'netZeroProgress',

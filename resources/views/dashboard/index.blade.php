@@ -298,6 +298,13 @@
         </div>
     </div>
 @else
+    {{-- ESG performance cards, ABOVE the existing dashboard. Additive: the
+         enterprise panel below is unchanged. Renders nothing when $esgCards
+         is null, so the onboarding path and any service failure are safe.
+         Both themes share this partial -- the new theme overrides
+         dashboard.partials.enterprise but not this file. --}}
+    @include('dashboard.partials.esg-performance')
+
     @include('dashboard.partials.enterprise')
 @endif
 @endsection
