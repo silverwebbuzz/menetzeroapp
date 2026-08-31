@@ -4333,3 +4333,42 @@ point inside its box.
 Verified: 236 non-theme views scan clean; old matrix 2/2, 7/7, 3/3; new matrix
 1/1, 7/7, 2/2; esg-performance 16/16, 9/9, 8/8; service braces 32/32; both
 stylesheets balanced.
+
+### 58.8 Materiality promoted to its own Overview item; both views matched to the canvas
+
+**Nav.** Materiality moved from Governance to **Overview**, as its own menu
+item. §58.2 argued for leaving it in Governance; the user's placement is
+better on the merits — materiality decides what the **whole report** covers
+(GRI 3-1/3-2) and feeds five services (IFRS S1, GRI, GRI content index, UAE
+ESG, and both dashboards). It is not a Governance-only concern.
+
+`gov.materiality` is kept in the item's `active` list, so the old pillar URL
+still lights the Overview tab rather than leaving no tab active.
+
+**Dashboard snapshot removed.** With Materiality one click away in the nav, a
+summary card on the Overview would be a second place for the same numbers to
+drift. The service method, its payload key and the `.mm-snap` CSS were all
+removed — verified zero remaining references in views, stylesheets and the
+service.
+
+**Both views rebuilt to `Menetzero-Redesign/Internal.dc.html`:**
+
+- **CSS-positioned dots with inline labels**, not SVG. The design labels each
+  point beside its dot with a `#fffffff2` text backing so overlapping labels
+  stay readable — reproducible with absolute positioning; an SVG would need
+  manual text-collision handling.
+- **Axis rules on left and bottom only** (`border-left` / `border-bottom` on
+  `#14161a`), over a 25% background grid.
+- **Five-column topics table** — Topic · GRI · Impact · Financial · Material —
+  with YES/NO badges, matching the canvas's grid template and type scale
+  exactly.
+
+Both themes share the `.mm-*` classes, so a topic cannot be plotted
+differently in the two.
+
+Positions verified: high/high top-right (84%, 89%), low/medium bottom-centre
+(46%, 11%), all within bounds.
+
+Verified: 236 non-theme views scan clean; old matrix 2/2, 5/5, 3/3; new matrix
+1/1, 5/5, 2/2; esg-performance 13/13, 7/7, 6/6; service braces 28/28;
+stylesheets 530/530 and 393/393; nav brackets 99/99 with 37 routes.

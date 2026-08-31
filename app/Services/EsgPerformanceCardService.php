@@ -63,7 +63,6 @@ class EsgPerformanceCardService
             ],
             'frameworks' => $this->frameworks($data, $hasGhg, $fiscalYear),
             'pathway' => $this->pathway($data, $trend, $fiscalYear),
-            'materiality' => $this->materiality($company, $fiscalYear),
         ];
     }
 
@@ -230,71 +229,6 @@ class EsgPerformanceCardService
 
         // Beyond a century the number stops meaning anything.
         return $projected <= $lastYear + 100 ? $projected : null;
-    }
-
-    /**
-     * Materiality SNAPSHOT for the Overview.
-     *
-     * Distinct from the full matrix at /disclosures/materiality-matrix: that
-     * page is where scores are SET (form plus a labelled plot with a key);
-     * this is a read-only glance -- a count, a mini plot, and a link through.
-     * Neither duplicates the other.
-     *
-     * Also surfaces topics whose is_material flag CONTRADICTS their scores.
-     * The rule is "medium or high on either axis is material"; GRI 3-1 allows
-     * a documented departure, but an undocumented one is a reporting gap and
-     * the Overview is where gaps belong.
-     *
-     * @return array<string, mixed>|null
-     */
-    protected function materiality(Company $company, int $fiscalYear): ?array
-    {
-        $topics = app(DisclosureService::class)
-            ->materialTopicsForCompany($company->id, $fiscalYear);
-
-        if ($topics === []) {
-            return null;
-        }
-
-        $levels = ['low' => 0, 'medium' => 1, 'high' => 2];
-        $ink = ['e' => '#0f7a4a', 's' => '#1a6c9e', 'g' => '#5b5aa8'];
-
-        $points = [];
-        $material = 0;
-        $mismatched = 0;
-
-        foreach ($topics as $key => $t) {
-            $impact = $t['impact_materiality'] ?: 'low';
-            $financial = $t['financial_materiality'] ?: 'low';
-            $isMaterial = (bool) $t['is_material'];
-
-            $material += $isMaterial ? 1 : 0;
-
-            $scored = in_array($impact, ['medium', 'high'], true)
-                || in_array($financial, ['medium', 'high'], true);
-            if ($scored !== $isMaterial) {
-                $mismatched++;
-            }
-
-            $seed = crc32($key);
-
-            $points[] = [
-                'x' => ($levels[$financial] ?? 0) + 0.5 + ((($seed % 44) - 22) / 100),
-                'y' => ($levels[$impact] ?? 0) + 0.5 + (((($seed >> 8) % 44) - 22) / 100),
-                'material' => $isMaterial,
-                'ink' => $ink[$t['pillar'] ?? ''] ?? '#8b9199',
-            ];
-        }
-
-        return [
-            'material' => $material,
-            'total' => count($topics),
-            'mismatched' => $mismatched,
-            'points' => $points,
-            'url' => \Illuminate\Support\Facades\Route::has('disclosures.materiality-matrix.index')
-                ? route('disclosures.materiality-matrix.index', ['fiscal_year' => $fiscalYear])
-                : null,
-        ];
     }
 
     /**

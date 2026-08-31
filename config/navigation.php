@@ -124,6 +124,20 @@ return [
                     'active' => ['client.dashboard'],
                     'year' => false,
                 ],
+                [
+                    // Materiality is CROSS-PILLAR: it decides what the whole
+                    // report covers (GRI 3-1/3-2) and feeds IFRS S1, GRI, the
+                    // GRI content index and the UAE ESG report. Moved here
+                    // from Governance. 'gov.materiality' stays in the active
+                    // list so the old pillar URL still lights this tab.
+                    'label' => 'Materiality',
+                    'icon' => 'grid',
+                    'route' => 'disclosures.materiality-matrix.index',
+                    'gate' => 'disclosures',
+                    'active' => ['disclosures.materiality-matrix', 'gov.materiality'],
+                    'year' => true,
+                    'feeds' => ['s1', 'gri', 'uae_esg'],
+                ],
             ],
         ],
 
@@ -294,15 +308,6 @@ return [
                     'active' => ['disclosures.s2.sections'],
                     'year' => true,
                     'feeds' => ['s2', 's1'],
-                ],
-                [
-                    'label' => 'Materiality',
-                    'icon' => 'grid',
-                    'route' => 'disclosures.materiality-matrix.index',
-                    'gate' => 'disclosures',
-                    'active' => ['disclosures.materiality-matrix', 'gov.materiality'],
-                    'year' => true,
-                    'feeds' => ['s1', 'gri', 'uae_esg'],
                 ],
                 [
                     // Non-climate sustainability risks (SustainabilityRisk,

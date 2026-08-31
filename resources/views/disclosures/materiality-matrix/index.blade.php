@@ -87,120 +87,92 @@
         </div>
     </div>
 
-    {{-- Double-materiality plot: impact (GRI 3) up, financial (IFRS S1) across.
+    {{-- Double-materiality view, matching Menetzero-Redesign/Internal.dc.html.
 
-         NUMBERED DOTS, NOT INLINE LABELS. Topic names run long ("Climate
-         (cross-reference IFRS S2)") and several topics share a cell, so
-         drawing names on the plot guaranteed overlapping text and truncation
-         at the right edge. Numbers keep the plot readable at any width and
-         the legend carries the full name, GRI code and both scores.
+         CSS-POSITIONED DOTS, NOT SVG. The design labels each point inline
+         beside its dot, with a white text backing so overlapping labels stay
+         readable. Absolute positioning inside a bordered box reproduces that
+         exactly; an SVG would need manual text-collision handling.
+
+         Axis rules on LEFT and BOTTOM only (the design's border-left /
+         border-bottom), with a 25% background grid.
 
          ALL topics are plotted. The original grid filtered to is_material,
-         which hid exactly the topics worth reviewing -- those scored high but
-         not yet flagged. Non-material topics render hollow. --}}
-    <div class="card">
-        <div class="card-header">
-            <div>
-                <h3 class="card-title">Materiality matrix</h3>
-                <p class="card-subtitle">Impact on the world (GRI 3) against financial effect on the business (IFRS S1).</p>
+         hiding exactly the topics worth reviewing -- those scored high but
+         not yet flagged. --}}
+    @php
+        $levels = ['low' => 0, 'medium' => 1, 'high' => 2];
+        $pillarInk = ['e' => '#0f7a4a', 's' => '#1a6c9e', 'g' => '#5b5aa8'];
+
+        $plotted = [];
+        foreach ($topics as $key => $t) {
+            $ix = $levels[$t['impact_materiality'] ?: 'low'] ?? 0;
+            $fx = $levels[$t['financial_materiality'] ?: 'low'] ?? 0;
+
+            // Deterministic nudge from the topic key: identical on every
+            // render, and topics sharing a cell separate rather than stack.
+            $seed = crc32($key);
+            $jx = (($seed % 40) - 20) / 100;
+            $jy = ((($seed >> 8) % 40) - 20) / 100;
+
+            $plotted[] = [
+                'label' => $t['label'],
+                'ink' => $pillarInk[$t['pillar'] ?? ''] ?? '#8b9199',
+                'left' => round((($fx + 0.5 + $jx) / 3) * 100, 2),
+                'bottom' => round((($ix + 0.5 + $jy) / 3) * 100, 2),
+            ];
+        }
+    @endphp
+
+    <div class="mm-grid">
+        <div class="mm-card">
+            <div class="mm-card__head">
+                <span class="mm-axis">Impact &uarr; / Financial &rarr;</span>
+                <span class="mm-year">FY{{ $fiscalYear }}</span>
             </div>
-        </div>
-        <div class="card-body">
-            @php
-                $levels = ['low' => 0, 'medium' => 1, 'high' => 2];
-                $pillarInk = ['e' => '#0f7a4a', 's' => '#1a6c9e', 'g' => '#5b5aa8'];
-
-                $W = 460; $H = 400; $padL = 58; $padR = 20; $padT = 18; $padB = 48;
-                $plotW = $W - $padL - $padR;
-                $plotH = $H - $padT - $padB;
-
-                $plotted = [];
-                $n = 0;
-                foreach ($topics as $key => $t) {
-                    $n++;
-                    $ix = $levels[$t['impact_materiality'] ?: 'low'] ?? 0;
-                    $fx = $levels[$t['financial_materiality'] ?: 'low'] ?? 0;
-
-                    // Deterministic nudge from the topic key: identical layout
-                    // on every render, and topics sharing a cell separate.
-                    $seed = crc32($key);
-                    $jx = (($seed % 44) - 22) / 100;
-                    $jy = ((($seed >> 8) % 44) - 22) / 100;
-
-                    $plotted[] = [
-                        'n' => $n,
-                        'label' => $t['label'],
-                        'gri' => $t['gri'],
-                        'impact' => $t['impact_materiality'] ?: 'low',
-                        'financial' => $t['financial_materiality'] ?: 'low',
-                        'material' => (bool) $t['is_material'],
-                        'ink' => $pillarInk[$t['pillar'] ?? ''] ?? '#8b9199',
-                        'x' => $padL + (($fx + 0.5 + $jx) / 3) * $plotW,
-                        'y' => $padT + $plotH - (($ix + 0.5 + $jy) / 3) * $plotH,
-                    ];
-                }
-            @endphp
-
-            <div class="mm-layout">
-                <svg viewBox="0 0 {{ $W }} {{ $H }}" class="mm-plot"
-                     role="img" aria-label="Double materiality matrix for {{ $fiscalYear }}">
-                    @foreach ([0, 1, 2, 3] as $i)
-                        @php
-                            $gx = $padL + ($i / 3) * $plotW;
-                            $gy = $padT + ($i / 3) * $plotH;
-                        @endphp
-                        <line x1="{{ round($gx, 1) }}" y1="{{ $padT }}" x2="{{ round($gx, 1) }}" y2="{{ $padT + $plotH }}"
-                              stroke="#e5e6e3" stroke-width="1"/>
-                        <line x1="{{ $padL }}" y1="{{ round($gy, 1) }}" x2="{{ $padL + $plotW }}" y2="{{ round($gy, 1) }}"
-                              stroke="#e5e6e3" stroke-width="1"/>
-                    @endforeach
-
-                    @foreach (['Low', 'Medium', 'High'] as $i => $lbl)
-                        <text x="{{ round($padL + (($i + 0.5) / 3) * $plotW, 1) }}" y="{{ $H - 26 }}"
-                              text-anchor="middle" font-size="11" fill="#8b9199">{{ $lbl }}</text>
-                        <text x="{{ $padL - 12 }}" y="{{ round($padT + $plotH - (($i + 0.5) / 3) * $plotH + 4, 1) }}"
-                              text-anchor="end" font-size="11" fill="#8b9199">{{ $lbl }}</text>
-                    @endforeach
-
-                    <text x="{{ round($padL + $plotW / 2, 1) }}" y="{{ $H - 6 }}" text-anchor="middle"
-                          font-size="9.5" fill="#a4a9ae" letter-spacing="1.2">FINANCIAL &rarr;</text>
-                    <text x="13" y="{{ round($padT + $plotH / 2, 1) }}" text-anchor="middle"
-                          font-size="9.5" fill="#a4a9ae" letter-spacing="1.2"
-                          transform="rotate(-90 13 {{ round($padT + $plotH / 2, 1) }})">IMPACT &uarr;</text>
-
-                    @foreach ($plotted as $pt)
-                        <circle cx="{{ round($pt['x'], 1) }}" cy="{{ round($pt['y'], 1) }}" r="11"
-                                fill="{{ $pt['material'] ? $pt['ink'] : '#fff' }}"
-                                stroke="{{ $pt['ink'] }}" stroke-width="2"/>
-                        <text x="{{ round($pt['x'], 1) }}" y="{{ round($pt['y'] + 4, 1) }}"
-                              text-anchor="middle" font-size="11" font-weight="600"
-                              fill="{{ $pt['material'] ? '#fff' : $pt['ink'] }}">{{ $pt['n'] }}</text>
-                    @endforeach
-                </svg>
-
-                <ol class="mm-key">
-                    @foreach ($plotted as $pt)
-                        <li>
-                            <span class="mm-key__n" style="background:{{ $pt['material'] ? $pt['ink'] : '#fff' }};
-                                  border-color:{{ $pt['ink'] }};
-                                  color:{{ $pt['material'] ? '#fff' : $pt['ink'] }}">{{ $pt['n'] }}</span>
-                            <span class="mm-key__label">
-                                {{ $pt['label'] }}
-                                <span class="mm-key__gri">{{ $pt['gri'] }}</span>
-                            </span>
-                            <span class="mm-key__score">{{ ucfirst($pt['impact'][0]) }}/{{ ucfirst($pt['financial'][0]) }}</span>
-                        </li>
-                    @endforeach
-                </ol>
+            <div class="mm-plot">
+                <div class="mm-plot__grid"></div>
+                @foreach ($plotted as $pt)
+                    <div class="mm-pt" style="left:{{ $pt['left'] }}%;bottom:{{ $pt['bottom'] }}%">
+                        <span class="mm-pt__dot" style="background:{{ $pt['ink'] }}"></span>
+                        <span class="mm-pt__name">{{ $pt['label'] }}</span>
+                    </div>
+                @endforeach
             </div>
-
-            <div class="mm-legend">
+            <div class="mm-keys">
                 <span><i style="background:#0f7a4a"></i>Environmental</span>
                 <span><i style="background:#1a6c9e"></i>Social</span>
                 <span><i style="background:#5b5aa8"></i>Governance</span>
-                <span><i style="background:#fff;border:2px solid #8b9199"></i>Not flagged material</span>
-                <span class="mm-legend__note">Scores shown as impact / financial</span>
             </div>
+        </div>
+
+        <div class="mm-card mm-card--flush">
+            <div class="mm-table__title">Material topics</div>
+            <div class="mm-table__head">
+                <span>Topic</span>
+                <span class="mm-r">GRI</span>
+                <span class="mm-r">Impact</span>
+                <span class="mm-r">Financial</span>
+                <span class="mm-r">Material</span>
+            </div>
+            @foreach ($topics as $key => $t)
+                @php
+                    $ink = $pillarInk[$t['pillar'] ?? ''] ?? '#8b9199';
+                    $isMaterial = (bool) $t['is_material'];
+                @endphp
+                <div class="mm-table__row">
+                    <span class="mm-topic">
+                        <i style="background:{{ $ink }}"></i>
+                        <span>{{ $t['label'] }}</span>
+                    </span>
+                    <span class="mm-r mm-gri">{{ $t['gri'] }}</span>
+                    <span class="mm-r mm-lvl">{{ $t['impact_materiality'] ? ucfirst($t['impact_materiality']) : '—' }}</span>
+                    <span class="mm-r mm-lvl">{{ $t['financial_materiality'] ? ucfirst($t['financial_materiality']) : '—' }}</span>
+                    <span class="mm-r">
+                        <span class="mm-flag {{ $isMaterial ? 'is-yes' : 'is-no' }}">{{ $isMaterial ? 'Yes' : 'No' }}</span>
+                    </span>
+                </div>
+            @endforeach
         </div>
     </div>
 </div>
