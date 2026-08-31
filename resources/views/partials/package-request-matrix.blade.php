@@ -97,11 +97,13 @@
     #package-comparison-matrix input[type="radio"]:checked + span {
         color: rgb(15 118 110); /* teal-700 */
     }
-    #package-comparison-matrix:has(input[value="client_scope_basic"]:checked) td.package-col[data-col="client_scope_basic"],
-    #package-comparison-matrix:has(input[value="client_scope_pro"]:checked) td.package-col[data-col="client_scope_pro"],
-    #package-comparison-matrix:has(input[value="client_esg_starter"]:checked) td.package-col[data-col="client_esg_starter"],
-    #package-comparison-matrix:has(input[value="client_esg_complete"]:checked) td.package-col[data-col="client_esg_complete"],
-    #package-comparison-matrix:has(input[value="client_enterprise"]:checked) td.package-col[data-col="client_enterprise"] {
+    {{-- Generated from the same CODES the columns come from. Written out by
+         hand these drifted the moment the catalogue changed: the selectors
+         still named retired packages, so no column highlighted. --}}
+@foreach (($columns ?? []) as $columnCode)
+    #package-comparison-matrix:has(input[value="{{ $columnCode }}"]:checked) td.package-col[data-col="{{ $columnCode }}"]@if (! $loop->last),@endif
+@endforeach
+    {
         background-color: rgba(20, 184, 166, 0.08);
     }
 </style>

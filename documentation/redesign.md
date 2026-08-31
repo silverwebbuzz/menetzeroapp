@@ -4916,3 +4916,58 @@ has never processed a transaction here. Sequence the AED test payment first.
 Re-run `php artisan migrate:refresh --path=database/migrations/2026_08_31_120000_four_tier_plan_catalogue.php`
 or re-run the migration to push the corrected prices to `subscription_plans`;
 `updateOrCreate` makes it idempotent.
+
+## 66. Plan-selection surfaces moved to the four-tier catalogue
+
+Data in section 65 was live but every page a buyer sees still offered the
+retired packages.
+
+**`app/Data/CompanyPackageOptions.php`** — drives BOTH the client
+"Request a package" page and the consultant packs page, so one file covered
+both. `packages()` rewritten to Carbon / ESG / Enterprise; `CODES` cut to the
+same three (it is validated on submit, so a retired code left there would let
+somebody activate a plan that is no longer sold); `comparisonMatrix()`
+collapsed from five columns to three across all 33 rows.
+
+Matrix values were re-derived from `PlanEntitlementDefaults`, not carried over:
+Carbon and ESG both show 5 sites and 10 users, 3 vs 5 reporting years, and
+Scope 3 is now `true` on Carbon — the old Scope Basic column said `false`
+because that plan really was Scope 1 & 2 only. Framework rows (IFRS, GRI, SASB,
+UAE ESG, materiality/stakeholder/supply-chain registers) are false on Carbon and
+true on ESG, which is the boundary the two tiers exist to draw.
+
+Retired codes are absent from `packages()` on purpose. This list is what a NEW
+request may choose; grandfathering lives in
+`PlanEntitlementDefaults::LEGACY_PLAN_CODES`.
+
+**`config/plans-company.php`** — taglines rewritten for the live tiers; retired
+ones kept and marked "(retired)" so a grandfathered subscriber still sees a
+label for the plan they are on.
+
+**`resources/views/client/subscriptions/request-package.blade.php`** — default
+selection was `client_scope_basic`, a retired plan. Now `client_carbon`.
+
+**`resources/views/partials/package-request-matrix.blade.php`** — the
+column-highlight CSS named each package code in a hand-written selector list,
+which still pointed at the retired packages, so no column would have
+highlighted. Now generated from the same `$columns` the table is built from,
+which is the only version that cannot drift.
+
+**`resources/views/client/subscriptions/upgrade.blade.php`** — plan order
+updated to the four live codes, plus an append of the subscriber's own code when
+they are grandfathered onto something retired (otherwise the page shows no
+current plan at all). NOTE: this view is currently unreachable —
+`SubscriptionController::upgrade()` redirects to `request-package` with
+"Self-serve plan checkout is unavailable". Updated so it is correct if and when
+self-serve returns, but it changes nothing today.
+
+**Verified:** 236 non-theme views scan clean, 0 broken; braces/parens/brackets
+balanced in both PHP files; all 33 matrix rows carry exactly 3 cells; no retired
+code remains in any view or controller; generated CSS simulated to 3
+comma-separated selectors and one declaration block; no Blade directive inside
+any `{{-- --}}` comment.
+
+**Still not built:** consultant slot-quantity checkout with block pricing.
+`PackCheckoutController::index()` still carries "Phase 3–5: self-serve pack
+grid/checkout hidden — request clients offline", so both sides remain
+request-then-activate. `SLOT_PRICING` has no purchase path.

@@ -5,8 +5,18 @@
 
 @section('content')
 @php
-    // Render order for the selectable plan cards.
-    $planOrder = ['client_free', 'client_starter', 'client_growth', 'client_enterprise'];
+    // Render order for the selectable plan cards: the live four-tier
+    // catalogue, Free through Enterprise.
+    $planOrder = ['client_free', 'client_carbon', 'client_esg', 'client_enterprise'];
+
+    // A subscriber grandfathered on a retired plan must still see the card for
+    // the plan they are actually paying for -- otherwise the page shows no
+    // current plan at all and the only apparent options are changes. Their code
+    // is appended rather than inserted so the live ladder still reads in order.
+    $currentCode = $currentSubscription?->plan?->plan_code;
+    if ($currentCode && ! in_array($currentCode, $planOrder, true)) {
+        $planOrder[] = $currentCode;
+    }
     $planGuide = config('plans-company');
     $planTaglines = $planGuide['plan_taglines'] ?? [];
     $freeMeta = [

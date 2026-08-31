@@ -5,7 +5,7 @@
 
 @section('content')
 @php
-    $selectedPackage = old('package_code', 'client_scope_basic');
+    $selectedPackage = old('package_code', 'client_carbon');
 @endphp
 <div class="w-full max-w-6xl">
     <div class="mb-6">

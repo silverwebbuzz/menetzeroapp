@@ -97,14 +97,19 @@ return [
     ],
 
     'plan_taglines' => [
-        'client_free' => 'Scope 1 & 2 full + Scope 3 (1 entry / category)',
-        'client_scope_basic' => 'Clean GHG / MOCCAE / Excel / IEQT',
-        'client_scope_pro' => 'Broader scopes + ESG disclosure exports',
-        'client_esg_starter' => 'Full ESG pack for mid-size orgs',
-        'client_esg_complete' => 'Larger portfolios + consolidation',
-        'client_enterprise' => 'Custom / white-label deployment',
-        // Legacy codes (older activations)
-        'client_starter' => 'Official GHG inventory PDF (legacy)',
-        'client_growth' => 'Integrated UAE ESG Report (legacy)',
+        // Live four-tier catalogue. Carbon and ESG name what the buyer gets:
+        // Carbon is the inventory and its UAE filings, ESG adds the framework
+        // reports on top.
+        'client_free' => 'Scope 1 & 2 for one site — preview only',
+        'client_carbon' => 'Full Scope 1–3 inventory with MOCCAE, IEQT and GHG reports',
+        'client_esg' => 'Everything in Carbon plus IFRS S1 & S2, GRI, SASB and UAE ESG',
+        'client_enterprise' => 'Multi-entity consolidation, assurance support and SSO',
+        // Superseded codes — still shown to whoever is grandfathered on them.
+        'client_scope_basic' => 'Clean GHG / MOCCAE / Excel / IEQT (retired)',
+        'client_scope_pro' => 'Broader scopes + ESG disclosure exports (retired)',
+        'client_esg_starter' => 'Full ESG pack for mid-size orgs (retired)',
+        'client_esg_complete' => 'Larger portfolios + consolidation (retired)',
+        'client_starter' => 'Official GHG inventory PDF (retired)',
+        'client_growth' => 'Integrated UAE ESG Report (retired)',
     ],
 ];
