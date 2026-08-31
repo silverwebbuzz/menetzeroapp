@@ -25,9 +25,10 @@
     x-field-help key="scorecard.manual_intro" is preserved - these are the
     invisible-in-a-screenshot losses caught in section 20.
 
-    SHARED PARTIAL: disclosures.partials.year-select included UNCHANGED, here
-    carrying 'hidden' => ['category' => ...] so the active tab survives a year
-    change.
+    YEAR PICKER REMOVED: this page used disclosures.partials.year-select,
+    carrying 'hidden' => ['category' => ...] so the active tab survived a year
+    change. The topbar switcher redirects back(), which preserves the whole
+    URL including ?category=, so the tab still survives.
 
     Controller data: $company $fiscalYear $scorecard
     Composer data: $gate (PlanGateComposer), $availableYears (read by the partial)
@@ -75,12 +76,6 @@
         <div>
             <div class="mnz-kicker">3-year KPI performance tables</div>
             <h1>{{ $company->name }}</h1>
-        </div>
-        <div class="mnz-pagehead__actions">
-            @include('disclosures.partials.year-select', [
-                'action' => route('disclosures.esg-scorecard.index'),
-                'hidden' => ['category' => $activeCategory],
-            ])
         </div>
     </div>
 

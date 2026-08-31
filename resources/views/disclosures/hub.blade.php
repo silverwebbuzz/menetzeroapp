@@ -5,14 +5,9 @@
 
 @section('content')
 <div class="w-full">
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-        <div>
-            <p class="text-sm text-gray-500">ISSB disclosure workspace</p>
-            <h2 class="text-xl font-semibold text-gray-900">{{ $company->name }}</h2>
-        </div>
-        @include('disclosures.partials.year-select', [
-            'action' => route('disclosures.hub'),
-        ])
+    <div class="mb-6">
+        <p class="text-sm text-gray-500">ISSB disclosure workspace</p>
+        <h2 class="text-xl font-semibold text-gray-900">{{ $company->name }}</h2>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

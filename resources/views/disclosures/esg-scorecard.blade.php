@@ -13,15 +13,9 @@
     $currentYear = $fiscalYear;
 @endphp
 <div class="w-full">
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-        <div>
-            <p class="text-sm text-gray-500">3-year KPI performance tables</p>
-            <h2 class="text-xl font-semibold text-gray-900">{{ $company->name }}</h2>
-        </div>
-        @include('disclosures.partials.year-select', [
-            'action' => route('disclosures.esg-scorecard.index'),
-            'hidden' => ['category' => $activeCategory],
-        ])
+    <div class="mb-6">
+        <p class="text-sm text-gray-500">3-year KPI performance tables</p>
+        <h2 class="text-xl font-semibold text-gray-900">{{ $company->name }}</h2>
     </div>
 
     <nav class="flex flex-wrap gap-2 mb-6 border-b border-gray-200 pb-3 text-sm">

@@ -5,9 +5,9 @@
     cross-links. No plan gating and no scripts - verified against the original,
     zero gate calls and zero script blocks.
 
-    SHARED PARTIAL: disclosures.partials.year-select is included UNCHANGED, for
-    the reason recorded in section 37.2 - it is self-contained and several
-    disclosure pages depend on its year-fallback logic.
+    YEAR PICKER REMOVED: this page used disclosures.partials.year-select,
+    which wrote the same session key as the topbar switcher. Two controls for
+    one value; the topbar one is global and survives navigation.
 
     Controller data: $company $fiscalYear $s2Completeness $s1Completeness
     $griCompleteness $uaeEsgCompleteness
@@ -44,11 +44,6 @@
         <div>
             <div class="mnz-kicker">ISSB disclosure workspace</div>
             <h1>{{ $company->name }}</h1>
-        </div>
-        <div class="mnz-pagehead__actions">
-            @include('disclosures.partials.year-select', [
-                'action' => route('disclosures.hub'),
-            ])
         </div>
     </div>
 

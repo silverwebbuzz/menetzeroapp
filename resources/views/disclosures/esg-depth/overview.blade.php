@@ -5,15 +5,9 @@
 
 @section('content')
 <div class="w-full">
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-2">
-        <div>
-            <p class="text-sm text-gray-500">Phase C — stakeholders, materiality, supply chain, targets</p>
-            <h2 class="text-xl font-semibold text-gray-900">{{ $company->name }}</h2>
-        </div>
-        @include('disclosures.partials.year-select', [
-            'action' => route('disclosures.esg-depth.overview'),
-            'label' => 'Year',
-        ])
+    <div class="mb-2">
+        <p class="text-sm text-gray-500">Phase C — stakeholders, materiality, supply chain, targets</p>
+        <h2 class="text-xl font-semibold text-gray-900">{{ $company->name }}</h2>
     </div>
 
     {{-- Tab strip removed: every destination it offered is now in the

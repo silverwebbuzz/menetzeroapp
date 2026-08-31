@@ -5,12 +5,9 @@
     remaining old body. No plan gating and no scripts - verified against the
     original, zero gate calls and zero script blocks.
 
-    SHARED PARTIAL: disclosures.partials.year-select is included UNCHANGED.
-    It is self-contained (its own form, its own inline PHP block, options from
-    $availableYears via ReportingYearsComposer) and styles itself with inline
-    Tailwind, which the new shell still loads. It therefore keeps the old look
-    but works correctly. Forking it per theme would duplicate the year-fallback
-    logic, which several disclosure pages depend on.
+    YEAR PICKER REMOVED: this page used disclosures.partials.year-select,
+    which wrote the same session key as the topbar switcher. Two controls for
+    one value; the topbar one is global and survives navigation.
 
     Routes preserved: disclosures.esg-dashboard (the year form target),
     disclosures.s2.targets.index (x2), disclosures.esg-scorecard.index.
@@ -53,12 +50,6 @@
         <div>
             <div class="mnz-kicker">E + S + G scorecards</div>
             <h1>{{ $company->name }}</h1>
-        </div>
-        <div class="mnz-pagehead__actions">
-            @include('disclosures.partials.year-select', [
-                'action' => route('disclosures.esg-dashboard'),
-                'label' => 'Year',
-            ])
         </div>
     </div>
 

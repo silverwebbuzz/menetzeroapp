@@ -4507,3 +4507,57 @@ balanced; all seven blocks carry all nine keys; every key is in
 `updateOrCreate`); all `topic` values are among the ten config keys, and
 `time_horizon`, `likelihood` and `status` are within the controller's validation
 enums. The year-filter logic was simulated to produce the tile counts above.
+
+## 60. Per-page reporting-year dropdowns removed
+
+The topbar carries a reporting-year switcher
+(`layouts.partials.reporting-year-switcher`, in both themes' `layouts/app`).
+Fourteen disclosure pages also drew their own year dropdown, so the same value
+had two controls on one screen.
+
+**Both wrote the same session key**, `disclosure_fiscal_year`:
+- topbar -> `ReportingYearController::update()`
+- per-page -> `DisclosureBaseController::resolveContext()`
+- deep links -> `CheckDisclosureAccess` middleware
+
+Those are the only three writers in the app, so removing the per-page control
+loses no behaviour. `?fiscal_year=` on an incoming link is still honoured by
+`resolveContext()` and the middleware, so existing links and bookmarks work and
+still move the topbar.
+
+The register pages had already dropped their copy for exactly this reason
+(`'context' => 'register'`); this extends the same decision to framework pages
+rather than leaving the app inconsistent about it.
+
+**Removed from:**
+- `disclosures/partials/header.blade.php` -- the `@if ($ctx !== 'register')`
+  dropdown, plus the now-unread `$years` fallback build it fed, plus the flex
+  row that had positioned title against dropdown (one child left, nothing to
+  space apart). This one partial covered 14 pages.
+- `disclosures/{hub, esg-scorecard, esg-dashboard, esg-depth/overview}` and the
+  three new-theme twins -- these included `disclosures.partials.year-select`
+  directly.
+- `disclosures/partials/year-select.blade.php` -- DELETED. Orphaned once the
+  seven includes went; left in place it would invite re-inclusion. Removed with
+  `git rm`, so it is recoverable.
+
+`esg-scorecard` passed `'hidden' => ['category' => $activeCategory]` so its
+active tab survived a year change. That still works: `ReportingYearController`
+ends in `redirect()->back()`, which preserves the whole URL including
+`?category=`. `$activeCategory` itself is unchanged -- the tab strip still
+reads it.
+
+**Deliberately NOT removed** -- these are not context switchers:
+- `quick-input/{index,show}` (both themes) -- a filter with an "All years"
+  option; the controller applies it as `if ($request->filled('fiscal_year'))`,
+  never touching the session.
+- `reports/index` (both themes) -- a required export parameter (`where
+  fiscal_year`), not page context.
+- `settings/reporting` -- configures the year, not a scope for viewing it.
+
+**Verified:** 236 non-theme views scan clean, 0 broken (237 before, one fewer
+file after the delete); 52 theme files, only the pre-existing `client.profile`
+config-route false positive. No stray `$years` / `$ysYears` / `$ysFy` / `$anchor`
+references survive in any edited file, and `esg-scorecard`'s own unrelated
+`$years = $scorecard['years']` was left untouched. No `@include` of the deleted
+partial remains anywhere.
