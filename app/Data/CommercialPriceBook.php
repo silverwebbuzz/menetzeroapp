@@ -11,24 +11,48 @@ use App\Models\CommercialPriceBookEntry;
  */
 class CommercialPriceBook
 {
-    /** Fallback defaults if DB empty / pre-migration. */
+    /**
+     * Fallback list prices if the DB table is empty / pre-migration.
+     *
+     * Retired codes are KEPT: a quote raised before the catalogue changed, or
+     * a renewal for a grandfathered subscriber, still resolves its price here.
+     * Dropping a code would make companyAmountAed() return null and the quote
+     * silently become "custom".
+     *
+     * null = negotiated per deal, never auto-quoted.
+     */
     public const COMPANY_LIST_AED = [
+        // Live catalogue (section 65).
+        'client_carbon' => 3000,
+        'client_esg' => 6500,
+        'client_enterprise' => null,
+        // Retired — priced for existing quotes and renewals only.
         'client_scope_basic' => 2500,
         'client_scope_pro' => 4999,
         'client_esg_starter' => 18000,
         'client_esg_complete' => 36000,
-        'client_enterprise' => null,
     ];
 
+    /**
+     * Legacy per-entity consultant rates, kept for quotes raised before slot
+     * pricing existed. New consultant quotes use
+     * ConsultantAgencyPlanMatrix::SLOT_PRICING, which is depth-aware -- a
+     * Carbon slot and an ESG slot are not the same product, and a single
+     * headcount rate cannot express that.
+     */
     public const CONSULTANT_RATE_LE_10 = 1399;
     public const CONSULTANT_RATE_GT_10 = 1199;
 
     public const COMPANY_LIVE_PLAN_MAP = [
+        'client_carbon' => 'client_carbon',
+        'client_esg' => 'client_esg',
+        'client_enterprise' => 'client_enterprise',
+        // Retired codes still map to themselves so an in-flight request
+        // activates the plan it was quoted at, not a substitute.
         'client_scope_basic' => 'client_scope_basic',
         'client_scope_pro' => 'client_scope_pro',
         'client_esg_starter' => 'client_esg_starter',
         'client_esg_complete' => 'client_esg_complete',
-        'client_enterprise' => 'client_enterprise',
     ];
 
     public static function companyAmountAed(string $packageCode): ?float
@@ -125,8 +149,10 @@ class CommercialPriceBook
     ): array {
         return self::suggestConsultantLinesQuote([
             [
+                // Carbon is the entry paid tier, so an unspecified request
+                // quotes there rather than at a retired package.
                 'package_code' => $packageCode
-                    ?? ($wantsEnterprise ? 'client_enterprise' : 'client_scope_basic'),
+                    ?? ($wantsEnterprise ? 'client_enterprise' : 'client_carbon'),
                 'entity_count' => max(1, $entityCount),
             ],
         ]);
@@ -244,7 +270,7 @@ class CommercialPriceBook
             'package_code' => $singleCode,
             'breakdown' => $breakdown,
             'band' => $anyCustom ? 'custom' : 'package×clients',
-            'suggested_pack_code' => $activations[0]['consultant_plan_code'] ?? 'consultant_scope_basic',
+            'suggested_pack_code' => $activations[0]['consultant_plan_code'] ?? 'consultant_carbon',
             'suggested_activations' => $activations,
             'min10_tip' => $totalClients < 10,
             'line_quotes' => $lineQuotes,
@@ -263,7 +289,7 @@ class CommercialPriceBook
             }
         }
 
-        return 'consultant_scope_basic';
+        return 'consultant_carbon';
     }
 
     /**
@@ -271,7 +297,7 @@ class CommercialPriceBook
      */
     public static function nearestAgencyPackCode(int $entityCount): string
     {
-        return self::suggestedConsultantPlanCode('client_scope_basic');
+        return self::suggestedConsultantPlanCode('client_carbon');
     }
 
     public static function extraSlotsNeeded(int $entityCount, string $packCode): int

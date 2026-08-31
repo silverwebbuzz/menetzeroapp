@@ -4971,3 +4971,57 @@ any `{{-- --}}` comment.
 `PackCheckoutController::index()` still carries "Phase 3–5: self-serve pack
 grid/checkout hidden — request clients offline", so both sides remain
 request-then-activate. `SLOT_PRICING` has no purchase path.
+
+## 67. Admin quoting moved to the four-tier catalogue
+
+Sections 65-66 covered the plan data and the pages a buyer sees. The path every
+real sale actually goes through -- admin raising a quote and activating a
+request -- was still entirely on the retired codes.
+
+**`app/Data/CommercialPriceBook.php`** prices a quote from a package code.
+`COMPANY_LIST_AED` listed only the four retired packages, so a request for
+`client_carbon` resolved to null and the quote silently became "custom" with no
+list price. Added the live codes; kept the retired ones, because a quote raised
+before the catalogue changed and a renewal for a grandfathered subscriber both
+still resolve here.
+
+Four fallbacks defaulted to retired codes and would have activated the wrong
+plan for any request that did not name one:
+
+    suggestConsultantQuote()        'client_scope_basic'     -> 'client_carbon'
+    suggestedConsultantPlanCode()   'consultant_scope_basic' -> 'consultant_carbon'
+    nearestAgencyPackCode()         'client_scope_basic'     -> 'client_carbon'
+    suggested_pack_code payload     'consultant_scope_basic' -> 'consultant_carbon'
+
+`COMPANY_LIVE_PLAN_MAP` keeps its retired self-maps on purpose: an in-flight
+request must activate the plan it was QUOTED at, not a substitute.
+
+**`commercial_price_book_entries`** is read before the constants, and the
+constants are only a fallback for a code the table does not hold. The table was
+seeded in Phase 7 with the retired packages only, so it would have overridden
+the corrected constants and kept showing the old catalogue. New migration
+`2026_08_31_140000_price_book_four_tier` adds `client_carbon` (3,000),
+`client_esg` (6,500) and the two per-slot consultant rates, and prefixes the
+superseded rows with "RETIRED" while pushing their sort_order down 100 --
+amounts untouched, since those rows still price in-flight quotes.
+
+Per-slot rates replace pricing by headcount alone: `consultant_rate_le_10` /
+`_gt_10` charged the same per entity whatever depth was sold, which cannot
+express that a Carbon slot and an ESG slot are different products. Block
+pricing rides in `meta` (`single`, `block5`), matching
+`ConsultantAgencyPlanMatrix::SLOT_PRICING`.
+
+**Verified:** braces/parens/brackets balanced in both files; every field written
+is in `CommercialPriceBookEntry::$fillable`; live and retired codes both resolve
+to a price (Carbon 3,000 · ESG 6,500 · Enterprise custom · scope_basic 2,500 ·
+scope_pro 4,999 · esg_starter 18,000 · esg_complete 36,000); no retired code
+remains as a default anywhere in the class -- the only survivors are the
+intentional self-maps in `COMPANY_LIVE_PLAN_MAP`.
+
+Run: `php artisan migrate`
+
+**Duplication noted, not resolved:** slot prices now exist in
+`ConsultantAgencyPlanMatrix::SLOT_PRICING` and in the price-book table. The
+table wins at runtime and the constant is the fallback, which is the same
+pattern the company packages already use -- but it is two places for one number
+and they can drift. Worth collapsing when slot checkout is built.
