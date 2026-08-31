@@ -307,7 +307,7 @@ class DashboardController extends Controller
         $esgCards = null;
         try {
             $esgCards = app(\App\Services\EsgPerformanceCardService::class)
-                ->build($company, (int) $selectedYear);
+                ->build($company, (int) $selectedYear, $yearlyTrend);
         } catch (\Throwable $e) {
             report($e);
         }

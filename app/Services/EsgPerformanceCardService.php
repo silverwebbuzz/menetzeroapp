@@ -46,7 +46,7 @@ class EsgPerformanceCardService
     /**
      * @return array<string, mixed>
      */
-    public function build(Company $company, int $fiscalYear): array
+    public function build(Company $company, int $fiscalYear, array $trend = []): array
     {
         $data = $this->dashboard->build($company, $fiscalYear);
         $rows = $this->scorecardRows($data['scorecard'] ?? [], $fiscalYear);
@@ -61,6 +61,219 @@ class EsgPerformanceCardService
                 $this->social($data, $rows),
                 $this->governance($data, $rows),
             ],
+            'frameworks' => $this->frameworks($data, $hasGhg, $fiscalYear),
+            'pathway' => $this->pathway($data, $trend, $fiscalYear),
+        ];
+    }
+
+    /**
+     * Emissions against the reduction pathway.
+     *
+     * STANDARD. The pathway is a STRAIGHT LINE from the target's base year to
+     * its target year -- "linear annual reduction", the convention the GHG
+     * Protocol, SBTi and IFRS S2 all use for presenting a trajectory. SBTi
+     * additionally requires a minimum annual rate, which is why sbti_aligned
+     * is surfaced: an SBTi-validated target means the slope has been checked
+     * against that floor. This method does NOT validate the rate; it draws the
+     * target the company actually set.
+     *
+     * The line ends at the target's own tonnage, NOT at zero, unless the
+     * target itself is zero. Drawing to zero would misrepresent a 50%
+     * reduction target as a net-zero commitment.
+     *
+     * SCOPE COVERAGE IS THE TARGET'S, NOT THE TOTAL.
+     * ReductionTargetProgressService::actualForCoverage() already sums only
+     * the scopes a target covers, so a Scope 1+2 target is not measured
+     * against a total that includes Scope 3. The coverage is labelled on the
+     * card so the reader knows which scopes the line represents.
+     *
+     * PROJECTION IS LABELLED "at current rate", NEVER AS A FINDING. It
+     * extrapolates the average annual change across the observed years, which
+     * may be a handful of points projected across decades. It is arithmetic,
+     * not a forecast, and it is omitted entirely when emissions are flat or
+     * rising -- "net zero in 2400" is noise, and a rising trend has no
+     * crossing point at all.
+     *
+     * Returns null when the company has no active reduction target: an
+     * emissions chart with no pathway is the existing dashboard's job.
+     *
+     * @return array<string, mixed>|null
+     */
+    protected function pathway(array $data, array $trend, int $fiscalYear): ?array
+    {
+        $target = $data['next_target'] ?? null;
+
+        if ($target === null || ($target['baseline_tco2e'] ?? null) === null) {
+            return null;
+        }
+
+        $baseYear = $target['base_year'] ?? null;
+        $targetYear = $target['target_year'] ?? null;
+        $baseline = (float) $target['baseline_tco2e'];
+        $targetTonnes = $target['target_tco2e'] !== null ? (float) $target['target_tco2e'] : null;
+
+        if ($baseYear === null || $targetYear === null || $targetYear <= $baseYear) {
+            return null;
+        }
+
+        // Actual series, from the trend the dashboard already computed.
+        $actual = [];
+        foreach ($trend['labels'] ?? [] as $i => $label) {
+            $year = (int) $label;
+            if ($year >= $baseYear) {
+                $actual[$year] = round((float) ($trend['values'][$i] ?? 0), 1);
+            }
+        }
+
+        return [
+            'base_year' => $baseYear,
+            'target_year' => $targetYear,
+            'baseline' => round($baseline, 1),
+            'target_tonnes' => $targetTonnes !== null ? round($targetTonnes, 1) : null,
+            'current' => $target['current_tco2e'] !== null ? round((float) $target['current_tco2e'], 1) : null,
+            'current_year' => $fiscalYear,
+            'reduction_percent' => $target['change_vs_baseline_percent'] ?? null,
+            'scope_label' => $target['scope_label'] ?? null,
+            'sbti_aligned' => (bool) ($target['sbti_aligned'] ?? false),
+            'target_is_derived' => (bool) ($target['target_is_derived'] ?? false),
+            'actual' => $actual,
+            'required' => $this->requiredLine($baseYear, $baseline, $targetYear, $targetTonnes),
+            'projection' => $this->projectedYear($actual, $targetTonnes),
+        ];
+    }
+
+    /**
+     * Straight line from baseline to the target's own tonnage.
+     *
+     * @return array<int, float>
+     */
+    protected function requiredLine(int $baseYear, float $baseline, int $targetYear, ?float $targetTonnes): array
+    {
+        $end = $targetTonnes ?? 0.0;
+        $span = $targetYear - $baseYear;
+        $line = [];
+
+        // Endpoints plus each decade, so a 2022-2050 axis stays readable
+        // instead of carrying 28 points.
+        $years = [$baseYear];
+        for ($y = (int) (ceil($baseYear / 10) * 10); $y < $targetYear; $y += 10) {
+            $years[] = $y;
+        }
+        $years[] = $targetYear;
+
+        foreach (array_unique($years) as $year) {
+            $progress = ($year - $baseYear) / $span;
+            $line[$year] = round($baseline + (($end - $baseline) * $progress), 1);
+        }
+
+        return $line;
+    }
+
+    /**
+     * The year emissions reach the target AT THE CURRENT AVERAGE RATE.
+     *
+     * Null unless there are at least two observations AND emissions are
+     * actually falling -- a flat or rising trend never reaches the target, and
+     * a projection into the 2300s would be noise presented as insight.
+     */
+    protected function projectedYear(array $actual, ?float $targetTonnes): ?int
+    {
+        if (count($actual) < 2) {
+            return null;
+        }
+
+        $years = array_keys($actual);
+        $firstYear = $years[0];
+        $lastYear = $years[array_key_last($years)];
+        $first = $actual[$firstYear];
+        $last = $actual[$lastYear];
+        $span = $lastYear - $firstYear;
+
+        if ($span < 1 || $last >= $first) {
+            return null;
+        }
+
+        $perYear = ($first - $last) / $span;
+        $end = $targetTonnes ?? 0.0;
+
+        if ($perYear <= 0 || $last <= $end) {
+            return null;
+        }
+
+        $projected = (int) ceil($lastYear + (($last - $end) / $perYear));
+
+        // Beyond a century the number stops meaning anything.
+        return $projected <= $lastYear + 100 ? $projected : null;
+    }
+
+    /**
+     * Framework readiness bars.
+     *
+     * Pure reuse: DisclosureService already computes a weighted percent for
+     * IFRS S2, IFRS S1 and GRI, and EsgDashboardService already returns all
+     * three. Nothing here recomputes completeness.
+     *
+     * TWO ROWS NEED A RULE RATHER THAN A LOOKUP, and both are stated plainly:
+     *
+     *   GHG Protocol -- there is no completeness weighting for the inventory,
+     *   so readiness is the share of the three scopes that have data. A
+     *   company with Scope 1 and 2 but no Scope 3 reads 67%, which is the
+     *   honest answer: its inventory is incomplete under the Protocol.
+     *
+     *   UAE ESG (SCA) -- UaeEsgReportService composes its report FROM S2, S1
+     *   and GRI and publishes no percent of its own, so this is the mean of
+     *   those three. It is a derived figure, not a separate assessment, and
+     *   is labelled as composed in the view.
+     *
+     * @return list<array<string, mixed>>
+     */
+    protected function frameworks(array $data, bool $hasGhg, int $fiscalYear): array
+    {
+        $fw = $data['frameworks'] ?? [];
+        $s2 = (int) ($fw['ifrs_s2']['percent'] ?? 0);
+        $s1 = (int) ($fw['ifrs_s1']['percent'] ?? 0);
+        $gri = (int) ($fw['gri']['percent'] ?? 0);
+
+        $scopes = $data['ghg_summary'] ?? [];
+        $withData = 0;
+        foreach (['scope1', 'scope2', 'scope3'] as $scope) {
+            if ((float) ($scopes[$scope] ?? 0) > 0) {
+                $withData++;
+            }
+        }
+        $ghgPercent = $hasGhg ? (int) round(($withData / 3) * 100) : 0;
+
+        $year = ['fiscal_year' => $fiscalYear];
+
+        return [
+            $this->framework('IFRS S2 — Climate', $s2, 'e', 'disclosures.s2.overview', $year),
+            $this->framework('GHG Protocol inventory', $ghgPercent, 'e', 'reports.index', []),
+            $this->framework('IFRS S1 — Sustainability', $s1, 'g', 'disclosures.s1.overview', $year),
+            $this->framework('GRI Standards', $gri, 's', 'disclosures.gri.overview', $year),
+            $this->framework(
+                'UAE ESG (SCA) report',
+                (int) round(($s2 + $s1 + $gri) / 3),
+                'g',
+                'disclosures.uae-esg.overview',
+                $year,
+                'Composed from IFRS S2, IFRS S1 and GRI'
+            ),
+        ];
+    }
+
+    /**
+     * A row whose route is missing is still shown, without a link -- readiness
+     * is information in its own right and must not vanish because a route was
+     * renamed.
+     */
+    protected function framework(string $label, int $percent, string $pillar, string $route, array $params, ?string $note = null): array
+    {
+        return [
+            'label' => $label,
+            'percent' => max(0, min(100, $percent)),
+            'pillar' => $pillar,
+            'note' => $note,
+            'url' => \Illuminate\Support\Facades\Route::has($route) ? route($route, $params) : null,
         ];
     }
 

@@ -3577,3 +3577,103 @@ braces 42/42 (+2 for try/catch); both stylesheets brace-balanced.
   the context line (built, needs data), `Compare FY24` / `Export board pack`.
 - **Pass 3** (needs your decisions): board independence field, ESG agenda
   enum, policies register.
+
+## 49. Framework readiness — Overview Box 3
+
+Five readiness bars under the E/S/G cards. **Almost pure reuse** — no
+completeness logic was written.
+
+### 49.1 Three rows are direct lookups
+
+`DisclosureService` already computes a **weighted** percent for IFRS S2, IFRS
+S1 and GRI (`completenessResult()`), and `EsgDashboardService` already returns
+all three under `frameworks`. The bars read those values.
+
+This matters beyond saving code: a percent here **cannot disagree** with the
+percent on the framework's own disclosure page, because it is the same number.
+
+### 49.2 Two rows needed a rule, and say so
+
+**GHG Protocol inventory.** No completeness weighting exists for the
+inventory, so readiness = share of the three scopes carrying data. A company
+with Scope 1 and 2 but no Scope 3 reads **67%** — the honest answer, since its
+inventory is incomplete under the Protocol.
+
+**UAE ESG (SCA).** `UaeEsgReportService` composes its report FROM S2, S1 and
+GRI and publishes no percent of its own, so this is the **mean of those
+three**. Marked `derived` in the UI with a tooltip, so it is never mistaken
+for a separate assessment.
+
+### 49.3 Details
+
+- A row whose route is missing renders **without a link** rather than
+  disappearing — readiness is information in its own right.
+- Percents clamped 0–100.
+- Bars use the pillar palette (E green, S blue, G purple) from the canvas.
+- Labels link to that framework's own page, carrying the fiscal year.
+
+Verified: 233 non-theme views scan clean; partial balanced 5/5, 3/3, 3/3;
+service braces 16/16; both stylesheets balanced.
+
+## 50. Emissions pathway — Overview Box 1
+
+Chart of actual emissions against the reduction pathway, with four stat tiles.
+Renders only when the company has an **active ReductionTarget**.
+
+### 50.1 The standard
+
+**Linear annual reduction** — a straight line from the target's base year to
+its target year. This is the convention the GHG Protocol, SBTi and IFRS S2 all
+use for presenting a trajectory.
+
+Three consequences, all deliberate:
+
+1. **The line ends at the TARGET's tonnage, not at zero** (unless the target
+   is itself zero). Drawing to zero would render a 50% reduction target as a
+   net-zero commitment — a materially different claim.
+2. **Scope coverage is the target's, not the total.**
+   `ReductionTargetProgressService::actualForCoverage()` already sums only the
+   scopes a target covers, so a Scope 1+2 target is never measured against a
+   total including Scope 3. The coverage is labelled on the card.
+3. **SBTi is surfaced, not asserted.** `sbti_aligned` shows a badge because
+   SBTi validation means the slope was checked against a minimum annual rate.
+   This code does **not** validate that rate; it draws the target as set.
+
+### 50.2 Projection is labelled, never presented as a finding
+
+The tile reads **"2039 · at current rate"**, with the qualifier styled down so
+it cannot be read with the same weight as the number.
+
+It extrapolates the average annual change across observed years — possibly a
+handful of points across decades. Guards, all verified against real cases:
+
+| Case | Result |
+|---|---|
+| Falling trend | year |
+| Flat | **omitted** |
+| Rising | **omitted** — no crossing point exists |
+| One observation | **omitted** |
+| Negligible decline (>100y out) | **omitted** — noise, not insight |
+
+When omitted the tile reads "not on current trend" rather than blank.
+
+**The design's "2047" is not reproducible from its own chart.** Its series
+(5,102 → 4,183 over three years) projects to **2039**. Ours is arithmetic from
+the actual data, which is exactly why the qualifier is required.
+
+### 50.3 Design
+
+Card structure matches the canvas: header with title/subtitle plus scope and
+SBTi tags, chart body, and a 4-up stat strip divided by hairlines. Collapses
+to 2-up under 720px.
+
+**Inline SVG, no chart library.** Both shells load Chart.js, but this is two
+polylines and a few ticks — inline keeps the partial theme-agnostic and avoids
+a second chart instance competing with the dashboard's own. Geometry verified:
+axes correct, all points inside the plot box.
+
+`derived target` is marked when the tonnage was computed from a reduction
+percentage rather than entered directly.
+
+Verified: 233 non-theme views clean; partial 11/11, 6/6, 5/5; service braces
+28/28; both stylesheets balanced.

@@ -325,3 +325,63 @@ table.mnz-table td{padding:11px 16px;border-bottom:1px solid var(--line-2);font-
 .esg-card__row dd.is-missing { color: #8a6118; font-weight: 500; }
 .esg-card__code-tag { font: 500 0.625rem 'IBM Plex Mono', ui-monospace, monospace;
     color: #a4a9ae; margin-left: 0.25rem; }
+/* ---------- Framework readiness (Overview, Box 3) ---------- */
+.esg-fw { border: 1px solid #e5e6e3; background: #fff; padding: 1.25rem;
+    margin-bottom: 1.5rem; }
+.esg-fw__title { font-size: 1rem; font-weight: 600; letter-spacing: -0.02em;
+    margin: 0 0 1rem; color: #14161a; }
+.esg-fw__row { padding: 0.75rem 0; border-bottom: 1px solid #f0f0ee; }
+.esg-fw__row:last-child { border-bottom: 0; padding-bottom: 0; }
+.esg-fw__head { display: flex; align-items: baseline; justify-content: space-between;
+    gap: 1rem; margin-bottom: 0.5rem; }
+.esg-fw__label { font-size: 0.875rem; color: #14161a; min-width: 0; }
+.esg-fw__label a { color: inherit; text-decoration: none; }
+.esg-fw__label a:hover { text-decoration: underline; }
+.esg-fw__pct { font-size: 0.8125rem; font-weight: 600; color: #5a6068;
+    white-space: nowrap; }
+/* Marks a percent that is composed from other frameworks rather than
+   measured in its own right. */
+.esg-fw__note { font: 500 0.625rem 'IBM Plex Mono', ui-monospace, monospace;
+    color: #a4a9ae; margin-left: 0.375rem; text-transform: uppercase;
+    letter-spacing: 0.06em; cursor: help; }
+.esg-fw__bar { height: 4px; background: #eeeeec; }
+.esg-fw__bar span { display: block; height: 4px; }
+/* ---------- Emissions pathway (Overview, Box 1) ---------- */
+.esg-path { border: 1px solid #e5e6e3; background: #fff; margin-bottom: 1.5rem; }
+.esg-path__head { display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 1rem; padding: 1.25rem; border-bottom: 1px solid #e5e6e3; flex-wrap: wrap; }
+.esg-path__title { font-size: 1rem; font-weight: 600; letter-spacing: -0.02em;
+    margin: 0; color: #14161a; }
+.esg-path__sub { font-size: 0.8125rem; color: #8b9199; margin: 0.25rem 0 0; }
+.esg-path__tags { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+.esg-path__scope, .esg-path__sbti {
+    font: 500 0.625rem 'IBM Plex Mono', ui-monospace, monospace;
+    letter-spacing: 0.08em; text-transform: uppercase; color: #8b9199; white-space: nowrap; }
+.esg-path__sbti { color: #0f7a4a; border: 1px solid #cde3d6; padding: 0.125rem 0.375rem; }
+.esg-path__note { font: 500 0.625rem 'IBM Plex Mono', ui-monospace, monospace;
+    color: #a4a9ae; text-transform: uppercase; letter-spacing: 0.06em;
+    margin-left: 0.375rem; cursor: help; }
+.esg-path__chart { padding: 1rem 1.25rem 0; }
+.esg-path__chart svg { display: block; width: 100%; height: auto; }
+.esg-path__legend { display: flex; justify-content: center; gap: 1.25rem;
+    padding: 0.5rem 0 1rem; font-size: 0.75rem; color: #5a6068; }
+.esg-path__legend span { display: inline-flex; align-items: center; gap: 0.375rem; }
+.esg-path__key { width: 12px; height: 12px; border-radius: 999px; display: inline-block; }
+.esg-path__key--actual { border: 2px solid #0f7a4a; background: #fff; }
+.esg-path__key--req { border: 2px solid #d6d7d3; background: #eeeeec; }
+.esg-path__stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid #e5e6e3; margin: 0; }
+@media (max-width: 720px) { .esg-path__stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.esg-path__stats > div { padding: 0.875rem 1.25rem; border-right: 1px solid #e5e6e3; }
+.esg-path__stats > div:last-child { border-right: 0; }
+@media (max-width: 720px) {
+    .esg-path__stats > div:nth-child(2n) { border-right: 0; }
+    .esg-path__stats > div:nth-child(-n+2) { border-bottom: 1px solid #e5e6e3; }
+}
+.esg-path__stats dt { font: 500 0.625rem 'IBM Plex Mono', ui-monospace, monospace;
+    letter-spacing: 0.06em; text-transform: uppercase; color: #8b9199; margin: 0; }
+.esg-path__stats dd { font-size: 1.25rem; font-weight: 600; letter-spacing: -0.02em;
+    color: #14161a; margin: 0.25rem 0 0; }
+/* "at current rate" must never read with the same weight as the number. */
+.esg-path__qualifier { display: block; font-size: 0.6875rem; font-weight: 500;
+    color: #8b9199; letter-spacing: 0; margin-top: 0.125rem; }
