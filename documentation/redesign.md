@@ -4404,3 +4404,63 @@ the new theme had no way to reach the snapshot. Added.
 Verified: 237 non-theme views scan clean; snapshot 0/0, 2/2, 2/2; old form
 2/2, 3/3, 1/1; new form 1/1, 3/3, 0/0; nav brackets 102/102 with 38 routes;
 stylesheets 536/536 and 399/399.
+
+## 59. Risk registers — field gap closed, table layout (both themes)
+
+Triggered by comparing `/disclosures/ifrs-s1/sustainability-risks` against the
+`Internal.dc.html` "Risk register" mockup.
+
+**Two URLs that are not variants of each other.** `ifrs-s1/sustainability-risks`
+holds risk ROWS; `ifrs-s2/sections/risk_management` holds five free-text boxes
+describing the risk PROCESS (identify / assess / prioritise / monitor / ERM
+integration, from `config/disclosure.php`). IFRS S2 §14–17 asks for the process,
+not the register. They never merge. The real near-duplicate pair is
+sustainability-risks (S1) and climate-risks (S2).
+
+**The mockup's own NOTE was out of date.** It states that sustainability-risks
+"captures only name, topic, time_horizon and description — no likelihood, owner
+or financial_impact", and concludes that merging the registers is a product
+decision requiring new fields. Verified against
+`2026_06_09_200000_phase2_ifrs_s1_disclosure_tables`: the table has
+`financial_impact`, `likelihood`, `mitigation`, `owner`, `status`, and
+`SustainabilityRiskController` validates and saves all of them. Only the Blade
+view omitted the inputs, so every S1 risk was stored with those four columns
+empty — not declined by the user, never asked. `disclosures/climate-risks`
+already collected all four. No migration was needed; this was a view defect.
+
+**Changed** (four views, no controller/route/schema change):
+- `disclosures/sustainability-risks/index` — added likelihood, owner,
+  financial effect, mitigation to both add and edit forms.
+- `disclosures/climate-risks/index` — field coverage unchanged; relaid out.
+- `themes/new/disclosures/sustainability-risks/index` — same field additions.
+- `themes/new/disclosures/climate-risks/index` — NEW. This route previously
+  fell through to the Tailwind view, the last Environmental page not on the
+  2.0 shell.
+
+All four now lead with four counted tiles (total / high likelihood /
+quantified / without owner) and a scannable table, with the edit forms kept
+below as `<details>` anchored by `#risk-{id}`. Accordions alone cannot be
+compared across rows once a risk carries six attributes.
+
+**Honesty constraints held:**
+- The TYPE column shows the S2 physical/transition taxonomy on climate risks
+  and the S1 topic on sustainability risks. S1 topics are never mapped onto
+  physical/transition — a water-stress risk is neither, and inventing a
+  classification would misstate a regulated disclosure. This is why the
+  mockup's single merged "Type" column was not reproduced.
+- `financial_impact` is free text (`text` column, no numeric type). It is
+  rendered verbatim and never parsed into a figure; empty reads "Not
+  quantified", never a currency value.
+- The four tiles are counts of stored columns. Nothing is scored or weighted.
+
+**Registers stay separate** (D4, §18). A combined read-only view was considered
+and deferred: until the S1 rows actually carry owners and figures, it would
+render mostly empty and demonstrate nothing.
+
+**Verification:** 237 non-theme views scan clean, 0 broken; 52 theme files, only
+the pre-existing `client.profile` config-route false positive. No Blade
+directive appears inside any `{{-- --}}` comment in the four files (checked
+explicitly). `@class`/`@style` were written first, then removed: zero precedent
+exists for either directive in ~250 views and there is no PHP CLI here to
+compile-test, so plain ternaries were used to match house style. `@selected` was
+kept — 66 existing usages.
