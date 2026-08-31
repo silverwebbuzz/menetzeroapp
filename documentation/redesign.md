@@ -4231,3 +4231,72 @@ navigate by label, not position.
 
 Verified: 236 non-theme views scan clean; `config/navigation.php` brackets
 99/99; `NavigationMap` 100/100 and 74/74; 37 nav destinations (35 + 2 new).
+
+## 58. Materiality matrix — scatter view
+
+### 58.1 What it is, and why it is per-company
+
+**Double materiality** scores each topic on two independent axes:
+**impact** (how the company affects the world — GRI 3) and **financial** (how
+the topic affects the business — IFRS S1). High on *either* makes it material.
+The two cannot be collapsed into one score.
+
+It is the **first step of GRI reporting** (GRI 3-1 process, 3-2 topic list,
+3-3 management approach) and determines which other disclosures are required.
+`materialTopicsForCompany()` is consumed by **five services**: IFRS S1, GRI,
+GRI content index, UAE ESG, and both the ESG and Governance dashboards.
+
+**Entirely per-company and per-year.** The 10-topic catalog is shared; the
+scores are not — a logistics firm scores GHG High/High, a software firm scores
+it Low/Low. `MaterialSustainabilityTopic` is keyed on company + fiscal year +
+topic, so a company re-assesses annually, which GRI expects.
+
+### 58.2 Placement: stays in Governance for now
+
+The mockup labels it `OVERVIEW · SNAPSHOT`, but that reflects the design's
+fuller Overview (Targets & pathway, Open items) which does not exist yet.
+Overview currently holds one item; adding Materiality alone gives it two with
+no theme.
+
+GRI also treats materiality as **governance** — it is the process by which the
+board decides what to report (GRI 3-1), so it belongs beside Board &
+oversight. Move it to Overview when Overview gains its Snapshot group; moving
+it twice is worse than once.
+
+### 58.3 What was added
+
+- **`pillar` key** on all 10 catalog topics (e/s/g) — config only, no
+  migration — exposed through `materialTopicsForCompany()`. This was the only
+  genuine data gap.
+- **Scatter plot in BOTH themes.** The new theme had the scoring form but **no
+  visual matrix at all** — the old theme's 3x3 grid was never ported.
+
+### 58.4 Two improvements over the old grid
+
+**All topics are plotted, not just material ones.** The old grid filtered to
+`is_material`, hiding exactly the topics a reviewer needs to see: those scored
+high but not yet flagged. Non-material topics render **hollow**.
+
+**Mismatch warning.** The page's own rule is "medium or high on either axis is
+material", but `is_material` is a free checkbox that can contradict it — the
+design's own mockup shows Labour practices at Medium/Medium marked NO. GRI 3-1
+permits a documented departure, but it must be **visible**. The table now
+flags "scored material" / "scored not material" when the two disagree.
+
+### 58.5 Rendering
+
+Scores are three discrete levels, so points land on a 3x3 lattice. Each is
+nudged within its cell by a **crc32 of the topic key** — deterministic, so
+co-located topics stay readable and never jump between renders.
+
+Geometry verified: high/high top-right, low/low bottom-left, all points inside
+the plot box.
+
+### 58.6 Still open
+
+`rationale` exists on the model and is required by GRI 3-1 for a documented
+override, but **is not in either form**. Adding it is the natural follow-up to
+the mismatch warning.
+
+Verified: 236 non-theme views scan clean; old view balanced 2/2, 6/6, 3/3;
+new view 1/1, 6/6, 2/2.

@@ -64,16 +64,16 @@ return [
 
     'ifrs_s1' => [
         'material_topics' => [
-            'water' => ['label' => 'Water & effluents', 'gri' => 'GRI 303'],
-            'biodiversity' => ['label' => 'Biodiversity & ecosystems', 'gri' => 'GRI 304'],
-            'supply_chain' => ['label' => 'Supply chain & responsible sourcing', 'gri' => 'GRI 308 / 414'],
-            'workforce' => ['label' => 'Workforce & human capital', 'gri' => 'GRI 401–404'],
-            'health_safety' => ['label' => 'Occupational health & safety', 'gri' => 'GRI 403'],
-            'anti_corruption' => ['label' => 'Anti-corruption & ethics', 'gri' => 'GRI 205'],
-            'community' => ['label' => 'Community engagement', 'gri' => 'GRI 413'],
-            'waste' => ['label' => 'Waste & circular economy', 'gri' => 'GRI 306'],
-            'energy' => ['label' => 'Energy (beyond climate reporting)', 'gri' => 'GRI 302'],
-            'climate' => ['label' => 'Climate (cross-reference IFRS S2)', 'gri' => 'IFRS S2 / GRI 305'],
+            'water' => ['label' => 'Water & effluents', 'gri' => 'GRI 303', 'pillar' => 'e'],
+            'biodiversity' => ['label' => 'Biodiversity & ecosystems', 'gri' => 'GRI 304', 'pillar' => 'e'],
+            'supply_chain' => ['label' => 'Supply chain & responsible sourcing', 'gri' => 'GRI 308 / 414', 'pillar' => 's'],
+            'workforce' => ['label' => 'Workforce & human capital', 'gri' => 'GRI 401–404', 'pillar' => 's'],
+            'health_safety' => ['label' => 'Occupational health & safety', 'gri' => 'GRI 403', 'pillar' => 's'],
+            'anti_corruption' => ['label' => 'Anti-corruption & ethics', 'gri' => 'GRI 205', 'pillar' => 'g'],
+            'community' => ['label' => 'Community engagement', 'gri' => 'GRI 413', 'pillar' => 's'],
+            'waste' => ['label' => 'Waste & circular economy', 'gri' => 'GRI 306', 'pillar' => 'e'],
+            'energy' => ['label' => 'Energy (beyond climate reporting)', 'gri' => 'GRI 302', 'pillar' => 'e'],
+            'climate' => ['label' => 'Climate (cross-reference IFRS S2)', 'gri' => 'IFRS S2 / GRI 305', 'pillar' => 'e'],
         ],
         'sections' => [
             'governance' => [

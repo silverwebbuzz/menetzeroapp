@@ -297,6 +297,9 @@ class DisclosureService
                 'key' => $key,
                 'label' => $meta['label'],
                 'gri' => $meta['gri'] ?? null,
+                // Pillar (e/s/g) so the matrix can colour a topic by the
+                // pillar it belongs to. Display only -- never gating.
+                'pillar' => $meta['pillar'] ?? null,
                 'is_material' => (bool) ($record->is_material ?? false),
                 'rationale' => $record->rationale ?? '',
                 'impact_materiality' => $record->impact_materiality ?? '',
