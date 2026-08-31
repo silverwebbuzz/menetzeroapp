@@ -4622,3 +4622,55 @@ shorter.
 pre-existing `client.profile` config-route false positive. No Blade directive
 appears inside any `{{-- --}}` comment in the four edited partials (checked
 explicitly — the header comments were extended, and two strips had none before).
+
+## 62. Disclosure section forms — field width driven by field type
+
+Every framework section form ran as one tall column of full-width boxes, so a
+count of 0 got the same width as a paragraph. GRI 306 Waste is seven numbers in
+a row; the Governance & Ethics KPIs screen four.
+
+Width now follows the `type` already declared in `config/disclosure.php` and
+`config/esg_report.php`:
+
+    textarea  -> full row   (md:col-span-2)
+    number    -> half row
+    select    -> half row
+    text      -> half row
+
+Chosen over adding a per-field width class because the config already carries
+the answer. A field added later gets the right width with no extra markup, and
+nothing has to be tagged by hand.
+
+**One file, both themes, four frameworks.**
+`resources/views/disclosures/section.blade.php` renders every section form for
+IFRS S1, IFRS S2, GRI and UAE ESG, and has no new-theme copy, so it serves both
+shells. Across both configs that is 55 fields narrowed (40 number, 10 text,
+5 select) over 13 sections; 68 textarea fields keep the full row.
+
+**Alignment:** each field is `flex flex-col` with `mt-auto` on its control, so
+two fields sharing a row keep their inputs level even when one has two lines of
+`x-field-help` and the other has none. Without this the pair would sit at
+different heights, which reads as a rendering fault.
+
+**Tab order is unchanged.** The grid does not reorder the DOM, so focus still
+moves left, right, then down, and a screen reader reads the same sequence as
+before. No `tabindex` attributes were added -- positive `tabindex` values
+override the document order and cause worse problems elsewhere on the page.
+
+**Pairing is positional**, so which two fields share a row follows config order.
+Checked before shipping: the number-heavy sections are lists of like-for-like
+metrics from a single GRI standard (all water figures, all waste figures), so
+adjacent fields are genuine peers and no config reordering was needed.
+
+Both themes load the Tailwind CDN, so the grid classes resolve in each.
+`space-y-5` was removed from the form (the grid owns spacing now) and the
+section-level help text was given `mb-5` to keep the gap it had inherited.
+
+Not touched: `disclosures/{esg-targets, stakeholders, supply-chain}` and the
+register forms already use two-column grids. `section.blade.php` was the
+outlier.
+
+**Verified:** div/form/label/select/textarea tags balanced; Blade directives
+balanced by stack; no directive name inside any `{{-- --}}` comment; 236
+non-theme views scan clean, 0 broken; 52 theme files, only the pre-existing
+`client.profile` config-route false positive.
