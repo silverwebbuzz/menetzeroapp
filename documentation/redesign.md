@@ -3258,13 +3258,14 @@ Needs a company **with an `industry_category_id`** that has a matching
 which is the safe default and also means a quick smoke test may show no
 difference. Check on quick-input for a source that has label data.
 
-## 45. Sidebar feeds indicators
+## 45. Sidebar feeds indicators — TRIED AND REVERTED
 
-Answers "these three pages look like reports — should they move to Reports?"
-**They should not.** Instead the relationship they were missing is now visible
-in the sidebar.
+Prompted by "these three pages look like reports, should they move under
+Reports?" The answer to the move is still **no** (§45.1). The proposed
+alternative — surfacing the feeds relationship in the sidebar — was built,
+rejected on sight, and reverted. Recorded so it is not re-attempted.
 
-### 45.1 Why not move them
+### 45.1 Why the pages should NOT move to Reports (unchanged)
 
 The nav is organised by **what you are doing**, not by subject:
 
@@ -3275,13 +3276,12 @@ The nav is organised by **what you are doing**, not by subject:
 Climate risks / Opportunities / Climate targets are all "Add ..." forms.
 Reports holds GHG inventory, Disclosure hub, UAE ESG, GRI, IFRS S2, IFRS S1 —
 all outputs. The IFRS S2 report already lives in Reports; Climate risks is one
-of its **inputs**. Moving inputs beside outputs collapses that distinction and
-makes Reports half forms, half documents.
+of its **inputs**. Moving inputs beside outputs makes Reports half forms, half
+documents.
 
 The URL `/disclosures/ifrs-s2/climate-risks` reflects **which framework
-consumes the data**, not where you go to enter it. If URLs drove placement,
-`disclosures.hub` and `disclosures.gri` would move too and Reports would
-become the whole app.
+consumes the data**, not where you enter it. If URLs drove placement,
+`disclosures.hub` and `disclosures.gri` would move too.
 
 Moving them would also break a deliberate pairing (`config/navigation.php:89`):
 `climate_risks` and `sustainability_risks` are identical column-for-column
@@ -3289,64 +3289,47 @@ except their discriminator, kept as separate tables, and the only thing
 stopping users confusing them is that they sit under different pillars. Same
 for Climate targets vs Social > ESG targets.
 
-### 45.2 What was actually missing
+### 45.2 What was tried
 
-Discoverability, not placement: "Climate risks" never said it feeds IFRS S2,
-so the link to the report was invisible until you were already in the form.
+`NavigationMap::items()` resolved each item's existing `feeds` keys to short
+framework labels, rendered in the sidebar beside the nav label.
 
-The on-page `register-lineage` partial already showed `FEEDS IFRS S2` — but
-only **after** you had chosen. This surfaces the same fact in the sidebar, at
-the point of choosing.
+### 45.3 Why it was reverted
 
-### 45.3 Implementation
+It broke the labels — the one thing a sidebar must get right:
 
-Reused the existing `feeds` data (already on 12 items, verified against the
-report services' model imports). `NavigationMap::items()` now resolves it to
-short labels via a new `feedLabels()`; both themes render it in the existing
-`mnz-nav__meta` / new `nav-link__meta` slot.
+- **"Materiality" rendered as "M..."**, its tag (`IFRS S1 · GRI · UAE ESG`)
+  three times longer than the label it was annotating
+- **"Policies" → "Po..."**, **"ESG scorecard" → "ESG scoreca..."**
+- 11 of 24 items carried a tag; the three-framework ones dominated the row
 
-Resulting tags:
+The `flex-shrink:0` added to protect the tag is what caused it: it protected
+the annotation and let the **label** collapse. Backwards. A nav item you
+cannot read is worse than one that does not say where its data goes.
 
-| Item | Tag |
+### 45.4 Why no simpler variant works either
+
+The sidebar is ~200px. It cannot carry a label AND up to three framework
+names. That is a space constraint, not a styling problem:
+
+| Variant | Fails because |
 |---|---|
-| Climate risks / Opportunities | IFRS S2 |
-| Climate targets | IFRS S2 · GRI |
-| Materiality / Policies | IFRS S1 · GRI · UAE ESG |
-| ESG scorecard | SASB · UAE ESG |
-| Sustainability risks | IFRS S1 |
-| Stakeholders / Supply chain / ESG targets | UAE ESG |
+| Cap at one framework | "Materiality `IFRS S1`" is now **wrong** — it feeds three |
+| Abbreviate to `S1·GRI·UAE` | still ~60px; "Materiality" still truncates |
+| Dot / count badge | "Materiality ③" is not actionable |
+| Second line under label | doubles sidebar height for 11 of 24 items |
 
-**Self-references suppressed**: the SASB item feeds the SASB report at the
-same route, which would have rendered "SASB   SASB". Fine on the on-page line
-(a link back to itself); noise in a sidebar tag that exists to point elsewhere.
+**Do not re-attempt without widening the sidebar**, which is a much larger
+change than the problem justifies.
 
-`feedLabels()` drops any unknown key or dead route silently — display
-metadata must never take the nav down.
+### 45.5 What already solves this
 
-### 45.4 Two defects caught
+The on-page `register-lineage` partial (`FEEDS IFRS S1 · GRI · UAE ESG`)
+renders at the top of every register page, with room to breathe and real
+links to each report. It answers the same question one click later, and it
+works today.
 
-1. **Invented CSS token.** Used `--text-tertiary`; it does not exist. The real
-   tokens are `--ink / --ink-muted / --ink-subtle / --ink-hint`. First
-   corrected to `--ink-muted` (`#374151`) — too heavy, it competed with the
-   label — then to `--ink-hint` (`#9ca3af`), lighter than the section
-   headings, which is the correct weight for a secondary tag.
-2. **Unwrapped label in the old theme.** Its nav label was a bare text node,
-   so the tag could not be pushed right. Added `.nav-link__label` with
-   `flex:1`. Also gave both `__meta` rules `flex-shrink:0; white-space:nowrap`
-   so a long label cannot squeeze the tag.
-
-### 45.5 Pre-existing checker false positives
-
-The run reports 2 failures — `client.profile` and `subscriptions.billing`
-"route dropped". **Both pre-date this change** (verified by stashing) and both
-are false positives: the checker compares literal `route()` calls in view
-text, but these now come from `config/navigation.php`, and
-`subscriptions.billing` is `->name('billing')` inside a prefixed group. Both
-routes exist and the nav links to them correctly.
-
-### 45.6 Runtime verification
-
-- Sidebar in **both themes** — tags right-aligned, not wrapping.
-- A **narrow sidebar / long label** — the tag must not be squeezed out.
-- The SASB item shows **no** tag.
-- Items with no feeds (Summary, Measure, Bulk import) are unchanged.
+If discoverability is still a problem, the better direction is the **reverse**
+link — on each report page, list the registers that populate it. That is the
+"I'm working on S2, where do I enter this?" journey, it currently dead-ends,
+and a report page has the width to carry it.
