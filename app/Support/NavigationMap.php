@@ -128,6 +128,45 @@ class NavigationMap
     }
 
     /**
+     * Short framework labels for a nav item's 'feeds' keys.
+     *
+     * An unknown key, or one whose report route no longer exists, is dropped
+     * silently - the sidebar must never throw over display metadata.
+     *
+     * @param  list<string>  $keys
+     * @return list<string>
+     */
+    protected static function feedLabels(array $keys, ?string $ownRoute = null): array
+    {
+        if ($keys === []) {
+            return [];
+        }
+
+        $frameworks = (array) config('navigation.frameworks', []);
+        $out = [];
+
+        foreach ($keys as $key) {
+            $framework = $frameworks[$key] ?? null;
+
+            if (! $framework || ! self::routeExists($framework['route'] ?? '')) {
+                continue;
+            }
+
+            // Skip a framework whose report IS this nav item, so SASB does not
+            // render as "SASB   SASB". Harmless on the on-page lineage line,
+            // where it reads as a link back to the page, but noise in a
+            // sidebar tag that exists to point somewhere ELSE.
+            if ($ownRoute !== null && ($framework['route'] ?? null) === $ownRoute) {
+                continue;
+            }
+
+            $out[] = $framework['label'];
+        }
+
+        return $out;
+    }
+
+    /**
      * @param  list<array<string, mixed>>  $items
      * @return list<array{label: string, url: string, active: bool}>
      */
@@ -167,6 +206,14 @@ class NavigationMap
                 'icon' => $item['icon'] ?? 'dot',
                 'url' => route($name, $params),
                 'active' => self::isActive($item, $currentRoute),
+                // Framework short labels for the sidebar, so a register shows
+                // WHICH reports consume it at the point of choosing rather
+                // than only once the page has loaded. Same 'feeds' data the
+                // register-lineage line uses; here we need only the labels,
+                // and for EVERY item rather than just the active one, so the
+                // resolved-url work in feedsFor() is deliberately not reused.
+                // Display only - never gates anything.
+                'feeds' => self::feedLabels($item['feeds'] ?? [], $name),
             ];
         }
 
