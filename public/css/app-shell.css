@@ -151,26 +151,6 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
     line-height: 1.428571;
 }
 
-/* Sidebar register lineage: the "Feeds" tag beside a nav item. Added with
-   the nav feeds indicators -- .nav-link is already flex, but its label was a
-   bare text node, so a wrapper is needed to push the tag right. */
-.nav-link__label {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.nav-link__meta {
-    flex-shrink: 0;
-    white-space: nowrap;
-    font-size: 0.65rem;
-    font-weight: 500;
-    letter-spacing: 0.02em;
-    color: var(--ink-hint);
-}
-
 .nav-link {
     position: relative;
     display: flex;

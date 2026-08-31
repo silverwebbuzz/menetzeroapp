@@ -108,15 +108,7 @@
                class="nav-link {{ $item['active'] ? 'active' : '' }}"
                @if ($item['active']) aria-current="page" @endif>
                 {!! $svg($item['icon'] ?? 'dot') !!}
-                {{-- Wrapped so the feeds tag below can sit right-aligned. The
-                     bare text node this replaces could not be flexed. --}}
-                <span class="nav-link__label">{{ $item['label'] }}</span>
-                {{-- Which framework reports read this register. Answers "where
-                     does what I type here end up?" at the point of CHOOSING.
-                     Empty for every item that is not a register. --}}
-                @if (! empty($item['feeds']))
-                    <span class="nav-link__meta">{{ implode(' · ', $item['feeds']) }}</span>
-                @endif
+                {{ $item['label'] }}
             </a>
         @endforeach
     </div>
