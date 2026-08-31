@@ -4135,3 +4135,26 @@ drift apart.
 
 Verified: 236 non-theme views scan clean; nav balanced 6/6, 3/3, 2/2;
 `mnz-ui.css` 365/365 braces; `nav-client` now **passes** the checker.
+
+### 52.6 AI Recommendations removed
+
+Removed from both themes at the user's request.
+
+`$recommendations` is still built by `DashboardController` and passed to the
+view. Nothing reads it now, so it is **inert, not broken** — left in place for
+the same reason as §52.3: deleting assignments inside a live controller risks
+breaking a working page for no user-visible gain.
+
+**What `/dashboard` now renders**, in order:
+
+1. ESG performance cards — E/S/G completeness with GRI-coded metrics
+2. Emissions pathway + Framework readiness (50/50 row)
+3. Reporting-year filter and boundary-change warning
+
+The `enterprise` partial is now down to the year filter and the boundary
+warning. It is no longer an "Overview panel" in any meaningful sense — worth
+considering whether those two belong in `esg-performance` so the partial can
+retire, but that is a tidy-up, not a fix.
+
+Verified: both partials balanced (old 5/5 divs, new 7/7); 236 non-theme views
+scan clean; no orphaned `$recommendations` reference outside a doc comment.

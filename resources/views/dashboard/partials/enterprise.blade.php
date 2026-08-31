@@ -131,27 +131,9 @@
          uses DisclosureService's weighted percentages, and links through to
          each framework's own page. --}}
 
-    {{-- Row 6: AI recommendations --}}
-    <div class="card">
-        <div class="card-header">
-            <div>
-                <h3 class="ent-card-title">AI Recommendations</h3>
-                <p class="ent-card-subtitle">Prioritized actions based on your inventory and reporting gaps</p>
-            </div>
-        </div>
-        <div class="card-body">
-            <ul class="ent-rec-list">
-                @foreach($recommendations ?? [] as $rec)
-                    <li class="ent-rec-item">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                        </svg>
-                        <span>{{ $rec['text'] }}</span>
-                    </li>
-                @endforeach
-            </ul>
-        </div>
-    </div>
+    {{-- AI Recommendations REMOVED at the user's request. $recommendations is
+         still built by DashboardController and passed to the view; nothing
+         else reads it, so it is inert rather than broken. --}}
 </div>
 
 @include('dashboard.partials.enterprise-scripts')

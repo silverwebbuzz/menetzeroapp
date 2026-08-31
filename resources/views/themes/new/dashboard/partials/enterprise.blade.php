@@ -113,28 +113,9 @@
          cards above -- five frameworks rather than four, weighted percentages
          from DisclosureService, each linking to its own page. --}}
 
-    {{-- Recommendations --}}
-    @if (!empty($recommendations))
-        <div class="mnz-panel">
-            <div class="mnz-panel__head">
-                <div>
-                    <h3>Recommended actions</h3>
-                    <p class="mnz-muted">Prioritised from your inventory and reporting gaps</p>
-                </div>
-            </div>
-            <div class="mnz-panel__body">
-                <div class="mnz-stack">
-                    @foreach ($recommendations as $rec)
-                        <div style="display:flex;gap:10px;align-items:flex-start">
-                            <span class="mnz-dot mnz-dot--e" style="margin-top:6px"></span>
-                            <span>{{ $rec['text'] }}</span>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-    @endif
-
+    {{-- Recommendations REMOVED at the user's request. $recommendations is
+         still built by DashboardController; nothing reads it now, so it is
+         inert rather than broken. --}}
 </div>
 
 {{-- Chart configuration, shared with the old theme. Both Overview partials
