@@ -4300,3 +4300,36 @@ the mismatch warning.
 
 Verified: 236 non-theme views scan clean; old view balanced 2/2, 6/6, 3/3;
 new view 1/1, 6/6, 2/2.
+
+### 58.7 Two distinct surfaces, corrected
+
+The first build rendered one plot with inline labels and used it as though it
+served both purposes. It served neither: too cramped for the working page,
+too heavy for a glance. Topic names run long ("Climate (cross-reference IFRS
+S2)") and several topics share a cell, so labels overlapped and truncated at
+the right edge.
+
+| | Where | What |
+|---|---|---|
+| **Full matrix** | `/disclosures/materiality-matrix` | Scoring form + plot **with a key**. Where scores are SET. |
+| **Snapshot** | Overview | Read-only: count, mini plot, link. |
+
+**Full page — numbered dots + key.** The plot carries numbers; the key beside
+it carries full name, GRI code and both scores (`H/M`). No overlap is
+possible, nothing truncates, and the key doubles as the reading order. Applied
+identically in both themes, so a topic cannot appear in different places.
+
+**Snapshot — dots only.** At 132px a label is unreadable, and the *shape* is
+what makes a matrix recognisable. Headline is "N of 10 topics material", plus
+a warning when `is_material` contradicts the scores, plus a link through.
+
+The mismatch count is the genuinely useful part: GRI 3-1 permits a documented
+departure from the scoring rule, but an **undocumented** one is a reporting
+gap, and the Overview is where gaps belong.
+
+Geometry verified on both: high/high top-right, low/low bottom-left, every
+point inside its box.
+
+Verified: 236 non-theme views scan clean; old matrix 2/2, 7/7, 3/3; new matrix
+1/1, 7/7, 2/2; esg-performance 16/16, 9/9, 8/8; service braces 32/32; both
+stylesheets balanced.

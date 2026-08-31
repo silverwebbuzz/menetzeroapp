@@ -87,18 +87,17 @@
         </div>
     </div>
 
-    {{-- Double-materiality scatter: impact (GRI 3) up, financial (IFRS S1)
-         across. Replaces the 3x3 label grid -- same data, but a plot shows
-         WHERE a topic sits relative to the others, which a grid of cells does
-         not.
+    {{-- Double-materiality plot: impact (GRI 3) up, financial (IFRS S1) across.
 
-         ALL topics are plotted, not just material ones. The old grid filtered
-         to is_material, which hid exactly the topics a reviewer needs to see:
-         the ones scored high but not yet flagged.
+         NUMBERED DOTS, NOT INLINE LABELS. Topic names run long ("Climate
+         (cross-reference IFRS S2)") and several topics share a cell, so
+         drawing names on the plot guaranteed overlapping text and truncation
+         at the right edge. Numbers keep the plot readable at any width and
+         the legend carries the full name, GRI code and both scores.
 
-         Scores are three discrete levels, so points land on a 3x3 lattice.
-         Each is nudged deterministically within its cell (by topic key) so
-         co-located topics stay readable and do not jump between renders. --}}
+         ALL topics are plotted. The original grid filtered to is_material,
+         which hid exactly the topics worth reviewing -- those scored high but
+         not yet flagged. Non-material topics render hollow. --}}
     <div class="card">
         <div class="card-header">
             <div>
@@ -111,23 +110,29 @@
                 $levels = ['low' => 0, 'medium' => 1, 'high' => 2];
                 $pillarInk = ['e' => '#0f7a4a', 's' => '#1a6c9e', 'g' => '#5b5aa8'];
 
-                $W = 640; $H = 380; $padL = 56; $padR = 24; $padT = 20; $padB = 44;
+                $W = 460; $H = 400; $padL = 58; $padR = 20; $padT = 18; $padB = 48;
                 $plotW = $W - $padL - $padR;
                 $plotH = $H - $padT - $padB;
 
                 $plotted = [];
+                $n = 0;
                 foreach ($topics as $key => $t) {
+                    $n++;
                     $ix = $levels[$t['impact_materiality'] ?: 'low'] ?? 0;
                     $fx = $levels[$t['financial_materiality'] ?: 'low'] ?? 0;
 
-                    // Deterministic nudge from the topic key: same layout every
-                    // render, no overlap for topics sharing a cell.
+                    // Deterministic nudge from the topic key: identical layout
+                    // on every render, and topics sharing a cell separate.
                     $seed = crc32($key);
-                    $jx = (($seed % 40) - 20) / 100;
-                    $jy = ((($seed >> 8) % 40) - 20) / 100;
+                    $jx = (($seed % 44) - 22) / 100;
+                    $jy = ((($seed >> 8) % 44) - 22) / 100;
 
                     $plotted[] = [
+                        'n' => $n,
                         'label' => $t['label'],
+                        'gri' => $t['gri'],
+                        'impact' => $t['impact_materiality'] ?: 'low',
+                        'financial' => $t['financial_materiality'] ?: 'low',
                         'material' => (bool) $t['is_material'],
                         'ink' => $pillarInk[$t['pillar'] ?? ''] ?? '#8b9199',
                         'x' => $padL + (($fx + 0.5 + $jx) / 3) * $plotW,
@@ -136,56 +141,65 @@
                 }
             @endphp
 
-            <svg viewBox="0 0 {{ $W }} {{ $H }}" width="100%" style="max-width:{{ $W }}px;height:auto"
-                 role="img" aria-label="Double materiality matrix for {{ $fiscalYear }}">
-                @foreach ([0, 1, 2, 3] as $i)
-                    @php
-                        $gx = $padL + ($i / 3) * $plotW;
-                        $gy = $padT + ($i / 3) * $plotH;
-                    @endphp
-                    <line x1="{{ round($gx, 1) }}" y1="{{ $padT }}" x2="{{ round($gx, 1) }}" y2="{{ $padT + $plotH }}"
-                          stroke="#e5e6e3" stroke-width="1"/>
-                    <line x1="{{ $padL }}" y1="{{ round($gy, 1) }}" x2="{{ $padL + $plotW }}" y2="{{ round($gy, 1) }}"
-                          stroke="#e5e6e3" stroke-width="1"/>
-                @endforeach
+            <div class="mm-layout">
+                <svg viewBox="0 0 {{ $W }} {{ $H }}" class="mm-plot"
+                     role="img" aria-label="Double materiality matrix for {{ $fiscalYear }}">
+                    @foreach ([0, 1, 2, 3] as $i)
+                        @php
+                            $gx = $padL + ($i / 3) * $plotW;
+                            $gy = $padT + ($i / 3) * $plotH;
+                        @endphp
+                        <line x1="{{ round($gx, 1) }}" y1="{{ $padT }}" x2="{{ round($gx, 1) }}" y2="{{ $padT + $plotH }}"
+                              stroke="#e5e6e3" stroke-width="1"/>
+                        <line x1="{{ $padL }}" y1="{{ round($gy, 1) }}" x2="{{ $padL + $plotW }}" y2="{{ round($gy, 1) }}"
+                              stroke="#e5e6e3" stroke-width="1"/>
+                    @endforeach
 
-                @foreach (['Low', 'Medium', 'High'] as $i => $lbl)
-                    <text x="{{ round($padL + (($i + 0.5) / 3) * $plotW, 1) }}" y="{{ $H - 22 }}"
-                          text-anchor="middle" font-size="11" fill="#8b9199">{{ $lbl }}</text>
-                    <text x="{{ $padL - 10 }}" y="{{ round($padT + $plotH - (($i + 0.5) / 3) * $plotH + 4, 1) }}"
-                          text-anchor="end" font-size="11" fill="#8b9199">{{ $lbl }}</text>
-                @endforeach
+                    @foreach (['Low', 'Medium', 'High'] as $i => $lbl)
+                        <text x="{{ round($padL + (($i + 0.5) / 3) * $plotW, 1) }}" y="{{ $H - 26 }}"
+                              text-anchor="middle" font-size="11" fill="#8b9199">{{ $lbl }}</text>
+                        <text x="{{ $padL - 12 }}" y="{{ round($padT + $plotH - (($i + 0.5) / 3) * $plotH + 4, 1) }}"
+                              text-anchor="end" font-size="11" fill="#8b9199">{{ $lbl }}</text>
+                    @endforeach
 
-                <text x="{{ round($padL + $plotW / 2, 1) }}" y="{{ $H - 4 }}" text-anchor="middle"
-                      font-size="10" fill="#a4a9ae" letter-spacing="1">FINANCIAL &rarr;</text>
-                <text x="14" y="{{ round($padT + $plotH / 2, 1) }}" text-anchor="middle"
-                      font-size="10" fill="#a4a9ae" letter-spacing="1"
-                      transform="rotate(-90 14 {{ round($padT + $plotH / 2, 1) }})">IMPACT &uarr;</text>
+                    <text x="{{ round($padL + $plotW / 2, 1) }}" y="{{ $H - 6 }}" text-anchor="middle"
+                          font-size="9.5" fill="#a4a9ae" letter-spacing="1.2">FINANCIAL &rarr;</text>
+                    <text x="13" y="{{ round($padT + $plotH / 2, 1) }}" text-anchor="middle"
+                          font-size="9.5" fill="#a4a9ae" letter-spacing="1.2"
+                          transform="rotate(-90 13 {{ round($padT + $plotH / 2, 1) }})">IMPACT &uarr;</text>
 
-                @foreach ($plotted as $pt)
-                    {{-- A non-material topic is hollow: present in the
-                         assessment, but not selected for reporting. --}}
-                    <circle cx="{{ round($pt['x'], 1) }}" cy="{{ round($pt['y'], 1) }}" r="5"
-                            fill="{{ $pt['material'] ? $pt['ink'] : '#fff' }}"
-                            stroke="{{ $pt['ink'] }}" stroke-width="2"/>
-                    <text x="{{ round($pt['x'] + 9, 1) }}" y="{{ round($pt['y'] + 4, 1) }}"
-                          font-size="11" fill="#14161a">{{ $pt['label'] }}</text>
-                @endforeach
-            </svg>
+                    @foreach ($plotted as $pt)
+                        <circle cx="{{ round($pt['x'], 1) }}" cy="{{ round($pt['y'], 1) }}" r="11"
+                                fill="{{ $pt['material'] ? $pt['ink'] : '#fff' }}"
+                                stroke="{{ $pt['ink'] }}" stroke-width="2"/>
+                        <text x="{{ round($pt['x'], 1) }}" y="{{ round($pt['y'] + 4, 1) }}"
+                              text-anchor="middle" font-size="11" font-weight="600"
+                              fill="{{ $pt['material'] ? '#fff' : $pt['ink'] }}">{{ $pt['n'] }}</text>
+                    @endforeach
+                </svg>
 
-            <div class="flex flex-wrap items-center gap-4 mt-3 text-xs text-gray-500">
-                <span class="inline-flex items-center gap-1.5">
-                    <span style="width:10px;height:10px;border-radius:999px;background:#0f7a4a;display:inline-block"></span>Environmental
-                </span>
-                <span class="inline-flex items-center gap-1.5">
-                    <span style="width:10px;height:10px;border-radius:999px;background:#1a6c9e;display:inline-block"></span>Social
-                </span>
-                <span class="inline-flex items-center gap-1.5">
-                    <span style="width:10px;height:10px;border-radius:999px;background:#5b5aa8;display:inline-block"></span>Governance
-                </span>
-                <span class="inline-flex items-center gap-1.5">
-                    <span style="width:10px;height:10px;border-radius:999px;border:2px solid #8b9199;display:inline-block"></span>Not flagged material
-                </span>
+                <ol class="mm-key">
+                    @foreach ($plotted as $pt)
+                        <li>
+                            <span class="mm-key__n" style="background:{{ $pt['material'] ? $pt['ink'] : '#fff' }};
+                                  border-color:{{ $pt['ink'] }};
+                                  color:{{ $pt['material'] ? '#fff' : $pt['ink'] }}">{{ $pt['n'] }}</span>
+                            <span class="mm-key__label">
+                                {{ $pt['label'] }}
+                                <span class="mm-key__gri">{{ $pt['gri'] }}</span>
+                            </span>
+                            <span class="mm-key__score">{{ ucfirst($pt['impact'][0]) }}/{{ ucfirst($pt['financial'][0]) }}</span>
+                        </li>
+                    @endforeach
+                </ol>
+            </div>
+
+            <div class="mm-legend">
+                <span><i style="background:#0f7a4a"></i>Environmental</span>
+                <span><i style="background:#1a6c9e"></i>Social</span>
+                <span><i style="background:#5b5aa8"></i>Governance</span>
+                <span><i style="background:#fff;border:2px solid #8b9199"></i>Not flagged material</span>
+                <span class="mm-legend__note">Scores shown as impact / financial</span>
             </div>
         </div>
     </div>

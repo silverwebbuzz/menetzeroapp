@@ -608,3 +608,45 @@ table.mnz-table td{padding:11px 16px;border-bottom:1px solid var(--line-2);font-
 /* Locked Scope 3: reads as unavailable, not as another source. */
 .mnz-subnav__link.is-locked { color: var(--warn); }
 .mnz-subnav__link.is-locked::before { content: '🔒'; margin-right: 6px; font-size: 10px; }
+/* ---------- Materiality matrix ---------- */
+/* Plot beside its key. The plot is fixed-ratio and the key scrolls if a
+   catalog ever grows past ten topics. */
+.mm-layout { display: grid; grid-template-columns: minmax(0, 460px) minmax(0, 1fr);
+    gap: 1.5rem; align-items: start; }
+@media (max-width: 900px) { .mm-layout { grid-template-columns: 1fr; } }
+.mm-plot { width: 100%; height: auto; display: block; }
+
+.mm-key { list-style: none; margin: 0; padding: 0; counter-reset: none; }
+.mm-key li { display: flex; align-items: center; gap: 0.625rem;
+    padding: 0.4375rem 0; border-bottom: 1px solid #f0f0ee; font-size: 0.8125rem; }
+.mm-key li:last-child { border-bottom: 0; }
+.mm-key__n { flex-shrink: 0; width: 22px; height: 22px; border-radius: 999px;
+    border: 2px solid; display: inline-flex; align-items: center;
+    justify-content: center; font-size: 0.6875rem; font-weight: 600; }
+.mm-key__label { flex: 1; min-width: 0; color: #14161a; }
+.mm-key__gri { display: block; font: 500 0.625rem 'IBM Plex Mono', ui-monospace, monospace;
+    color: #a4a9ae; letter-spacing: 0.04em; margin-top: 1px; }
+.mm-key__score { flex-shrink: 0; font: 600 0.6875rem 'IBM Plex Mono', ui-monospace, monospace;
+    color: #5a6068; letter-spacing: 0.06em; }
+
+.mm-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
+    margin-top: 1.25rem; padding-top: 0.875rem; border-top: 1px solid #f0f0ee;
+    font-size: 0.75rem; color: #8b9199; }
+.mm-legend span { display: inline-flex; align-items: center; gap: 0.375rem; }
+.mm-legend i { width: 10px; height: 10px; border-radius: 999px; flex-shrink: 0; }
+.mm-legend__note { margin-left: auto; color: #a4a9ae; }
+/* Materiality snapshot (Overview). Read-only; the working matrix is a
+   separate page. */
+.mm-snap { border: 1px solid #e5e6e3; background: #fff; margin-bottom: 1.5rem; }
+.mm-snap__body { display: flex; align-items: center; justify-content: space-between;
+    gap: 1.5rem; padding: 1.25rem; flex-wrap: wrap; }
+.mm-snap__title { font-size: 1rem; font-weight: 600; letter-spacing: -0.02em;
+    margin: 0; color: #14161a; }
+.mm-snap__count { font-size: 0.875rem; color: #5a6068; margin: 0.375rem 0 0; }
+.mm-snap__count strong { font-size: 1.5rem; font-weight: 600; color: #14161a;
+    letter-spacing: -0.02em; }
+.mm-snap__warn { font-size: 0.75rem; color: #8a6118; margin: 0.375rem 0 0; }
+.mm-snap__link { display: inline-block; margin-top: 0.75rem; font-size: 0.8125rem;
+    font-weight: 500; color: #0f7a4a; text-decoration: none; }
+.mm-snap__link:hover { text-decoration: underline; }
+.mm-snap__plot { width: 132px; height: 132px; flex-shrink: 0; }

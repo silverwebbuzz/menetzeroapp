@@ -277,5 +277,51 @@
         </section>
     @endif
 
+    {{-- Materiality SNAPSHOT. Read-only glance: a count, a mini plot and a
+         link. The working matrix -- scoring form, labelled plot, key -- lives
+         at /disclosures/materiality-matrix. Deliberately not the same view. --}}
+    @if (!empty($esgCards['materiality']))
+        @php $mat = $esgCards['materiality']; @endphp
+        <section class="mm-snap" aria-label="Materiality">
+            <div class="mm-snap__body">
+                <div>
+                    <h3 class="mm-snap__title">Materiality</h3>
+                    <p class="mm-snap__count">
+                        <strong>{{ $mat['material'] }}</strong> of {{ $mat['total'] }} topics material
+                    </p>
+                    @if ($mat['mismatched'] > 0)
+                        <p class="mm-snap__warn">
+                            {{ $mat['mismatched'] }}
+                            {{ \Illuminate\Support\Str::plural('topic', $mat['mismatched']) }}
+                            scored differently to the material flag
+                        </p>
+                    @endif
+                    @if ($mat['url'])
+                        <a href="{{ $mat['url'] }}" class="mm-snap__link">Review matrix &rarr;</a>
+                    @endif
+                </div>
+
+                {{-- Dots only at this size: labels would be unreadable, and the
+                     shape is what makes the matrix recognisable. --}}
+                <svg viewBox="0 0 132 132" class="mm-snap__plot" role="img"
+                     aria-label="{{ $mat['material'] }} of {{ $mat['total'] }} topics flagged material">
+                    @foreach ([0, 1, 2, 3] as $i)
+                        @php $g = 6 + ($i / 3) * 120; @endphp
+                        <line x1="{{ round($g, 1) }}" y1="6" x2="{{ round($g, 1) }}" y2="126"
+                              stroke="#eeeeec" stroke-width="1"/>
+                        <line x1="6" y1="{{ round($g, 1) }}" x2="126" y2="{{ round($g, 1) }}"
+                              stroke="#eeeeec" stroke-width="1"/>
+                    @endforeach
+                    @foreach ($mat['points'] as $pt)
+                        <circle cx="{{ round(6 + ($pt['x'] / 3) * 120, 1) }}"
+                                cy="{{ round(126 - ($pt['y'] / 3) * 120, 1) }}" r="4"
+                                fill="{{ $pt['material'] ? $pt['ink'] : '#fff' }}"
+                                stroke="{{ $pt['ink'] }}" stroke-width="1.5"/>
+                    @endforeach
+                </svg>
+            </div>
+        </section>
+    @endif
+
     </div>
 @endif
