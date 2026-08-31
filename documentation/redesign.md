@@ -4089,3 +4089,49 @@ the full text belongs on the section editor.
 Verified: 236 non-theme views scan clean; view balanced 9/9, 3/3, 1/1; service
 braces 12/12; both stylesheets balanced; `gov.risks` and
 `disclosures.s1.sections.edit` both confirmed registered.
+
+## 56. Emission-source tree ported to the new theme
+
+The old theme's sidebar carried a Scope 1/2/3 tree of emission sources —
+direct shortcuts into `quick-input.show`. **The new theme had none of it.**
+
+### 56.1 Why this mattered more than it looked
+
+§46.3 recorded the tree as a "documented omission" of the new theme. That was
+wrong to leave standing: it is not a stylistic difference, it is **dozens of
+missing destinations**. Under the new theme a user could reach a source only
+by going to Measure and picking it on-page.
+
+The pre-flight checker had been reporting it all along —
+`route dropped vs original: ['quick-input.show', 'subscriptions.billing']` on
+`nav-client` — and that failure was being treated as a known false positive.
+**It was real.** After the port, `nav-client` passes.
+
+### 56.2 The gate is the important part
+
+The Scope 3 branch is plan-gated. When `$gate->isScope3Locked()` the source
+links are replaced by an upgrade link — with the agency-workspace variant of
+the message where applicable. Rendering the sources instead would expose a
+paid feature to a lower tier (risk R-1).
+
+Verified identical between themes: `isScope3Locked` ×1, `isAgencyWorkspace`
+×2, `agencyLockedMessage` ×1, `upgradeRoute` ×1.
+
+### 56.3 Parity verified by destination, not by eye
+
+Route names extracted from both files are **identical sets** — no destination
+is reachable in one theme and not the other.
+
+The port collapses the old theme's three near-identical hand-written blocks
+into one loop over `[1, 2, 3]`, so `quick_input_slug` appears twice rather
+than nine times. Same output, one code path — the three scopes can no longer
+drift apart.
+
+### 56.4 Behaviour preserved
+
+- Alpine collapse, with the **current scope open on load**
+- Active source highlighted from the route's `scope` + `slug`
+- `x-cloak` (defined in both shells) prevents a flash of open panels
+
+Verified: 236 non-theme views scan clean; nav balanced 6/6, 3/3, 2/2;
+`mnz-ui.css` 365/365 braces; `nav-client` now **passes** the checker.

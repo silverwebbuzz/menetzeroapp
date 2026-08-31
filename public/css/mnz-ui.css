@@ -592,3 +592,19 @@ table.mnz-table td{padding:11px 16px;border-bottom:1px solid var(--line-2);font-
     line-height: 1.55; }
 .gov-rem__empty { font-size: 0.8125rem; color: #8b9199; margin: 0 0 1rem;
     line-height: 1.55; }
+/* Emission-source tree in the sidebar (Environmental tab). */
+.mnz-nav--toggle { width: 100%; }
+.mnz-nav__chev { margin-left: auto; flex-shrink: 0; color: var(--ink-4);
+    font-size: 15px; line-height: 1; transform: rotate(90deg);
+    transition: transform .12s ease; }
+.mnz-nav__chev.is-open { transform: rotate(-90deg); }
+.mnz-subnav { margin: 2px 0 6px 18px; padding-left: 8px;
+    border-left: 1px solid var(--line); display: flex; flex-direction: column; }
+.mnz-subnav__link { display: block; padding: 5px 10px; font-size: 12.5px;
+    color: var(--ink-2); text-decoration: none; border-radius: var(--r);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mnz-subnav__link:hover { background: var(--canvas-2); color: var(--ink); }
+.mnz-subnav__link.is-active { background: var(--canvas-2); color: var(--ink); font-weight: 600; }
+/* Locked Scope 3: reads as unavailable, not as another source. */
+.mnz-subnav__link.is-locked { color: var(--warn); }
+.mnz-subnav__link.is-locked::before { content: '🔒'; margin-right: 6px; font-size: 10px; }
