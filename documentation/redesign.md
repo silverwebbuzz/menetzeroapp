@@ -3887,3 +3887,128 @@ weighted percentages, and a link to each framework's page.
 Verified: no orphaned `$netZeroProgress`, `$compliance` or `$currentIntensity`
 references in either partial; both balanced (old 9/9 divs, new 13/13); 234
 non-theme views scan clean; both stylesheets balanced.
+
+## 53. Social pillar dashboard (/social)
+
+`SocialDashboardService` + `SocialDashboardController` + `social/index`.
+Same fix as §51: `/social` pointed at `EsgDashboardController`, so a Social URL
+rendered whole-ESG content.
+
+### 53.1 Standard: GRI, every indicator coded
+
+| Indicator | Code |
+|---|---|
+| Total headcount | GRI 2-7 |
+| New hires · Turnover | GRI 401-1 |
+| Parental leave return | GRI 401-3 |
+| Training hours per employee | GRI 404-1 |
+| Women in management · workforce | GRI 405-1 |
+| LTIFR · Recordable injuries | GRI 403-9 |
+| Fatalities | GRI 403-10 |
+| Suppliers screened — social | GRI 414-1 |
+
+All 13 referenced fields verified present in `config/disclosure.php`.
+
+**The app holds more than the design showed** — the mockup's six-row table
+undersells it. Parental leave, fatalities split employee/contractor, hours
+worked and OHS management system all exist and are surfaced.
+
+### 53.2 Percent vs percentage points
+
+A headcount change is a **percent** change; a rate change is in **percentage
+points**. Reporting "turnover fell 14%" when it moved 13.2 → 11.4 would be
+wrong — it fell **1.8 points**. The two are computed by separate methods and
+labelled differently. Verified against the design's own figures: +7.2% and
+−1.8 pts both reproduce exactly.
+
+Direction is per metric: turnover up is bad, women in management up is good,
+headcount up is neither. A zero delta is never coloured.
+
+`percentChange()` returns null when the prior year is zero — a change from
+zero has no percentage.
+
+### 53.3 Status is derived, never invented
+
+An indicator is **complete** when the field has a value, **missing** when it
+does not. The design's `DRAFT` / `IN REVIEW` states were **not** built: no
+review workflow exists for disclosure fields, and showing one would imply an
+approval step that cannot happen.
+
+`0` counts as collected — a legitimate reading for injuries and fatalities.
+Only null/empty is missing, and a missing metric shows an em dash plus "not
+collected", never `0`.
+
+### 53.4 Three design elements not built
+
+1. **Headcount by function** — no department/function dimension exists in the
+   schema. Needs its own table, not a dashboard query. **Replaced with GRI 403
+   readiness**, which is what that panel was really pointing at: which H&S
+   fields are still missing, with a link straight to the `health_safety`
+   section editor (`gri.sections.edit`) rather than a generic overview.
+2. **Gender pay gap** — **GRI 405-2**, and a genuine gap in the app's 405
+   coverage. Needs a field before it can be shown.
+3. **Assign owner / Start collection** — no data-owner or task model exists.
+
+### 53.5 Design
+
+Reuses the `.env-*` layout classes from the Environmental dashboard so both
+pillars read as one product and the styles cannot drift from themselves. Only
+the accent changes, via `.env-page--social` (Social blue `#1a6c9e` from the
+canvas).
+
+**HRIS import is real** — routes and a CSV template already exist
+(`social.scorecard`), so that button works rather than being decorative.
+
+Verified: 235 non-theme views scan clean; view balanced 7/7, 3/3, 2/2; service
+braces 18/18; both stylesheets balanced.
+
+## 54. Production fix: ESG scorecard Sync and Save 500
+
+`POST /disclosures/esg-scorecard/sync` threw
+`RouteNotFoundException: Route [disclosures.esg-scorecard] not defined`.
+
+### 54.1 Cause
+
+The route group is `->prefix('esg-scorecard')->name('esg-scorecard.')` inside
+`->name('disclosures.')`, so the index is
+**`disclosures.esg-scorecard.index`** — there is no bare
+`disclosures.esg-scorecard` route.
+
+`EsgScorecardController` used the bare name in two `fiscalRedirect()` calls
+(lines 55 and 69) while four other call sites in the **same file** (131, 136,
+168, 173) already used the correct `.index` form. An internal inconsistency,
+not a missing route.
+
+**Two actions were broken, not one:**
+
+| Line | Method | Effect |
+|---|---|---|
+| 55 | `update()` | **Saving scorecard metrics** 500'd after writing |
+| 69 | `sync()` | Sync 500'd after syncing |
+
+Both threw **after** their work committed — the redirect is the last step — so
+data was saved and the user saw a 500. Reported for `sync`; `update` would
+have failed the same way on the next save.
+
+### 54.2 Fix
+
+Both changed to `disclosures.esg-scorecard.index`. Line 27 is a **view** name
+(`view('disclosures.esg-scorecard', ...)`) and is correct — deliberately left
+alone.
+
+### 54.3 Codebase sweep
+
+Swept every `->route(...)` and `fiscalRedirect(...)` in `app/` against route
+names resolved from `routes/web.php`. After correcting the resolver for nested
+groups, 15 candidates remained — all `locations.*` and `consultant.clients.*`,
+every one generated by **`Route::resource()`**, which the text scan cannot
+see. Verified at `routes/web.php:277` and `:106`.
+
+**No other broken route reference exists.** The scorecard was the only one.
+
+### 54.4 Note
+
+A first pass of the sweep reported ~190 failures, including names verified as
+working in production. The group-nesting logic was wrong. Recorded because the
+lesson matters: a static route check is only as good as its group resolution,
+and a scanner that cries wolf is worse than none.

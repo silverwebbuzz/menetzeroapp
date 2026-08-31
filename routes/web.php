@@ -520,7 +520,9 @@ Route::middleware([
 
     // --- Social ------------------------------------------------------------
     Route::prefix('social')->name('social.')->middleware('disclosureAccess')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Disclosure\EsgDashboardController::class, 'index'])->name('overview');
+        // Workforce dashboard for the pillar. Previously reused
+        // EsgDashboardController, which answers a different question.
+        Route::get('/', [\App\Http\Controllers\Disclosure\SocialDashboardController::class, 'index'])->name('overview');
         Route::get('/stakeholders', [\App\Http\Controllers\Disclosure\StakeholderEngagementController::class, 'index'])->name('stakeholders');
         Route::get('/supply-chain', [\App\Http\Controllers\Disclosure\SupplyChainSupplierController::class, 'index'])->name('supply-chain');
         Route::get('/scorecard', [\App\Http\Controllers\Disclosure\EsgScorecardController::class, 'index'])->name('scorecard');

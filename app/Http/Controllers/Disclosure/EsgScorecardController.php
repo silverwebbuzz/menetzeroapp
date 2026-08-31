@@ -52,7 +52,7 @@ class EsgScorecardController extends DisclosureBaseController
         );
 
         return $this->fiscalRedirect(
-            'disclosures.esg-scorecard',
+            'disclosures.esg-scorecard.index',
             $fiscalYear,
             'Scorecard metrics saved.',
             ['category' => $category]
@@ -66,7 +66,7 @@ class EsgScorecardController extends DisclosureBaseController
         $count = $this->scorecardService->syncAutoSnapshots($company, $fiscalYear);
 
         return $this->fiscalRedirect(
-            'disclosures.esg-scorecard',
+            'disclosures.esg-scorecard.index',
             $fiscalYear,
             "Synced {$count} auto KPI snapshot(s) from GHG and GRI data."
         );

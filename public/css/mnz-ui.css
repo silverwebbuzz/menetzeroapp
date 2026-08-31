@@ -511,3 +511,39 @@ table.mnz-table td{padding:11px 16px;border-bottom:1px solid var(--line-2);font-
 .esg-path__progress-lbl { font: 500 0.5625rem 'IBM Plex Mono', ui-monospace, monospace;
     letter-spacing: 0.06em; text-transform: uppercase; color: #8b9199;
     margin-top: 0.125rem; }
+/* ---------- Social pillar dashboard (/social) ---------- */
+/* Reuses the .env-* layout so both pillar dashboards read as one product;
+   only the accent changes. Social blue from the design canvas. */
+.env-page--social .env-kicker { color: #1a6c9e; }
+.env-page--social .env-kicker__dot { background: #1a6c9e; }
+.env-page--social .env-btn--primary { background: #1a6c9e; border-color: #1a6c9e; }
+.env-page--social .env-btn--primary:hover { background: #155877; }
+.env-page--social .soc-hs__bar span { background: #1a6c9e; }
+
+/* Em dash for a metric with no value: distinct from 0, which is a real
+   reading for injuries and fatalities. */
+.env-kpi__none { color: #a4a9ae; font-weight: 500; }
+.env-kpi__meta { display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }
+.env-kpi__code { margin-left: auto; font: 500 0.5625rem 'IBM Plex Mono', ui-monospace, monospace;
+    letter-spacing: 0.06em; color: #a4a9ae; white-space: nowrap; }
+.env-table__code { display: inline-block; font: 500 0.5625rem 'IBM Plex Mono', ui-monospace, monospace;
+    letter-spacing: 0.06em; color: #a4a9ae; margin-left: 0.375rem; white-space: nowrap; }
+.env-table .is-warn { color: #8a6118; }
+
+.soc-hs { padding: 1.25rem; }
+.soc-hs__score { display: flex; align-items: baseline; gap: 0.5rem; }
+.soc-hs__pct { font-size: 1.75rem; font-weight: 600; letter-spacing: -0.03em; color: #14161a; }
+.soc-hs__lbl { font-size: 0.75rem; color: #8b9199; }
+.soc-hs__bar { height: 4px; background: #eeeeec; margin: 0.75rem 0 1rem; }
+.soc-hs__bar span { display: block; height: 4px; }
+.soc-hs__list { list-style: none; margin: 0; padding: 0; }
+.soc-hs__list li { display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.5rem 0; font-size: 0.8125rem; color: #8b9199;
+    border-bottom: 1px solid #f0f0ee; }
+.soc-hs__list li:last-child { border-bottom: 0; }
+.soc-hs__list li.is-done { color: #14161a; }
+.soc-hs__tick { width: 16px; height: 16px; border: 1px solid #e5e6e3; border-radius: 3px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 0.625rem; color: #fff; flex-shrink: 0; }
+.soc-hs__list li.is-done .soc-hs__tick { background: #1a6c9e; border-color: #1a6c9e; }
+.soc-hs__cta { margin-top: 1rem; }
