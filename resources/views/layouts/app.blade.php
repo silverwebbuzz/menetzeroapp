@@ -99,10 +99,6 @@
 
                 <nav class="mt-2 px-1 flex-1 flex flex-col">
                     <div class="flex-1">
-                        {{-- Six-pillar switcher; the nav below shows only the
-                             active pillar's items. --}}
-                        @include('layouts.partials.nav-tabs')
-
                         @include('layouts.partials.nav-client')
                     </div>
                 </nav>
@@ -111,7 +107,8 @@
             <!-- Main content -->
             <div class="main-content">
                 <div class="portal-shell-inner">
-                <!-- Top header -->
+                <!-- Top header + pillar tabs -->
+                <div class="header-stack">
                 <header class="header">
                     <button type="button"
                             class="mobile-menu-btn"
@@ -261,6 +258,13 @@
                         </div>
                     </div>
                 </header>
+
+                {{-- Six-pillar tab row: the SECOND ROW of the header stack, as
+                     in the design canvas. It spans the content width rather
+                     than sitting in the sidebar, where it had to wrap to three
+                     rows to fit. --}}
+                @include('layouts.partials.nav-tabs')
+                </div>
 
                 <!-- Page content -->
                 <main class="content-area">

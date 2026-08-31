@@ -3464,3 +3464,35 @@ latter, so the current items stand until pages are built.
 The Overview group's HANDOFF section ("All mockups" 11, "Implementation map"
 37) refers to the design canvas's own artboards. It is project tooling, not
 product, and must not ship in a client's nav.
+
+### 47.5 Old theme: tabs moved out of the sidebar
+
+The first old-theme attempt put the switcher inside the 236px sidebar, where
+six entries **wrapped to three rows** — a stack of pills, not a tab bar.
+
+Moved to where the design puts it: a second band under the header, spanning
+the content width.
+
+**How, without restructuring the shell.** `.header` and the tab row are wrapped
+in a new `.header-stack` that carries the `position: sticky`; `.header` inside
+it becomes `position: static`. Sticking the stack rather than each band is what
+stops the two detaching and scrolling apart. `.sidebar` is untouched — it is
+`position: fixed` and never participated.
+
+- One row, `overflow-x: auto`, `scrollbar-width: none` — scrolls, never wraps
+- Active tab is an **underline**, not a pill
+- 42px tall with a 1.5rem gutter, matching the canvas
+
+**Pillar colours** now come from the canvas (`E #0f7a4a`, `S #1a6c9e`,
+`G #5b5aa8`) rather than `--brand` (`#10b981`), which is a brighter emerald
+than the logo or the design use. Each pillar tab's dot and active underline
+use its own colour.
+
+**One specificity bug fixed on the way**: `.pillar-tab.active .pillar-tab__dot`
+(0,2,1) outranks `.pillar-tab__dot[data-pillar]` (0,2,0), so an active pillar
+tab's dot rendered dark instead of its colour. The dark rule is now scoped
+`:not([data-pillar])`, which is exactly the three non-pillar tabs (Overview,
+Reports, Settings) since Blade only emits `data-pillar` for E/S/G.
+
+Verified: 232 non-theme views scan clean, shell `<div>` count 30/30 (one pair
+more than before — the wrapper), CSS braces 314/314.
