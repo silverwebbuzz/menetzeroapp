@@ -260,7 +260,12 @@ class NavigationMap
                 continue;
             }
 
-            $params = [];
+            // Fixed route parameters, for items that point at a
+            // parameterised route -- e.g. the GRI/IFRS section editors, which
+            // take {section}. Merged BEFORE the fiscal year so an item can
+            // never accidentally override the year key.
+            $params = (array) ($item['params'] ?? []);
+
             if (! empty($item['year']) && $fiscalYear !== null) {
                 $params[$yearKey] = $fiscalYear;
             }

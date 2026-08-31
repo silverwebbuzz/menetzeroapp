@@ -46,29 +46,9 @@
 
 <div class="mnz-stack" data-pillar="e">
 
-    <div class="mnz-pagehead">
-        <div>
-            <div class="mnz-kicker">Overview</div>
-            <h1>Dashboard</h1>
-            <p class="mnz-lead">Emissions performance, net zero progress and compliance readiness.</p>
-        </div>
-        <div class="mnz-pagehead__actions">
-            @if (count($availableYears ?? []) > 1)
-                <form method="GET" action="{{ route('client.dashboard') }}">
-                    <select name="fiscal_year" class="mnz-select" onchange="this.form.submit()"
-                            aria-label="Reporting year">
-                        @foreach ($availableYears as $availableYear)
-                            <option value="{{ $availableYear }}" @selected($availableYear == ($selectedYear ?? null))>{{ $availableYear }}</option>
-                        @endforeach
-                    </select>
-                    <noscript><button type="submit" class="mnz-btn">Go</button></noscript>
-                </form>
-            @endif
-            <a href="{{ route('locations.index') }}" class="mnz-btn mnz-btn--ghost">Locations</a>
-            <a href="{{ route('quick-input.index') }}" class="mnz-btn mnz-btn--soft">Quick Input</a>
-            <a href="{{ route('reports.index') }}" class="mnz-btn mnz-btn--primary">Reports</a>
-        </div>
-    </div>
+    {{-- Page header REMOVED at the user's request: the reporting-year select
+         duplicated the shell's own year switcher, and the three actions are
+         all reachable from the nav. --}}
 
     {{-- Boundary-change warning. Absolute emissions across years with a
          different organisational boundary are not like-for-like (GHG Protocol

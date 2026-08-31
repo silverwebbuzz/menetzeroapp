@@ -4158,3 +4158,76 @@ retire, but that is a tidy-up, not a fix.
 
 Verified: both partials balanced (old 5/5 divs, new 7/7); 236 non-theme views
 scan clean; no orphaned `$recommendations` reference outside a doc comment.
+
+## 57. Nav ordered by workflow; dashboard header removed
+
+### 57.1 Dashboard page header removed (both themes)
+
+The `Dashboard / Executive snapshot` header carried a reporting-year `<select>`
+that **duplicated the shell's own year switcher**
+(`layouts.partials.reporting-year-switcher`, present in both shells — the
+"YEAR 2026" control in the topbar). Locations / Quick Input / Reports are all
+nav destinations. Removed.
+
+### 57.2 Summary stays first — the user's call, and the right one
+
+Summary is the pillar **dashboard**: it is what the tab lands on, and the new
+pillar dashboards report *what is missing*, so an empty Summary is itself the
+prompt to act. Ordering below it is **input before output**.
+
+### 57.3 Environmental: Locations moved above Measure
+
+Boundaries must exist before anything can be measured against them —
+`quick-input` requires a location. The nav previously listed Measure, Bulk
+import, then Locations, which is the reverse of the dependency.
+
+| Before | After |
+|---|---|
+| Summary · Measure · Bulk import · Locations · … | Summary · **Locations** · Measure · Bulk import · … |
+
+### 57.4 Social and Governance had no data-entry point
+
+Both pillars started at Summary and went straight to outputs. Their data is
+entered in **section editors** that appeared nowhere in the nav — so a user
+could see what was missing on the new dashboards but had to hunt for where to
+type it.
+
+Added:
+
+| Pillar | Item | Route | Section |
+|---|---|---|---|
+| Social | **Workforce data** | `gri.sections.edit` | `social_hr` |
+| Governance | **Board & oversight** | `disclosures.s2.sections.edit` | `governance` |
+
+Both placed directly under Summary — see it, then fix it.
+
+IFRS S2 governance was chosen over S1 because it is the fuller section: it
+carries the oversight body, frequency and remuneration fields the Governance
+Summary reports on. S1 mirrors them.
+
+### 57.5 NavigationMap gained route parameters
+
+Nav items could only carry the fiscal year, so a parameterised route
+(`sections/{section}`) was unreachable. `items()` now reads an optional
+`'params'` array, **merged before** the fiscal year so an item can never
+override the year key.
+
+`SectionController::edit()` calls `abort(404)` on an unknown section, so both
+section keys were verified against `config/disclosure.php`: `social_hr` valid
+under GRI, `governance` valid under IFRS S2.
+
+### 57.6 The two journeys this serves
+
+**New company** — a sequence, each step blocking the next:
+Settings › Reporting (fiscal year, intensity denominator) → Environmental ›
+Locations → Measure → Summary shows numbers → Climate targets sets a baseline,
+unlocking the pathway chart → Social/Governance data entry → Reports.
+
+**Existing company** — a cycle: Measure → Summary → fill flagged gaps →
+Reports. Locations is never revisited.
+
+The reorder serves the first without disturbing the second: existing users
+navigate by label, not position.
+
+Verified: 236 non-theme views scan clean; `config/navigation.php` brackets
+99/99; `NavigationMap` 100/100 and 74/74; 37 nav destinations (35 + 2 new).

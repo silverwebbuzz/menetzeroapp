@@ -141,6 +141,14 @@ return [
                     'year' => false,
                 ],
                 [
+                    'label' => 'Locations & boundaries',
+                    'icon' => 'pin',
+                    'route' => 'locations.index',
+                    'gate' => 'locations',
+                    'active' => ['locations.', 'emission-boundaries.', 'env.locations', 'env.boundaries'],
+                    'year' => false,
+                ],
+                [
                     'label' => 'Measure',
                     'icon' => 'list',
                     'route' => 'quick-input.index',
@@ -154,14 +162,6 @@ return [
                     'route' => 'quick-input.bulk-import.index',
                     'gate' => 'quick_input',
                     'active' => ['quick-input.bulk-import', 'quick-input.scope3-bulk-import', 'env.measure.bulk-import'],
-                    'year' => false,
-                ],
-                [
-                    'label' => 'Locations & boundaries',
-                    'icon' => 'pin',
-                    'route' => 'locations.index',
-                    'gate' => 'locations',
-                    'active' => ['locations.', 'emission-boundaries.', 'env.locations', 'env.boundaries'],
                     'year' => false,
                 ],
                 [
@@ -210,6 +210,20 @@ return [
                     'gate' => 'disclosures',
                     'active' => ['social.overview'],
                     'year' => false,
+                ],
+                [
+                    // Where Social data is actually ENTERED. The Summary above
+                    // reports GRI 401/403/404/405 completeness; without this
+                    // link the user can see what is missing but has to hunt
+                    // through the GRI pages for the editor.
+                    'label' => 'Workforce data',
+                    'icon' => 'users',
+                    'route' => 'gri.sections.edit',
+                    'params' => ['section' => 'social_hr'],
+                    'gate' => 'disclosures',
+                    'active' => ['gri.sections'],
+                    'year' => true,
+                    'feeds' => ['gri', 'uae_esg'],
                 ],
                 [
                     'label' => 'Stakeholders',
@@ -266,6 +280,20 @@ return [
                     'gate' => 'disclosures',
                     'active' => ['gov.overview'],
                     'year' => false,
+                ],
+                [
+                    // Where Governance oversight data is ENTERED. IFRS S2
+                    // governance is the fuller section (it carries the
+                    // oversight body, frequency and remuneration fields the
+                    // pillar Summary reports on) and S1 mirrors it.
+                    'label' => 'Board & oversight',
+                    'icon' => 'shield',
+                    'route' => 'disclosures.s2.sections.edit',
+                    'params' => ['section' => 'governance'],
+                    'gate' => 'disclosures',
+                    'active' => ['disclosures.s2.sections'],
+                    'year' => true,
+                    'feeds' => ['s2', 's1'],
                 ],
                 [
                     'label' => 'Materiality',

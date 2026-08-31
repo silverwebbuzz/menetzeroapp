@@ -52,32 +52,11 @@
 @endphp
 
 <div class="ent-dashboard">
-    <div class="ent-page-header flex flex-wrap items-start justify-between gap-4 mb-2">
-        <div>
-            <h1 class="ent-page-title">Dashboard</h1>
-            <p class="ent-page-lead">Executive snapshot of emissions performance, net zero progress, and compliance readiness.</p>
-        </div>
-        <div class="page-header-actions flex flex-wrap items-center gap-2">
-            {{-- Reporting-year filter. Hidden when there is nothing to choose
-                 between, so a single-year company sees no redundant control. --}}
-            @if(count($availableYears ?? []) > 1)
-                <form method="GET" action="{{ route('client.dashboard') }}" class="flex items-center gap-2 mr-1">
-                    <label for="dashboard_year" class="text-sm text-gray-600">Year</label>
-                    <select name="fiscal_year" id="dashboard_year"
-                            class="border border-gray-300 rounded-lg px-3 py-2 text-sm"
-                            onchange="this.form.submit()">
-                        @foreach($availableYears as $availableYear)
-                            <option value="{{ $availableYear }}" @selected($availableYear == ($selectedYear ?? null))>{{ $availableYear }}</option>
-                        @endforeach
-                    </select>
-                    <noscript><button type="submit" class="btn btn-secondary btn-sm">Go</button></noscript>
-                </form>
-            @endif
-            <a href="{{ route('locations.index') }}" class="btn btn-secondary btn-sm">Locations</a>
-            <a href="{{ route('quick-input.index') }}" class="btn btn-secondary btn-sm">Quick Input</a>
-            <a href="{{ route('reports.index') }}" class="btn btn-primary btn-sm">Reports</a>
-        </div>
-    </div>
+    {{-- Page header REMOVED at the user's request: the title restated the
+         nav, and the reporting-year select duplicated the year switcher the
+         SHELL already renders in the topbar
+         (layouts.partials.reporting-year-switcher, present in both themes).
+         Locations / Quick Input / Reports are all reachable from the nav. --}}
 
     {{-- Boundary-change warning. Absolute emissions across years with a
          different organisational boundary are not like-for-like (GHG Protocol
