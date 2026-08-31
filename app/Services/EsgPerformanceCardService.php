@@ -103,8 +103,20 @@ class EsgPerformanceCardService
     {
         $target = $data['next_target'] ?? null;
 
+        // An EMPTY STATE rather than null: the card still renders, with an
+        // empty plot and a prompt, so the user can see that a pathway will
+        // appear here once a reduction target exists. Hiding it entirely
+        // leaves no clue the feature is there at all.
         if ($target === null || ($target['baseline_tco2e'] ?? null) === null) {
-            return null;
+            return [
+                'empty' => true,
+                'reason' => $target === null
+                    ? 'No reduction target set yet.'
+                    : 'This target has no baseline tonnage.',
+                'cta_url' => \Illuminate\Support\Facades\Route::has('disclosures.s2.targets.index')
+                    ? route('disclosures.s2.targets.index', ['fiscal_year' => $fiscalYear])
+                    : null,
+            ];
         }
 
         $baseYear = $target['base_year'] ?? null;
@@ -113,7 +125,13 @@ class EsgPerformanceCardService
         $targetTonnes = $target['target_tco2e'] !== null ? (float) $target['target_tco2e'] : null;
 
         if ($baseYear === null || $targetYear === null || $targetYear <= $baseYear) {
-            return null;
+            return [
+                'empty' => true,
+                'reason' => 'Target needs a base year and a later target year.',
+                'cta_url' => \Illuminate\Support\Facades\Route::has('disclosures.s2.targets.index')
+                    ? route('disclosures.s2.targets.index', ['fiscal_year' => $fiscalYear])
+                    : null,
+            ];
         }
 
         // Actual series, from the trend the dashboard already computed.
@@ -126,6 +144,7 @@ class EsgPerformanceCardService
         }
 
         return [
+            'empty' => false,
             'base_year' => $baseYear,
             'target_year' => $targetYear,
             'baseline' => round($baseline, 1),

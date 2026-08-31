@@ -81,6 +81,11 @@
         </div>
     </section>
 
+    {{-- Pathway and readiness sit SIDE BY SIDE at 50/50. Stacked full-width
+         the chart dominated the page; paired, each is a normal-sized card and
+         the two read as one row. Collapses to a single column under 1100px. --}}
+    <div class="esg-row">
+
     {{-- Emissions against the reduction pathway.
 
          INLINE SVG, NO CHART LIBRARY. Both shells load Chart.js, but this is
@@ -90,7 +95,35 @@
 
          The pathway ends at the TARGET's tonnage, not at zero, unless the
          target is itself zero. --}}
-    @if (!empty($esgCards['pathway']))
+    @if (!empty($esgCards['pathway']) && !empty($esgCards['pathway']['empty']))
+        {{-- Empty state: an inert placeholder plot, so the user can see WHERE
+             the pathway will appear once a target exists, rather than the
+             card simply being absent. --}}
+        <section class="esg-path esg-path--empty" aria-label="Emissions against pathway">
+            <div class="esg-path__head">
+                <div>
+                    <h3 class="esg-path__title">Emissions against pathway</h3>
+                    <p class="esg-path__sub">{{ $esgCards['pathway']['reason'] }}</p>
+                </div>
+            </div>
+            <div class="esg-path__chart">
+                <svg viewBox="0 0 720 180" width="100%" height="180" aria-hidden="true">
+                    @foreach ([0, 0.25, 0.5, 0.75, 1] as $t)
+                        @php $gy = 12 + (140 * (1 - $t)); @endphp
+                        <line x1="52" y1="{{ $gy }}" x2="704" y2="{{ $gy }}" stroke="#f0f0ee" stroke-width="1"/>
+                    @endforeach
+                    <line x1="52" y1="152" x2="704" y2="60" stroke="#d6d7d3"
+                          stroke-width="1.5" stroke-dasharray="4 4"/>
+                </svg>
+                <p class="esg-path__emptymsg">
+                    Set a reduction target to chart your emissions against a pathway.
+                    @if ($esgCards['pathway']['cta_url'])
+                        <a href="{{ $esgCards['pathway']['cta_url'] }}">Add a target &rarr;</a>
+                    @endif
+                </p>
+            </div>
+        </section>
+    @elseif (!empty($esgCards['pathway']))
         @php
             $pw = $esgCards['pathway'];
             $series = $pw['actual'];
@@ -104,7 +137,7 @@
             $maxVal = max(array_merge([1], array_values($series), array_values($required)));
             $span = max(1, $maxYear - $minYear);
 
-            $W = 720; $H = 220; $padL = 52; $padR = 16; $padT = 12; $padB = 28;
+            $W = 560; $H = 180; $padL = 48; $padR = 14; $padT = 12; $padB = 26;
             $plotW = $W - $padL - $padR;
             $plotH = $H - $padT - $padB;
 
@@ -139,7 +172,7 @@
             </div>
 
             <div class="esg-path__chart">
-                <svg viewBox="0 0 {{ $W }} {{ $H }}" width="100%" height="{{ $H }}"
+                <svg viewBox="0 0 {{ $W }} {{ $H }}" width="100%" height="auto"
                      role="img" preserveAspectRatio="xMidYMid meet"
                      aria-label="Emissions from {{ $minYear }} to {{ $maxYear }} against the required reduction pathway">
                     @foreach ([0, 0.25, 0.5, 0.75, 1] as $t)
@@ -232,4 +265,6 @@
             @endforeach
         </section>
     @endif
+
+    </div>
 @endif

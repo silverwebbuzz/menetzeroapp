@@ -3677,3 +3677,39 @@ percentage rather than entered directly.
 
 Verified: 233 non-theme views clean; partial 11/11, 6/6, 5/5; service braces
 28/28; both stylesheets balanced.
+
+### 50.4 Layout: pathway and readiness paired 50/50
+
+Stacked full-width, the chart dominated the page — a 720x220 plot above a
+short list. They now sit side by side in `.esg-row`, each a normal-sized card,
+collapsing to one column under 1100px. Plot reduced to 560x180 to suit half
+width; `align-items: start` stops the shorter card stretching.
+
+Geometry re-verified at the new size against live data: axes correct, all
+points inside the plot box.
+
+### 50.5 Empty state instead of a hidden card
+
+`pathway()` now returns `['empty' => true, 'reason' => ..., 'cta_url' => ...]`
+rather than null when there is no usable target. The card renders with an
+inert placeholder plot (gridlines and a dashed slope) plus "Set a reduction
+target to chart your emissions against a pathway" and a link to add one.
+
+Hiding the card left no clue the feature existed. Three distinct reasons are
+surfaced: no target, target without baseline tonnage, target without a valid
+base/target year pair.
+
+### 50.6 A data problem the chart exposed
+
+On a live workspace (Falcon Industrial Parks, PRY 2026) the card shows
+baseline **FY2024 = 120 t** against **FY2026 actual = 1,714 t** — 14x the
+baseline, rising steeply.
+
+This is not a rendering fault; the y-axis correctly scales to the actual
+series while the pathway hugs zero. Either the boundary genuinely expanded
+since baseline (new sites or scopes added, which under the GHG Protocol
+requires a **base-year recalculation**), or the baseline is wrong. Until one
+is corrected the target is unreachable.
+
+The projection guard behaved correctly: a rising trend produced **no**
+projected year rather than a fabricated one.

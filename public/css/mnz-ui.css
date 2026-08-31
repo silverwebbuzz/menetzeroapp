@@ -385,3 +385,20 @@ table.mnz-table td{padding:11px 16px;border-bottom:1px solid var(--line-2);font-
 /* "at current rate" must never read with the same weight as the number. */
 .esg-path__qualifier { display: block; font-size: 0.6875rem; font-weight: 500;
     color: #8b9199; letter-spacing: 0; margin-top: 0.125rem; }
+/* ---------- Overview 2-up row: pathway + readiness ---------- */
+/* Stacked full-width the chart dominated the page. Paired at 50/50 each is a
+   normal card and the two read as one row. align-items:start so the shorter
+   card does not stretch to match the taller one. */
+.esg-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem; align-items: start; }
+@media (max-width: 1100px) { .esg-row { grid-template-columns: 1fr; } }
+/* The two cards carry their own bottom margin when stacked; inside the row the
+   grid gap handles spacing. */
+.esg-row > .esg-path, .esg-row > .esg-fw { margin-bottom: 0; }
+
+/* Empty pathway: a visible placeholder, so the slot reads as "not filled in
+   yet" rather than as a missing feature. */
+.esg-path--empty .esg-path__chart { padding-bottom: 0.5rem; }
+.esg-path__emptymsg { font-size: 0.8125rem; color: #8b9199; text-align: center;
+    margin: 0; padding: 0 1rem 1.25rem; line-height: 1.5; }
+.esg-path__emptymsg a { color: #0f7a4a; font-weight: 500; white-space: nowrap; }
