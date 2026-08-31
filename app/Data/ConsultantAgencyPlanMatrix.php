@@ -504,12 +504,23 @@ class ConsultantAgencyPlanMatrix
      * Depth capacity plan — entitlements mirror the paired client_* package.
      * slot_limit on each subscription row is set at activation (request qty).
      *
+     * PRICE IS WHOLESALE, not the client list price. A consultant buying a
+     * slot resells that slot to their client, so charging them the client
+     * price would leave zero margin and no reason to carry the product.
+     * SLOT_PRICING holds the entry rate per depth; the client plan is still
+     * the source for entitlements and the display name.
+     *
+     * Legacy packs have no SLOT_PRICING entry and keep the mirrored client
+     * price they were sold at — repricing a grandfathered pack would change
+     * what an existing agency is billed at renewal.
+     *
      * @return array<string, mixed>
      */
     private static function depthPack(string $consultantCode, string $clientCode, int $sortOrder): array
     {
         $client = PlanEntitlementDefaults::forPlanCode($clientCode) ?? [];
-        $priceAnnual = (float) ($client['price_annual'] ?? 0);
+        $clientPrice = (float) ($client['price_annual'] ?? 0);
+        $priceAnnual = (float) (self::SLOT_PRICING[$consultantCode]['entry'] ?? $clientPrice);
         $name = 'Consultant — ' . ($client['plan_name'] ?? $clientCode);
 
         return [
@@ -523,6 +534,9 @@ class ConsultantAgencyPlanMatrix
             'plan_category' => 'consultant_agency',
             'price_annual' => $priceAnnual,
             'price_per_slot_aed' => $priceAnnual,
+            // What the managed client would pay direct — the resale reference
+            // a practice prices against. Display only; never charged.
+            'client_list_price_aed' => $clientPrice,
             'consultant_slot_count' => 1,
             'currency' => $client['currency'] ?? 'AED',
             'sort_order' => $sortOrder,

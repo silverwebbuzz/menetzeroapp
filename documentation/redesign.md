@@ -4876,3 +4876,43 @@ this system (0 rows). AED settlement on that account is unverified -- one live
 AED test payment is needed before the other gateways are removed. Addon
 purchase (site blocks, slot blocks) is defined in `SLOT_PRICING` but has no
 checkout path yet.
+
+### 65.1 Consultant packs are priced wholesale
+
+`depthPack()` set `price_annual` and `price_per_slot_aed` from the paired
+`client_*` plan, so `consultant_carbon` came out at AED 3,000 and
+`consultant_esg` at 6,500 -- the CLIENT list price. A consultant buying a slot
+resells it, so charging them retail leaves zero margin and no reason to carry
+the product. That inherited behaviour was harmless while consultant packs
+merely mirrored client plans; it stops being harmless the moment a wholesale
+rate exists.
+
+Now reads `SLOT_PRICING[$code]['entry']`, falling back to the mirrored client
+price when a pack has no entry:
+
+    consultant_carbon   2,000 wholesale   3,000 client list   33% margin
+    consultant_esg      4,000 wholesale   6,500 client list   38% margin
+
+Legacy depth packs keep the mirrored price they were sold at -- repricing a
+grandfathered pack would change what an existing agency is billed at renewal.
+`consultant_enterprise` also keeps it: that tier is negotiated per deal, so its
+row is a placeholder rather than a charged rate.
+
+Added `client_list_price_aed` to the pack definition -- the resale reference a
+practice prices against. Display only, never charged.
+
+**This was not yet reachable.** `price_per_slot_aed` has no consumers outside
+this class, and `PackCheckoutController::index()` carries "Phase 3–5: self-serve
+pack grid/checkout hidden — request clients offline". Consultant packs are
+requested offline and activated by an admin, which is why the wrong price never
+surfaced. The fix corrects the data before anything reads it.
+
+**Consequence for the four-tier plan:** the "buy slots and go" self-serve path
+does not exist in the product today. Delivering it needs a slot-quantity
+checkout, block pricing (entry / +1 / +5) wired into the quote, and the pack
+grid un-hidden -- new work touching payment flow, on a gateway (Razorpay) that
+has never processed a transaction here. Sequence the AED test payment first.
+
+Re-run `php artisan migrate:refresh --path=database/migrations/2026_08_31_120000_four_tier_plan_catalogue.php`
+or re-run the migration to push the corrected prices to `subscription_plans`;
+`updateOrCreate` makes it idempotent.
