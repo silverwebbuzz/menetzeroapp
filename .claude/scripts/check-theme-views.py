@@ -107,7 +107,16 @@ def blade_include_errors(src, known_views):
         name, concat = m.group(1), m.group(2)
         if concat:
             continue
-        if name.split('::')[-1] not in known_views:
+        # 'theme-new::a.b' resolves to themes/new/a/b -- NOT to a bare 'a.b'.
+        # Stripping the namespace and looking up the remainder only worked
+        # when a non-themed view of the same name happened to exist, and
+        # wrongly reported a themed-only partial as missing.
+        if '::' in name:
+            ns, rest = name.split('::', 1)
+            candidate = 'themes.new.' + rest if ns == 'theme-new' else rest
+        else:
+            candidate = name
+        if candidate not in known_views:
             errs.append(f"@include target does not exist: '{name}'")
     return errs
 

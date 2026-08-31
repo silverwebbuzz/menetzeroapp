@@ -141,6 +141,56 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
 
 .nav-section { padding: 1rem 0.5rem 0.25rem; }
 .nav-section:first-child { padding-top: 0.5rem; }
+/* Six-pillar switcher, rendered at the top of the sidebar. Wraps to as many
+   rows as it needs -- the old shell has no full-width band to lay it out in
+   one row, so it is a compact grid rather than a tab strip. */
+.pillar-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    padding: 0 0.5rem 0.75rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.pillar-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.3125rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--ink-subtle);
+    border-radius: var(--radius);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.pillar-tab:hover { background-color: var(--canvas); color: var(--ink); }
+
+.pillar-tab.active { background-color: var(--canvas); color: var(--ink); font-weight: 600; }
+
+.pillar-tab__dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 2px;
+    background-color: var(--line-strong);
+    flex-shrink: 0;
+}
+
+.pillar-tab.active .pillar-tab__dot { background-color: currentColor; }
+
+/* Pillar-tab nav: the active section's own name, under the small-caps
+   eyebrow. Added with the six-tab IA. */
+.nav-section-heading {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--ink);
+    padding: 0 0.75rem 0.625rem;
+}
+
+.nav-section__links { display: block; }
+
 .nav-section-title {
     font-size: 0.875rem;
     font-weight: 500;

@@ -3333,3 +3333,72 @@ If discoverability is still a problem, the better direction is the **reverse**
 link — on each report page, list the registers that populate it. That is the
 "I'm working on S2, where do I enter this?" journey, it currently dead-ends,
 and a report page has the width to carry it.
+
+## 46. Six-pillar tab IA (both themes)
+
+Replaces the single scrolling rail with a **tab bar + filtered sidebar**: six
+tabs (Overview · Environmental · Social · Governance · Reports · Settings),
+and the sidebar shows only the active tab's items.
+
+**Structure only — no pages added, no routes changed.** All 30 nav
+destinations (24 in pillar groups + 6 promoted from the footer) stay
+reachable. `config/navigation.php` remains the single source of truth.
+
+### 46.1 Overview has one item — deliberate (Option B)
+
+Overview's sidebar shows a single link today. Chosen over hiding the rail so
+the layout does not change shape when Overview pages are added later.
+
+### 46.2 NavigationMap::tabs()
+
+New method beside `build()`. Same config, same gates, same items; only the
+shape differs. `build()` returns every group for one rail, `tabs()` returns
+one tab per group plus the active tab's items.
+
+- **Settings is promoted** from the `footer` block to the sixth tab. Items are
+  identical; only placement changes, so it is not duplicated into config.
+- **Active tab** = the group owning the current route, using the per-item
+  `active` flag `items()` already computes. Falls back to the first tab, so an
+  unrecognised route still renders a usable nav.
+- A tab whose items are all gated away is dropped, exactly as `build()` drops
+  such a group — a user never sees a tab opening onto nothing.
+- Returns `pillar` for the active tab so neither view needs a loop.
+
+**No JavaScript.** A tab links to its first item; that route makes the tab
+active next request. Works with JS disabled.
+
+### 46.3 The two shells differ, on purpose
+
+| | New theme | Old theme |
+|---|---|---|
+| Tab bar | full-width band between topbar and body | inside the sidebar, above the section |
+| Why | `.mnz-tabs` already existed, incl. active state and mobile scroll | `.sidebar` is `position:fixed; top:0` and `.main-content` is offset by its width — **there is no full-width band above both** |
+
+Putting a full-width bar in the old shell would mean restructuring the whole
+layout. Same information, same source, laid out to suit each shell.
+
+**Emission-source tree preserved** in the old theme (6 `quick-input.show`
+links), now keyed off `$nav['active'] === 'environmental'` instead of
+`$group['key']`. The new theme has never carried it (documented omission).
+
+### 46.4 A checker bug this exposed
+
+`@include('theme-new::layouts.partials.nav-tabs')` was reported missing. The
+checker stripped the namespace and looked up the bare remainder, which only
+resolved when a **non-themed** view of the same name happened to exist — true
+for `help.partials.guide-highlight` in §42, false for a themed-only partial.
+
+Fixed to map `theme-new::a.b` → `themes.new.a.b`. **Validated**: a genuinely
+bad target is still reported.
+
+### 46.5 Runtime verification
+
+- Click all six tabs in **both themes**; sidebar shows only that pillar.
+- **Overview** shows its single item, not an empty rail.
+- **Settings** tab reaches all six items (Reporting, Team & access, Profile,
+  Billing, Find a consultant, Help & guide).
+- **Environmental in the old theme** still shows the Scope 1/2/3 tree, with
+  Scope 3 locked on Free.
+- A **gated-away tab** (e.g. Reports without the `disclosures` entitlement) is
+  absent, not empty.
+- Deep-link into a sub-page and confirm the correct tab is active.

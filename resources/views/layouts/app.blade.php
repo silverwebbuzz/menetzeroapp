@@ -99,6 +99,10 @@
 
                 <nav class="mt-2 px-1 flex-1 flex flex-col">
                     <div class="flex-1">
+                        {{-- Six-pillar switcher; the nav below shows only the
+                             active pillar's items. --}}
+                        @include('layouts.partials.nav-tabs')
+
                         @include('layouts.partials.nav-client')
                     </div>
                 </nav>

@@ -128,6 +128,112 @@ class NavigationMap
     }
 
     /**
+     * Build the pillar tab bar plus the ACTIVE tab's sidebar.
+     *
+     * Same config, same gates, same items as build() -- only the shape
+     * differs. build() returns every group at once for a single scrolling
+     * rail; this returns one tab per group and the items of the active tab
+     * only, for a tab bar + filtered sidebar.
+     *
+     * SETTINGS IS A TAB HERE. In build() it is the 'footer' block rendered
+     * at the bottom of the rail. Its items are identical either way -- only
+     * its placement changes -- so it is appended as the sixth tab
+     * rather than duplicated into config.
+     *
+     * ACTIVE TAB: the group that owns the current route. Falls back to the
+     * first tab when nothing matches, so an unrecognised route still renders
+     * a usable nav instead of an empty rail.
+     *
+     * A tab whose items are all gated away is dropped, exactly as build()
+     * drops such a group -- otherwise the user gets a tab that opens onto
+     * nothing.
+     *
+     * @param  array<string, bool>  $gates
+     * @return array{tabs: list<array<string, mixed>>, active: string|null, items: list<array<string, mixed>>, title: string|null, eyebrow: string|null}
+     */
+    public static function tabs(array $gates, ?int $fiscalYear = null): array
+    {
+        $built = self::build($gates, $fiscalYear);
+
+        $tabs = [];
+        foreach ($built['groups'] as $group) {
+            $tabs[] = [
+                'key' => $group['key'],
+                // The Overview group carries 'title' => null because it renders
+                // headingless in the rail. A TAB must always have a label.
+                'label' => $group['title'] ?? 'Overview',
+                'pillar' => $group['pillar'],
+                'items' => $group['items'],
+                'eyebrow' => self::eyebrowFor($group['key']),
+                'url' => $group['items'][0]['url'] ?? null,
+                'active' => false,
+            ];
+        }
+
+        // Settings: the footer block, promoted to a tab.
+        if ($built['footer']['items'] !== []) {
+            $tabs[] = [
+                'key' => 'settings',
+                'label' => $built['footer']['title'] ?? 'Settings',
+                'pillar' => null,
+                'items' => $built['footer']['items'],
+                'eyebrow' => self::eyebrowFor('settings'),
+                'url' => $built['footer']['items'][0]['url'] ?? null,
+                'active' => false,
+            ];
+        }
+
+        if ($tabs === []) {
+            return ['tabs' => [], 'active' => null, 'items' => [], 'title' => null, 'eyebrow' => null, 'pillar' => null];
+        }
+
+        // The active tab owns whichever item is active. Items already carry
+        // their active flag from items(), computed by prefix match, so this
+        // needs no second route comparison.
+        $activeIndex = null;
+        foreach ($tabs as $i => $tab) {
+            foreach ($tab['items'] as $item) {
+                if ($item['active']) {
+                    $activeIndex = $i;
+                    break 2;
+                }
+            }
+        }
+
+        $activeIndex ??= 0;
+        $tabs[$activeIndex]['active'] = true;
+
+        return [
+            'tabs' => $tabs,
+            'active' => $tabs[$activeIndex]['key'],
+            'items' => $tabs[$activeIndex]['items'],
+            'title' => $tabs[$activeIndex]['label'],
+            'eyebrow' => $tabs[$activeIndex]['eyebrow'],
+            // Active tab's pillar, so the sidebar can pick up that pillar's
+            // accent without re-scanning the tab list in a view.
+            'pillar' => $tabs[$activeIndex]['pillar'],
+        ];
+    }
+
+    /**
+     * Small caps label above the sidebar heading, per tab.
+     *
+     * Display only. An unlisted key falls back to null and the sidebar simply
+     * renders no eyebrow.
+     */
+    protected static function eyebrowFor(string $key): ?string
+    {
+        return [
+            'overview' => 'Workspace',
+            'environmental' => 'Pillar',
+            'social' => 'Pillar',
+            'governance' => 'Pillar',
+            'reports' => 'Output',
+            'settings' => 'Admin',
+        ][$key] ?? null;
+    }
+
+    /**
      * @param  list<array<string, mixed>>  $items
      * @return list<array{label: string, url: string, active: bool}>
      */

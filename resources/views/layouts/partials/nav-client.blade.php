@@ -26,7 +26,10 @@
     // variable it defines is discarded when it returns; the including view
     // never sees it.
     $navGates = \App\Support\NavigationGates::forUser();
-    $nav = \App\Support\NavigationMap::build($navGates);
+    // Pillar-tab nav: tabs() returns the ACTIVE tab's items only. The tab
+    // bar itself is rendered by the shell (layouts.partials.nav-tabs) so it
+    // can span the full width above both this sidebar and the content.
+    $nav = \App\Support\NavigationMap::tabs($navGates);
 
     $canViewQuickInput = $navGates['quick_input'];
     $scope3Locked = isset($gate) ? $gate->isScope3Locked() : true;
@@ -97,13 +100,16 @@
     };
 @endphp
 
-@foreach ($nav['groups'] as $group)
-    <div class="nav-section">
-        @if ($group['title'])
-            <div class="nav-section-title">{{ $group['title'] }}</div>
-        @endif
+<div class="nav-section">
+    @if ($nav['eyebrow'])
+        <div class="nav-section-title">{{ $nav['eyebrow'] }}</div>
+    @endif
+    @if ($nav['title'])
+        <div class="nav-section-heading">{{ $nav['title'] }}</div>
+    @endif
 
-        @foreach ($group['items'] as $item)
+    <div class="nav-section__links">
+        @foreach ($nav['items'] as $item)
             <a href="{{ $item['url'] }}"
                class="nav-link {{ $item['active'] ? 'active' : '' }}"
                @if ($item['active']) aria-current="page" @endif>
@@ -117,7 +123,7 @@
          under Measure. Preserved verbatim from the pre-config nav: it is a
          genuinely useful shortcut into quick-input.show and no destination
          should be lost. --}}
-    @if ($group['key'] === 'environmental')
+    @if ($nav['active'] === 'environmental')
     @if($canViewQuickInput)
         @php
             $quickInputSources = \App\Models\EmissionSourceMaster::where('is_quick_input', true)
@@ -232,19 +238,8 @@
         </div>
     @endif
     @endif
-@endforeach
-
-<div class="nav-section" style="border-top: 1px solid var(--line); padding-top: 0.75rem;">
-    @if ($nav['footer']['title'])
-        <div class="nav-section-title">{{ $nav['footer']['title'] }}</div>
-    @endif
-
-    @foreach ($nav['footer']['items'] as $item)
-        <a href="{{ $item['url'] }}"
-           class="nav-link {{ $item['active'] ? 'active' : '' }}"
-           @if ($item['active']) aria-current="page" @endif>
-            {!! $svg($item['icon'] ?? 'dot') !!}
-            {{ $item['label'] }}
-        </a>
-    @endforeach
 </div>
+
+{{-- Settings is no longer a footer block here: NavigationMap::tabs() promotes
+     it to its own tab, so its items render through the loop above when that
+     tab is active. --}}
