@@ -4734,3 +4734,72 @@ dropped). 236 non-theme views scan clean, 0 broken.
 give GRI 3-1's documented-override requirement a home on the assessment page
 itself, but it is a form change on a page users are already filling in, so it is
 left as a separate decision.
+
+## 64. Demo baseline — derived from seeded entries, not hardcoded
+
+`ConsultantFullDemoSeeder::seedReductionTargets()` wrote a fixed
+`baseline_tco2e => 32.6` while the same seeder generated ~95 tCO2e of actual
+Scope 1+2 across three sites. The demo therefore showed a company already 3x
+past a target it had supposedly just set. Two numbers in one seeder with no
+shared source.
+
+**Correction to an earlier claim.** This was previously described in
+conversation as "baseline 120t vs 1,714t actual, 14x". Both figures were wrong.
+Traced to source: the seeded samples are per location per year, in kg --
+Scope 1 = 6,380 and Scope 2 = 25,200, so three locations give 94.74 tCO2e. The
+"120" was FY2024 (125.06 t) after the historical seeder's 1.32 multiplier. There
+was never a 1,714 t figure.
+
+**The dashboard maths was never wrong.**
+`DashboardController::calculateNetZeroProgress()` already resolves the actual
+through `emissionsForCoverage($target->scope_coverage, ...)`, so a `scope12`
+target is measured against Scope 1+2 only, and a target at or above baseline is
+treated as unset rather than dividing by zero. Only the seed data was wrong.
+
+**Fix:** the baseline is now read back from the `measurement_data` rows the
+seeder just wrote (`scope12TonnesForYear()`), and `target_tco2e` is computed from
+it rather than stated separately, so the two can never drift apart. If no
+measured data exists the target is left unseeded rather than inventing a
+baseline the dashboard would chart against.
+
+Scope 3 is excluded from that sum deliberately -- the target is
+`scope_coverage = 'scope12'`, and including Scope 3 in the baseline while the
+dashboard compares Scope 1+2 actuals would show phantom progress.
+
+**Base-year selection was NOT duplicated.**
+`FalconHistoricalDataSeeder::rebaseReductionTarget()` already re-points
+`base_year` and `baseline_tco2e` to the earliest backfilled year, and already
+supports `FALCON_DEMO_TARGET=strict` for the behind-schedule path. An
+`earliestMeasuredYear()` helper was written here, then removed on finding that
+-- two places computing one base year is exactly the class of disagreement
+section 63 was about.
+
+Resulting demo, both seeders run:
+
+    FY2024  125.06 tCO2e     <- base year
+    FY2025  108.95 tCO2e
+    FY2026   94.74 tCO2e     <- current
+    baseline 125.06, target 87.54 (-30% by 2030)
+    24.2% reduction achieved, 80.8% of the required reduction
+
+Three years, three locations, a declining trend and a target within reach --
+which is the story the demo is meant to tell.
+
+`ConsultantFullDemoSeeder` alone gives baseline = current year = 94.74 t and 0%
+progress: correct for a company at the start line, and no longer nonsensical.
+
+**Verified statically** (no PHP CLI): braces/parens/brackets balanced; column
+names checked against `MeasurementData::$fillable` (`calculated_co2e`, `scope`)
+and `Measurement::$fillable` (`fiscal_year`, `location_id`); scope values match
+the `'Scope 1'` / `'Scope 2'` string form used throughout the app;
+`Location`, `Measurement` and `MeasurementData` were already imported; no
+orphaned reference to the removed helper. Figures above are arithmetic on the
+seeded sample values.
+
+**Found but not built:** `base_year_restatements` and `structural_changes` are
+migrated, `BaseYearRestatement` is a complete model citing the GHG Protocol and
+IFRS S2 requirement -- and NOTHING reads or writes either. So are
+`recalculation_threshold_percent` and the three `intensity_denominator_*`
+columns. The Chapter 5 apparatus exists in the schema with no UI, the same
+pattern as the S1 risk fields in section 59. A real boundary change today would
+have nowhere to be recorded.

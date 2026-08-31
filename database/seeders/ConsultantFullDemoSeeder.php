@@ -873,18 +873,80 @@ class ConsultantFullDemoSeeder extends Seeder
         }
     }
 
+    /**
+     * Scope 1 + 2 for one fiscal year, in tonnes.
+     *
+     * Scope 3 is excluded deliberately: the target this feeds is
+     * scope_coverage = 'scope12', and DashboardController::calculateNetZero-
+     * Progress() measures such a target against Scope 1 + 2 actuals only.
+     * Including Scope 3 in the baseline would compare a larger baseline to a
+     * smaller actual and show phantom progress.
+     *
+     * calculated_co2e is stored in kg.
+     */
+    private function scope12TonnesForYear(Company $managed, int $fiscalYear): float
+    {
+        $locationIds = Location::where('company_id', $managed->id)->pluck('id');
+
+        if ($locationIds->isEmpty()) {
+            return 0.0;
+        }
+
+        $measurementIds = Measurement::whereIn('location_id', $locationIds)
+            ->where('fiscal_year', $fiscalYear)
+            ->pluck('id');
+
+        if ($measurementIds->isEmpty()) {
+            return 0.0;
+        }
+
+        $kg = (float) MeasurementData::whereIn('measurement_id', $measurementIds)
+            ->whereIn('scope', ['Scope 1', 'Scope 2'])
+            ->sum('calculated_co2e');
+
+        return $kg / 1000;
+    }
+
+    /**
+     * Interim reduction target.
+     *
+     * The baseline is READ BACK from the entries this seeder just wrote, not
+     * hardcoded. A fixed figure drifts the moment a location or an emission
+     * sample is added: it was 32.6 tCO2e against ~95 tCO2e of actual Scope 1+2
+     * across three sites, so the demo showed a company already 3x past a
+     * target it had supposedly just set.
+     *
+     * Base year stays the current reporting year here, because that is the
+     * only year with data at this point in the run.
+     * FalconHistoricalDataSeeder::rebaseReductionTarget() re-points base_year
+     * and baseline to the earliest backfilled year once history exists -- that
+     * logic is NOT duplicated here, so the two can never disagree.
+     */
     private function seedReductionTargets(Company $managed, int $reportingYear): ?ReductionTarget
     {
+        $baseline = $this->scope12TonnesForYear($managed, $reportingYear);
+
+        // No measured data at all — leave the target unseeded rather than
+        // inventing a baseline the dashboard would then chart against.
+        if ($baseline <= 0) {
+            return null;
+        }
+
+        $reductionPercent = 30.0;
+        $targetTonnes = round($baseline * (1 - ($reductionPercent / 100)), 2);
+
         $target = ReductionTarget::updateOrCreate(
             ['company_id' => $managed->id, 'name' => 'UAE Net Zero 2050 aligned interim target'],
             [
                 'target_type' => 'absolute',
                 'scope_coverage' => 'scope12',
                 'base_year' => $reportingYear,
+                // Six years past the CURRENT reporting year, so the target is
+                // always in the future however old the base year is.
                 'target_year' => $reportingYear + 6,
-                'baseline_tco2e' => 32.6,
-                'target_tco2e' => 22.8,
-                'reduction_percent' => 30,
+                'baseline_tco2e' => round($baseline, 2),
+                'target_tco2e' => $targetTonnes,
+                'reduction_percent' => $reductionPercent,
                 'sbti_aligned' => false,
                 'status' => 'active',
             ]
