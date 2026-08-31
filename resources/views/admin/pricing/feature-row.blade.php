@@ -6,6 +6,16 @@
 @section('page-title', ($isEdit ? 'Edit' : 'New') . ' Feature Row')
 
 @section('content')
+    {{-- Same warning as the index. Someone reaching this form directly would
+         otherwise fill in three fields that reach no customer-facing page. --}}
+    <div class="mb-6 max-w-3xl rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        <strong>Not shown to customers.</strong>
+        These rows belong to a retired comparison table that no page renders, and the
+        Starter / Growth columns are plans the Carbon / ESG catalogue replaced.
+        To change what customers see, edit
+        <a href="{{ route('admin.subscription-plans') }}" class="underline">Plans &amp; entitlements</a>.
+    </div>
+
     <div class="bg-white shadow rounded-lg p-6 max-w-3xl">
         <form method="POST" action="{{ $isEdit ? route('admin.pricing.feature-rows.update', $row->id) : route('admin.pricing.feature-rows.store') }}">
             @csrf

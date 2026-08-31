@@ -5059,3 +5059,48 @@ in the file; resolution simulated -- every defined code returns itself, only an
 unknown code falls back.
 
 No migration. Run: `php artisan optimize:clear`
+
+## 69. Orphaned pricing admin marked, not renamed
+
+Final sweep for retired plan codes. Everything still matching is either an
+intentional grandfathering map (`COMPANY_LIST_AED`, `COMPANY_LIVE_PLAN_MAP`,
+`CLIENT_DEPTH_TO_CONSULTANT`, the legacy `depthPack()` registrations) or this
+one orphaned chain:
+
+    PlanFeatureRow  (columns value_starter / value_growth / value_enterprise)
+      -> SubscriptionPlanMatrix   imported by SubscriptionController, never called
+      -> no view renders it
+
+`/admin/pricing` still edits those rows, with column headers naming Starter and
+Growth -- both retired.
+
+**Marked rather than renamed.** Renaming `value_starter` / `value_growth` means
+a schema migration plus a model, a controller, two admin views and a seeder, to
+fix a table no customer ever sees. The real harm is an admin editing these
+expecting a customer-visible change, so both the index and the edit form now say
+plainly that the rows render nowhere and point at Plans & entitlements instead.
+
+**Public pricing needed nothing.** `/pricing` renders `public.pricing`, which
+carries "No public prices - explore first" and lists no plan or amount, so the
+catalogue change does not reach it.
+
+**Plan work is now complete on every live path:**
+
+    request  -> CompanyPackageOptions::CODES              (66)
+    quote    -> CommercialPriceBook + price book table    (67)
+    activate -> COMPANY_LIVE_PLAN_MAP -> seeded plan row  (67, 68)
+    entitle  -> managedClientLimitsPlanCode()             (68)
+
+**Verified:** 236 non-theme views scan clean, 0 broken; div and directive pairs
+balanced in both edited views; no Blade directive inside any `{{-- --}}` comment.
+
+No migration. Run: `php artisan optimize:clear`
+
+**Remaining, in order:**
+1. Razorpay AED test payment — zero transactions have ever succeeded in this
+   system, and everything below assumes AED settles.
+2. Self-serve checkout — slot quantity, block pricing, un-hide the pack grid.
+   `PackCheckoutController::index()` still carries "Phase 3-5: self-serve pack
+   grid/checkout hidden". Both sides remain request-then-activate.
+3. Retire Stripe and Cashfree — safe now: `client_payment_transactions` is empty
+   and all three FK holders are at zero.

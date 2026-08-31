@@ -10,11 +10,25 @@
         </div>
     @endif
 
+    {{-- These rows render nowhere. PlanFeatureRow feeds SubscriptionPlanMatrix,
+         which SubscriptionController imports but never calls, and no view
+         renders it. Their columns are also still Starter / Growth / Enterprise
+         -- two plans retired by the Carbon / ESG catalogue. Saying so here is
+         cheaper and safer than renaming three DB columns for a table nobody
+         sees; an admin editing these expecting a customer-visible change is
+         the actual harm. --}}
+    <div class="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        <strong>These rows are not shown to customers.</strong>
+        The live catalogue is <strong>Carbon</strong>, <strong>ESG</strong> and <strong>Enterprise</strong>, driven by
+        <a href="{{ route('admin.subscription-plans') }}" class="underline">Plans &amp; entitlements</a>.
+        The Starter / Growth columns below belong to a retired comparison table that no page renders.
+        Edit plan entitlements instead &mdash; changes here have no effect.
+    </div>
+
     <p class="text-sm text-gray-500 mb-6">
         <strong>Public pricing</strong> and the in-app <strong>upgrade comparison tables</strong> are driven by plan entitlements
         (<a href="{{ route('admin.subscription-plans') }}" class="text-purple-600 hover:underline">Plans &amp; entitlements</a>).
-        Use this section for optional <em>extra</em> rows on the legacy upgrade matrix, or
-        <a href="{{ route('pricing') }}" target="_blank" class="text-purple-600 hover:underline">preview public pricing ↗</a>.
+        <a href="{{ route('pricing') }}" target="_blank" class="text-purple-600 hover:underline">Preview public pricing</a>.
     </p>
 
     <!-- Feature comparison rows -->
