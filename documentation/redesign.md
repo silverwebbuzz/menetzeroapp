@@ -4464,3 +4464,46 @@ explicitly). `@class`/`@style` were written first, then removed: zero precedent
 exists for either directive in ~250 views and there is no PHP CLI here to
 compile-test, so plain ternaries were used to match house style. `@selected` was
 kept — 66 existing usages.
+
+## 59.1 Demo data — IFRS S1 sustainability risks
+
+`database/seeders/FalconSustainabilityRiskSeeder.php`. Run explicitly:
+
+    php artisan db:seed --class=FalconSustainabilityRiskSeeder
+
+**Why it was needed.** `ConsultantFullDemoSeeder` imports `SustainabilityRisk`
+(line 33) but never writes a row, so a fully seeded demo showed a populated S2
+climate register and an empty S1 register. Nothing was wrong with the page.
+
+Follows `FalconHistoricalDataSeeder`'s conventions: company looked up by name,
+overridable via `FALCON_DEMO_COMPANY`, `updateOrCreate` keyed on
+(company, fiscal_year, name) so re-running is idempotent, and an explicit
+"demo data only, never wire into DatabaseSeeder::run()" warning.
+
+Seven risks across six of the ten `ifrs_s1.material_topics` keys, seeded for
+the current year and the two years `FalconHistoricalDataSeeder` backfills, so
+the year selector never drops the register to empty. Resulting tiles:
+
+    FY2024  total 4   quantified 0/4   without owner 0
+    FY2025  total 5   quantified 4/5   without owner 0
+    FY2026  total 7   quantified 6/7   without owner 1
+
+**Two rows are deliberately incomplete.** The contracted-workforce risk has no
+`financial_impact` (no audit has been run, so any figure would be invented) and
+the supplier-screening risk has no `owner` (procurement ownership genuinely has
+not been allocated). A register where every field is populated would make the
+"Quantified" and "Without owner" tiles decorative — they exist to show exactly
+this kind of gap, and demo data that hides it would misrepresent what the page
+is for.
+
+**No climate duplication.** Climate detail stays in the IFRS S2 register
+(`ClimateRisk`). The single `climate` row is a cross-reference so the S1
+assessment is not silent on climate, never a copy of the S2 rows — the same
+exposure in two registers would have no single owner.
+
+**Verified statically** (no PHP CLI on this machine): braces/parens/brackets
+balanced; all seven blocks carry all nine keys; every key is in
+`SustainabilityRisk::$fillable` (an unfillable key would be silently dropped by
+`updateOrCreate`); all `topic` values are among the ten config keys, and
+`time_horizon`, `likelihood` and `status` are within the controller's validation
+enums. The year-filter logic was simulated to produce the tile counts above.
