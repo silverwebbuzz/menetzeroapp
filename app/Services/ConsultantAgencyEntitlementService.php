@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Data\ConsultantAgencyPlanMatrix;
+use App\Data\PlanEntitlementDefaults;
 use App\Models\Company;
 use App\Models\ConsultantClientEngagement;
 use App\Models\ConsultantSubscriptionAddon;
@@ -12,6 +13,14 @@ use App\Models\ConsultantSubscriptionAddon;
  */
 class ConsultantAgencyEntitlementService
 {
+    /**
+     * Depth a managed client falls back to when the engagement names no
+     * package. Carbon is the entry PAID tier: a consultant only reaches this
+     * code on a paid slot, so defaulting to Free would under-serve a client
+     * somebody has paid for.
+     */
+    private const DEFAULT_MANAGED_CLIENT_CODE = 'client_carbon';
+
     public const MODE_PRY_FULL = 'pry_full';
     public const MODE_PREVIEW = 'preview';
     public const MODE_READ_ONLY = 'read_only';
@@ -277,7 +286,7 @@ class ConsultantAgencyEntitlementService
             }
         }
 
-        return 'client_scope_basic';
+        return self::DEFAULT_MANAGED_CLIENT_CODE;
     }
 
     /**
@@ -292,22 +301,20 @@ class ConsultantAgencyEntitlementService
         }
 
         if ($engagement && $this->isDemoEngagement($engagement)) {
-            return 'client_growth';
+            // Demo/QA gets the full paid tier so every screen is reachable.
+            return 'client_esg';
         }
 
+        // Any code with a real definition is accepted. A hardcoded whitelist
+        // silently downgraded a managed client the moment the catalogue grew:
+        // a consultant on a Carbon slot would fall through to the default and
+        // their client would get the wrong entitlements, with nothing logged.
         $packageCode = $this->managedClientPackageCode($engagement);
-        if ($packageCode && in_array($packageCode, [
-            'client_scope_basic',
-            'client_scope_pro',
-            'client_esg_starter',
-            'client_esg_complete',
-            'client_enterprise',
-            'client_free',
-        ], true)) {
+        if ($packageCode && PlanEntitlementDefaults::forPlanCode($packageCode) !== null) {
             return $packageCode;
         }
 
-        return 'client_scope_basic';
+        return self::DEFAULT_MANAGED_CLIENT_CODE;
     }
 
     public function isTrialManagedClient(int $companyId): bool

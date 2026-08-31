@@ -5025,3 +5025,37 @@ Run: `php artisan migrate`
 table wins at runtime and the constant is the fallback, which is the same
 pattern the company packages already use -- but it is two places for one number
 and they can drift. Worth collapsing when slot checkout is built.
+
+## 68. Managed-client entitlements accepted the new tiers
+
+`ConsultantAgencyEntitlementService::managedClientLimitsPlanCode()` decides what
+a consultant's managed client actually gets. It checked the resolved package
+against a HARDCODED whitelist of six codes, none of which were `client_carbon`
+or `client_esg`.
+
+So a consultant on a Carbon slot would have had their client fall through to
+`client_scope_basic` -- wrong limits, wrong exports, nothing logged. Silent, and
+only visible as "why can't my client export the UAE ESG report".
+
+Replaced the whitelist with `PlanEntitlementDefaults::forPlanCode($code) !==
+null`: any code with a real definition is accepted. A list that must be edited
+every time the catalogue changes is the bug, not the missing entries.
+
+Two bare `'client_scope_basic'` fallbacks became
+`DEFAULT_MANAGED_CLIENT_CODE = 'client_carbon'`. Carbon, not Free: this code is
+only reached on a PAID slot, so defaulting to Free would under-serve a client
+somebody has paid for.
+
+The demo/QA engagement returned `client_growth`, itself retired. Now
+`client_esg`, so every screen stays reachable in a demo.
+
+**`AdminRequestActivationService` needed no change** -- it resolves through
+`CommercialPriceBook::COMPANY_LIVE_PLAN_MAP`, already updated in section 67, and
+its pre-Phase-8 legacy fallback never fires because `SubscriptionPlanSeeder`
+creates every row. Verified all seven mapped codes resolve to a seeded plan.
+
+**Verified:** braces/parens balanced; no `'client_scope_basic'` literal remains
+in the file; resolution simulated -- every defined code returns itself, only an
+unknown code falls back.
+
+No migration. Run: `php artisan optimize:clear`
