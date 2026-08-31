@@ -4012,3 +4012,80 @@ A first pass of the sweep reported ~190 failures, including names verified as
 working in production. The group-nesting logic was wrong. Recorded because the
 lesson matters: a static route check is only as good as its group resolution,
 and a scanner that cries wolf is worse than none.
+
+## 55. Governance pillar dashboard (/governance)
+
+Third and last pillar dashboard. All three roots now have their own
+controller, service and view.
+
+### 55.1 The ESG dashboard is NOT orphaned
+
+`EsgDashboardController` still serves **`/disclosures/esg-dashboard`**
+(`routes/web.php:401`), unchanged, and is linked from the **Disclosure hub**
+and the **ESG scorecard** in both themes. Only the three pillar roots were
+repointed. That is the right home for it: it is a cross-pillar view, and the
+hub is where cross-pillar things belong.
+
+### 55.2 A correction
+
+§48.1 recorded that *"ESG on board agenda: Quarterly"* had no field. **Wrong.**
+`oversight_frequency` exists in **both** IFRS S1 and S2 governance sections, as
+a select with exactly the design's values (Quarterly / Bi-annually / Annually /
+Ad hoc). It is now the lead KPI.
+
+### 55.3 Standard
+
+| Disclosure | Code |
+|---|---|
+| Board / committee responsible | GRI 2-9 |
+| Management accountability | GRI 2-13 |
+| Board oversight frequency | GRI 2-12 |
+| Remuneration linkage | GRI 2-19 |
+| Confirmed corruption incidents | GRI 205-3 |
+| Ethics training coverage | GRI 205-2 |
+| Data privacy breaches | GRI 418-1 |
+| Collective bargaining coverage | GRI 2-30 |
+
+All 13 referenced fields verified present in `config/disclosure.php`.
+
+Oversight frequency and body read from **IFRS S2, falling back to S1** — a
+company may complete either first, and both ask the same question of the same
+board.
+
+### 55.4 Three judgment calls
+
+**Zero is a real answer.** `0` corruption incidents and `0` data breaches are
+*reported results*, not missing data, so they never render as "not collected".
+Only null does.
+
+**Remuneration linkage reports only whether it was ANSWERED.** The field is
+free text. Parsing it for a yes/no would be unreliable and could misstate
+whether executive pay is linked to ESG performance — a GRI 2-19 disclosure.
+The stored answer is shown; no verdict is inferred.
+
+**Board independence still absent.** `board_diversity_percent` is *women* on
+the board; independence is *non-executive* directors. Presenting one under the
+other's label would be a misstatement in a regulated disclosure. Unchanged
+from §48.1.
+
+### 55.5 Policies register replaced, not faked
+
+The design's left-hand register needs an entity with owner, review date and
+approval status per policy — a feature with its own schema. In its place:
+**governance disclosure completeness**, which answers the same question
+("what is still missing") against data that exists, with a progress bar and
+per-row status.
+
+### 55.6 Design
+
+`.env-*` layout shared with Environmental and Social so all three pillars read
+as one product; only the accent changes (`.env-page--gov`, purple `#5b5aa8`).
+
+One layout fix: a frequency or committee name is **text, not a figure**, so it
+renders at 18px rather than the 26px numeral size — otherwise it wraps and
+dwarfs the tiles beside it. Long stored answers are truncated in the table;
+the full text belongs on the section editor.
+
+Verified: 236 non-theme views scan clean; view balanced 9/9, 3/3, 1/1; service
+braces 12/12; both stylesheets balanced; `gov.risks` and
+`disclosures.s1.sections.edit` both confirmed registered.

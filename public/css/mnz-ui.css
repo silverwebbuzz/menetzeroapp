@@ -547,3 +547,48 @@ table.mnz-table td{padding:11px 16px;border-bottom:1px solid var(--line-2);font-
     font-size: 0.625rem; color: #fff; flex-shrink: 0; }
 .soc-hs__list li.is-done .soc-hs__tick { background: #1a6c9e; border-color: #1a6c9e; }
 .soc-hs__cta { margin-top: 1rem; }
+/* ---------- Governance pillar dashboard (/governance) ---------- */
+/* Same .env-* layout as the other two pillars; only the accent changes.
+   Governance purple from the design canvas. */
+.env-page--gov .env-kicker { color: #5b5aa8; }
+.env-page--gov .env-kicker__dot { background: #5b5aa8; }
+.env-page--gov .env-btn--primary { background: #5b5aa8; border-color: #5b5aa8; }
+.env-page--gov .env-btn--primary:hover { background: #4a4990; }
+.env-page--gov .gov-progress__bar span { background: #5b5aa8; }
+
+/* A frequency or committee name is text, not a figure -- it must not be set
+   at the 26px numeral size or it wraps and dwarfs the tiles beside it. */
+.env-kpi__value--text { font-size: 1.125rem; letter-spacing: -0.01em; }
+
+.gov-progress { padding: 0 1.25rem; }
+.gov-progress__bar { height: 4px; background: #eeeeec; }
+.gov-progress__bar span { display: block; height: 4px; }
+
+/* The stored answer, under its disclosure label. Only shown when short --
+   a long narrative belongs on the section editor, not in a table cell. */
+.gov-answer { font-size: 0.75rem; color: #8b9199; margin-top: 0.1875rem;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 22rem; }
+.gov-fw { font: 500 0.625rem 'IBM Plex Mono', ui-monospace, monospace;
+    letter-spacing: 0.06em; color: #8b9199; white-space: nowrap; }
+
+.gov-side { display: flex; flex-direction: column; gap: 1rem; }
+
+.gov-metrics { margin: 0; padding: 0.5rem 1.25rem 1.25rem; }
+.gov-metric { display: flex; align-items: baseline; justify-content: space-between;
+    gap: 0.75rem; padding: 0.625rem 0; border-bottom: 1px solid #f0f0ee; }
+.gov-metric:last-child { border-bottom: 0; }
+.gov-metric dt { font-size: 0.8125rem; color: #5a6068; margin: 0; min-width: 0; }
+.gov-metric dd { font-size: 0.875rem; font-weight: 600; color: #14161a; margin: 0;
+    text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.gov-metric dd.is-missing { color: #8a6118; font-weight: 500; font-size: 0.75rem; }
+
+.env-card--dashed { border-style: dashed; }
+.gov-rem { padding: 1rem 1.25rem 1.25rem; }
+.gov-rem__item + .gov-rem__item { margin-top: 0.875rem; padding-top: 0.875rem;
+    border-top: 1px solid #f0f0ee; }
+.gov-rem__lbl { font: 500 0.625rem 'IBM Plex Mono', ui-monospace, monospace;
+    letter-spacing: 0.06em; text-transform: uppercase; color: #8b9199; }
+.gov-rem__item p { font-size: 0.8125rem; color: #14161a; margin: 0.25rem 0 0;
+    line-height: 1.55; }
+.gov-rem__empty { font-size: 0.8125rem; color: #8b9199; margin: 0 0 1rem;
+    line-height: 1.55; }

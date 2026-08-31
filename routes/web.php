@@ -530,7 +530,9 @@ Route::middleware([
 
     // --- Governance --------------------------------------------------------
     Route::prefix('governance')->name('gov.')->middleware('disclosureAccess')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Disclosure\EsgDashboardController::class, 'index'])->name('overview');
+        // Oversight dashboard for the pillar. Previously reused
+        // EsgDashboardController, which answers a different question.
+        Route::get('/', [\App\Http\Controllers\Disclosure\GovernanceDashboardController::class, 'index'])->name('overview');
         Route::get('/materiality', [\App\Http\Controllers\Disclosure\MaterialityMatrixController::class, 'index'])->name('materiality');
         // D4: the two risk registers keep their own schemas. Their columns are
         // in fact identical apart from the discriminator (risk_type vs topic),
