@@ -22,6 +22,21 @@
 --}}
 @php
     $navTabs = \App\Support\NavigationMap::tabs(\App\Support\NavigationGates::forUser());
+
+    // Assurance level shown at the right of the tab row. Reads the company's
+    // stored value where one exists and falls back to the honest default --
+    // most companies have had no external assurance, and claiming otherwise
+    // in a compliance product would be worse than saying nothing.
+    $navAssurance = 'None';
+    try {
+        $navCompany = auth('web')->user()?->getActiveCompany();
+        $stored = $navCompany?->settings['assurance_level'] ?? null;
+        if (is_string($stored) && $stored !== '') {
+            $navAssurance = $stored;
+        }
+    } catch (\Throwable) {
+        // Display metadata must never take the shell down.
+    }
 @endphp
 
 @if (! empty($navTabs['tabs']))
@@ -36,5 +51,14 @@
                 </a>
             @endif
         @endforeach
+
+        {{-- Right-hand meta, per the design canvas. .mnz-tabs__meta is already
+             defined (margin-left:auto) and is hidden on narrow screens by the
+             stylesheet's own media query, so the tabs keep the full width on
+             mobile. Assurance level is real; the sync time is not wired to
+             anything yet and is deliberately omitted rather than faked. --}}
+        <div class="mnz-tabs__meta">
+            <span>Assurance: {{ $navAssurance }}</span>
+        </div>
     </nav>
 @endif

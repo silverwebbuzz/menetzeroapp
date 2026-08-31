@@ -40,14 +40,18 @@
     $navGates = \App\Support\NavigationGates::forUser();
     $navTabs = \App\Support\NavigationMap::tabs($navGates);
 @endphp
-<div class="mnz-side__group" @if ($navTabs['pillar']) data-pillar="{{ $navTabs['pillar'] }}" @endif>
+{{-- Sidebar head: kicker + section name, per the design canvas. Sits in its
+     own block above the links, NOT inside the link group. --}}
+<div class="mnz-side__head">
     @if ($navTabs['eyebrow'])
         <div class="mnz-side__eyebrow">{{ $navTabs['eyebrow'] }}</div>
     @endif
     @if ($navTabs['title'])
         <div class="mnz-side__heading">{{ $navTabs['title'] }}</div>
     @endif
+</div>
 
+<div class="mnz-side__group" @if ($navTabs['pillar']) data-pillar="{{ $navTabs['pillar'] }}" @endif>
     @foreach ($navTabs['items'] as $item)
         <a href="{{ $item['url'] }}"
            class="mnz-nav {{ $item['active'] ? 'is-active' : '' }}"

@@ -81,8 +81,8 @@ img,svg{display:block;max-width:100%}
    own name. Replaces .mnz-side__title, which was referenced by the previous
    single-rail nav but never defined in this stylesheet. */
 .mnz-side__eyebrow{font:500 10.5px var(--mono);letter-spacing:.1em;color:var(--ink-4);
-  text-transform:uppercase;padding:0 12px 4px}
-.mnz-side__heading{font:600 15px var(--sans);color:var(--ink);padding:0 12px 12px}
+  text-transform:uppercase}
+.mnz-side__heading{font:600 15px var(--sans);letter-spacing:-.015em;color:var(--ink);margin-top:3px}
 .mnz-nav{width:100%;text-align:left;display:flex;align-items:center;gap:9px;border:0;background:none;
   font:500 13px var(--sans);color:var(--ink-2);padding:6px 12px;border-radius:var(--r);cursor:pointer;margin:1px 0}
 .mnz-nav__dot{width:5px;height:5px;border-radius:999px;background:var(--line-3);flex-shrink:0}

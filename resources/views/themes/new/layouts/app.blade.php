@@ -252,13 +252,12 @@
                 <button type="submit" class="mnz-signout">Sign out</button>
             </form>
         </div>
+        {{-- Six-pillar tab bar: the SECOND ROW OF THE HEADER, per the design
+             canvas (Menetzero-Redesign/MeNetZero Redesign.dc.html, the
+             42px row under the 56px topbar). It must sit INSIDE <header> --
+             outside it reads as a detached strip on its own hairline. --}}
+        @include('theme-new::layouts.partials.nav-tabs')
     </header>
-
-    {{-- Six-pillar tab bar. Sits between the topbar and the body so it spans
-         the full width, above BOTH the sidebar and the content -- the sidebar
-         then shows only the active pillar's items. Rendered from the same
-         config/navigation.php as the sidebar, via NavigationMap::tabs(). --}}
-    @include('theme-new::layouts.partials.nav-tabs')
 
     <div class="mnz-body">
         <aside class="mnz-side" :class="{ 'is-open': sidebarOpen }"

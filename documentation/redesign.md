@@ -3402,3 +3402,65 @@ bad target is still reported.
 - A **gated-away tab** (e.g. Reports without the `disclosures` entitlement) is
   absent, not empty.
 - Deep-link into a sub-page and confirm the correct tab is active.
+
+## 47. Aligning to the design canvas
+
+Source of truth: `Menetzero-Redesign/MeNetZero Redesign.dc.html`. Earlier
+sections were built from screenshots; this reconciles against the file.
+
+### 47.1 Shell fixes applied
+
+| # | Design | Was | Now |
+|---|---|---|---|
+| 1 | Tab row is the **second row of `<header>`** (42px under the 56px topbar) | rendered AFTER `</header>` | inside `<header>` |
+| 2 | Right-hand meta on the tab row | missing | `Assurance: <level>` via `.mnz-tabs__meta` |
+| 3 | Sidebar head (kicker + title) in its own block, `0 20px 14px` | inside the link group | own `.mnz-side__head` |
+
+**#1 was the visible bug** — outside `<header>` the tabs read as a detached
+strip on their own hairline.
+
+**Sync time deliberately omitted.** The design shows `LAST SYNC 09:41`;
+nothing in the app records it, so it is left out rather than faked. Assurance
+reads the company's stored value and falls back to **"None"** — most companies
+have had no external assurance, and overclaiming it in a compliance product
+would be worse than showing nothing.
+
+### 47.2 The design's sidebar is NOT the current nav restyled
+
+It specifies different items in **sub-groups**. Bold = does not exist:
+
+- **Environmental** — MEASURE: Scope 1/2/3, Locations, Bulk import ·
+  MANAGE: Targets & pathway, **Energy & water**, **Waste & circularity**,
+  Climate risk (S2)
+- **Social** — WORKFORCE: **Headcount & turnover**, **Diversity & inclusion**,
+  **Health & safety**, **Training & development** · VALUE CHAIN: Supply chain
+  labour, **Community investment**, **Human rights**
+- **Governance** — OVERSIGHT: **Board & committees**, **ESG accountability**,
+  **Remuneration link** · CONDUCT: Policies register, **Ethics &
+  anti-bribery**, **Data & cyber**, Risk register
+- **Overview** — SNAPSHOT / PROGRAMME / HANDOFF, all new
+
+**Social is the extreme case: 7 items, 1 of which exists.** The current Social
+nav (Summary, Stakeholders, Supply chain, ESG scorecard, ESG targets) is a
+different list.
+
+So "use the design's structure" and "show the submenus we have" are, for
+Social and Governance, two different navs. The user's instruction was the
+latter, so the current items stand until pages are built.
+
+### 47.3 Not yet done, and why
+
+- **Sub-group headings** (MEASURE / MANAGE ...) — needs a `section` key per
+  item in `config/navigation.php`. Can be done with existing items; deferred
+  pending confirmation of which existing item belongs in which sub-group.
+- **Item counts** (`9`, `6/15`, `!`) — each needs a real query. `6/15` is
+  Scope 3 coverage, `!` is a warning state. Not faked.
+- **Readiness meter** — the design pins a % meter to the sidebar foot. The
+  denominator ("required fields") is not defined anywhere in the app; it needs
+  a rule before it can be computed.
+
+### 47.4 HANDOFF is not customer-facing
+
+The Overview group's HANDOFF section ("All mockups" 11, "Implementation map"
+37) refers to the design canvas's own artboards. It is project tooling, not
+product, and must not ship in a client's nav.
