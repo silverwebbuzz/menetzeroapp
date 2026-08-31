@@ -4372,3 +4372,35 @@ Positions verified: high/high top-right (84%, 89%), low/medium bottom-centre
 Verified: 236 non-theme views scan clean; old matrix 2/2, 5/5, 3/3; new matrix
 1/1, 5/5, 2/2; esg-performance 13/13, 7/7, 6/6; service braces 28/28;
 stylesheets 530/530 and 393/393; nav brackets 99/99 with 37 routes.
+
+### 58.9 Two separate pages, one source
+
+Corrects §58.8, which moved Materiality out of Governance. It belongs in
+**both** places, because they are different jobs:
+
+| Nav | Route | Page |
+|---|---|---|
+| **Governance › Materiality** | `disclosures.materiality-matrix.index` | **Input** — the scoring form (selects + checkboxes) |
+| **Overview › Materiality** | `disclosures.materiality-matrix.snapshot` | **Read-only** — plot + topics table, 50/50 |
+
+`MaterialityMatrixController::snapshot()` reads the **same**
+`materialTopicsForCompany()` as `index()`, so the snapshot can never show a
+value the form has not saved. One source, two presentations.
+
+**The plot was removed from the form page** in both themes. Rendering the
+matrix on both would be two places for one set of numbers to disagree; the
+form now links to the snapshot with a "View matrix" button, and the snapshot
+links back with "Edit scores".
+
+The snapshot view needs **no themed override** — it uses only `.mm-*` classes,
+verified present in both `app-shell.css` and `mnz-ui.css`, so it renders
+correctly under either theme from one file.
+
+**The checker caught a real gap here**: after adding the "View matrix" link to
+the old theme's form, `themes/new/.../index` reported
+`route dropped vs original: ['disclosures.materiality-matrix.snapshot']` —
+the new theme had no way to reach the snapshot. Added.
+
+Verified: 237 non-theme views scan clean; snapshot 0/0, 2/2, 2/2; old form
+2/2, 3/3, 1/1; new form 1/1, 3/3, 0/0; nav brackets 102/102 with 38 routes;
+stylesheets 536/536 and 399/399.

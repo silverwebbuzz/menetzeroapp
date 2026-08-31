@@ -132,9 +132,9 @@ return [
                     // list so the old pillar URL still lights this tab.
                     'label' => 'Materiality',
                     'icon' => 'grid',
-                    'route' => 'disclosures.materiality-matrix.index',
+                    'route' => 'disclosures.materiality-matrix.snapshot',
                     'gate' => 'disclosures',
-                    'active' => ['disclosures.materiality-matrix', 'gov.materiality'],
+                    'active' => ['disclosures.materiality-matrix.snapshot'],
                     'year' => true,
                     'feeds' => ['s1', 'gri', 'uae_esg'],
                 ],
@@ -308,6 +308,19 @@ return [
                     'active' => ['disclosures.s2.sections'],
                     'year' => true,
                     'feeds' => ['s2', 's1'],
+                ],
+                [
+                    // The SCORING FORM. Governance is where materiality is
+                    // decided -- GRI 3-1 treats it as a governance process.
+                    // The Overview item points at a read-only snapshot of the
+                    // same data.
+                    'label' => 'Materiality',
+                    'icon' => 'grid',
+                    'route' => 'disclosures.materiality-matrix.index',
+                    'gate' => 'disclosures',
+                    'active' => ['disclosures.materiality-matrix.index', 'gov.materiality'],
+                    'year' => true,
+                    'feeds' => ['s1', 'gri', 'uae_esg'],
                 ],
                 [
                     // Non-climate sustainability risks (SustainabilityRisk,

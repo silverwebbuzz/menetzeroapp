@@ -81,99 +81,15 @@
                 </div>
                 <div class="mt-6">
                     <button type="submit" class="btn btn-primary">Save materiality matrix</button>
+                    <a href="{{ route('disclosures.materiality-matrix.snapshot', ['fiscal_year' => $fiscalYear]) }}" class="btn btn-secondary ml-2">View matrix</a>
                     <a href="{{ route('disclosures.s1.material-topics', ['fiscal_year' => $fiscalYear]) }}" class="btn btn-secondary ml-2">Material topics list</a>
                 </div>
             </form>
         </div>
     </div>
 
-    {{-- Double-materiality view, matching Menetzero-Redesign/Internal.dc.html.
-
-         CSS-POSITIONED DOTS, NOT SVG. The design labels each point inline
-         beside its dot, with a white text backing so overlapping labels stay
-         readable. Absolute positioning inside a bordered box reproduces that
-         exactly; an SVG would need manual text-collision handling.
-
-         Axis rules on LEFT and BOTTOM only (the design's border-left /
-         border-bottom), with a 25% background grid.
-
-         ALL topics are plotted. The original grid filtered to is_material,
-         hiding exactly the topics worth reviewing -- those scored high but
-         not yet flagged. --}}
-    @php
-        $levels = ['low' => 0, 'medium' => 1, 'high' => 2];
-        $pillarInk = ['e' => '#0f7a4a', 's' => '#1a6c9e', 'g' => '#5b5aa8'];
-
-        $plotted = [];
-        foreach ($topics as $key => $t) {
-            $ix = $levels[$t['impact_materiality'] ?: 'low'] ?? 0;
-            $fx = $levels[$t['financial_materiality'] ?: 'low'] ?? 0;
-
-            // Deterministic nudge from the topic key: identical on every
-            // render, and topics sharing a cell separate rather than stack.
-            $seed = crc32($key);
-            $jx = (($seed % 40) - 20) / 100;
-            $jy = ((($seed >> 8) % 40) - 20) / 100;
-
-            $plotted[] = [
-                'label' => $t['label'],
-                'ink' => $pillarInk[$t['pillar'] ?? ''] ?? '#8b9199',
-                'left' => round((($fx + 0.5 + $jx) / 3) * 100, 2),
-                'bottom' => round((($ix + 0.5 + $jy) / 3) * 100, 2),
-            ];
-        }
-    @endphp
-
-    <div class="mm-grid">
-        <div class="mm-card">
-            <div class="mm-card__head">
-                <span class="mm-axis">Impact &uarr; / Financial &rarr;</span>
-                <span class="mm-year">FY{{ $fiscalYear }}</span>
-            </div>
-            <div class="mm-plot">
-                <div class="mm-plot__grid"></div>
-                @foreach ($plotted as $pt)
-                    <div class="mm-pt" style="left:{{ $pt['left'] }}%;bottom:{{ $pt['bottom'] }}%">
-                        <span class="mm-pt__dot" style="background:{{ $pt['ink'] }}"></span>
-                        <span class="mm-pt__name">{{ $pt['label'] }}</span>
-                    </div>
-                @endforeach
-            </div>
-            <div class="mm-keys">
-                <span><i style="background:#0f7a4a"></i>Environmental</span>
-                <span><i style="background:#1a6c9e"></i>Social</span>
-                <span><i style="background:#5b5aa8"></i>Governance</span>
-            </div>
-        </div>
-
-        <div class="mm-card mm-card--flush">
-            <div class="mm-table__title">Material topics</div>
-            <div class="mm-table__head">
-                <span>Topic</span>
-                <span class="mm-r">GRI</span>
-                <span class="mm-r">Impact</span>
-                <span class="mm-r">Financial</span>
-                <span class="mm-r">Material</span>
-            </div>
-            @foreach ($topics as $key => $t)
-                @php
-                    $ink = $pillarInk[$t['pillar'] ?? ''] ?? '#8b9199';
-                    $isMaterial = (bool) $t['is_material'];
-                @endphp
-                <div class="mm-table__row">
-                    <span class="mm-topic">
-                        <i style="background:{{ $ink }}"></i>
-                        <span>{{ $t['label'] }}</span>
-                    </span>
-                    <span class="mm-r mm-gri">{{ $t['gri'] }}</span>
-                    <span class="mm-r mm-lvl">{{ $t['impact_materiality'] ? ucfirst($t['impact_materiality']) : '—' }}</span>
-                    <span class="mm-r mm-lvl">{{ $t['financial_materiality'] ? ucfirst($t['financial_materiality']) : '—' }}</span>
-                    <span class="mm-r">
-                        <span class="mm-flag {{ $isMaterial ? 'is-yes' : 'is-no' }}">{{ $isMaterial ? 'Yes' : 'No' }}</span>
-                    </span>
-                </div>
-            @endforeach
-        </div>
-    </div>
+    {{-- The plot lives on the READ-ONLY snapshot (Overview > Materiality),
+         not here. This page is the scoring form: showing the same matrix
+         twice would mean two places for one set of numbers to disagree. --}}
 </div>
 @endsection

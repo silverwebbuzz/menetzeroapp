@@ -412,6 +412,9 @@ Route::middleware([
 
         Route::prefix('materiality-matrix')->name('materiality-matrix.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Disclosure\MaterialityMatrixController::class, 'index'])->name('index');
+            // Read-only view for the Overview nav item. The index above stays
+            // the editable form under Governance.
+            Route::get('/snapshot', [\App\Http\Controllers\Disclosure\MaterialityMatrixController::class, 'snapshot'])->name('snapshot');
             Route::post('/', [\App\Http\Controllers\Disclosure\MaterialityMatrixController::class, 'update'])->name('update');
         });
 

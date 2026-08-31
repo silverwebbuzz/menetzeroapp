@@ -97,90 +97,17 @@
                     @endforeach
                 </div>
 
-                <div style="margin-top:16px">
+                <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
                     <button type="submit" class="mnz-btn mnz-btn--primary">Save materiality matrix</button>
+                    <a href="{{ route('disclosures.materiality-matrix.snapshot', ['fiscal_year' => $fiscalYear]) }}"
+                       class="mnz-btn mnz-btn--ghost">View matrix</a>
                 </div>
             </form>
         </div>
     </div>
 
-    {{-- Double-materiality view. Same structure and classes as the old
-         theme's, from Menetzero-Redesign/Internal.dc.html -- CSS-positioned
-         dots with inline labels, plus the five-column topics table. Sharing
-         the .mm-* classes means a topic cannot be plotted differently in the
-         two themes. --}}
-    @php
-        $levels = ['low' => 0, 'medium' => 1, 'high' => 2];
-        $pillarInk = ['e' => '#0f7a4a', 's' => '#1a6c9e', 'g' => '#5b5aa8'];
-
-        $plotted = [];
-        foreach ($topics as $key => $t) {
-            $ix = $levels[$t['impact_materiality'] ?: 'low'] ?? 0;
-            $fx = $levels[$t['financial_materiality'] ?: 'low'] ?? 0;
-            $seed = crc32($key);
-            $jx = (($seed % 40) - 20) / 100;
-            $jy = ((($seed >> 8) % 40) - 20) / 100;
-
-            $plotted[] = [
-                'label' => $t['label'],
-                'ink' => $pillarInk[$t['pillar'] ?? ''] ?? '#8b9199',
-                'left' => round((($fx + 0.5 + $jx) / 3) * 100, 2),
-                'bottom' => round((($ix + 0.5 + $jy) / 3) * 100, 2),
-            ];
-        }
-    @endphp
-
-    <div class="mm-grid">
-        <div class="mm-card">
-            <div class="mm-card__head">
-                <span class="mm-axis">Impact &uarr; / Financial &rarr;</span>
-                <span class="mm-year">FY{{ $fiscalYear }}</span>
-            </div>
-            <div class="mm-plot">
-                <div class="mm-plot__grid"></div>
-                @foreach ($plotted as $pt)
-                    <div class="mm-pt" style="left:{{ $pt['left'] }}%;bottom:{{ $pt['bottom'] }}%">
-                        <span class="mm-pt__dot" style="background:{{ $pt['ink'] }}"></span>
-                        <span class="mm-pt__name">{{ $pt['label'] }}</span>
-                    </div>
-                @endforeach
-            </div>
-            <div class="mm-keys">
-                <span><i style="background:#0f7a4a"></i>Environmental</span>
-                <span><i style="background:#1a6c9e"></i>Social</span>
-                <span><i style="background:#5b5aa8"></i>Governance</span>
-            </div>
-        </div>
-
-        <div class="mm-card mm-card--flush">
-            <div class="mm-table__title">Material topics</div>
-            <div class="mm-table__head">
-                <span>Topic</span>
-                <span class="mm-r">GRI</span>
-                <span class="mm-r">Impact</span>
-                <span class="mm-r">Financial</span>
-                <span class="mm-r">Material</span>
-            </div>
-            @foreach ($topics as $key => $t)
-                @php
-                    $ink = $pillarInk[$t['pillar'] ?? ''] ?? '#8b9199';
-                    $isMaterial = (bool) $t['is_material'];
-                @endphp
-                <div class="mm-table__row">
-                    <span class="mm-topic">
-                        <i style="background:{{ $ink }}"></i>
-                        <span>{{ $t['label'] }}</span>
-                    </span>
-                    <span class="mm-r mm-gri">{{ $t['gri'] }}</span>
-                    <span class="mm-r mm-lvl">{{ $t['impact_materiality'] ? ucfirst($t['impact_materiality']) : '—' }}</span>
-                    <span class="mm-r mm-lvl">{{ $t['financial_materiality'] ? ucfirst($t['financial_materiality']) : '—' }}</span>
-                    <span class="mm-r">
-                        <span class="mm-flag {{ $isMaterial ? 'is-yes' : 'is-no' }}">{{ $isMaterial ? 'Yes' : 'No' }}</span>
-                    </span>
-                </div>
-            @endforeach
-        </div>
-    </div>
-
+    {{-- The plot lives on the READ-ONLY snapshot (Overview > Materiality).
+         This page is the scoring form; rendering the matrix here too would be
+         two places for one set of numbers to disagree. --}}
 </div>
 @endsection

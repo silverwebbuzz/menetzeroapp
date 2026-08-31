@@ -664,3 +664,12 @@ table.mnz-table td{padding:11px 16px;border-bottom:1px solid var(--line-2);font-
 .mm-flag.is-yes { border-color: #cde3d6; color: #0f7a4a; background: #eef6f1; }
 .mm-flag.is-no { border-color: #e5e6e3; color: #8b9199; background: #f7f7f5; }
 
+/* Materiality snapshot page header (read-only view). */
+.mm-head { display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 24px; border-bottom: 1px solid #e5e6e3; padding-bottom: 18px; flex-wrap: wrap; }
+.mm-kicker { font: 500 10.5px 'IBM Plex Mono', ui-monospace, monospace;
+    letter-spacing: 0.1em; color: #a4a9ae; text-transform: uppercase; }
+.mm-title { font-size: 26px; font-weight: 600; letter-spacing: -0.03em; margin: 6px 0 0; }
+.mm-lead { margin: 5px 0 0; color: #5a6068; font-size: 13.5px; }
+.mm-lead strong { color: #14161a; font-weight: 600; }
+.mm-head__actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
