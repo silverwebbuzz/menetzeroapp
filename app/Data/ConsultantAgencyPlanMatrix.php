@@ -26,10 +26,38 @@ class ConsultantAgencyPlanMatrix
         'consultant_50',
     ];
 
-    /** Live catalog after Phase 1–2. */
+    /**
+     * Live self-serve catalogue. Mirrors the four client tiers: a practice buys
+     * slots at Carbon or ESG depth, and each managed client gets exactly that
+     * depth. A practice may hold both -- consultant_subscriptions carries one
+     * row per purchase with its own slot count and expiry, so mixed portfolios
+     * need no new structure.
+     */
+    public const CURRENT_PLAN_CODES = [
+        'consultant_free',
+        'consultant_carbon',
+        'consultant_esg',
+        'consultant_enterprise',
+    ];
+
+    /**
+     * Superseded, still resolvable. Existing agencies keep their slots, their
+     * depth and their price; these are hidden from checkout via is_active
+     * rather than deleted. Same treatment consultant_trial received in Phase 2.
+     */
+    public const LEGACY_DEPTH_CODES = [
+        'consultant_scope_basic',
+        'consultant_scope_pro',
+        'consultant_esg_starter',
+        'consultant_esg_complete',
+    ];
+
+    /** Every code that must still resolve, live or grandfathered. */
     public const TARGET_PLAN_CODES = [
         'consultant_free',
         'consultant_1',
+        'consultant_carbon',
+        'consultant_esg',
         'consultant_scope_basic',
         'consultant_scope_pro',
         'consultant_esg_starter',
@@ -38,6 +66,8 @@ class ConsultantAgencyPlanMatrix
     ];
 
     public const DEPTH_PLAN_CODES = [
+        'consultant_carbon',
+        'consultant_esg',
         'consultant_scope_basic',
         'consultant_scope_pro',
         'consultant_esg_starter',
@@ -45,8 +75,31 @@ class ConsultantAgencyPlanMatrix
         'consultant_enterprise',
     ];
 
+    /**
+     * Minimum slots on a first self-serve purchase.
+     *
+     * Five, not ten: a solo UAE practice testing the product should not face a
+     * five-figure commitment, and consultants add clients one at a time.
+     */
+    public const MIN_SLOTS = 5;
+
+    /**
+     * Per-slot price by purchase size. Expansion is never dearer than entry --
+     * a consultant buying their 6th client must not pay more than for their
+     * 1st, or the pricing punishes exactly the growth it should reward.
+     *
+     * consultant_carbon resells at client_carbon (3,000) and consultant_esg at
+     * client_esg (6,500), leaving roughly 33-40% margin at every tier.
+     */
+    public const SLOT_PRICING = [
+        'consultant_carbon' => ['entry' => 2000, 'single' => 1900, 'block5' => 1800],
+        'consultant_esg' => ['entry' => 4000, 'single' => 3800, 'block5' => 3600],
+    ];
+
     /** Request form uses company codes; activation writes consultant_* rows. */
     public const CLIENT_DEPTH_TO_CONSULTANT = [
+        'client_carbon' => 'consultant_carbon',
+        'client_esg' => 'consultant_esg',
         'client_scope_basic' => 'consultant_scope_basic',
         'client_scope_pro' => 'consultant_scope_pro',
         'client_esg_starter' => 'consultant_esg_starter',
@@ -56,6 +109,8 @@ class ConsultantAgencyPlanMatrix
     ];
 
     public const CONSULTANT_DEPTH_TO_CLIENT = [
+        'consultant_carbon' => 'client_carbon',
+        'consultant_esg' => 'client_esg',
         'consultant_scope_basic' => 'client_scope_basic',
         'consultant_scope_pro' => 'client_scope_pro',
         'consultant_esg_starter' => 'client_esg_starter',
@@ -138,9 +193,12 @@ class ConsultantAgencyPlanMatrix
 
         return match ($planCode) {
             self::FREE_CODE, self::FREE_TRIAL_CODE, self::LEGACY_TRIAL_CODE, self::DEMO_PACK_CODE => 0,
-            'consultant_scope_basic', 'consultant_managed_standard' => 1,
+            // Carbon sits level with the legacy scope tiers and ESG with the
+            // legacy esg tiers, so a grandfathered agency moving to a new code
+            // is never misread as a downgrade.
+            'consultant_carbon', 'consultant_scope_basic', 'consultant_managed_standard' => 1,
             'consultant_scope_pro' => 2,
-            'consultant_esg_starter' => 3,
+            'consultant_esg', 'consultant_esg_starter' => 3,
             'consultant_esg_complete' => 4,
             self::ENTERPRISE_CODE => 5,
             default => -1,
@@ -179,6 +237,9 @@ class ConsultantAgencyPlanMatrix
         return [
             'consultant_free' => self::freePack(),
             'consultant_1' => self::demoPack(),
+            'consultant_carbon' => self::depthPack('consultant_carbon', 'client_carbon', 10),
+            'consultant_esg' => self::depthPack('consultant_esg', 'client_esg', 11),
+            // Legacy depth packs (inactive) — existing agencies keep them.
             'consultant_scope_basic' => self::depthPack('consultant_scope_basic', 'client_scope_basic', 20),
             'consultant_scope_pro' => self::depthPack('consultant_scope_pro', 'client_scope_pro', 21),
             'consultant_esg_starter' => self::depthPack('consultant_esg_starter', 'client_esg_starter', 22),
@@ -245,7 +306,7 @@ class ConsultantAgencyPlanMatrix
      */
     public static function selectablePacks(): array
     {
-        $hidden = [
+        $hidden = array_merge([
             self::FREE_TRIAL_CODE,
             self::FREE_CODE,
             self::DEMO_PACK_CODE,
@@ -254,7 +315,7 @@ class ConsultantAgencyPlanMatrix
             'consultant_10',
             'consultant_25',
             'consultant_50',
-        ];
+        ], self::LEGACY_DEPTH_CODES);
 
         return array_values(array_filter(
             self::packDefinitions(),

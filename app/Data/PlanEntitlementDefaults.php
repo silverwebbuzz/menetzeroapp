@@ -10,11 +10,47 @@ namespace App\Data;
  */
 class PlanEntitlementDefaults
 {
-    public const PLAN_CODES = [
+    /**
+     * Live self-serve catalogue. Four tiers: Free, Carbon, ESG, Enterprise.
+     *
+     * GHG accounting and ESG disclosure are different disciplines bought by
+     * different people -- a manufacturer filing MOCCAE needs the inventory and
+     * nothing else, while a listed company needs the disclosure layer on top.
+     * Carbon and ESG split on exactly that line. ESG is a superset: every
+     * framework report reads tCO2e from the same inventory, so there is no ESG
+     * tier without carbon accounting underneath it.
+     */
+    public const CURRENT_PLAN_CODES = [
         'client_free',
+        'client_carbon',
+        'client_esg',
+        'client_enterprise',
+    ];
+
+    /**
+     * Superseded by CURRENT_PLAN_CODES. Kept defined so existing subscribers
+     * keep their entitlements and their price -- forPlanCode() must still
+     * resolve them. Hidden from checkout via is_active on subscription_plans,
+     * the same way consultant_trial was retired in Phase 2. Never delete a
+     * code somebody is still paying for.
+     */
+    public const LEGACY_PLAN_CODES = [
         'client_starter',
         'client_growth',
+        'client_scope_basic',
+        'client_scope_pro',
+        'client_esg_starter',
+        'client_esg_complete',
+    ];
+
+    /** Every code that must still resolve, live or grandfathered. */
+    public const PLAN_CODES = [
+        'client_free',
+        'client_carbon',
+        'client_esg',
         'client_enterprise',
+        'client_starter',
+        'client_growth',
         'client_scope_basic',
         'client_scope_pro',
         'client_esg_starter',
@@ -30,6 +66,8 @@ class PlanEntitlementDefaults
     {
         return [
             'client_free' => self::free(),
+            'client_carbon' => self::carbon(),
+            'client_esg' => self::esg(),
             'client_starter' => self::starter(),
             'client_growth' => self::growth(),
             'client_enterprise' => self::enterprise(),
@@ -101,6 +139,95 @@ class PlanEntitlementDefaults
             ],
             'features' => ['disclosures_access'],
         ];
+    }
+
+    /**
+     * Carbon — the GHG inventory and its UAE regulatory filings.
+     *
+     * Everything needed to measure and file emissions: Scope 1-3, bulk
+     * import/export, targets and the pathway, plus GHG / MOCCAE / IEQT / Excel
+     * exports. Deliberately NO framework reports -- IFRS, GRI, SASB and the UAE
+     * ESG report are the ESG tier, and that boundary is the whole reason this
+     * plan exists at a lower price.
+     *
+     * @return array<string, mixed>
+     */
+    private static function carbon(): array
+    {
+        return [
+            'plan_name' => 'Carbon',
+            'description' => 'Full Scope 1-3 inventory with MOCCAE, IEQT and GHG reports. 5 sites.',
+            'price_annual' => 3000,
+            'currency' => 'AED',
+            'sort_order' => 2,
+            'limits' => [
+                'locations' => 5,
+                'users' => 10,
+                'documents' => 100,
+                // 12 = one entry per month per Scope 3 category, so a bulk
+                // import can carry a full year.
+                'scope3_records_per_form' => 12,
+                'annual_report_pdf' => -1,
+                'historical_years' => 3,
+            ],
+            'entitlements' => [
+                'scope3_mode' => 'preview_per_category',
+                'bulk_import' => true,
+                'bulk_export' => true,
+                'help_level' => 'full',
+                // Disclosure screens are reachable so the buyer can see what
+                // the ESG tier adds, but nothing is exportable from them.
+                'disclosures' => ['access' => true, 'export' => false],
+                'exports' => ['ghg_pdf', 'moccae_pdf', 'excel', 'ieqt'],
+                'consultant_directory' => 'partial',
+                'export_regen' => 'subscription_year_unlimited',
+            ],
+            'features' => ['disclosures_access'],
+        ];
+    }
+
+    /**
+     * ESG — Carbon plus the disclosure layer.
+     *
+     * Adds the framework reports: IFRS S1 and S2, GRI with content index, SASB
+     * index and the UAE ESG report, along with the registers that feed them
+     * (materiality, stakeholders, supply chain, risks). A superset of Carbon,
+     * never an alternative to it.
+     *
+     * @return array<string, mixed>
+     */
+    private static function esg(): array
+    {
+        $plan = self::carbon();
+
+        $plan['plan_name'] = 'ESG';
+        $plan['description'] = 'Everything in Carbon plus IFRS S1 & S2, GRI, SASB and the UAE ESG report. 5 sites.';
+        $plan['price_annual'] = 6500;
+        $plan['sort_order'] = 3;
+
+        $plan['limits']['documents'] = 200;
+        $plan['limits']['historical_years'] = 5;
+
+        $plan['entitlements']['disclosures'] = ['access' => true, 'export' => true];
+        $plan['entitlements']['help_level'] = 'full_disclosures';
+        $plan['entitlements']['consultant_directory'] = 'full';
+        $plan['entitlements']['exports'] = [
+            'ghg_pdf',
+            'moccae_pdf',
+            'excel',
+            'ieqt',
+            'ifrs_s2_pdf',
+            'ifrs_s1_pdf',
+            'gri_pdf',
+            'gri_content_index',
+            'uae_esg_pdf',
+            'esg_scorecard',
+            'sasb_index',
+        ];
+
+        $plan['features'] = ['disclosures_access', 'ifrs_s2', 'ifrs_s1', 'gri'];
+
+        return $plan;
     }
 
     /**

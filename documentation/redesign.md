@@ -4803,3 +4803,76 @@ IFRS S2 requirement -- and NOTHING reads or writes either. So are
 columns. The Chapter 5 apparatus exists in the schema with no UI, the same
 pattern as the S1 risk fields in section 59. A real boundary change today would
 have nowhere to be recorded.
+
+## 65. Four-tier plan catalogue (Carbon / ESG)
+
+Eight client packages and seven consultant packs collapsed to four on each
+side. Most differed only by a location cap -- `esgComplete()` was literally
+`growth()` with `locations = 10` and a higher price, so one product was being
+sold four times.
+
+**The split that matters** is GHG accounting vs ESG disclosure. They are
+different disciplines bought by different people: a manufacturer filing MOCCAE
+needs the inventory and nothing else; a listed company needs the disclosure
+layer on top. Carbon and ESG split on exactly that line.
+
+ESG is a SUPERSET, never an alternative -- every framework report (GRI 305,
+IFRS S2 metrics, UAE ESG) reads tCO2e from the same inventory, so there is no
+"ESG without carbon accounting" tier.
+
+    Companies                      Consultants
+    Starter      AED     0         Starter          AED 0      1 demo client
+    Carbon       AED 3,000         Carbon Practice  AED 2,000/slot  min 5
+    ESG          AED 6,500         ESG Practice     AED 4,000/slot  min 5
+    Enterprise   call us           Enterprise       call us         20+
+
+Carbon exports: ghg_pdf, moccae_pdf, excel, ieqt (4).
+ESG adds: ifrs_s1_pdf, ifrs_s2_pdf, gri_pdf, gri_content_index, uae_esg_pdf,
+esg_scorecard, sasb_index (11 total) plus disclosure export, full consultant
+directory and 5 years of history.
+
+**Expansion is never dearer than entry.** Slot pricing decreases with volume
+(entry 2,000 / single 1,900 / block-of-5 1,800 for Carbon), so a consultant
+buying their 6th client never pays more than for their 1st. An earlier proposal
+had slot 11 at 3,500 against an entry of 3,000, which would have penalised
+exactly the growth the pricing should reward. `MIN_SLOTS = 5`, not 10: a solo
+UAE practice testing the product should not face a five-figure commitment, and
+consultants add clients one at a time.
+
+Consultant margin is 33% (Carbon) and 38% (ESG) against the client list price,
+since `depthPack()` already derives its price from the paired `client_*` plan.
+
+**Grandfathering.** No legacy plan row is deleted and no subscriber is moved.
+`LEGACY_PLAN_CODES` / `LEGACY_DEPTH_CODES` stay resolvable through
+`forPlanCode()`; the migration only sets `is_active = false`, which removes them
+from checkout while every existing subscription keeps its plan, entitlements and
+price. Deleting a plan somebody is paying for would strip their access at the
+next entitlement lookup.
+
+Checkout listing is filtered two ways, matching how each side already worked:
+the client side reads `is_active` from `subscription_plans`; the consultant side
+also filters in code, so `selectablePacks()` now merges `LEGACY_DEPTH_CODES`
+into its hidden list.
+
+`depthRank()` was extended -- `consultant_carbon` ranks 1 (level with
+`consultant_scope_basic`) and `consultant_esg` ranks 3 (level with
+`consultant_esg_starter`). Without this both would return -1 and every
+`isStrictUpgrade()` / `isDowngrade()` check involving a new code would silently
+misbehave for a grandfathered agency moving across.
+
+**Verified statically:** braces/brackets/parens balanced in all three files;
+Carbon resolves to 4 exports and ESG to 11; slot curve confirmed decreasing
+(5 slots = AED 10,000 at 2,000/slot; 20 slots = AED 37,000 at 1,850/slot).
+
+**Payment gateways.** `client_payment_transactions` was truncated and all three
+FK holders (`consultant_subscriptions`, `consultant_subscription_addons`,
+`consultant_orders`) confirmed at zero, so there is no payment history to
+protect. Stripe and Cashfree removal is therefore safe whenever it is done --
+deliberately NOT in this change, because removing payment paths in the same
+release that changes what people are buying puts two variables in one deploy.
+
+**Outstanding before launch:** Razorpay has never processed a transaction in
+this system (0 rows). AED settlement on that account is unverified -- one live
+AED test payment is needed before the other gateways are removed. Addon
+purchase (site blocks, slot blocks) is defined in `SLOT_PRICING` but has no
+checkout path yet.
