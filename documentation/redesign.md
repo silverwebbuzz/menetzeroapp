@@ -5297,3 +5297,49 @@ Run: `php artisan optimize:clear`
 **Untested by me:** no PHP has executed. The first real purchase should be a
 small one, watched end to end -- checkout -> Razorpay -> callback -> subscription
 row -- with `slot_limit` confirmed against what was bought.
+
+## 73. Brand palette restored to the new consultant shell
+
+Went to build the new-theme twin of the purchase grid and found the twin was
+the wrong shape. The consultant side of the redesign was done at the LAYOUT
+level, not per page: `themes/new/consultant/layouts/app.blade.php` exists, and
+none of the nine `consultant/agency/*` page bodies has a themed copy. Because
+`ResolveTheme` uses `prependLocation()`, a missing themed view falls through,
+so `@extends('consultant.layouts.app')` already resolves to the 2.0 shell under
+`?theme=new`. The packs page was themed the moment the shell landed.
+
+Writing `themes/new/.../packs/index.blade.php` would have made packs the only
+consultant page with a divergent twin -- two files to edit for every future
+pricing change, which is the duplication §63 was about. Not written.
+
+**The real defect, found while checking whether the shared body renders.**
+The old shell loads Tailwind from the CDN *and* configures it:
+
+    brand: {...}, indigo: BRAND, teal: BRAND, emerald: BRAND, blue: BRAND
+
+The new shell loaded the CDN with **no config**. Two failure classes across the
+nine bodies it hosts:
+
+* `text-brand` (35) and `bg-brand` (1) are not stock Tailwind. With no config
+  they match no rule at all. The `bg-brand` one is the §72 **Buy now** button:
+  white text on a white background, i.e. an invisible primary action on the
+  page that takes money.
+* `teal-*` / `indigo-*` (74) are stock, so they rendered -- as literal teal and
+  indigo instead of MENetZero blue. Wrong brand, not invisible.
+
+Fixed in the shell, not in the view: one config repairs all nine bodies at
+once. `fontFamily` is deliberately not copied over -- the 2.0 shell owns its
+own Inter Tight / IBM Plex Mono typography, and the old shell's `Inter`
+override would have undone it. Marked to delete once the bodies are themed.
+
+**Verified:** config sits after the CDN script (the CDN reads `tailwind.config`
+at parse time, so order matters); Blade directives, comments and script tags
+all paired; diff is 41 insertions and 0 deletions; 236 non-theme views scan
+clean, 0 broken; the checker's single FAIL is the known `client.profile` false
+positive in a file this change does not touch.
+
+Run: `php artisan optimize:clear`
+
+**Untested by me:** no page has rendered. Load the packs page with `?theme=new`
+and confirm the Buy now button has a blue background -- that is the assertion
+static analysis cannot make.

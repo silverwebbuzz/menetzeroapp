@@ -40,6 +40,47 @@
          loads AFTER so the shell always wins. --}}
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        /* Brand palette for the UNMIGRATED page bodies this shell hosts.
+           Those bodies are Tailwind-utility markup written against the old
+           consultant shell, which extends the palette below. Loading the CDN
+           without this config left `text-brand`/`bg-brand` (36 uses) matching
+           no rule at all -- a primary button rendered white-on-white -- and
+           the teal/indigo aliases (74 uses) falling back to literal Tailwind
+           teal instead of MENetZero blue.
+
+           Keep in step with consultant/layouts/app.blade.php until the
+           Phase 3 page bodies are themed; delete it when none remain.
+           fontFamily is deliberately NOT overridden here -- the 2.0 shell
+           sets its own Inter Tight / IBM Plex Mono typography below. */
+        const BRAND = {
+            50:  '#eef4fe',
+            100: '#dce9fd',
+            200: '#b9d3fb',
+            300: '#8cb8f8',
+            400: '#5a97f2',
+            500: '#1563eb',
+            600: '#1254c9',
+            700: '#0f459f',
+            800: '#0c3678',
+            900: '#021d71',
+        };
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { DEFAULT: BRAND[500], dark: BRAND[900], soft: BRAND[50], ...BRAND },
+                        indigo: BRAND,
+                        purple: BRAND,
+                        violet: BRAND,
+                        teal: BRAND,
+                        emerald: BRAND,
+                        blue: BRAND,
+                    },
+                },
+            },
+        };
+    </script>
     <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260824b">
     <link rel="stylesheet" href="{{ asset('css/consultant-shell.css') }}?v=20260630">
     <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260630">
