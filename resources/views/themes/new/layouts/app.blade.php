@@ -40,6 +40,48 @@
          until the Phase 5 page bodies are migrated. --}}
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        /* Brand palette for the UNMIGRATED page bodies this shell hosts.
+           209 `-brand` utilities across 51 views are Tailwind-utility markup
+           written against the old client shell, which extends the palette
+           below. Loading the CDN without this config left them matching no
+           rule at all -- on subscriptions/upgrade the selected currency pill
+           is `bg-brand text-white`, i.e. white on white.
+
+           These are the CLIENT values (green #16a34a) and differ from the
+           consultant shell's (blue #1563eb) -- the two portals have different
+           brands, so this block is deliberately not shared. `orange` is
+           remapped here but not there, matching each old shell.
+
+           Keep in step with layouts/app.blade.php until the page bodies are
+           themed; delete it when none remain. fontFamily is deliberately NOT
+           overridden -- the 2.0 shell sets its own typography below. */
+        const BRAND = {
+            50:  '#f0fdf4',
+            100: '#dcfce7',
+            200: '#bbf7d0',
+            300: '#86efac',
+            400: '#4ade80',
+            500: '#16a34a',
+            600: '#15803d',
+            700: '#166534',
+            800: '#14532d',
+            900: '#052e16',
+        };
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { DEFAULT: BRAND[500], dark: BRAND[600], soft: BRAND[50], ...BRAND },
+                        purple: BRAND,
+                        violet: BRAND,
+                        indigo: BRAND,
+                        orange: BRAND,
+                    },
+                },
+            },
+        };
+    </script>
     <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260824b">
     @stack('styles')
     <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260630">

@@ -5433,3 +5433,42 @@ only be exercised on the first real payment. Set the invoice details in admin
 BEFORE the first live purchase -- the seller name and address are snapshotted
 onto each invoice at issue time, and blanks cannot be backfilled onto documents
 already issued.
+
+## 75. Brand palette restored to the new client shell
+
+The §73 defect was not confined to the consultant portal. `themes/new/layouts/
+app.blade.php` -- the client 2.0 shell -- also loaded the Tailwind CDN with no
+`tailwind.config`, and it hosts far more unmigrated markup: **209 `-brand`
+utilities across 51 views** (129 `text-brand`, 54 `bg-brand`, 24
+`border-brand`, 2 `hover:bg-brand`).
+
+Worst case found: `subscriptions/upgrade` renders the AED/INR currency toggle
+as `bg-brand text-white`. With no config that is white text on a white
+background -- the selected currency becomes invisible on the page where the
+customer picks what they are about to be charged in.
+
+Also affected: `themes/new/quick-input/index.blade.php`. It is a THEMED page,
+but it extends `layouts.app` and so renders through this same shell -- its own
+`-brand` use was broken by the missing config too. A themed page is not immune;
+the shell owns the palette either way.
+
+**The two palettes are different and are deliberately not shared.** Client
+brand is green `#16a34a`; consultant brand is blue `#1563eb`. The client shell
+also remaps `orange` to brand, which the consultant one does not. Copying §73's
+block here would have repainted the entire client portal in the consultant's
+blue -- each config mirrors its own old shell.
+
+`fontFamily` is again left out: the old client shell sets Inter/Poppins, and
+the 2.0 shell owns its own typography.
+
+**Verified:** config sits after the CDN script (the CDN reads `tailwind.config`
+at parse time); Blade directives, comments and script tags all paired; 42
+insertions, 0 deletions; 237 non-theme views scan clean, 0 broken; the
+checker's single FAIL is the known `client.profile` false positive, present
+before this change.
+
+Run: `php artisan optimize:clear`
+
+**Untested by me:** no page has rendered. Load `/subscriptions/upgrade?theme=new`
+and confirm the selected currency pill is green with white text rather than
+blank.
