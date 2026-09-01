@@ -13,15 +13,22 @@ class TemplateMail extends Mailable
     use AppliesGlobalBcc, Queueable, SerializesModels;
 
     /**
-     * @param  list<array{data: string, name: string, mime?: string}>  $rawAttachments
+     * @param  list<array{data: string, name: string, mime?: string}>  $fileAttachments
      *         In-memory attachments (the invoice PDF). Raw data rather than a
      *         path so a queued job does not depend on the file still being
      *         there when it runs.
+     *
+     *         NOT named $rawAttachments: Illuminate\Mail\Mailable already
+     *         declares that property -- it is where attachData() stores what it
+     *         is given -- and redeclaring it here is a fatal
+     *         "must not be defined (as in class Mailable)" at class load. That
+     *         took down the payment callback, since this class is constructed
+     *         on every templated send.
      */
     public function __construct(
         public EmailTemplate $template,
         public array $variables = [],
-        public array $rawAttachments = [],
+        public array $fileAttachments = [],
     ) {}
 
     public function build(): self
@@ -51,7 +58,7 @@ class TemplateMail extends Mailable
             ]);
         }
 
-        foreach ($this->rawAttachments as $attachment) {
+        foreach ($this->fileAttachments as $attachment) {
             if (empty($attachment['data']) || empty($attachment['name'])) {
                 continue;
             }

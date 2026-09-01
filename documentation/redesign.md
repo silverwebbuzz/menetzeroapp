@@ -5665,3 +5665,53 @@ Run: `php artisan optimize:clear`
 
 **Untested by me:** no PHP has executed. Press Buy now on the real account and
 confirm the quantity pre-fills to the client count and the error is gone.
+
+## 80. Fatal: TemplateMail redeclared a Mailable property
+
+The first real payment reached Razorpay, was authorised in AED, and came back
+to `razorpayCallback()` -- which died with
+
+> Type of App\Mail\TemplateMail::$rawAttachments must not be defined (as in
+> class Illuminate\Mail\Mailable)
+
+`Illuminate\Mail\Mailable` already declares `$rawAttachments`; it is where
+`attachData()` stores what it is handed. The §74 attachment support promoted a
+constructor property of the same name, which PHP rejects at class load. So the
+property was not merely colliding, it was shadowing the exact mechanism the
+same `build()` method feeds through `attachData()`.
+
+Renamed to `$fileAttachments`. `$template` and `$variables` were always safe --
+neither is a Mailable property, which is why this class worked until a third
+one was added.
+
+**Why static checking missed it.** Every check in §74 was structural -- braces,
+directives, fillable coverage -- and this is a *semantic* clash with a parent
+class in `vendor/`, which is not installed on this machine. No amount of brace
+counting finds it. The lesson is not "check harder" but that subclassing a
+framework class is exactly where local static analysis stops being sufficient,
+and a real load of the class is the only proof.
+
+**Blast radius was wider than the invoice feature.** `TemplateMail` is
+constructed by every templated send, so the fatal was not limited to payment
+receipts -- any email would have hit it. It surfaced here only because this was
+the first send after deploy.
+
+**Payment safety.** The crash was AFTER `complete()` and after
+`InvoiceService::issueFor()`. The query log shows `select * from invoices where
+transaction_id = 2` running twice and the subscription row being read, so the
+money was taken, the pack activated and the invoice issued -- only the email
+and the success redirect were lost. A FatalError is not catchable by the
+try/catch around the email call, which is why the whole request 500'd rather
+than logging and continuing.
+
+**Verified:** the three promoted properties parsed out of the constructor and
+checked against Mailable's property names -- no collisions; the single caller
+passes positionally and still matches; braces/parens balanced.
+
+Run: `php artisan optimize:clear`
+
+**To confirm after deploy:** transaction 2 should be `completed`, subscription
+26 should carry the purchased `slot_limit`, and `invoices` should hold one row
+for `transaction_id = 2`. The receipt email for that payment was never sent --
+it is not queued or retried, so it is simply lost. Everything from the next
+payment onward sends normally.
