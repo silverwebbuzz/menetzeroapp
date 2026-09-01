@@ -50,7 +50,7 @@ class PackCheckoutController extends Controller
             ->get();
 
         $packages = \App\Data\CompanyPackageOptions::packages();
-        $extraOptions = \App\Data\CompanyPackageOptions::extraOptions();
+
         $matrix = \App\Data\CompanyPackageOptions::comparisonMatrix();
 
         // Self-serve purchase. Enterprise is filtered out: it has no list price
@@ -93,7 +93,6 @@ class PackCheckoutController extends Controller
             'contractYear',
             'recentRequests',
             'packages',
-            'extraOptions',
             'matrix',
             'buyablePacks',
             'suggestedSlots',

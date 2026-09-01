@@ -40,27 +40,6 @@
         ])
 
         <div class="bg-white rounded-xl border border-gray-200 p-5">
-            <h2 class="text-sm font-semibold text-gray-900 mb-1">Optional extras</h2>
-            <p class="text-xs text-gray-500 mb-3">
-                Tick only what you may need beyond the package defaults. If something is already included in your selection, MENetZero will ignore the duplicate when quoting.
-            </p>
-            <div class="grid sm:grid-cols-2 gap-2">
-                @foreach($extraOptions as $key => $label)
-                    <label class="flex items-start gap-2 text-sm text-gray-700">
-                        <input
-                            type="checkbox"
-                            name="extras[]"
-                            value="{{ $key }}"
-                            class="mt-1 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
-                            @checked(in_array($key, old('extras', []), true))
-                        >
-                        <span>{{ $label }}</span>
-                    </label>
-                @endforeach
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl border border-gray-200 p-5">
             <label for="message" class="block text-sm font-semibold text-gray-900 mb-2">Notes for MENetZero</label>
             <textarea
                 id="message"

@@ -11,7 +11,6 @@ use App\Services\ContactInquiryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class EntityRequestController extends Controller
@@ -31,8 +30,6 @@ class EntityRequestController extends Controller
         $data = $request->validate([
             'lines' => 'required|array',
             'lines.*' => 'nullable|integer|min:0|max:500',
-            'extras' => 'nullable|array',
-            'extras.*' => ['string', Rule::in(array_keys(CompanyPackageOptions::extraOptions()))],
             'message' => 'nullable|string|max:2000',
         ]);
 

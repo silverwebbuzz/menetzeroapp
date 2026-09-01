@@ -5773,3 +5773,41 @@ Raised rather than guessed.
 referenced routes exist; 237 non-theme views scan clean.
 
 Run: `php artisan optimize:clear`
+
+## 82. Optional extras removed; renew vs buy
+
+**Optional extras gone from both portals.** The checkbox block (extra sites,
+team seats, Scope 3 intensity, white-label covers, assurance workflow) is
+removed from `consultant/agency/packs` and `client/subscriptions/request-package`.
+
+Kept deliberately: the `extras` DB column, `CompanyPackageOptions::extraOptions()`,
+and the label lookups in both store methods. Historical requests hold values
+that are still rendered by label into the notification emails -- dropping the
+map would print raw keys on records already submitted.
+
+Removed with it: the now-unreachable validation rules in both controllers, the
+`$extraOptions` view variable in both, and the `Rule` import left unused in
+EntityRequestController. `$extras` is now `[]` in the client controller and
+still resolves via `$data['extras'] ?? []` in the consultant one, so both store
+paths keep working unchanged.
+
+A near-miss: deleting `$extraOptions` while leaving it in `compact()` would
+have been an undefined-variable error on a page that had just rendered fine.
+Caught by grepping the name after the edit rather than trusting the removal.
+
+**Renew vs buy.** The current-plan panel now carries a "Renew now" action, but
+ONLY inside the 45-day window (or once expired). `RenewalController::index()`
+redirects away outside that window with "Renewal opens within 45 days of a
+capacity package expiry" -- a Renew button visible year-round would have landed
+on a redirect. The existing renewal flow is linked rather than duplicated.
+
+The plan cards already carried their own Buy button per pack from §72, which is
+the requested shape. The section heading now reads "Add client slots" for a
+paying agency and "Choose a plan" on free/trial, so the same grid reads
+correctly in both states.
+
+**Verified:** both changed views balanced (if/foreach/php/comments); all three
+changed controllers balanced; no `extraOptions` reference survives in any view
+or compact(); 237 non-theme views scan clean.
+
+Run: `php artisan optimize:clear`

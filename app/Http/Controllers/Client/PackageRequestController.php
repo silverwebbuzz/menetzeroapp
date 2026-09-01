@@ -20,7 +20,7 @@ class PackageRequestController extends Controller
         }
 
         $packages = CompanyPackageOptions::packages();
-        $extraOptions = CompanyPackageOptions::extraOptions();
+
         $matrix = CompanyPackageOptions::comparisonMatrix();
         $recent = CompanyPackageRequest::query()
             ->where('company_id', $company->id)
@@ -31,7 +31,6 @@ class PackageRequestController extends Controller
         return view('client.subscriptions.request-package', compact(
             'company',
             'packages',
-            'extraOptions',
             'matrix',
             'recent',
         ));
@@ -44,16 +43,15 @@ class PackageRequestController extends Controller
             return redirect()->route('client.dashboard')->with('error', 'Access denied.');
         }
 
-        $validExtras = array_keys(CompanyPackageOptions::extraOptions());
-
         $data = $request->validate([
             'package_code' => 'required|in:' . implode(',', CompanyPackageOptions::CODES),
-            'extras' => 'nullable|array',
-            'extras.*' => 'string|in:' . implode(',', $validExtras),
             'message' => 'nullable|string|max:2000',
         ]);
 
-        $extras = array_values(array_unique($data['extras'] ?? []));
+        // The Optional extras checkboxes were removed from the form. The column
+        // and CompanyPackageOptions::extraOptions() stay: historical requests
+        // hold values that are still rendered by label below.
+        $extras = [];
         $user = Auth::user();
         $packageLabel = CompanyPackageOptions::label($data['package_code']);
 
