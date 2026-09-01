@@ -69,6 +69,14 @@ class PackCheckoutController extends Controller
             ->where('is_active', true)
             ->pluck('id', 'plan_code');
 
+        // Invoices issued to this agency. Shown on this page because it is
+        // where an agency buys -- there is no separate consultant billing
+        // screen, and an invoice the buyer cannot find is not delivered.
+        $invoices = \App\Models\Invoice::where('company_id', $consultantOrg->id)
+            ->orderByDesc('issued_at')
+            ->limit(24)
+            ->get();
+
         $checkoutAvailable = PaymentGateway::checkoutAvailable();
         $minSlots = \App\Data\ConsultantAgencyPlanMatrix::MIN_SLOTS;
         $slotPricing = \App\Data\ConsultantAgencyPlanMatrix::SLOT_PRICING;
@@ -82,6 +90,7 @@ class PackCheckoutController extends Controller
             'extraOptions',
             'matrix',
             'buyablePacks',
+            'invoices',
             'planIds',
             'checkoutAvailable',
             'minSlots',

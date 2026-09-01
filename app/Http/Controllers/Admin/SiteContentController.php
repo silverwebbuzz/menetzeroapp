@@ -18,6 +18,10 @@ class SiteContentController extends Controller
         'company_legal_name', 'brand_name', 'support_email', 'sales_email',
         'support_phone', 'address_line', 'city', 'country', 'business_hours',
         'default_currency', 'currency_auto_detect',
+        // Invoice header. billing_trn doubles as the VAT switch: InvoiceService
+        // charges 0% until a TRN is present, because applying VAT without being
+        // registered to collect it is a compliance problem, not a display one.
+        'billing_legal_name', 'billing_address', 'billing_trn', 'billing_vat_rate',
     ];
 
     public function index()
@@ -41,6 +45,10 @@ class SiteContentController extends Controller
             'country' => 'nullable|string|max:100',
             'business_hours' => 'nullable|string|max:255',
             'default_currency' => 'required|in:AED,INR',
+            'billing_legal_name' => 'nullable|string|max:255',
+            'billing_address' => 'nullable|string|max:500',
+            'billing_trn' => 'nullable|string|max:40',
+            'billing_vat_rate' => 'nullable|numeric|min:0|max:100',
         ]);
 
         foreach ($this->settingKeys as $key) {

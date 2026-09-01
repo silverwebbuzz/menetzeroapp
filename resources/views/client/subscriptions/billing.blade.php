@@ -241,7 +241,11 @@
                                             <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100">{{ ucfirst($transaction->status ?? 'pending') }}</span>
                                         </td>
                                         <td class="px-4 py-3">
-                                            @if($transaction->invoice_url)
+                                            {{-- Prefer the issued invoice; invoice_url is the
+                                                 legacy gateway-hosted link kept for older rows. --}}
+                                            @if($transaction->invoice)
+                                                <a href="{{ route('invoices.download', $transaction->invoice) }}" class="text-blue-600 hover:underline">{{ $transaction->invoice->invoice_number }}</a>
+                                            @elseif($transaction->invoice_url)
                                                 <a href="{{ $transaction->invoice_url }}" target="_blank" class="text-blue-600 hover:underline">Download</a>
                                             @else
                                                 <span class="text-gray-400">—</span>

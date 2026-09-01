@@ -327,7 +327,11 @@
                                         <td>{{ $transaction->description ?? 'Package payment' }}</td>
                                         <td><span class="mnz-chip">{{ ucfirst($transaction->status ?? 'pending') }}</span></td>
                                         <td>
-                                            @if($transaction->invoice_url)
+                                            {{-- Prefer the issued invoice; invoice_url is the
+                                                 legacy gateway-hosted link kept for older rows. --}}
+                                            @if($transaction->invoice)
+                                                <a href="{{ route('invoices.download', $transaction->invoice) }}">{{ $transaction->invoice->invoice_number }}</a>
+                                            @elseif($transaction->invoice_url)
                                                 <a href="{{ $transaction->invoice_url }}" target="_blank">Download</a>
                                             @else
                                                 <span style="color:var(--ink-4)">—</span>

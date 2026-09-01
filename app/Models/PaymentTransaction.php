@@ -82,5 +82,13 @@ class PaymentTransaction extends Model
     {
         return $query->where('status', 'failed');
     }
+
+    /**
+     * The tax invoice issued for this payment, if it completed.
+     */
+    public function invoice()
+    {
+        return $this->hasOne(Invoice::class, 'transaction_id');
+    }
 }
 

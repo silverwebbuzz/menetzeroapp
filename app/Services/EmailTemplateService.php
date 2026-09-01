@@ -46,7 +46,7 @@ class EmailTemplateService
      * @param  string|array<int, string>  $to
      * @param  array<string, mixed>  $variables
      */
-    public function send(string $slug, string|array $to, array $variables = []): bool
+    public function send(string $slug, string|array $to, array $variables = [], array $attachments = []): bool
     {
         $template = $this->resolve($slug);
         if (!$template) {
@@ -58,7 +58,7 @@ class EmailTemplateService
         try {
             $mailer = $this->mailerName($template->mailer);
 
-            $mailable = (new TemplateMail($template, $variables))->mailer($mailer);
+            $mailable = (new TemplateMail($template, $variables, $attachments))->mailer($mailer);
 
             Mail::mailer($mailer)->to($to)->send($mailable);
 
@@ -130,6 +130,29 @@ class EmailTemplateService
 
         $company = $transaction->company;
         $planName = $transaction->subscription?->plan?->plan_name ?? 'Subscription';
+
+        // Issued by PaymentCompletionService before this runs. Looked up rather
+        // than passed so a resend (or a webhook arriving after the callback)
+        // still finds the same document instead of issuing a second one.
+        $invoice = \App\Models\Invoice::where('transaction_id', $transaction->id)->first();
+
+        // The PDF rides along with the receipt. A failure here must not stop
+        // the email: the invoice stays downloadable from billing either way.
+        $attachments = [];
+        if ($invoice) {
+            try {
+                $attachments[] = [
+                    'data' => app(InvoiceService::class)->pdfContents($invoice),
+                    'name' => $invoice->invoice_number . '.pdf',
+                    'mime' => 'application/pdf',
+                ];
+            } catch (\Throwable $e) {
+                Log::error('Invoice PDF could not be attached', [
+                    'invoice_id' => $invoice->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
         $vars = [
             'company_name' => $company?->name ?? 'Your company',
             'plan_name' => $planName,
@@ -137,8 +160,11 @@ class EmailTemplateService
             'currency' => strtoupper((string) $transaction->currency),
             'expires_at' => $transaction->subscription?->expires_at?->format('F j, Y') ?? '—',
             'billing_url' => route('subscriptions.billing'),
-            'invoice_number' => $transaction->invoice_number ?: ('TXN-' . $transaction->id),
-            'invoice_url' => $transaction->invoice_url ?: route('subscriptions.billing'),
+            'invoice_number' => $invoice?->invoice_number
+                ?: ($transaction->invoice_number ?: ('TXN-' . $transaction->id)),
+            'invoice_url' => $invoice
+                ? route('invoices.download', $invoice)
+                : ($transaction->invoice_url ?: route('subscriptions.billing')),
             'paid_at' => ($transaction->paid_at ?? now())->format('F j, Y g:i A'),
             'description' => $transaction->description ?: $planName,
         ];
@@ -149,7 +175,7 @@ class EmailTemplateService
                 'user_name' => $user?->name ?? 'there',
             ]);
             $this->send('subscription_confirmed', $email, $payload);
-            $this->send('invoice_receipt', $email, $payload);
+            $this->send('invoice_receipt', $email, $payload, $attachments);
         }
     }
 

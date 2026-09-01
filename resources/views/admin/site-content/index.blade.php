@@ -58,6 +58,48 @@
                            class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
                     <label for="currency_auto_detect" class="ml-2 block text-sm text-gray-700">Auto-detect currency by visitor country (India → INR, UAE → AED)</label>
                 </div>
+
+                {{-- Invoice header. These appear on every issued tax invoice.
+                     Leaving the TRN blank keeps VAT at 0% regardless of the
+                     rate below -- see InvoiceService::taxRate(). --}}
+                <div class="md:col-span-2 mt-2 pt-4 border-t border-gray-200">
+                    <h3 class="text-sm font-semibold text-gray-900">Invoice details</h3>
+                    <p class="text-xs text-gray-500 mt-1">
+                        Printed on every tax invoice. VAT stays at 0% until a TRN is entered.
+                    </p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Billing legal name</label>
+                    <input type="text" name="billing_legal_name" value="{{ old('billing_legal_name', $settings['billing_legal_name'] ?? '') }}"
+                           placeholder="The entity that issues invoices"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+                    @error('billing_legal_name')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tax Registration Number (TRN)</label>
+                    <input type="text" name="billing_trn" value="{{ old('billing_trn', $settings['billing_trn'] ?? '') }}"
+                           placeholder="Leave blank if not VAT-registered"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+                    @error('billing_trn')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Billing address</label>
+                    <textarea name="billing_address" rows="2"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">{{ old('billing_address', $settings['billing_address'] ?? '') }}</textarea>
+                    @error('billing_address')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">VAT rate (%)</label>
+                    <input type="number" name="billing_vat_rate" step="0.01" min="0" max="100"
+                           value="{{ old('billing_vat_rate', $settings['billing_vat_rate'] ?? '0') }}"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+                    <p class="mt-1 text-xs text-gray-500">UAE standard rate is 5. Ignored while the TRN is blank.</p>
+                    @error('billing_vat_rate')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                </div>
             </div>
             <div class="mt-5 flex justify-end">
                 <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">Save Details</button>

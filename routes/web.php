@@ -86,6 +86,11 @@ Route::prefix('consultant')->name('consultant.')->group(function () {
             Route::post('/workspace/enter-readonly/{engagement}', [\App\Http\Controllers\Consultant\Agency\WorkspaceController::class, 'enterReadOnly'])->name('workspace.enter-readonly');
             Route::post('/workspace/exit', [\App\Http\Controllers\Consultant\Agency\WorkspaceController::class, 'exit'])->name('workspace.exit');
 
+            // Agency invoices. The agency hub authenticates on the web guard
+            // with setActiveCompany, so InvoiceController::canView() resolves
+            // the agency's company the same way it does for a client.
+            Route::get('/invoices/{invoice}/download', [\App\Http\Controllers\InvoiceController::class, 'download'])->name('invoices.download');
+
             Route::get('/renewal', [\App\Http\Controllers\Consultant\Agency\RenewalController::class, 'index'])->name('renewal.index');
             Route::post('/renewal', [\App\Http\Controllers\Consultant\Agency\RenewalController::class, 'process'])->name('renewal.process');
 
@@ -600,6 +605,13 @@ Route::middleware([
         Route::delete('/invitations/{invitation}', [\App\Http\Controllers\StaffManagementController::class, 'cancelInvitation'])->name('cancel-invitation');
     });
     
+    // Invoices. Deliberately OUTSIDE the subscriptions group: that group carries
+    // restrictManagedClientBilling, and a consultant-managed workspace still needs
+    // to reach an invoice that was issued to it. Access is authorised per invoice
+    // against its company_id in InvoiceController::canView().
+    Route::get('/invoices/{invoice}/download', [\App\Http\Controllers\InvoiceController::class, 'download'])->name('invoices.download');
+    Route::get('/invoices/{invoice}', [\App\Http\Controllers\InvoiceController::class, 'view'])->name('invoices.view');
+
     // Subscription & Billing routes (not for consultant-managed client workspaces)
     Route::prefix('subscriptions')->name('subscriptions.')->middleware('restrictManagedClientBilling')->group(function () {
         Route::get('/', [\App\Http\Controllers\Client\SubscriptionController::class, 'index'])->name('index');

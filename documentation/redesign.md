@@ -5343,3 +5343,93 @@ Run: `php artisan optimize:clear`
 **Untested by me:** no page has rendered. Load the packs page with `?theme=new`
 and confirm the Buy now button has a blue background -- that is the assertion
 static analysis cannot make.
+
+## 74. Invoicing: issue, email, download
+
+Checkout took money and told the customer nothing. `invoice_number` and
+`invoice_url` columns existed on `client_payment_transactions`, the billing
+view already rendered a Download link against them, and `config/emails.php`
+already defined an `invoice_receipt` template -- but nothing ever populated the
+columns, so the link never appeared and the receipt linked to the billing page.
+Schema ahead of UI again (§63).
+
+**Where it hooks in.** `PaymentCompletionService::complete()` is the single
+point every payment type passes through -- client subscriptions plus all four
+consultant agency types (`consultant_pack`, `consultant_agency_pack`,
+`..._extra_slot`, `..._year_unlock`, `..._renewal`). One call site covers every
+package, present and future, instead of five.
+
+Issuing runs BEFORE the notification emails, because
+`sendPaymentNotifications()` looks the invoice up to fill `invoice_number` /
+`invoice_url` and to attach the PDF.
+
+**New `invoices` table**, not extra columns on the transaction. A transaction
+is a payment attempt: it can fail, retry, be superseded. An invoice is a legal
+document whose number is spent once and whose buyer details must stay as they
+were on the issue date. Buyer and seller are stored as flat text snapshots
+rather than joins for exactly that reason -- a company that renames itself must
+not silently rewrite invoices already issued.
+
+**Numbering** is `INV-<year>-0001`, allocated by reading the current max and
+retrying on a duplicate-key error, with a UNIQUE index on `invoice_number` as
+the real guard. Two payments completing in the same instant read the same max;
+the index turns that into a caught exception and a retry rather than two
+documents sharing a number. Issuing is idempotent per transaction, so a gateway
+that sends both a callback and a webhook does not spend a second number.
+
+**VAT is stored but defaults to 0%.** `taxRate()` returns 0 unless a TRN is set
+in admin, because charging VAT without being registered to collect it is a
+compliance problem rather than a display detail. The quoted price is treated as
+tax-INCLUSIVE -- it is what the customer was shown and agreed to, so tax is
+extracted from it, never added on top. Verified the split reconciles exactly at
+0% and 5% for 3,000 / 6,500 / 9,000 AED.
+
+**Currency.** The invoice is denominated in the currency that was QUOTED, with
+the settled figure shown alongside when Razorpay's AED -> INR fallback fires.
+That fallback overwrites `amount`/`currency` on the transaction, so the
+original quote survives only in metadata. The client checkout already wrote
+`original_amount`/`original_currency`; the consultant path wrote nothing and
+lost the AED figure entirely -- fixed, writing `quoted_amount`/`quoted_currency`
+and persisting immediately rather than at the end of the try block. The service
+reads both spellings: renaming the live client keys would strand transactions
+already mid-flight.
+
+**Access.** `InvoiceController::canView()` authorises against the invoice's
+`company_id`, never the id alone -- an invoice carries buyer name, address and
+TRN, so a bare `/invoices/{id}` would let anyone enumerate other customers'
+billing details. Routes sit OUTSIDE the subscriptions group on purpose: that
+group carries `restrictManagedClientBilling`, and a consultant-managed
+workspace still needs to reach its own invoice.
+
+Consultant agencies authenticate on the `web` guard with `setActiveCompany`
+(not the `consultant` guard), so the same check resolves them; the
+`Auth::guard('consultant')` branch is a fallback. It reads `agency_company_id`
+-- `company_id` does not exist on Consultant, and the first draft would have
+403'd every consultant on their own invoice.
+
+**Attachments.** `TemplateMail` had no attachment support. Added as raw data
+rather than a path, so a queued send does not depend on the file still being
+on disk when it runs. A PDF failure never blocks the email, and a failed render
+never loses the record: the row is committed first and the PDF regenerates on
+demand at download.
+
+**Verified:** braces/parens/brackets balanced across all 12 changed PHP files;
+Blade directives, comments and script tags paired in all 5 changed views (the
+`@section` "mismatch" is the inline `@section('title', '...')` form, identical
+to HEAD); 237 non-theme views scan clean, 0 broken; the checker's one FAIL is
+the known `client.profile` false positive; every attribute written is in
+`$fillable`, so nothing is silently dropped; VAT arithmetic reconciles at both
+rates; both billing views updated (old + new theme).
+
+Run:
+```
+php artisan migrate
+php artisan db:seed --class=EmailTemplateSeeder
+php artisan optimize:clear
+```
+
+**Untested by me:** no PHP has executed and no PDF has rendered. dompdf will
+only be exercised on the first real payment. Set the invoice details in admin
+BEFORE the first live purchase -- the seller name and address are snapshotted
+onto each invoice at issue time, and blanks cannot be backfilled onto documents
+already issued.

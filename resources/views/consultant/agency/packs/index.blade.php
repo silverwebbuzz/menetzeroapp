@@ -258,6 +258,40 @@
         </div>
     </form>
 
+    {{-- Invoices for this agency. Lives here because the agency buys here and
+         there is no separate consultant billing screen. --}}
+    @if(isset($invoices) && $invoices->isNotEmpty())
+        <div class="mt-10">
+            <h2 class="text-sm font-semibold text-gray-900 mb-3">Invoices</h2>
+            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden text-sm">
+                <table class="min-w-full divide-y divide-gray-100">
+                    <thead class="bg-gray-50 text-left text-xs text-gray-500">
+                        <tr>
+                            <th class="px-4 py-2">Invoice</th>
+                            <th class="px-4 py-2">Date</th>
+                            <th class="px-4 py-2">Description</th>
+                            <th class="px-4 py-2 text-right">Amount</th>
+                            <th class="px-4 py-2"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @foreach($invoices as $invoice)
+                            <tr>
+                                <td class="px-4 py-2 font-medium text-gray-900">{{ $invoice->invoice_number }}</td>
+                                <td class="px-4 py-2 text-gray-600">{{ $invoice->issued_at?->format('d M Y') ?? '—' }}</td>
+                                <td class="px-4 py-2 text-gray-600">{{ $invoice->description }}</td>
+                                <td class="px-4 py-2 text-right">{{ $invoice->currency }} {{ number_format((float) $invoice->total, 2) }}</td>
+                                <td class="px-4 py-2 text-right">
+                                    <a href="{{ route('consultant.invoices.download', $invoice) }}" class="text-brand hover:underline">Download</a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    @endif
+
     @if(isset($recentRequests) && $recentRequests->isNotEmpty())
         <div class="mt-10">
             <h2 class="text-sm font-semibold text-gray-900 mb-3">Recent requests</h2>

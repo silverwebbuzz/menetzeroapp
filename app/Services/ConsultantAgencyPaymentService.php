@@ -79,11 +79,25 @@ class ConsultantAgencyPaymentService
                 }
 
                 $inrQuote = $inrFallbackQuote();
+
+                // Preserve the price that was quoted BEFORE overwriting amount
+                // and currency. The invoice is denominated in the currency the
+                // customer agreed to; without this the AED figure is lost and
+                // only the INR settlement survives.
+                $meta['quoted_amount'] = (float) $transaction->amount;
+                $meta['quoted_currency'] = strtoupper((string) $transaction->currency);
+
                 $transaction->update([
                     'amount' => $inrQuote['charge_amount'],
                     'currency' => 'INR',
                 ]);
                 $meta['charged_in_inr_fallback'] = true;
+
+                // metadata is persisted at the end of the try block, but an
+                // exception between here and there would lose the quote, so
+                // write it now -- the invoice depends on it.
+                $transaction->metadata = $meta;
+                $transaction->save();
 
                 $rzOrder = $this->paymentService->createRazorpayOrder(
                     $gateway,
