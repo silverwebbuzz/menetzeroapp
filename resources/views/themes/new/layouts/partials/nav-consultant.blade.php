@@ -31,7 +31,7 @@
     <a href="{{ route('consultant.packs.index') }}"
        class="mnz-nav {{ request()->routeIs('consultant.packs.*') ? 'is-active' : '' }}">
         <span class="mnz-nav__dot"></span>
-        <span class="mnz-nav__label">Request clients</span>
+        <span class="mnz-nav__label">Plans &amp; Billing</span>
     </a>
 
     @if (!empty($showRenewalNav))

@@ -5715,3 +5715,61 @@ Run: `php artisan optimize:clear`
 for `transaction_id = 2`. The receipt email for that payment was never sent --
 it is not queued or retried, so it is simply lost. Everything from the next
 payment onward sends normally.
+
+## 81. Plans & Billing: labels, entry points, current-plan panel
+
+Six requested changes; five done, one found to be half-built.
+
+**1a / 2a — nav labels.** `config/navigation.php` "Billing" -> "Plans &
+Billing". Consultant "Request clients" -> "Plans & Billing" in BOTH nav
+partials (old and new theme). The same phrase appears in consultant landing
+copy and inline links, deliberately left alone -- those are marketing prose,
+not the submenu.
+
+**1b — billing page.** "Features only · no public list price" removed from both
+themes, and the primary button repointed from `subscriptions.request-package`
+to `subscriptions.upgrade`, relabelled "Plans" / "Renew plan". The old wording
+predates checkout: plans now carry list prices and can be bought self-serve.
+
+Removing that link left `request-package` with ZERO references in the UI --
+it is not in the nav either, so Enterprise (no list price, quote-only) would
+have become unreachable. Re-added as a secondary link, "Need Enterprise, or
+prefer an invoice?", in both themes. This is now its only entry point.
+
+**2b / 2c — consultant packs page.** Header still read "Request managed
+clients ... Pricing is confirmed offline", written before self-serve existed,
+and the current plan was one grey line with no term dates. Replaced with a
+current-plan panel showing plan name, slots used/limit, contract year, term
+start and expiry, with the border and a banner turning amber inside 45 days and
+red once expired. `expires_at` was already on the model and simply never
+rendered -- an agency could not tell when its capacity lapses, on the page
+whose job is to tell it.
+
+"Pricing is confirmed offline" is kept in `partials/package-request-matrix`:
+that partial belongs to the request form, where it is still true.
+
+**1c — scheduled downgrade: NOT delivered, and the reason matters.**
+The request was "if downgrade it will apply after completion of any paid
+package". Half of that already works: `processUpgrade()` routes a downgrade to
+`scheduleDowngrade()`, which stores `renewal_plan_id` on the subscription and
+takes no payment, so access continues to term end. The upgrade and billing
+screens read it back and show "scheduled".
+
+But **nothing ever applies it.** `getScheduledRenewalPlan()` has exactly two
+callers, both views. The only scheduled command is
+`SendRenewalRemindersCommand`; there is no expiry job. So at term end the
+subscription simply lapses with the downgrade still sitting unread in metadata
+-- the customer is not moved onto the plan they chose.
+
+Fixing that means a scheduled command that finds expired subscriptions with a
+`renewal_plan_id` and activates the target plan, which needs decisions this
+change should not make silently: what happens to a downgrade whose target is
+now retired, whether the new term is free or invoiced, and what happens to
+usage that exceeded the smaller plan's limits (`validatePlanChange()` already
+warns about this at selection time but nothing re-checks at apply time).
+Raised rather than guessed.
+
+**Verified:** all five changed views balanced (directives, comments); both
+referenced routes exist; 237 non-theme views scan clean.
+
+Run: `php artisan optimize:clear`

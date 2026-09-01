@@ -37,7 +37,7 @@
     </a>
     <a href="{{ route('consultant.packs.index') }}" class="nav-link {{ request()->routeIs('consultant.packs.*') ? 'active' : '' }}">
         {!! $svg('card') !!}
-        Request clients
+        Plans &amp; Billing
     </a>
     @if(!empty($showRenewalNav))
         <a href="{{ route('consultant.renewal.index') }}" class="nav-link {{ request()->routeIs('consultant.renewal.*') ? 'active' : '' }}">

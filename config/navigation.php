@@ -449,7 +449,7 @@ return [
                 'year' => false,
             ],
             [
-                'label' => 'Billing',
+                'label' => 'Plans & Billing',
                 'icon' => 'card',
                 'route' => 'subscriptions.billing',
                 'gate' => 'billing',

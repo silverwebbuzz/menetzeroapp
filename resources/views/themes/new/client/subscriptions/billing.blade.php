@@ -139,10 +139,17 @@
                 </div>
 
                 <div class="bl-side">
-                    <a href="{{ route('subscriptions.request-package') }}" class="mnz-btn mnz-btn--accent" style="text-align:center">
-                        {{ ($daysRemaining ?? 999) <= 45 && !empty($isPaidPlan) ? 'Renew — request a package' : 'Request a package' }}
+                    {{-- See the old-theme twin: primary action is now Plans
+                         (self-serve checkout), not the offline request form. --}}
+                    <a href="{{ route('subscriptions.upgrade') }}" class="mnz-btn mnz-btn--accent" style="text-align:center">
+                        {{ ($daysRemaining ?? 999) <= 45 && !empty($isPaidPlan) ? 'Renew plan' : 'Plans' }}
                     </a>
-                    <p style="font-size:11px;color:var(--ink-4);margin:0">Features only · no public list price</p>
+                    {{-- Only UI entry point to the request form (Enterprise /
+                         invoice buyers); it is not in the nav. --}}
+                    <a href="{{ route('subscriptions.request-package') }}"
+                       style="font-size:11px;color:var(--ink-4);text-decoration:underline">
+                        Need Enterprise, or prefer an invoice?
+                    </a>
 
                     @if(!empty($cancellationScheduled))
                         <form action="{{ route('subscriptions.resume') }}" method="POST">

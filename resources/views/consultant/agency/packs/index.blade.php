@@ -14,20 +14,72 @@
 <div class="w-full max-w-6xl">
     <div class="mb-6">
         <a href="{{ route('consultant.dashboard') }}" class="text-sm text-brand hover:underline">&larr; Dashboard</a>
-        <h1 class="text-3xl font-bold text-gray-900 mt-2">Request managed clients</h1>
+        <h1 class="text-3xl font-bold text-gray-900 mt-2">Plans &amp; Billing</h1>
         <p class="mt-2 text-gray-600">
-            Compare packages, then enter how many managed clients you need at each depth.
-            You can mix packages (e.g. Scope Basic ×5 and ESG Starter ×5). Pricing is confirmed offline.
+            Your current pack, and buying more client slots.
         </p>
-        @if($subscription)
-            <p class="mt-2 text-sm text-gray-500">
-                Current: {{ $subscription->plan?->plan_name }} · {{ $currentUsed }}/{{ $currentLimit }} managed clients · contract year {{ $contractYear }}
-            </p>
-        @endif
-        @if($isTrial)
-            <p class="mt-1 text-xs text-gray-500">You’re on Free (1 client, watermarked trials). This request is for paid capacity.</p>
-        @endif
     </div>
+
+    {{-- CURRENT PLAN. The page previously stated only "Current: <plan> ·
+         used/limit", with no term dates -- an agency could not tell when its
+         capacity lapses, which is the single most important fact on a billing
+         page. expires_at was already on the model and simply unused. --}}
+    @if($subscription)
+        @php
+            $expiresAt = $subscription->expires_at;
+            $daysLeft = $expiresAt ? (int) now()->startOfDay()->diffInDays($expiresAt, false) : null;
+            $isExpired = $daysLeft !== null && $daysLeft < 0;
+            $isExpiring = $daysLeft !== null && $daysLeft >= 0 && $daysLeft <= 45;
+        @endphp
+
+        <div class="bg-white rounded-xl border {{ $isExpired ? 'border-red-300' : ($isExpiring ? 'border-amber-300' : 'border-gray-200') }} p-5 mb-8">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                    <div class="text-xs uppercase tracking-wide text-gray-500">Current plan</div>
+                    <div class="text-xl font-semibold text-gray-900 mt-1">
+                        {{ $subscription->plan?->plan_name ?? 'Plan' }}
+                        @if($isTrial)
+                            <span class="ml-1 align-middle text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">Free trial</span>
+                        @endif
+                    </div>
+                    @if($isTrial)
+                        <p class="text-xs text-gray-500 mt-1">1 client, watermarked downloads. Buy slots below for clean exports.</p>
+                    @endif
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-3 text-sm">
+                    <div>
+                        <div class="text-gray-500 text-xs">Client slots</div>
+                        <div class="font-semibold text-gray-900">{{ $currentUsed }} / {{ $currentLimit }} used</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 text-xs">Contract year</div>
+                        <div class="font-semibold text-gray-900">{{ $contractYear }}</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 text-xs">Term started</div>
+                        <div class="font-semibold text-gray-900">{{ $subscription->starts_at?->format('d M Y') ?? '—' }}</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-500 text-xs">{{ $isExpired ? 'Expired' : 'Expires' }}</div>
+                        <div class="font-semibold {{ $isExpired ? 'text-red-600' : ($isExpiring ? 'text-amber-700' : 'text-gray-900') }}">
+                            {{ $expiresAt?->format('d M Y') ?? '—' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if($isExpired)
+                <p class="mt-4 text-sm text-red-700 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+                    This pack expired on {{ $expiresAt->format('d M Y') }}. Buy slots below to restore capacity.
+                </p>
+            @elseif($isExpiring)
+                <p class="mt-4 text-sm text-amber-800 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
+                    Expires in {{ $daysLeft }} {{ \Illuminate\Support\Str::plural('day', $daysLeft) }}.
+                </p>
+            @endif
+        </div>
+    @endif
 
     @if(session('success'))
         <div class="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">{{ session('success') }}</div>
