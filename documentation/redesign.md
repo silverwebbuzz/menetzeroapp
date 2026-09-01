@@ -5472,3 +5472,62 @@ Run: `php artisan optimize:clear`
 **Untested by me:** no page has rendered. Load `/subscriptions/upgrade?theme=new`
 and confirm the selected currency pill is green with white text rather than
 blank.
+
+## 76. Policy pages seeded (gateway onboarding prerequisite)
+
+Razorpay -- like every gateway -- checks for published terms, refund and
+privacy pages before activating an account.
+
+The infrastructure was already complete and unused: `/terms`, `/refunds` and
+`/privacy` are routed to `PageController::show()`, the `site_pages` table and
+`SitePage` model exist, admin can edit pages at `/admin/site-content`, and the
+marketing footer already links all three. But **no seeder ever created a row**,
+so `firstOrFail()` returned 404 on all three URLs -- including from footer links
+a reviewer would click first. Schema and routes ahead of content, the same
+pattern as §74.
+
+**Written to match what the code actually does, not boilerplate.** Traced
+before drafting:
+
+* `SubscriptionController::cancel()` schedules cancellation for END OF TERM --
+  access continues to `expires_at` and does not renew. The refund page says
+  exactly that, rather than implying immediate termination.
+* Plans are billed annually in advance (`billing_cycle => 'annual'`).
+* The AED -> INR fallback means a refund can be issued in a currency other than
+  the one quoted, and FX movement between charge and refund dates changes what
+  lands. Stated plainly instead of being left as a support surprise.
+* Card data never touches our systems -- the gateway handles it. Invoices are
+  on the private disk (§74), so the security section can say so truthfully.
+
+Bodies are HTML (`public/page.blade.php` renders with `{!! !!}`) and use
+`{{placeholder}}` tokens substituted by `SitePage::renderedBody()`, which
+escapes each value. Company name, address, email and phone therefore come from
+admin settings rather than being hardcoded -- one place to change them, and
+they stay correct on every page. Verified all 7 tokens used resolve to real
+keys in `SiteContentController::$settingKeys`.
+
+`updateOrCreate` keyed on slug, so re-running never duplicates a page or
+silently overwrites wording edited in admin since. To reset a page
+deliberately, delete the row and re-run.
+
+NOT added to `DatabaseSeeder`: that seeder is interactive demo-data generation
+and prompts for extra companies. Policy pages are production content, so they
+stay an explicit standalone command.
+
+**Verified:** PHP structure balanced with heredoc bodies excluded from the
+count (the `{{token}}` braces otherwise inflate it); all three bodies have
+balanced `<p> <h2> <ul> <li> <em> <strong> <a>` tags; both internal links
+(`/privacy`, `/refunds`) resolve to real routes.
+
+Run:
+```
+php artisan db:seed --class=SitePageSeeder
+php artisan optimize:clear
+```
+
+**Not legal advice.** These are operational policies describing how the system
+actually behaves, drafted to be accurate and readable. Before submitting to a
+gateway, set the company details in `/admin/site-content` -- the pages render
+whatever is there, and blank tokens produce blank gaps -- and have someone
+qualified in your jurisdiction review the wording, particularly the liability
+and governing-law clauses in the terms.
