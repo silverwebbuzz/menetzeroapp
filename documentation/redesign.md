@@ -5531,3 +5531,50 @@ gateway, set the company details in `/admin/site-content` -- the pages render
 whatever is there, and blank tokens produce blank gaps -- and have someone
 qualified in your jurisdiction review the wording, particularly the liability
 and governing-law clauses in the terms.
+
+## 77. Webhooks now respect is_enabled
+
+`PaymentWebhookController` verified each gateway's signature but never checked
+whether that gateway was still ENABLED. All three endpoints -- razorpay,
+cashfree, stripe -- gated only on a webhook secret being present.
+
+§70 retired Cashfree and Stripe by setting `is_enabled = false` while
+deliberately KEEPING their rows, so historical transactions still resolve by
+name. Their `key_secret` therefore survives, which meant both webhook endpoints
+stayed fully live: a valid signed payload would pass verification and call
+`activate()` -> `PaymentCompletionService::complete()`, granting a subscription
+and (since §74) issuing an invoice, for a gateway whose checkout code no longer
+exists and which cannot take a payment.
+
+**Severity, stated honestly.** This is not remotely exploitable: every path
+still requires a valid HMAC signature, so an attacker without the secret gets
+nothing. The realistic failure is a stale or replayed Cashfree webhook from the
+period before retirement reactivating an old transaction -- silent, because the
+completion path logs success rather than questioning the gateway.
+
+Fixed by adding `is_enabled` to all three guards. Disabling a gateway in admin
+now actually closes its payment path, which is what an operator already
+believes that toggle does.
+
+**A near-miss worth recording.** The guard line
+`if (!$gateway || !$secret) {` appears TWICE -- Cashfree and Stripe are
+byte-identical. The first patch attempt asserted a single occurrence and
+failed, which is the only reason it did not silently patch Cashfree's guard
+into Stripe's method and leave Cashfree open. Each was then anchored on its own
+surrounding context. Assert on uniqueness before replacing.
+
+**Verified against the admin path**, since a wrong guard here would have
+permanently blocked the Razorpay webhook you are about to depend on:
+`PaymentGatewayController::update()` sets `is_enabled` from
+`$request->boolean('is_enabled')`, the view has the checkbox, and the
+controller already refuses to enable a gateway without credentials. Ticking
+Enabled sets the flag, so the guard passes.
+
+**Verified:** braces/parens balanced; all three endpoints check `is_enabled`;
+237 non-theme views scan clean.
+
+Run: `php artisan optimize:clear`
+
+**Untested by me:** no webhook has been received. When the Razorpay keys
+arrive, confirm a real webhook still activates -- the guard passes only when
+the gateway row is enabled AND has a webhook secret.

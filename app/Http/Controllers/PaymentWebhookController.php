@@ -32,7 +32,11 @@ class PaymentWebhookController extends Controller
         $gateway = PaymentGateway::forGateway('razorpay');
         $secret = $gateway?->webhook_secret;
 
-        if (!$secret) {
+        // is_enabled is checked as well as the secret. Disabling a gateway in
+        // admin must actually close its payment path: a disabled row keeps its
+        // credentials so historical transactions still resolve by name, so the
+        // presence of a secret is not evidence the gateway is in service.
+        if (!$gateway?->is_enabled || !$secret) {
             return response()->json(['message' => 'Webhook not configured'], 400);
         }
 
@@ -78,7 +82,12 @@ class PaymentWebhookController extends Controller
         // Cashfree signs with the secret key; allow a dedicated webhook secret too.
         $secret = $gateway?->webhook_secret ?: $gateway?->key_secret;
 
-        if (!$gateway || !$secret) {
+        // Cashfree was retired in §70: its checkout code is gone, but the row
+        // was deliberately kept (disabled) so historical payments still resolve
+        // by name. Without this is_enabled check the endpoint stayed live and
+        // could still activate a subscription -- and now issue an invoice --
+        // for a gateway that can no longer take a payment.
+        if (!$gateway || !$gateway->is_enabled || !$secret) {
             return response()->json(['message' => 'Webhook not configured'], 400);
         }
 
@@ -128,7 +137,8 @@ class PaymentWebhookController extends Controller
         $gateway = PaymentGateway::forGateway('stripe');
         $secret = $gateway?->webhook_secret;
 
-        if (!$gateway || !$secret) {
+        // Retired alongside Cashfree in §70 -- same reasoning as above.
+        if (!$gateway || !$gateway->is_enabled || !$secret) {
             return response()->json(['message' => 'Webhook not configured'], 400);
         }
 
