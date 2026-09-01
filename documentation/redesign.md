@@ -5187,3 +5187,56 @@ will charge INR and say so -- which is the designed behaviour, not a failure.
 **Not built:** consultant slot-quantity checkout with block pricing.
 `PackCheckoutController::index()` still carries "Phase 3-5: self-serve pack
 grid/checkout hidden", so consultant packs remain request-then-activate.
+
+## 71. Consultant pack checkout restored, slot pricing made depth-aware
+
+Same story as section 70: `processCheckout()` and `processExtraSlots()` were
+redirect stubs from commit 743f12a, not missing code. Recovered from `743f12a^`,
+with `validatePackChange`, `resolvePackPurchase`, `resolveExtraSlotPurchase` and
+the pro-rata-to-31-Dec logic all still intact in
+`ConsultantAgencySubscriptionService`. Routes `consultant.packs.checkout` and
+`.extra-slots` were already wired.
+
+Changes made while restoring:
+
+* **Razorpay only.** `'gateway' => 'required|in:razorpay,cashfree,stripe'`
+  dropped from both; `'razorpay'` passed directly to
+  `ConsultantAgencyPaymentService::start()`.
+* **AED, not forced INR.** The recovered code did
+  `$chargeCurrency = $gateway === 'razorpay' ? 'INR' : $displayCurrency`. Now the
+  display currency is charged, and the `$inrFallbackQuote` closure the method
+  already accepted handles a Razorpay AED rejection -- re-pricing rather than
+  converting, so the INR figure is the real INR list price.
+* **`is_active` on the pack lookup**, so a retired pack cannot be bought by
+  someone new.
+
+**The pricing bug this exposed.** `resolveExtraSlotPurchase()` charged a flat
+`EXTRA_SLOT_PRICE_AED = 1299` for every extra slot regardless of depth. An ESG
+slot resells at AED 6,500 and a Carbon slot at 3,000, so one flat number either
+gives an ESG slot away or overcharges for a Carbon one. Added
+`ConsultantAgencyPlanMatrix::extraSlotPriceAed($planCode, $quantity)`, which
+reads the depth from the pack the agency already holds and applies the
+`SLOT_PRICING` volume bands:
+
+    consultant_carbon   1 slot 1,900   5 slots  9,000   10 slots 18,000
+    consultant_esg      1 slot 3,800   5 slots 18,000   10 slots 36,000
+    legacy / enterprise flat 1,299 (unchanged -- repricing an existing
+                                    agency's renewal is not this method's job)
+
+Blocks of five take the block rate, the remainder the single rate, both below
+entry: expansion is never dearer than starting.
+
+**Verified:** braces/parens balanced in all three edited PHP files;
+`ConsultantAgencyPaymentService::start()` signature matches both call sites
+(8 args, closure last); `PaymentGateway` and `SubscriptionPlan` already imported;
+band arithmetic simulated across 1/3/5/7/10 slots for all three pack types.
+
+Run: `php artisan optimize:clear`
+
+**Backend is complete; the purchase UI is not.**
+`resources/views/consultant/agency/packs/index.blade.php` is a REQUEST form
+(`consultant.packs.request-entities`), not a purchase grid -- no view posts to
+`consultant.packs.checkout` or `.extra-slots`. A consultant still cannot buy a
+pack from the interface even though every route, controller and price behind it
+now works. That grid is a design task, and it is the last piece between here and
+self-serve.

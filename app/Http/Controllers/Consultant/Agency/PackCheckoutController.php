@@ -64,16 +64,121 @@ class PackCheckoutController extends Controller
         ));
     }
 
+    /**
+     * Buy an agency pack (slots at Carbon or ESG depth).
+     *
+     * Razorpay only, charged in the display currency. If AED is not yet
+     * activated on the Razorpay account, ConsultantAgencyPaymentService
+     * re-prices through the closure passed as the last argument and charges
+     * the INR equivalent, telling the buyer before they pay.
+     */
     public function processCheckout(Request $request)
     {
-        return redirect()->route('consultant.packs.index')
-            ->with('info', 'Self-serve agency pack checkout is unavailable. Request managed-client entities from this page or contact MENetZero — pricing is confirmed offline.');
+        if (!PaymentGateway::checkoutAvailable()) {
+            return redirect()->route('consultant.packs.index')
+                ->with('error', 'Online payments are not available yet. Agency pack checkout is coming soon.');
+        }
+
+        $consultantOrg = $this->consultantCompany();
+
+        $data = $request->validate([
+            'plan_id' => 'required|exists:subscription_plans,id',
+        ]);
+
+        // is_active keeps a retired pack from being sold; an agency already on
+        // one keeps it, but nobody new can buy it.
+        $plan = SubscriptionPlan::where('id', $data['plan_id'])
+            ->where('plan_category', 'consultant_agency')
+            ->where('is_active', true)
+            ->firstOrFail();
+
+        $chargeCurrency = \App\Services\CurrencyService::displayCurrency();
+        $current = $this->consultantSubscriptions->getActiveSubscription($consultantOrg->id);
+
+        try {
+            $this->consultantSubscriptions->validatePackChange($consultantOrg, $plan, $current);
+        } catch (\Throwable $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        $quote = $this->consultantSubscriptions->resolvePackPurchase($consultantOrg, $plan, null, $chargeCurrency);
+
+        if (!$quote['requires_payment'] || $quote['charge_amount'] <= 0) {
+            return back()->with('error', 'This pack is not available for online checkout.');
+        }
+
+        return $this->checkout->start(
+            $consultantOrg,
+            'consultant_agency_pack',
+            'razorpay',
+            $quote['charge_amount'],
+            $quote['charge_currency'],
+            'Agency pack: ' . $plan->plan_name . ' (' . $quote['contract_year'] . ')',
+            [
+                'plan_id' => $plan->id,
+                'plan_code' => $plan->plan_code,
+                'contract_year' => $quote['contract_year'],
+                'pro_rata' => $quote['pro_rata'],
+            ],
+            fn () => $this->consultantSubscriptions->resolvePackPurchase($consultantOrg, $plan, $quote['contract_year'], 'INR'),
+        );
     }
 
+    /**
+     * Add slots to an existing pack. Priced at the depth of that pack, in
+     * volume bands -- blocks of five cost less per slot than singles, and both
+     * cost less than the entry rate, so expanding is never dearer than
+     * starting.
+     */
     public function processExtraSlots(Request $request)
     {
-        return redirect()->route('consultant.packs.index')
-            ->with('info', 'Self-serve extra slot checkout is unavailable. Request more entities via MENetZero — activation is offline.');
+        if (!PaymentGateway::checkoutAvailable()) {
+            return redirect()->route('consultant.packs.index')
+                ->with('error', 'Online payments are not available yet. Extra slot purchases are coming soon.');
+        }
+
+        $consultantOrg = $this->consultantCompany();
+        $subscription = $this->consultantSubscriptions->getActiveSubscription($consultantOrg->id);
+
+        if (!$subscription) {
+            return back()->with('error', 'Purchase an agency pack before adding extra slots.');
+        }
+
+        $data = $request->validate([
+            'quantity' => 'required|integer|min:1|max:50',
+        ]);
+
+        $chargeCurrency = \App\Services\CurrencyService::displayCurrency();
+
+        try {
+            $quote = $this->consultantSubscriptions->resolveExtraSlotPurchase(
+                $subscription,
+                (int) $data['quantity'],
+                $chargeCurrency,
+            );
+        } catch (\Throwable $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return $this->checkout->start(
+            $consultantOrg,
+            'consultant_agency_extra_slot',
+            'razorpay',
+            $quote['charge_amount'],
+            $quote['charge_currency'],
+            "Extra slots (×{$quote['quantity']}) through 31 Dec {$quote['contract_year']}",
+            [
+                'consultant_subscription_id' => $subscription->id,
+                'quantity' => $quote['quantity'],
+                'contract_year' => $quote['contract_year'],
+                'pro_rata' => $quote['pro_rata'],
+            ],
+            fn () => $this->consultantSubscriptions->resolveExtraSlotPurchase(
+                $subscription,
+                (int) $data['quantity'],
+                'INR',
+            ),
+        );
     }
 
     public function processYearUnlock(Request $request)

@@ -148,6 +148,36 @@ class ConsultantAgencyPlanMatrix
     /** AED per extra slot (pro-rata to contract 31 Dec) — legacy pack path. */
     public const EXTRA_SLOT_PRICE_AED = 1299;
 
+    /**
+     * AED for `$quantity` extra slots on a pack, using the volume bands in
+     * SLOT_PRICING.
+     *
+     * A flat rate cannot price these: an ESG slot resells at AED 6,500 and a
+     * Carbon slot at 3,000, so one number either gives an ESG slot away or
+     * overcharges for a Carbon one. Depth comes from the pack the agency
+     * already holds.
+     *
+     * Blocks of five take the block rate and the remainder the single rate,
+     * both below the entry rate -- expansion is never dearer than entry.
+     * A pack with no SLOT_PRICING entry (legacy, enterprise) falls back to the
+     * flat constant it was sold under, because repricing an existing agency's
+     * renewal is not this method's job.
+     */
+    public static function extraSlotPriceAed(?string $planCode, int $quantity): float
+    {
+        $quantity = max(0, $quantity);
+
+        $bands = self::SLOT_PRICING[$planCode] ?? null;
+        if ($bands === null) {
+            return self::EXTRA_SLOT_PRICE_AED * $quantity;
+        }
+
+        $blocks = intdiv($quantity, 5);
+        $remainder = $quantity % 5;
+
+        return ($blocks * 5 * $bands['block5']) + ($remainder * $bands['single']);
+    }
+
     /** AED to unlock a new PRY for an existing managed client mid-contract. */
     public const REPORTING_YEAR_UNLOCK_PRICE_AED = 999;
 

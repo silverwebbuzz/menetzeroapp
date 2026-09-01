@@ -527,7 +527,12 @@ class ConsultantAgencySubscriptionService
 
         $contractYear = (int) $subscription->contract_year;
         $chargeCurrency = strtoupper($chargeCurrency);
-        $annualTotal = ConsultantAgencyPlanMatrix::EXTRA_SLOT_PRICE_AED * $quantity;
+        // Depth-aware: an ESG slot and a Carbon slot are different products,
+        // and a flat rate would sell one of them at the wrong price.
+        $annualTotal = ConsultantAgencyPlanMatrix::extraSlotPriceAed(
+            $subscription->plan?->plan_code,
+            $quantity
+        );
         $chargeAmount = $chargeCurrency === 'INR'
             ? PlanEntitlementDefaults::defaultPriceInr($annualTotal)
             : $annualTotal;
