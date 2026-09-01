@@ -5240,3 +5240,60 @@ Run: `php artisan optimize:clear`
 pack from the interface even though every route, controller and price behind it
 now works. That grid is a design task, and it is the last piece between here and
 self-serve.
+
+## 72. Consultant self-serve purchase grid
+
+The pack page now sells slots. "Buy now" cards for Carbon Practice and ESG
+Practice sit above the existing request form, which is kept for invoices,
+negotiated rates and Enterprise -- nothing was taken away.
+
+**Two bugs found while wiring it, both of which would have taken money and
+delivered the wrong thing.**
+
+`resolvePackPurchase()` ignored quantity entirely. It quoted `price_annual`,
+which is ONE slot's price, so a five-slot purchase would have charged for one.
+Added a `$slots` argument priced through
+`ConsultantAgencyPlanMatrix::extraSlotPriceAed()` -- the banded rate, not
+`entry x slots`, or buying five singly would cost more than a block of five.
+
+`completePackTransaction()` never passed `slot_limit` to
+`activatePackSubscription()`, so a pack activated at the plan's default
+capacity. Someone who paid for five slots would have received one, AFTER the
+payment succeeded. The quantity now travels
+`quote['slots']` -> transaction metadata -> activation options.
+
+**The preview is a preview.** The JS calculator mirrors the PHP band logic, but
+`processCheckout()` re-quotes server-side, so an edited form field cannot change
+what is charged. Verified the two agree at 5/6/10/12 slots for both packs:
+
+    Carbon  5 -> 9,000   6 -> 10,900   10 -> 18,000   12 -> 21,800
+    ESG     5 -> 18,000  6 -> 21,800   10 -> 36,000   12 -> 43,600
+
+Pro-rata is applied server-side only, so a mid-year purchase is charged LESS
+than the preview shows. The page says so rather than showing a figure that
+drops at checkout.
+
+**Deliberate exclusions:**
+* Enterprise has no list price, so it has no Buy button -- a quote would have
+  been impossible. It stays in the request form.
+* A pack with no row in `subscription_plans` renders no card at all: the form
+  posts `plan_id`, and a Buy button that 404s is worse than an absent one.
+* `is_active` on the pack lookup, so a retired pack cannot be bought by
+  somebody new.
+* The whole grid is hidden unless `PaymentGateway::checkoutAvailable()`.
+
+`MIN_SLOTS` is enforced twice -- `min` on the number input and
+`min:` in validation -- because a number input stops nothing.
+
+`ConsultantAgencyPlanMatrix` was missing from the controller's imports after
+the changes; added, or the first Buy-now submit would have been a fatal error.
+
+**Verified:** braces/parens balanced in both PHP files; Blade directives and
+script tags paired; 236 non-theme views scan clean, 0 broken; band arithmetic
+simulated across both packs and four quantities.
+
+Run: `php artisan optimize:clear`
+
+**Untested by me:** no PHP has executed. The first real purchase should be a
+small one, watched end to end -- checkout -> Razorpay -> callback -> subscription
+row -- with `slot_limit` confirmed against what was bought.

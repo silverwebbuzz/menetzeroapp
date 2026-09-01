@@ -270,11 +270,22 @@ class ConsultantAgencySubscriptionService
      *   message: string
      * }
      */
+    /**
+     * Quote a pack purchase.
+     *
+     * $slots is the number of managed-client slots being bought. It was
+     * previously absent and the quote was always one slot's list price, so a
+     * five-slot purchase was charged for one. Priced through
+     * ConsultantAgencyPlanMatrix::extraSlotPriceAed(), which applies the
+     * volume bands, rather than multiplying the entry rate -- otherwise buying
+     * five singly would cost more than buying a block of five.
+     */
     public function resolvePackPurchase(
         Company $consultantOrg,
         SubscriptionPlan $plan,
         ?int $contractYear = null,
         string $chargeCurrency = 'AED',
+        int $slots = 1,
     ): array {
         $this->assertConsultantOrg($consultantOrg);
 
@@ -282,11 +293,20 @@ class ConsultantAgencySubscriptionService
             throw new RuntimeException('Selected plan is not a consultant pack.');
         }
 
+        $slots = max(1, $slots);
         $contractYear ??= (int) now()->year;
         $chargeCurrency = strtoupper($chargeCurrency);
+
+        // Banded AED total for the whole purchase. Falls back to the plan's own
+        // price x slots for a pack with no bands (legacy, enterprise).
+        $annualAed = ConsultantAgencyPlanMatrix::extraSlotPriceAed($plan->plan_code, $slots);
+        if ($annualAed <= 0) {
+            $annualAed = (float) $plan->price_annual * $slots;
+        }
+
         $annualPrice = $chargeCurrency === 'INR'
-            ? (float) ($plan->price_inr ?? PlanEntitlementDefaults::defaultPriceInr((float) $plan->price_annual))
-            : (float) $plan->price_annual;
+            ? PlanEntitlementDefaults::defaultPriceInr($annualAed)
+            : $annualAed;
         $isMidYear = !now()->startOfDay()->equalTo(Carbon::create($contractYear, 1, 1)->startOfDay());
         $chargeAmount = $isMidYear
             ? $this->proRataToContractYearEnd($annualPrice, $contractYear)
@@ -297,6 +317,7 @@ class ConsultantAgencySubscriptionService
 
         return [
             'type' => 'new_pack',
+            'slots' => $slots,
             'requires_payment' => $chargeAmount > 0,
             'charge_amount' => $chargeAmount,
             'charge_currency' => strtoupper($chargeCurrency),
@@ -333,14 +354,23 @@ class ConsultantAgencySubscriptionService
         $plan = SubscriptionPlan::findOrFail($planId);
         $consultantOrg = Company::findOrFail($transaction->company_id);
 
-        $subscription = $this->activatePackSubscription($consultantOrg, $plan, [
+        $options = [
             'contract_year' => $contractYear,
             'starts_at' => now()->toDateString(),
             'payment_transaction_id' => $transaction->id,
             'metadata' => array_merge($gatewayRefs, [
                 'provision_type' => $metadata['provision_type'] ?? 'paid',
             ]),
-        ]);
+        ];
+
+        // Slots bought at checkout. Without this the pack activates at the
+        // plan's default capacity, so someone who paid for five slots would
+        // receive one -- and the payment has already been taken by this point.
+        if (!empty($metadata['slot_limit'])) {
+            $options['slot_limit'] = (int) $metadata['slot_limit'];
+        }
+
+        $subscription = $this->activatePackSubscription($consultantOrg, $plan, $options);
 
         $transaction->update([
             'status' => 'completed',

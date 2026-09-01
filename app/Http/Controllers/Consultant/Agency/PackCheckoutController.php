@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Consultant\Agency;
 
+use App\Data\ConsultantAgencyPlanMatrix;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Consultant\Agency\Concerns\ResolvesConsultantAgency;
 use App\Models\PaymentGateway;
@@ -52,7 +53,26 @@ class PackCheckoutController extends Controller
         $extraOptions = \App\Data\CompanyPackageOptions::extraOptions();
         $matrix = \App\Data\CompanyPackageOptions::comparisonMatrix();
 
-        // Phase 3–5: self-serve pack grid/checkout hidden — request clients offline.
+        // Self-serve purchase. Enterprise is filtered out: it has no list price
+        // (negotiated per deal), so a Buy-now button there would post a plan
+        // resolvePackPurchase() cannot quote. It stays reachable through the
+        // request form below the grid.
+        $buyablePacks = collect(\App\Data\ConsultantAgencyPlanMatrix::selectablePacks())
+            ->filter(fn (array $pack) => isset(
+                \App\Data\ConsultantAgencyPlanMatrix::SLOT_PRICING[$pack['plan_code'] ?? '']
+            ))
+            ->values();
+
+        // Only rows that actually exist in subscription_plans can be bought --
+        // the form posts plan_id, not plan_code.
+        $planIds = SubscriptionPlan::where('plan_category', 'consultant_agency')
+            ->where('is_active', true)
+            ->pluck('id', 'plan_code');
+
+        $checkoutAvailable = PaymentGateway::checkoutAvailable();
+        $minSlots = \App\Data\ConsultantAgencyPlanMatrix::MIN_SLOTS;
+        $slotPricing = \App\Data\ConsultantAgencyPlanMatrix::SLOT_PRICING;
+
         return view('consultant.agency.packs.index', compact(
             'subscription',
             'slotSummary',
@@ -61,6 +81,11 @@ class PackCheckoutController extends Controller
             'packages',
             'extraOptions',
             'matrix',
+            'buyablePacks',
+            'planIds',
+            'checkoutAvailable',
+            'minSlots',
+            'slotPricing',
         ));
     }
 
@@ -83,7 +108,12 @@ class PackCheckoutController extends Controller
 
         $data = $request->validate([
             'plan_id' => 'required|exists:subscription_plans,id',
+            // Minimum enforced here as well as in the form: the field is a
+            // number input and nothing stops a smaller value being posted.
+            'quantity' => 'required|integer|min:' . ConsultantAgencyPlanMatrix::MIN_SLOTS . '|max:50',
         ]);
+
+        $slots = (int) $data['quantity'];
 
         // is_active keeps a retired pack from being sold; an agency already on
         // one keeps it, but nobody new can buy it.
@@ -101,7 +131,7 @@ class PackCheckoutController extends Controller
             return back()->with('error', $e->getMessage());
         }
 
-        $quote = $this->consultantSubscriptions->resolvePackPurchase($consultantOrg, $plan, null, $chargeCurrency);
+        $quote = $this->consultantSubscriptions->resolvePackPurchase($consultantOrg, $plan, null, $chargeCurrency, $slots);
 
         if (!$quote['requires_payment'] || $quote['charge_amount'] <= 0) {
             return back()->with('error', 'This pack is not available for online checkout.');
@@ -113,14 +143,16 @@ class PackCheckoutController extends Controller
             'razorpay',
             $quote['charge_amount'],
             $quote['charge_currency'],
-            'Agency pack: ' . $plan->plan_name . ' (' . $quote['contract_year'] . ')',
+            'Agency pack: ' . $plan->plan_name . ' x' . $quote['slots'] . ' (' . $quote['contract_year'] . ')',
             [
                 'plan_id' => $plan->id,
                 'plan_code' => $plan->plan_code,
                 'contract_year' => $quote['contract_year'],
                 'pro_rata' => $quote['pro_rata'],
+                // Read at activation to set slot_limit on the subscription row.
+                'slot_limit' => $quote['slots'],
             ],
-            fn () => $this->consultantSubscriptions->resolvePackPurchase($consultantOrg, $plan, $quote['contract_year'], 'INR'),
+            fn () => $this->consultantSubscriptions->resolvePackPurchase($consultantOrg, $plan, $quote['contract_year'], 'INR', $slots),
         );
     }
 

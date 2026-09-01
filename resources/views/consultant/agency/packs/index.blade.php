@@ -45,6 +45,123 @@
         </div>
     @endif
 
+    {{-- SELF-SERVE PURCHASE.
+
+         Totals are computed in Blade from ConsultantAgencyPlanMatrix::SLOT_PRICING
+         and recomputed in JS as the quantity changes. The JS figure is a
+         PREVIEW only -- processCheckout() re-quotes server-side through
+         resolvePackPurchase(), so a tampered form cannot change what is
+         charged, and a mid-year purchase is pro-rated there rather than here.
+
+         Enterprise is absent by design: it has no list price, so it is bought
+         through the request form below. --}}
+    @if ($checkoutAvailable && $buyablePacks->isNotEmpty())
+        <div class="mb-8">
+            <h2 class="text-lg font-semibold text-gray-900 mb-1">Buy client slots</h2>
+            <p class="text-sm text-gray-600 mb-4">
+                Each slot is one managed client for the contract year. Minimum {{ $minSlots }} to start;
+                blocks of five cost less per slot.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                @foreach ($buyablePacks as $pack)
+                    @php
+                        $code = $pack['plan_code'];
+                        $planId = $planIds[$code] ?? null;
+                        $bands = $slotPricing[$code];
+                        $clientList = $pack['client_list_price_aed'] ?? null;
+                    @endphp
+
+                    {{-- No row in subscription_plans means the seeder has not run;
+                         showing a Buy button that 404s on plan_id would be worse
+                         than showing nothing. --}}
+                    @if ($planId)
+                        <div class="rounded-xl border border-gray-200 bg-white p-5">
+                            <h3 class="font-semibold text-gray-900">{{ $pack['plan_name'] }}</h3>
+                            <p class="mt-1 text-sm text-gray-600">
+                                AED {{ number_format($bands['entry']) }} per slot / year
+                                @if ($clientList)
+                                    <span class="text-gray-400">&middot; your client would pay AED {{ number_format($clientList) }}</span>
+                                @endif
+                            </p>
+
+                            <form action="{{ route('consultant.packs.checkout') }}" method="POST" class="mt-4">
+                                @csrf
+                                <input type="hidden" name="plan_id" value="{{ $planId }}">
+
+                                <div class="flex items-end gap-3">
+                                    <div>
+                                        <label for="qty_{{ $code }}" class="block text-xs text-gray-500 mb-1">Slots</label>
+                                        <input type="number" id="qty_{{ $code }}" name="quantity"
+                                               value="{{ $minSlots }}" min="{{ $minSlots }}" max="50" step="1"
+                                               data-entry="{{ $bands['entry'] }}"
+                                               data-single="{{ $bands['single'] }}"
+                                               data-block5="{{ $bands['block5'] }}"
+                                               data-total="total_{{ $code }}"
+                                               class="js-slot-qty w-24 border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="text-xs text-gray-500">Total</div>
+                                        <div id="total_{{ $code }}" class="text-lg font-semibold text-gray-900">
+                                            AED {{ number_format($minSlots * $bands['entry']) }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="mt-4 w-full py-2.5 bg-brand hover:opacity-90 text-white font-medium rounded-lg text-sm">
+                                    Buy now
+                                </button>
+                            </form>
+                        </div>
+                    @endif
+                @endforeach
+            </div>
+
+            <p class="mt-4 text-xs text-gray-500">
+                Charged once for the contract year. A mid-year purchase is pro-rated to 31 December,
+                so the amount confirmed at checkout may be lower than shown here.
+            </p>
+
+            <script>
+                // Mirrors ConsultantAgencyPlanMatrix::extraSlotPriceAed(): blocks
+                // of five at the block rate, remainder at the single rate. This
+                // is a PREVIEW -- processCheckout() re-quotes server-side, so a
+                // changed value here cannot change what is charged.
+                (function () {
+                    var inputs = document.querySelectorAll('.js-slot-qty');
+
+                    function price(qty, single, block5) {
+                        var blocks = Math.floor(qty / 5);
+                        var remainder = qty % 5;
+                        return (blocks * 5 * block5) + (remainder * single);
+                    }
+
+                    function sync(el) {
+                        var target = document.getElementById(el.dataset.total);
+                        if (!target) { return; }
+
+                        var qty = parseInt(el.value, 10);
+                        var min = parseInt(el.min, 10) || 1;
+                        if (isNaN(qty) || qty < min) { qty = min; }
+
+                        var total = price(qty, parseInt(el.dataset.single, 10), parseInt(el.dataset.block5, 10));
+                        target.textContent = 'AED ' + total.toLocaleString('en-AE');
+                    }
+
+                    inputs.forEach(function (el) {
+                        el.addEventListener('input', function () { sync(el); });
+                        sync(el);
+                    });
+                })();
+            </script>
+        </div>
+
+        <div class="mb-6 border-t border-gray-200 pt-6">
+            <h2 class="text-lg font-semibold text-gray-900">Prefer an invoice, or need Enterprise?</h2>
+            <p class="text-sm text-gray-600">Request below and we confirm pricing offline.</p>
+        </div>
+    @endif
+
     <form action="{{ route('consultant.packs.request-entities') }}" method="POST" class="space-y-6" id="request-clients-form">
         @csrf
 
