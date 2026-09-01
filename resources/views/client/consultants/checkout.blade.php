@@ -26,13 +26,10 @@
                 @csrf
                 <input type="hidden" name="pack_type" value="{{ $packType }}">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Payment method</label>
-                    @foreach($enabledGateways as $gw)
-                        <label class="flex items-center gap-2 mb-2 text-sm">
-                            <input type="radio" name="gateway" value="{{ $gw->gateway }}" @checked($loop->first) required>
-                            {{ $gw->label }}
-                        </label>
-                    @endforeach
+                    {{-- Razorpay is the only gateway; a radio group of one is not a
+                         choice. The field is still posted so the controller
+                         validation ("required|in:razorpay") keeps working. --}}
+                    <input type="hidden" name="gateway" value="razorpay">
                 </div>
                 <button type="submit" class="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg">
                     Continue to payment

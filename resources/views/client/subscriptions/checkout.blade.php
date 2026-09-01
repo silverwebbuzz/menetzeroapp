@@ -14,8 +14,8 @@
     @endif
     @if(!empty($meta['charged_in_inr_fallback']))
         <div class="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            Prices on our site are shown in {{ $meta['display_currency'] ?? 'AED' }}, but Cashfree has not enabled that currency on our account yet.
-            You will pay the INR equivalent below.
+            Prices on our site are shown in {{ $meta['display_currency'] ?? 'AED' }}, but that currency is still being activated with our payment provider.
+            You will pay the INR equivalent shown below.
         </div>
     @endif
     <div class="bg-white rounded-xl border border-gray-200 p-8 text-center">
@@ -30,7 +30,7 @@
             <div class="text-3xl font-extrabold text-gray-900">{{ $chargeLabel }}</div>
             <div class="text-xs text-gray-500 mt-1">Annual plan · billed once via {{ $gateway->label }}</div>
             @if($transaction->currency === 'AED')
-                <p class="text-xs text-gray-400 mt-2">Cashfree will charge in AED. Your account receives settlement in INR per Cashfree international rules.</p>
+                <p class="text-xs text-gray-400 mt-2">Charged in UAE Dirhams (AED).</p>
             @else
                 <p class="text-xs text-gray-400 mt-2">Charged in Indian Rupees (INR).</p>
             @endif
@@ -85,35 +85,6 @@
         var rzp = new Razorpay(options);
         document.getElementById('payBtn').addEventListener('click', function () { rzp.open(); });
         rzp.open();
-    })();
-</script>
-@elseif($gateway->gateway === 'cashfree')
-<script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
-<script>
-    (function () {
-        var cashfree = Cashfree({ mode: @json($gateway->isLive() ? 'production' : 'sandbox') });
-        function startCheckout() {
-            cashfree.checkout({
-                paymentSessionId: @json($meta['cashfree_payment_session_id'] ?? ''),
-                redirectTarget: '_self'
-            });
-        }
-        document.getElementById('payBtn').addEventListener('click', startCheckout);
-        startCheckout();
-    })();
-</script>
-@elseif($gateway->gateway === 'stripe')
-<script>
-    (function () {
-        var sessionUrl = @json($meta['stripe_session_url'] ?? null);
-        function startCheckout() {
-            if (!sessionUrl) {
-                return;
-            }
-            window.location.href = sessionUrl;
-        }
-        document.getElementById('payBtn').addEventListener('click', startCheckout);
-        startCheckout();
     })();
 </script>
 @endif

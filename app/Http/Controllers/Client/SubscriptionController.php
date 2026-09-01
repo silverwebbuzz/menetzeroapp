@@ -72,26 +72,329 @@ class SubscriptionController extends Controller
                 ->with('error', 'Access denied.');
         }
 
-        return redirect()
-            ->route('subscriptions.request-package')
-            ->with('info', 'Self-serve plan checkout is unavailable. Request a package — we confirm pricing offline and activate after payment.');
+        $currentSubscription = $this->subscriptionService->getActiveSubscription($company->id, 'client');
+
+        // is_active filters retired plans out, so nobody can select one.
+        $availablePlans = SubscriptionPlan::where('plan_category', 'client')
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get()
+            ->keyBy('plan_code');
+
+        $planMeta = SubscriptionPlanMatrix::plans();
+        $comparisonColumns = CommercialPlanComparison::PLAN_COLUMNS;
+        $comparisonLabels = CommercialPlanComparison::planLabels();
+        $operationsRows = CommercialPlanComparison::operationsRows();
+        $downloadRows = CommercialPlanComparison::downloadRows();
+        $consultantAddOns = CommercialPlanComparison::consultantAddOns();
+        $enabledGateways = PaymentGateway::enabled();
+        $displayCurrency = \App\Services\CurrencyService::displayCurrency();
+
+        $planChanges = [];
+        $downgradeWarnings = [];
+        foreach ($availablePlans as $code => $availablePlan) {
+            $planChanges[$code] = $this->subscriptionService->resolvePlanChange(
+                $currentSubscription,
+                $availablePlan,
+                $displayCurrency
+            );
+
+            if (in_array($planChanges[$code]['type'], ['downgrade', 'downgrade_to_free'], true)) {
+                $downgradeWarnings[$code] = $this->subscriptionService->getDowngradeWarnings(
+                    $company->id,
+                    $availablePlan
+                );
+            }
+        }
+
+        return view('client.subscriptions.upgrade', compact(
+            'currentSubscription',
+            'availablePlans',
+            'company',
+            'planMeta',
+            'comparisonColumns',
+            'comparisonLabels',
+            'operationsRows',
+            'downloadRows',
+            'consultantAddOns',
+            'enabledGateways',
+            'planChanges',
+            'downgradeWarnings',
+            'displayCurrency'
+        ));
     }
 
     /**
      * Self-serve checkout disabled (Phase 3). Free/downgrade paths retained for admin ops only via direct service.
      */
+    /**
+     * Plan change: schedule a downgrade, apply a free upgrade, or start payment.
+     *
+     * Razorpay is the only gateway. Charges are attempted in AED and fall back
+     * to INR only if Razorpay rejects the currency -- a standard Indian
+     * account accepts INR alone, and International Payments has to be
+     * activated for AED. The previous version forced INR unconditionally,
+     * which billed UAE customers in rupees even once AED was available.
+     */
     public function processUpgrade(Request $request)
     {
-        return redirect()
-            ->route('subscriptions.request-package')
-            ->with('info', 'Self-serve plan checkout is unavailable. Submit a package request — pricing is confirmed offline.');
+        $company = Auth::user()->getActiveCompany();
+        if (!$company || !$company->isClient()) {
+            return redirect()->route('client.dashboard')
+                ->with('error', 'Access denied.');
+        }
+
+        $request->validate([
+            'plan_id' => 'required|exists:subscription_plans,id',
+        ]);
+
+        $plan = SubscriptionPlan::findOrFail($request->plan_id);
+
+        if ($plan->plan_category !== 'client') {
+            return back()->withErrors(['plan_id' => 'Invalid plan selected.'])->withInput();
+        }
+
+        // A retired plan still resolves for the subscriber already on it, but
+        // must never be a destination -- nobody can be sold a plan that is no
+        // longer in the catalogue.
+        if (!$plan->is_active) {
+            return back()->withErrors(['plan_id' => 'That plan is no longer available.'])->withInput();
+        }
+
+        $currentSubscription = $this->subscriptionService->getActiveSubscription($company->id, 'client');
+        $displayCurrency = \App\Services\CurrencyService::displayCurrency();
+        $change = $this->subscriptionService->resolvePlanChange($currentSubscription, $plan, $displayCurrency);
+
+        if ($change['type'] === 'same') {
+            return redirect()->route('subscriptions.upgrade')
+                ->with('info', $change['message']);
+        }
+
+        // Downgrade: scheduled at renewal — no payment, and limits are not
+        // reduced today, so nobody loses data mid-period.
+        if (in_array($change['type'], ['downgrade', 'downgrade_to_free'], true)) {
+            if (!$currentSubscription) {
+                return redirect()->route('subscriptions.upgrade')->with('error', 'No active subscription to change.');
+            }
+
+            try {
+                $this->subscriptionService->scheduleDowngrade($currentSubscription, $plan);
+
+                $message = $change['message'];
+                $warnings = $this->subscriptionService->getDowngradeWarnings($company->id, $plan);
+                if (!empty($warnings)) {
+                    $message .= ' ' . implode(' ', $warnings);
+                }
+
+                return redirect()->route('subscriptions.billing')->with('success', $message);
+            } catch (\Exception $e) {
+                return back()->withErrors(['error' => $e->getMessage()])->withInput();
+            }
+        }
+
+        // Upgrade whose prorated amount is zero — apply immediately, no payment.
+        if ($change['type'] === 'upgrade' && !$change['requires_payment']) {
+            try {
+                $this->subscriptionService->subscribeClient($company->id, $plan->id, [
+                    'billing_cycle' => 'annual',
+                    'payment_method' => $currentSubscription?->payment_method ?? 'free',
+                    'auto_renew' => $request->has('auto_renew'),
+                    'preserve_expiry' => $change['preserve_expiry'],
+                ]);
+
+                return redirect()->route('subscriptions.billing')
+                    ->with('success', 'Plan upgraded successfully!');
+            } catch (\Exception $e) {
+                return back()->withErrors(['error' => $e->getMessage()])->withInput();
+            }
+        }
+
+        if (!PaymentGateway::checkoutAvailable()) {
+            return redirect()->route('subscriptions.upgrade')
+                ->with('error', 'Online payments are not available yet. Paid upgrades will open when checkout goes live.');
+        }
+
+        $gateway = PaymentGateway::forGateway('razorpay');
+        if (!$gateway || !$gateway->is_enabled || !$gateway->isConfigured()) {
+            return redirect()->route('subscriptions.upgrade')
+                ->with('error', 'Online payment is unavailable right now. Please request a package instead.');
+        }
+
+        $charge = [
+            'currency' => $change['charge_currency'],
+            'amount' => (float) $change['charge_amount'],
+            'display_currency' => $displayCurrency,
+        ];
+
+        $couponMeta = [];
+        $couponCode = trim((string) $request->input('coupon_code', ''));
+
+        if ($couponCode !== '') {
+            try {
+                $applied = $this->couponService->validateForCheckout(
+                    $couponCode,
+                    $company->id,
+                    $plan,
+                    $charge['amount'],
+                    $charge['currency']
+                );
+
+                if ($applied['is_free']) {
+                    $subscription = $this->subscriptionService->activateWithCoupon(
+                        $company->id,
+                        $plan->id,
+                        [
+                            'coupon_code' => $applied['coupon']->code,
+                            'coupon_id' => $applied['coupon']->id,
+                        ],
+                        $change['preserve_expiry']
+                    );
+
+                    $this->couponService->recordRedemption(
+                        $applied['coupon'],
+                        $company->id,
+                        $applied['discount'],
+                        $charge['currency'],
+                        $subscription
+                    );
+
+                    return redirect()->route('subscriptions.billing')
+                        ->with('success', 'Coupon applied — your ' . $plan->plan_name . ' plan is now active!');
+                }
+
+                $couponMeta = [
+                    'coupon_id' => $applied['coupon']->id,
+                    'coupon_code' => $applied['coupon']->code,
+                    'discount_applied' => $applied['discount'],
+                    'original_amount' => $charge['amount'] + $applied['discount'],
+                ];
+                $charge['amount'] = $applied['final_amount'];
+            } catch (\RuntimeException $e) {
+                return back()->withErrors(['coupon_code' => $e->getMessage()])->withInput();
+            }
+        }
+
+        if ($charge['amount'] <= 0) {
+            return redirect()->route('subscriptions.upgrade')
+                ->with('error', 'This plan is not available for online payment yet. Please contact support.');
+        }
+
+        $description = $change['type'] === 'upgrade' && $currentSubscription
+            ? 'Plan upgrade: ' . ($currentSubscription->plan->plan_name ?? '') . ' → ' . $plan->plan_name
+            : 'Subscription: ' . $plan->plan_name . ' (annual)';
+
+        $transaction = PaymentTransaction::create([
+            'company_id' => $company->id,
+            'transaction_type' => 'subscription',
+            'amount' => $charge['amount'],
+            'currency' => $charge['currency'],
+            'status' => 'pending',
+            'payment_method' => 'razorpay',
+            'description' => $description,
+            'metadata' => array_merge([
+                'plan_id' => $plan->id,
+                'auto_renew' => $request->has('auto_renew'),
+                'change_type' => $change['type'],
+                'preserve_expiry' => $change['preserve_expiry'],
+                'from_plan_id' => $currentSubscription?->subscription_plan_id,
+                'display_currency' => $displayCurrency,
+            ], $couponMeta),
+        ]);
+
+        try {
+            $metadata = $transaction->metadata;
+
+            try {
+                $order = $this->paymentService->createRazorpayOrder(
+                    $gateway,
+                    $transaction->amount,
+                    $transaction->currency,
+                    'txn_' . $transaction->id,
+                    ['plan' => $plan->plan_code, 'company_id' => (string) $company->id]
+                );
+            } catch (\RuntimeException $e) {
+                // AED not activated on the Razorpay account. Re-price in INR
+                // and retry rather than failing the sale. Anything else is
+                // rethrown — charging the wrong currency is worse than an
+                // error the customer can retry.
+                if ($transaction->currency === 'INR'
+                    || !$this->paymentService->isRazorpayCurrencyDisabledError($e->getMessage())) {
+                    throw $e;
+                }
+
+                $inrChange = $this->subscriptionService->resolvePlanChange($currentSubscription, $plan, 'INR');
+                $inrAmount = (float) $inrChange['charge_amount'];
+
+                // A coupon was priced against the AED amount; re-apply the same
+                // proportion so the customer keeps the discount they were shown.
+                if (!empty($couponMeta) && $charge['amount'] > 0) {
+                    $inrAmount = round($inrAmount * ($charge['amount'] / ($couponMeta['original_amount'] ?? $charge['amount'])), 2);
+                }
+
+                if ($inrAmount <= 0) {
+                    throw $e;
+                }
+
+                $transaction->update(['amount' => $inrAmount, 'currency' => 'INR']);
+                $metadata['charged_in_inr_fallback'] = true;
+                $metadata['original_currency'] = $charge['currency'];
+                $metadata['original_amount'] = $charge['amount'];
+
+                $order = $this->paymentService->createRazorpayOrder(
+                    $gateway,
+                    $inrAmount,
+                    'INR',
+                    'txn_' . $transaction->id,
+                    ['plan' => $plan->plan_code, 'company_id' => (string) $company->id]
+                );
+
+                session()->flash(
+                    'info',
+                    'AED checkout is still being activated on our payment provider. '
+                    . 'You will be charged the INR equivalent (₹' . number_format($inrAmount, 0) . ') for now.'
+                );
+            }
+
+            $metadata['razorpay_order_id'] = $order['id'] ?? null;
+            $transaction->metadata = $metadata;
+            $transaction->save();
+
+            return redirect()->route('subscriptions.checkout', $transaction->id);
+        } catch (\Throwable $e) {
+            $transaction->update(['status' => 'failed']);
+
+            return redirect()->route('subscriptions.upgrade')
+                ->with('error', 'Unable to start payment: ' . $e->getMessage());
+        }
     }
 
     public function checkout($id)
     {
-        return redirect()
-            ->route('subscriptions.request-package')
-            ->with('info', 'Self-serve checkout is unavailable. Request a package instead.');
+        $company = Auth::user()->getActiveCompany();
+        if (!$company || !$company->isClient()) {
+            return redirect()->route('client.dashboard')->with('error', 'Access denied.');
+        }
+
+        // Scoped to the company, so a transaction id cannot be guessed to read
+        // another tenant's payment.
+        $transaction = PaymentTransaction::where('id', $id)
+            ->where('company_id', $company->id)
+            ->firstOrFail();
+
+        if ($transaction->status !== 'pending') {
+            return redirect()->route('subscriptions.billing')
+                ->with('info', 'This payment has already been processed.');
+        }
+
+        $gateway = PaymentGateway::forGateway($transaction->payment_method);
+        if (!$gateway) {
+            return redirect()->route('subscriptions.upgrade')->with('error', 'Payment method unavailable.');
+        }
+
+        $plan = SubscriptionPlan::find($transaction->metadata['plan_id'] ?? null);
+        $user = Auth::user();
+
+        return view('client.subscriptions.checkout', compact('transaction', 'gateway', 'plan', 'company', 'user'));
     }
 
     /**
@@ -133,131 +436,6 @@ class SubscriptionController extends Controller
             'razorpay_payment_id' => $request->razorpay_payment_id,
             'razorpay_order_id' => $request->razorpay_order_id,
         ], $request->razorpay_payment_id);
-    }
-
-    /**
-     * Cashfree return-URL handler. Verifies the order status server-side.
-     */
-    public function cashfreeCallback(Request $request)
-    {
-        $company = Auth::user()->getActiveCompany();
-        if (!$company || !$company->isClient()) {
-            return redirect()->route('client.dashboard')->with('error', 'Access denied.');
-        }
-
-        $orderId = (string) $request->query('order_id');
-        if ($orderId === '') {
-            return redirect()->route('subscriptions.upgrade')->with('error', 'Missing payment reference.');
-        }
-
-        // order_id is "txn_{id}_{rand}".
-        $txnId = explode('_', $orderId)[1] ?? null;
-        $transaction = PaymentTransaction::where('id', $txnId)
-            ->where('company_id', $company->id)
-            ->firstOrFail();
-
-        if (($transaction->metadata['cashfree_order_id'] ?? null) !== $orderId) {
-            return redirect()->route('subscriptions.upgrade')->with('error', 'Payment reference mismatch.');
-        }
-
-        if ($transaction->status === 'completed') {
-            return redirect()->route('subscriptions.billing')
-                ->with('success', 'Subscription is already active.');
-        }
-
-        $gateway = PaymentGateway::forGateway('cashfree');
-        if (!$gateway) {
-            return redirect()->route('subscriptions.upgrade')->with('error', 'Payment method unavailable.');
-        }
-
-        $orderStatus = $this->paymentService->getCashfreeOrderStatus($gateway, $orderId);
-
-        // Order is settled — activate immediately.
-        if ($orderStatus === 'PAID') {
-            return $this->completePaidSubscription($transaction, ['cashfree_order_id' => $orderId], $orderId);
-        }
-
-        // Not PAID yet: inspect the latest payment attempt to decide what to tell
-        // the customer (pending / dropped / failed).
-        $paymentStatus = $this->paymentService->getCashfreePaymentStatus($gateway, $orderId);
-
-        if ($paymentStatus === 'SUCCESS') {
-            // Payment captured but order not flipped to PAID yet — safe to activate.
-            return $this->completePaidSubscription($transaction, ['cashfree_order_id' => $orderId], $orderId);
-        }
-
-        // Still processing — leave the transaction pending and let the webhook
-        // activate it once the bank confirms. Do NOT mark it failed.
-        if ($paymentStatus === 'PENDING' || ($orderStatus === 'ACTIVE' && $paymentStatus === null)) {
-            $transaction->update(['status' => 'pending']);
-            return redirect()->route('subscriptions.index')
-                ->with('info', 'Your payment is being processed. We\'ll activate your plan automatically once your bank confirms it — please don\'t pay again.');
-        }
-
-        // Customer abandoned the payment page.
-        if (in_array($paymentStatus, ['USER_DROPPED', 'CANCELLED'], true)) {
-            $transaction->update(['status' => 'cancelled']);
-            return redirect()->route('subscriptions.upgrade')
-                ->with('error', 'Payment was cancelled. You can try again whenever you\'re ready — you were not charged.');
-        }
-
-        // FAILED / EXPIRED / TERMINATED / anything else.
-        $transaction->update(['status' => 'failed']);
-        return redirect()->route('subscriptions.upgrade')
-            ->with('error', 'Payment failed (status: ' . ($paymentStatus ?? $orderStatus ?? 'unknown') . '). You were not charged. Please try again.');
-    }
-
-    /**
-     * Stripe hosted checkout success handler.
-     */
-    public function stripeCallback(Request $request)
-    {
-        $company = Auth::user()->getActiveCompany();
-        if (!$company || !$company->isClient()) {
-            return redirect()->route('client.dashboard')->with('error', 'Access denied.');
-        }
-
-        $request->validate([
-            'transaction_id' => 'required|integer',
-            'session_id' => 'required|string',
-        ]);
-
-        $transaction = PaymentTransaction::where('id', $request->integer('transaction_id'))
-            ->where('company_id', $company->id)
-            ->firstOrFail();
-
-        if ($transaction->status === 'completed') {
-            return redirect()->route('subscriptions.billing')
-                ->with('success', 'Subscription is already active.');
-        }
-
-        $gateway = PaymentGateway::forGateway('stripe');
-        if (!$gateway || !$gateway->is_enabled || !$gateway->isConfigured()) {
-            return redirect()->route('subscriptions.upgrade')->with('error', 'Payment method unavailable.');
-        }
-
-        $sessionId = (string) $request->query('session_id');
-        $session = $this->paymentService->getStripeCheckoutSession($gateway, $sessionId);
-
-        if (!$session || ($session['id'] ?? null) !== $sessionId) {
-            return redirect()->route('subscriptions.upgrade')->with('error', 'Could not verify Stripe payment.');
-        }
-
-        $expectedTxn = (string) ($transaction->id);
-        $sessionTxn = (string) ($session['metadata']['transaction_id'] ?? $session['client_reference_id'] ?? '');
-        if ($sessionTxn !== '' && $sessionTxn !== $expectedTxn) {
-            return redirect()->route('subscriptions.upgrade')->with('error', 'Payment reference mismatch.');
-        }
-
-        if (($session['payment_status'] ?? null) === 'paid') {
-            return $this->completePaidSubscription($transaction, [
-                'stripe_session_id' => $sessionId,
-                'stripe_payment_intent_id' => $session['payment_intent'] ?? null,
-            ], (string) ($session['payment_intent'] ?? $sessionId));
-        }
-
-        return redirect()->route('subscriptions.index')
-            ->with('info', 'Stripe payment is still processing. Your plan will activate automatically when confirmed.');
     }
 
     /**

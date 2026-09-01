@@ -99,8 +99,6 @@ Route::prefix('consultant')->name('consultant.')->group(function () {
                 Route::post('/year-unlock', [\App\Http\Controllers\Consultant\Agency\PackCheckoutController::class, 'processYearUnlock'])->name('year-unlock');
                 Route::get('/payment/{transaction}', [\App\Http\Controllers\Consultant\Agency\PackCheckoutController::class, 'paymentCheckout'])->name('payment.checkout');
                 Route::post('/payment/razorpay', [\App\Http\Controllers\Consultant\Agency\PackCheckoutController::class, 'razorpayCallback'])->name('payment.razorpay');
-                Route::get('/payment/cashfree', [\App\Http\Controllers\Consultant\Agency\PackCheckoutController::class, 'cashfreeCallback'])->name('payment.cashfree');
-                Route::get('/payment/stripe', [\App\Http\Controllers\Consultant\Agency\PackCheckoutController::class, 'stripeCallback'])->name('payment.stripe');
             });
 
             Route::resource('clients', \App\Http\Controllers\Consultant\Agency\ManagedClientController::class);
@@ -612,8 +610,6 @@ Route::middleware([
         // Payment checkout + gateway callbacks
         Route::get('/checkout/{id}', [\App\Http\Controllers\Client\SubscriptionController::class, 'checkout'])->name('checkout');
         Route::post('/payment/razorpay/callback', [\App\Http\Controllers\Client\SubscriptionController::class, 'razorpayCallback'])->name('payment.razorpay');
-        Route::get('/payment/cashfree/callback', [\App\Http\Controllers\Client\SubscriptionController::class, 'cashfreeCallback'])->name('payment.cashfree');
-        Route::get('/payment/stripe/callback', [\App\Http\Controllers\Client\SubscriptionController::class, 'stripeCallback'])->name('payment.stripe');
         Route::get('/billing', [\App\Http\Controllers\Client\SubscriptionController::class, 'billing'])->name('billing');
         Route::get('/request-package', [\App\Http\Controllers\Client\PackageRequestController::class, 'create'])->name('request-package');
         Route::post('/request-package', [\App\Http\Controllers\Client\PackageRequestController::class, 'store'])->name('request-package.store');
@@ -634,8 +630,6 @@ Route::middleware([
         Route::get('/orders', [\App\Http\Controllers\Client\ConsultantMarketplaceController::class, 'orders'])->name('orders');
         Route::get('/payment/checkout/{id}', [\App\Http\Controllers\Client\ConsultantMarketplaceController::class, 'paymentCheckout'])->name('payment.checkout');
         Route::post('/payment/razorpay', [\App\Http\Controllers\Client\ConsultantMarketplaceController::class, 'razorpayCallback'])->name('payment.razorpay');
-        Route::get('/payment/cashfree', [\App\Http\Controllers\Client\ConsultantMarketplaceController::class, 'cashfreeCallback'])->name('payment.cashfree');
-        Route::get('/payment/stripe', [\App\Http\Controllers\Client\ConsultantMarketplaceController::class, 'stripeCallback'])->name('payment.stripe');
         Route::get('/{consultant}/checkout', [\App\Http\Controllers\Client\ConsultantMarketplaceController::class, 'checkout'])->name('checkout');
         Route::post('/{consultant}/checkout', [\App\Http\Controllers\Client\ConsultantMarketplaceController::class, 'processCheckout'])->name('checkout.process');
         Route::get('/{consultant}', [\App\Http\Controllers\Client\ConsultantDirectoryController::class, 'show'])->name('show');

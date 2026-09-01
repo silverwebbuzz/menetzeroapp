@@ -215,32 +215,21 @@
                     @error('coupon_code')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
                 </div>
 
-                {{-- Payment method (only needed for upgrades / new paid plans) --}}
+                {{-- Razorpay is the only gateway, so there is nothing to choose.
+                     The radio group and its 'gateway' form field were removed with
+                     Cashfree and Stripe; processUpgrade() resolves razorpay
+                     directly and no longer validates a submitted gateway name. --}}
                 <div id="payment-method-section">
-                    <p class="text-sm font-medium text-gray-700 mb-2">Payment method <span class="text-gray-400 font-normal">(for upgrades &amp; new plans)</span></p>
                     @if($enabledGateways->isEmpty())
                         <p class="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
                             Online payment isn't configured yet. You can switch to the Free plan, or contact sales for paid plans.
                         </p>
                     @else
-                        <div class="flex flex-wrap gap-3">
-                            @foreach($enabledGateways as $i => $gw)
-                                <label class="flex items-center gap-2 px-4 py-2 border rounded-lg cursor-pointer hover:bg-gray-50 text-sm">
-                                    <input type="radio" name="gateway" value="{{ $gw->gateway }}" {{ $i === 0 ? 'checked' : '' }}
-                                           class="text-orange-600 focus:ring-orange-500">
-                                    <span class="font-medium text-gray-800">{{ $gw->label }}</span>
-                                    @if(!$gw->isLive())
-                                        <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800">Test</span>
-                                    @endif
-                                </label>
-                            @endforeach
-                        </div>
-                        @error('gateway')<p class="text-red-600 text-sm mt-1">{{ $message }}</p>@enderror
-                        <p class="text-xs text-gray-400 mt-2">
+                        <p class="text-xs text-gray-400">
                             @if($displayCurrency === 'AED')
-                                Checkout opens in <strong>AED</strong> when enabled on Cashfree. While AED activation is pending, you will be charged the <strong>INR (₹) equivalent</strong> automatically. UAE/international cards supported; UPI &amp; NetBanking are India-only.
+                                Checkout opens in <strong>AED</strong>. If AED is still being activated with our payment provider you will be charged the <strong>INR (&#8377;) equivalent</strong> automatically, and told before you pay.
                             @else
-                                Checkout opens in <strong>INR (₹)</strong>. The exact amount is shown on the payment screen.
+                                Checkout opens in <strong>INR (&#8377;)</strong>. The exact amount is shown on the payment screen.
                             @endif
                         </p>
                     @endif

@@ -287,6 +287,27 @@ class PaymentService
     }
 
     /**
+     * Razorpay rejects an order when the requested currency is not enabled on
+     * the merchant account. A standard Indian Razorpay account accepts INR
+     * only; AED needs International Payments activated.
+     *
+     * Matched on the message because Razorpay returns a generic
+     * BAD_REQUEST_ERROR for this, with the detail only in the description.
+     * Deliberately narrow -- a false positive here would silently charge a
+     * customer in the wrong currency, so anything unrecognised is rethrown.
+     */
+    public function isRazorpayCurrencyDisabledError(string $message): bool
+    {
+        $msg = strtolower($message);
+
+        return str_contains($msg, 'currency is not supported')
+            || str_contains($msg, 'currency not supported')
+            || str_contains($msg, 'international payments')
+            || str_contains($msg, 'not enabled for international')
+            || (str_contains($msg, 'currency') && str_contains($msg, 'not allowed'));
+    }
+
+    /**
      * Cashfree returns this when order_currency (e.g. AED) is requested but not
      * yet approved on the merchant account.
      */

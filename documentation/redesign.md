@@ -5104,3 +5104,86 @@ No migration. Run: `php artisan optimize:clear`
    grid/checkout hidden". Both sides remain request-then-activate.
 3. Retire Stripe and Cashfree — safe now: `client_payment_transactions` is empty
    and all three FK holders are at zero.
+
+## 70. Razorpay-only checkout, restored and simplified
+
+Client self-serve checkout was NOT missing -- `upgrade()`, `processUpgrade()`
+and `checkout()` had been replaced by redirect stubs ("Self-serve plan checkout
+is unavailable") in commit 743f12a, while the gateway callbacks underneath were
+left fully implemented. Recovered the originals from `743f12a^` and restored
+them, rather than writing a checkout that already existed. Coupons, proration,
+scheduled downgrades and free upgrades all came back with it.
+
+**AED first, INR fallback.** The recovered code carried
+`// Razorpay: INR only` and forced every charge to INR, which would bill UAE
+customers in rupees even once AED was enabled. Now the charge is attempted in
+AED and re-priced to INR only if Razorpay rejects the currency -- a standard
+Indian Razorpay account accepts INR alone; AED needs International Payments
+activated. `PaymentService::isRazorpayCurrencyDisabledError()` matches that case
+narrowly and anything unrecognised is rethrown: charging a customer in the wrong
+currency is worse than an error they can retry. A coupon priced in AED keeps its
+proportion when re-priced.
+
+**Removed** Stripe and Cashfree: callbacks in three controllers, their branches
+in `ConsultantMarketplaceController` and `ConsultantAgencyPaymentService`, four
+routes, the SDK blocks in the checkout view, and the gateway pickers in four
+views. `PaymentService` methods are left in place -- unreferenced, but they are
+the only record of how those integrations worked.
+
+**Four dead `route()` calls were the real risk.** Removing the routes left
+`route('client.consultants.payment.stripe')` and three others in live code
+paths, which throw `RouteNotFoundException` AFTER the transaction row is written
+-- the same failure mode as the esg-scorecard bug in section 43. Found by
+grepping for route names after the deletion, not by reading the diff.
+
+Gateway surfaces, all now posting `razorpay`:
+
+    client/consultants/checkout            radio loop -> hidden field
+    themes/new/client/consultants/checkout radio loop -> hidden field
+    consultant/agency/clients/show         HARDCODED <option value="cashfree"> first
+    client/subscriptions/upgrade           radio loop removed entirely
+
+The agency one mattered most: its options were hardcoded rather than looped over
+enabled gateways, so the DEFAULT selection would have posted a dead gateway.
+
+`ConsultantMarketplaceController` validation narrowed from
+`in:razorpay,cashfree,stripe` to `in:razorpay`. The new theme's marketplace
+checkout carries a "money path preserved byte-for-byte" header; its contract
+block was updated to match the hidden field, since a header that lies is worse
+than none.
+
+**Plan surfaces the restored page depends on:** `SubscriptionPlanMatrix::plans()`
+(card name, tagline, price) and `CommercialPlanComparison` (23 comparison rows)
+were both still on `client_starter` / `client_growth`. Keys renamed to
+`client_carbon` / `client_esg`, then values corrected against
+`PlanEntitlementDefaults` rather than carried over -- the old Starter/Growth
+numbers (3/10 sites, 5/10 users, "1 entry / category") do not describe the new
+tiers, which are 5 sites and 10 users each with full Scope 3.
+
+**Migration** `2026_09_01_100000_razorpay_only_gateway` disables the Cashfree and
+Stripe rows and labels them "(retired)". Not deleted:
+`PaymentTransaction.payment_method` stores the gateway name and a receipt lookup
+resolves the row by it. Razorpay is deliberately NOT enabled by the migration --
+it needs keys set in admin first, and enabling an unconfigured row would surface
+a payment button that cannot work.
+
+**Verified:** braces and parens balanced in all eight edited PHP files
+(`PaymentService` reports -1/27:26 both before and after this change -- a
+pre-existing artifact of the quote-stripping checker, confirmed identical to
+HEAD); Blade directives paired in all five edited views; 236 non-theme views
+scan clean, 0 broken; no `route()` call to a deleted route remains; every
+`name="gateway"` input posts `razorpay`; no unused `Str` import left behind.
+
+Run:
+
+    php artisan migrate
+    php artisan optimize:clear
+
+**Still required before this can take money:** Razorpay has processed zero
+transactions in this system. Enable the gateway in admin with live keys, then
+make one real AED payment. If AED is not activated on the account the fallback
+will charge INR and say so -- which is the designed behaviour, not a failure.
+
+**Not built:** consultant slot-quantity checkout with block pricing.
+`PackCheckoutController::index()` still carries "Phase 3-5: self-serve pack
+grid/checkout hidden", so consultant packs remain request-then-activate.

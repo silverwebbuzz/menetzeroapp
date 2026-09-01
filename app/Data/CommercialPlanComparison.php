@@ -11,8 +11,8 @@ class CommercialPlanComparison
 {
     public const PLAN_COLUMNS = [
         'client_free',
-        'client_starter',
-        'client_growth',
+        'client_carbon',
+        'client_esg',
         'client_enterprise',
     ];
 
@@ -26,8 +26,8 @@ class CommercialPlanComparison
                 'label' => 'Locations / branches',
                 'cells' => [
                     'client_free' => '1',
-                    'client_starter' => '3',
-                    'client_growth' => '10',
+                    'client_carbon' => '5',
+                    'client_esg' => '5',
                     'client_enterprise' => 'Unlimited',
                 ],
             ],
@@ -35,8 +35,8 @@ class CommercialPlanComparison
                 'label' => 'Users',
                 'cells' => [
                     'client_free' => '2',
-                    'client_starter' => '5',
-                    'client_growth' => '10',
+                    'client_carbon' => '10',
+                    'client_esg' => '10',
                     'client_enterprise' => 'Unlimited',
                 ],
             ],
@@ -44,8 +44,8 @@ class CommercialPlanComparison
                 'label' => 'Scope 1 & 2 Quick Input',
                 'cells' => [
                     'client_free' => true,
-                    'client_starter' => true,
-                    'client_growth' => true,
+                    'client_carbon' => true,
+                    'client_esg' => true,
                     'client_enterprise' => true,
                 ],
             ],
@@ -53,8 +53,8 @@ class CommercialPlanComparison
                 'label' => 'Bulk CSV / XLS import',
                 'cells' => [
                     'client_free' => false,
-                    'client_starter' => true,
-                    'client_growth' => true,
+                    'client_carbon' => true,
+                    'client_esg' => true,
                     'client_enterprise' => true,
                 ],
             ],
@@ -62,8 +62,8 @@ class CommercialPlanComparison
                 'label' => 'Bulk data export',
                 'cells' => [
                     'client_free' => false,
-                    'client_starter' => true,
-                    'client_growth' => true,
+                    'client_carbon' => true,
+                    'client_esg' => true,
                     'client_enterprise' => true,
                 ],
             ],
@@ -71,8 +71,8 @@ class CommercialPlanComparison
                 'label' => 'Scope 3',
                 'cells' => [
                     'client_free' => '1 entry / category',
-                    'client_starter' => '1 entry / category',
-                    'client_growth' => '1 entry / category',
+                    'client_carbon' => '12 entries / category',
+                    'client_esg' => '1 entry / category',
                     'client_enterprise' => 'Unlimited',
                 ],
             ],
@@ -80,8 +80,8 @@ class CommercialPlanComparison
                 'label' => 'Help guide',
                 'cells' => [
                     'client_free' => 'Basic',
-                    'client_starter' => 'Full',
-                    'client_growth' => 'Full + disclosures',
+                    'client_carbon' => 'Full',
+                    'client_esg' => 'Full + disclosures',
                     'client_enterprise' => 'Full + training',
                 ],
             ],
@@ -89,8 +89,8 @@ class CommercialPlanComparison
                 'label' => 'Disclosure forms (IFRS / GRI)',
                 'cells' => [
                     'client_free' => 'Preview only',
-                    'client_starter' => 'Preview only',
-                    'client_growth' => 'Preview + export',
+                    'client_carbon' => 'Preview only',
+                    'client_esg' => 'Preview + export',
                     'client_enterprise' => 'Full',
                 ],
             ],
@@ -98,8 +98,8 @@ class CommercialPlanComparison
                 'label' => 'Consultant directory',
                 'cells' => [
                     'client_free' => 'Teaser',
-                    'client_starter' => 'Request intro',
-                    'client_growth' => 'Full connect',
+                    'client_carbon' => 'Request intro',
+                    'client_esg' => 'Full connect',
                     'client_enterprise' => 'Priority',
                 ],
             ],
@@ -116,8 +116,8 @@ class CommercialPlanComparison
                 'label' => 'GHG Inventory PDF',
                 'cells' => [
                     'client_free' => 'Watermarked',
-                    'client_starter' => true,
-                    'client_growth' => true,
+                    'client_carbon' => true,
+                    'client_esg' => true,
                     'client_enterprise' => true,
                 ],
             ],
@@ -125,8 +125,8 @@ class CommercialPlanComparison
                 'label' => 'MOCCAE S1 & 2 PDF',
                 'cells' => [
                     'client_free' => 'Watermarked',
-                    'client_starter' => true,
-                    'client_growth' => true,
+                    'client_carbon' => true,
+                    'client_esg' => true,
                     'client_enterprise' => true,
                 ],
             ],
@@ -134,8 +134,8 @@ class CommercialPlanComparison
                 'label' => 'Excel results export',
                 'cells' => [
                     'client_free' => 'Watermarked',
-                    'client_starter' => true,
-                    'client_growth' => true,
+                    'client_carbon' => true,
+                    'client_esg' => true,
                     'client_enterprise' => true,
                 ],
             ],
@@ -143,8 +143,8 @@ class CommercialPlanComparison
                 'label' => 'IEQT export (mrv.ae)',
                 'cells' => [
                     'client_free' => 'Watermarked',
-                    'client_starter' => true,
-                    'client_growth' => true,
+                    'client_carbon' => true,
+                    'client_esg' => true,
                     'client_enterprise' => true,
                 ],
             ],
@@ -152,8 +152,8 @@ class CommercialPlanComparison
                 'label' => 'IFRS S1 / S2 PDF',
                 'cells' => [
                     'client_free' => false,
-                    'client_starter' => false,
-                    'client_growth' => true,
+                    'client_carbon' => false,
+                    'client_esg' => true,
                     'client_enterprise' => true,
                 ],
             ],
@@ -161,8 +161,8 @@ class CommercialPlanComparison
                 'label' => 'GRI PDF + content index',
                 'cells' => [
                     'client_free' => false,
-                    'client_starter' => false,
-                    'client_growth' => true,
+                    'client_carbon' => false,
+                    'client_esg' => true,
                     'client_enterprise' => true,
                 ],
             ],
@@ -170,8 +170,8 @@ class CommercialPlanComparison
                 'label' => 'UAE ESG Report PDF',
                 'cells' => [
                     'client_free' => false,
-                    'client_starter' => false,
-                    'client_growth' => true,
+                    'client_carbon' => false,
+                    'client_esg' => true,
                     'client_enterprise' => true,
                 ],
             ],
@@ -179,8 +179,8 @@ class CommercialPlanComparison
                 'label' => 'ESG Scorecard Excel',
                 'cells' => [
                     'client_free' => false,
-                    'client_starter' => false,
-                    'client_growth' => true,
+                    'client_carbon' => false,
+                    'client_esg' => true,
                     'client_enterprise' => '80+ KPIs',
                 ],
             ],
@@ -188,8 +188,8 @@ class CommercialPlanComparison
                 'label' => 'SASB index CSV',
                 'cells' => [
                     'client_free' => false,
-                    'client_starter' => false,
-                    'client_growth' => true,
+                    'client_carbon' => false,
+                    'client_esg' => true,
                     'client_enterprise' => true,
                 ],
             ],
@@ -197,8 +197,8 @@ class CommercialPlanComparison
                 'label' => 'GRI index 80+ rows',
                 'cells' => [
                     'client_free' => false,
-                    'client_starter' => false,
-                    'client_growth' => false,
+                    'client_carbon' => false,
+                    'client_esg' => false,
                     'client_enterprise' => true,
                 ],
             ],
@@ -206,8 +206,8 @@ class CommercialPlanComparison
                 'label' => 'White-label UAE ESG PDF',
                 'cells' => [
                     'client_free' => false,
-                    'client_starter' => false,
-                    'client_growth' => false,
+                    'client_carbon' => false,
+                    'client_esg' => false,
                     'client_enterprise' => true,
                 ],
             ],
@@ -215,8 +215,8 @@ class CommercialPlanComparison
                 'label' => 'Assurance PDF upload',
                 'cells' => [
                     'client_free' => false,
-                    'client_starter' => false,
-                    'client_growth' => false,
+                    'client_carbon' => false,
+                    'client_esg' => false,
                     'client_enterprise' => true,
                 ],
             ],
@@ -224,8 +224,8 @@ class CommercialPlanComparison
                 'label' => 'HRIS KPI CSV import',
                 'cells' => [
                     'client_free' => false,
-                    'client_starter' => false,
-                    'client_growth' => false,
+                    'client_carbon' => false,
+                    'client_esg' => false,
                     'client_enterprise' => true,
                 ],
             ],
@@ -277,9 +277,9 @@ class CommercialPlanComparison
     {
         return [
             'client_free' => ['name' => 'Free', 'tagline' => 'S1&2 full + Scope 3 (1 entry / category)'],
-            'client_starter' => ['name' => 'Starter', 'tagline' => 'MOCCAE-ready inventory & IEQT'],
-            'client_growth' => ['name' => 'Growth', 'tagline' => 'UAE ESG Report + IFRS & GRI'],
-            'client_enterprise' => ['name' => 'Enterprise', 'tagline' => '80+ KPIs, HRIS & white-label PDF'],
+            'client_carbon' => ['name' => 'Carbon', 'tagline' => 'Full Scope 1-3 inventory, MOCCAE & IEQT'],
+            'client_esg' => ['name' => 'ESG', 'tagline' => 'Adds IFRS S1 & S2, GRI, SASB, UAE ESG'],
+            'client_enterprise' => ['name' => 'Enterprise', 'tagline' => 'Multi-entity groups and assurance'],
         ];
     }
 }

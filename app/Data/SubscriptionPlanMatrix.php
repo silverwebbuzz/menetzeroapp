@@ -26,19 +26,19 @@ class SubscriptionPlanMatrix
     public static function plans(): array
     {
         return [
-            'client_starter' => [
-                'name' => 'Starter',
-                'tagline' => 'MOCCAE-ready inventory & IEQT',
-                'price_display' => 'AED 1,499',
+            'client_carbon' => [
+                'name' => 'Carbon',
+                'tagline' => 'Full Scope 1-3 inventory, MOCCAE & IEQT',
+                'price_display' => 'AED 3,000',
                 'price_sub' => '/ year',
                 'is_custom' => false,
                 'selectable' => true,
                 'highlight' => false,
             ],
-            'client_growth' => [
-                'name' => 'Growth',
-                'tagline' => 'IFRS & GRI report downloads',
-                'price_display' => 'AED 2,499',
+            'client_esg' => [
+                'name' => 'ESG',
+                'tagline' => 'Adds IFRS S1 & S2, GRI, SASB, UAE ESG',
+                'price_display' => 'AED 6,500',
                 'price_sub' => '/ year',
                 'is_custom' => false,
                 'selectable' => true,
@@ -46,9 +46,9 @@ class SubscriptionPlanMatrix
             ],
             'client_enterprise' => [
                 'name' => 'Enterprise',
-                'tagline' => 'For large / multi-site organisations',
+                'tagline' => 'Multi-entity groups and assurance',
                 'price_display' => 'Custom',
-                'price_sub' => 'AED 20,000+ / year',
+                'price_sub' => 'Contact us',
                 'is_custom' => true,
                 'selectable' => false,
                 'highlight' => false,

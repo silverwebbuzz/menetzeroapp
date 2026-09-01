@@ -15,7 +15,6 @@ use App\Services\PaymentService;
 use App\Support\PlanGate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 
 class ConsultantMarketplaceController extends Controller
 {
@@ -72,7 +71,7 @@ class ConsultantMarketplaceController extends Controller
 
         $data = $request->validate([
             'pack_type' => 'required|in:starter_consultant,growth_consultant',
-            'gateway' => 'required|in:razorpay,cashfree,stripe',
+            'gateway' => 'required|in:razorpay',
         ]);
 
         $pack = CommercialPlanComparison::consultantPackByType($data['pack_type']);
@@ -113,54 +112,18 @@ class ConsultantMarketplaceController extends Controller
         try {
             $metadata = $transaction->metadata;
 
-            if ($gateway->gateway === 'razorpay') {
-                $rzOrder = $this->paymentService->createRazorpayOrder(
-                    $gateway,
-                    $transaction->amount,
-                    $transaction->currency,
-                    'consultant_' . $order->id,
-                    ['consultant_order_id' => (string) $order->id]
-                );
-                $metadata['razorpay_order_id'] = $rzOrder['id'] ?? null;
-            } elseif ($gateway->gateway === 'stripe') {
-                $user = Auth::user();
-                $session = $this->paymentService->createStripeCheckoutSession(
-                    $gateway,
-                    $transaction,
-                    route('client.consultants.payment.stripe') . '?session_id={CHECKOUT_SESSION_ID}&transaction_id=' . $transaction->id,
-                    route('client.consultants.payment.checkout', $transaction->id),
-                    [
-                        'name' => $user->name ?: $company->name,
-                        'email' => $user->email ?: ($company->email ?: null),
-                    ]
-                );
-                $metadata['stripe_session_id'] = $session['id'] ?? null;
-                $metadata['stripe_session_url'] = $session['url'] ?? null;
-            } else {
-                $user = Auth::user();
-                $cfOrderId = 'consultant_' . $transaction->id . '_' . Str::lower(Str::random(6));
-                $returnUrl = route('client.consultants.payment.cashfree') . '?order_id={order_id}';
-                $phone = PaymentService::normalizePhone($user->phone ?? null)
-                    ?? PaymentService::normalizePhone($company->phone ?? null)
-                    ?? PaymentService::normalizePhone(\App\Models\SiteSetting::get('support_phone'))
-                    ?? '9999999999';
-                $customer = [
-                    'id' => 'cust_' . $company->id,
-                    'name' => $user->name ?: $company->name,
-                    'email' => $user->email ?: ($company->email ?: 'billing@menetzero.com'),
-                    'phone' => $phone,
-                ];
-                $cfOrder = $this->paymentService->createCashfreeOrder(
-                    $gateway,
-                    $cfOrderId,
-                    $transaction->amount,
-                    $transaction->currency,
-                    $customer,
-                    $returnUrl
-                );
-                $metadata['cashfree_order_id'] = $cfOrderId;
-                $metadata['cashfree_payment_session_id'] = $cfOrder['payment_session_id'] ?? null;
-            }
+            // Razorpay only. The Stripe and Cashfree branches were removed
+            // with their routes; leaving them would have called route() on a
+            // name that no longer exists and thrown after the transaction row
+            // was already written.
+            $rzOrder = $this->paymentService->createRazorpayOrder(
+                $gateway,
+                $transaction->amount,
+                $transaction->currency,
+                'consultant_' . $order->id,
+                ['consultant_order_id' => (string) $order->id]
+            );
+            $metadata['razorpay_order_id'] = $rzOrder['id'] ?? null;
 
             $transaction->metadata = $metadata;
             $transaction->save();
@@ -201,102 +164,6 @@ class ConsultantMarketplaceController extends Controller
     public function razorpayCallback(Request $request)
     {
         return $this->handlePaymentCallback($request, 'razorpay');
-    }
-
-    public function cashfreeCallback(Request $request)
-    {
-        $company = Auth::user()->getActiveCompany();
-        if (!$company) {
-            return redirect()->route('client.dashboard');
-        }
-
-        $orderId = (string) $request->query('order_id', '');
-        if (!str_starts_with($orderId, 'consultant_')) {
-            return redirect()->route('client.consultants.index')->with('error', 'Invalid payment reference.');
-        }
-
-        $txnId = explode('_', $orderId)[1] ?? null;
-        $transaction = PaymentTransaction::where('id', $txnId)
-            ->where('company_id', $company->id)
-            ->where('transaction_type', 'consultant_pack')
-            ->firstOrFail();
-
-        if ($transaction->status === 'completed') {
-            return redirect()->route('client.consultants.orders')->with('success', 'Payment already completed.');
-        }
-
-        $gateway = PaymentGateway::forGateway('cashfree');
-        $orderStatus = $this->paymentService->getCashfreeOrderStatus($gateway, $orderId);
-
-        if ($orderStatus === 'PAID') {
-            return $this->finalizePayment($transaction, ['cashfree_order_id' => $orderId], $orderId);
-        }
-
-        $paymentStatus = $this->paymentService->getCashfreePaymentStatus($gateway, $orderId);
-        if ($paymentStatus === 'SUCCESS') {
-            return $this->finalizePayment($transaction, ['cashfree_order_id' => $orderId], $orderId);
-        }
-
-        if (in_array($paymentStatus, ['USER_DROPPED', 'CANCELLED'], true)) {
-            $transaction->update(['status' => 'cancelled']);
-
-            return redirect()->route('client.consultants.checkout', $transaction->metadata['consultant_id'] ?? 1)
-                ->with('error', 'Payment cancelled.');
-        }
-
-        $transaction->update(['status' => 'failed']);
-
-        return redirect()->route('client.consultants.index')->with('error', 'Payment failed. Please try again.');
-    }
-
-    public function stripeCallback(Request $request)
-    {
-        $company = Auth::user()->getActiveCompany();
-        if (!$company) {
-            return redirect()->route('client.dashboard');
-        }
-
-        $request->validate([
-            'transaction_id' => 'required|integer',
-            'session_id' => 'required|string',
-        ]);
-
-        $transaction = PaymentTransaction::where('id', $request->integer('transaction_id'))
-            ->where('company_id', $company->id)
-            ->where('transaction_type', 'consultant_pack')
-            ->firstOrFail();
-
-        if ($transaction->status === 'completed') {
-            return redirect()->route('client.consultants.orders')->with('success', 'Payment already completed.');
-        }
-
-        $gateway = PaymentGateway::forGateway('stripe');
-        if (!$gateway || !$gateway->is_enabled || !$gateway->isConfigured()) {
-            return redirect()->route('client.consultants.index')->with('error', 'Payment method unavailable.');
-        }
-
-        $sessionId = (string) $request->query('session_id');
-        $session = $this->paymentService->getStripeCheckoutSession($gateway, $sessionId);
-
-        if (!$session || ($session['id'] ?? null) !== $sessionId) {
-            return redirect()->route('client.consultants.index')->with('error', 'Could not verify Stripe payment.');
-        }
-
-        $expectedTxn = (string) $transaction->id;
-        $sessionTxn = (string) ($session['metadata']['transaction_id'] ?? $session['client_reference_id'] ?? '');
-        if ($sessionTxn !== '' && $sessionTxn !== $expectedTxn) {
-            return redirect()->route('client.consultants.index')->with('error', 'Payment reference mismatch.');
-        }
-
-        if (($session['payment_status'] ?? null) === 'paid') {
-            return $this->finalizePayment($transaction, [
-                'stripe_session_id' => $sessionId,
-                'stripe_payment_intent_id' => $session['payment_intent'] ?? null,
-            ], (string) ($session['payment_intent'] ?? $sessionId));
-        }
-
-        return redirect()->route('client.consultants.orders')
-            ->with('info', 'Stripe payment is processing. Your order will activate automatically once confirmed.');
     }
 
     public function orders(PlanGate $gate)

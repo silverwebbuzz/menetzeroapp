@@ -99,14 +99,10 @@
                 @csrf
                 <input type="hidden" name="engagement_id" value="{{ $engagement->id }}">
                 <input type="hidden" name="reporting_year" value="{{ $yearUnlockTarget }}">
-                <div>
-                    <label class="block text-xs mb-1">Payment</label>
-                    <select name="gateway" class="form-select max-w-xs" required>
-                        <option value="cashfree">Cashfree</option>
-                        <option value="razorpay">Razorpay (INR)</option>
-                        <option value="stripe">Stripe</option>
-                    </select>
-                </div>
+                {{-- Razorpay is the only gateway. These options were hardcoded
+                     with Cashfree first, so the default selection would have
+                     posted a gateway whose checkout code no longer exists. --}}
+                <input type="hidden" name="gateway" value="razorpay">
                 <button type="submit" class="btn btn-warning">
                     Unlock {{ $yearUnlockTarget }}
                 </button>

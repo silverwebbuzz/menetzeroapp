@@ -7,8 +7,7 @@
         POST client.consultants.checkout.process ($consultant)
         "csrf"
         <input type="hidden" name="pack_type" value="{{ $packType }}">
-        <input type="radio"  name="gateway"   value="{{ $gw->gateway }}" required
-               "checked"($loop->first)
+        <input type="hidden" name="gateway"   value="razorpay">
 
     THREE THINGS THAT LOOK COSMETIC AND ARE NOT:
       1. "checked"($loop->first) pre-selects the first gateway. Without it the
@@ -91,14 +90,13 @@
                 <form method="POST" action="{{ route('client.consultants.checkout.process', $consultant) }}">
                     @csrf
                     <input type="hidden" name="pack_type" value="{{ $packType }}">
-                    <div style="margin-bottom:16px">
-                        @foreach($enabledGateways as $gw)
-                            <label class="ck-gw">
-                                <input type="radio" name="gateway" value="{{ $gw->gateway }}" @checked($loop->first) required>
-                                {{ $gw->label }}
-                            </label>
-                        @endforeach
-                    </div>
+                    {{-- Razorpay is the only gateway. A radio group of one is
+                         not a choice, and 'required' on a single unchecked
+                         radio is the silent conversion drop this file's header
+                         warns about. Posted as a hidden field so the
+                         controller's "required|in:razorpay" rule still
+                         receives a value. --}}
+                    <input type="hidden" name="gateway" value="razorpay">
                     <button type="submit" class="mnz-btn mnz-btn--primary mnz-btn--lg" style="width:100%">
                         Continue to payment
                     </button>

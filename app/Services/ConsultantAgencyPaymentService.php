@@ -8,7 +8,6 @@ use App\Models\PaymentTransaction;
 use App\Models\SiteSetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 
 class ConsultantAgencyPaymentService
 {
@@ -56,7 +55,16 @@ class ConsultantAgencyPaymentService
             $user = Auth::user();
             $meta = $transaction->metadata;
 
-            if ($gateway->gateway === 'razorpay') {
+            // Razorpay only. Stripe and Cashfree were removed with their
+            // routes -- their branches called route() on names that no longer
+            // exist, which would have thrown after the transaction row was
+            // already written.
+            //
+            // The AED -> INR fallback is kept, now on Razorpay: a standard
+            // Indian account accepts INR only, and AED needs International
+            // Payments activated. $inrFallbackQuote() re-prices rather than
+            // converting, so the INR amount is the real INR list price.
+            try {
                 $rzOrder = $this->paymentService->createRazorpayOrder(
                     $gateway,
                     $transaction->amount,
@@ -64,69 +72,31 @@ class ConsultantAgencyPaymentService
                     'consultant_' . $transaction->id,
                     ['type' => $transactionType, 'consultant_id' => (string) $consultantOrg->id]
                 );
-                $meta['razorpay_order_id'] = $rzOrder['id'] ?? null;
-            } elseif ($gateway->gateway === 'stripe') {
-                $session = $this->paymentService->createStripeCheckoutSession(
-                    $gateway,
-                    $transaction,
-                    route('consultant.packs.payment.stripe') . '?session_id={CHECKOUT_SESSION_ID}&transaction_id=' . $transaction->id,
-                    route('consultant.packs.payment.checkout', $transaction->id),
-                    [
-                        'name' => $user->name ?: $consultantOrg->name,
-                        'email' => $user->email ?: ($consultantOrg->email ?: null),
-                    ]
-                );
-                $meta['stripe_session_id'] = $session['id'] ?? null;
-                $meta['stripe_session_url'] = $session['url'] ?? null;
-            } else {
-                $cfOrderId = 'consultant_' . $transaction->id . '_' . Str::lower(Str::random(6));
-                $returnUrl = route('consultant.packs.payment.cashfree') . '?order_id={order_id}';
-                $phone = PaymentService::normalizePhone($user->phone ?? null)
-                    ?? PaymentService::normalizePhone($consultantOrg->phone ?? null)
-                    ?? PaymentService::normalizePhone(SiteSetting::get('support_phone'))
-                    ?? '9999999999';
-                $customer = [
-                    'id' => 'consultant_' . $consultantOrg->id,
-                    'name' => $user->name ?: $consultantOrg->name,
-                    'email' => $user->email ?: ($consultantOrg->email ?: 'billing@menetzero.com'),
-                    'phone' => $phone,
-                ];
-
-                try {
-                    $cfOrder = $this->paymentService->createCashfreeOrder(
-                        $gateway,
-                        $cfOrderId,
-                        $transaction->amount,
-                        $transaction->currency,
-                        $customer,
-                        $returnUrl
-                    );
-                } catch (\RuntimeException $e) {
-                    if ($transaction->currency !== 'INR'
-                        && $this->paymentService->isCashfreeCurrencyDisabledError($e->getMessage())) {
-                        $inrQuote = $inrFallbackQuote();
-                        $transaction->update([
-                            'amount' => $inrQuote['charge_amount'],
-                            'currency' => 'INR',
-                        ]);
-                        $meta['charged_in_inr_fallback'] = true;
-                        $cfOrder = $this->paymentService->createCashfreeOrder(
-                            $gateway,
-                            $cfOrderId,
-                            $inrQuote['charge_amount'],
-                            'INR',
-                            $customer,
-                            $returnUrl
-                        );
-                        session()->flash('info', 'Charged in INR equivalent while AED activation is pending on Cashfree.');
-                    } else {
-                        throw $e;
-                    }
+            } catch (\RuntimeException $e) {
+                if ($transaction->currency === 'INR'
+                    || !$this->paymentService->isRazorpayCurrencyDisabledError($e->getMessage())) {
+                    throw $e;
                 }
 
-                $meta['cashfree_order_id'] = $cfOrderId;
-                $meta['cashfree_payment_session_id'] = $cfOrder['payment_session_id'] ?? null;
+                $inrQuote = $inrFallbackQuote();
+                $transaction->update([
+                    'amount' => $inrQuote['charge_amount'],
+                    'currency' => 'INR',
+                ]);
+                $meta['charged_in_inr_fallback'] = true;
+
+                $rzOrder = $this->paymentService->createRazorpayOrder(
+                    $gateway,
+                    $inrQuote['charge_amount'],
+                    'INR',
+                    'consultant_' . $transaction->id,
+                    ['type' => $transactionType, 'consultant_id' => (string) $consultantOrg->id]
+                );
+
+                session()->flash('info', 'Charged in the INR equivalent while AED activation is pending with our payment provider.');
             }
+
+            $meta['razorpay_order_id'] = $rzOrder['id'] ?? null;
 
             $transaction->metadata = $meta;
             $transaction->save();
