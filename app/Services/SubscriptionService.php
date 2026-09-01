@@ -198,8 +198,13 @@ class SubscriptionService
             $used = $this->getCurrentUsage($companyId, $resource);
 
             if ($used > (int) $limit) {
+                // Wording matches what ScheduledDowngradeService actually does:
+                // the change IS applied on the day, existing records stay
+                // readable, and the smaller limit binds new additions. The old
+                // text promised the downgrade "cannot take effect", which the
+                // job now contradicts.
                 $warnings[] = "You currently have {$used} {$label}, but {$targetPlan->plan_name} allows {$limit}. "
-                    . "Please reduce usage before your renewal date or the downgrade cannot take effect.";
+                    . "Your existing {$label} stay available, but you will not be able to add more until you are under the limit.";
             }
         }
 

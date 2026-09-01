@@ -5811,3 +5811,72 @@ changed controllers balanced; no `extraOptions` reference survives in any view
 or compact(); 237 non-theme views scan clean.
 
 Run: `php artisan optimize:clear`
+
+## 83. Scheduled downgrades are now applied
+
+§81 found that `scheduleDowngrade()` writes `renewal_plan_id` and nothing ever
+reads it back. Closed here, but the investigation changed the shape of the fix.
+
+**Half of it was never broken.** At expiry `getActiveSubscription()` stops
+matching (`expires_at > now()`) and `PlanEntitlementService::resolveEntitlements()`
+falls through to `client_free`. So a `downgrade_to_free` already lands exactly
+where it should by doing nothing. Only a **paid -> cheaper paid** downgrade was
+broken: the customer chose Carbon and silently got Free. The service skips free
+targets rather than pointlessly re-activating them.
+
+**Three decisions, taken by the user:**
+
+*Billing* -- grant the term, invoice after. The transaction is written as
+`pending` with `payment_method = 'invoice'`, and §74 issues an invoice against
+it. Nothing in this system charges a stored card without the customer present
+(no e-mandate), so billing after the fact is the only option that does not
+interrupt a paying customer.
+
+*Over-limit* -- apply anyway. Existing records stay readable; the smaller
+plan's limits bind new additions.
+
+*Retired target* -- honour it. `is_active` is deliberately NOT filtered: it
+hides a plan from new checkout, and existing subscribers already keep retired
+plans (`LEGACY_PLAN_CODES`). The customer chose it while it was on sale.
+
+**A contradiction the over-limit decision exposed.** `getDowngradeWarnings()`
+told customers "Please reduce usage before your renewal date or the downgrade
+cannot take effect" -- which the new job flatly contradicts, since it applies
+the change regardless. Reworded to state what actually happens: existing
+records stay, new additions are blocked until under the limit. Either
+behaviour is defensible; the two disagreeing with each other is not.
+
+**Two bugs caught in my own code before it shipped:**
+
+* I invented `SiteSettingCurrency()`, which does not exist -- a fatal on first
+  run. The real helper, `CurrencyService::displayCurrency()`, reads the
+  SESSION and is wrong in cron anyway. Now hardcoded AED, which is what
+  `price_annual` is denominated in.
+* `apply()` called `clearScheduledDowngrade()` after `subscribeClient()`.
+  `subscribeClient()` already clears `renewal_plan_id` itself, so the extra
+  call re-fetched and re-saved metadata after the fact -- a way to write back
+  keys that had just been removed. Removed.
+
+Raw `JSON_EXTRACT` was swapped for Laravel's `metadata->renewal_plan_id` path
+syntax, which the codebase already uses in four places.
+
+Scheduled at 07:30, before the 08:00 reminder job: a term that ended overnight
+should be moved to its new plan before anything emails about renewing it.
+
+**Verified:** all three new/changed PHP files balanced; every attribute written
+to PaymentTransaction is fillable; `subscribeClient()` and
+`clearScheduledDowngrade()` signatures confirmed; an expired row still carries
+`status = 'active'` (nothing flips it), so `subscribeClient()` updates in place
+rather than creating a duplicate.
+
+Run:
+```
+php artisan optimize:clear
+php artisan subscriptions:apply-scheduled-downgrades --dry-run
+```
+
+**Untested by me:** no PHP has executed. Run the dry-run first -- it counts
+without writing. Confirm the count matches what you expect before letting cron
+apply anything, and check the scheduler is actually running
+(`php artisan schedule:list`); if cron was never configured on this server the
+renewal reminders have not been sending either.
