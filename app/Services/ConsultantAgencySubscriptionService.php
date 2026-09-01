@@ -859,19 +859,43 @@ class ConsultantAgencySubscriptionService
         return $quotes;
     }
 
-    public function validatePackChange(Company $consultantOrg, SubscriptionPlan $plan, ?ConsultantSubscription $current): void
-    {
+    /**
+     * Guard against a pack change that would strand active clients.
+     *
+     * $slots is the quantity being PURCHASED. Without it this compared usage
+     * against slotCountForPlanCode(), which returns 1 for every depth plan by
+     * definition ("Activation sets slot_limit from request qty; base
+     * definition = 1"). An agency with 51 active clients buying 5 slots was
+     * therefore told it was downgrading to 1 -- a buy blocked as if it were a
+     * downgrade.
+     *
+     * activatePackSubscription() uses an explicit slot_limit verbatim and does
+     * NOT apply carriedSlotFloor, so the post-purchase capacity really is the
+     * quantity bought; validating against anything else would let capacity
+     * silently fall below what is in use.
+     */
+    public function validatePackChange(
+        Company $consultantOrg,
+        SubscriptionPlan $plan,
+        ?ConsultantSubscription $current,
+        ?int $slots = null,
+    ): void {
         if (!$current) {
             return;
         }
 
-        $newLimit = ConsultantAgencyPlanMatrix::slotCountForPlanCode($plan->plan_code);
+        $newLimit = $slots !== null
+            ? max(1, $slots)
+            : ConsultantAgencyPlanMatrix::slotCountForPlanCode($plan->plan_code);
+
         $used = $this->activeSlotUsage($consultantOrg->id, $current);
 
         if ($used > $newLimit) {
+            $noun = $newLimit === 1 ? 'slot' : 'slots';
+
             throw new RuntimeException(
-                "You have {$used} active clients but {$plan->plan_name} allows {$newLimit} slots. "
-                . 'Archive clients before downgrading your pack.'
+                "You have {$used} active clients but this purchase provides {$newLimit} {$noun}. "
+                . "Buy at least {$used} slots, or archive clients first."
             );
         }
     }

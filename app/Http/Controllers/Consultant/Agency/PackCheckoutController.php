@@ -79,6 +79,12 @@ class PackCheckoutController extends Controller
 
         $checkoutAvailable = PaymentGateway::checkoutAvailable();
         $minSlots = \App\Data\ConsultantAgencyPlanMatrix::MIN_SLOTS;
+
+        // Default the quantity to what the agency actually needs. An agency
+        // already managing more clients than MIN_SLOTS would otherwise land on
+        // a pre-filled 5, submit it, and be told to archive clients -- the
+        // form would be steering them into its own validation error.
+        $suggestedSlots = max($minSlots, (int) ($slotSummary['used'] ?? 0));
         $slotPricing = \App\Data\ConsultantAgencyPlanMatrix::SLOT_PRICING;
 
         return view('consultant.agency.packs.index', compact(
@@ -90,6 +96,7 @@ class PackCheckoutController extends Controller
             'extraOptions',
             'matrix',
             'buyablePacks',
+            'suggestedSlots',
             'invoices',
             'planIds',
             'checkoutAvailable',
@@ -119,7 +126,10 @@ class PackCheckoutController extends Controller
             'plan_id' => 'required|exists:subscription_plans,id',
             // Minimum enforced here as well as in the form: the field is a
             // number input and nothing stops a smaller value being posted.
-            'quantity' => 'required|integer|min:' . ConsultantAgencyPlanMatrix::MIN_SLOTS . '|max:50',
+            // Cap raised from 50: an agency with more than 50 active clients
+            // could not buy enough slots to satisfy validatePackChange(), so
+            // self-serve was impossible for exactly the largest customers.
+            'quantity' => 'required|integer|min:' . ConsultantAgencyPlanMatrix::MIN_SLOTS . '|max:500',
         ]);
 
         $slots = (int) $data['quantity'];
@@ -135,7 +145,7 @@ class PackCheckoutController extends Controller
         $current = $this->consultantSubscriptions->getActiveSubscription($consultantOrg->id);
 
         try {
-            $this->consultantSubscriptions->validatePackChange($consultantOrg, $plan, $current);
+            $this->consultantSubscriptions->validatePackChange($consultantOrg, $plan, $current, $slots);
         } catch (\Throwable $e) {
             return back()->with('error', $e->getMessage());
         }

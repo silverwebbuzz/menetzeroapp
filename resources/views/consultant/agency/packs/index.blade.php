@@ -93,7 +93,7 @@
                                     <div>
                                         <label for="qty_{{ $code }}" class="block text-xs text-gray-500 mb-1">Slots</label>
                                         <input type="number" id="qty_{{ $code }}" name="quantity"
-                                               value="{{ $minSlots }}" min="{{ $minSlots }}" max="50" step="1"
+                                               value="{{ $suggestedSlots }}" min="{{ $minSlots }}" max="500" step="1"
                                                data-entry="{{ $bands['entry'] }}"
                                                data-single="{{ $bands['single'] }}"
                                                data-block5="{{ $bands['block5'] }}"
@@ -103,7 +103,10 @@
                                     <div class="flex-1">
                                         <div class="text-xs text-gray-500">Total</div>
                                         <div id="total_{{ $code }}" class="text-lg font-semibold text-gray-900">
-                                            AED {{ number_format($minSlots * $bands['entry']) }}
+                                            {{-- Priced through the same band helper the server quote uses,
+                                                 so the figure is right before JS runs and matches what
+                                                 processCheckout() re-quotes. --}}
+                                            AED {{ number_format(\App\Data\ConsultantAgencyPlanMatrix::extraSlotPriceAed($code, $suggestedSlots)) }}
                                         </div>
                                     </div>
                                 </div>

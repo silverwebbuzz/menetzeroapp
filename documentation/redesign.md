@@ -5578,3 +5578,90 @@ Run: `php artisan optimize:clear`
 **Untested by me:** no webhook has been received. When the Razorpay keys
 arrive, confirm a real webhook still activates -- the guard passes only when
 the gateway row is enabled AND has a webhook secret.
+
+## 78. Gateway review account
+
+Razorpay's verification form asks for test-account credentials so a reviewer
+can walk the checkout flow. A hand-built account is easy to get subtly wrong,
+so it is seeded instead.
+
+**Two requirements that are not obvious**, both traced rather than assumed:
+
+* `company_type = 'client'` -- `SubscriptionController::upgrade()` redirects
+  anything else with "Access denied", so a consultant-org account never sees
+  a plan.
+* `consultant_id = null` (with `is_direct_client = true`) --
+  `RestrictManagedClientBilling` bounces a managed client to the consultant
+  dashboard, so the reviewer would never reach billing at all.
+
+A `UserCompanyRole` row with `company_custom_role_id = null` (owner) is also
+required: `getActiveCompany()` resolves through `getOwnedCompany()`, and
+without that row it returns null and every billing page redirects.
+
+The password comes from `REVIEW_ACCOUNT_PASSWORD` rather than the file, so it
+is never committed. If unset the seeder generates one and prints it with a
+warning that it is stored nowhere. Re-running rotates the password and leaves
+the rest intact -- which is what you want once a review closes.
+
+**Verified:** every attribute written is in its model's `$fillable`, so nothing
+is silently dropped (the failure mode that bit `updateOrCreate` in §63);
+`Str::password()` exists in Laravel 12; braces/parens/brackets balanced.
+
+Run:
+```
+REVIEW_ACCOUNT_PASSWORD='<pick one>' php artisan db:seed --class=GatewayReviewAccountSeeder
+```
+
+**Untested by me:** no PHP has executed. Log in as the account yourself and
+reach `/subscriptions/upgrade` BEFORE submitting the form -- if the reviewer
+hits a redirect, the application is rejected and re-verification is slow.
+
+## 79. Buying slots was blocked as if it were a downgrade
+
+Reported from production: an agency with 51 active clients pressed Buy now on
+Consultant — Carbon (5 slots) and got
+
+> You have 5 active clients but Consultant — Carbon allows 1 slots. Archive
+> clients before downgrading your pack.
+
+Three defects, only the first of which produced the message.
+
+**1. Validation ignored the quantity being bought.**
+`validatePackChange()` compared usage against
+`slotCountForPlanCode($plan->plan_code)`, which returns **1** for every depth
+plan by its own definition -- "Activation sets slot_limit from request qty;
+base definition = 1". So every self-serve purchase looked like a downgrade to a
+single slot. Now takes the purchased `$slots`, matching what
+`activatePackSubscription()` actually applies: when an explicit `slot_limit` is
+passed (which §72 always does) it is used verbatim and `carriedSlotFloor` is
+NOT applied, so the post-purchase capacity really is the quantity bought.
+
+The message was also wrong in the other direction -- it named the plan's
+nominal allowance rather than what the buyer would get -- so it now states the
+purchase's capacity and tells them the minimum to buy.
+
+**2. The quantity cap made the fix unreachable for large agencies.**
+`max:50`, against 51 active clients: even correct validation could not be
+satisfied, so self-serve was impossible for precisely the biggest customers.
+Raised to 500, matching the existing request-form field.
+
+**3. The form steered users into the error.**
+Quantity defaulted to `MIN_SLOTS` (5) regardless of how many clients the agency
+manages. An agency with 51 would submit 5 and be told to archive clients --
+the form pre-filling a value it would then reject. Now defaults to
+`max($minSlots, $slotSummary['used'])`.
+
+The server-rendered Total was still `$minSlots * entry`, which no longer
+matched the input and would have shown 5 slots' worth beside a quantity of 51
+until JS ran. It now prices through `extraSlotPriceAed()` -- the same helper
+`resolvePackPurchase()` uses -- so the first paint matches the server quote.
+
+**Verified:** braces/parens balanced in both PHP files; Blade directives and
+comments paired; 237 non-theme views scan clean; band arithmetic checked at
+5/51/63 slots for both packs (carbon 51 = AED 91,900; esg 51 = AED 183,800);
+`$slots` and `$slotSummary` both confirmed defined before their new use.
+
+Run: `php artisan optimize:clear`
+
+**Untested by me:** no PHP has executed. Press Buy now on the real account and
+confirm the quantity pre-fills to the client count and the error is gone.
