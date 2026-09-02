@@ -395,12 +395,23 @@ a:hover { color: var(--brand-darker); text-decoration: underline; }
     box-sizing: border-box;
 }
 
-/* Admin / legacy shells without portal-shell-inner — centered column */
-.app-shell:not(:has(.portal-shell-inner)) .content-area,
+/* Legacy consultant shell without portal-shell-inner — centered column.
+   The admin shell is deliberately NOT included: its pages are dense data
+   tables (companies, consultants, plan/activity columns) that were being
+   squeezed into 1280px with dead space either side on a wide screen.
+   Consultant pages keep the centered column — narrowing that was not asked
+   for, and this rule is shared CSS. */
 .consultant-shell:not(:has(.portal-shell-inner)) .content-area {
     max-width: 1280px;
     margin-left: auto;
     margin-right: auto;
+}
+
+/* Admin: full width, with breathing room at the edges. */
+.app-shell:not(:has(.portal-shell-inner)) .content-area {
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
 }
 
 /* ===================================================================== */

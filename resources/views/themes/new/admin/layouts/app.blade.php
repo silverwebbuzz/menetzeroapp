@@ -39,7 +39,7 @@
          mnz-ui.css is `mnz-` prefixed and loads after, so the shell wins. --}}
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260902">
     <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260630">
 
     @foreach ($themeAssets['css'] ?? [] as $themeCss)

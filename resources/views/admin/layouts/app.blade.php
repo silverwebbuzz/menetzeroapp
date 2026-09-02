@@ -31,7 +31,9 @@
         };
     </script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}">
+    {{-- Cache-busted like the consultant shell: without a version the browser
+         serves its cached copy and a CSS change appears to do nothing. --}}
+    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260902">
     @stack('head')
 </head>
 <body class="bg-slate-50">

@@ -6257,3 +6257,46 @@ Swept the whole view tree: no other `@php(` contains a call, so this was the
 only instance.
 
 Run: `php artisan optimize:clear`
+
+## 91. Admin pages go full width
+
+Admin content was capped at 1280px with dead space either side on a wide
+screen. The companies and consultants lists now carry Plan, Last login,
+Clients/Data and Status columns (§86, §89), and were being squeezed into a
+column narrower than the data needs.
+
+The cap came from one shared rule in `app-shell.css`:
+
+    .app-shell:not(:has(.portal-shell-inner)) .content-area,
+    .consultant-shell:not(:has(.portal-shell-inner)) .content-area {
+        max-width: 1280px; margin: auto;
+    }
+
+**Split rather than edited.** The rule named BOTH shells, so removing the cap
+outright would have widened the consultant portal too -- which was not asked
+for. The consultant selector keeps the centered column; a new admin-only rule
+sets `max-width: none`.
+
+**Per-page caps left alone.** Four admin views carry their own `max-w-3xl` /
+`max-w-4xl`: the site-content page editor, the pricing addon and feature-row
+forms, and a paragraph of help text. All are single-column forms or prose,
+where a text input stretched across a 2500px monitor is worse, not better.
+Full width is for the data tables.
+
+Responsive overrides at 768px and 640px still name `.app-shell`, and were
+checked: they set `padding` only, no width, so mobile behaviour is unchanged.
+
+**The change would have been invisible without this:** the admin layout loaded
+`app-shell.css` with NO cache-busting query, unlike the consultant shell's
+`?v=20260824b`. The browser would have served its cached copy and the CSS edit
+would have appeared to do nothing. Added `?v=20260902` to both the admin layout
+and its new-theme twin.
+
+**Verified:** CSS braces and comments balanced (537/537, 160/160); diff is 13
+insertions / 2 deletions in one rule; both admin layouts' directives and
+comments paired; 52 theme files scan clean.
+
+Run: `php artisan optimize:clear`
+
+If the width still looks unchanged, hard-reload once (Cmd/Ctrl+Shift+R) -- the
+version bump handles new visits, not a page already open.
