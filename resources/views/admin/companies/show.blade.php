@@ -242,6 +242,7 @@
          the delete while appearing nowhere. --}}
     @php
         $managedClients = \App\Models\Company::where('consultant_id', $company->id)
+            ->with(['clientSubscriptions.plan', 'consultantSubscriptions.plan'])
             ->withCount(['carbonEmissions', 'locations'])
             ->orderBy('name')
             ->get();
@@ -265,6 +266,7 @@
                             <tr class="text-left text-xs text-gray-500 border-b border-gray-200">
                                 <th class="px-5 py-2">Company</th>
                                 <th class="px-5 py-2">Type</th>
+                                <th class="px-5 py-2">Plan</th>
                                 <th class="px-5 py-2">Data</th>
                                 <th class="px-5 py-2">Registered</th>
                                 <th class="px-5 py-2 text-right">Open</th>
@@ -285,6 +287,14 @@
                                             <span class="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">Direct (referred)</span>
                                         @else
                                             <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">Managed</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-5 py-2">
+                                        @php($mcPlan = $mc->currentPlanName())
+                                        @if($mcPlan)
+                                            <span class="text-xs px-2 py-0.5 rounded-full bg-teal-50 text-teal-700">{{ $mcPlan }}</span>
+                                        @else
+                                            <span class="text-xs text-gray-400">Free</span>
                                         @endif
                                     </td>
                                     <td class="px-5 py-2 text-xs text-gray-600">

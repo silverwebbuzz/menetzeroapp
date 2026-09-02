@@ -24,6 +24,7 @@
                     <th class="px-4 py-2 text-left font-medium text-gray-500">Practice</th>
                     <th class="px-4 py-2 text-left font-medium text-gray-500">Contact</th>
                     <th class="px-4 py-2 text-left font-medium text-gray-500">Status</th>
+                    <th class="px-4 py-2 text-left font-medium text-gray-500">Plan</th>
                     <th class="px-4 py-2 text-left font-medium text-gray-500">Docs</th>
                     <th class="px-4 py-2 text-left font-medium text-gray-500">Leads</th>
                     <th class="px-4 py-2 text-left font-medium text-gray-500">Submitted</th>
@@ -44,6 +45,19 @@
                         <td class="px-4 py-2">
                             <span class="px-2 py-0.5 rounded-full text-xs bg-gray-100">{{ $c->statusLabel() }}</span>
                         </td>
+                        {{-- A consultant's pack belongs to its agency COMPANY, not the
+                             profile row -- Company::currentPlanName() resolves it. No
+                             agency company yet means registration never completed. --}}
+                        <td class="px-4 py-2">
+                            @php($planName = $c->agencyCompany?->currentPlanName())
+                            @if($planName)
+                                <span class="px-2 py-0.5 rounded-full text-xs bg-teal-50 text-teal-700">{{ $planName }}</span>
+                            @elseif($c->agencyCompany)
+                                <span class="text-xs text-gray-400">Free</span>
+                            @else
+                                <span class="text-xs text-gray-300">—</span>
+                            @endif
+                        </td>
                         <td class="px-4 py-2">{{ $c->documents_count }}</td>
                         <td class="px-4 py-2">{{ $c->intro_requests_count }}</td>
                         <td class="px-4 py-2 text-xs text-gray-500">{{ $c->submitted_at?->format('d M Y') ?? '—' }}</td>
@@ -52,7 +66,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="7" class="px-4 py-6 text-center text-gray-500">No consultant applications yet.</td></tr>
+                    <tr><td colspan="8" class="px-4 py-6 text-center text-gray-500">No consultant applications yet.</td></tr>
                 @endforelse
             </tbody>
         </table>

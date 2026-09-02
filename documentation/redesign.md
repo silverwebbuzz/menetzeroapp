@@ -6172,3 +6172,48 @@ Most other admin actions use `back()`, which preserves the full URL including
 controller renders that view.
 
 Run: `php artisan optimize:clear`
+
+## 89. Current plan shown in all three admin listings
+
+Added a **Plan** column to the companies list (both tabs), the consultant
+profiles list, and the client-companies table on an agency's detail page.
+
+**One accessor, not three copies.** `Company::currentPlanName()` resolves the
+active plan for either kind of organisation:
+
+* a consultant agency's subscription lives in `consultant_subscriptions`
+* a client's lives in `client_subscriptions`
+
+Two tables, two models -- so the "which one do I read" decision belongs in one
+place. Writing it inline in three views is the duplication §63 was about.
+
+**The consultant branch is not a plain `first()`.** It mirrors
+`ConsultantAgencySubscriptionService::getActiveSubscription()`: prefer a paid
+pack over a free trial when both are active. An agency that has bought capacity
+still holds its trial row, so the naive query reports the trial as its plan --
+the list would have shown "Free" for a paying agency.
+
+Null renders as **Free**, which is correct rather than a fallback:
+`PlanEntitlementService::resolveEntitlements()` returns `client_free`
+entitlements when no subscription is active, so no active row genuinely IS the
+free tier.
+
+On the consultant profiles list the plan comes from
+`$c->agencyCompany?->currentPlanName()` -- a consultant's pack belongs to its
+agency COMPANY, not the profile row. A consultant with no agency company shows
+"—" rather than "Free", because that means registration never completed, which
+is a different state from being on the free tier.
+
+**N+1 avoided** by eager-loading in all three places:
+`consultantSubscriptions.plan` alongside `clientSubscriptions.plan` on the
+companies list, `agencyCompany.consultantSubscriptions.plan` on the consultant
+list, and both on the managed-clients query.
+
+**Verified:** three PHP files balanced; both list tables' `<th>` counts match
+their empty-state colspans exactly (companies 9/9, consultants 8/8 -- each was
+bumped with the new column); directives and comments paired in all three views;
+`agencyCompany` confirmed to exist on Consultant; the `@php=3 @endphp=2` count
+on the companies list is the inline `@php($x = ...)` form, which is
+self-closing.
+
+Run: `php artisan optimize:clear`

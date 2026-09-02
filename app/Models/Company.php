@@ -184,6 +184,42 @@ class Company extends Model
     }
 
     /**
+     * The plan this organisation is on right now, whichever kind it is.
+     *
+     * A consultant agency's subscription lives in consultant_subscriptions, a
+     * client's in client_subscriptions -- two tables with two models -- so
+     * admin lists that show "current package" for both need one place that
+     * knows which to read.
+     *
+     * The consultant branch mirrors ConsultantAgencySubscriptionService::
+     * getActiveSubscription(): prefer a paid pack over a free trial when both
+     * are active, because an agency that has bought capacity still holds its
+     * trial row and the trial would otherwise be reported as its plan.
+     *
+     * Returns null when nothing is active -- render that as Free, since
+     * PlanEntitlementService falls through to the free tier in that case.
+     */
+    public function currentPlanName(): ?string
+    {
+        if ($this->company_type === 'consultant') {
+            $subs = $this->consultantSubscriptions
+                ->filter(fn ($s) => $s->status === 'active'
+                    && $s->expires_at !== null
+                    && $s->expires_at->gte(now()->startOfDay()));
+
+            $sub = $subs->first(fn ($s) => !$s->isFreeTrial()) ?? $subs->first();
+
+            return $sub?->plan?->plan_name;
+        }
+
+        return $this->clientSubscriptions
+            ->first(fn ($s) => $s->status === 'active'
+                && $s->expires_at !== null
+                && $s->expires_at->gt(now()))
+            ?->plan?->plan_name;
+    }
+
+    /**
      * Get active client subscription.
      */
     public function activeClientSubscription()

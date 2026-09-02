@@ -18,6 +18,9 @@ class ConsultantController extends Controller
         $status = $request->query('status');
 
         $consultants = Consultant::query()
+            // agencyCompany.consultantSubscriptions.plan feeds currentPlanName()
+            // in the list; without it each row fires its own queries.
+            ->with(['agencyCompany.consultantSubscriptions.plan'])
             ->withCount(['documents', 'introRequests', 'orders'])
             ->when($status, fn ($q) => $q->where('status', $status))
             ->orderByRaw("FIELD(status, 'pending_review', 'draft', 'approved', 'rejected', 'suspended')")

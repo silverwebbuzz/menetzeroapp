@@ -103,6 +103,7 @@
                         <th>Company</th>
                         <th>Email</th>
                         <th>Type</th>
+                        <th>Plan</th>
                         <th>Last login</th>
                         <th>{{ $tab === 'consultant' ? 'Clients' : 'Data' }}</th>
                         <th>Status</th>
@@ -134,6 +135,19 @@
                                     <span class="badge badge-info badge-dot">Consultant</span>
                                 @else
                                     <span class="badge badge-brand badge-dot">Client</span>
+                                @endif
+                            </td>
+
+                            {{-- One accessor for both kinds: a consultant agency's plan
+                                 lives in consultant_subscriptions, a client's in
+                                 client_subscriptions. Null means nothing active, which
+                                 is the free tier. --}}
+                            <td>
+                                @php($planName = $company->currentPlanName())
+                                @if($planName)
+                                    <span class="badge badge-brand">{{ $planName }}</span>
+                                @else
+                                    <span class="text-xs text-slate-400">Free</span>
                                 @endif
                             </td>
 
@@ -199,7 +213,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center py-10 cell-muted">
+                            <td colspan="9" class="text-center py-10 cell-muted">
                                 <div class="flex flex-col items-center gap-2">
                                     <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>

@@ -94,7 +94,10 @@ class SuperAdminController extends Controller
                 ->whereDoesntHave('clientSubscriptions.plan', fn ($p) => $p->where('price_annual', '>', 0));
         }
 
-        $companies = $query->with(['clientSubscriptions.plan'])
+        // Both subscription kinds eager-loaded: currentPlanName() reads
+        // whichever matches the company type, and without this it would fire
+        // two queries per row.
+        $companies = $query->with(['clientSubscriptions.plan', 'consultantSubscriptions.plan'])
             ->withCount(['users', 'carbonEmissions', 'locations', 'managedClients'])
             ->withMax('users', 'last_login_at')
             ->orderBy('created_at', 'desc')
