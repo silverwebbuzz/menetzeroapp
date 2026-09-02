@@ -5880,3 +5880,68 @@ without writing. Confirm the count matches what you expect before letting cron
 apply anything, and check the scheduler is actually running
 (`php artisan schedule:list`); if cron was never configured on this server the
 renewal reminders have not been sending either.
+
+## 84. Cron reference; reset plan catalogue
+
+**Cron doc.** No such document existed. `documentation/CRON_AND_SCHEDULED_JOBS.md`
+now lists the single system cron entry (`schedule:run` every minute -- Laravel
+schedules the rest), both scheduled jobs with what breaks if they do not run,
+the two manual-only commands, and why a queue worker is NOT currently needed
+(`QUEUE_CONNECTION=database` but nothing implements `ShouldQueue` and there are
+no `Mail::queue()` calls, so mail is synchronous).
+
+It flags the trap that `schedule:list` looking healthy proves nothing: it reads
+`routes/console.php`, not crontab. If the cron entry was never installed, both
+jobs have been silently dead.
+
+**Plan reset migration.** `2026_09_02_120000_reset_plans_to_current_catalogue`
+moves every company to `client_free` and deletes every plan outside the
+current catalogue.
+
+This reverses the standing rule -- every prior retirement used
+`is_active = false` precisely because "never delete a code somebody is still
+paying for". That reasoning is intact; it just does not apply at zero paying
+customers. So the migration **aborts** if it finds any completed payment rather
+than trusting the assumption.
+
+*Ordering is the whole problem.* Four tables reference `subscription_plans`
+with three different delete behaviours, so every reference is repointed BEFORE
+any delete:
+
+| Table | FK behaviour | Why it matters |
+|---|---|---|
+| `consultant_subscriptions` | `restrictOnDelete` | MySQL REFUSES the delete while a row points at the plan |
+| `admin_package_assignments` | `cascadeOnDelete` | Deleting a plan silently destroys the assignment |
+| `subscription_coupons` | `nullOnDelete` | Safe, but nulled explicitly so a coupon does not quietly become plan-agnostic |
+| `client_subscriptions` | (no FK) | Repointed to client_free |
+
+**Two things caught before this could run:**
+
+* `consultant_1` (DEMO_PACK_CODE) and `consultant_entity` (ENTITY_PLAN_CODE)
+  are absent from CURRENT_PLAN_CODES but referenced BY NAME in live code.
+  Deleting them would break the free-trial and entity flows. Added to KEEP.
+* The first draft set `status = 'active'` on every client subscription.
+  `client_subscriptions` carries a generated column `active_company_key`
+  (= company_id when status='active') under a UNIQUE index -- one active
+  subscription per company. Any company holding a cancelled row alongside a
+  live one would have thrown a duplicate-key error and aborted the migration.
+  `status` is now left alone.
+
+`down()` is intentionally empty: the deleted rows and the previous plan
+assignments are gone, and re-seeding creates new ids nothing points at.
+Restore from backup.
+
+**Verified:** balanced; KEEP covers the 8 seeder ACTIVE_CODES plus the 2
+code-referenced codes; all four FK behaviours traced to their migrations; the
+unique-index constraint read from the migration that created it.
+
+Run:
+```
+mysqldump -u <user> -p <db> > backup-before-plan-reset.sql
+php artisan db:seed --class=SubscriptionPlanSeeder
+php artisan migrate
+php artisan optimize:clear
+```
+
+**Untested by me:** no PHP or SQL has executed. Take the backup first -- this
+migration is not reversible.
