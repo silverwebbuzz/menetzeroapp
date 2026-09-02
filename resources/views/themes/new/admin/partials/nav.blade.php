@@ -4,9 +4,13 @@
     Same routes, same 7 sections, same active-state logic as
     admin/partials/nav.blade.php. Only markup and styling change.
 
-    Two links leave the admin portal and are preserved as-is:
+    One link leaves the admin portal and is preserved as-is:
       - Pricing page (public, opens in a new tab)
-      - Client Portal (company dashboard)
+
+    The Client Portal link was removed: it pointed at client.dashboard, which
+    is behind auth:web while admin is behind auth:admin, so for an admin
+    without a client session it led to a login screen. Admin is its own portal
+    and should not advertise a way "back" to one it did not come from.
 --}}
 @php
     $routeName = \Illuminate\Support\Facades\Route::currentRouteName();
@@ -111,14 +115,5 @@
     <a href="{{ route('admin.statistics') }}"
        class="mnz-nav {{ $isActive('admin.statistics') ? 'is-active' : '' }}">
         <span class="mnz-nav__dot"></span><span class="mnz-nav__label">Statistics</span>
-    </a>
-</div>
-
-<div class="mnz-side__foot">
-    <div class="mnz-side__title">Client portal</div>
-    <a href="{{ route('client.dashboard') }}" class="mnz-nav">
-        <span class="mnz-nav__dot"></span>
-        <span class="mnz-nav__label">Company dashboard</span>
-        <span class="mnz-nav__meta">↗</span>
     </a>
 </div>

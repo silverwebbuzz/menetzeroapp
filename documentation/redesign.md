@@ -6300,3 +6300,39 @@ Run: `php artisan optimize:clear`
 
 If the width still looks unchanged, hard-reload once (Cmd/Ctrl+Shift+R) -- the
 version bump handles new visits, not a page already open.
+
+## 92. Removed "Back to Client Portal" from the admin nav
+
+The admin sidebar carried a link to `client.dashboard`, which read as though
+admin were a section of the client portal and prompted the reasonable question
+of whether the reverse path existed.
+
+**It did not.** Checked before removing anything:
+
+* No admin route is linked from any client or consultant view. Every
+  `route('admin.*)` reference outside `resources/views/admin/` is inside
+  `themes/new/admin/` -- the admin views' own new-theme twins.
+* The single `'gate' => 'admin'` in `config/navigation.php` is on
+  `settings.reporting`, a client settings page. It means COMPANY admin, an
+  unrelated concept.
+* `client.dashboard` is behind `auth:web`, the admin panel behind
+  `auth:admin` -- separate guards, separate models (§ EnsureSuperAdmin). A
+  client session cannot satisfy the admin guard.
+
+So the link was one-way and cosmetic. Removed anyway: for an admin without a
+client session it led to a login screen, and a portal advertising a way "back"
+to somewhere it did not come from invites exactly the suspicion it caused.
+
+Removed from BOTH navs -- `admin/partials/nav.blade.php` and its new-theme twin
+-- and the twin's header comment, which documented "Two links leave the admin
+portal", was corrected rather than left describing a link that no longer exists.
+
+`.mnz-side__foot` (`margin: auto 8px 0`, which pushed the block to the sidebar
+bottom) is still used by the consultant nav, so the CSS rule stays live and
+needed no change.
+
+**Verified:** both navs balanced (12/12 divs each, no orphaned section, both
+now ending cleanly on Statistics); both layouts confirmed to include their own
+nav partial, so both edits take effect; 52 theme files scan clean.
+
+Run: `php artisan optimize:clear`
