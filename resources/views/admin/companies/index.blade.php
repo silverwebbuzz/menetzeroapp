@@ -41,11 +41,38 @@
     </div>
 
     {{-- Table card --}}
+    {{-- Three-way split. company_type alone does not separate a direct client
+         from a consultant-managed one -- both are 'client'. See
+         SuperAdminController::companies(). --}}
+    <div class="flex flex-wrap gap-2 mb-4">
+        @foreach ([
+            'direct' => 'Direct companies',
+            'managed' => 'With a consultant',
+            'consultant' => 'Consultants',
+        ] as $key => $label)
+            <a href="{{ route('admin.companies.index', ['tab' => $key]) }}"
+               class="px-4 py-2 rounded-lg text-sm font-medium {{ $tab === $key ? 'bg-purple-600 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50' }}">
+                {{ $label }}
+                <span class="ml-1 opacity-70">{{ $counts[$key] }}</span>
+            </a>
+        @endforeach
+    </div>
+
     <div class="card">
         <div class="card-header">
             <div>
-                <h2 class="card-title">All Companies</h2>
-                <p class="card-subtitle">Filter by type or search by name and email.</p>
+                <h2 class="card-title">
+                    @if($tab === 'consultant') Consultants
+                    @elseif($tab === 'managed') Companies with a consultant
+                    @else Direct companies
+                    @endif
+                </h2>
+                <p class="card-subtitle">
+                    @if($tab === 'consultant') Consultant agency organisations.
+                    @elseif($tab === 'managed') Client companies managed by a consultant.
+                    @else Client companies that signed up directly.
+                    @endif
+                </p>
             </div>
 
             <form method="GET" class="flex flex-wrap items-center gap-2">
@@ -62,11 +89,16 @@
                         style="padding-left: 2.125rem; min-width: 16rem;"
                     >
                 </div>
-                <select name="type" class="form-select" style="min-width: 9rem;">
-                    <option value="">All types</option>
-                    <option value="client" {{ request('type') === 'client' ? 'selected' : '' }}>Client</option>
-                    <option value="consultant" {{ request('type') === 'consultant' ? 'selected' : '' }}>Consultant</option>
-                </select>
+                {{-- Carry the tab through search, or searching would drop
+                     the user back to the default list. --}}
+                <input type="hidden" name="tab" value="{{ $tab }}">
+
+                <label class="flex items-center gap-1.5 text-sm text-slate-600">
+                    <input type="checkbox" name="dormant" value="1" {{ request()->boolean('dormant') ? 'checked' : '' }}>
+                    Dormant only
+                </label>
+                <input type="number" name="dormant_days" value="{{ $dormantDays }}" min="7" max="365"
+                       class="form-control" style="width: 5.5rem;" title="Days with no activity">
                 <button type="submit" class="btn btn-primary">Apply</button>
             </form>
         </div>
@@ -78,6 +110,8 @@
                         <th>Company</th>
                         <th>Email</th>
                         <th>Type</th>
+                        <th>Last login</th>
+                        <th>Data</th>
                         <th>Status</th>
                         <th>Created</th>
                         <th class="text-right">Actions</th>
@@ -108,6 +142,41 @@
                                 @else
                                     <span class="badge badge-brand badge-dot">Client</span>
                                 @endif
+                                @if($company->consultantOrg)
+                                    <div class="text-xs text-slate-500 truncate">via {{ $company->consultantOrg->name }}</div>
+                                @endif
+                            </td>
+
+                            {{-- users_max_last_login_at comes from withMax(): the most
+                                 recent sign-in by anyone at this company. Null means
+                                 nobody has ever logged in since tracking was added. --}}
+                            @php
+                                $lastLogin = $company->users_max_last_login_at
+                                    ? \Illuminate\Support\Carbon::parse($company->users_max_last_login_at)
+                                    : null;
+                                $idleDays = $lastLogin ? (int) $lastLogin->diffInDays(now()) : null;
+                                $hasData = ($company->carbon_emissions_count ?? 0) > 0
+                                    || ($company->locations_count ?? 0) > 0;
+                            @endphp
+                            <td>
+                                @if($lastLogin)
+                                    <div class="cell-strong">{{ $lastLogin->format('d M Y') }}</div>
+                                    <div class="text-xs {{ $idleDays > 30 ? 'text-amber-600' : 'text-slate-500' }}">
+                                        {{ $idleDays === 0 ? 'today' : $idleDays . 'd ago' }}
+                                    </div>
+                                @else
+                                    <span class="text-xs text-slate-400">never</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($hasData)
+                                    <div class="text-xs text-slate-600">
+                                        {{ $company->carbon_emissions_count ?? 0 }} entries ·
+                                        {{ $company->locations_count ?? 0 }} sites
+                                    </div>
+                                @else
+                                    <span class="badge badge-warning">no data</span>
+                                @endif
                             </td>
                             <td>
                                 @if($company->is_active)
@@ -130,7 +199,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center py-10 cell-muted">
+                            <td colspan="8" class="text-center py-10 cell-muted">
                                 <div class="flex flex-col items-center gap-2">
                                     <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>

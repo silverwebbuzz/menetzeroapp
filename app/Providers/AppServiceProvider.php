@@ -7,6 +7,9 @@ use App\Http\View\Composers\PlanGateComposer;
 use App\Support\PlanGate;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
+use App\Listeners\RecordSuccessfulLogin;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -26,6 +29,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Login tracking. Illuminate\Auth\Events\Login fires for every guard
+        // (web, consultant, admin), so this single registration covers all
+        // three without editing any login controller.
+        Event::listen(Login::class, RecordSuccessfulLogin::class);
+
         // MENetZero 2.0 (Phase 0): every composer below is bound to BOTH the
         // existing view names and their 'theme-new::' equivalents.
         //

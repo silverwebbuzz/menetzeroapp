@@ -48,27 +48,77 @@ class SuperAdminController extends Controller
     /**
      * Manage Companies
      */
+    /**
+     * Organisation list, split three ways.
+     *
+     * company_type alone does not separate a direct client from one a
+     * consultant manages -- both are company_type = 'client'. The distinction
+     * is Company::isManagedClient(): consultant_id set AND is_direct_client
+     * false. The tabs mirror that:
+     *
+     *   direct    -> client companies with no consultant
+     *   managed   -> client companies belonging to a consultant
+     *   consultant-> the agency organisations themselves
+     */
     public function companies(Request $request)
     {
-        $query = Company::query();
-
-        // Filters
-        if ($request->filled('type')) {
-            $query->where('company_type', $request->type);
+        $tab = $request->query('tab', 'direct');
+        if (!in_array($tab, ['direct', 'managed', 'consultant'], true)) {
+            $tab = 'direct';
         }
 
+        $query = Company::query();
+
+        match ($tab) {
+            'consultant' => $query->where('company_type', 'consultant'),
+            'managed' => $query->where('company_type', '!=', 'consultant')
+                ->whereNotNull('consultant_id')
+                ->where('is_direct_client', false),
+            default => $query->where('company_type', '!=', 'consultant')
+                ->where(fn ($q) => $q->whereNull('consultant_id')->orWhere('is_direct_client', true)),
+        };
+
         if ($request->filled('search')) {
-            $query->where(function($q) use ($request) {
+            $query->where(function ($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->search . '%')
                   ->orWhere('email', 'like', '%' . $request->search . '%');
             });
         }
 
-        $companies = $query->with(['clientSubscriptions.plan'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+        // Dormant = on a free plan, and nothing entered for N days. Judged on
+        // real data (emissions + locations) as well as last login, because
+        // signing in and entering nothing is exactly the case being looked for.
+        $dormantDays = (int) $request->query('dormant_days', 30);
+        if ($request->boolean('dormant')) {
+            $cutoff = now()->subDays($dormantDays);
 
-        return view('admin.companies.index', compact('companies'));
+            $query->whereDoesntHave('carbonEmissions', fn ($q) => $q->where('created_at', '>=', $cutoff))
+                ->whereDoesntHave('locations', fn ($q) => $q->where('created_at', '>=', $cutoff))
+                ->where('created_at', '<', $cutoff)
+                ->where(function ($q) {
+                    $q->whereDoesntHave('clientSubscriptions.plan', fn ($p) => $p->where('price_annual', '>', 0));
+                });
+        }
+
+        $companies = $query->with(['clientSubscriptions.plan', 'consultantOrg'])
+            ->withCount(['users', 'carbonEmissions', 'locations'])
+            ->withMax('users', 'last_login_at')
+            ->orderBy('created_at', 'desc')
+            ->paginate(20)
+            ->withQueryString();
+
+        $counts = [
+            'direct' => Company::where('company_type', '!=', 'consultant')
+                ->where(fn ($q) => $q->whereNull('consultant_id')->orWhere('is_direct_client', true))
+                ->count(),
+            'managed' => Company::where('company_type', '!=', 'consultant')
+                ->whereNotNull('consultant_id')
+                ->where('is_direct_client', false)
+                ->count(),
+            'consultant' => Company::where('company_type', 'consultant')->count(),
+        ];
+
+        return view('admin.companies.index', compact('companies', 'tab', 'counts', 'dormantDays'));
     }
 
     /**

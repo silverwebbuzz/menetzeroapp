@@ -231,6 +231,77 @@
             </div>
         </div>
 
+    {{-- ACTIVITY. last_login_* are written by RecordSuccessfulLogin on every
+         successful sign-in (all three guards). Null means the account has not
+         signed in since login tracking was added, NOT that it never has --
+         the columns start empty for everyone. --}}
+    @php
+        $lastLogin = $company->users->max('last_login_at');
+        $lastLogin = $lastLogin ? \Illuminate\Support\Carbon::parse($lastLogin) : null;
+        $idleDays = $lastLogin ? (int) $lastLogin->diffInDays(now()) : null;
+        $lastEntry = $company->carbonEmissions()->max('created_at');
+        $lastEntry = $lastEntry ? \Illuminate\Support\Carbon::parse($lastEntry) : null;
+    @endphp
+
+    <div class="bg-white shadow rounded-lg mt-8">
+        <div class="px-5 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">Activity</h2>
+        </div>
+        <div class="p-5">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm mb-6">
+                <div>
+                    <div class="text-xs text-gray-500">Last login</div>
+                    <div class="font-semibold {{ $idleDays !== null && $idleDays > 30 ? 'text-amber-600' : 'text-gray-900' }}">
+                        {{ $lastLogin ? $lastLogin->format('d M Y') : 'Never' }}
+                    </div>
+                    @if($idleDays !== null)
+                        <div class="text-xs text-gray-500">{{ $idleDays === 0 ? 'today' : $idleDays . ' days ago' }}</div>
+                    @endif
+                </div>
+                <div>
+                    <div class="text-xs text-gray-500">Registered</div>
+                    <div class="font-semibold text-gray-900">{{ $company->created_at?->format('d M Y') ?? '—' }}</div>
+                </div>
+                <div>
+                    <div class="text-xs text-gray-500">Emission entries</div>
+                    <div class="font-semibold text-gray-900">{{ $company->carbonEmissions()->count() }}</div>
+                </div>
+                <div>
+                    <div class="text-xs text-gray-500">Last data entered</div>
+                    <div class="font-semibold text-gray-900">{{ $lastEntry ? $lastEntry->format('d M Y') : 'Never' }}</div>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm">
+                    <thead>
+                        <tr class="text-left text-xs text-gray-500 border-b border-gray-200">
+                            <th class="py-2">User</th>
+                            <th class="py-2">Last login</th>
+                            <th class="py-2">From</th>
+                            <th class="py-2 text-right">Logins</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($company->users as $u)
+                            <tr class="border-b border-gray-100">
+                                <td class="py-2">
+                                    <div class="font-medium text-gray-900">{{ $u->name }}</div>
+                                    <div class="text-xs text-gray-500">{{ $u->email }}</div>
+                                </td>
+                                <td class="py-2 text-gray-600">
+                                    {{ $u->last_login_at ? \Illuminate\Support\Carbon::parse($u->last_login_at)->format('d M Y H:i') : 'Never' }}
+                                </td>
+                                <td class="py-2 text-gray-500 font-mono text-xs">{{ $u->last_login_ip ?: '—' }}</td>
+                                <td class="py-2 text-right text-gray-600">{{ $u->login_count ?? 0 }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     {{-- DANGER ZONE. Typed-name confirmation rather than a JS confirm():
          this erases an organisation and every record cascading from it, and a
          stray Enter key must not be able to do that. The button stays disabled

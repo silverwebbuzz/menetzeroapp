@@ -6006,3 +6006,66 @@ in the application. Test on a throwaway company FIRST -- create one, add a
 location and an emission entry, delete it, and confirm the related rows are
 gone and no other company was touched. Take a database backup before the first
 real deletion.
+
+## 86. Admin: three-way org split, login tracking, dormancy
+
+**Three tabs instead of one list.** `company_type` alone cannot separate a
+direct client from a consultant-managed one -- both are `client`. The split
+follows `Company::isManagedClient()` (consultant_id set AND is_direct_client
+false):
+
+| Tab | Query |
+|---|---|
+| Direct companies | not consultant, and (no consultant_id OR is_direct_client) |
+| With a consultant | not consultant, consultant_id set, is_direct_client false |
+| Consultants | company_type = 'consultant' |
+
+Each tab shows its own count. The old `type` dropdown is gone -- it offered
+Client/Consultant, which is the distinction the tabs now make properly. Search
+carries the tab in a hidden field, or searching would silently drop back to the
+default list.
+
+**Login tracking did not exist.** No `last_login_at`, no IP, no history
+anywhere -- so "when did they last log in" was unanswerable from stored data.
+Added three columns to `users`, `consultants` and `admins`, written by a
+`RecordSuccessfulLogin` listener on `Illuminate\Auth\Events\Login`. One
+registration covers all three guards, so no login controller was touched.
+
+The listener writes through the query builder rather than `$user->save()`:
+saving the model would persist any unsaved state as a side effect of logging
+in, and would fire model events that observers could mistake for a content
+change. Failures are logged and swallowed -- tracking must never block a
+sign-in.
+
+`UsageTracking` looked like the natural home for this and is a trap: the
+service exists but **nothing ever calls it**, so the table is empty. Activity
+is derived from `carbon_emissions` and `locations` `created_at` instead, which
+are really written.
+
+**Dormancy is a filter, not a job.** "Dormant only" plus a days threshold
+lists free-plan companies with no emissions, no locations and no sign-in inside
+the window, registered before it. Deletion stays the §85 manual button.
+
+Judged on data AND login, deliberately: the case being hunted is somebody who
+signed in, looked around and entered nothing, which a login-only test would
+call active and a data-only test could not date.
+
+**Caught before shipping:** adding two table columns left the empty-state
+`colspan="6"` against 8 columns, so the "no companies" row would have rendered
+misaligned. Now 8.
+
+**Verified:** all four PHP files balanced; every relation used
+(`users`, `carbonEmissions`, `locations`, `clientSubscriptions`,
+`consultantOrg`) confirmed to exist on Company; both views' directives and
+comments paired; no stale `request('type')` reference remains.
+
+Run:
+```
+php artisan migrate
+php artisan optimize:clear
+```
+
+**Untested by me:** nothing has executed. `last_login_at` starts NULL for
+everyone, so every account reads "Never" until it signs in again -- that is the
+columns being new, not the accounts being dormant. Wait for real logins before
+trusting the dormant filter, or it will list active customers.
