@@ -6399,39 +6399,44 @@ registration → business profile → first location and confirm the stepper sho
 ## 94. Business profile: two-column layout, narrower fields
 
 The §93 stepper landed but the screen still did not read like
-`Internal.dc.html`. Two concrete differences, both fixed.
+`Internal.dc.html`. Two differences, both fixed.
 
-**Field width.** The form was `md:grid-cols-2` throughout, so on a wide screen
-each input was roughly half the content area -- a ~700px box for "Business
-Name". The canvas uses
-`repeat(auto-fit, minmax(min(100%,260px), 1fr))`, which lands 3 across at that
-width. Now `md:grid-cols-2 xl:grid-cols-3`: two columns on a laptop, three on a
-wide monitor, one on mobile.
+**Field width.** The form was `md:grid-cols-2` throughout, so each input was
+roughly half the content area -- a ~700px box for "Business Name". The canvas
+uses `repeat(auto-fit, minmax(min(100%,260px), 1fr))`, which lands 3 across at
+that width. Now `md:grid-cols-2 xl:grid-cols-3`. The two textareas sit OUTSIDE
+those grids in their own `mt-4` wrappers, so they stay full width without a
+span override.
 
-The two textareas (business address, description) sit OUTSIDE those grids in
-their own `mt-4` wrappers, so they stay full width without a span override --
-checked rather than assumed, since squeezing a 4-row textarea into a third of
-the width would have been worse than the problem being fixed.
+**"Why complete your business profile?" moved beside the form**, as a sticky
+`<aside>` in a `lg:grid-cols-3` shell: `lg:col-span-2` form, `lg:col-span-1`
+rationale, stacking below `lg`.
 
-**"Why complete your business profile?" moved beside the form.** It was below
-it, after ~200 lines of fields, where nobody reads it. Now a `lg:col-span-1`
-sticky `<aside>` against a `lg:col-span-2` form column -- 2fr/1fr, about
-65/35 -- stacking under the form below `lg`. Its inner grid went from
-`md:grid-cols-2` to a single column, since it is now a third of the width
-rather than half the page.
+**The pre-existing stray `</div>` was the whole difficulty.** This file ended
+at depth -1 before any of this work: a card in the form closed one time too
+many, at the line just above the Why-Complete block.
 
-**A pre-existing stray `</div>` had to be fixed first.** The setup branch
-closed three wrappers after `</form>` but opened only two: the file arrived at
-`@else` with depth -1, confirmed against the pre-change backup (45/46 before,
-so not introduced here). Harmless while everything was one column; with a grid
-and an aside it would have let the sidebar escape its container. Removed, and
-the two real closes labelled. File is now 47/47.
+The first attempt treated that as junk and deleted it, then added two fresh
+wrappers -- which put the `<aside>` OUTSIDE the grid, because the form column
+was being closed early by the same imbalance. The screenshot showed the panel
+full-width and overflowing the card, which is exactly that.
+
+The fix was to stop deleting and start counting: the stray close is REUSED as
+the form column's close. Depth now reads 5->4 at `/form column` with the
+`<aside>` opening at 4 -- the same level, so both are direct children of the
+grid -- and the file ends at 0, which also repairs the -1 that predated this
+change.
+
+Lesson worth keeping: on an already-unbalanced file, tag counts alone are not
+enough. A per-line depth walk showing WHERE the imbalance sits is what
+distinguishes a stray tag from a load-bearing one, and I removed a load-bearing
+one first.
 
 Both themes covered: `themes/new/dashboard/` holds only `partials/`, with no
 `index.blade.php`, so the new theme falls through to this file.
 
-**Verified:** `<div>` 47/47, `<form>` 1/1, `<aside>` 1/1; all directives paired
-(`@error` 9/9 included); setup branch balanced in isolation at 42/42; 52 theme
-files scan clean.
+**Verified:** `<div>` 47/47, `<form>` 1/1, `<aside>` 1/1; `@if` 4/4,
+`@foreach` 1/1, `@error` 9/9; depth 0 at `@else`; 3 field grids widened; 52
+theme files scan clean; net diff 9 insertions / 12 deletions.
 
 Run: `php artisan optimize:clear`

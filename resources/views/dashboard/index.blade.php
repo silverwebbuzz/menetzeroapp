@@ -47,10 +47,8 @@
                 <form method="POST" action="{{ route('company.setup.store') }}" id="companySetupForm">
                     @csrf
 
-                    {{-- Two columns, matching Internal.dc.html: the form carries the
-                         work, the rationale sits beside it rather than below. At
-                         lg it is roughly 2fr / 1fr (~65% / 35%); below that the
-                         panel stacks under the form. --}}
+                    {{-- Two columns, per Internal.dc.html: the form carries the work,
+                         the rationale sits beside it. ~2fr/1fr at lg; stacks below. --}}
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                     <div class="lg:col-span-2 space-y-6">
 
@@ -243,13 +241,11 @@
                         });
                     });
                     </script>
-                    </div>
+                    </div>{{-- /form column. This close was previously stray: the
+                             file ended at depth -1 before the two-column layout,
+                             so it is reused here rather than removed. --}}
 
-                    </div>{{-- /form column --}}
-
-                    {{-- Rationale column. sticky so it stays in view while the
-                         form scrolls; single column here because it is a third
-                         of the width, not half the page. --}}
+                    {{-- Rationale column, sticky beside the form. --}}
                     <aside class="lg:col-span-1 lg:sticky lg:top-6">
                     <div class="bg-gradient-to-b from-emerald-50 to-teal-50 border border-emerald-200 rounded-lg p-5">
                         <h3 class="text-base font-semibold text-emerald-900 mb-4">Why complete your business profile?</h3>
@@ -311,8 +307,9 @@
                         </div>
                     </div>
                 </form>
-            </div>{{-- /white card --}}
-        </div>{{-- /w-full --}}
+            </div>
+        </div>
+    </div>
 @else
     {{-- SETUP COMPLETE. Shown once, on the redirect after the first location.
          Flashed, so it does not reappear on later visits.
