@@ -231,6 +231,74 @@
             </div>
         </div>
 
+    {{-- MANAGED CLIENTS. Uses consultant_id alone -- the same test
+         OrganisationDeletionService::blockerFor() applies -- so what the delete
+         blocker counts is exactly what is listed here. An earlier version
+         filtered on is_direct_client too and produced a company that blocked
+         the delete while appearing nowhere. --}}
+    @php
+        $managedClients = \App\Models\Company::where('consultant_id', $company->id)
+            ->withCount(['carbonEmissions', 'locations'])
+            ->orderBy('name')
+            ->get();
+    @endphp
+
+    @if($company->company_type === 'consultant' || $managedClients->isNotEmpty())
+        <div class="bg-white shadow rounded-lg mt-8">
+            <div class="px-5 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">
+                    Client companies ({{ $managedClients->count() }})
+                </h2>
+                <p class="text-xs text-gray-500 mt-1">Companies this agency manages.</p>
+            </div>
+
+            @if($managedClients->isEmpty())
+                <div class="p-5 text-sm text-gray-500">No client companies.</div>
+            @else
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead>
+                            <tr class="text-left text-xs text-gray-500 border-b border-gray-200">
+                                <th class="px-5 py-2">Company</th>
+                                <th class="px-5 py-2">Type</th>
+                                <th class="px-5 py-2">Data</th>
+                                <th class="px-5 py-2">Registered</th>
+                                <th class="px-5 py-2 text-right">Open</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($managedClients as $mc)
+                                <tr class="border-b border-gray-100">
+                                    <td class="px-5 py-2">
+                                        <div class="font-medium text-gray-900">{{ $mc->name }}</div>
+                                        <div class="text-xs text-gray-500">{{ $mc->email ?: '—' }}</div>
+                                    </td>
+                                    <td class="px-5 py-2">
+                                        {{-- is_direct_client separates a referred customer who pays
+                                             us directly from a workspace the agency runs. Both point
+                                             at this agency, so both block its deletion. --}}
+                                        @if($mc->is_direct_client)
+                                            <span class="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">Direct (referred)</span>
+                                        @else
+                                            <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">Managed</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-5 py-2 text-xs text-gray-600">
+                                        {{ $mc->carbon_emissions_count }} entries · {{ $mc->locations_count }} sites
+                                    </td>
+                                    <td class="px-5 py-2 text-gray-600">{{ $mc->created_at?->format('d M Y') ?? '—' }}</td>
+                                    <td class="px-5 py-2 text-right">
+                                        <a href="{{ route('admin.companies.show', $mc->id) }}" class="text-purple-600 hover:underline">View</a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </div>
+    @endif
+
     {{-- ACTIVITY. last_login_* are written by RecordSuccessfulLogin on every
          successful sign-in (all three guards). Null means the account has not
          signed in since login tracking was added, NOT that it never has --

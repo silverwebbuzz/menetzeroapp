@@ -49,34 +49,30 @@ class SuperAdminController extends Controller
      * Manage Companies
      */
     /**
-     * Organisation list, split three ways.
+     * Organisation list: direct companies, or consultants.
      *
-     * company_type alone does not separate a direct client from one a
-     * consultant manages -- both are company_type = 'client'. The distinction
-     * is Company::isManagedClient(): consultant_id set AND is_direct_client
-     * false. The tabs mirror that:
+     * Companies a consultant manages are NOT a top-level tab -- they belong to
+     * their agency and are listed on its detail page. "Direct" therefore means
+     * any client company with no consultant behind it at all.
      *
-     *   direct    -> client companies with no consultant
-     *   managed   -> client companies belonging to a consultant
-     *   consultant-> the agency organisations themselves
+     * The consultant_id test is used ALONE here, deliberately. Company::
+     * isManagedClient() additionally requires is_direct_client = false, but
+     * OrganisationDeletionService::blockerFor() blocks on consultant_id alone.
+     * Using the stricter test in the list produced a company that blocked a
+     * deletion while appearing in no tab -- see redesign.md §87.
      */
     public function companies(Request $request)
     {
-        $tab = $request->query('tab', 'direct');
-        if (!in_array($tab, ['direct', 'managed', 'consultant'], true)) {
-            $tab = 'direct';
-        }
+        $tab = $request->query('tab') === 'consultant' ? 'consultant' : 'direct';
 
         $query = Company::query();
 
-        match ($tab) {
-            'consultant' => $query->where('company_type', 'consultant'),
-            'managed' => $query->where('company_type', '!=', 'consultant')
-                ->whereNotNull('consultant_id')
-                ->where('is_direct_client', false),
-            default => $query->where('company_type', '!=', 'consultant')
-                ->where(fn ($q) => $q->whereNull('consultant_id')->orWhere('is_direct_client', true)),
-        };
+        if ($tab === 'consultant') {
+            $query->where('company_type', 'consultant');
+        } else {
+            $query->where('company_type', '!=', 'consultant')
+                ->whereNull('consultant_id');
+        }
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
@@ -85,9 +81,9 @@ class SuperAdminController extends Controller
             });
         }
 
-        // Dormant = on a free plan, and nothing entered for N days. Judged on
-        // real data (emissions + locations) as well as last login, because
-        // signing in and entering nothing is exactly the case being looked for.
+        // Dormant = free plan, and nothing entered for N days. Judged on real
+        // data (emissions + locations) as well as last login, because signing
+        // in and entering nothing is exactly the case being looked for.
         $dormantDays = (int) $request->query('dormant_days', 30);
         if ($request->boolean('dormant')) {
             $cutoff = now()->subDays($dormantDays);
@@ -95,13 +91,11 @@ class SuperAdminController extends Controller
             $query->whereDoesntHave('carbonEmissions', fn ($q) => $q->where('created_at', '>=', $cutoff))
                 ->whereDoesntHave('locations', fn ($q) => $q->where('created_at', '>=', $cutoff))
                 ->where('created_at', '<', $cutoff)
-                ->where(function ($q) {
-                    $q->whereDoesntHave('clientSubscriptions.plan', fn ($p) => $p->where('price_annual', '>', 0));
-                });
+                ->whereDoesntHave('clientSubscriptions.plan', fn ($p) => $p->where('price_annual', '>', 0));
         }
 
-        $companies = $query->with(['clientSubscriptions.plan', 'consultantOrg'])
-            ->withCount(['users', 'carbonEmissions', 'locations'])
+        $companies = $query->with(['clientSubscriptions.plan'])
+            ->withCount(['users', 'carbonEmissions', 'locations', 'managedClients'])
             ->withMax('users', 'last_login_at')
             ->orderBy('created_at', 'desc')
             ->paginate(20)
@@ -109,11 +103,7 @@ class SuperAdminController extends Controller
 
         $counts = [
             'direct' => Company::where('company_type', '!=', 'consultant')
-                ->where(fn ($q) => $q->whereNull('consultant_id')->orWhere('is_direct_client', true))
-                ->count(),
-            'managed' => Company::where('company_type', '!=', 'consultant')
-                ->whereNotNull('consultant_id')
-                ->where('is_direct_client', false)
+                ->whereNull('consultant_id')
                 ->count(),
             'consultant' => Company::where('company_type', 'consultant')->count(),
         ];

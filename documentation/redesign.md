@@ -6069,3 +6069,60 @@ php artisan optimize:clear
 everyone, so every account reads "Never" until it signs in again -- that is the
 columns being new, not the accounts being dormant. Wait for real logins before
 trusting the dormant filter, or it will list active customers.
+
+## 87. Two tabs, and a company that existed in no list
+
+Reported: a consultant detail page said "This agency still manages 2 client
+companies", but those 2 appeared in no tab.
+
+**Cause: two different definitions of "managed".**
+
+* `OrganisationDeletionService::blockerFor()` counts `consultant_id = agency`,
+  full stop.
+* The `managed` tab additionally required `is_direct_client = false`, following
+  `Company::isManagedClient()`.
+
+Both writers set `consultant_id`, but with opposite `is_direct_client`:
+`ConsultantAgencyClientService` creates managed workspaces with `false`,
+while a referred customer who pays MENetZero directly is `true`. A referred
+company therefore blocked its agency's deletion while being invisible in the
+list that was supposed to show what was blocking it.
+
+Fixed by using `consultant_id` alone everywhere the blocker uses it. The list,
+the count and the blocker now cannot disagree.
+
+**Restructured to two tabs.** Managed companies are no longer top-level; they
+belong to their agency:
+
+| Tab | Query |
+|---|---|
+| Direct companies | not consultant, `consultant_id` NULL |
+| Consultants | `company_type = 'consultant'` |
+
+"Direct" now means genuinely unattached -- any company with a consultant behind
+it, referred or managed, is listed on that agency's page instead. The
+consultant tab shows a client count per row
+(`withCount('managedClients')`, which is `hasMany(Company, 'consultant_id')` --
+the same test as the blocker).
+
+The agency detail page gained a **Client companies** table listing every one of
+them, each labelled *Managed* or *Direct (referred)* so the distinction stays
+visible, with a link through to each company. That is where the 2 companies now
+appear.
+
+Removed with the tab: the "via {consultant}" line under Type, which is now
+meaningless (the direct tab has no consultant by definition, and the consultant
+tab rows ARE the agencies), and the `consultantOrg` eager-load that fed it.
+
+**Verified:** no stale `'managed'` reference in the controller or view; no
+orphaned `consultantOrg` use; `managedClients` confirmed to exist on Company
+and to key on `consultant_id`; all directives and comments paired; controller
+balanced.
+
+Run: `php artisan optimize:clear`
+
+To see which 2 companies were involved:
+```sql
+SELECT id, name, email, company_type, is_direct_client, consultant_id
+FROM companies WHERE consultant_id IS NOT NULL;
+```

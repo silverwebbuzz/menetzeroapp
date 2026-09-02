@@ -47,7 +47,6 @@
     <div class="flex flex-wrap gap-2 mb-4">
         @foreach ([
             'direct' => 'Direct companies',
-            'managed' => 'With a consultant',
             'consultant' => 'Consultants',
         ] as $key => $label)
             <a href="{{ route('admin.companies.index', ['tab' => $key]) }}"
@@ -61,17 +60,11 @@
     <div class="card">
         <div class="card-header">
             <div>
-                <h2 class="card-title">
-                    @if($tab === 'consultant') Consultants
-                    @elseif($tab === 'managed') Companies with a consultant
-                    @else Direct companies
-                    @endif
-                </h2>
+                <h2 class="card-title">{{ $tab === 'consultant' ? 'Consultants' : 'Direct companies' }}</h2>
                 <p class="card-subtitle">
-                    @if($tab === 'consultant') Consultant agency organisations.
-                    @elseif($tab === 'managed') Client companies managed by a consultant.
-                    @else Client companies that signed up directly.
-                    @endif
+                    {{ $tab === 'consultant'
+                        ? 'Consultant agencies. Their client companies are listed on each agency page.'
+                        : 'Client companies that signed up directly, with no consultant behind them.' }}
                 </p>
             </div>
 
@@ -111,7 +104,7 @@
                         <th>Email</th>
                         <th>Type</th>
                         <th>Last login</th>
-                        <th>Data</th>
+                        <th>{{ $tab === 'consultant' ? 'Clients' : 'Data' }}</th>
                         <th>Status</th>
                         <th>Created</th>
                         <th class="text-right">Actions</th>
@@ -142,9 +135,6 @@
                                 @else
                                     <span class="badge badge-brand badge-dot">Client</span>
                                 @endif
-                                @if($company->consultantOrg)
-                                    <div class="text-xs text-slate-500 truncate">via {{ $company->consultantOrg->name }}</div>
-                                @endif
                             </td>
 
                             {{-- users_max_last_login_at comes from withMax(): the most
@@ -169,7 +159,15 @@
                                 @endif
                             </td>
                             <td>
-                                @if($hasData)
+                                @if($tab === 'consultant')
+                                    {{-- managed_clients_count uses consultant_id alone, the same
+                                         test OrganisationDeletionService::blockerFor() applies, so
+                                         this number always agrees with the delete blocker. --}}
+                                    <div class="text-xs text-slate-600">
+                                        {{ $company->managed_clients_count ?? 0 }}
+                                        {{ ($company->managed_clients_count ?? 0) === 1 ? 'client' : 'clients' }}
+                                    </div>
+                                @elseif($hasData)
                                     <div class="text-xs text-slate-600">
                                         {{ $company->carbon_emissions_count ?? 0 }} entries ·
                                         {{ $company->locations_count ?? 0 }} sites
