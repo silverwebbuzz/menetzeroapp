@@ -136,8 +136,11 @@ class LocationController extends Controller
         ]);
 
         if ($isFirstLocation || $request->boolean('onboarding')) {
+            // setup_complete drives the one-time panel on the dashboard. Flashed
+            // rather than persisted: it is a moment, not a state, and the panel
+            // must not reappear on every later visit.
             return redirect()->route('client.dashboard')
-                ->with('success', 'Location added. You can now start entering emission data.');
+                ->with('setup_complete', true);
         }
 
         return redirect()->route('locations.index')->with('success', 'Location created successfully!');
@@ -247,9 +250,11 @@ class LocationController extends Controller
                 // Clear session after final step
                 session()->forget('location_id');
 
+                // Same flag as the single-step path above: both finish onboarding,
+                // and the panel must not depend on which form was used.
                 if ($request->boolean('onboarding') || $company->locations()->where('is_active', true)->count() === 1) {
                     return redirect()->route('client.dashboard')
-                        ->with('success', 'Location added. You can now start entering emission data.');
+                        ->with('setup_complete', true);
                 }
 
                 return redirect()->route('locations.index')->with('success', 'Location created successfully!');

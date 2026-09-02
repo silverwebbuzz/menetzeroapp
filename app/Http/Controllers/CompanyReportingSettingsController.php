@@ -27,9 +27,19 @@ class CompanyReportingSettingsController extends Controller
             ]
         );
 
+        // The base-year nudge is shown only when the question is answerable:
+        // there is data to measure against, and no base year set yet. Prompting
+        // before either is true asks the user to guess.
+        $entryCount = $company->carbonEmissions()->count();
+        $earliestEntry = $entryCount > 0
+            ? $company->carbonEmissions()->min('created_at')
+            : null;
+
         return view('settings.reporting', [
             'company' => $company,
             'settings' => $settings,
+            'entryCount' => $entryCount,
+            'earliestEntry' => $earliestEntry,
             'fiscalYear' => $fiscalYear,
             'boundaries' => CompanyReportingSetting::BOUNDARIES,
             'scope3Categories' => CompanyReportingSetting::SCOPE3_CATEGORIES,

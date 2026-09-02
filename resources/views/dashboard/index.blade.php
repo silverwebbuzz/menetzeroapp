@@ -6,6 +6,8 @@
 @if(isset($needsCompanySetup) && $needsCompanySetup)
     <!-- Company Setup Form - Show ONLY when company not added -->
     <div class="w-full">
+        @include('partials.onboarding-stepper', ['current' => 'business'])
+
         <div class="bg-white rounded-lg shadow-lg border border-gray-200">
             <!-- Setup Header -->
             <div class="flex items-center justify-between p-6 border-b border-gray-200">
@@ -298,6 +300,44 @@
         </div>
     </div>
 @else
+    {{-- SETUP COMPLETE. Shown once, on the redirect after the first location.
+         Flashed, so it does not reappear on later visits.
+
+         Quick Input is the primary action: setup exists to make data entry
+         possible, so the moment it finishes the next step should be obvious.
+         Reporting boundary is offered as a secondary link rather than a step,
+         because nothing in EmissionCalculationService reads base year or
+         consolidation approach -- they matter at reporting time, and asking
+         before there is data to compare against is asking too early. --}}
+    @if(session('setup_complete'))
+        <div class="bg-white rounded-lg border border-green-200 p-5 mb-6">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-50 border border-green-200 text-green-700 text-xs font-semibold">✓</span>
+                        <h3 class="text-base font-semibold text-gray-900">You're set up</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1">
+                        Your business profile and first location are saved. You can start entering emission data now.
+                    </p>
+                    <p class="text-xs text-gray-500 mt-2">
+                        Reporting settings — base year, consolidation approach, intensity denominator —
+                        can be set whenever you are ready. They affect reports, not data entry.
+                    </p>
+                </div>
+                <div class="flex flex-wrap items-center gap-3">
+                    <a href="{{ route('quick-input.index') }}"
+                       class="px-4 py-2.5 bg-brand text-white text-sm font-semibold rounded-lg hover:opacity-90">
+                        Enter your first data
+                    </a>
+                    <a href="{{ route('settings.reporting') }}" class="text-sm text-gray-600 hover:text-gray-900 underline">
+                        Set reporting boundary
+                    </a>
+                </div>
+            </div>
+        </div>
+    @endif
+
     {{-- ESG performance cards, ABOVE the existing dashboard. Additive: the
          enterprise panel below is unchanged. Renders nothing when $esgCards
          is null, so the onboarding path and any service failure are safe.

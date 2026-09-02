@@ -18,6 +18,25 @@
 @section('content')
 <div class="mnz-stack" data-pillar="e">
 
+    {{-- Base-year nudge; see the old-theme twin for the reasoning. --}}
+    @if(($entryCount ?? 0) > 0 && blank($settings->base_year ?? null))
+        <div class="mnz-panel" style="border-color:var(--warn-line,#e6d5a8);background:var(--warn-tint,#fdf8ec)">
+            <div class="mnz-panel__body">
+                <div style="font-weight:600;font-size:13px">Set a base year to track reductions</div>
+                <p class="mnz-muted" style="margin:6px 0 0">
+                    You have {{ number_format($entryCount) }}
+                    {{ $entryCount === 1 ? 'entry' : 'entries' }}
+                    @if(!empty($earliestEntry))
+                        going back to {{ \Illuminate\Support\Carbon::parse($earliestEntry)->format('F Y') }}
+                    @endif
+                    . Reduction targets are measured against a base year, so nothing can be
+                    reported as an increase or decrease until one is set.
+                </p>
+            </div>
+        </div>
+    @endif
+
+
     <div class="mnz-pagehead">
         <div>
             <div class="mnz-kicker">Settings</div>

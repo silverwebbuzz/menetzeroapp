@@ -6336,3 +6336,62 @@ now ending cleanly on Statistics); both layouts confirmed to include their own
 nav partial, so both edits take effect; 52 theme files scan clean.
 
 Run: `php artisan optimize:clear`
+
+## 93. Onboarding: progress made visible, boundary deferred
+
+`Internal.dc.html` draws a four-step wizard: Company profile → Boundary →
+Locations → First data. Built the progress and the prompts, but **not** the
+step count -- and the reason is in the code, not preference.
+
+**`EmissionCalculationService` contains zero references to `base_year` or
+`consolidation_approach`.** They are read only by `EmissionsIntensityService`,
+`IeqtExportService` and `ReductionTargetProgressService` -- all reporting-time.
+What actually gates data entry is narrower:
+
+| Requirement | Why it blocks |
+|---|---|
+| country | `EmissionCalculationService` matches factors on `region` |
+| sector / industry | selects which sources and Scope 3 categories are offered |
+| one active location | an entry belongs to a site, whose country feeds region |
+
+`OnboardingService::currentStep()` already requires exactly those three, in two
+steps. Putting Boundary at step 2 would front-load the hardest question -- base
+year -- at the moment the user knows least, on a screen they must clear before
+doing anything. It also has a real default (`operational_control`) that suits
+most companies.
+
+**Three additions, no new required step:**
+
+1. **`partials/onboarding-stepper`** -- two states, mirroring
+   `OnboardingService` so it cannot drift from what the middleware enforces.
+   On `locations/create` it REPLACES the amber "you cannot enter emission data"
+   banner, which stated a restriction without showing position or remaining
+   work.
+
+2. **A "You're set up" panel** on the dashboard, flashed via `setup_complete`
+   from `LocationController`. Quick Input is the primary action; reporting
+   boundary a secondary link. Flashed, not persisted -- it is a moment, not a
+   state. Set on BOTH completion paths (single-step and multi-step location
+   forms), or it would have appeared for only one.
+
+3. **A base-year nudge** on `/settings/reporting`, shown only when
+   `entryCount > 0 && base_year is blank` -- the point at which the question is
+   answerable. It names the entry count and earliest month, so the prompt
+   carries the evidence for answering it. Added to both themes.
+
+The boundary screen itself was already complete in both themes, with more
+fields than the canvas draws (GWP version, recalculation policy, intensity
+denominator). Nothing there was rebuilt.
+
+**Verified:** all six changed views' directives and comments paired; both
+changed controllers balanced; `quick-input.index` and `settings.reporting`
+confirmed as real route names; `Company::carbonEmissions()` and
+`CompanyReportingSetting::base_year` confirmed to exist. Neither panel link is
+allow-listed in `EnsureOnboardingComplete`, which is correct -- the panel
+renders in the `@else` branch that only runs once onboarding is complete.
+
+Run: `php artisan optimize:clear`
+
+**Untested by me:** nothing has executed. Walk a new company through
+registration → business profile → first location and confirm the stepper shows
+1 of 2 then 2 of 2, and the panel appears once and not again on reload.

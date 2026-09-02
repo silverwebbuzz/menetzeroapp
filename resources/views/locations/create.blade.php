@@ -8,12 +8,12 @@
 @endpush
 
 @section('content')
+{{-- Progress, not a warning. The amber "you cannot enter emission data"
+     banner this replaces stated a restriction without showing where the user
+     was in the sequence or how much was left. --}}
 @if(request('onboarding') || (isset($company) && $company->locations()->where('is_active', true)->count() === 0))
-    <div class="max-w-4xl mx-auto mb-6">
-        <div class="bg-amber-50 border border-amber-200 text-amber-900 px-4 py-3 rounded-lg">
-            <p class="font-medium">Complete your setup</p>
-            <p class="text-sm mt-1">Add your first business location. You cannot enter emission data until this step is finished.</p>
-        </div>
+    <div class="max-w-4xl mx-auto">
+        @include('partials.onboarding-stepper', ['current' => 'location'])
     </div>
 @endif
 

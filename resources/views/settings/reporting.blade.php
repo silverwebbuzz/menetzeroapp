@@ -5,6 +5,26 @@
 
 @section('content')
 <div class="w-full">
+
+    {{-- BASE YEAR NUDGE. Shown only when there is data but no base year -- the
+         point at which the question becomes answerable. Asking during
+         onboarding (as Internal.dc.html draws it) puts the hardest question
+         first, before the user has anything to compare against. --}}
+    @if(($entryCount ?? 0) > 0 && blank($settings->base_year ?? null))
+        <div class="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mb-6">
+            <p class="text-sm font-medium text-amber-900">Set a base year to track reductions</p>
+            <p class="text-sm text-amber-800 mt-1">
+                You have {{ number_format($entryCount) }}
+                {{ $entryCount === 1 ? 'entry' : 'entries' }}
+                @if(!empty($earliestEntry))
+                    going back to {{ \Illuminate\Support\Carbon::parse($earliestEntry)->format('F Y') }}
+                @endif
+                . Reduction targets are measured against a base year, so nothing can be
+                reported as an increase or decrease until one is set.
+            </p>
+        </div>
+    @endif
+
     @if(session('success'))
         <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6">{{ session('success') }}</div>
     @endif
