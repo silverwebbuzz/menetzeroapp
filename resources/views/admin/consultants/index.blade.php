@@ -49,7 +49,7 @@
                              profile row -- Company::currentPlanName() resolves it. No
                              agency company yet means registration never completed. --}}
                         <td class="px-4 py-2">
-                            @php($planName = $c->agencyCompany?->currentPlanName())
+                            @php $planName = $c->agencyCompany?->currentPlanName(); @endphp
                             @if($planName)
                                 <span class="px-2 py-0.5 rounded-full text-xs bg-teal-50 text-teal-700">{{ $planName }}</span>
                             @elseif($c->agencyCompany)

@@ -138,6 +138,27 @@ def blade_php_brace_errors(src):
     return errs
 
 
+def blade_inline_php_errors(src):
+    """@php(...) whose expression contains parentheses.
+
+    Blade's inline form is compiled by matching to a closing paren; an
+    expression containing its own call parens is truncated, emitting
+    unbalanced PHP and a ParseError at render time. Cost a production 500
+    on /admin/companies (redesign.md 90).
+
+    @php($x = 'literal')            fine
+    @php($x = $y->method())         BREAKS -- use the @php ... @endphp block
+    """
+    errs = []
+    for m in re.finditer(r'@php\(([^\n]*)\)', src):
+        expr = m.group(1)
+        if '(' in expr or ')' in expr:
+            line = src[:m.start()].count('\n') + 1
+            errs.append(f'line {line}: @php(...) expression contains parentheses; '
+                        f'use a @php ... @endphp block instead')
+    return errs
+
+
 def main() -> int:
     css = set(re.findall(r'\.(mnz-[a-zA-Z0-9_-]+)',
                          open(os.path.join(ROOT, 'public/css/mnz-ui.css')).read()))
@@ -215,7 +236,8 @@ def main() -> int:
         _src = open(f).read()
         probs = (blade_structure_errors(_src)
                  + blade_include_errors(_src, all_views)
-                 + blade_php_brace_errors(_src))
+                 + blade_php_brace_errors(_src)
+                 + blade_inline_php_errors(_src))
         if probs:
             structural_failures += 1
             failures += 1
@@ -241,6 +263,7 @@ def main() -> int:
         problems += blade_structure_errors(src)
         problems += blade_include_errors(src, all_views)
         problems += blade_php_brace_errors(src)
+        problems += blade_inline_php_errors(src)
 
         undef = sorted(set(re.findall(r'\$([a-zA-Z_]\w*)', body)) - defined_vars(body))
         # A name reached ONLY through ?? / ?-> / isset() / empty() cannot cause a

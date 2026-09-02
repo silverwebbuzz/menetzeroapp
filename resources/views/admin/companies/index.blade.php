@@ -143,7 +143,7 @@
                                  client_subscriptions. Null means nothing active, which
                                  is the free tier. --}}
                             <td>
-                                @php($planName = $company->currentPlanName())
+                                @php $planName = $company->currentPlanName(); @endphp
                                 @if($planName)
                                     <span class="badge badge-brand">{{ $planName }}</span>
                                 @else

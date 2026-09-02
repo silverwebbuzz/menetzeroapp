@@ -290,7 +290,7 @@
                                         @endif
                                     </td>
                                     <td class="px-5 py-2">
-                                        @php($mcPlan = $mc->currentPlanName())
+                                        @php $mcPlan = $mc->currentPlanName(); @endphp
                                         @if($mcPlan)
                                             <span class="text-xs px-2 py-0.5 rounded-full bg-teal-50 text-teal-700">{{ $mcPlan }}</span>
                                         @else

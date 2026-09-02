@@ -6217,3 +6217,43 @@ on the companies list is the inline `@php($x = ...)` form, which is
 self-closing.
 
 Run: `php artisan optimize:clear`
+
+## 90. ParseError from @php() with a method call
+
+§89 took `/admin/companies` down:
+
+> ParseError: syntax error, unexpected token "@"
+> resources/views/admin/companies/index.blade.php:147
+
+**Cause.** Blade's inline `@php(...)` compiles by matching to a closing paren.
+An expression containing its own call parens is truncated:
+
+    @php($planName = $company->currentPlanName())
+
+is cut at `currentPlanName(`, emitting unbalanced PHP followed by a stray `)`
+and the next `@` -- hence "unexpected token @". The block form has no such
+limit.
+
+All three §89 cells used it. Converted to `@php ... @endphp`.
+
+**Why the pre-flight check missed it.** The checker verifies directive BALANCE,
+and `@php(...)` is self-closing, so `@php=3 @endphp=2` looked correct -- I even
+confirmed that count deliberately and moved on. Balance was never the issue;
+the failure is inside a directive that balances fine. `@php(` is also
+explicitly excluded from `blade_php_brace_errors()`, so nothing looked at its
+contents.
+
+The precedent I checked was misleading too: `@php(` does appear in nine other
+views, which I read as proof the form was safe. Every one of them is a simple
+string assignment (`@php($variant = 'default')`) with no parentheses in the
+expression. The form is fine; the form *with a call in it* is not.
+
+**Added `blade_inline_php_errors()` to `.claude/scripts/check-theme-views.py`**,
+flagging any `@php(...)` whose expression contains parentheses, wired into both
+scan paths. Verified it catches the broken line, passes the block form, and does
+not false-positive on the nine legitimate simple uses.
+
+Swept the whole view tree: no other `@php(` contains a call, so this was the
+only instance.
+
+Run: `php artisan optimize:clear`
