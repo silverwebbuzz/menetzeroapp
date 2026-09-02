@@ -44,14 +44,21 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('company.setup.store') }}" class="space-y-6" id="companySetupForm">
+                <form method="POST" action="{{ route('company.setup.store') }}" id="companySetupForm">
                     @csrf
-                    
+
+                    {{-- Two columns, matching Internal.dc.html: the form carries the
+                         work, the rationale sits beside it rather than below. At
+                         lg it is roughly 2fr / 1fr (~65% / 35%); below that the
+                         panel stacks under the form. --}}
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                    <div class="lg:col-span-2 space-y-6">
+
                     <!-- Business Information -->
                     <div class="bg-white border border-gray-200 rounded-lg p-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Business Information</h3>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Business Name *</label>
                                 <input class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" 
@@ -67,7 +74,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Business Website</label>
                                 <input class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" 
@@ -107,7 +114,7 @@
                         <h3 class="text-lg font-semibold text-gray-900 mb-2">Business Details</h3>
                         <p class="text-sm text-gray-600 mb-4">Describe briefly what your business does.</p>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                             <!-- Sector -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Sector *</label>
@@ -238,10 +245,15 @@
                     </script>
                     </div>
 
-                    <!-- Why Complete Section -->
-                    <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-lg p-6 mt-6">
-                        <h3 class="text-lg font-semibold text-emerald-900 mb-4">Why complete your business profile?</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    </div>{{-- /form column --}}
+
+                    {{-- Rationale column. sticky so it stays in view while the
+                         form scrolls; single column here because it is a third
+                         of the width, not half the page. --}}
+                    <aside class="lg:col-span-1 lg:sticky lg:top-6">
+                    <div class="bg-gradient-to-b from-emerald-50 to-teal-50 border border-emerald-200 rounded-lg p-5">
+                        <h3 class="text-base font-semibold text-emerald-900 mb-4">Why complete your business profile?</h3>
+                        <div class="grid grid-cols-1 gap-4">
                             <div class="flex items-start gap-3">
                                 <div class="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                                     <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
@@ -289,16 +301,18 @@
                         </div>
                     </div>
 
+                    </aside>
+                    </div>{{-- /two-column grid --}}
+
                     <!-- Action Buttons -->
-                    <div class="flex items-center justify-end pt-6 border-t border-gray-200">
+                    <div class="flex items-center justify-end pt-6 mt-6 border-t border-gray-200">
                         <div class="flex gap-3">
                             <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">Complete Setup</button>
                         </div>
                     </div>
                 </form>
-            </div>
-        </div>
-    </div>
+            </div>{{-- /white card --}}
+        </div>{{-- /w-full --}}
 @else
     {{-- SETUP COMPLETE. Shown once, on the redirect after the first location.
          Flashed, so it does not reappear on later visits.

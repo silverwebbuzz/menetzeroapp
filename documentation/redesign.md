@@ -6395,3 +6395,43 @@ Run: `php artisan optimize:clear`
 **Untested by me:** nothing has executed. Walk a new company through
 registration → business profile → first location and confirm the stepper shows
 1 of 2 then 2 of 2, and the panel appears once and not again on reload.
+
+## 94. Business profile: two-column layout, narrower fields
+
+The §93 stepper landed but the screen still did not read like
+`Internal.dc.html`. Two concrete differences, both fixed.
+
+**Field width.** The form was `md:grid-cols-2` throughout, so on a wide screen
+each input was roughly half the content area -- a ~700px box for "Business
+Name". The canvas uses
+`repeat(auto-fit, minmax(min(100%,260px), 1fr))`, which lands 3 across at that
+width. Now `md:grid-cols-2 xl:grid-cols-3`: two columns on a laptop, three on a
+wide monitor, one on mobile.
+
+The two textareas (business address, description) sit OUTSIDE those grids in
+their own `mt-4` wrappers, so they stay full width without a span override --
+checked rather than assumed, since squeezing a 4-row textarea into a third of
+the width would have been worse than the problem being fixed.
+
+**"Why complete your business profile?" moved beside the form.** It was below
+it, after ~200 lines of fields, where nobody reads it. Now a `lg:col-span-1`
+sticky `<aside>` against a `lg:col-span-2` form column -- 2fr/1fr, about
+65/35 -- stacking under the form below `lg`. Its inner grid went from
+`md:grid-cols-2` to a single column, since it is now a third of the width
+rather than half the page.
+
+**A pre-existing stray `</div>` had to be fixed first.** The setup branch
+closed three wrappers after `</form>` but opened only two: the file arrived at
+`@else` with depth -1, confirmed against the pre-change backup (45/46 before,
+so not introduced here). Harmless while everything was one column; with a grid
+and an aside it would have let the sidebar escape its container. Removed, and
+the two real closes labelled. File is now 47/47.
+
+Both themes covered: `themes/new/dashboard/` holds only `partials/`, with no
+`index.blade.php`, so the new theme falls through to this file.
+
+**Verified:** `<div>` 47/47, `<form>` 1/1, `<aside>` 1/1; all directives paired
+(`@error` 9/9 included); setup branch balanced in isolation at 42/42; 52 theme
+files scan clean.
+
+Run: `php artisan optimize:clear`
