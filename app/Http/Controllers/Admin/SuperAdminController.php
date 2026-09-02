@@ -11,6 +11,7 @@ use App\Models\RoleTemplate;
 use App\Models\Permission;
 use App\Models\ClientSubscription;
 use App\Models\UsageTracking;
+use App\Services\OrganisationDeletionService;
 use App\Services\SubscriptionService;
 
 class SuperAdminController extends Controller
@@ -457,6 +458,37 @@ class SuperAdminController extends Controller
             ->sum(function($sub) {
                 return $sub->plan->price_annual ?? 0;
             });
+    }
+
+    /**
+     * Permanently delete a company and everything belonging to it.
+     *
+     * Guarded by a typed-name confirmation: the admin must retype the exact
+     * company name. A misclick must not be able to erase an organisation, and
+     * typing the name forces them to read which one they are on.
+     */
+    public function destroyCompany(Request $request, $id, OrganisationDeletionService $deletions)
+    {
+        $company = Company::findOrFail($id);
+
+        $request->validate(['confirm_name' => 'required|string']);
+
+        if (trim($request->input('confirm_name')) !== trim((string) $company->name)) {
+            return back()->with('error', 'The name you typed does not match. Nothing was deleted.');
+        }
+
+        try {
+            $summary = $deletions->deleteCompany($company, (int) auth('admin')->id());
+        } catch (\RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return redirect()->route('admin.companies.index')->with(
+            'success',
+            "Deleted {$summary['name']} permanently — {$summary['users_deleted']} user(s) removed, "
+            . "{$summary['users_detached']} kept (member of another company), "
+            . "{$summary['invoices_deleted']} invoice(s) removed."
+        );
     }
 }
 

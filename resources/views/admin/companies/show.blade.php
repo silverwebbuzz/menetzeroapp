@@ -230,6 +230,61 @@
                 @endif
             </div>
         </div>
+
+    {{-- DANGER ZONE. Typed-name confirmation rather than a JS confirm():
+         this erases an organisation and every record cascading from it, and a
+         stray Enter key must not be able to do that. The button stays disabled
+         until the typed value matches exactly. --}}
+    @php
+        $deletionBlocker = app(\App\Services\OrganisationDeletionService::class)->blockerFor($company);
+    @endphp
+
+    <div class="bg-white shadow rounded-lg border border-red-200 mt-8">
+        <div class="px-5 py-4 border-b border-red-100">
+            <h2 class="text-lg font-medium text-red-700">Danger zone</h2>
+        </div>
+        <div class="p-5">
+            @if($deletionBlocker)
+                <p class="text-sm text-gray-700">{{ $deletionBlocker }}</p>
+            @else
+                <p class="text-sm text-gray-700 mb-1">
+                    Permanently delete <strong>{{ $company->name }}</strong> and everything belonging to it —
+                    emissions data, reports, disclosures, locations, users, subscriptions and invoices.
+                </p>
+                <p class="text-xs text-red-600 mb-4">This cannot be undone. There is no recovery short of a database backup.</p>
+
+                <form method="POST" action="{{ route('admin.companies.destroy', $company->id) }}"
+                      class="flex flex-wrap items-end gap-3" id="delete-company-form">
+                    @csrf
+                    @method('DELETE')
+                    <div>
+                        <label for="confirm_name" class="block text-xs text-gray-600 mb-1">
+                            Type <span class="font-mono font-semibold">{{ $company->name }}</span> to confirm
+                        </label>
+                        <input type="text" name="confirm_name" id="confirm_name" autocomplete="off"
+                               data-expected="{{ $company->name }}"
+                               class="w-80 px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                    </div>
+                    <button type="submit" id="delete-company-btn" disabled
+                            class="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg disabled:opacity-40 disabled:cursor-not-allowed">
+                        Delete permanently
+                    </button>
+                </form>
+
+                <script>
+                    (function () {
+                        var input = document.getElementById('confirm_name');
+                        var btn = document.getElementById('delete-company-btn');
+                        if (!input || !btn) { return; }
+                        input.addEventListener('input', function () {
+                            btn.disabled = input.value.trim() !== input.dataset.expected.trim();
+                        });
+                    })();
+                </script>
+            @endif
+        </div>
+    </div>
+
     @else
         <p class="text-gray-500 text-sm">Company data not available.</p>
     @endisset

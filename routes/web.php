@@ -725,6 +725,9 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
         // change to THEME_DEFAULT. Removable in one step once migration ends.
         Route::post('/companies/{company}/theme', [\App\Http\Controllers\Admin\CompanyThemeController::class, 'update'])->name('companies.theme');
 
+        // Permanent deletion. POST-confirmed with a typed name in the controller.
+        Route::delete('/companies/{id}', [\App\Http\Controllers\Admin\SuperAdminController::class, 'destroyCompany'])->name('companies.destroy');
+
         // Campaign coupons
         Route::get('/coupons', [\App\Http\Controllers\Admin\CouponController::class, 'index'])->name('coupons.index');
         Route::get('/coupons/create', [\App\Http\Controllers\Admin\CouponController::class, 'create'])->name('coupons.create');
@@ -760,6 +763,7 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
             Route::post('/{consultant}/suspend', [\App\Http\Controllers\Admin\ConsultantController::class, 'suspend'])->name('suspend');
             Route::post('/{consultant}/featured', [\App\Http\Controllers\Admin\ConsultantController::class, 'toggleFeatured'])->name('featured');
             Route::put('/{consultant}/notes', [\App\Http\Controllers\Admin\ConsultantController::class, 'updateNotes'])->name('notes');
+            Route::delete('/{consultant}', [\App\Http\Controllers\Admin\ConsultantController::class, 'destroy'])->name('destroy');
             Route::get('/{consultant}/documents/{documentId}/download', [\App\Http\Controllers\Admin\ConsultantController::class, 'downloadDocument'])->name('documents.download');
         });
         

@@ -6,6 +6,7 @@ use App\Data\ConsultantOptions;
 use App\Http\Controllers\Controller;
 use App\Models\Consultant;
 use App\Services\ConsultantAccountService;
+use App\Services\OrganisationDeletionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -137,5 +138,34 @@ class ConsultantController extends Controller
         $consultant->update($data);
 
         return back()->with('success', 'Admin notes saved.');
+    }
+
+    /**
+     * Permanently delete a consultant and the agency company behind it.
+     *
+     * The profile and its agency company are two rows describing one
+     * organisation; deleting only the profile would strand the company and
+     * every workspace under it. Typed-name confirmation, as for companies.
+     */
+    public function destroy(Request $request, Consultant $consultant, OrganisationDeletionService $deletions)
+    {
+        $request->validate(['confirm_name' => 'required|string']);
+
+        if (trim($request->input('confirm_name')) !== trim((string) $consultant->name)) {
+            return back()->with('error', 'The name you typed does not match. Nothing was deleted.');
+        }
+
+        try {
+            $summary = $deletions->deleteConsultant($consultant, (int) Auth::guard('admin')->id());
+        } catch (\RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return redirect()->route('admin.consultants.index')->with(
+            'success',
+            "Deleted {$summary['name']} permanently — {$summary['users_deleted']} user(s) removed, "
+            . "{$summary['users_detached']} kept (member of another company), "
+            . "{$summary['invoices_deleted']} invoice(s) removed."
+        );
     }
 }

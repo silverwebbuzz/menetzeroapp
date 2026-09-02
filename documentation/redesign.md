@@ -5945,3 +5945,64 @@ php artisan optimize:clear
 
 **Untested by me:** no PHP or SQL has executed. Take the backup first -- this
 migration is not reversible.
+
+## 85. Admin: permanent organisation deletion
+
+The list and detail pages already existed (`admin/companies`,
+`admin/consultants`) -- this adds the delete they lacked. No delete existed
+anywhere in admin before.
+
+**The schema does most of the work.** 28 of the 30 tables carrying `company_id`
+declare `cascadeOnDelete`, so removing the company row removes its emissions
+data, reports, disclosures, locations, roles and subscriptions. A new service
+exists only for the exceptions the cascade does NOT cover, each found by
+walking the migrations rather than assumed:
+
+* **`invoices`** -- `company_id` has an index but NO foreign key (§74 created it
+  that way), so invoice rows would be silently orphaned, keeping the buyer name,
+  address and TRN of a deleted company. Deleted explicitly.
+* **`companies.consultant_id`** -- `nullOnDelete`, so deleting an agency would
+  quietly orphan every client company it manages, leaving them with no
+  consultant and no UI to reattach them. **Blocked** instead: the page refuses
+  and names the count.
+* **`users`** -- `users.company_id` cascades, and `Company::users()` is
+  `hasMany(User::class)` on exactly that column. A user who also belongs to
+  another company through `user_company_roles` would be destroyed along with
+  this one. Those users are detached (`company_id = null`) BEFORE the delete so
+  the cascade cannot take them; only users with no other active membership go.
+
+**Deleting a consultant deletes its agency company too.** The profile and the
+company are two rows describing one organisation; removing only the profile
+would strand the company and every workspace under it.
+
+**Confirmation is a typed name**, not `confirm()`. The button stays disabled
+until the typed value matches exactly, so a stray Enter cannot erase an
+organisation, and typing forces the admin to read which one they are on. The
+controller re-checks server-side -- the disabled attribute is a convenience,
+not the guard.
+
+**Two of my own mistakes, caught before shipping:**
+
+* The service had the invoice/user logic written twice, once in
+  `deleteCompany()` and once in `deleteCompanyRows()` -- the duplication bug
+  class §63 was about. Collapsed to one implementation.
+* The company danger zone was first placed AFTER `@endisset`, outside the
+  `@isset($company)` that wraps the whole page, so `blockerFor($company)` would
+  fatal on an unset company. `findOrFail()` means that cannot happen today, but
+  relying on that while the page explicitly guards against it is inconsistent.
+  Moved inside.
+
+**Verified:** all four PHP files balanced; both views' directives and comments
+paired (`@section` counts match HEAD -- the extras are the inline
+`@section('title', ...)` form); `DELETE /{consultant}` does not shadow
+`GET /{consultant}` (different verbs); `Company::users()`,
+`user_company_roles.is_active` and `Consultant::agency_company_id` all
+confirmed to exist.
+
+Run: `php artisan optimize:clear`
+
+**Untested by me:** nothing has executed, and this is the most destructive code
+in the application. Test on a throwaway company FIRST -- create one, add a
+location and an emission entry, delete it, and confirm the related rows are
+gone and no other company was touched. Take a database backup before the first
+real deletion.

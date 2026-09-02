@@ -171,4 +171,62 @@
             </div>
         </div>
     </div>
+
+    {{-- DANGER ZONE. Deletes the consultant AND the agency company behind it:
+         two rows describing one organisation. Typed-name confirmation, as on
+         the company page -- a stray Enter key must not erase an org. --}}
+    @php
+        $agencyCompany = $consultant->agency_company_id
+            ? \App\Models\Company::find($consultant->agency_company_id)
+            : null;
+        $deletionBlocker = $agencyCompany
+            ? app(\App\Services\OrganisationDeletionService::class)->blockerFor($agencyCompany)
+            : null;
+    @endphp
+
+    <div class="bg-white shadow rounded-lg border border-red-200 mt-8">
+        <div class="px-5 py-4 border-b border-red-100">
+            <h2 class="text-lg font-medium text-red-700">Danger zone</h2>
+        </div>
+        <div class="p-5">
+            @if($deletionBlocker)
+                <p class="text-sm text-gray-700">{{ $deletionBlocker }}</p>
+            @else
+                <p class="text-sm text-gray-700 mb-1">
+                    Permanently delete <strong>{{ $consultant->name }}</strong>, its agency workspace
+                    and everything belonging to it — documents, orders, subscriptions, users and invoices.
+                </p>
+                <p class="text-xs text-red-600 mb-4">This cannot be undone. There is no recovery short of a database backup.</p>
+
+                <form method="POST" action="{{ route('admin.consultants.destroy', $consultant) }}"
+                      class="flex flex-wrap items-end gap-3">
+                    @csrf
+                    @method('DELETE')
+                    <div>
+                        <label for="confirm_name" class="block text-xs text-gray-600 mb-1">
+                            Type <span class="font-mono font-semibold">{{ $consultant->name }}</span> to confirm
+                        </label>
+                        <input type="text" name="confirm_name" id="confirm_name" autocomplete="off"
+                               data-expected="{{ $consultant->name }}"
+                               class="w-80 px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                    </div>
+                    <button type="submit" id="delete-consultant-btn" disabled
+                            class="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg disabled:opacity-40 disabled:cursor-not-allowed">
+                        Delete permanently
+                    </button>
+                </form>
+
+                <script>
+                    (function () {
+                        var input = document.getElementById('confirm_name');
+                        var btn = document.getElementById('delete-consultant-btn');
+                        if (!input || !btn) { return; }
+                        input.addEventListener('input', function () {
+                            btn.disabled = input.value.trim() !== input.dataset.expected.trim();
+                        });
+                    })();
+                </script>
+            @endif
+        </div>
+    </div>
 @endsection
