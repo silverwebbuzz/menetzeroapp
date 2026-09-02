@@ -280,7 +280,6 @@ Route::middleware([
     Route::resource('locations', LocationController::class);
     Route::post('/locations/{location}/toggle-status', [LocationController::class, 'toggleStatus'])->name('locations.toggle-status');
     Route::post('/locations/{location}/toggle-head-office', [LocationController::class, 'toggleHeadOffice'])->name('locations.toggle-head-office');
-    Route::post('/locations/step/{step}', [LocationController::class, 'storeStep'])->name('locations.store-step');
     
     // Emission boundaries routes
     Route::get('/locations/{location}/emission-boundaries', [EmissionBoundaryController::class, 'index'])->name('emission-boundaries.index');

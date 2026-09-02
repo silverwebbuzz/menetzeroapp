@@ -82,22 +82,31 @@ class LocationController extends Controller
             abort(403, 'No active company found.');
         }
 
+        // Required set is narrow by design: a field is required only where the
+        // calculation engine is wrong without it. country drives region-matched
+        // emission factors; the three period fields decide whether any
+        // measurement can be attached to this location at all. They were
+        // nullable, which is how locations with zero periods were created.
         $request->validate([
             'name' => 'required|string|max:255',
             'address' => 'nullable|string|max:500',
             'city' => 'nullable|string|max:100',
-            'country' => 'nullable|string|max:100',
+            'country' => 'required|string|max:100',
             'location_type' => 'nullable|string|max:100',
             'staff_count' => 'required|integer|min:1',
             'staff_work_from_home' => 'boolean',
             'work_from_home_percentage' => 'nullable|numeric|min:0|max:100',
-            'fiscal_year_start' => 'nullable|string|max:20',
+            'fiscal_year_start' => 'required|string|max:20',
             'is_head_office' => 'boolean',
             'receives_utility_bills' => 'boolean',
             'pays_electricity_proportion' => 'boolean',
             'shared_building_services' => 'boolean',
-            'reporting_period' => 'nullable|integer|min:2020|max:2030',
-            'measurement_frequency' => 'nullable|string|max:20',
+            'reporting_period' => 'required|integer|min:2020|max:2030',
+            'measurement_frequency' => 'required|string|max:20',
+        ], [
+            'country.required' => 'Select a country — it determines which emission factors apply to this location.',
+            'reporting_period.required' => 'Choose the year you are reporting on.',
+            'measurement_frequency.required' => 'Choose how often you will record data.',
         ]);
 
         // Check location limit before creating. When the plan limit is hit we send the
@@ -135,6 +144,12 @@ class LocationController extends Controller
             'is_active' => true,
         ]);
 
+        // Generate the measurement periods this location's settings imply.
+        // Previously only the AJAX step path did this, so a location saved
+        // through this method had nowhere to put data.
+        app(\App\Services\MeasurementPeriodService::class)
+            ->syncMeasurementPeriods($location, $user->id);
+
         if ($isFirstLocation || $request->boolean('onboarding')) {
             // setup_complete drives the one-time panel on the dashboard. Flashed
             // rather than persisted: it is a moment, not a state, and the panel
@@ -144,123 +159,6 @@ class LocationController extends Controller
         }
 
         return redirect()->route('locations.index')->with('success', 'Location created successfully!');
-    }
-
-    public function storeStep(Request $request, $step)
-    {
-        $user = Auth::user();
-        $company = $user->getActiveCompany();
-        
-        if (!$company) {
-            abort(403, 'No active company found.');
-        }
-        
-        if (!$company) {
-            return redirect()->route('client.dashboard')->with('error', 'Please complete your business profile first to access this feature.');
-        }
-
-        // Get or create location from session
-        $locationId = session('location_id');
-        $location = null;
-        
-        if ($locationId) {
-            $location = Location::find($locationId);
-        }
-        
-        if (!$location) {
-            // Check location limit before creating
-            $limitCheck = $this->subscriptionService->canPerformAction($company->id, 'locations', 1);
-            if (!$limitCheck['allowed']) {
-                return response()->json([
-                    'success' => false,
-                    'error' => $limitCheck['message'],
-                    'upgrade_url' => route('subscriptions.upgrade'),
-                ], 422);
-            }
-
-            // Check if this is the first location for the company
-            $isFirstLocation = $company->locations()->count() === 0;
-            
-            // Create new location with basic info
-            $location = $company->locations()->create([
-                'name' => $request->name ?? 'New Location',
-                'is_active' => true,
-                'is_head_office' => $isFirstLocation, // First location is automatically head office
-            ]);
-            session(['location_id' => $location->id]);
-        }
-
-        // Update location based on step
-        switch ($step) {
-            case 'step1':
-                $request->validate([
-                    'name' => 'required|string|max:255',
-                    'address' => 'nullable|string|max:500',
-                    'city' => 'nullable|string|max:100',
-                    'country' => 'nullable|string|max:100',
-                    'location_type' => 'nullable|string|max:100',
-                    'fiscal_year_start' => 'nullable|string|max:20',
-                    'receives_utility_bills' => 'boolean',
-                    'pays_electricity_proportion' => 'boolean',
-                    'shared_building_services' => 'boolean',
-                ]);
-                
-                $location->update([
-                    'name' => $request->name,
-                    'address' => $request->address,
-                    'city' => $request->city,
-                    'country' => $request->country,
-                    'location_type' => $request->location_type,
-                    'fiscal_year_start' => $request->fiscal_year_start ?? 'January',
-                    'receives_utility_bills' => $request->boolean('receives_utility_bills'),
-                    'pays_electricity_proportion' => $request->boolean('pays_electricity_proportion'),
-                    'shared_building_services' => $request->boolean('shared_building_services'),
-                ]);
-                break;
-                
-            case 'step2':
-                $request->validate([
-                    'staff_count' => 'required|integer|min:1',
-                    'staff_work_from_home' => 'boolean',
-                    'work_from_home_percentage' => 'nullable|numeric|min:0|max:100',
-                ]);
-                
-                $location->update([
-                    'staff_count' => $request->staff_count,
-                    'staff_work_from_home' => $request->boolean('staff_work_from_home'),
-                    'work_from_home_percentage' => $request->work_from_home_percentage,
-                ]);
-                break;
-                
-            case 'step3':
-                $request->validate([
-                    'reporting_period' => 'nullable|integer|min:2020|max:2030',
-                    'measurement_frequency' => 'nullable|string|max:20',
-                ]);
-                
-                $location->update([
-                    'reporting_period' => $request->reporting_period,
-                    'measurement_frequency' => $request->measurement_frequency ?? 'Annually',
-                ]);
-                
-                 if ($location->measurement_frequency && $location->fiscal_year_start) {
-                    $service = app(\App\Services\MeasurementPeriodService::class);
-                    $service->syncMeasurementPeriods($location, $user->id);
-                }
-                // Clear session after final step
-                session()->forget('location_id');
-
-                // Same flag as the single-step path above: both finish onboarding,
-                // and the panel must not depend on which form was used.
-                if ($request->boolean('onboarding') || $company->locations()->where('is_active', true)->count() === 1) {
-                    return redirect()->route('client.dashboard')
-                        ->with('setup_complete', true);
-                }
-
-                return redirect()->route('locations.index')->with('success', 'Location created successfully!');
-        }
-
-        return response()->json(['success' => true, 'location_id' => $location->id]);
     }
 
     public function show(Location $location)

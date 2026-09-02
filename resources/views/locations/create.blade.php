@@ -1,556 +1,392 @@
+{{--
+    Location set-up — single form.
+
+    This replaced a 3-"step" wizard that was cosmetic: all three panels lived
+    inside ONE <form> posting to locations.store, and the step JS only toggled
+    display:none. Worse, the Next buttons fired AJAX at locations.store-step,
+    which created the location immediately and stashed location_id in the
+    session; "Save and Close" then submitted the real form to store(), creating
+    a SECOND location. Whether you got a duplicate — and whether measurement
+    periods existed at all — depended on which buttons you happened to click.
+
+    One form, one POST, one location. storeStep() and its route are gone.
+
+    Required set is deliberately narrow: a field is required only when the
+    calculation engine is wrong without it.
+      - country          → emission factors are region-matched (factors are
+                           tagged 'UAE' etc; see EmissionCalculationService::76)
+      - fiscal_year_start,
+        reporting_period,
+        measurement_frequency
+                         → these three define the measurement periods. They
+                           were nullable, which is how a location could exist
+                           that no measurement could ever attach to.
+      - staff_count      → copied onto every Measurement; intensity denominator
+
+    Everything else stays optional. The utility questions in particular need a
+    bill in hand to answer, and only matter at first electricity entry — so
+    they are collapsed, not blocking.
+--}}
 @extends('layouts.app')
 
 @section('title', 'Add New Location - MenetZero')
 @section('page-title', 'Add New Location')
 
-@push('head')
-<meta name="csrf-token" content="{{ csrf_token() }}">
-@endpush
-
 @section('content')
-{{-- Progress, not a warning. The amber "you cannot enter emission data"
-     banner this replaces stated a restriction without showing where the user
-     was in the sequence or how much was left. --}}
-@if(request('onboarding') || (isset($company) && $company->locations()->where('is_active', true)->count() === 0))
-    <div class="max-w-4xl mx-auto">
-        @include('partials.onboarding-stepper', ['current' => 'location'])
-    </div>
-@endif
+@php
+    $isOnboarding = request('onboarding')
+        || (isset($company) && $company->locations()->where('is_active', true)->count() === 0);
 
-@if(session('success') || session('info') || session('error'))
-    <div class="max-w-4xl mx-auto mb-6">
-        @if(session('success'))
-            <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">{{ session('success') }}</div>
-        @endif
-        @if(session('info'))
-            <div class="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg">{{ session('info') }}</div>
-        @endif
-        @if(session('error'))
-            <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">{{ session('error') }}</div>
-        @endif
-    </div>
-@endif
+    $countries = [
+        'UAE' => 'United Arab Emirates',
+        'SA'  => 'Saudi Arabia',
+        'KW'  => 'Kuwait',
+        'QA'  => 'Qatar',
+        'BH'  => 'Bahrain',
+        'OM'  => 'Oman',
+        'US'  => 'United States',
+        'UK'  => 'United Kingdom',
+        'IN'  => 'India',
+        'Other' => 'Other',
+    ];
+
+    $locationTypes = ['Co-Working Desks', 'Office', 'Warehouse', 'Factory', 'Retail Store', 'Data Center', 'Other'];
+
+    $months = ['January','February','March','April','May','June',
+               'July','August','September','October','November','December'];
+
+    $currentYear = (int) date('Y');
+@endphp
 
 <style>
-    .step-indicator { 
-        display: flex; 
-        align-items: center; 
-        padding: 0.75rem 1rem; 
-        border-radius: 0.5rem; 
-        font-weight: 500; 
-        transition: all 0.2s; 
-        border: 1px solid transparent;
-    }
-    .step-indicator.active { 
-        background: #f97316; 
-        color: white; 
-        border-color: #f97316;
-    }
-    .step-indicator.completed { 
-        background: #10b981; 
-        color: white; 
-        border-color: #10b981;
-    }
-    .step-indicator.pending { 
-        background: #f8fafc; 
-        color: #6b7280; 
-        border-color: #e5e7eb;
-    }
-    .step-content { display: none; }
-    .step-content.active { display: block; }
-    .toggle-switch {
-        position: relative;
-        display: inline-block;
-        width: 44px;
-        height: 24px;
-    }
-    .toggle-switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
+    .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; flex: none; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
     .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        transition: .4s;
-        border-radius: 24px;
+        position: absolute; cursor: pointer; inset: 0;
+        background-color: #ccc; transition: .3s; border-radius: 24px;
     }
     .slider:before {
-        position: absolute;
-        content: "";
-        height: 18px;
-        width: 18px;
-        left: 3px;
-        bottom: 3px;
-        background-color: white;
-        transition: .4s;
-        border-radius: 50%;
+        position: absolute; content: ""; height: 18px; width: 18px;
+        left: 3px; bottom: 3px; background-color: #fff;
+        transition: .3s; border-radius: 50%;
     }
-    input:checked + .slider {
-        background-color: #f97316;
-    }
-    input:checked + .slider:before {
-        transform: translateX(20px);
-    }
+    input:checked + .slider { background-color: #f97316; }
+    input:checked + .slider:before { transform: translateX(20px); }
+    .fld { width: 100%; padding: .5rem .75rem; border: 1px solid #d1d5db; border-radius: .5rem; }
+    .fld:focus { outline: none; border-color: #f97316; box-shadow: 0 0 0 2px rgba(249,115,22,.35); }
+    .lbl { display: block; font-size: .875rem; font-weight: 500; color: #374151; margin-bottom: .5rem; }
+    .req { color: #dc2626; }
 </style>
 
-<div class="w-full">
-    <!-- Progress Steps -->
-    <div class="mb-8">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Set-up your location</h2>
-        <div class="flex space-x-4">
-            <div class="step-indicator active" id="step-1-indicator">
-                <span class="w-6 h-6 rounded-full bg-white text-orange-600 flex items-center justify-center text-sm font-bold mr-3">1</span>
-                Choose business location
+<div class="max-w-4xl mx-auto">
+
+    @if($isOnboarding)
+        @include('partials.onboarding-stepper', ['current' => 'location'])
+    @endif
+
+    @foreach(['success' => 'green', 'info' => 'blue', 'error' => 'red'] as $key => $tone)
+        @if(session($key))
+            <div class="bg-{{ $tone }}-50 border border-{{ $tone }}-200 text-{{ $tone }}-800 px-4 py-3 rounded-lg mb-4">
+                {{ session($key) }}
             </div>
-            <div class="step-indicator pending" id="step-2-indicator">
-                <span class="w-6 h-6 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center text-sm font-bold mr-3">2</span>
-                Staff Details
-            </div>
-            <div class="step-indicator pending" id="step-3-indicator">
-                <span class="w-6 h-6 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center text-sm font-bold mr-3">3</span>
-                Create a new measurement period
-            </div>
-        </div>
+        @endif
+    @endforeach
+
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold text-gray-900">Set up your location</h2>
+        <p class="text-gray-600 mt-1">
+            Takes about a minute. You can add more locations later, and change any of this at any time.
+        </p>
     </div>
 
-    <form method="POST" action="{{ route('locations.store') }}" id="location-form">
+    @if($errors->any())
+        <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+            <p class="font-medium">Please check the highlighted fields.</p>
+            <ul class="list-disc list-inside text-sm mt-1">
+                @foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach
+            </ul>
+        </div>
+    @endif
+
+    <form method="POST" action="{{ route('locations.store') }}" class="space-y-6">
         @csrf
-        
-        <!-- Step 1: Choose business location -->
-        <div class="step-content active" id="step-1">
-            <div class="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-6">Choose business location</h3>
-                
-                <div class="space-y-6">
+        @if($isOnboarding)
+            <input type="hidden" name="onboarding" value="1">
+        @endif
+
+        {{-- ── Location ────────────────────────────────────────────── --}}
+        <div class="bg-white rounded-lg border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-1">Location</h3>
+            <p class="text-sm text-gray-500 mb-5">Where this site is. The country sets which emission factors we use.</p>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="lbl" for="name">Location name <span class="req">*</span></label>
+                    <input type="text" id="name" name="name" value="{{ old('name') }}" required
+                           placeholder="e.g. Head Office, Dubai Warehouse" class="fld">
+                    @error('name')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Business Location</label>
-                        <input type="text" name="name" value="{{ old('name') }}" 
-                               placeholder="Enter the building name, street name" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500" required>
-                        @error('name')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
+                        <label class="lbl" for="country">Country <span class="req">*</span></label>
+                        <select name="country" id="country" required class="fld">
+                            <option value="">Select a country</option>
+                            @foreach($countries as $code => $label)
+                                <option value="{{ $code }}" @selected(old('country') === $code)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">Determines your grid electricity and fuel factors.</p>
+                        @error('country')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                     </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Country</label>
-                            <select name="country" id="country" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
-                                <option value="">Select a country</option>
-                                <option value="UAE" {{ old('country') == 'UAE' ? 'selected' : '' }}>United Arab Emirates</option>
-                                <option value="SA" {{ old('country') == 'SA' ? 'selected' : '' }}>Saudi Arabia</option>
-                                <option value="KW" {{ old('country') == 'KW' ? 'selected' : '' }}>Kuwait</option>
-                                <option value="QA" {{ old('country') == 'QA' ? 'selected' : '' }}>Qatar</option>
-                                <option value="BH" {{ old('country') == 'BH' ? 'selected' : '' }}>Bahrain</option>
-                                <option value="OM" {{ old('country') == 'OM' ? 'selected' : '' }}>Oman</option>
-                                <option value="US" {{ old('country') == 'US' ? 'selected' : '' }}>United States</option>
-                                <option value="UK" {{ old('country') == 'UK' ? 'selected' : '' }}>United Kingdom</option>
-                                <option value="IN" {{ old('country') == 'IN' ? 'selected' : '' }}>India</option>
-                                <option value="Other" {{ old('country') == 'Other' ? 'selected' : '' }}>Other</option>
-                            </select>
-                            @error('country')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
-                            <select name="city" id="city" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
-                                <option value="">Select country first</option>
-                            </select>
-                            @error('city')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
-                        </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Location type</label>
-                            <select name="location_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
-                                <option value="">Select location type</option>
-                                <option value="Co-Working Desks" {{ old('location_type') == 'Co-Working Desks' ? 'selected' : '' }}>Co-Working Desks</option>
-                                <option value="Office" {{ old('location_type') == 'Office' ? 'selected' : '' }}>Office</option>
-                                <option value="Warehouse" {{ old('location_type') == 'Warehouse' ? 'selected' : '' }}>Warehouse</option>
-                                <option value="Factory" {{ old('location_type') == 'Factory' ? 'selected' : '' }}>Factory</option>
-                                <option value="Retail Store" {{ old('location_type') == 'Retail Store' ? 'selected' : '' }}>Retail Store</option>
-                                <option value="Data Center" {{ old('location_type') == 'Data Center' ? 'selected' : '' }}>Data Center</option>
-                                <option value="Other" {{ old('location_type') == 'Other' ? 'selected' : '' }}>Other</option>
-                            </select>
-                            @error('location_type')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Fiscal Year start from</label>
-                            <select name="fiscal_year_start" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
-                                <option value="January" {{ old('fiscal_year_start', 'January') == 'January' ? 'selected' : '' }}>January</option>
-                                <option value="February" {{ old('fiscal_year_start') == 'February' ? 'selected' : '' }}>February</option>
-                                <option value="March" {{ old('fiscal_year_start') == 'March' ? 'selected' : '' }}>March</option>
-                                <option value="April" {{ old('fiscal_year_start') == 'April' ? 'selected' : '' }}>April</option>
-                                <option value="May" {{ old('fiscal_year_start') == 'May' ? 'selected' : '' }}>May</option>
-                                <option value="June" {{ old('fiscal_year_start') == 'June' ? 'selected' : '' }}>June</option>
-                                <option value="July" {{ old('fiscal_year_start') == 'July' ? 'selected' : '' }}>July</option>
-                                <option value="August" {{ old('fiscal_year_start') == 'August' ? 'selected' : '' }}>August</option>
-                                <option value="September" {{ old('fiscal_year_start') == 'September' ? 'selected' : '' }}>September</option>
-                                <option value="October" {{ old('fiscal_year_start') == 'October' ? 'selected' : '' }}>October</option>
-                                <option value="November" {{ old('fiscal_year_start') == 'November' ? 'selected' : '' }}>November</option>
-                                <option value="December" {{ old('fiscal_year_start') == 'December' ? 'selected' : '' }}>December</option>
-                            </select>
-                            @error('fiscal_year_start')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
-                        </div>
-                    </div>
-                    
+
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                        <textarea name="address" rows="3" 
-                                  placeholder="Enter the full address" 
-                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">{{ old('address') }}</textarea>
-                        @error('address')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
-                    </div>
-                    
-                    <!-- Utility and Building Details -->
-                    <div class="border-t pt-6">
-                        <h4 class="text-md font-semibold text-gray-900 mb-4">Utility and Building Details</h4>
-                        
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm font-medium text-gray-900">Do you receive the utility bills for the entire office building?</p>
-                                </div>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" name="receives_utility_bills" {{ old('receives_utility_bills') ? 'checked' : '' }}>
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                            
-                            <div class="bg-gray-50 rounded-lg p-4" id="building-details">
-                                <h5 class="text-sm font-semibold text-gray-900 mb-3">Office Building Details</h5>
-                                
-                                <div class="space-y-4">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <p class="text-sm font-medium text-gray-900">Do you pay your proportion of the electricity bill for this location?</p>
-                                        </div>
-                                        <label class="toggle-switch">
-                                            <input type="checkbox" name="pays_electricity_proportion" {{ old('pays_electricity_proportion') ? 'checked' : '' }}>
-                                            <span class="slider"></span>
-                                        </label>
-                                    </div>
-                                    
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <p class="text-sm font-medium text-gray-900">Is your office space part of a larger building with shared services (lifts, lobbies, aircon)?</p>
-                                        </div>
-                                        <label class="toggle-switch">
-                                            <input type="checkbox" name="shared_building_services" {{ old('shared_building_services') ? 'checked' : '' }}>
-                                            <span class="slider"></span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <label class="lbl" for="city">City</label>
+                        {{-- data-selected lets the JS restore old('city') after a
+                             failed submit. The previous version rebuilt this list
+                             on change only, so the choice was silently lost. --}}
+                        <select name="city" id="city" class="fld" data-selected="{{ old('city') }}">
+                            <option value="">Select country first</option>
+                        </select>
+                        @error('city')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                     </div>
                 </div>
-                
-                <div class="flex justify-end mt-6">
-                    <button type="button" onclick="nextStep()" class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">
-                        Next
-                    </button>
+
+                <div>
+                    <label class="lbl" for="location_type">Location type</label>
+                    <select name="location_type" id="location_type" class="fld">
+                        <option value="">Select location type</option>
+                        @foreach($locationTypes as $type)
+                            <option value="{{ $type }}" @selected(old('location_type') === $type)>{{ $type }}</option>
+                        @endforeach
+                    </select>
+                    @error('location_type')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
+                </div>
+
+                <div>
+                    <label class="lbl" for="address">Address</label>
+                    <textarea name="address" id="address" rows="2"
+                              placeholder="Enter the full address" class="fld">{{ old('address') }}</textarea>
+                    @error('address')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                 </div>
             </div>
         </div>
 
-        <!-- Step 2: Staff Details -->
-        <div class="step-content" id="step-2">
-            <div class="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-6">Staff Details</h3>
-                <p class="text-sm text-gray-600 mb-6">Tell us about your employees and staff</p>
-                
-                <div class="space-y-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Input the average number for the period you are measuring: Total number of staff(FTE)</label>
-                        <p class="text-xs text-gray-500 mb-3">Staff are a source of indirect emissions. Include full-time, flexible, and remote employees. Do not include independent contractors not on your payroll.</p>
-                        <input type="number" name="staff_count" value="{{ old('staff_count') }}" min="1" required
-                               placeholder="10" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
-                        @error('staff_count')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
-                    </div>
-                    
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-900">Have staff regularly worked from home?</p>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" name="staff_work_from_home" {{ old('staff_work_from_home') ? 'checked' : '' }} onchange="toggleWorkFromHomePercentage()">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    
-                    <div id="wfh-percentage-section" class="{{ old('staff_work_from_home') ? '' : 'hidden' }}">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Work from Home Percentage</label>
-                        <p class="text-xs text-gray-500 mb-3">What percentage of your staff work from home on average?</p>
-                        <input type="number" name="work_from_home_percentage" value="{{ old('work_from_home_percentage', 100) }}" 
-                               min="0" max="100" step="0.01"
-                               placeholder="100" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
-                        @error('work_from_home_percentage')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
-                    </div>
+        {{-- ── People ─────────────────────────────────────────────── --}}
+        <div class="bg-white rounded-lg border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-1">People</h3>
+            <p class="text-sm text-gray-500 mb-5">Used for per-employee intensity figures in your reports.</p>
+
+            <div class="space-y-4">
+                <div class="md:w-1/2">
+                    <label class="lbl" for="staff_count">Number of staff (FTE) <span class="req">*</span></label>
+                    <input type="number" id="staff_count" name="staff_count" min="1" required
+                           value="{{ old('staff_count') }}" placeholder="10" class="fld">
+                    <p class="text-xs text-gray-500 mt-1">
+                        Include full-time, flexible and remote employees. Exclude contractors not on your payroll.
+                    </p>
+                    @error('staff_count')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                 </div>
-                
-                <div class="flex justify-between mt-6">
-                    <button type="button" onclick="prevStep()" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
-                        Back
-                    </button>
-                    <button type="button" onclick="nextStep()" class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">
-                        Next
-                    </button>
+
+                <div class="flex items-center justify-between border-t pt-4">
+                    <p class="text-sm font-medium text-gray-900">Have staff regularly worked from home?</p>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="wfh_toggle" name="staff_work_from_home" value="1"
+                               {{ old('staff_work_from_home') ? 'checked' : '' }}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div id="wfh-percentage-section" class="md:w-1/2 {{ old('staff_work_from_home') ? '' : 'hidden' }}">
+                    <label class="lbl" for="work_from_home_percentage">Percentage of staff working from home</label>
+                    <input type="number" id="work_from_home_percentage" name="work_from_home_percentage"
+                           min="0" max="100" step="0.01"
+                           value="{{ old('work_from_home_percentage', 100) }}" class="fld">
+                    @error('work_from_home_percentage')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                 </div>
             </div>
         </div>
 
-        <!-- Step 3: Create a new measurement period -->
-        <div class="step-content" id="step-3">
-            <div class="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-6">Create a new measurement period</h3>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {{-- ── Reporting period ───────────────────────────────────── --}}
+        <div class="bg-white rounded-lg border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-1">Reporting period</h3>
+            <p class="text-sm text-gray-500 mb-5">
+                This creates the periods you enter data into. You can add more years later.
+            </p>
+
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
-                        <div class="px-3 py-2 bg-gray-50 rounded-lg text-gray-600" id="location-preview">Dubai</div>
+                        <label class="lbl" for="fiscal_year_start">Fiscal year starts <span class="req">*</span></label>
+                        <select name="fiscal_year_start" id="fiscal_year_start" required class="fld">
+                            @foreach($months as $month)
+                                <option value="{{ $month }}" @selected(old('fiscal_year_start', 'January') === $month)>{{ $month }}</option>
+                            @endforeach
+                        </select>
+                        @error('fiscal_year_start')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                     </div>
-                    
+
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Fiscal year start</label>
-                        <div class="px-3 py-2 bg-gray-50 rounded-lg text-gray-600" id="fiscal-preview">January</div>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Reporting Period</label>
-                        <select name="reporting_period" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
-                            <option value="">Select reporting period</option>
-                            @for($year = date('Y'); $year >= 2020; $year--)
-                                <option value="{{ $year }}" {{ old('reporting_period', date('Y')) == $year ? 'selected' : '' }}>{{ $year }}</option>
+                        <label class="lbl" for="reporting_period">Reporting year <span class="req">*</span></label>
+                        <select name="reporting_period" id="reporting_period" required class="fld">
+                            @for($year = 2020; $year <= 2030; $year++)
+                                <option value="{{ $year }}" @selected((int) old('reporting_period', $currentYear) === $year)>{{ $year }}</option>
                             @endfor
                         </select>
                         @error('reporting_period')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                     </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Measurement Frequency</label>
-                        <div class="space-y-2">
-                            <label class="flex items-center">
-                                <input type="radio" name="measurement_frequency" value="Annually" {{ old('measurement_frequency', 'Annually') == 'Annually' ? 'checked' : '' }} class="mr-2">
-                                <span class="text-sm">Annually</span>
-                            </label>
-                            <label class="flex items-center">
-                                <input type="radio" name="measurement_frequency" value="Half Yearly" {{ old('measurement_frequency') == 'Half Yearly' ? 'checked' : '' }} class="mr-2">
-                                <span class="text-sm">Half Yearly</span>
-                            </label>
-                            <label class="flex items-center">
-                                <input type="radio" name="measurement_frequency" value="Quarterly" {{ old('measurement_frequency') == 'Quarterly' ? 'checked' : '' }} class="mr-2">
-                                <span class="text-sm">Quarterly</span>
-                            </label>
-                            <label class="flex items-center">
-                                <input type="radio" name="measurement_frequency" value="Monthly" {{ old('measurement_frequency') == 'Monthly' ? 'checked' : '' }} class="mr-2">
-                                <span class="text-sm">Monthly</span>
-                            </label>
-                        </div>
-                        @error('measurement_frequency')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
-                    </div>
                 </div>
-                
-                <div class="flex justify-between mt-6">
-                    <button type="button" onclick="prevStep()" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
-                        Back
-                    </button>
-                    <button type="button" onclick="saveAndFinish()" class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">
-                        Save and Close
-                    </button>
+
+                <div>
+                    <span class="lbl">Measurement frequency <span class="req">*</span></span>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        @foreach(['Annually' => 1, 'Half Yearly' => 2, 'Quarterly' => 4, 'Monthly' => 12] as $freq => $count)
+                            <label class="flex items-center border border-gray-300 rounded-lg px-3 py-2 cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="measurement_frequency" value="{{ $freq }}"
+                                       data-periods="{{ $count }}" required
+                                       @checked(old('measurement_frequency', 'Annually') === $freq)
+                                       class="mr-2 freq-radio">
+                                <span class="text-sm">{{ $freq }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                    <p class="text-sm text-gray-600 mt-2" id="period-preview"></p>
+                    @error('measurement_frequency')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                 </div>
             </div>
+        </div>
+
+        {{-- ── Utility bills (optional) ───────────────────────────── --}}
+        <details class="bg-white rounded-lg border border-gray-200 p-6">
+            <summary class="cursor-pointer font-semibold text-gray-900">
+                Utility and building details
+                <span class="font-normal text-sm text-gray-500">— optional, you can set this later</span>
+            </summary>
+
+            <p class="text-sm text-gray-500 mt-3">
+                Not sure? Leave these. They only affect how we treat shared-building electricity,
+                and you can change them before entering your first bill.
+            </p>
+
+            <div class="space-y-4 mt-4">
+                <div class="flex items-center justify-between">
+                    <p class="text-sm font-medium text-gray-900">Do you receive the utility bills for the entire office building?</p>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="receives_utility_bills" name="receives_utility_bills" value="1"
+                               {{ old('receives_utility_bills') ? 'checked' : '' }}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4 {{ old('receives_utility_bills') ? 'hidden' : '' }}" id="building-details">
+                    <h5 class="text-sm font-semibold text-gray-900 mb-3">Office building details</h5>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm font-medium text-gray-900">Do you pay your proportion of the electricity bill for this location?</p>
+                            <label class="toggle-switch">
+                                <input type="checkbox" name="pays_electricity_proportion" value="1"
+                                       {{ old('pays_electricity_proportion') ? 'checked' : '' }}>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm font-medium text-gray-900">Is your office space part of a larger building with shared services (lifts, lobbies, aircon)?</p>
+                            <label class="toggle-switch">
+                                <input type="checkbox" name="shared_building_services" value="1"
+                                       {{ old('shared_building_services') ? 'checked' : '' }}>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        <div class="flex justify-between items-center">
+            <a href="{{ $isOnboarding ? route('client.dashboard') : route('locations.index') }}"
+               class="px-4 py-2 text-gray-700 hover:text-gray-900">Cancel</a>
+            <button type="submit" class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">
+                {{ $isOnboarding ? 'Save and start entering data' : 'Save location' }}
+            </button>
         </div>
     </form>
 </div>
 
 <script>
-let currentStep = 1;
-const totalSteps = 3;
-
-function showStep(step) {
-    // Hide all steps
-    document.querySelectorAll('.step-content').forEach(content => {
-        content.classList.remove('active');
-    });
-    
-    // Show current step
-    document.getElementById(`step-${step}`).classList.add('active');
-    
-    // Update indicators
-    for (let i = 1; i <= totalSteps; i++) {
-        const indicator = document.getElementById(`step-${i}-indicator`);
-        if (i < step) {
-            indicator.className = 'step-indicator completed';
-        } else if (i === step) {
-            indicator.className = 'step-indicator active';
-        } else {
-            indicator.className = 'step-indicator pending';
-        }
-    }
-    
-    // Update previews in step 3
-    if (step === 3) {
-        const locationName = document.querySelector('input[name="name"]').value || 'Location';
-        const fiscalYear = document.querySelector('select[name="fiscal_year_start"]').value || 'January';
-        
-        document.getElementById('location-preview').textContent = locationName;
-        document.getElementById('fiscal-preview').textContent = fiscalYear;
-    }
-}
-
-function nextStep() {
-    // Save current step data
-    saveStepData();
-    
-    if (currentStep < totalSteps) {
-        currentStep++;
-        showStep(currentStep);
-    }
-}
-
-function saveStepData() {
-    const formData = new FormData();
-    const step = currentStep;
-    
-    // Add CSRF token
-    formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
-    
-    // Collect data based on current step
-    if (step === 1) {
-        formData.append('name', document.querySelector('input[name="name"]').value);
-        formData.append('address', document.querySelector('textarea[name="address"]').value);
-        formData.append('city', document.querySelector('select[name="city"]').value);
-        formData.append('country', document.querySelector('select[name="country"]').value);
-        formData.append('location_type', document.querySelector('select[name="location_type"]').value);
-        formData.append('fiscal_year_start', document.querySelector('select[name="fiscal_year_start"]').value);
-        formData.append('receives_utility_bills', document.querySelector('input[name="receives_utility_bills"]').checked ? '1' : '0');
-        formData.append('pays_electricity_proportion', document.querySelector('input[name="pays_electricity_proportion"]').checked ? '1' : '0');
-        formData.append('shared_building_services', document.querySelector('input[name="shared_building_services"]').checked ? '1' : '0');
-    } else if (step === 2) {
-        formData.append('staff_count', document.querySelector('input[name="staff_count"]').value);
-        formData.append('staff_work_from_home', document.querySelector('input[name="staff_work_from_home"]').checked ? '1' : '0');
-        formData.append('work_from_home_percentage', document.querySelector('input[name="work_from_home_percentage"]').value);
-    } else if (step === 3) {
-        formData.append('reporting_period', document.querySelector('select[name="reporting_period"]').value);
-        formData.append('measurement_frequency', document.querySelector('input[name="measurement_frequency"]:checked')?.value || 'Annually');
-    }
-    
-    // Send AJAX request to save step
-    fetch(`/locations/step/step${step}`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => {
-        if (response.redirected) {
-            // If redirected (final step), follow the redirect
-            window.location.href = response.url;
-        } else {
-            return response.json();
-        }
-    })
-    .then(data => {
-        if (data && data.success) {
-            console.log('Step data saved successfully');
-        }
-    })
-    .catch(error => {
-        console.error('Error saving step data:', error);
-    });
-}
-
-function prevStep() {
-    if (currentStep > 1) {
-        currentStep--;
-        showStep(currentStep);
-    }
-}
-
-function saveAndFinish() {
-    // Save final step data - this will redirect automatically for step 3
-    saveStepData();
-}
-
-// City options based on country
-document.getElementById('country').addEventListener('change', function() {
-    const citySelect = document.getElementById('city');
-    const country = this.value;
-    
-    citySelect.innerHTML = '<option value="">Select city</option>';
-    
-    const cities = {
+(function () {
+    var CITIES = {
         'UAE': ['Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Umm Al Quwain'],
-        'SA': ['Riyadh', 'Jeddah', 'Mecca', 'Medina', 'Dammam'],
-        'KW': ['Kuwait City', 'Hawalli', 'Ahmadi'],
-        'QA': ['Doha', 'Al Rayyan', 'Al Wakrah'],
-        'BH': ['Manama', 'Riffa', 'Muharraq'],
-        'OM': ['Muscat', 'Salalah', 'Nizwa'],
-        'US': ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix'],
-        'UK': ['London', 'Birmingham', 'Manchester', 'Glasgow', 'Liverpool'],
-        'IN': ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Kolkata']
+        'SA':  ['Riyadh', 'Jeddah', 'Mecca', 'Medina', 'Dammam'],
+        'KW':  ['Kuwait City', 'Hawalli', 'Ahmadi'],
+        'QA':  ['Doha', 'Al Rayyan', 'Al Wakrah'],
+        'BH':  ['Manama', 'Riffa', 'Muharraq'],
+        'OM':  ['Muscat', 'Salalah', 'Nizwa'],
+        'US':  ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix'],
+        'UK':  ['London', 'Birmingham', 'Manchester', 'Glasgow', 'Liverpool'],
+        'IN':  ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Kolkata']
     };
-    
-    if (cities[country]) {
-        cities[country].forEach(city => {
-            const option = document.createElement('option');
-            option.value = city;
-            option.textContent = city;
-            citySelect.appendChild(option);
+
+    var countryEl = document.getElementById('country');
+    var cityEl    = document.getElementById('city');
+
+    function fillCities(keepSelection) {
+        var list = CITIES[countryEl.value] || [];
+        var want = keepSelection ? cityEl.getAttribute('data-selected') : '';
+        cityEl.innerHTML = '';
+
+        var first = document.createElement('option');
+        first.value = '';
+        first.textContent = list.length ? 'Select city' : 'Select country first';
+        cityEl.appendChild(first);
+
+        list.forEach(function (city) {
+            var opt = document.createElement('option');
+            opt.value = city;
+            opt.textContent = city;
+            if (city === want) { opt.selected = true; }
+            cityEl.appendChild(opt);
         });
     }
-});
 
-// Handle utility bills logic
-document.querySelector('input[name="receives_utility_bills"]').addEventListener('change', function() {
-    const buildingDetails = document.getElementById('building-details');
-    if (this.checked) {
-        // If company receives utility bills for entire building, hide the other questions
-        buildingDetails.style.display = 'none';
-        // Uncheck the other options since they don't apply
-        document.querySelector('input[name="pays_electricity_proportion"]').checked = false;
-        document.querySelector('input[name="shared_building_services"]').checked = false;
-    } else {
-        // If company doesn't receive utility bills, show the other questions
-        buildingDetails.style.display = 'block';
+    countryEl.addEventListener('change', function () { fillCities(false); });
+
+    // Utility toggle: receiving the whole building's bill makes the
+    // apportionment questions meaningless, so hide and clear them.
+    var receives = document.getElementById('receives_utility_bills');
+    var details  = document.getElementById('building-details');
+    receives.addEventListener('change', function () {
+        if (this.checked) {
+            details.classList.add('hidden');
+            document.querySelector('input[name="pays_electricity_proportion"]').checked = false;
+            document.querySelector('input[name="shared_building_services"]').checked = false;
+        } else {
+            details.classList.remove('hidden');
+        }
+    });
+
+    var wfh = document.getElementById('wfh_toggle');
+    var wfhSection = document.getElementById('wfh-percentage-section');
+    wfh.addEventListener('change', function () {
+        wfhSection.classList.toggle('hidden', !this.checked);
+    });
+
+    // Frequency is the one choice whose consequences people do not anticipate.
+    var preview = document.getElementById('period-preview');
+    function showPreview() {
+        var picked = document.querySelector('.freq-radio:checked');
+        if (!picked) { preview.textContent = ''; return; }
+        var n = parseInt(picked.getAttribute('data-periods'), 10);
+        var year = document.getElementById('reporting_period').value;
+        preview.textContent = 'Creates ' + n + (n === 1 ? ' period' : ' periods')
+            + ' for ' + year + ' that you can enter data into.';
     }
-});
+    document.querySelectorAll('.freq-radio').forEach(function (el) {
+        el.addEventListener('change', showPreview);
+    });
+    document.getElementById('reporting_period').addEventListener('change', showPreview);
 
-// Initialize utility bills logic on page load
-document.addEventListener('DOMContentLoaded', function() {
-    const receivesUtilityBills = document.querySelector('input[name="receives_utility_bills"]');
-    const buildingDetails = document.getElementById('building-details');
-    
-    if (receivesUtilityBills.checked) {
-        buildingDetails.style.display = 'none';
-    } else {
-        buildingDetails.style.display = 'block';
-    }
-});
-
-// Toggle work from home percentage field
-function toggleWorkFromHomePercentage() {
-    const checkbox = document.querySelector('input[name="staff_work_from_home"]');
-    const percentageSection = document.getElementById('wfh-percentage-section');
-    
-    if (checkbox.checked) {
-        percentageSection.classList.remove('hidden');
-    } else {
-        percentageSection.classList.add('hidden');
-    }
-}
-
-// Initialize
-showStep(1);
+    fillCities(true);
+    showPreview();
+})();
 </script>
 @endsection

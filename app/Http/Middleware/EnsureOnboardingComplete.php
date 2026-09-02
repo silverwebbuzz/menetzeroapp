@@ -31,7 +31,6 @@ class EnsureOnboardingComplete
             'company.setup.store',
             'locations.create',
             'locations.store',
-            'locations.store-step',
             'logout',
             'account.selector',
             'account.switch',
