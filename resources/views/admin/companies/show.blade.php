@@ -5,7 +5,11 @@
 
 @section('content')
     @isset($company)
-        <div class="space-y-6">
+        {{-- Returns to whichever list the admin arrived from -- see
+             SuperAdminController::resolveBackUrl(). --}}
+        <a href="{{ $back['url'] }}" class="text-sm text-purple-600 hover:underline">&larr; {{ $back['label'] }}</a>
+
+        <div class="space-y-6 mt-3">
             <div class="bg-white shadow rounded-lg p-4">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">Company Information</h2>
                 <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
@@ -288,7 +292,7 @@
                                     </td>
                                     <td class="px-5 py-2 text-gray-600">{{ $mc->created_at?->format('d M Y') ?? '—' }}</td>
                                     <td class="px-5 py-2 text-right">
-                                        <a href="{{ route('admin.companies.show', $mc->id) }}" class="text-purple-600 hover:underline">View</a>
+                                        <a href="{{ route('admin.companies.show', ['id' => $mc->id, 'from' => 'agency:' . $company->id]) }}" class="text-purple-600 hover:underline">View</a>
                                     </td>
                                 </tr>
                             @endforeach
@@ -396,6 +400,9 @@
                       class="flex flex-wrap items-end gap-3" id="delete-company-form">
                     @csrf
                     @method('DELETE')
+                    {{-- Keeps the origin across the redirect, so deleting from an
+                         agency's client list returns to that agency. --}}
+                    <input type="hidden" name="from" value="{{ request()->query('from') }}">
                     <div>
                         <label for="confirm_name" class="block text-xs text-gray-600 mb-1">
                             Type <span class="font-mono font-semibold">{{ $company->name }}</span> to confirm

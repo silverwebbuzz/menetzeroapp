@@ -42,7 +42,12 @@ class CompanySubscriptionController extends Controller
             Auth::id()
         );
 
-        return redirect()->route('admin.companies.show', $company->id)
-            ->with('success', "Granted complimentary {$plan->plan_name} until {$expiresAt->format('F d, Y')}.");
+        // Carry `from` so the detail page keeps pointing back at the list the
+        // admin arrived from; without it the back link reverts to the default
+        // tab after every grant.
+        return redirect()->route('admin.companies.show', [
+            'id' => $company->id,
+            'from' => $request->input('from'),
+        ])->with('success', "Granted complimentary {$plan->plan_name} until {$expiresAt->format('F d, Y')}.");
     }
 }

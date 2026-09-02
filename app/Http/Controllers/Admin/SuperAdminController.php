@@ -114,8 +114,43 @@ class SuperAdminController extends Controller
     /**
      * View Company Details
      */
-    public function showCompany($id)
+    /**
+     * Where "back" goes from a company detail page.
+     *
+     * The `from` query parameter records which list the admin arrived from:
+     * a tab name, or "agency:<id>" when they came from an agency's client
+     * table. Without it every action returned to the default companies tab,
+     * so opening a consultant and acting on it dumped the admin into the
+     * direct-companies list.
+     *
+     * Whitelisted rather than trusted: `from` is user input, and turning it
+     * straight into a redirect would be an open-redirect hole.
+     */
+    protected function resolveBackUrl(?string $from): array
     {
+        if (is_string($from) && str_starts_with($from, 'agency:')) {
+            $agencyId = (int) substr($from, 7);
+
+            if ($agencyId > 0 && Company::whereKey($agencyId)->exists()) {
+                return [
+                    'url' => route('admin.companies.show', ['id' => $agencyId, 'from' => 'consultant']),
+                    'label' => 'Back to agency',
+                ];
+            }
+        }
+
+        $tab = $from === 'consultant' ? 'consultant' : 'direct';
+
+        return [
+            'url' => route('admin.companies.index', ['tab' => $tab]),
+            'label' => $tab === 'consultant' ? 'All consultants' : 'All companies',
+        ];
+    }
+
+    public function showCompany(Request $request, $id)
+    {
+        $back = $this->resolveBackUrl($request->query('from'));
+
         $company = Company::with([
             'users',
             'clientSubscriptions.plan',
@@ -142,7 +177,7 @@ class SuperAdminController extends Controller
             ->latest()
             ->get();
 
-        return view('admin.companies.show', compact('company', 'grantPlans', 'consultantPacks', 'packageAssignments'));
+        return view('admin.companies.show', compact('company', 'grantPlans', 'consultantPacks', 'packageAssignments', 'back'));
     }
 
     /**
@@ -523,7 +558,9 @@ class SuperAdminController extends Controller
             return back()->with('error', $e->getMessage());
         }
 
-        return redirect()->route('admin.companies.index')->with(
+        // Back to the list the admin came from, not the default tab.
+        // input(), not query(): the delete form POSTs `from` in the body.
+        return redirect()->to($this->resolveBackUrl($request->input('from'))['url'])->with(
             'success',
             "Deleted {$summary['name']} permanently — {$summary['users_deleted']} user(s) removed, "
             . "{$summary['users_detached']} kept (member of another company), "

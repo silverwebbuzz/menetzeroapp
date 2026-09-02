@@ -6126,3 +6126,49 @@ To see which 2 companies were involved:
 SELECT id, name, email, company_type, is_direct_client, consultant_id
 FROM companies WHERE consultant_id IS NOT NULL;
 ```
+
+## 88. Detail pages return to the list they came from
+
+Opening a consultant from the Consultants tab and acting on it dumped the admin
+into the direct-companies list: `admin.companies.show` had no back link at all,
+and §85's delete redirected to `admin.companies.index` with no tab.
+
+Both consultant *companies* and consultant *profiles* have their own lists
+(`admin.companies.index?tab=consultant` and `admin.consultants.index`), so
+"back" is genuinely ambiguous without recording where the admin came from.
+
+**Origin is carried in a `from` query parameter**, resolved by
+`SuperAdminController::resolveBackUrl()`:
+
+| `from` | Back goes to |
+|---|---|
+| `consultant` | Companies list, Consultants tab |
+| `agency:<id>` | That agency's detail page |
+| anything else / absent | Companies list, Direct tab |
+
+`from` is user input, so it is **whitelisted, never used as a redirect target
+directly** -- turning it into a URL would be an open-redirect hole. The
+`agency:<id>` branch also confirms the company exists before linking to it.
+
+Wired at three points: the list's View link carries the current tab, the
+agency's client table marks itself as the origin, and the delete form posts
+`from` through so deleting from an agency's client list returns to that agency.
+
+**Caught while wiring:** `destroyCompany()` read `$request->query('from')`, but
+the delete form POSTs it in the BODY -- `query()` only reads the URL, so it
+would silently have fallen back to the default tab. Now `input()` there, and
+`query()` in `showCompany()` where it really is a GET parameter.
+
+Also fixed: `CompanySubscriptionController::grant()` redirected to
+`companies.show` without `from`, which would have reset the back link after
+every grant. (No view posts to that route yet, so the value is simply null and
+falls back -- correct, and ready if the form is added.)
+
+Most other admin actions use `back()`, which preserves the full URL including
+`from`, so they needed no change.
+
+**Verified:** controller balanced; both views' directives and comments paired;
+`$back` passed at the only render site of `admin.companies.show`; no other
+controller renders that view.
+
+Run: `php artisan optimize:clear`

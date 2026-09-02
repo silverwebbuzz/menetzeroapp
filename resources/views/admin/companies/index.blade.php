@@ -186,7 +186,9 @@
                             <td class="cell-muted">{{ optional($company->created_at)->format('d M Y') ?? '—' }}</td>
                             <td>
                                 <div class="row-actions">
-                                    <a href="{{ route('admin.companies.show', $company->id) }}" class="btn btn-ghost btn-xs">
+                                    {{-- Carry the originating tab so the detail page can send the admin back
+                                         to the list they came from, not the default one. --}}
+                                    <a href="{{ route('admin.companies.show', ['id' => $company->id, 'from' => $tab]) }}" class="btn btn-ghost btn-xs">
                                         View
                                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
