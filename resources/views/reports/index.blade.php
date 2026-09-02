@@ -202,12 +202,12 @@
 
         @if($previewOnly)
             <x-preview-only-banner
-                :message="$gate->lockedFeatureMessage('In-app preview only. Request a package to download official GHG, Excel, and IEQT exports.', 'Report downloads')"
-                :upgrade-label="$gate->upgradeButtonLabel('Request a package')" />
+                :message="$gate->lockedFeatureMessage('In-app preview only. Upgrade your package to download official GHG, Excel, and IEQT exports.', 'Report downloads')"
+                :upgrade-label="$gate->upgradeButtonLabel('Upgrade Package')" />
         @elseif($trialWatermarked)
             <x-preview-only-banner
                 :message="$gate->watermarkBannerMessage()"
-                :upgrade-label="$gate->upgradeButtonLabel('Request a package')" />
+                :upgrade-label="$gate->upgradeButtonLabel('Upgrade Package')" />
         @endif
 
         <x-export-readiness-banner :readiness="$exportReadiness ?? null" />

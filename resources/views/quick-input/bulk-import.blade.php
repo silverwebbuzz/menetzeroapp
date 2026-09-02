@@ -60,7 +60,7 @@
                     @endif
                 </div>
                 <div class="callout-panel__actions">
-                    <a href="{{ $gate->upgradeRoute() }}" class="btn btn-primary btn-sm">{{ $gate->upgradeButtonLabel('Request a package') }}</a>
+                    <a href="{{ $gate->upgradeRoute() }}" class="btn btn-primary btn-sm">{{ $gate->upgradeButtonLabel('Upgrade Package') }}</a>
                 </div>
             </div>
         @else
@@ -134,7 +134,7 @@
                     @endif
                 </div>
                 <div class="callout-panel__actions">
-                    <a href="{{ $gate->upgradeRoute() }}" class="btn btn-primary btn-sm">{{ $gate->upgradeButtonLabel('Request a package') }}</a>
+                    <a href="{{ $gate->upgradeRoute() }}" class="btn btn-primary btn-sm">{{ $gate->upgradeButtonLabel('Upgrade Package') }}</a>
                 </div>
             </div>
         @elseif(!$gate->canBulkImport())
@@ -148,7 +148,7 @@
                     @endif
                 </div>
                 <div class="callout-panel__actions">
-                    <a href="{{ $gate->upgradeRoute() }}" class="btn btn-primary btn-sm">{{ $gate->upgradeButtonLabel('Request a package') }}</a>
+                    <a href="{{ $gate->upgradeRoute() }}" class="btn btn-primary btn-sm">{{ $gate->upgradeButtonLabel('Upgrade Package') }}</a>
                 </div>
             </div>
         @else

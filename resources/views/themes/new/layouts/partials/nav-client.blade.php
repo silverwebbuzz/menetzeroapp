@@ -109,8 +109,8 @@
                     @if ($scopeNum === 3 && $scope3Locked)
                         <a href="{{ isset($gate) ? $gate->upgradeRoute() : route('subscriptions.billing') }}"
                            class="mnz-subnav__link is-locked"
-                           title="{{ isset($gate) && $gate->isAgencyWorkspace() ? $gate->agencyLockedMessage('Scope 3') : 'Request a package to expand Scope 3' }}">
-                            {{ isset($gate) && $gate->isAgencyWorkspace() ? 'Request slots' : 'Request a package' }}
+                           title="{{ isset($gate) && $gate->isAgencyWorkspace() ? $gate->agencyLockedMessage('Scope 3') : 'Upgrade your package to expand Scope 3' }}">
+                            {{ isset($gate) && $gate->isAgencyWorkspace() ? 'Request slots' : 'Upgrade Package' }}
                         </a>
                     @else
                         @foreach ($scopeSources[$scopeNum] as $source)

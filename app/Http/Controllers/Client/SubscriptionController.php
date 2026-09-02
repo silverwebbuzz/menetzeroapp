@@ -62,7 +62,7 @@ class SubscriptionController extends Controller
     }
 
     /**
-     * Self-serve upgrade catalog removed (Phase 3). Request a package via billing / support.
+     * Self-serve upgrade catalog removed (Phase 3). Upgrade your package via billing / support.
      */
     public function upgrade()
     {

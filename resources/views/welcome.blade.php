@@ -23,7 +23,7 @@
             <a href="{{ route('register') }}" class="mkt-btn mkt-btn-primary mkt-btn-lg">Company sign up</a>
             <a href="{{ route('pricing') }}" class="mkt-btn mkt-btn-outline mkt-btn-lg">Explore Free</a>
         </div>
-        <p class="text-xs text-gray-400 mt-4">Free for all · Request a package when ready · Google or email registration</p>
+        <p class="text-xs text-gray-400 mt-4">Free for all · Upgrade your package when ready · Google or email registration</p>
     </div>
 </section>
 
@@ -36,7 +36,7 @@
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             @foreach([
                 ['MOCCAE-ready from day one', 'Generate GHG inventories, MOCCAE Scope 1 & 2 PDFs, and IEQT exports aligned with UAE reporting workflows.'],
-                ['Start free, request when ready', 'Try Scope 1 & 2 and watermarked trial downloads at no cost. Request a package for official clean exports and higher limits.'],
+                ['Start free, request when ready', 'Try Scope 1 & 2 and watermarked trial downloads at no cost. Upgrade your package for official clean exports and higher limits.'],
                 ['UAE ESG on higher packages', 'Build narrative chapters, auto-pull GHG totals, and download the integrated UAE ESG Report PDF plus ESG Scorecard on ESG packages.'],
                 ['Human review when you need it', 'Connect with verified UAE consultants from the directory — optional review packs for professional sign-off.'],
             ] as $item)
@@ -188,7 +188,7 @@
     <div class="mkt-container">
         <div class="mkt-section-head">
             <h2>Reports &amp; exports by package</h2>
-            <p>Capabilities only — no public prices. Request a package from your account when ready.</p>
+            <p>Capabilities only — no public prices. Upgrade your package from your account when ready.</p>
         </div>
         <div class="mkt-table-wrap">
             <table class="mkt-table">
@@ -262,7 +262,7 @@
                 ['01', 'Create your account', 'Company sign up with Google or email — add your organisation and first location.'],
                 ['02', 'Enter emission data', 'Use quick input or bulk import to capture Scope 1 & 2 activity data across your sites.'],
                 ['03', 'Review your dashboard', 'See calculated totals, explore disclosure forms, and identify carbon hotspots.'],
-                ['04', 'Export & report', 'Request a package for clean MOCCAE/GHG exports, or an ESG package for UAE ESG Report, Scorecard, IFRS, and GRI deliverables.'],
+                ['04', 'Export & report', 'Upgrade your package for clean MOCCAE/GHG exports, or an ESG package for UAE ESG Report, Scorecard, IFRS, and GRI deliverables.'],
             ] as $step)
                 <div class="relative">
                     <div class="mkt-step-badge">{{ $step[0] }}</div>

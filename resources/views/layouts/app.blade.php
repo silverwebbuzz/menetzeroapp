@@ -289,7 +289,7 @@
                                 Pricing is confirmed offline.
                             </span>
                             <a href="{{ $companyRenewalNudge['request_url'] }}" class="inline-flex justify-center px-3 py-1.5 rounded-md bg-orange-600 text-white text-xs font-semibold hover:bg-orange-700 whitespace-nowrap">
-                                Request a package
+                                Upgrade Package
                             </a>
                         </div>
                     @endif

@@ -112,7 +112,7 @@ class PlanEntitlementDefaults
     {
         return [
             'plan_name' => 'Free',
-            'description' => 'Scope 1 & 2 full, Scope 3 (1 entry per category), disclosure previews, watermarked GHG/Excel/IEQT trial downloads. Request a package for clean exports.',
+            'description' => 'Scope 1 & 2 full, Scope 3 (1 entry per category), disclosure previews, watermarked GHG/Excel/IEQT trial downloads. Upgrade your package for clean exports.',
             'price_annual' => 0,
             'currency' => 'AED',
             'sort_order' => 1,

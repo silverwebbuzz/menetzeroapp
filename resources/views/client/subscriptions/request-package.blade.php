@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Request a package - MenetZero')
-@section('page-title', 'Request a package')
+@section('title', 'Upgrade Package - MenetZero')
+@section('page-title', 'Upgrade Package')
 
 @section('content')
 @php
@@ -10,7 +10,7 @@
 <div class="w-full max-w-6xl">
     <div class="mb-6">
         <a href="{{ route('subscriptions.billing') }}" class="text-sm text-brand hover:underline">&larr; Plan &amp; billing</a>
-        <h1 class="text-3xl font-bold text-gray-900 mt-2">Request a package</h1>
+        <h1 class="text-3xl font-bold text-gray-900 mt-2">Upgrade Package</h1>
         <p class="mt-2 text-gray-600">
             Compare capabilities across packages, select one, then add extras if needed.
             MENetZero confirms the quote offline and activates when payment clears — no prices shown here.

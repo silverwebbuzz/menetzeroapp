@@ -327,7 +327,7 @@
                             expires {{ $companyRenewalNudge['expires_at']->format('d M Y') }}
                             ({{ $companyRenewalNudge['days_left'] }} days). Pricing is confirmed offline.
                         </span>
-                        <a href="{{ $companyRenewalNudge['request_url'] }}" class="mnz-btn mnz-btn--primary">Request a package</a>
+                        <a href="{{ $companyRenewalNudge['request_url'] }}" class="mnz-btn mnz-btn--primary">Upgrade Package</a>
                     </div>
                 </div>
             @endif

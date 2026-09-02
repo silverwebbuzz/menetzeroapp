@@ -3,7 +3,7 @@
 namespace App\Data;
 
 /**
- * Company package choices for "Request a package" (Phase 4).
+ * Company package choices for "Upgrade Package" (Phase 4).
  * Features only — no AED. Commercial amounts live in admin / offline quotes (§5).
  */
 class CompanyPackageOptions

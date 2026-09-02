@@ -25,7 +25,7 @@ class TrialWatermarkNoticeSheet implements FromArray, WithStyles, WithTitle
             [''],
             ['This file is a draft working paper for exploring the platform.'],
             ['It is NOT for regulatory submission, auditor delivery, or client-facing final reporting.'],
-            ['Request a package from MENetZero for clean official exports.'],
+            ['Upgrade your package with MENetZero for clean official exports.'],
         ];
     }
 

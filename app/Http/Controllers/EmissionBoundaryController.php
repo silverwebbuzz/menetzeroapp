@@ -113,32 +113,12 @@ class EmissionBoundaryController extends Controller
             );
         }
 
-        // Handle different actions
-        $action = $request->input('action', 'save');
-        
-        if ($action === 'next') {
-            // Get the current tab from the form
-            $currentTab = $request->input('current_tab', 'scope1');
-            
-            // Determine next tab based on current tab
-            if ($currentTab === 'scope1') {
-                return redirect()->route('emission-boundaries.index', $location)
-                    ->with('success', 'Scope 1 selections saved! Please continue with Scope 2.')
-                    ->with('active_tab', 'scope2');
-            } elseif ($currentTab === 'scope2') {
-                return redirect()->route('emission-boundaries.index', $location)
-                    ->with('success', 'Scope 2 selections saved! Please continue with Scope 3.')
-                    ->with('active_tab', 'scope3');
-            } else {
-                // If somehow on scope3, just redirect back to scope3
-                return redirect()->route('emission-boundaries.index', $location)
-                    ->with('success', 'Selections saved!')
-                    ->with('active_tab', 'scope3');
-            }
-        } else {
-            // Save and close - redirect to locations listing
-            return redirect()->route('locations.index')
-                ->with('success', 'Emission boundaries updated successfully!');
-        }
+        // The page shows all three scopes at once and posts them together,
+        // so there is no tab sequence left to advance through. The old
+        // action/current_tab branch drove Next between tabs; it went out with
+        // the tabs. Scopes with nothing ticked are still written above as an
+        // empty array, which is what makes unticking everything persist.
+        return redirect()->route('locations.index')
+            ->with('success', 'Emission boundaries updated for ' . $location->name . '.');
     }
 }

@@ -661,7 +661,7 @@ class SubscriptionService
                 'limit' => $limit,
                 'used' => $used,
                 'message' => "Your Free access allows {$limit} entry per Scope 3 category. "
-                    . 'Request a package for higher Scope 3 limits.',
+                    . 'Upgrade your package for higher Scope 3 limits.',
             ];
         }
 

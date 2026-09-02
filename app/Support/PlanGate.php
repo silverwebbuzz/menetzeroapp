@@ -132,21 +132,24 @@ class PlanGate
         return route('subscriptions.request-package');
     }
 
-    public function upgradeButtonLabel(string $clientLabel = 'Request a package'): string
+    public function upgradeButtonLabel(string $clientLabel = 'Upgrade Package'): string
     {
         if ($this->isAgencyWorkspace()) {
             return 'Request clients';
         }
 
+        // Named plans must not leak into a button label: the plan a user needs
+        // depends on the feature they hit, and prices are confirmed offline.
+        // 'upgrade' is deliberately NOT in this list any more — it used to be,
+        // which silently rewrote every "Upgrade" caller back to the old wording.
         if (str_contains(strtolower($clientLabel), 'starter')
             || str_contains(strtolower($clientLabel), 'growth')
-            || str_contains(strtolower($clientLabel), 'upgrade')
             || str_contains(strtolower($clientLabel), 'view plans')
             || str_contains(strtolower($clientLabel), 'view upgrade')) {
-            return 'Request a package';
+            return 'Upgrade Package';
         }
 
-        return $clientLabel !== '' ? $clientLabel : 'Request a package';
+        return $clientLabel !== '' ? $clientLabel : 'Upgrade Package';
     }
 
     public function lockedFeatureMessage(string $clientMessage, string $featureName = 'This feature'): string
@@ -256,7 +259,7 @@ class PlanGate
 
     public function watermarkBannerMessage(): string
     {
-        return 'These downloads are watermarked Free trial files — draft only, not for regulatory submission or auditor delivery. Request a package for clean official exports.';
+        return 'These downloads are watermarked Free trial files — draft only, not for regulatory submission or auditor delivery. Upgrade your package for clean official exports.';
     }
 
     /** Starter-tier exports (GHG, MOCCAE, Excel, IEQT). */
@@ -326,7 +329,7 @@ class PlanGate
             [
                 'label' => 'Bulk import',
                 'allowed' => $this->canBulkImport(),
-                'hint' => $this->canBulkImport() ? null : 'Request a package',
+                'hint' => $this->canBulkImport() ? null : 'Upgrade Package',
             ],
             [
                 'label' => 'Scope 3',
@@ -365,7 +368,7 @@ class PlanGate
             $allowed = $this->canExport($item['code']);
             $hint = null;
             if (!$allowed) {
-                $hint = 'Request a package';
+                $hint = 'Upgrade Package';
             } elseif ($this->exportsAreWatermarked()) {
                 $hint = 'Watermarked trial';
             }
@@ -426,7 +429,7 @@ class PlanGate
     protected function scope3EntitlementHint(): ?string
     {
         if ($this->isScope3Locked()) {
-            return 'Request a package';
+            return 'Upgrade Package';
         }
 
         $limit = app(PlanEntitlementService::class)->getScope3RecordsPerFormLimit($this->companyId ?? 0);
