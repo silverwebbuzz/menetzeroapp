@@ -184,88 +184,98 @@ class LocationController extends Controller
 
     public function update(Request $request, Location $location)
     {
-        \Log::info('=== LOCATION CONTROLLER UPDATE METHOD CALLED ===', [
-            'location_id' => $location->id,
-            'request_data' => $request->all(),
-            'method' => $request->method(),
-            'url' => $request->url()
+        $this->requirePermission('locations.*', null, ['manage_locations']);
+
+        $user = Auth::user();
+        $company = $user->getActiveCompany();
+
+        if (!$company || $location->company_id !== $company->id) {
+            abort(403, 'Unauthorized access to this location.');
+        }
+
+        // Same required set as store(). The edit form posts 15 fields; this
+        // method used to validate 7 and write 7, so country, city, address,
+        // location_type and the three utility toggles were silently dropped —
+        // the form reported success while discarding half of what was typed.
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'nullable|string|max:500',
+            'city' => 'nullable|string|max:100',
+            'country' => 'required|string|max:100',
+            'location_type' => 'nullable|string|max:100',
+            'staff_count' => 'required|integer|min:1',
+            'staff_work_from_home' => 'nullable|boolean',
+            'work_from_home_percentage' => 'nullable|numeric|min:0|max:100',
+            'fiscal_year_start' => 'required|string|max:20',
+            'is_head_office' => 'nullable|boolean',
+            'receives_utility_bills' => 'nullable|boolean',
+            'pays_electricity_proportion' => 'nullable|boolean',
+            'shared_building_services' => 'nullable|boolean',
+            'reporting_period' => 'required|integer|min:2020|max:2030',
+            'measurement_frequency' => 'required|string|max:20',
+        ], [
+            'country.required' => 'Select a country — it determines which emission factors apply to this location.',
+            'reporting_period.required' => 'Choose the year you are reporting on.',
+            'measurement_frequency.required' => 'Choose how often you will record data.',
         ]);
 
-        try {
-            $user = Auth::user();
-            $company = $user->getActiveCompany();
-        if (!$company || $location->company_id !== $company->id) {
-                abort(403, 'Unauthorized access to this location.');
-            }
+        $oldFrequency       = $location->measurement_frequency;
+        $oldReportingPeriod = $location->reporting_period;
+        $oldFiscalYearStart = $location->fiscal_year_start;
 
-            // Validation
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'staff_count' => 'required|integer|min:1',
-                'staff_work_from_home' => 'nullable|boolean',
-                'work_from_home_percentage' => 'nullable|numeric|min:0|max:100',
-                'measurement_frequency' => 'nullable|string|max:20',
-                'reporting_period' => 'nullable|integer|min:2020|max:2030',
-                'fiscal_year_start' => 'nullable|string|max:20',
-            ]);
+        // Promoting this location to head office demotes the previous one.
+        // Demoting the last head office is refused: reports assume one exists.
+        $wantsHeadOffice = $request->boolean('is_head_office');
 
-            \Log::info('Validation passed, proceeding with update');
-
-            // Store old values for comparison
-            $oldFrequency = $location->measurement_frequency;
-            $oldReportingPeriod = $location->reporting_period;
-            $oldFiscalYearStart = $location->fiscal_year_start;
-
-                // Update location
-                $location->update([
-                    'name' => $request->name,
-                    'staff_count' => $request->staff_count,
-                    'staff_work_from_home' => $request->boolean('staff_work_from_home'),
-                    'work_from_home_percentage' => $request->work_from_home_percentage,
-                    'measurement_frequency' => $request->measurement_frequency ?? 'Annually',
-                    'reporting_period' => $request->reporting_period,
-                    'fiscal_year_start' => $request->fiscal_year_start ?? 'January',
-                ]);
-
-            \Log::info('Location updated successfully', [
-                'location_id' => $location->id,
-                'old_frequency' => $oldFrequency,
-                'new_frequency' => $location->measurement_frequency,
-                'old_reporting_period' => $oldReportingPeriod,
-                'new_reporting_period' => $location->reporting_period,
-                'old_fiscal_year_start' => $oldFiscalYearStart,
-                'new_fiscal_year_start' => $location->fiscal_year_start
-            ]);
-
-            // Check if measurement settings changed and sync measurements
-            if ($oldFrequency != $location->measurement_frequency || 
-                $oldReportingPeriod != $location->reporting_period || 
-                $oldFiscalYearStart != $location->fiscal_year_start) {
-                
-                \Log::info('Measurement settings changed, syncing measurements');
-                
-                $service = app(\App\Services\MeasurementPeriodService::class);
-                $service->syncMeasurementPeriods($location, $user->id);
-                
-                \Log::info('Measurement sync completed');
-            }
-
-            return back()->with('success', 'Location updated successfully!');
-            
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            \Log::error('Validation error in location update', [
-                'errors' => $e->errors(),
-                'request_data' => $request->all()
-            ]);
-            return back()->withErrors($e->errors())->withInput();
-        } catch (\Exception $e) {
-            \Log::error('Error updating location: ' . $e->getMessage(), [
-                'location_id' => $location->id,
-                'request_data' => $request->all(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            return back()->withErrors(['error' => 'Failed to update location: ' . $e->getMessage()])->withInput();
+        if ($wantsHeadOffice && !$location->is_head_office) {
+            $company->locations()->where('id', '!=', $location->id)
+                ->update(['is_head_office' => false]);
         }
+
+        if (!$wantsHeadOffice && $location->is_head_office) {
+            $otherHeadOffice = $company->locations()
+                ->where('id', '!=', $location->id)
+                ->where('is_head_office', true)
+                ->exists();
+
+            if (!$otherHeadOffice) {
+                return back()->withInput()->withErrors([
+                    'is_head_office' => 'This is your only head office. Make another location the head office first.',
+                ]);
+            }
+        }
+
+        $location->update([
+            'name' => $request->name,
+            'address' => $request->address,
+            'city' => $request->city,
+            'country' => $request->country,
+            'location_type' => $request->location_type,
+            'staff_count' => $request->staff_count,
+            'staff_work_from_home' => $request->boolean('staff_work_from_home'),
+            'work_from_home_percentage' => $request->boolean('staff_work_from_home')
+                ? ($request->work_from_home_percentage ?? 100)
+                : null,
+            'fiscal_year_start' => $request->fiscal_year_start,
+            'is_head_office' => $wantsHeadOffice,
+            'receives_utility_bills' => $request->boolean('receives_utility_bills'),
+            'pays_electricity_proportion' => $request->boolean('pays_electricity_proportion'),
+            'shared_building_services' => $request->boolean('shared_building_services'),
+            'reporting_period' => $request->reporting_period,
+            'measurement_frequency' => $request->measurement_frequency,
+        ]);
+
+        // Only regenerate periods when the settings that define them changed.
+        // syncMeasurementPeriods() adds what is missing and keeps what exists,
+        // so entered data survives; it never deletes periods.
+        if ($oldFrequency !== $location->measurement_frequency
+            || (int) $oldReportingPeriod !== (int) $location->reporting_period
+            || $oldFiscalYearStart !== $location->fiscal_year_start) {
+            app(\App\Services\MeasurementPeriodService::class)
+                ->syncMeasurementPeriods($location, $user->id);
+        }
+
+        return back()->with('success', 'Location updated successfully!');
     }
 
     public function destroy(Location $location)
