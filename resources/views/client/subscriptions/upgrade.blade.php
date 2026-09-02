@@ -176,7 +176,12 @@
                             </button>
                         @else
                             <label class="flex items-center justify-center gap-2 w-full px-4 py-2 border-2 {{ in_array($change['type'] ?? '', ['downgrade', 'downgrade_to_free']) ? 'border-amber-400 text-amber-800 hover:bg-amber-50' : 'border-orange-500 text-orange-700 hover:bg-orange-50' }} rounded-lg cursor-pointer text-sm font-medium transition">
-                                <input type="radio" name="plan_id" value="{{ $plan->id }}" class="text-orange-600 focus:ring-orange-500">
+                                <input type="radio" name="plan_id" value="{{ $plan->id }}" class="plan-radio text-orange-600 focus:ring-orange-500"
+                                       data-plan-name="{{ $plan->plan_name ?? $meta['name'] }}"
+                                       data-price-text="{{ $priceText }}"
+                                       data-price-sub="{{ $priceSub }}"
+                                       data-change-type="{{ $change['type'] ?? '' }}"
+                                       @if($isPaidUpgrade)data-charge="{{ \App\Services\CurrencyService::format($change['charge_amount'], $change['charge_currency']) }}"@endif>
                                 <span>
                                     @if(($change['type'] ?? '') === 'upgrade')
                                         Upgrade to {{ $meta['name'] }}
@@ -197,54 +202,113 @@
             <p class="text-red-600 text-sm mb-4">{{ $message }}</p>
         @enderror
 
-        <!-- Submit (annual billing only) -->
-        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-10">
-            <div class="flex flex-col gap-5">
-                <div>
-                    <p class="text-sm font-medium text-gray-700">Billed annually</p>
-                    <label class="flex items-center mt-2">
-                        <input type="checkbox" name="auto_renew" value="1" checked class="rounded border-gray-300 text-orange-600 focus:ring-orange-500">
-                        <span class="ml-2 text-gray-600 text-sm">Remind me to renew next year (one-time payment each year — no card mandate)</span>
-                    </label>
-                </div>
+        {{-- Checkout footer.
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Coupon code <span class="text-gray-400 font-normal">(optional)</span></label>
-                    <input type="text" name="coupon_code" value="{{ old('coupon_code') }}" placeholder="e.g. LAUNCH50"
-                           class="w-full max-w-xs border border-gray-300 rounded-lg px-3 py-2 text-sm uppercase">
-                    @error('coupon_code')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
-                </div>
+             Previously one full-width band: checkbox, coupon, currency note and
+             buttons all stacked hard against the left edge with the actions far
+             right, and nowhere on it did the page say WHAT you were buying or
+             what you would pay. The order summary now restates the selection
+             next to the button that commits to it. --}}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start mb-10">
 
-                {{-- Razorpay is the only gateway, so there is nothing to choose.
-                     The radio group and its 'gateway' form field were removed with
-                     Cashfree and Stripe; processUpgrade() resolves razorpay
-                     directly and no longer validates a submitted gateway name. --}}
-                <div id="payment-method-section">
-                    @if($enabledGateways->isEmpty())
-                        <p class="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-                            Online payment isn't configured yet. You can switch to the Free plan, or contact sales for paid plans.
-                        </p>
-                    @else
-                        <p class="text-xs text-gray-400">
-                            @if($displayCurrency === 'AED')
-                                Checkout opens in <strong>AED</strong>. If AED is still being activated with our payment provider you will be charged the <strong>INR (&#8377;) equivalent</strong> automatically, and told before you pay.
-                            @else
-                                Checkout opens in <strong>INR (&#8377;)</strong>. The exact amount is shown on the payment screen.
-                            @endif
-                        </p>
-                    @endif
-                </div>
+            <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-6">
+                <h3 class="text-base font-semibold text-gray-900 mb-4">Payment options</h3>
 
-                <div class="flex items-center justify-end gap-3 border-t border-gray-100 pt-4">
-                    <a href="{{ route('subscriptions.billing') }}" class="px-5 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">Back to billing</a>
-                    <button type="submit" class="px-6 py-2 {{ $checkoutAvailable ? 'bg-orange-600 hover:bg-orange-700 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300' }} rounded-lg text-sm font-medium">
-                        {{ $checkoutAvailable ? 'Continue' : 'Apply change (downgrades only)' }}
-                    </button>
-                    @if(!$checkoutAvailable)
-                        <p class="text-xs text-gray-400 w-full text-right">Paid upgrades show as Coming soon until checkout opens.</p>
-                    @endif
+                <div class="space-y-5">
+                    <div>
+                        <label class="flex items-start gap-2">
+                            <input type="checkbox" name="auto_renew" value="1" checked
+                                   class="mt-0.5 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                            <span class="text-sm">
+                                <span class="font-medium text-gray-900">Remind me to renew next year</span>
+                                <span class="block text-gray-600 mt-0.5">
+                                    We will email you before your package expires. No card is stored and nothing is
+                                    charged automatically.
+                                </span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <div class="border-t border-gray-100 pt-5">
+                        <label for="coupon_code" class="block text-sm font-medium text-gray-700 mb-1">
+                            Coupon code <span class="text-gray-400 font-normal">(optional)</span>
+                        </label>
+                        <input type="text" id="coupon_code" name="coupon_code" value="{{ old('coupon_code') }}"
+                               placeholder="e.g. LAUNCH50"
+                               class="w-full max-w-xs border border-gray-300 rounded-lg px-3 py-2 text-sm uppercase">
+                        <p class="text-xs text-gray-500 mt-1">Applied at checkout — the discount is shown before you pay.</p>
+                        @error('coupon_code')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
+                    </div>
+
+                    {{-- Razorpay is the only gateway, so there is nothing to choose.
+                         The radio group and its 'gateway' form field were removed with
+                         Cashfree and Stripe; processUpgrade() resolves razorpay
+                         directly and no longer validates a submitted gateway name. --}}
+                    <div id="payment-method-section" class="border-t border-gray-100 pt-5">
+                        @if($enabledGateways->isEmpty())
+                            <p class="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                                Online payment isn't configured yet. You can switch to the Free plan, or contact sales for paid plans.
+                            </p>
+                        @else
+                            {{-- This warns that you may be charged in a different currency
+                                 than the one displayed, so it must be readable. It was
+                                 text-gray-400: the lightest text on the page. --}}
+                            <div class="text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+                                @if($displayCurrency === 'AED')
+                                    Checkout opens in <strong>AED</strong>. If AED is still being activated with our
+                                    payment provider you will be charged the <strong>INR (&#8377;) equivalent</strong>
+                                    automatically, and told the exact amount before you pay.
+                                @else
+                                    Checkout opens in <strong>INR (&#8377;)</strong>. The exact amount is shown on the
+                                    payment screen before you pay.
+                                @endif
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
+
+            {{-- Order summary. Values are mirrored from the selected plan card by
+                 the script below; the server re-resolves everything from plan_id
+                 on submit, so nothing here can change what is actually charged. --}}
+            <aside class="lg:col-span-1 lg:sticky lg:top-6 bg-white rounded-xl border border-gray-200 p-6">
+                <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-4">Order summary</h3>
+
+                <div id="summary-empty" class="text-sm text-gray-500">
+                    Select a package above to see what you will pay.
+                </div>
+
+                <div id="summary-filled" class="hidden">
+                    <div class="text-lg font-bold text-gray-900" id="summary-plan"></div>
+                    <div class="text-xs text-gray-500" id="summary-billing">Billed annually</div>
+
+                    <div class="border-t border-gray-100 mt-4 pt-4 flex items-baseline justify-between">
+                        <span class="text-sm text-gray-600">Package price</span>
+                        <span class="text-sm font-medium text-gray-900" id="summary-price"></span>
+                    </div>
+
+                    <div class="border-t border-gray-200 mt-3 pt-3 flex items-baseline justify-between">
+                        <span class="text-sm font-semibold text-gray-900">Due today</span>
+                        <span class="text-xl font-extrabold text-gray-900" id="summary-total"></span>
+                    </div>
+
+                    <p class="text-xs text-gray-500 mt-1" id="summary-note"></p>
+                </div>
+
+                <div class="mt-5 space-y-2">
+                    <button type="submit"
+                            class="w-full px-6 py-2.5 {{ $checkoutAvailable ? 'bg-orange-600 hover:bg-orange-700 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300' }} rounded-lg text-sm font-medium">
+                        {{ $checkoutAvailable ? 'Continue to payment' : 'Apply change (downgrades only)' }}
+                    </button>
+                    <a href="{{ route('subscriptions.billing') }}"
+                       class="block w-full text-center px-5 py-2 text-sm text-gray-600 hover:text-gray-900">
+                        Back to billing
+                    </a>
+                    @if(!$checkoutAvailable)
+                        <p class="text-xs text-gray-500 text-center">Paid upgrades show as Coming soon until checkout opens.</p>
+                    @endif
+                </div>
+            </aside>
         </div>
     </form>
 
@@ -294,4 +358,57 @@
     ])
 
 </div>
+
+<script>
+(function () {
+    // Mirrors the selected plan card into the order summary. Display only —
+    // processUpgrade() re-resolves the plan and its price from plan_id, so a
+    // stale or tampered value here cannot affect what is charged.
+    var radios = document.querySelectorAll('.plan-radio');
+    if (!radios.length) { return; }
+
+    var empty  = document.getElementById('summary-empty');
+    var filled = document.getElementById('summary-filled');
+
+    function render() {
+        var picked = document.querySelector('.plan-radio:checked');
+
+        if (!picked) {
+            empty.classList.remove('hidden');
+            filled.classList.add('hidden');
+            return;
+        }
+
+        empty.classList.add('hidden');
+        filled.classList.remove('hidden');
+
+        var price  = picked.getAttribute('data-price-text') || '';
+        var sub    = picked.getAttribute('data-price-sub') || '';
+        var charge = picked.getAttribute('data-charge');
+        var type   = picked.getAttribute('data-change-type') || '';
+
+        document.getElementById('summary-plan').textContent = picked.getAttribute('data-plan-name') || '';
+        document.getElementById('summary-price').textContent = price;
+        document.getElementById('summary-billing').textContent =
+            sub === 'per year' ? 'Billed annually' : sub;
+
+        // charge_amount already accounts for credit from the current plan, so
+        // it is the figure to show as due today whenever one was supplied.
+        document.getElementById('summary-total').textContent = charge || price;
+
+        var note = document.getElementById('summary-note');
+        if (charge && charge !== price) {
+            note.textContent = 'Includes credit from your current package.';
+        } else if (type === 'downgrade' || type === 'downgrade_to_free') {
+            note.textContent = 'Takes effect at the end of your current paid period.';
+        } else {
+            note.textContent = '';
+        }
+    }
+
+    radios.forEach(function (r) { r.addEventListener('change', render); });
+    render();
+})();
+</script>
+
 @endsection

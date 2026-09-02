@@ -7,7 +7,7 @@
 <div class="w-full">
     <div class="mb-6">
         <h1 class="text-3xl font-bold text-gray-900">Plan &amp; billing</h1>
-        <p class="mt-2 text-gray-600">Your subscription, usage, and entitlements. Paid packages are requested here — pricing is confirmed offline.</p>
+        <p class="mt-2 text-gray-600">Your subscription, usage, and entitlements.</p>
     </div>
 
     @if(session('success'))
@@ -69,7 +69,7 @@
                      primary action is to view and buy a plan. The request form
                      is still reachable below for Enterprise / invoice buyers. --}}
                 <a href="{{ route('subscriptions.upgrade') }}" class="px-4 py-2.5 bg-orange-600 text-white text-sm font-semibold rounded-lg hover:bg-orange-700 text-center">
-                    {{ ($daysRemaining ?? 999) <= 45 && !empty($isPaidPlan) ? 'Renew plan' : 'Plans' }}
+                    {{ ($daysRemaining ?? 999) <= 45 && !empty($isPaidPlan) ? 'Renew plan' : 'Upgrade plan' }}
                 </a>
                 {{-- Enterprise has no list price, so the request form stays the
                      only way to reach it. This is now its ONLY entry point in
@@ -213,23 +213,23 @@
         </a>
     </div>
 
-    {{-- Payment history & billing methods (tabs) --}}
+    {{-- Payment history.
+
+         The "Billing methods" tab that used to sit beside this was removed
+         along with its modal, routes and controller methods. Its Add-card form
+         posted a full card number to this application to store the last four
+         digits, brand, expiry and billing address -- and nothing ever read the
+         result: Razorpay collects card details on its own checkout and the
+         saved-card table was never consulted when taking payment. It put the
+         app in PCI-DSS scope for a feature that did nothing. With one section
+         left there is nothing to tab between, so this is a plain panel. --}}
     <div class="bg-white rounded-lg border border-gray-200">
-        <div class="border-b border-gray-200">
-            <nav class="flex -mb-px">
-                <button type="button" onclick="showTab('transactions')" id="transactions-tab" class="tab-button active px-6 py-4 text-sm font-medium border-b-2 border-blue-500 text-blue-600">
-                    Payment history
-                </button>
-                <button type="button" onclick="showTab('billing-methods')" id="billing-methods-tab" class="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
-                    Billing methods
-                </button>
-            </nav>
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Payment history</h3>
+            <p class="text-sm text-gray-500 mt-0.5">Your past payments and their status. Invoices are emailed and downloadable.</p>
         </div>
         <div class="p-6">
-            <div id="transactions-content" class="tab-content">
-                <p class="text-xs text-gray-500 mb-4">
-                    Amounts are confirmed offline with MENetZero. This list tracks request activity and payment status — not a public price list.
-                </p>
+            <div>
                 @if($paymentHistory && $paymentHistory->count() > 0)
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 text-sm">
@@ -276,49 +276,9 @@
                 @endif
             </div>
 
-            <div id="billing-methods-content" class="tab-content hidden">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="font-semibold text-gray-900">Saved cards</h3>
-                    <button type="button" onclick="openAddBillingMethodModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">Add card</button>
-                </div>
-                @if($billingMethods && $billingMethods->count() > 0)
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        @foreach($billingMethods as $method)
-                            <div class="border border-gray-200 rounded-lg p-4 flex justify-between items-center">
-                                <div>
-                                    <p class="font-semibold">•••• {{ $method->card_last4 ?? '0000' }}</p>
-                                    <p class="text-sm text-gray-500">{{ $method->card_brand ?? 'Card' }} · {{ $method->card_exp_month }}/{{ $method->card_exp_year }}</p>
-                                </div>
-                                @if($method->is_default)
-                                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Default</span>
-                                @endif
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <p class="text-sm text-gray-500 py-6 text-center">No saved payment methods.</p>
-                @endif
-            </div>
         </div>
     </div>
 </div>
 
-@include('client.subscriptions.partials.billing-method-modal', ['billingMethods' => $billingMethods])
 
-<script>
-function showTab(tabName) {
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-    document.querySelectorAll('.tab-button').forEach(btn => {
-        btn.classList.remove('active', 'border-blue-500', 'text-blue-600');
-        btn.classList.add('border-transparent', 'text-gray-500');
-    });
-    document.getElementById(tabName + '-content').classList.remove('hidden');
-    const tab = document.getElementById(tabName + '-tab');
-    tab.classList.add('active', 'border-blue-500', 'text-blue-600');
-    tab.classList.remove('border-transparent', 'text-gray-500');
-}
-@if(session('active_tab'))
-document.addEventListener('DOMContentLoaded', () => showTab('{{ session('active_tab') }}'));
-@endif
-</script>
 @endsection

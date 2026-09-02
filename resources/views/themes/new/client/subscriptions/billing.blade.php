@@ -15,20 +15,14 @@
         client.consultants.index
       - the entitlement lists, which tell the user what they have paid for
 
-    TAB CONTRACT - this page's showTab() is NOT the same function as the one in
-    profile/partials/index-scripts. Both are global and both are named showTab,
-    but this one toggles the `hidden` class plus Tailwind colour utilities,
-    while profile's toggles .active / .inactive. They never load on the same
-    page. This page keeps its own copy verbatim rather than sharing, precisely
-    because the contracts differ.
-    Required ids: transactions-tab / transactions-content and
-    billing-methods-tab / billing-methods-content.
+    NO TABS: this page had a showTab() pair (Payment history / Billing methods)
+    and included the shared billing-method-modal. Billing methods was removed
+    entirely -- its Add-card form posted a full card number to this application
+    to store only the last four digits, and nothing ever read the result, since
+    Razorpay collects card details on its own checkout. The tab script and the
+    modal went with it, so no global showTab() is defined here any more.
 
-    MODAL: client.subscriptions.partials.billing-method-modal is already shared
-    and self-contained (its own script defines openAddBillingMethodModal and its
-    own ids), so it is included unchanged.
-
-    Controller data: $subscription $company $paymentHistory $billingMethods
+    Controller data: $subscription $company $paymentHistory
     $scheduledPlan $scheduledDowngradeWarnings $isPaidPlan $cancellationScheduled
     $isComplimentary $provisionLabel $gate $usageMeters $dataEntitlements
     $downloadEntitlements $consultantDirectoryLabel $daysRemaining
@@ -75,7 +69,7 @@
             <h1>Plan &amp; billing</h1>
             <p class="mnz-lead">
                 Your subscription, usage, and entitlements. Paid packages are requested
-                here — pricing is confirmed offline.
+                here.
             </p>
         </div>
     </div>
@@ -142,7 +136,7 @@
                     {{-- See the old-theme twin: primary action is now Plans
                          (self-serve checkout), not the offline request form. --}}
                     <a href="{{ route('subscriptions.upgrade') }}" class="mnz-btn mnz-btn--accent" style="text-align:center">
-                        {{ ($daysRemaining ?? 999) <= 45 && !empty($isPaidPlan) ? 'Renew plan' : 'Plans' }}
+                        {{ ($daysRemaining ?? 999) <= 45 && !empty($isPaidPlan) ? 'Renew plan' : 'Upgrade plan' }}
                     </a>
                     {{-- Only UI entry point to the request form (Enterprise /
                          invoice buyers); it is not in the nav. --}}
@@ -297,24 +291,23 @@
         </div>
     </div>
 
-    {{-- Payment history & billing methods --}}
+    {{-- Payment history. The "Billing methods" tab beside this was removed with
+         its modal, routes and controller methods: its Add-card form posted a
+         full card number to this app to store only the last four digits, and
+         nothing ever read the result -- Razorpay collects card details on its
+         own checkout. One section left means nothing to tab between. --}}
     <div class="mnz-panel">
-        <div style="border-bottom:1px solid var(--line)">
-            <nav style="display:flex">
-                <button type="button" onclick="showTab('transactions')" id="transactions-tab" class="tab-button active">
-                    Payment history
-                </button>
-                <button type="button" onclick="showTab('billing-methods')" id="billing-methods-tab" class="tab-button">
-                    Billing methods
-                </button>
-            </nav>
+        <div class="mnz-panel__head">
+            <div>
+                <h3>Payment history</h3>
+                <p class="mnz-muted">Your past payments and their status. Invoices are emailed and downloadable.</p>
+            </div>
         </div>
 
         <div class="mnz-panel__body">
-            <div id="transactions-content" class="tab-content">
+            <div>
                 <p style="font-size:11.5px;color:var(--ink-3);margin:0 0 14px">
-                    Amounts are confirmed offline with MENetZero. This list tracks request
-                    activity and payment status — not a public price list.
+                    Every payment you have made, with its status.
                 </p>
                 @if($paymentHistory && $paymentHistory->count() > 0)
                     <div style="overflow-x:auto">
@@ -362,46 +355,9 @@
                 @endif
             </div>
 
-            <div id="billing-methods-content" class="tab-content hidden">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-                    <h3 style="font-size:13px;font-weight:600;margin:0">Saved cards</h3>
-                    <button type="button" onclick="openAddBillingMethodModal()" class="mnz-btn mnz-btn--primary">Add card</button>
-                </div>
-                @if($billingMethods && $billingMethods->count() > 0)
-                    <div class="mnz-seam mnz-seam--2">
-                        @foreach($billingMethods as $method)
-                            <div style="padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px">
-                                <div>
-                                    <p style="margin:0;font-weight:600;font-size:12.5px">•••• {{ $method->card_last4 ?? '0000' }}</p>
-                                    <p style="margin:3px 0 0;font-size:11.5px;color:var(--ink-3)">{{ $method->card_brand ?? 'Card' }} · {{ $method->card_exp_month }}/{{ $method->card_exp_year }}</p>
-                                </div>
-                                @if($method->is_default)
-                                    <span class="mnz-chip mnz-chip--ok">Default</span>
-                                @endif
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="mnz-empty">
-                        <div class="mnz-empty__text">No saved payment methods.</div>
-                    </div>
-                @endif
-            </div>
         </div>
     </div>
 </div>
 
-@include('client.subscriptions.partials.billing-method-modal', ['billingMethods' => $billingMethods])
 
-<script>
-function showTab(tabName) {
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-    document.getElementById(tabName + '-content').classList.remove('hidden');
-    document.getElementById(tabName + '-tab').classList.add('active');
-}
-@if(session('active_tab'))
-document.addEventListener('DOMContentLoaded', () => showTab('{{ session('active_tab') }}'));
-@endif
-</script>
 @endsection

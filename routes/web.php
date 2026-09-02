@@ -627,12 +627,6 @@ Route::middleware([
         Route::get('/payment-history', [\App\Http\Controllers\Client\SubscriptionController::class, 'paymentHistory'])->name('payment-history');
         Route::post('/cancel', [\App\Http\Controllers\Client\SubscriptionController::class, 'cancel'])->name('cancel');
         Route::post('/resume', [\App\Http\Controllers\Client\SubscriptionController::class, 'resume'])->name('resume');
-        
-        // Billing Methods routes
-        Route::post('/billing-methods', [\App\Http\Controllers\Client\SubscriptionController::class, 'storeBillingMethod'])->name('billing-methods.store');
-        Route::put('/billing-methods/{billingMethod}', [\App\Http\Controllers\Client\SubscriptionController::class, 'updateBillingMethod'])->name('billing-methods.update');
-        Route::delete('/billing-methods/{billingMethod}', [\App\Http\Controllers\Client\SubscriptionController::class, 'destroyBillingMethod'])->name('billing-methods.destroy');
-        Route::post('/billing-methods/{billingMethod}/set-default', [\App\Http\Controllers\Client\SubscriptionController::class, 'setDefaultBillingMethod'])->name('billing-methods.set-default');
     });
 
     // Consultant directory (plan-gated visibility) + marketplace checkout (C10)

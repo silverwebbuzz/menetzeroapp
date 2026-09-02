@@ -1,98 +1,116 @@
 <?php
 
 /**
- * Human-friendly copy for company package guidance (legacy upgrade page + helpers).
- * No public AED. Request a package → offline quote → activate.
+ * Human-friendly copy for the company package guidance on the upgrade page.
+ *
+ * KEEP THIS IN STEP WITH THE CATALOGUE. The live self-serve tiers are
+ * client_free · client_carbon · client_esg · client_enterprise
+ * (SubscriptionPlanSeeder::ACTIVE_CODES). Everything else is retired: those
+ * rows still exist so grandfathered subscribers keep their entitlements, but
+ * nobody can buy them, so they must not appear in `examples` or the FAQ.
+ *
+ * This file previously described a six-tier line-up (Scope Basic, Scope Pro,
+ * ESG Starter, ESG Complete) and told users prices were not public. Both were
+ * out of date: the upgrade page renders each plan's price_annual, and checkout
+ * is self-serve through Razorpay. Copy that contradicts the page it sits on is
+ * worse than no copy, so when the catalogue moves, this moves with it.
  */
 return [
     'intro' => [
         'title' => 'Choose the package that matches what you need to deliver',
-        'body' => 'All packages include Scope 1 and 2 in MENetZero. The difference is clean exports, Scope 3 depth, disclosure PDFs, and how many sites and teammates you can use.',
+        'body' => 'Every package includes your full Scope 1 and 2 inventory. What changes is Scope 3 depth, '
+                . 'which reports you can download without a watermark, and how many sites and teammates you get.',
         'tips' => [
-            'Not sure yet? Stay on Free — Scope 1 & 2 are included, plus one Scope 3 entry per category (watermarked trial downloads).',
-            'Need official PDF downloads? Request a package — MENetZero confirms pricing offline and activates after payment.',
-            'Preparing an integrated UAE ESG report? Request Scope Pro or an ESG package.',
+            'Not sure yet? Stay on Free — Scope 1 & 2 for one site, plus one Scope 3 entry per category. Downloads are watermarked trial files.',
+            'Need clean MOCCAE, IEQT or GHG reports you can actually submit? That is Carbon.',
+            'Need IFRS S1 & S2, GRI, SASB or the UAE ESG Report? That is ESG.',
         ],
     ],
 
+    // Four entries, one per live tier. "You get" lines are deliberately close
+    // to plan_taglines below so the two cannot tell a user different stories.
     'examples' => [
         [
             'plan' => 'Free',
             'code' => 'client_free',
-            'scenario' => 'A 1-location café wants to understand its electricity and LPG use before committing budget.',
-            'you_get' => 'Enter data, view dashboards and disclosure previews — watermarked trial downloads only.',
+            'scenario' => 'A one-location café wants to understand its electricity and LPG use before committing any budget.',
+            'you_get' => 'Enter data, view dashboards and preview disclosures — watermarked trial downloads only.',
         ],
         [
-            'plan' => 'Scope Basic',
-            'code' => 'client_scope_basic',
-            'scenario' => 'A logistics SME with a few sites must submit a MOCCAE-aligned inventory this year.',
-            'you_get' => 'Up to 3 sites, bulk import, and clean GHG / MOCCAE / Excel / IEQT exports.',
+            'plan' => 'Carbon',
+            'code' => 'client_carbon',
+            'scenario' => 'A logistics SME with a few sites has to submit a MOCCAE-aligned inventory this year.',
+            'you_get' => 'Full Scope 1–3 inventory with clean MOCCAE, IEQT and GHG reports you can submit.',
         ],
         [
-            'plan' => 'Scope Pro',
-            'code' => 'client_scope_pro',
-            'scenario' => 'A mid-size org needing broader Scope 3 and ESG disclosure PDF exports.',
-            'you_get' => 'Up to 10 sites, broader Scope 3, UAE ESG Report / Scorecard / IFRS / GRI exports.',
-        ],
-        [
-            'plan' => 'ESG Starter',
-            'code' => 'client_esg_starter',
-            'scenario' => 'First integrated UAE ESG delivery with white-label / assurance options.',
-            'you_get' => 'Full ESG report set for mid-size orgs (up to 5 sites) plus assurance / white-label options.',
-        ],
-        [
-            'plan' => 'ESG Complete',
-            'code' => 'client_esg_complete',
-            'scenario' => 'A group needing larger site count and multi-entity consolidation.',
-            'you_get' => 'Full ESG suite at larger scale (up to 10 sites) with consolidation options.',
+            'plan' => 'ESG',
+            'code' => 'client_esg',
+            'scenario' => 'A mid-size organisation whose investors and lenders ask for IFRS and GRI disclosures, not just a carbon number.',
+            'you_get' => 'Everything in Carbon, plus IFRS S1 & S2, GRI, SASB and the UAE ESG Report.',
         ],
         [
             'plan' => 'Enterprise',
             'code' => 'client_enterprise',
-            'scenario' => 'Custom implementation, extended KPIs, HRIS import, and white-label deployment.',
-            'you_get' => 'Custom sites, seats, and workflows — quoted offline with MENetZero.',
+            'scenario' => 'A group consolidating several entities, with external assurance and SSO requirements.',
+            'you_get' => 'Multi-entity consolidation, assurance support and SSO — scoped and quoted with our team.',
         ],
     ],
 
     'clarifications' => [
         [
-            'title' => 'Offline quotes only',
-            'body' => 'There is no public AED grid and no self-serve checkout. Submit Request a package; MENetZero confirms the annual quote and activates after payment.',
+            'title' => 'Free is really free',
+            'body' => 'There is no time limit and no card required. Stay on Free as long as you like to learn the platform. '
+                    . 'Paid packages unlock clean exports, deeper Scope 3, more sites and team seats.',
         ],
         [
-            'title' => 'Free is really free',
-            'body' => 'You can stay on Free to learn the platform. Paid packages unlock clean exports, more locations, and team seats.',
+            'title' => 'Your data is yours',
+            'body' => 'Moving between packages never deletes what you have entered. If you return to Free, your data stays — '
+                    . 'only the download and capacity limits change.',
         ],
         [
             'title' => 'Scope 3 depth varies',
-            'body' => 'Free allows one Scope 3 entry per category. Scope Pro and ESG packages expand value-chain capacity; extras can be requested when quoting.',
+            'body' => 'Free allows one Scope 3 entry per category, which is enough to see how it works. '
+                    . 'Carbon and ESG open up full value-chain capacity.',
         ],
     ],
 
     'faq' => [
         [
-            'q' => 'Which package do I need for the UAE ESG Report?',
-            'a' => 'Typically Scope Pro, ESG Starter, ESG Complete, or Enterprise. Free and Scope Basic usually preview disclosures only. Enterprise adds extended KPI / white-label / assurance options.',
+            'q' => 'Which package do I need for MOCCAE reporting?',
+            'a' => 'Carbon or above. Carbon produces clean MOCCAE, IEQT, GHG and Excel files you can submit. '
+                 . 'Free downloads are watermarked trial files, which are fine for checking your numbers but '
+                 . 'not accepted for regulatory submission.',
         ],
         [
-            'q' => 'Which package do I need for MOCCAE reporting?',
-            'a' => 'Scope Basic or higher for clean GHG / MOCCAE / Excel / IEQT. Free downloads are watermarked trial files.',
+            'q' => 'Which package do I need for the UAE ESG Report?',
+            'a' => 'ESG or Enterprise. Carbon covers your emissions inventory and its UAE filings; ESG adds the '
+                 . 'framework reports on top — IFRS S1 & S2, GRI, SASB and the UAE ESG Report. Enterprise adds '
+                 . 'multi-entity consolidation and assurance support.',
         ],
         [
             'q' => 'Can I try before I pay?',
-            'a' => 'Yes. Free lets you add a location, enter Scope 1 and 2 data, and preview disclosure forms. Request a package when you need clean exports.',
+            'a' => 'Yes. Free lets you add a location, enter Scope 1 and 2 data, try one Scope 3 entry per category, '
+                 . 'and preview every disclosure form. Upgrade when you need clean exports or more capacity.',
         ],
         [
-            'q' => 'Where do I see prices?',
-            'a' => 'You do not publicly. Request a package shows features only; MENetZero confirms AED amounts offline.',
+            'q' => 'What does it cost?',
+            'a' => 'Prices are shown on each package above and billed annually in AED. Enterprise is quoted, because '
+                 . 'it depends on how many entities and seats you need — contact us and we will scope it with you.',
         ],
         [
-            'q' => 'We work with a sustainability consultant — do we still need a company package?',
-            'a' => 'If your consultant manages your workspace, they request managed-client capacity. If you use MENetZero directly as a company, request the package that matches your download needs.',
+            'q' => 'How do I pay, and is my card stored?',
+            'a' => 'Checkout is online and takes one annual payment. No card is stored and nothing is charged '
+                 . 'automatically — we email you before your package expires so you can choose to renew.',
         ],
         [
-            'q' => 'Can I cancel or go back to Free?',
-            'a' => 'You can schedule a return to Free at renewal. Your data stays; clean export features follow Free limits.',
+            'q' => 'We work with a sustainability consultant — do we still need our own package?',
+            'a' => 'If your consultant manages your workspace, they hold the capacity and you do not need your own. '
+                 . 'If you use MENetZero directly as a company, choose the package that matches the reports you need.',
+        ],
+        [
+            'q' => 'Can I change package or go back to Free?',
+            'a' => 'Yes. Upgrades apply immediately. Downgrades and a return to Free take effect at the end of your '
+                 . 'current paid period, so you keep what you paid for. Your data is kept either way.',
         ],
     ],
 
