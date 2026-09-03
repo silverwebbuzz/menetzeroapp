@@ -567,7 +567,10 @@ class SuperAdminController extends Controller
             'success',
             "Deleted {$summary['name']} permanently — {$summary['users_deleted']} user(s) removed, "
             . "{$summary['users_detached']} kept (member of another company), "
-            . "{$summary['invoices_deleted']} invoice(s) removed."
+            . "{$summary['invoices_deleted']} invoice(s) removed"
+            . ($summary['consultants_deleted'] > 0
+                ? ", {$summary['consultants_deleted']} consultant login(s) removed."
+                : '.')
         );
     }
 }

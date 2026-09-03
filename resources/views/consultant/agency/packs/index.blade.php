@@ -1,7 +1,7 @@
 @extends('consultant.layouts.app')
 
-@section('title', 'Request clients')
-@section('page-title', 'Request clients')
+@section('title', 'Plans & Billing')
+@section('page-title', 'Plans & Billing')
 
 @section('content')
 @php
@@ -16,7 +16,7 @@
         <a href="{{ route('consultant.dashboard') }}" class="text-sm text-brand hover:underline">&larr; Dashboard</a>
         <h1 class="text-3xl font-bold text-gray-900 mt-2">Plans &amp; Billing</h1>
         <p class="mt-2 text-gray-600">
-            Your current pack, and buying more client slots.
+            Your current pack, buying client slots, and your invoices.
         </p>
     </div>
 
@@ -221,7 +221,54 @@
 
         <div class="mb-6 border-t border-gray-200 pt-6">
             <h2 class="text-lg font-semibold text-gray-900">Prefer an invoice, or need Enterprise?</h2>
-            <p class="text-sm text-gray-600">Request below and we confirm pricing offline.</p>
+            <p class="text-sm text-gray-600">Slot prices are listed above and you can buy them directly. Use this form only for an invoice, a custom arrangement, or Enterprise.</p>
+        </div>
+    @endif
+
+    {{-- Invoices. This sat at the very bottom of the page, below the
+         Enterprise request form and the recent-requests table, so an agency
+         looking for a receipt for something it had already bought had to
+         scroll past two purchase forms to reach it. Buying comes first, then
+         what you have already bought. There is no separate consultant billing
+         screen, so this page is it.
+
+         Deliberately OUTSIDE the checkout-availability condition: receipts for
+         money already paid must not disappear if the gateway is switched off. --}}
+    @if(isset($invoices))
+        <div class="mb-8">
+            <h2 class="text-sm font-semibold text-gray-900 mb-3">Invoices</h2>
+            @if($invoices->isEmpty())
+                <div class="bg-white rounded-xl border border-gray-200 px-4 py-6 text-sm text-gray-500 text-center">
+                    No invoices yet. They appear here after your first purchase, and are emailed to you too.
+                </div>
+            @else
+            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden text-sm">
+                <table class="min-w-full divide-y divide-gray-100">
+                    <thead class="bg-gray-50 text-left text-xs text-gray-500">
+                        <tr>
+                            <th class="px-4 py-2">Invoice</th>
+                            <th class="px-4 py-2">Date</th>
+                            <th class="px-4 py-2">Description</th>
+                            <th class="px-4 py-2 text-right">Amount</th>
+                            <th class="px-4 py-2"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @foreach($invoices as $invoice)
+                            <tr>
+                                <td class="px-4 py-2 font-medium text-gray-900">{{ $invoice->invoice_number }}</td>
+                                <td class="px-4 py-2 text-gray-600">{{ $invoice->issued_at?->format('d M Y') ?? '—' }}</td>
+                                <td class="px-4 py-2 text-gray-600">{{ $invoice->description }}</td>
+                                <td class="px-4 py-2 text-right">{{ $invoice->currency }} {{ number_format((float) $invoice->total, 2) }}</td>
+                                <td class="px-4 py-2 text-right">
+                                    <a href="{{ route('consultant.invoices.download', $invoice) }}" class="text-brand hover:underline">Download</a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            @endif
         </div>
     @endif
 
@@ -299,40 +346,6 @@
             </a>
         </div>
     </form>
-
-    {{-- Invoices for this agency. Lives here because the agency buys here and
-         there is no separate consultant billing screen. --}}
-    @if(isset($invoices) && $invoices->isNotEmpty())
-        <div class="mt-10">
-            <h2 class="text-sm font-semibold text-gray-900 mb-3">Invoices</h2>
-            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden text-sm">
-                <table class="min-w-full divide-y divide-gray-100">
-                    <thead class="bg-gray-50 text-left text-xs text-gray-500">
-                        <tr>
-                            <th class="px-4 py-2">Invoice</th>
-                            <th class="px-4 py-2">Date</th>
-                            <th class="px-4 py-2">Description</th>
-                            <th class="px-4 py-2 text-right">Amount</th>
-                            <th class="px-4 py-2"></th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
-                        @foreach($invoices as $invoice)
-                            <tr>
-                                <td class="px-4 py-2 font-medium text-gray-900">{{ $invoice->invoice_number }}</td>
-                                <td class="px-4 py-2 text-gray-600">{{ $invoice->issued_at?->format('d M Y') ?? '—' }}</td>
-                                <td class="px-4 py-2 text-gray-600">{{ $invoice->description }}</td>
-                                <td class="px-4 py-2 text-right">{{ $invoice->currency }} {{ number_format((float) $invoice->total, 2) }}</td>
-                                <td class="px-4 py-2 text-right">
-                                    <a href="{{ route('consultant.invoices.download', $invoice) }}" class="text-brand hover:underline">Download</a>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    @endif
 
     @if(isset($recentRequests) && $recentRequests->isNotEmpty())
         <div class="mt-10">
