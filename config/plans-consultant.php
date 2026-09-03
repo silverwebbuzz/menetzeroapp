@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Consultant portal guidance copy — Request clients (offline), multi-package capacity.
+ * Consultant portal guidance copy — buying client capacity online, multi-package capacity.
  * See documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md.
  */
 return [
@@ -9,9 +9,9 @@ return [
         'title' => 'Grow managed-client capacity when you are ready',
         'tips' => [
             'Free includes 1 managed client with Free rules (watermarked trial downloads).',
-            'Request clients — enter how many you need per package (mix depths in one request).',
+            'Agency packs — buy the slots you need at Carbon or ESG depth and pay online.',
             'After activation you hold separate capacity rows (each with its own expiry). Pick a depth when adding a client.',
-            'Pricing is confirmed offline — no public AED list and no self-serve checkout.',
+            'Prices are shown in AED on Agency packs and charged at checkout.',
         ],
     ],
 
@@ -21,16 +21,16 @@ return [
             'you_get' => 'One managed client for Scope 1 & 2 exploration and watermarked trial files.',
         ],
         [
-            'pack' => 'Mixed request example',
-            'you_get' => 'e.g. Scope Basic ×5 + ESG Starter ×5 → two capacity rows after offline payment.',
+            'pack' => 'Mixed purchase example',
+            'you_get' => 'e.g. Carbon ×5 then ESG ×5 → two capacity rows, each with its own expiry.',
         ],
         [
-            'pack' => 'Scope Pro / ESG × N clients',
+            'pack' => 'ESG × N clients',
             'you_get' => 'Disclosure PDF suites when those packages are activated for those slots.',
         ],
         [
             'pack' => 'Enterprise',
-            'you_get' => 'Custom / white-label deployments — quoted offline.',
+            'you_get' => 'Custom / white-label deployments — contact sales for a quote.',
         ],
     ],
 
@@ -45,7 +45,7 @@ return [
         ],
         [
             'title' => 'Free vs paid',
-            'body' => 'Free = 1 client, data entry + watermarked trials. Paid = one or more package depths × slot counts, activated after offline payment. Free stays when paid rows are added.',
+            'body' => 'Free = 1 client, data entry + watermarked trials. Paid = one or more package depths × slot counts, activated once payment clears. Free stays when paid rows are added.',
         ],
         [
             'title' => 'Multiple packages on one agency',
@@ -53,26 +53,26 @@ return [
         ],
         [
             'title' => 'Preferential ≥10 clients',
-            'body' => 'Sales/contract policy only. Requesting fewer than 10 is fine — MENetZero may adjust quotes offline when you onboard 10+ in 12 months.',
+            'body' => 'Sales/contract policy only. Buying fewer than 10 is fine — contact sales if you expect to onboard 10+ in 12 months.',
         ],
     ],
 
     'faq' => [
         [
             'q' => 'How do I add more clients?',
-            'a' => 'Open Request clients, enter quantities for one or more packages, and submit. MENetZero quotes offline and activates after payment. Then Add client and pick a package with remaining places.',
+            'a' => 'Open Agency packs, choose the package depth and number of slots, and pay online. Capacity activates once payment clears — then Add client and pick a package with remaining places.',
         ],
         [
             'q' => 'What does each paid client get?',
-            'a' => 'Entitlements follow the package of the capacity row you assign when creating the client (Scope Basic through Enterprise).',
+            'a' => 'Entitlements follow the package of the capacity row you assign when creating the client (Carbon through Enterprise).',
         ],
         [
             'q' => 'Where do I see prices?',
-            'a' => 'You do not in the app. Preferential bands may be discussed offline — never treated as a public list.',
+            'a' => 'On Agency packs, in AED, before you check out. Preferential bands for large volumes are agreed with sales.',
         ],
         [
             'q' => 'What about renewals?',
-            'a' => 'Within ~45 days of capacity expiry you will see renewal nudges. Request clients for the next year offline — there is no self-serve checkout. Mid-year top-ups can have different expiry dates per row.',
+            'a' => 'Within ~45 days of capacity expiry you will see renewal nudges. Renew for the next year from Agency packs. Mid-year top-ups can have different expiry dates per row.',
         ],
         [
             'q' => 'Is directory listing the same as paid capacity?',

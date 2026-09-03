@@ -8,7 +8,7 @@ return [
             'Your Primary Reporting Year (PRY) is the calendar year you report against — most entries are tagged to a location and year.',
             'Permissions depend on your role. Company admins see billing and team settings; other users may only view or enter data.',
             'On Free you get Scope 1 & 2 fully, one Scope 3 entry per category, disclosure previews, and watermarked GHG / Excel / IEQT trial downloads.',
-            'Need clean exports or full ESG? Use Plan & billing → Request a package (Scope Basic, Scope Pro, ESG Starter, ESG Complete, or Enterprise). Features only in-app — pricing is confirmed offline; MENetZero activates after payment.',
+            'Need clean exports or full ESG? Use Plan & billing → Upgrade plan (Carbon, ESG or Enterprise) and pay online — the plan activates once payment clears.',
             'If a sustainability consultant manages your account, some billing and team settings may be handled by them.',
         ],
     ],
@@ -46,13 +46,13 @@ return [
         ],
         [
             'title' => 'Complete disclosures & export reports',
-            'body' => 'Fill IFRS S1/S2 and GRI sections, add narrative chapters in the UAE ESG Report, then download PDFs when your package allows (typically Scope Pro and ESG packages). Free and Scope Basic can preview disclosures.',
+            'body' => 'Fill IFRS S1/S2 and GRI sections, add narrative chapters in the UAE ESG Report, then download PDFs when your package allows (ESG and Enterprise). Free and Carbon can preview disclosures.',
             'route' => 'disclosures.hub',
             'link_label' => 'Disclosures',
         ],
         [
-            'title' => 'Publish UAE ESG Report (Scope Pro / ESG packages)',
-            'body' => 'Complete leadership message, strategy, and about sections, then export the integrated UAE ESG Report PDF — GHG numbers pull automatically from your inventory. Request a package if exports are locked.',
+            'title' => 'Publish UAE ESG Report (ESG / Enterprise)',
+            'body' => 'Complete leadership message, strategy, and about sections, then export the integrated UAE ESG Report PDF — GHG numbers pull automatically from your inventory. Upgrade your plan if exports are locked.',
             'route' => 'disclosures.uae-esg.overview',
             'link_label' => 'UAE ESG Report',
         ],
@@ -165,13 +165,13 @@ return [
             'steps' => [
                 'View Entries — table of all entries with filters by scope, location, and year.',
                 'Input forms — cards grouped by Scope 1 (direct), Scope 2 (purchased energy), Scope 3 (value chain).',
-                'Bulk import — upload Excel/CSV for Scope 1 & 2 (Scope Basic and paid packages).',
+                'Bulk import — upload Excel/CSV for Scope 1 & 2 (paid packages).',
                 'Export CSV — download filtered entries for audit or external analysis.',
             ],
             'tips' => [
                 'One row = one bill or period (e.g. January DEWA invoice).',
                 'Read the Scope 1 & 2 Help Guide before your first bulk upload — it explains DEWA bills, fuel receipts, and valid units.',
-                'On Free you can enter one Scope 3 row per category. Request Scope Pro or an ESG package for higher Scope 3 capacity. Managed clients follow the consultant’s entitlements (paid Standard is typically GHG exports with limited Scope 3).',
+                'On Free you can enter one Scope 3 row per category. Upgrade to Carbon or ESG for full Scope 3 capacity. Managed clients follow the consultant’s entitlements (paid Standard is typically GHG exports with limited Scope 3).',
             ],
             'links' => [
                 ['route' => 'quick-input.index', 'label' => 'Input Data'],
@@ -196,7 +196,7 @@ return [
                     'caption' => 'Aggregated tCO₂e by scope and category from your Quick Input entries.',
                 ],
             ],
-            'body' => 'The GHG Inventory report aggregates all entered data by scope, category, and location for your selected reporting year. Export to Excel or PDF for auditors, MOCCAE submissions, or internal review. On Free, allowed downloads are watermarked trial files — Request Scope Basic or higher for clean official exports.',
+            'body' => 'The GHG Inventory report aggregates all entered data by scope, category, and location for your selected reporting year. Export to Excel or PDF for auditors, MOCCAE submissions, or internal review. On Free, allowed downloads are watermarked trial files — upgrade to Carbon or higher for clean official exports.',
             'steps' => [
                 'Select reporting year and filters on the reports page.',
                 'Review scope totals and activity breakdown.',
@@ -213,7 +213,7 @@ return [
         [
             'id' => 'disclosures',
             'title' => 'Disclosures & sustainability reports',
-            'summary' => 'IFRS S1/S2, GRI, UAE ESG Report, ESG Scorecard, and SASB (Scope Pro / ESG packages).',
+            'summary' => 'IFRS S1/S2, GRI, UAE ESG Report, ESG Scorecard, and SASB (ESG / Enterprise).',
             'highlights' => [
                 [
                     'title' => 'Disclosures hub',
@@ -228,7 +228,7 @@ return [
                     'caption' => 'Each framework shows completion % — work through sections in any order.',
                 ],
             ],
-            'body' => 'Disclosures capture narrative and structured sustainability information beyond raw emissions. Free and Scope Basic can usually preview forms; Scope Pro, ESG Starter, ESG Complete, and Enterprise unlock PDF/CSV disclosure exports when activated.',
+            'body' => 'Disclosures capture narrative and structured sustainability information beyond raw emissions. Free and Carbon can preview forms; ESG and Enterprise unlock PDF/CSV disclosure exports when activated.',
             'steps' => [
                 'Disclosures hub — overview of completion status across frameworks.',
                 'IFRS S2 — climate-related disclosures, risks, targets, and GHG emissions (§29).',
@@ -241,7 +241,7 @@ return [
                 'ESG Dashboard — visual summary linking metrics and disclosure progress.',
             ],
             'tips' => [
-                'Package access gates PDF/CSV exports — Free and Scope Basic preview; Scope Pro and ESG packages unlock UAE ESG Report, Scorecard, GRI, and IFRS downloads.',
+                'Package access gates PDF/CSV exports — Free and Carbon preview; ESG and Enterprise unlock UAE ESG Report, Scorecard, GRI, and IFRS downloads.',
                 'GHG totals in disclosure PDFs always come from your Quick Input inventory — never re-enter emissions in narrative forms.',
                 'Reporting Settings (admin) controls methodology defaults used in reports.',
             ],
@@ -255,7 +255,7 @@ return [
             'id' => 'enterprise-esg',
             'title' => 'Enterprise ESG add-ons',
             'summary' => 'Extended indexes, HRIS feed, assurance upload, and white-label PDF (Enterprise / custom).',
-            'body' => 'Enterprise is a custom package for deeper KPI packs, branding, and integrations. ESG Starter and ESG Complete keep the standard UAE ESG PDF and scorecard depth — Enterprise features are additional when activated for you.',
+            'body' => 'Enterprise is a custom package for deeper KPI packs, branding, and integrations. ESG keeps the standard UAE ESG PDF and scorecard depth — Enterprise features are additional when activated for you.',
             'steps' => [
                 'GRI content index (80+ rows) — download extended CSV from the GRI overview page.',
                 'ESG Scorecard enterprise export — 80+ KPI Excel workbook from the Scorecard page.',
@@ -265,14 +265,14 @@ return [
                 'White-label UAE ESG PDF — download a branded cover PDF without MenetZero branding on the cover page.',
             ],
             'tips' => [
-                'Enterprise-only buttons stay hidden until MENetZero activates an Enterprise package — Request a package and tick white-label / assurance extras if needed.',
+                'Enterprise-only buttons stay hidden until an Enterprise package is active — upgrade to Enterprise to unlock white-label and assurance features.',
                 'HRIS import rows are tagged separately from manual scorecard edits and will not be overwritten by UI saves.',
                 'Arabic bilingual PDF is not yet available — English reports are fully supported.',
             ],
             'links' => [
                 ['route' => 'disclosures.esg-scorecard.index', 'label' => 'ESG Scorecard'],
                 ['route' => 'disclosures.uae-esg.overview', 'label' => 'UAE ESG Report'],
-                ['route' => 'subscriptions.request-package', 'label' => 'Request a package'],
+                ['route' => 'subscriptions.upgrade', 'label' => 'Upgrade plan'],
             ],
         ],
         [
@@ -303,7 +303,7 @@ return [
         [
             'id' => 'billing',
             'title' => 'Plan & billing',
-            'summary' => 'Current package, Request a package, and invoices.',
+            'summary' => 'Current package, upgrading, and invoices.',
             'highlights' => [
                 [
                     'title' => 'Plan card',
@@ -312,19 +312,19 @@ return [
                     'caption' => 'See what Free or your activated package includes — bulk import, sites, Scope 3, and PDF exports vary.',
                 ],
             ],
-            'body' => 'View your current package and entitlements. To move beyond Free, submit Request a package (features only — no public prices). MENetZero confirms pricing offline and activates after payment. Not available when your account is fully managed by a consultant agency.',
+            'body' => 'View your current package and entitlements. To move beyond Free, open Upgrade plan, pick a package and pay online — the plan activates as soon as the payment clears. Not available when your account is fully managed by a consultant agency.',
             'steps' => [
                 'Current package — features included and renewal date (when paid).',
-                'Request a package — choose Scope Basic, Scope Pro, ESG Starter, ESG Complete, or Enterprise, plus optional extras.',
-                'Billing history — invoices and payment records after offline settlement.',
+                'Upgrade plan — choose Carbon, ESG or Enterprise and pay online.',
+                'Billing history — invoices and payment records.',
             ],
             'tips' => [
-                'Public and in-app package choosers never show AED amounts. Sales confirms totals offline.',
-                'If a consultant manages you, they request client capacity from the consultant portal instead.',
+                'Prices are shown in AED on the upgrade page and charged at checkout.',
+                'If a consultant manages you, they buy client capacity from the consultant portal instead.',
             ],
             'links' => [
                 ['route' => 'subscriptions.billing', 'label' => 'Plan & billing'],
-                ['route' => 'subscriptions.request-package', 'label' => 'Request a package'],
+                ['route' => 'subscriptions.upgrade', 'label' => 'Upgrade plan'],
             ],
         ],
         [
@@ -358,15 +358,15 @@ return [
         ],
         [
             'q' => 'Which package do I need for the UAE ESG Report and Scorecard?',
-            'a' => 'Typically Scope Pro, ESG Starter, ESG Complete, or Enterprise. Those unlock disclosure PDF/CSV exports (UAE ESG Report, Scorecard, GRI/IFRS). Free and Scope Basic usually allow form previews only. Enterprise can add extended KPI packs, HRIS import, assurance upload, and white-label covers. Use Request a package — pricing is offline.',
+            'a' => 'ESG or Enterprise. Those unlock disclosure PDF/CSV exports (UAE ESG Report, Scorecard, GRI/IFRS). Free and Carbon allow form previews only. Enterprise adds extended KPI packs, HRIS import, assurance upload, and white-label covers. Upgrade from Plan & billing.',
         ],
         [
             'q' => 'Which package do I need for clean exports, bulk import, and Scope 3?',
-            'a' => 'Free includes Scope 1 & 2, one Scope 3 entry per category, and watermarked trial downloads. Scope Basic unlocks clean GHG/MOCCAE/Excel/IEQT and bulk import (up to 3 sites). Scope Pro and ESG packages add broader Scope 3 and disclosure exports. Check Plan & billing for your entitlements.',
+            'a' => 'Free includes Scope 1 & 2, one Scope 3 entry per category, and watermarked trial downloads. Carbon unlocks clean GHG/MOCCAE/Excel/IEQT exports, bulk import and full Scope 3. ESG adds the disclosure frameworks on top. Check Plan & billing for your entitlements.',
         ],
         [
             'q' => 'Where do I see prices?',
-            'a' => 'You do not — public and in-app package requests show features only. After you submit Request a package, MENetZero confirms amounts offline and activates after payment.',
+            'a' => 'On the pricing page and on Plan & billing → Upgrade plan. Amounts are in AED and are charged at online checkout.',
         ],
         [
             'q' => 'Can I have multiple companies under one login?',

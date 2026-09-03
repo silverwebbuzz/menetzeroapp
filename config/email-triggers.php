@@ -115,7 +115,7 @@ return [
             'route' => 'subscriptions.upgrade',
             'path' => '/subscriptions/upgrade',
             'file' => 'app/Services/PaymentCompletionService.php',
-            'note' => 'Sent to company owners after Razorpay/Cashfree payment completes.',
+            'note' => 'Sent to company owners after Razorpay payment completes.',
             'status' => 'live',
         ],
     ],
@@ -182,7 +182,7 @@ return [
         [
             'label' => 'Daily schedule — company package expiry window',
             'file' => 'app/Console/Commands/SendRenewalRemindersCommand.php',
-            'note' => 'subscriptions:send-renewal-reminders (45/14/3-day buckets). CTA = Request a package.',
+            'note' => 'subscriptions:send-renewal-reminders (45/14/3-day buckets). CTA = Upgrade plan.',
             'status' => 'live',
         ],
     ],
@@ -191,7 +191,7 @@ return [
         [
             'label' => 'Daily schedule — consultant capacity expiry window',
             'file' => 'app/Console/Commands/SendRenewalRemindersCommand.php',
-            'note' => 'subscriptions:send-renewal-reminders (45/14/3-day buckets). CTA = Request clients.',
+            'note' => 'subscriptions:send-renewal-reminders (45/14/3-day buckets). CTA = Agency packs.',
             'status' => 'live',
         ],
     ],

@@ -33,6 +33,12 @@ yarn-error.log
 !database/schema/
 !database/schema/*.sql
 
+# One-off cleanup / data-fix scripts run by hand on the server. These are
+# reviewed changes, not dumps -- an unreviewed DROP TABLE is exactly what
+# should not be pasted into a production shell from someone's Downloads.
+!database/sql/
+!database/sql/*.sql
+
 # External reference materials (not part of the product)
 final-web---dp-world-esg-2024-eng-v3.pdf
 reference-material/

@@ -6440,3 +6440,65 @@ Both themes covered: `themes/new/dashboard/` holds only `partials/`, with no
 theme files scan clean; net diff 9 insertions / 12 deletions.
 
 Run: `php artisan optimize:clear`
+
+## 95. Online-only: offline request workflow and retired gateways removed
+
+The product now sells exclusively through online checkout, so everything that
+existed to support offline quoting was removed rather than left disabled.
+
+**Removed — the two request features.** `company_package_requests` ("Company
+package requests") and `consultant_entity_requests` ("Consultant client
+requests"): both admin screens, both client-facing submit forms
+(`subscriptions.request-package`, `consultant.packs.request-entities`), their
+controllers, models, `AdminRequestActivationService`, and the shared
+`partials/package-request-matrix.blade.php`.
+
+**Removed — the price book, which was not independent.** This is the part worth
+recording. `commercial_price_book_entries` / `App\Data\CommercialPriceBook`
+looked like a standalone admin feature with its own nav entry and page, but its
+only consumer was `AdminRequestActivationService::suggestCompanyQuote()` and
+its consultant twin. Nothing else in the app ever read a price book row —
+checkout charges `subscription_plans.price_annual`. Deleting the two request
+features therefore made the entire price book dead code, so trimming its rows
+to the live catalogue would have left a page maintaining prices that nothing
+charges, and two places to update on every price change. It went with them.
+
+`App\Data\CompanyPackageOptions` fell out the same way — once the request forms
+and the packs comparison matrix were gone, it had no callers left.
+
+**Removed — Cashfree and Stripe.** §70 had already deleted their checkout code
+and merely disabled the rows. The leftovers are now gone too: both webhook
+methods, every Cashfree/Stripe method in `PaymentService` (including
+`normalizePhone()`, which was Cashfree-only and by then uncalled), the dead
+`@elseif` SDK branches in four checkout blades, the gateway-name conditionals
+in the admin card, and the credential rows themselves.
+
+Deliberately **kept**: `payment_transactions` rows from those gateways, the
+`stripe_*` columns on `client_subscriptions` / `client_billing_methods`, and
+the retired-gateway keys in `ConsultantMarketplaceService`'s `payment_reference`
+fallback chain. An old order whose only link to its payment is
+`cashfree_order_id` still needs to resolve.
+
+**Copy that contradicted the product.** The renewal reminder emails told
+customers "There is no self-serve checkout" and linked to the deleted request
+route; the two portal guides described offline quoting and named four retired
+packages (Scope Basic / Scope Pro / ESG Starter / ESG Complete). Both were
+rewritten for online checkout and the live four-tier catalogue. Three live
+`route('subscriptions.request-package')` calls — in `PlanGate::upgradeRoute()`
+and `SubscriptionRenewalNudgeService` — would have thrown
+`RouteNotFoundException` on a renewal nudge; they now point at
+`subscriptions.upgrade`.
+
+**Database.** `database/sql/2026_09_03_cleanup_offline_requests_and_retired_gateways.sql`
+drops the three tables (all leaves — nothing FKs into them), deletes the two
+gateway rows, and removes retired `subscription_plans` rows *only where nothing
+references them*, so a grandfathered subscriber keeps a working plan. The guard
+includes `subscription_coupons`, which is `ON DELETE SET NULL`: deleting a
+referenced plan there would not error, it would silently widen a plan-restricted
+coupon into one valid on every plan. `consultant_1` (inactive demo/QA) and
+`consultant_managed_standard` (limit template for managed clients, never sold)
+are both kept on purpose.
+
+Schema baseline updated: 79 tables -> 76.
+
+Run: `php artisan optimize:clear`

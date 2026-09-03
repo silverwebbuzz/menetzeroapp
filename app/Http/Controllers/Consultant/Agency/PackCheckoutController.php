@@ -43,16 +43,6 @@ class PackCheckoutController extends Controller
         $subscription = $this->consultantSubscriptions->getActiveSubscription($consultantOrg->id);
         $slotSummary = $this->consultantSubscriptions->slotSummary($consultantOrg->id, $subscription);
         $contractYear = (int) now()->year;
-        $recentRequests = \App\Models\ConsultantEntityRequest::query()
-            ->where('consultant_company_id', $consultantOrg->id)
-            ->orderByDesc('created_at')
-            ->limit(5)
-            ->get();
-
-        $packages = \App\Data\CompanyPackageOptions::packages();
-
-        $matrix = \App\Data\CompanyPackageOptions::comparisonMatrix();
-
         // Self-serve purchase. Enterprise is filtered out: it has no list price
         // (negotiated per deal), so a Buy-now button there would post a plan
         // resolvePackPurchase() cannot quote. It stays reachable through the
@@ -91,9 +81,6 @@ class PackCheckoutController extends Controller
             'subscription',
             'slotSummary',
             'contractYear',
-            'recentRequests',
-            'packages',
-            'matrix',
             'buyablePacks',
             'suggestedSlots',
             'invoices',

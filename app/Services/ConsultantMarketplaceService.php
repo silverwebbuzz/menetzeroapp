@@ -10,15 +10,8 @@ use App\Models\SiteSetting;
 
 class ConsultantMarketplaceService
 {
-    public function chargeAmount(float $amountAed, string $gateway): array
+    public function chargeAmount(float $amountAed): array
     {
-        if (in_array($gateway, ['cashfree', 'stripe'], true)) {
-            return [
-                'currency' => 'AED',
-                'amount' => $amountAed,
-            ];
-        }
-
         $rate = (float) SiteSetting::get('aed_inr_rate', 22.5);
 
         return [
@@ -97,6 +90,9 @@ class ConsultantMarketplaceService
 
         $order->update([
             'payment_transaction_id' => $transaction->id,
+            // Retired-gateway keys stay in the fallback chain: orders paid
+            // before Cashfree/Stripe were removed still carry them, and a
+            // null reference would lose the only link to that payment.
             'payment_reference' => $metadata['razorpay_payment_id']
                 ?? $metadata['cashfree_order_id']
                 ?? $metadata['stripe_payment_intent_id']

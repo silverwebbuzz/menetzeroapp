@@ -210,20 +210,6 @@ CREATE TABLE `climate_risks` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `commercial_price_book_entries` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `code` varchar(64) NOT NULL,
-  `category` varchar(32) NOT NULL,
-  `label` varchar(255) NOT NULL,
-  `amount_aed` decimal(12,2) DEFAULT NULL,
-  `is_custom` tinyint(1) NOT NULL DEFAULT 0,
-  `notes` text DEFAULT NULL,
-  `sort_order` smallint(5) UNSIGNED NOT NULL DEFAULT 0,
-  `meta` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`meta`)),
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 CREATE TABLE `companies` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `name` varchar(255) NOT NULL,
@@ -307,25 +293,6 @@ CREATE TABLE `company_invitations` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `company_package_requests` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `company_id` bigint(20) UNSIGNED NOT NULL,
-  `user_id` bigint(20) UNSIGNED NOT NULL,
-  `package_code` varchar(64) NOT NULL,
-  `extras` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`extras`)),
-  `message` text DEFAULT NULL,
-  `status` varchar(32) NOT NULL DEFAULT 'new',
-  `admin_notes` text DEFAULT NULL,
-  `quote_amount_aed` decimal(12,2) DEFAULT NULL,
-  `quote_breakdown` text DEFAULT NULL,
-  `duration_months` smallint(5) UNSIGNED NOT NULL DEFAULT 12,
-  `quoted_at` timestamp NULL DEFAULT NULL,
-  `paid_at` timestamp NULL DEFAULT NULL,
-  `activated_at` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 CREATE TABLE `company_reporting_settings` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `company_id` bigint(20) UNSIGNED NOT NULL,
@@ -405,28 +372,6 @@ CREATE TABLE `consultant_documents` (
   `original_filename` varchar(255) NOT NULL,
   `status` enum('pending','verified','rejected') NOT NULL DEFAULT 'pending',
   `admin_notes` text DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE `consultant_entity_requests` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `consultant_company_id` bigint(20) UNSIGNED NOT NULL,
-  `user_id` bigint(20) UNSIGNED NOT NULL,
-  `entity_count` smallint(5) UNSIGNED NOT NULL,
-  `lines` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`lines`)),
-  `package_code` varchar(64) DEFAULT NULL,
-  `needs_sites_over_5` tinyint(1) NOT NULL DEFAULT 0,
-  `extras` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`extras`)),
-  `wants_enterprise` tinyint(1) NOT NULL DEFAULT 0,
-  `message` text DEFAULT NULL,
-  `status` varchar(32) NOT NULL DEFAULT 'new',
-  `admin_notes` text DEFAULT NULL,
-  `quote_amount_aed` decimal(12,2) DEFAULT NULL,
-  `quote_breakdown` text DEFAULT NULL,
-  `quoted_at` timestamp NULL DEFAULT NULL,
-  `paid_at` timestamp NULL DEFAULT NULL,
-  `activated_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1313,11 +1258,6 @@ ALTER TABLE `climate_risks`
   ADD PRIMARY KEY (`id`),
   ADD KEY `climate_risks_company_id_foreign` (`company_id`);
 
-ALTER TABLE `commercial_price_book_entries`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `commercial_price_book_entries_code_unique` (`code`),
-  ADD KEY `commercial_price_book_entries_category_index` (`category`);
-
 ALTER TABLE `companies`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `companies_slug_unique` (`slug`),
@@ -1351,13 +1291,6 @@ ALTER TABLE `company_invitations`
   ADD KEY `fk_company_invitations_inviter` (`invited_by`),
   ADD KEY `fk_company_invitations_accepter` (`accepted_by_user_id`);
 
-ALTER TABLE `company_package_requests`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `company_package_requests_company_id_foreign` (`company_id`),
-  ADD KEY `company_package_requests_user_id_foreign` (`user_id`),
-  ADD KEY `company_package_requests_status_created_at_index` (`status`,`created_at`),
-  ADD KEY `company_package_requests_package_code_index` (`package_code`);
-
 ALTER TABLE `company_reporting_settings`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `company_reporting_settings_company_id_fiscal_year_unique` (`company_id`,`fiscal_year`);
@@ -1381,12 +1314,6 @@ ALTER TABLE `consultant_client_engagements`
 ALTER TABLE `consultant_documents`
   ADD PRIMARY KEY (`id`),
   ADD KEY `consultant_documents_consultant_id_foreign` (`consultant_id`);
-
-ALTER TABLE `consultant_entity_requests`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `consultant_entity_requests_user_id_foreign` (`user_id`),
-  ADD KEY `consultant_entity_requests_status_created_at_index` (`status`,`created_at`),
-  ADD KEY `consultant_entity_requests_consultant_company_id_index` (`consultant_company_id`);
 
 ALTER TABLE `consultant_intro_requests`
   ADD PRIMARY KEY (`id`),
@@ -1700,9 +1627,6 @@ ALTER TABLE `climate_opportunities`
 ALTER TABLE `climate_risks`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=154;
 
-ALTER TABLE `commercial_price_book_entries`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
-
 ALTER TABLE `companies`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=92;
 
@@ -1718,9 +1642,6 @@ ALTER TABLE `company_disclosures`
 ALTER TABLE `company_invitations`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
-ALTER TABLE `company_package_requests`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-
 ALTER TABLE `company_reporting_settings`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
 
@@ -1732,9 +1653,6 @@ ALTER TABLE `consultant_client_engagements`
 
 ALTER TABLE `consultant_documents`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-
-ALTER TABLE `consultant_entity_requests`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 ALTER TABLE `consultant_intro_requests`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
@@ -1939,10 +1857,6 @@ ALTER TABLE `company_invitations`
   ADD CONSTRAINT `fk_company_invitations_company` FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_company_invitations_inviter` FOREIGN KEY (`invited_by`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
-ALTER TABLE `company_package_requests`
-  ADD CONSTRAINT `company_package_requests_company_id_foreign` FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `company_package_requests_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
-
 ALTER TABLE `company_reporting_settings`
   ADD CONSTRAINT `company_reporting_settings_company_id_foreign` FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`) ON DELETE CASCADE;
 
@@ -1958,10 +1872,6 @@ ALTER TABLE `consultant_client_engagements`
 
 ALTER TABLE `consultant_documents`
   ADD CONSTRAINT `consultant_documents_consultant_id_foreign` FOREIGN KEY (`consultant_id`) REFERENCES `consultants` (`id`) ON DELETE CASCADE;
-
-ALTER TABLE `consultant_entity_requests`
-  ADD CONSTRAINT `consultant_entity_requests_consultant_company_id_foreign` FOREIGN KEY (`consultant_company_id`) REFERENCES `companies` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `consultant_entity_requests_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `consultant_intro_requests`
   ADD CONSTRAINT `consultant_intro_requests_company_id_foreign` FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`) ON DELETE CASCADE,

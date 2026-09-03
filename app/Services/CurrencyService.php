@@ -62,9 +62,9 @@ class CurrencyService
 
     /**
      * Amount sent to the payment gateway. Matches the visitor's display currency
-     * so Cashfree/Razorpay checkout shows the same currency they picked on our
-     * site (AED or INR). Settlement to your bank is still in INR per gateway
-     * rules; AED orders use Cashfree International / Pay Native.
+     * so Razorpay checkout shows the same currency they picked on our site
+     * (AED or INR). Settlement to your bank is still in INR per gateway rules;
+     * AED orders need International Payments activated on the account.
      *
      * @return array{currency:string, amount:float, display_currency:string}
      */

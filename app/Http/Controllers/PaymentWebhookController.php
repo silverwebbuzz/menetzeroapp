@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Server-to-server payment notifications from Razorpay and Cashfree.
+ * Server-to-server payment notifications from Razorpay.
  *
  * These run outside the auth/CSRF middleware (see bootstrap/app.php). Every
  * request is authenticated by verifying the gateway signature against the
@@ -70,114 +70,6 @@ class PaymentWebhookController extends Controller
         }
 
         // Always 200 on a verified request so the gateway stops retrying.
-        return response()->json(['status' => 'ok']);
-    }
-
-    /**
-     * Cashfree webhook. Verifies base64(HMAC-SHA256(timestamp + body)).
-     */
-    public function cashfree(Request $request)
-    {
-        $gateway = PaymentGateway::forGateway('cashfree');
-        // Cashfree signs with the secret key; allow a dedicated webhook secret too.
-        $secret = $gateway?->webhook_secret ?: $gateway?->key_secret;
-
-        // Cashfree was retired in §70: its checkout code is gone, but the row
-        // was deliberately kept (disabled) so historical payments still resolve
-        // by name. Without this is_enabled check the endpoint stayed live and
-        // could still activate a subscription -- and now issue an invoice --
-        // for a gateway that can no longer take a payment.
-        if (!$gateway || !$gateway->is_enabled || !$secret) {
-            return response()->json(['message' => 'Webhook not configured'], 400);
-        }
-
-        $raw = $request->getContent();
-        $timestamp = (string) $request->header('x-webhook-timestamp');
-        $signature = (string) $request->header('x-webhook-signature');
-        $expected = base64_encode(hash_hmac('sha256', $timestamp . $raw, $secret, true));
-
-        if (!hash_equals($expected, $signature)) {
-            Log::warning('Cashfree webhook signature mismatch');
-            return response()->json(['message' => 'Invalid signature'], 400);
-        }
-
-        $payload = $request->json()->all();
-        $orderId = $payload['data']['order']['order_id'] ?? null;
-        $type = $payload['type'] ?? null;
-        $paymentStatus = $payload['data']['payment']['payment_status'] ?? null;
-
-        if ($orderId) {
-            $transaction = PaymentTransaction::where('metadata->cashfree_order_id', $orderId)->first();
-
-            if ($transaction && $transaction->status !== 'completed') {
-                $success = $type === 'PAYMENT_SUCCESS_WEBHOOK' || $paymentStatus === 'SUCCESS';
-
-                if ($success) {
-                    // Confirm with the orders API before activating.
-                    if ($this->paymentService->getCashfreeOrderStatus($gateway, $orderId) === 'PAID') {
-                        $this->activate($transaction, ['cashfree_order_id' => $orderId, 'source' => 'webhook']);
-                    }
-                } elseif (in_array($paymentStatus, ['USER_DROPPED', 'CANCELLED'], true)) {
-                    $transaction->update(['status' => 'cancelled']);
-                } elseif ($paymentStatus === 'FAILED' || $type === 'PAYMENT_FAILED_WEBHOOK') {
-                    $transaction->update(['status' => 'failed']);
-                }
-                // PENDING and other transient states: leave as-is and wait.
-            }
-        }
-
-        return response()->json(['status' => 'ok']);
-    }
-
-    /**
-     * Stripe webhook using the endpoint signing secret.
-     */
-    public function stripe(Request $request)
-    {
-        $gateway = PaymentGateway::forGateway('stripe');
-        $secret = $gateway?->webhook_secret;
-
-        // Retired alongside Cashfree in §70 -- same reasoning as above.
-        if (!$gateway || !$gateway->is_enabled || !$secret) {
-            return response()->json(['message' => 'Webhook not configured'], 400);
-        }
-
-        $raw = $request->getContent();
-        $signature = (string) $request->header('Stripe-Signature');
-        $event = $this->paymentService->verifyStripeWebhook($raw, $signature, $secret);
-
-        if (!$event) {
-            Log::warning('Stripe webhook signature mismatch');
-            return response()->json(['message' => 'Invalid signature'], 400);
-        }
-
-        $type = $event['type'] ?? null;
-        $session = $event['data']['object'] ?? [];
-
-        if (in_array($type, ['checkout.session.completed', 'checkout.session.async_payment_succeeded'], true)) {
-            $txnId = $session['metadata']['transaction_id'] ?? $session['client_reference_id'] ?? null;
-            if ($txnId) {
-                $transaction = PaymentTransaction::find($txnId);
-                if ($transaction && $transaction->status !== 'completed') {
-                    $this->activate($transaction, [
-                        'stripe_session_id' => $session['id'] ?? null,
-                        'stripe_payment_intent_id' => $session['payment_intent'] ?? null,
-                        'source' => 'webhook',
-                    ]);
-                }
-            }
-        }
-
-        if ($type === 'checkout.session.expired') {
-            $txnId = $session['metadata']['transaction_id'] ?? $session['client_reference_id'] ?? null;
-            if ($txnId) {
-                $transaction = PaymentTransaction::find($txnId);
-                if ($transaction && $transaction->status === 'pending') {
-                    $transaction->update(['status' => 'failed']);
-                }
-            }
-        }
-
         return response()->json(['status' => 'ok']);
     }
 

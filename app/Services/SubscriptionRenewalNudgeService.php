@@ -60,7 +60,7 @@ class SubscriptionRenewalNudgeService
             'expires_at' => $expires,
             'days_left' => max(0, $daysLeft),
             'plan_name' => $subscription->plan?->plan_name ?? 'your package',
-            'request_url' => route('subscriptions.request-package'),
+            'request_url' => route('subscriptions.upgrade'),
         ];
     }
 
@@ -278,7 +278,7 @@ class SubscriptionRenewalNudgeService
                 'plan_name' => $subscription->plan?->plan_name ?? 'your package',
                 'expires_at' => $expires,
                 'days_left' => (string) max(0, (int) now()->startOfDay()->diffInDays($subscription->expires_at->copy()->startOfDay(), false)),
-                'request_url' => url('/subscriptions/request-package'),
+                'request_url' => url('/subscriptions/upgrade'),
                 'billing_url' => url('/subscriptions/billing'),
                 'help_email' => config('mail.addresses.help.address', 'help@menetzero.com'),
                 'app_name' => config('app.name', 'MENetZero'),

@@ -71,12 +71,6 @@
                 <a href="{{ route('subscriptions.upgrade') }}" class="px-4 py-2.5 bg-orange-600 text-white text-sm font-semibold rounded-lg hover:bg-orange-700 text-center">
                     {{ ($daysRemaining ?? 999) <= 45 && !empty($isPaidPlan) ? 'Renew plan' : 'Upgrade plan' }}
                 </a>
-                {{-- Enterprise has no list price, so the request form stays the
-                     only way to reach it. This is now its ONLY entry point in
-                     the UI -- it is not in the nav. --}}
-                <a href="{{ route('subscriptions.request-package') }}" class="text-xs text-gray-500 hover:text-gray-700 text-center lg:text-left underline">
-                    Need Enterprise, or prefer an invoice?
-                </a>
                 @if(!empty($cancellationScheduled))
                     <form action="{{ route('subscriptions.resume') }}" method="POST">
                         @csrf

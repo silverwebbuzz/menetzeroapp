@@ -133,34 +133,5 @@
         rzp.open();
     })();
 </script>
-@elseif($gateway->gateway === 'cashfree')
-<script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
-<script>
-    (function () {
-        var cashfree = Cashfree({ mode: @json($gateway->isLive() ? 'production' : 'sandbox') });
-        function startCheckout() {
-            cashfree.checkout({
-                paymentSessionId: @json($meta['cashfree_payment_session_id'] ?? ''),
-                redirectTarget: '_self'
-            });
-        }
-        document.getElementById('payBtn').addEventListener('click', startCheckout);
-        startCheckout();
-    })();
-</script>
-@elseif($gateway->gateway === 'stripe')
-<script>
-    (function () {
-        var sessionUrl = @json($meta['stripe_session_url'] ?? null);
-        function startCheckout() {
-            if (!sessionUrl) {
-                return;
-            }
-            window.location.href = sessionUrl;
-        }
-        document.getElementById('payBtn').addEventListener('click', startCheckout);
-        startCheckout();
-    })();
-</script>
 @endif
 @endsection

@@ -96,9 +96,6 @@ Route::prefix('consultant')->name('consultant.')->group(function () {
 
             Route::prefix('packs')->name('packs.')->group(function () {
                 Route::get('/', [\App\Http\Controllers\Consultant\Agency\PackCheckoutController::class, 'index'])->name('index');
-                Route::post('/request-entities', [\App\Http\Controllers\Consultant\Agency\EntityRequestController::class, 'store'])
-                    ->middleware('throttle:10,1')
-                    ->name('request-entities');
                 Route::post('/checkout', [\App\Http\Controllers\Consultant\Agency\PackCheckoutController::class, 'processCheckout'])->name('checkout');
                 Route::post('/extra-slots', [\App\Http\Controllers\Consultant\Agency\PackCheckoutController::class, 'processExtraSlots'])->name('extra-slots');
                 Route::post('/year-unlock', [\App\Http\Controllers\Consultant\Agency\PackCheckoutController::class, 'processYearUnlock'])->name('year-unlock');
@@ -622,8 +619,6 @@ Route::middleware([
         Route::get('/checkout/{id}', [\App\Http\Controllers\Client\SubscriptionController::class, 'checkout'])->name('checkout');
         Route::post('/payment/razorpay/callback', [\App\Http\Controllers\Client\SubscriptionController::class, 'razorpayCallback'])->name('payment.razorpay');
         Route::get('/billing', [\App\Http\Controllers\Client\SubscriptionController::class, 'billing'])->name('billing');
-        Route::get('/request-package', [\App\Http\Controllers\Client\PackageRequestController::class, 'create'])->name('request-package');
-        Route::post('/request-package', [\App\Http\Controllers\Client\PackageRequestController::class, 'store'])->name('request-package.store');
         Route::get('/payment-history', [\App\Http\Controllers\Client\SubscriptionController::class, 'paymentHistory'])->name('payment-history');
         Route::post('/cancel', [\App\Http\Controllers\Client\SubscriptionController::class, 'cancel'])->name('cancel');
         Route::post('/resume', [\App\Http\Controllers\Client\SubscriptionController::class, 'resume'])->name('resume');
@@ -646,8 +641,6 @@ Route::middleware([
 // Payment gateway webhooks (public, signature-verified, CSRF-exempt)
 Route::prefix('webhooks/payments')->name('webhooks.payments.')->group(function () {
     Route::post('/razorpay', [\App\Http\Controllers\PaymentWebhookController::class, 'razorpay'])->name('razorpay');
-    Route::post('/cashfree', [\App\Http\Controllers\PaymentWebhookController::class, 'cashfree'])->name('cashfree');
-    Route::post('/stripe', [\App\Http\Controllers\PaymentWebhookController::class, 'stripe'])->name('stripe');
 });
 
 // API routes for dynamic industry category dropdowns
@@ -698,19 +691,7 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
         Route::post('/companies/{company}/grant-subscription', [\App\Http\Controllers\Admin\CompanySubscriptionController::class, 'grant'])->name('companies.grant-subscription');
 
         // Unified admin package assignment (client plans + consultant agency packs) with DB audit
-        Route::get('/price-book', [\App\Http\Controllers\Admin\PriceBookController::class, 'index'])->name('price-book.index');
-        Route::put('/price-book', [\App\Http\Controllers\Admin\PriceBookController::class, 'update'])->name('price-book.update');
         Route::get('/package-assignments', [\App\Http\Controllers\Admin\AdminPackageAssignmentController::class, 'index'])->name('package-assignments.index');
-        Route::get('/package-requests', [\App\Http\Controllers\Admin\CompanyPackageRequestController::class, 'index'])->name('package-requests.index');
-        Route::put('/package-requests/{packageRequest}', [\App\Http\Controllers\Admin\CompanyPackageRequestController::class, 'update'])->name('package-requests.update');
-        Route::post('/package-requests/{packageRequest}/quote', [\App\Http\Controllers\Admin\CompanyPackageRequestController::class, 'saveQuote'])->name('package-requests.quote');
-        Route::post('/package-requests/{packageRequest}/mark-paid', [\App\Http\Controllers\Admin\CompanyPackageRequestController::class, 'markPaid'])->name('package-requests.mark-paid');
-        Route::post('/package-requests/{packageRequest}/activate', [\App\Http\Controllers\Admin\CompanyPackageRequestController::class, 'activate'])->name('package-requests.activate');
-        Route::get('/entity-requests', [\App\Http\Controllers\Admin\ConsultantEntityRequestController::class, 'index'])->name('entity-requests.index');
-        Route::put('/entity-requests/{entityRequest}', [\App\Http\Controllers\Admin\ConsultantEntityRequestController::class, 'update'])->name('entity-requests.update');
-        Route::post('/entity-requests/{entityRequest}/quote', [\App\Http\Controllers\Admin\ConsultantEntityRequestController::class, 'saveQuote'])->name('entity-requests.quote');
-        Route::post('/entity-requests/{entityRequest}/mark-paid', [\App\Http\Controllers\Admin\ConsultantEntityRequestController::class, 'markPaid'])->name('entity-requests.mark-paid');
-        Route::post('/entity-requests/{entityRequest}/activate', [\App\Http\Controllers\Admin\ConsultantEntityRequestController::class, 'activate'])->name('entity-requests.activate');
         Route::post('/companies/{company}/assign-package', [\App\Http\Controllers\Admin\AdminPackageAssignmentController::class, 'assignToCompany'])->name('companies.assign-package');
 
         // MENetZero 2.0 (Phase 6) — per-company theme opt-in. Super-admin only.
@@ -777,7 +758,7 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
             Route::delete('/addons/{id}', [\App\Http\Controllers\Admin\PricingContentController::class, 'destroyAddon'])->name('addons.destroy');
         });
 
-        // Payment Gateway Settings (Razorpay / Cashfree credentials)
+        // Payment Gateway Settings (Razorpay credentials)
         Route::get('/payment-gateways', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'index'])->name('payment-gateways.index');
         Route::put('/payment-gateways/{id}', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'update'])->name('payment-gateways.update');
 

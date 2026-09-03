@@ -129,7 +129,7 @@ class PlanGate
             return route('consultant.packs.index');
         }
 
-        return route('subscriptions.request-package');
+        return route('subscriptions.upgrade');
     }
 
     public function upgradeButtonLabel(string $clientLabel = 'Upgrade Package'): string

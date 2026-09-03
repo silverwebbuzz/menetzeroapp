@@ -47,10 +47,6 @@
        class="mnz-nav {{ $isActive('admin.subscription-plans') ? 'is-active' : '' }}">
         <span class="mnz-nav__dot"></span><span class="mnz-nav__label">Subscription plans</span>
     </a>
-    <a href="{{ route('admin.price-book.index') }}"
-       class="mnz-nav {{ $isActive('admin.price-book') ? 'is-active' : '' }}">
-        <span class="mnz-nav__dot"></span><span class="mnz-nav__label">Price book</span>
-    </a>
     <a href="{{ route('admin.pricing.index') }}"
        class="mnz-nav {{ $isActive('admin.pricing') ? 'is-active' : '' }}">
         <span class="mnz-nav__dot"></span><span class="mnz-nav__label">Pricing content</span>
@@ -67,14 +63,6 @@
     <a href="{{ route('admin.payment-gateways.index') }}"
        class="mnz-nav {{ $isActive('admin.payment-gateways') ? 'is-active' : '' }}">
         <span class="mnz-nav__dot"></span><span class="mnz-nav__label">Payment gateways</span>
-    </a>
-    <a href="{{ route('admin.package-requests.index') }}"
-       class="mnz-nav {{ $isActive('admin.package-requests') ? 'is-active' : '' }}">
-        <span class="mnz-nav__dot"></span><span class="mnz-nav__label">Package requests</span>
-    </a>
-    <a href="{{ route('admin.entity-requests.index') }}"
-       class="mnz-nav {{ $isActive('admin.entity-requests') ? 'is-active' : '' }}">
-        <span class="mnz-nav__dot"></span><span class="mnz-nav__label">Entity requests</span>
     </a>
     <a href="{{ route('admin.package-assignments.index') }}"
        class="mnz-nav {{ $isActive('admin.package-assignments') ? 'is-active' : '' }}">

@@ -133,7 +133,7 @@ All packs: each slot = **one managed client × one PRY** with **Growth** feature
 
 | Type | Method |
 |------|--------|
-| Pack purchase / renewal | Online checkout (Razorpay / Cashfree / Stripe) — whole pack. See [PAYMENT_GATEWAYS.md](./PAYMENT_GATEWAYS.md) |
+| Pack purchase / renewal | Online checkout (Razorpay) — whole pack. See [PAYMENT_GATEWAYS.md](./PAYMENT_GATEWAYS.md) |
 | Enterprise | Manual invoice |
 | Extra slot / year unlock | Checkout or invoice after payment |
 

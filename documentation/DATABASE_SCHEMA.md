@@ -1,6 +1,6 @@
 # Database schema
 
-79 tables, as of the 2026-09-03 baseline. The authoritative definition is
+76 tables, as of the 2026-09-03 baseline. The authoritative definition is
 `database/schema/mysql-schema.sql`, dumped from the live database.
 
 ## How migrations work here
@@ -108,14 +108,12 @@ Eleven empty, unreferenced tables were dropped, and their models deleted:
 `client_payment_transactions`, `client_billing_methods`, `invoices`,
 `payment_gateways`, `subscription_coupons`, `subscription_coupon_redemptions`,
 `usage_tracking`, `feature_flags`, `scope3_addons`,
-`commercial_price_book_entries`, `admin_package_assignments`,
-`company_package_requests`
+`admin_package_assignments`
 
 **Consultant / agency** — `consultant_subscriptions`,
 `consultant_client_engagements`, `consultant_subscription_addons`,
 `consultant_documents`, `consultant_intro_requests`,
-`consultant_public_inquiries`, `consultant_entity_requests`,
-`consultant_orders`
+`consultant_public_inquiries`, `consultant_orders`
 
 **Site & infrastructure** — `site_pages`, `site_settings`, `email_templates`,
 `cache`, `cache_locks`, `jobs`, `job_batches`, `failed_jobs`, `migrations`

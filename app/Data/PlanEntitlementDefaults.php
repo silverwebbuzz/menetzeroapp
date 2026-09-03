@@ -98,7 +98,7 @@ class PlanEntitlementDefaults
     }
 
     /**
-     * Approximate INR list price (Razorpay/Cashfree). Admin may override.
+     * Approximate INR list price (Razorpay). Admin may override.
      */
     public static function defaultPriceInr(float $priceAnnualAed): float
     {

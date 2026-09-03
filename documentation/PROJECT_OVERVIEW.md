@@ -340,6 +340,6 @@ Default super-admin is seeded by `AdminSeeder` — check that file for credentia
 - Core controller: [app/Http/Controllers/QuickInputController.php](../app/Http/Controllers/QuickInputController.php)
 - Core service: [app/Services/EmissionCalculationService.php](../app/Services/EmissionCalculationService.php)
 - User model (auth/permissions): [app/Models/User.php](../app/Models/User.php)
-- **Payment gateways (Stripe, Razorpay, Cashfree):** [PAYMENT_GATEWAYS.md](./PAYMENT_GATEWAYS.md)
+- **Payment gateway (Razorpay):** [PAYMENT_GATEWAYS.md](./PAYMENT_GATEWAYS.md)
 - Pre-existing Quick Input spec: [SYSTEM_DOCUMENTATION_COMPLETE.md](../SYSTEM_DOCUMENTATION_COMPLETE.md)
 - Latest DB dump: [silverwebbuzz_in_menetzero(5).sql](<../silverwebbuzz_in_menetzero(5).sql>)

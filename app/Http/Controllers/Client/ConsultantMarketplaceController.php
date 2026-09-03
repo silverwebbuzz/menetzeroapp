@@ -87,7 +87,7 @@ class ConsultantMarketplaceController extends Controller
         $order = $this->marketplace->createPendingOrder($company->id, $consultant, $data['pack_type']);
 
         $amountAed = (float) $pack['price_aed'];
-        $charge = $this->marketplace->chargeAmount($amountAed, $gateway->gateway);
+        $charge = $this->marketplace->chargeAmount($amountAed);
         $currency = $charge['currency'];
         $amount = $charge['amount'];
 

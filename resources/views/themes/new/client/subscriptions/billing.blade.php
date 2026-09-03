@@ -2,7 +2,7 @@
     MENetZero 2.0 - Plan & billing (Phase 6 body migration).
 
     SCOPE: this page only. The rest of the client/subscriptions cluster
-    (upgrade, checkout, current-plan, payment-history, request-package, index)
+    (upgrade, checkout, current-plan, payment-history, index)
     stays on old bodies inside the new shell, which renders correctly today.
     Only subscriptions.billing is reachable from the nav; the others sit deeper
     in the upgrade funnel. Decision recorded in redesign.md section 35.
@@ -11,8 +11,7 @@
       - subscriptions.cancel   POST + csrf + the confirm() text, which names the
         exact date the plan stays active until
       - subscriptions.resume   POST + csrf ("Keep my plan")
-      - subscriptions.request-package, subscriptions.upgrade,
-        client.consultants.index
+      - subscriptions.upgrade, client.consultants.index
       - the entitlement lists, which tell the user what they have paid for
 
     NO TABS: this page had a showTab() pair (Payment history / Billing methods)
@@ -137,12 +136,6 @@
                          (self-serve checkout), not the offline request form. --}}
                     <a href="{{ route('subscriptions.upgrade') }}" class="mnz-btn mnz-btn--accent" style="text-align:center">
                         {{ ($daysRemaining ?? 999) <= 45 && !empty($isPaidPlan) ? 'Renew plan' : 'Upgrade plan' }}
-                    </a>
-                    {{-- Only UI entry point to the request form (Enterprise /
-                         invoice buyers); it is not in the nav. --}}
-                    <a href="{{ route('subscriptions.request-package') }}"
-                       style="font-size:11px;color:var(--ink-4);text-decoration:underline">
-                        Need Enterprise, or prefer an invoice?
                     </a>
 
                     @if(!empty($cancellationScheduled))

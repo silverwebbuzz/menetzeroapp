@@ -6,7 +6,7 @@ oversees everything.
 
 ## Start here
 
-- `documentation/DATABASE_SCHEMA.md` — the 79 tables, what they do, and which
+- `documentation/DATABASE_SCHEMA.md` — the 76 tables, what they do, and which
   ones are traps. **Read before touching the database.**
 - `documentation/PROJECT_OVERVIEW.md` — product and domain background.
 - `graphify-out/wiki/index.md` — generated code map, for broad navigation.
