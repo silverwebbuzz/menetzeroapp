@@ -13,6 +13,8 @@ use App\Models\ClientSubscription;
 use App\Models\UsageTracking;
 use App\Services\OrganisationDeletionService;
 use App\Services\SubscriptionService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class SuperAdminController extends Controller
 {
@@ -161,6 +163,8 @@ class SuperAdminController extends Controller
             'featureFlags',
         ])->findOrFail($id);
 
+        $people = $this->peopleFor($company);
+
         $grantPlans = SubscriptionPlan::where('plan_category', 'client')
             ->where('is_active', true)
             ->where('price_annual', '>', 0)
@@ -180,7 +184,110 @@ class SuperAdminController extends Controller
             ->latest()
             ->get();
 
-        return view('admin.companies.show', compact('company', 'grantPlans', 'consultantPacks', 'packageAssignments', 'back'));
+        return view('admin.companies.show', compact('company', 'grantPlans', 'consultantPacks', 'packageAssignments', 'back', 'people'));
+    }
+
+    /**
+     * Everyone who can sign in to this organisation, as flat rows for the
+     * detail page.
+     *
+     * Two different things are collapsed here on purpose, because from an
+     * admin's point of view they are the same question -- "who has access?":
+     *
+     *   users        the normal workspace accounts (the `web` guard)
+     *   consultants  the agency's own login, a SEPARATE auth table with its own
+     *                email and password. Nothing on this page used to show it,
+     *                so an agency's primary account was invisible to admin.
+     *
+     * Roles come from user_company_roles, not users.role: that column is legacy
+     * and is no longer what the application authorises against. A membership row
+     * with a null/0 company_custom_role_id means owner, not "no role".
+     */
+    protected function peopleFor(Company $company): array
+    {
+        $rows = [];
+
+        $memberships = DB::table('user_company_roles')
+            ->leftJoin(
+                'company_custom_roles',
+                'user_company_roles.company_custom_role_id',
+                '=',
+                'company_custom_roles.id'
+            )
+            ->where('user_company_roles.company_id', $company->id)
+            ->select(
+                'user_company_roles.user_id',
+                'user_company_roles.is_active',
+                'user_company_roles.company_custom_role_id',
+                'company_custom_roles.role_name'
+            )
+            ->get()
+            ->keyBy('user_id');
+
+        // A user may belong to more than one company; the count tells the admin
+        // whether deleting this company would remove the account or just detach it.
+        $otherMemberships = DB::table('user_company_roles')
+            ->whereIn('user_id', $company->users->pluck('id'))
+            ->where('company_id', '!=', $company->id)
+            ->where('is_active', true)
+            ->select('user_id', DB::raw('COUNT(*) as total'))
+            ->groupBy('user_id')
+            ->pluck('total', 'user_id');
+
+        foreach ($company->users as $user) {
+            $membership = $memberships->get($user->id);
+
+            $rows[] = [
+                'kind' => 'User',
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone ?? null,
+                'designation' => $user->designation ?? null,
+                'role' => $membership
+                    ? ($membership->role_name ?: 'Owner')
+                    : '—',
+                'active' => $membership ? (bool) $membership->is_active : (bool) $user->is_active,
+                'verified' => $user->email_verified_at !== null,
+                'last_login_at' => $user->last_login_at,
+                'last_login_ip' => $user->last_login_ip,
+                'login_count' => $user->login_count ?? 0,
+                'created_at' => $user->created_at,
+                'other_companies' => (int) ($otherMemberships[$user->id] ?? 0),
+            ];
+        }
+
+        foreach ($this->consultantLoginsFor($company) as $consultant) {
+            $rows[] = [
+                'kind' => 'Consultant login',
+                'name' => $consultant->name,
+                'email' => $consultant->email,
+                'phone' => $consultant->phone,
+                'designation' => $consultant->company_name,
+                'role' => 'Agency owner',
+                'active' => (bool) $consultant->is_active,
+                'verified' => null,
+                'last_login_at' => $consultant->last_login_at ?? null,
+                'last_login_ip' => $consultant->last_login_ip ?? null,
+                'login_count' => $consultant->login_count ?? 0,
+                'created_at' => $consultant->created_at,
+                'other_companies' => 0,
+            ];
+        }
+
+        return $rows;
+    }
+
+    /**
+     * The consultant profile(s) whose agency workspace IS this company.
+     * Guarded because agency_company_id is added by a later migration.
+     */
+    protected function consultantLoginsFor(Company $company)
+    {
+        if (!Schema::hasTable('consultants') || !Schema::hasColumn('consultants', 'agency_company_id')) {
+            return collect();
+        }
+
+        return DB::table('consultants')->where('agency_company_id', $company->id)->get();
     }
 
     /**

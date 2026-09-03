@@ -33,20 +33,14 @@
             </div>
 
             <div class="bg-white shadow rounded-lg p-4">
-                <h2 class="text-md font-semibold text-gray-900 mb-3">Users</h2>
-                @if($company->users->isEmpty())
-                    <p class="text-sm text-gray-500">No users linked to this company.</p>
+                <h2 class="text-md font-semibold text-gray-900 mb-3">People</h2>
+                @if(empty($people))
+                    <p class="text-sm text-gray-500">Nobody can sign in to this company.</p>
                 @else
-                    <ul class="divide-y divide-gray-200 text-sm">
-                        @foreach ($company->users as $user)
-                            <li class="py-2 flex items-center justify-between">
-                                <div>
-                                    <div class="text-gray-900">{{ $user->name }}</div>
-                                    <div class="text-gray-500 text-xs">{{ $user->email }}</div>
-                                </div>
-                            </li>
-                        @endforeach
-                    </ul>
+                    <p class="text-sm text-gray-600">
+                        {{ count($people) }} {{ \Illuminate\Support\Str::plural('account', count($people)) }} with access.
+                    </p>
+                    <a href="#people" class="text-sm text-blue-600 hover:underline">See full details below &darr;</a>
                 @endif
             </div>
 
@@ -318,7 +312,9 @@
          signed in since login tracking was added, NOT that it never has --
          the columns start empty for everyone. --}}
     @php
-        $lastLogin = $company->users->max('last_login_at');
+        // Across everyone with access, not just users: an agency's only login
+        // is often the consultant profile, which would otherwise read "Never".
+        $lastLogin = collect($people)->pluck('last_login_at')->filter()->max();
         $lastLogin = $lastLogin ? \Illuminate\Support\Carbon::parse($lastLogin) : null;
         $idleDays = $lastLogin ? (int) $lastLogin->diffInDays(now()) : null;
         $lastEntry = $company->carbonEmissions()->max('created_at');
@@ -354,34 +350,97 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+
+    {{-- PEOPLE. Workspace users and the agency's own consultant login in one
+         table: they are separate auth tables, but an admin asking "who has
+         access?" means both. Roles come from user_company_roles, not the
+         legacy users.role column. --}}
+    <div id="people" class="bg-white shadow rounded-lg mt-8">
+        <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-medium text-gray-900">People &amp; access</h2>
+                <p class="text-sm text-gray-500">Everyone who can sign in to this organisation.</p>
+            </div>
+            <span class="text-sm text-gray-500">{{ count($people) }} total</span>
+        </div>
+
+        @if(empty($people))
+            <div class="p-5 text-sm text-gray-500">
+                Nobody can sign in to this company. It has no users and no consultant login.
+            </div>
+        @else
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead>
-                        <tr class="text-left text-xs text-gray-500 border-b border-gray-200">
-                            <th class="py-2">User</th>
-                            <th class="py-2">Last login</th>
-                            <th class="py-2">From</th>
-                            <th class="py-2 text-right">Logins</th>
+                        <tr class="text-left text-xs text-gray-500 border-b border-gray-200 bg-gray-50">
+                            <th class="px-5 py-2">Person</th>
+                            <th class="px-3 py-2">Role</th>
+                            <th class="px-3 py-2">Contact</th>
+                            <th class="px-3 py-2">Status</th>
+                            <th class="px-3 py-2">Last login</th>
+                            <th class="px-3 py-2">From</th>
+                            <th class="px-3 py-2 text-right">Logins</th>
+                            <th class="px-5 py-2">Joined</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($company->users as $u)
-                            <tr class="border-b border-gray-100">
-                                <td class="py-2">
-                                    <div class="font-medium text-gray-900">{{ $u->name }}</div>
-                                    <div class="text-xs text-gray-500">{{ $u->email }}</div>
+                        @foreach($people as $p)
+                            <tr class="border-b border-gray-100 align-top">
+                                <td class="px-5 py-3">
+                                    <div class="font-medium text-gray-900">{{ $p['name'] }}</div>
+                                    <div class="text-xs text-gray-500">{{ $p['email'] }}</div>
+                                    @if($p['kind'] !== 'User')
+                                        <span class="inline-block mt-1 px-2 py-0.5 text-[11px] rounded bg-purple-100 text-purple-800">
+                                            {{ $p['kind'] }}
+                                        </span>
+                                    @endif
+                                    @if($p['other_companies'] > 0)
+                                        <div class="text-[11px] text-amber-600 mt-1">
+                                            Also in {{ $p['other_companies'] }} other
+                                            {{ \Illuminate\Support\Str::plural('company', $p['other_companies']) }}
+                                            — kept if this company is deleted
+                                        </div>
+                                    @endif
                                 </td>
-                                <td class="py-2 text-gray-600">
-                                    {{ $u->last_login_at ? \Illuminate\Support\Carbon::parse($u->last_login_at)->format('d M Y H:i') : 'Never' }}
+                                <td class="px-3 py-3 text-gray-700">{{ $p['role'] }}</td>
+                                <td class="px-3 py-3 text-gray-600 text-xs">
+                                    <div>{{ $p['phone'] ?: '—' }}</div>
+                                    @if($p['designation'])
+                                        <div class="text-gray-400">{{ $p['designation'] }}</div>
+                                    @endif
                                 </td>
-                                <td class="py-2 text-gray-500 font-mono text-xs">{{ $u->last_login_ip ?: '—' }}</td>
-                                <td class="py-2 text-right text-gray-600">{{ $u->login_count ?? 0 }}</td>
+                                <td class="px-3 py-3">
+                                    @if($p['active'])
+                                        <span class="px-2 py-0.5 text-[11px] rounded bg-green-100 text-green-800">Active</span>
+                                    @else
+                                        <span class="px-2 py-0.5 text-[11px] rounded bg-gray-200 text-gray-700">Inactive</span>
+                                    @endif
+                                    @if($p['verified'] === false)
+                                        <div class="text-[11px] text-amber-600 mt-1">Email unverified</div>
+                                    @endif
+                                </td>
+                                <td class="px-3 py-3 text-gray-600">
+                                    {{ $p['last_login_at'] ? \Illuminate\Support\Carbon::parse($p['last_login_at'])->format('d M Y H:i') : 'Never' }}
+                                </td>
+                                <td class="px-3 py-3 text-gray-500 font-mono text-xs">{{ $p['last_login_ip'] ?: '—' }}</td>
+                                <td class="px-3 py-3 text-right text-gray-600">{{ $p['login_count'] }}</td>
+                                <td class="px-5 py-3 text-gray-500 text-xs">
+                                    {{ $p['created_at'] ? \Illuminate\Support\Carbon::parse($p['created_at'])->format('d M Y') : '—' }}
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
-        </div>
+
+            {{-- last_login_* start empty for everyone: the columns were added by
+                 add_login_tracking, so "Never" can mean "not since then". --}}
+            <div class="px-5 py-3 border-t border-gray-200 text-xs text-gray-500">
+                Login tracking started when the feature was added — “Never” may mean no sign-in since then, not that the account has never been used.
+            </div>
+        @endif
     </div>
 
     {{-- DANGER ZONE. Typed-name confirmation rather than a JS confirm():
