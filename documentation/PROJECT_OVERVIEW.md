@@ -132,7 +132,7 @@ A single user can **own one company** and **be staff in many**. `UserActiveConte
 Domain groups:
 
 **Identity & org**
-- `User`, `Admin`, `Company`, `UserCompanyAccess`, `UserCompanyRole`, `UserActiveContext`
+- `User`, `Admin`, `Consultant`, `Company`, `UserCompanyRole`, `UserActiveContext`
 - `CompanyInvitation` (staff invite tokens)
 - `CompanyCustomRole`, `CompanyCustomRolePermission`, `Permission`, `RoleTemplate`, `RoleTemplatePermission`
 
