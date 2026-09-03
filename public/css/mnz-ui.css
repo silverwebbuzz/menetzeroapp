@@ -673,3 +673,30 @@ table.mnz-table td{padding:11px 16px;border-bottom:1px solid var(--line-2);font-
 .mm-lead { margin: 5px 0 0; color: #5a6068; font-size: 13.5px; }
 .mm-lead strong { color: #14161a; font-weight: 600; }
 .mm-head__actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+
+
+/* ---------------------------------------------------------------------------
+   Sidebar plan card (nav-client footer).
+
+   Sits inside .mnz-side__foot, which already pins itself to the bottom of the
+   flex-column sidebar. Company name truncates rather than wraps: an agency
+   name long enough to wrap to three lines would push the button off-screen on
+   short viewports, and the full name is in the title attribute.
+   --------------------------------------------------------------------------- */
+.mnz-plan{padding:2px 0 0}
+.mnz-plan__company{font:600 12.5px var(--sans);color:var(--ink);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mnz-plan__meta{margin-top:2px;font:500 11px var(--sans);color:var(--ink-3);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mnz-plan__tier{color:var(--ink-2)}
+.mnz-plan.is-expiring .mnz-plan__days{color:var(--warn);font-weight:600}
+.mnz-plan.is-expired .mnz-plan__days{color:var(--bad);font-weight:600}
+.mnz-plan__btn{display:flex;align-items:center;justify-content:center;margin-top:9px;
+  height:30px;padding:0 10px;border:1px solid var(--line);border-radius:var(--r);
+  background:var(--surface);color:var(--ink);font:500 12px var(--sans);
+  white-space:nowrap;transition:background .12s,border-color .12s}
+.mnz-plan__btn:hover{background:var(--canvas-2);text-decoration:none;color:var(--ink)}
+.mnz-plan.is-expiring .mnz-plan__btn,
+.mnz-plan.is-expired .mnz-plan__btn{background:var(--ink);border-color:var(--ink);color:#fff}
+.mnz-plan.is-expiring .mnz-plan__btn:hover,
+.mnz-plan.is-expired .mnz-plan__btn:hover{background:#000;color:#fff}

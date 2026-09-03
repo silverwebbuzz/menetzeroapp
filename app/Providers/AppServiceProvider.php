@@ -47,6 +47,12 @@ class AppServiceProvider extends ServiceProvider
             $this->withThemeViews([
                 'layouts.app',
                 'layouts.partials.nav-client',
+                // Sidebar plan card. Blade renders an included partial in a
+                // CHILD scope, but a composer binds by view NAME -- without
+                // this line $gate is null inside the partial and the card
+                // silently never renders, which is exactly the R-1 failure
+                // mode described above.
+                'layouts.partials.plan-card',
                 'reports.*',
                 'disclosures.*',
                 'quick-input.*',

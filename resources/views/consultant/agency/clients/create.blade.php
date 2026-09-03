@@ -35,15 +35,15 @@
 
 @if(!$hasCapacity)
     <div class="cd-notice cd-notice--warning p-6 text-sm">
-        No managed client places remaining. Archive a finished client or request more capacity.
-        <a href="{{ route('consultant.packs.index') }}" class="font-medium underline">Request clients</a>
+        No managed client places remaining. Archive a finished client or buy more capacity.
+        <a href="{{ route('consultant.packs.index') }}" class="font-medium underline">Agency packs</a>
     </div>
 @else
     @php $onlyTrial = collect($capacityOptions)->every(fn ($b) => !empty($b['is_trial'])); @endphp
     @if($onlyTrial)
         <div class="cd-callout mb-6">
             <strong>Free trial workspace</strong> — this client gets Free rules: Scope 1 &amp; 2 full, Scope 3 (1 entry per category), disclosure form previews. Official PDF exports unlock after paid capacity is activated.
-            <a href="{{ route('consultant.packs.index') }}" class="font-medium underline">Request clients</a>
+            <a href="{{ route('consultant.packs.index') }}" class="font-medium underline">Agency packs</a>
         </div>
     @endif
 

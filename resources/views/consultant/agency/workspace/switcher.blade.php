@@ -111,7 +111,7 @@
 @empty
     <div class="bg-white border border-gray-200 rounded-xl p-8 text-center text-gray-500 text-sm mb-6">
         No package capacity yet.
-        <a href="{{ route('consultant.packs.index') }}" class="text-brand hover:underline">Request clients</a>
+        <a href="{{ route('consultant.packs.index') }}" class="text-brand hover:underline">Agency packs</a>
         or
         <a href="{{ route('consultant.clients.create') }}" class="text-brand hover:underline">add a Free client</a>.
     </div>
@@ -151,7 +151,7 @@
 
 <div class="mt-2 flex flex-wrap gap-4 text-sm">
     <a href="{{ route('consultant.clients.index') }}" class="text-brand hover:underline">Managed clients</a>
-    <a href="{{ route('consultant.packs.index') }}" class="text-brand hover:underline">Request clients</a>
+    <a href="{{ route('consultant.packs.index') }}" class="text-brand hover:underline">Agency packs</a>
     <a href="{{ route('consultant.dashboard') }}" class="text-brand hover:underline">← Consultant dashboard</a>
 </div>
 @endsection

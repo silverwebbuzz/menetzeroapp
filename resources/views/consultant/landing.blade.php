@@ -27,7 +27,7 @@
             <a href="{{ route('consultant.register') }}" class="mkt-btn mkt-btn-primary mkt-btn-lg">Create consultant account</a>
             <a href="{{ route('consultant.login') }}" class="mkt-btn mkt-btn-outline mkt-btn-lg">Sign in</a>
         </div>
-        <p class="text-xs text-gray-400 mt-4">Start with 1 free managed client · Request more after sign-in · Pricing offline · Google or email registration</p>
+        <p class="text-xs text-gray-400 mt-4">Start with 1 free managed client · Buy more after sign-in · AED pricing at checkout · Google or email registration</p>
     </div>
 </section>
 
@@ -40,8 +40,8 @@
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             @foreach([
                 ['One login, many clients', 'Switch between managed SME workspaces without juggling separate accounts or passwords.'],
-                ['Package depth per client', 'Request Scope Basic through Enterprise for managed clients — inventory exports or full ESG suites, activated offline.'],
-                ['Preferential when you scale', 'Request managed clients from the consultant portal — MENetZero confirms rates offline (no public AED list). Preferential policy may apply at 10+ clients.'],
+                ['Package depth per client', 'Buy Carbon or ESG capacity for managed clients — inventory exports or full ESG suites, activated on payment.'],
+                ['Preferential when you scale', 'Buy managed-client capacity from the consultant portal at the listed AED rates. Preferential policy may apply at 10+ clients — talk to sales.'],
                 ['Leads without spam', 'Directory listing routes inquiries through the platform — your phone and email stay private.'],
             ] as $item)
                 <div class="mkt-feature-card">
@@ -91,14 +91,14 @@
             <div class="mkt-feature-card">
                 <div class="flex items-center mb-4">
                     <div class="mkt-scope-number">3</div>
-                    <h3 class="text-xl font-bold text-gray-900">Request clients</h3>
+                    <h3 class="text-xl font-bold text-gray-900">Buy client capacity</h3>
                 </div>
-                <p class="text-gray-500 mb-6">Choose package depth and how many managed clients — quoted offline.</p>
+                <p class="text-gray-500 mb-6">Choose package depth and how many managed clients — pay online.</p>
                 <ul class="space-y-3 text-sm text-gray-600">
-                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Request Scope Basic … Enterprise packages for your clients</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Buy Carbon or ESG packages for your clients</li>
                     <li class="flex items-start"><span class="mkt-checkmark">✓</span> Clean inventory or full ESG exports depending on package</li>
-                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Grow mid-year by requesting more managed clients</li>
-                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Calendar-aligned renewals with offline activation</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Grow mid-year by buying more managed clients</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Calendar-aligned renewals, activated on payment</li>
                     <li class="flex items-start"><span class="mkt-checkmark">✓</span> No public AED list — rates confirmed after you request</li>
                 </ul>
             </div>
@@ -110,16 +110,16 @@
     <div class="mkt-container">
         <div class="mkt-section-head">
             <h2>What each paid client workspace includes</h2>
-            <p>Choose package depth per engagement — Scope Basic (clean inventory exports) through ESG packages and Enterprise</p>
+            <p>Choose package depth per engagement — Carbon (clean inventory exports), ESG (disclosure suites) or Enterprise</p>
         </div>
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach([
                 ['Emissions engine', ['Scope 1 & 2 quick input and calculations', 'Scope 3 within package limits', 'MENA-specific emission factors', 'Dashboard with trends and hotspots']],
                 ['Data operations', ['Bulk CSV / Excel import on paid packages', 'Bulk data export', 'Sites per client by package', 'Historical data retention by package']],
                 ['UAE compliance', ['Clean GHG inventory PDF', 'MOCCAE Scope 1 & 2 PDF', 'IEQT export for mrv.ae', 'Excel results export']],
-                ['Disclosure &amp; ESG', ['Available on Scope Pro / ESG packages', 'UAE ESG Report & Scorecard options', 'IFRS / GRI / SASB when package allows', 'Enterprise for white-label / custom']],
+                ['Disclosure &amp; ESG', ['Available on the ESG package', 'UAE ESG Report & Scorecard options', 'IFRS / GRI / SASB when package allows', 'Enterprise for white-label / custom']],
                 ['Your workflow', ['Enter client data on their behalf', 'Review calculations before sign-off', 'Export client-ready working papers', 'Separate workspace per client organisation']],
-                ['Free trial client', ['1 client included at registration', 'Full Scope 1 & 2 + disclosure preview', 'Watermarked trial downloads', 'Request clients when ready for clean exports']],
+                ['Free trial client', ['1 client included at registration', 'Full Scope 1 & 2 + disclosure preview', 'Watermarked trial downloads', 'Buy capacity when ready for clean exports']],
             ] as $block)
                 <div class="mkt-feature-card">
                     <h3 class="text-lg font-bold text-gray-900 mb-4">{!! $block[0] !!}</h3>
@@ -162,7 +162,7 @@
     <div class="mkt-container">
         <div class="mkt-section-head">
             <h2>Reports you can prepare for clients</h2>
-            <p>Capabilities depend on the package activated for your capacity — Scope Basic for inventory, Scope Pro / ESG for disclosure suites</p>
+            <p>Capabilities depend on the package activated for your capacity — Carbon for inventory, ESG for disclosure suites</p>
         </div>
         <div class="mkt-table-wrap max-w-3xl mx-auto">
             <table class="mkt-table">
@@ -170,8 +170,8 @@
                     <tr>
                         <th>Deliverable</th>
                         <th>Free client</th>
-                        <th>Scope Basic+</th>
-                        <th>Scope Pro / ESG</th>
+                        <th>Carbon</th>
+                        <th>ESG</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -203,13 +203,13 @@
     <div class="mkt-container">
         <div class="mkt-section-head">
             <h2>Built for every practice size</h2>
-            <p>Request the package depth and client count you need — no fixed pack sizes for sale</p>
+            <p>Buy the package depth and client count you need — no fixed pack sizes</p>
         </div>
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             @foreach([
                 ['Free', 'Get started', '1 managed client with Free rules — explore the workflow with watermarked trial downloads.'],
-                ['Scope Basic', 'Inventory clients', 'Clean GHG / MOCCAE / Excel / IEQT for inventory-focused engagements.'],
-                ['Scope Pro / ESG', 'Disclosure work', 'UAE ESG Report, Scorecard, IFRS / GRI when those packages are activated.'],
+                ['Carbon', 'Inventory clients', 'Clean GHG / MOCCAE / Excel / IEQT plus full Scope 3 for inventory-focused engagements.'],
+                ['ESG', 'Disclosure work', 'UAE ESG Report, Scorecard, IFRS / GRI when that package is activated.'],
                 ['Enterprise', 'Custom work', 'White-label and custom deployments — talk through requirements with MENetZero.'],
             ] as $pack)
                 <div class="mkt-feature-card">
@@ -220,7 +220,7 @@
             @endforeach
         </div>
         <p class="text-center text-sm text-gray-500 mt-8">
-            Preferential rates may apply at 10+ managed clients / 12 months — sales confirms offline.
+            Preferential rates may apply at 10+ managed clients / 12 months — talk to sales.
             Need a custom arrangement? <a href="{{ route('contact') }}" class="mkt-text-brand hover:underline">Contact us</a>.
         </p>
     </div>
@@ -235,7 +235,7 @@
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             @foreach([
                 ['01', 'Register', 'Create your consultant account with practice details — Google or email.'],
-                ['02', 'Add a client', 'Start with one free managed workspace, then Request clients when you need clean exports or more capacity.'],
+                ['02', 'Add a client', 'Start with one free managed workspace, then buy capacity when you need clean exports or more clients.'],
                 ['03', 'Enter &amp; review', 'Open client workspaces — emissions, disclosures, MOCCAE forms, and downloads per package.'],
                 ['04', 'Get listed', 'Complete your directory profile, pass verification, and receive platform leads.'],
             ] as $step)
@@ -278,10 +278,10 @@
                 <div class="space-y-0 text-sm">
                     @foreach([
                         ['Free', '1 managed client'],
-                        ['Scope Basic+', 'Clean GHG / MOCCAE / Excel / IEQT'],
-                        ['Scope Pro / ESG', 'Disclosure PDF suites'],
+                        ['Carbon', 'Clean GHG / MOCCAE / Excel / IEQT'],
+                        ['ESG', 'Disclosure PDF suites'],
                         ['Enterprise', 'White-label / custom'],
-                        ['Pricing', 'Confirmed offline — no public AED list'],
+                        ['Pricing', 'Shown in AED at checkout'],
                     ] as $i => $row)
                         <div class="flex justify-between gap-4 py-3 {{ $i < 4 ? 'border-b border-white/10' : '' }}">
                             <span class="text-slate-300 shrink-0">{{ $row[0] }}</span>
@@ -289,7 +289,7 @@
                         </div>
                     @endforeach
                 </div>
-                <p class="text-xs text-slate-400 mt-4">Request clients from the consultant portal after you sign in.</p>
+                <p class="text-xs text-slate-400 mt-4">Buy client capacity from the consultant portal after you sign in.</p>
                 <a href="{{ route('consultant.register') }}" class="mkt-btn mkt-btn-primary mkt-btn-block mt-4">Get started free</a>
             </div>
         </div>
@@ -308,7 +308,7 @@
                     <li class="flex items-start"><span class="mkt-checkmark">✓</span> Sustainability consultants &amp; ESG advisors</li>
                     <li class="flex items-start"><span class="mkt-checkmark">✓</span> MOCCAE / GHG Protocol specialists</li>
                     <li class="flex items-start"><span class="mkt-checkmark">✓</span> Agencies managing multiple SME inventories</li>
-                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Practices wanting directory leads + Request clients capacity</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> Practices wanting directory leads + managed-client capacity</li>
                 </ul>
             </div>
             <div class="mkt-feature-card">
@@ -333,9 +333,9 @@
                 ['Is the directory listing mandatory?', 'No. You can use MenetZero purely as an agency hub for managed clients. The public directory is optional — apply when you want platform leads.'],
                 ['What does the free trial client include?', 'One managed workspace on Free limits: Scope 1 & 2, Scope 3 (one entry each), watermarked trial downloads. Clean exports unlock after paid capacity is activated.'],
                 ['Do my clients need their own MenetZero login?', 'You work inside managed workspaces on their behalf. Your clients do not need separate subscriptions for the work you perform in their workspace.'],
-                ['Can I add more clients mid-year?', 'Yes. Request more managed clients from the consultant portal. MENetZero confirms rates offline and activates after payment.'],
+                ['Can I add more clients mid-year?', 'Yes. Buy more managed-client capacity from the consultant portal — it activates as soon as payment clears.'],
                 ['How is this different from company Explore Free?', 'Explore Free on the public site is for businesses tracking their own emissions. Consultants request managed clients after consultant sign-in — no public AED list.'],
-                ['What packages can I request?', 'Scope Basic, Scope Pro, ESG Starter, ESG Complete, or Enterprise — same capability cards as companies, applied to your managed clients.'],
+                ['What packages can I buy?', 'Carbon, ESG or Enterprise — the same capability tiers as companies, applied to your managed clients.'],
             ] as $faq)
                 <details class="mkt-feature-card group" style="padding:1.25rem;">
                     <summary class="font-semibold text-gray-900 cursor-pointer list-none flex justify-between items-center gap-4">
@@ -354,7 +354,7 @@
         <h2 class="text-3xl font-bold text-gray-900 mb-4">Ready to run client workspaces from one login?</h2>
         <p class="text-gray-500 mb-8">
             Register once — your agency hub, client portfolio, and directory profile live on the same consultant account.
-            Start free with one managed client, then Request clients when you need clean exports or more capacity.
+            Start free with one managed client, then buy capacity when you need clean exports or more clients.
         </p>
         <div class="flex flex-wrap justify-center gap-3">
             <a href="{{ route('consultant.register') }}" class="mkt-btn mkt-btn-primary mkt-btn-lg">Create consultant account</a>

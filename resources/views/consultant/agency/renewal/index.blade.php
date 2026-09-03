@@ -40,7 +40,7 @@
 
 <div class="flex flex-wrap items-center gap-3 mb-6 text-sm">
     <span class="text-gray-600">Spare seats available now: <strong class="text-gray-900">{{ $spareSeats }}</strong></span>
-    <a href="{{ route('consultant.packs.index') }}" class="text-brand hover:underline">Request clients for {{ $nextYear }} →</a>
+    <a href="{{ route('consultant.packs.index') }}" class="text-brand hover:underline">Buy capacity for {{ $nextYear }} →</a>
 </div>
 
 @if($boardCount === 0)

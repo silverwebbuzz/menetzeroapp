@@ -13,6 +13,9 @@ use App\Services\SubscriptionService;
  */
 class PlanGate
 {
+    /** @var array<string, array<string, mixed>|null> Memo for planSummary(). */
+    protected array $planSummaryCache = [];
+
     public function __construct(
         protected ?int $companyId,
         protected PlanEntitlementService $entitlements,
@@ -120,7 +123,7 @@ class PlanGate
 
     public function agencyLockedMessage(string $featureName = 'This feature'): string
     {
-        return "{$featureName} requires paid managed clients. Use Request clients to ask MENetZero for activation.";
+        return "{$featureName} requires paid managed clients. Buy client capacity from Agency packs.";
     }
 
     public function upgradeRoute(): string
@@ -135,7 +138,7 @@ class PlanGate
     public function upgradeButtonLabel(string $clientLabel = 'Upgrade Package'): string
     {
         if ($this->isAgencyWorkspace()) {
-            return 'Request clients';
+            return 'Agency packs';
         }
 
         // Named plans must not leak into a button label: the plan a user needs
@@ -379,6 +382,93 @@ class PlanGate
                 'hint' => $hint,
             ];
         }, $items);
+    }
+
+    /**
+     * Plan summary for the sidebar card, which renders on EVERY portal page.
+     *
+     * Memoised because getActiveSubscription() is an uncached query and this
+     * gate already calls it several times per render — an always-visible card
+     * must not add another one on top of that.
+     *
+     * A managed client gets 'managed' => true and no action: billing lives on
+     * the consultant's account (RestrictManagedClientBilling redirects them
+     * away from the billing pages entirely), so offering an upgrade button
+     * here would lead somewhere they are bounced out of.
+     *
+     * @return array{
+     *   company: string|null,
+     *   plan: string,
+     *   managed: bool,
+     *   paid: bool,
+     *   days_left: int|null,
+     *   expiring: bool,
+     *   expired: bool,
+     *   action_url: string|null,
+     *   action_label: string|null
+     * }|null
+     */
+    public function planSummary(): ?array
+    {
+        if (array_key_exists('summary', $this->planSummaryCache)) {
+            return $this->planSummaryCache['summary'];
+        }
+
+        return $this->planSummaryCache['summary'] = $this->buildPlanSummary();
+    }
+
+    /** @return array<string, mixed>|null */
+    protected function buildPlanSummary(): ?array
+    {
+        if (!$this->companyId) {
+            return null;
+        }
+
+        $company = \App\Models\Company::find($this->companyId);
+        if (!$company) {
+            return null;
+        }
+
+        // Managed clients: show what they are on, but never an upgrade action.
+        if ($this->isManagedClient()) {
+            return [
+                'company' => $company->name,
+                'plan' => 'Managed by consultant',
+                'managed' => true,
+                'paid' => false,
+                'days_left' => null,
+                'expiring' => false,
+                'expired' => false,
+                'action_url' => null,
+                'action_label' => null,
+            ];
+        }
+
+        $subscription = app(SubscriptionService::class)->getActiveSubscription($this->companyId, 'client');
+        $paid = $subscription ? app(SubscriptionService::class)->isPaidSubscription($subscription) : false;
+
+        $daysLeft = null;
+        if ($subscription?->expires_at) {
+            $daysLeft = (int) now()->startOfDay()->diffInDays($subscription->expires_at->copy()->startOfDay(), false);
+        }
+
+        // Only a PAID plan can expire in a way the user must act on. Free has
+        // an expires_at too, and counting it down would nag every free user
+        // forever about a renewal that costs nothing.
+        $expired = $paid && $daysLeft !== null && $daysLeft < 0;
+        $expiring = $paid && !$expired && $daysLeft !== null && $daysLeft <= 45;
+
+        return [
+            'company' => $company->name,
+            'plan' => $subscription?->plan?->plan_name ?? 'Free',
+            'managed' => false,
+            'paid' => $paid,
+            'days_left' => $paid && $daysLeft !== null ? max(0, $daysLeft) : null,
+            'expiring' => $expiring,
+            'expired' => $expired,
+            'action_url' => $this->upgradeRoute(),
+            'action_label' => $paid && ($expiring || $expired) ? 'Renew plan' : 'Upgrade plan',
+        ];
     }
 
     public function consultantDirectoryLabel(): string

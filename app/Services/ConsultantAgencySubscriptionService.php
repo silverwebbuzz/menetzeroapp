@@ -746,7 +746,7 @@ class ConsultantAgencySubscriptionService
 
     /**
      * Legacy checkout hook: more seats become a NEW capacity row (same plan / contract year).
-     * Preferred path: Request clients → admin grantDepthSubscription.
+     * Preferred path: Agency packs online checkout.
      */
     public function addExtraSlots(ConsultantSubscription $subscription, int $quantity, ?PaymentTransaction $transaction = null): ConsultantSubscription
     {

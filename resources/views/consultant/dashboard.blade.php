@@ -72,7 +72,7 @@
         <div class="ent-kpi-card">
             <span class="ent-label">Client capacity</span>
             <div class="ent-kpi-value">{{ $slotSummary['used'] ?? 0 }}<span class="ent-kpi-unit">/ {{ $slotSummary['limit'] ?? 0 }}</span></div>
-            <div class="ent-kpi-card__compare">{{ $slotsRemaining }} remaining · <a href="{{ route('consultant.packs.index') }}" class="text-brand hover:underline">Request clients</a></div>
+            <div class="ent-kpi-card__compare">{{ $slotsRemaining }} remaining · <a href="{{ route('consultant.packs.index') }}" class="text-brand hover:underline">Agency packs</a></div>
         </div>
     </div>
 

@@ -110,7 +110,7 @@
                         <a href="{{ isset($gate) ? $gate->upgradeRoute() : route('subscriptions.billing') }}"
                            class="mnz-subnav__link is-locked"
                            title="{{ isset($gate) && $gate->isAgencyWorkspace() ? $gate->agencyLockedMessage('Scope 3') : 'Upgrade your package to expand Scope 3' }}">
-                            {{ isset($gate) && $gate->isAgencyWorkspace() ? 'Request slots' : 'Upgrade Package' }}
+                            {{ isset($gate) && $gate->isAgencyWorkspace() ? 'Agency packs' : 'Upgrade Package' }}
                         </a>
                     @else
                         @foreach ($scopeSources[$scopeNum] as $source)
@@ -122,6 +122,47 @@
                     @endif
                 </div>
             @endforeach
+        </div>
+    </div>
+@endif
+
+{{-- PLAN CARD — pinned to the bottom of the sidebar.
+
+     .mnz-side is already a flex column and .mnz-side__foot carries
+     `margin:auto 8px 0`, so this sits against the bottom edge without any
+     layout change: the nav above scrolls, this stays put.
+
+     Rendered on every portal page, so the data comes from
+     PlanGate::planSummary(), which memoises its subscription lookup. Reading
+     the subscription directly here would add a query to every page load.
+
+     Three states, because there are three billing situations:
+       - direct company  -> plan, days left when paid, Upgrade/Renew
+       - managed client  -> plan only; billing is the agency's, and
+                            RestrictManagedClientBilling redirects them away
+                            from the billing pages, so an action here would
+                            lead somewhere they get bounced out of
+       - no company yet  -> nothing at all --}}
+@php
+    $planCard = isset($gate) ? $gate->planSummary() : null;
+@endphp
+
+@if ($planCard)
+    <div class="mnz-side__foot">
+        <div class="mnz-plan {{ $planCard['expired'] ? 'is-expired' : ($planCard['expiring'] ? 'is-expiring' : '') }}">
+            <div class="mnz-plan__company" title="{{ $planCard['company'] }}">{{ $planCard['company'] }}</div>
+            <div class="mnz-plan__meta">
+                <span class="mnz-plan__tier">{{ $planCard['plan'] }}</span>
+                @if ($planCard['expired'])
+                    <span class="mnz-plan__days">· expired</span>
+                @elseif ($planCard['days_left'] !== null)
+                    <span class="mnz-plan__days">· {{ $planCard['days_left'] }} {{ \Illuminate\Support\Str::plural('day', $planCard['days_left']) }} left</span>
+                @endif
+            </div>
+
+            @if ($planCard['action_url'])
+                <a href="{{ $planCard['action_url'] }}" class="mnz-plan__btn">{{ $planCard['action_label'] }}</a>
+            @endif
         </div>
     </div>
 @endif

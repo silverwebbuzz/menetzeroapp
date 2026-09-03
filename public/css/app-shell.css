@@ -2175,3 +2175,84 @@ table.min-w-full tbody tr:hover { background-color: var(--canvas); }
 .mm-lead { margin: 5px 0 0; color: #5a6068; font-size: 13.5px; }
 .mm-lead strong { color: #14161a; font-weight: 600; }
 .mm-head__actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+
+
+/* ===================================================================== */
+/* Sidebar plan card                                                      */
+/* ===================================================================== */
+
+/* Sits as the last child of .sidebar, which is already a flex column, so
+   margin-top:auto pins it to the bottom edge while the nav above scrolls.
+   Company name truncates rather than wraps -- a long agency name would
+   otherwise push the button below the fold on short viewports, and the full
+   name is carried in the title attribute. */
+.plan-card {
+    margin-top: auto;
+    padding: 0.875rem 1rem;
+    border-top: 1px solid var(--line);
+    flex-shrink: 0;
+}
+
+.plan-card__company {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.plan-card__meta {
+    margin-top: 0.125rem;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: var(--ink-subtle);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.plan-card__tier { color: var(--ink-muted); }
+
+.plan-card.is-expiring .plan-card__days { color: var(--warning); font-weight: 600; }
+.plan-card.is-expired  .plan-card__days { color: var(--danger);  font-weight: 600; }
+
+.plan-card__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.5rem;
+    height: 1.875rem;
+    padding: 0 0.625rem;
+    border: 1px solid var(--line);
+    border-radius: 0.375rem;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: background 0.12s, border-color 0.12s;
+}
+
+.plan-card__btn:hover {
+    background: var(--brand-soft);
+    border-color: var(--brand);
+    color: var(--brand-darker);
+    text-decoration: none;
+}
+
+/* An expiring or expired plan is the one case worth a solid button: it is
+   the only state where not clicking has a consequence. */
+.plan-card.is-expiring .plan-card__btn,
+.plan-card.is-expired .plan-card__btn {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #fff;
+}
+
+.plan-card.is-expiring .plan-card__btn:hover,
+.plan-card.is-expired .plan-card__btn:hover {
+    background: var(--brand-dark);
+    border-color: var(--brand-dark);
+    color: #fff;
+}

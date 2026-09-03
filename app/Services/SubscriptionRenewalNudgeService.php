@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * Phase 10a — offline renewal window detection + email nudges.
- * CTAs point to Upgrade Package / Request clients (no self-serve checkout).
+ * CTAs point to Upgrade plan / Agency packs (online checkout).
  */
 class SubscriptionRenewalNudgeService
 {

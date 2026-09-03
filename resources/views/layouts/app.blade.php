@@ -102,6 +102,14 @@
                         @include('layouts.partials.nav-client')
                     </div>
                 </nav>
+
+                {{-- Plan card pinned to the sidebar's bottom edge. Placed HERE
+                     rather than inside nav-client because that partial renders
+                     inside the scrolling .flex-1 wrapper above -- putting the
+                     card there would scroll it away with the nav. The new
+                     theme's sidebar is a flex column with its own footer hook,
+                     so its copy of this lives in that partial instead. --}}
+                @include('layouts.partials.plan-card')
             </aside>
 
             <!-- Main content -->
