@@ -90,7 +90,7 @@ class SuperAdminController extends Controller
         if ($request->boolean('dormant')) {
             $cutoff = now()->subDays($dormantDays);
 
-            $query->whereDoesntHave('carbonEmissions', fn ($q) => $q->where('created_at', '>=', $cutoff))
+            $query->whereDoesntHave('measurements', fn ($q) => $q->where('created_at', '>=', $cutoff))
                 ->whereDoesntHave('locations', fn ($q) => $q->where('created_at', '>=', $cutoff))
                 ->where('created_at', '<', $cutoff)
                 ->whereDoesntHave('clientSubscriptions.plan', fn ($p) => $p->where('price_annual', '>', 0));
@@ -100,7 +100,7 @@ class SuperAdminController extends Controller
         // whichever matches the company type, and without this it would fire
         // two queries per row.
         $companies = $query->with(['clientSubscriptions.plan', 'consultantSubscriptions.plan'])
-            ->withCount(['users', 'carbonEmissions', 'locations', 'managedClients'])
+            ->withCount(['users', 'measurements', 'locations', 'managedClients'])
             ->withMax('users', 'last_login_at')
             ->orderBy('created_at', 'desc')
             ->paginate(20)

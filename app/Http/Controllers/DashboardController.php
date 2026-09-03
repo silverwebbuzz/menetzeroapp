@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\EmissionSourceMaster;
 use App\Models\Company;
-use App\Models\Facility;
 use App\Models\Measurement;
 use App\Models\MasterIndustryCategory;
 use App\Services\GhgReportService;

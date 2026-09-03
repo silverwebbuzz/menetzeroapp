@@ -237,7 +237,7 @@
     @php
         $managedClients = \App\Models\Company::where('consultant_id', $company->id)
             ->with(['clientSubscriptions.plan', 'consultantSubscriptions.plan'])
-            ->withCount(['carbonEmissions', 'locations'])
+            ->withCount(['measurements', 'locations'])
             ->orderBy('name')
             ->get();
     @endphp
@@ -317,7 +317,7 @@
         $lastLogin = collect($people)->pluck('last_login_at')->filter()->max();
         $lastLogin = $lastLogin ? \Illuminate\Support\Carbon::parse($lastLogin) : null;
         $idleDays = $lastLogin ? (int) $lastLogin->diffInDays(now()) : null;
-        $lastEntry = $company->carbonEmissions()->max('created_at');
+        $lastEntry = $company->measurements()->max('measurements.created_at');
         $lastEntry = $lastEntry ? \Illuminate\Support\Carbon::parse($lastEntry) : null;
     @endphp
 
@@ -342,7 +342,7 @@
                 </div>
                 <div>
                     <div class="text-xs text-gray-500">Emission entries</div>
-                    <div class="font-semibold text-gray-900">{{ $company->carbonEmissions()->count() }}</div>
+                    <div class="font-semibold text-gray-900">{{ $company->measurements()->count() }}</div>
                 </div>
                 <div>
                     <div class="text-xs text-gray-500">Last data entered</div>

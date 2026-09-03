@@ -25,6 +25,14 @@ yarn-error.log
 !documentation/
 !documentation/**/*.md
 
+# CLAUDE.md is the entry point for the codebase and must be tracked.
+!CLAUDE.md
+
+# The schema baseline IS the schema (see documentation/DATABASE_SCHEMA.md).
+# It is not a dump to be ignored -- without it the database cannot be rebuilt.
+!database/schema/
+!database/schema/*.sql
+
 # External reference materials (not part of the product)
 final-web---dp-world-esg-2024-eng-v3.pdf
 reference-material/

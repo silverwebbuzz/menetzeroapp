@@ -106,10 +106,33 @@ class Company extends Model
 
     /**
      * Get the carbon emissions for the company.
+     *
+     * LEGACY. carbon_emissions is empty and nothing writes to it -- emissions
+     * are recorded in measurements/measurement_data. Kept only so existing
+     * references do not break; use measurements() for anything that must
+     * reflect real activity.
      */
     public function carbonEmissions()
     {
         return $this->hasMany(CarbonEmission::class);
+    }
+
+    /**
+     * Emission entries actually recorded by this company.
+     *
+     * Measurements hang off locations, not companies, so this reaches them
+     * through the location: company -> locations -> measurements.
+     */
+    public function measurements()
+    {
+        return $this->hasManyThrough(
+            Measurement::class,
+            Location::class,
+            'company_id',   // locations.company_id
+            'location_id',  // measurements.location_id
+            'id',
+            'id'
+        );
     }
 
     /**
@@ -118,11 +141,6 @@ class Company extends Model
     public function carbonCalculations()
     {
         return $this->hasMany(CarbonCalculation::class);
-    }
-
-    public function facilities()
-    {
-        return $this->hasMany(Facility::class);
     }
 
     public function reports()
