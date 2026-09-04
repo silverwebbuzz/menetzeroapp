@@ -58,6 +58,104 @@ class PaymentService
         return hash_equals($expected, $signature);
     }
 
+    /**
+     * Fetch a payment from Razorpay by its id.
+     *
+     * verifyRazorpaySignature() only proves the values the BROWSER handed back
+     * were not tampered with; it says nothing about whether money moved, and it
+     * cannot be used at all when there is no browser callback -- which is
+     * exactly the situation an admin repairing a stuck transaction is in.
+     * This asks Razorpay directly.
+     *
+     * @return array{id: string, status: string, amount: int, currency: string, order_id: ?string}|null
+     *         null when the payment is unknown to Razorpay.
+     * @throws \RuntimeException when the API cannot be reached
+     */
+    public function fetchRazorpayPayment(PaymentGateway $gw, string $paymentId): ?array
+    {
+        $response = Http::withBasicAuth($gw->key_id, $gw->key_secret)
+            ->acceptJson()
+            ->timeout(15)
+            ->get('https://api.razorpay.com/v1/payments/' . urlencode($paymentId));
+
+        if ($response->status() === 404) {
+            return null;
+        }
+
+        if ($response->failed()) {
+            Log::error('Razorpay payment fetch failed', [
+                'payment_id' => $paymentId,
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            throw new \RuntimeException($this->extractError($response->json(), 'Could not reach Razorpay to verify this payment.'));
+        }
+
+        return $response->json();
+    }
+
+    /**
+     * Does a fetched Razorpay payment settle the given transaction?
+     *
+     * Guards the admin repair action: it must be impossible to activate a
+     * subscription for money that never arrived, whoever clicks the button.
+     * `captured` is the only status that means the funds are ours --
+     * `authorized` is a hold that can still expire, and Razorpay reports
+     * amounts in minor units, so both sides are compared in fils.
+     *
+     * @param  array<string, mixed>  $payment
+     * @return array{ok: bool, reason: ?string}
+     */
+    public function razorpayPaymentSettles(array $payment, \App\Models\PaymentTransaction $transaction): array
+    {
+        $status = (string) ($payment['status'] ?? '');
+
+        if ($status !== 'captured') {
+            return [
+                'ok' => false,
+                'reason' => "Razorpay reports this payment as '{$status}', not 'captured'. No funds have been settled.",
+            ];
+        }
+
+        $paidMinor = (int) ($payment['amount'] ?? 0);
+        $dueMinor = $this->toMinorUnits($transaction->amount);
+
+        if ($paidMinor !== $dueMinor) {
+            return [
+                'ok' => false,
+                'reason' => sprintf(
+                    'Amount mismatch: Razorpay captured %s %s, the transaction is for %s %s.',
+                    number_format($paidMinor / 100, 2),
+                    strtoupper((string) ($payment['currency'] ?? '?')),
+                    number_format((float) $transaction->amount, 2),
+                    strtoupper((string) $transaction->currency)
+                ),
+            ];
+        }
+
+        if (strtoupper((string) ($payment['currency'] ?? '')) !== strtoupper((string) $transaction->currency)) {
+            return [
+                'ok' => false,
+                'reason' => 'Currency mismatch between the Razorpay payment and this transaction.',
+            ];
+        }
+
+        // The order id ties the payment to THIS transaction rather than another
+        // of the same value. Only checked when the transaction recorded one.
+        $expectedOrder = $transaction->metadata['razorpay_order_id'] ?? null;
+        $actualOrder = $payment['order_id'] ?? null;
+
+        if ($expectedOrder && $actualOrder && $expectedOrder !== $actualOrder) {
+            return [
+                'ok' => false,
+                'reason' => 'This payment belongs to a different Razorpay order than the one on this transaction.',
+            ];
+        }
+
+        return ['ok' => true, 'reason' => null];
+    }
+
     /* ===================== Helpers ===================== */
 
     /**

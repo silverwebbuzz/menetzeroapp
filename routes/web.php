@@ -762,6 +762,12 @@ Route::prefix('admin')->name('admin.')->middleware(['ensureSuperAdmin'])->group(
         Route::get('/payment-gateways', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'index'])->name('payment-gateways.index');
         Route::put('/payment-gateways/{id}', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'update'])->name('payment-gateways.update');
 
+        // Repair captured-but-unactivated payments. verify() only reads from
+        // Razorpay; activate() re-verifies before granting anything.
+        Route::get('/payment-recovery', [\App\Http\Controllers\Admin\PaymentRecoveryController::class, 'index'])->name('payment-recovery.index');
+        Route::post('/payment-recovery/{transaction}/verify', [\App\Http\Controllers\Admin\PaymentRecoveryController::class, 'verify'])->name('payment-recovery.verify');
+        Route::post('/payment-recovery/{transaction}/activate', [\App\Http\Controllers\Admin\PaymentRecoveryController::class, 'activate'])->name('payment-recovery.activate');
+
         // Site Content (company/contact details, currency, policy pages)
         Route::get('/site-content', [\App\Http\Controllers\Admin\SiteContentController::class, 'index'])->name('site-content.index');
         Route::put('/site-content/settings', [\App\Http\Controllers\Admin\SiteContentController::class, 'updateSettings'])->name('site-content.settings');

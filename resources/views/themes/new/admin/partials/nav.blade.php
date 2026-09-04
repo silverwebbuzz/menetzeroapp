@@ -64,6 +64,10 @@
        class="mnz-nav {{ $isActive('admin.payment-gateways') ? 'is-active' : '' }}">
         <span class="mnz-nav__dot"></span><span class="mnz-nav__label">Payment gateways</span>
     </a>
+    <a href="{{ route('admin.payment-recovery.index') }}"
+       class="mnz-nav {{ $isActive('admin.payment-recovery') ? 'is-active' : '' }}">
+        <span class="mnz-nav__dot"></span><span class="mnz-nav__label">Payment recovery</span>
+    </a>
     <a href="{{ route('admin.package-assignments.index') }}"
        class="mnz-nav {{ $isActive('admin.package-assignments') ? 'is-active' : '' }}">
         <span class="mnz-nav__dot"></span><span class="mnz-nav__label">Package assignments</span>
