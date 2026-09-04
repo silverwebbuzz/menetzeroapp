@@ -51,7 +51,7 @@
     </script>
 
     <!-- App shell styles (portal-design-system loads last so typography always wins) -->
-    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260824b">
+    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260904">
     @stack('styles')
     <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260630">
     <link rel="stylesheet" href="{{ asset('css/portal-enterprise.css') }}?v=20260630">
@@ -356,11 +356,12 @@
              covers the chat composer, and a voice assistant is redundant where the
              user is already typing to one. --}}
         @if(config('services.elevenlabs.agent_id') && !auth()->user()->isAdmin() && !request()->routeIs('client.zero-ai'))
-            {{-- The widget fixes itself to the bottom-right corner and builds its
-                 call UI inside its own shadow DOM. We deliberately do NOT override
-                 that positioning — doing so collapses the in-call panel. Instead
-                 .content-area reserves bottom padding (app-shell.css) so the bubble
-                 never covers buttons or text at the end of a page. --}}
+            {{-- The widget builds its call UI inside its own shadow DOM, which we
+                 still leave completely alone — restyling those internals collapses
+                 the in-call panel. What we DO move is the host element, which is
+                 ours: app-shell.css parks it bottom-LEFT over the sidebar, above
+                 the plan card, because the bottom-right corner is where page
+                 content ends and the bubble kept landing on real controls. --}}
             <elevenlabs-convai agent-id="{{ config('services.elevenlabs.agent_id') }}"></elevenlabs-convai>
             <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
         @endif

@@ -1685,24 +1685,68 @@ table.min-w-full tbody tr:hover { background-color: var(--canvas); }
 
 /* ==========================================================================
    Voice help assistant — placement
+
    The ElevenLabs embed is a custom element that fixes ITSELF to the viewport
-   via its own shadow DOM, and builds its call UI as positioned children in
-   there. Overriding that positioning collapses the call panel, so we don't:
-   we leave the widget's internals completely alone and only reserve space in
-   the page so its bubble never sits on top of page content.
+   bottom-right via its own shadow DOM, and builds its call UI as positioned
+   children in there. Its INTERNALS are still off limits — restyling those
+   collapses the call panel — but the host element is ours, and moving the host
+   carries the panel with it because the panel is positioned relative to it.
+
+   It is moved out of the bottom-right corner because that corner is where page
+   content ends: on the upgrade page it landed on top of the checkout bar, and
+   on long pages it covered the last row of buttons. Bottom-LEFT over the
+   sidebar is dead space on every screen in the app, so the bubble stops
+   competing with content entirely.
+
+   `bottom` clears the sidebar's name/plan footer box, so the two stack rather
+   than overlap: the bubble sits directly above it.
    ========================================================================== */
 
-/* Keep the last of the page clear of the floating bubble, so buttons and text
-   at the end of long pages are always reachable. This is the reliable fix:
-   it needs no knowledge of the vendor's internal markup. Overrides the
-   bottom half of the `padding` shorthand set on .content-area above. */
+elevenlabs-convai {
+    position: fixed !important;
+    /* Tucked into the left gutter, inside the sidebar column. */
+    left: 12px !important;
+    right: auto !important;
+    /* Above .sidebar-footer (approx 3rem tall) with a gap. */
+    bottom: 4.25rem !important;
+    /* Under the sidebar (40) and the mobile overlay (35) so an open mobile menu
+       covers it, but above ordinary page content. */
+    z-index: 34 !important;
+}
+
+/* The old shell's sidebar is a fixed 280px column; keep the bubble inside it
+   rather than straddling the content edge.
+
+   Scoped on the BODY class, not .app-shell: the widget is emitted at the end of
+   <body>, outside the .app-shell wrapper div, so a descendant selector on the
+   wrapper would never match it. */
+body.company-portal elevenlabs-convai,
+body.consultant-portal elevenlabs-convai {
+    left: 16px !important;
+}
+
+/* On mobile both shells collapse the sidebar, so there is no left column to sit
+   in and no footer box to clear — return the bubble to the bottom-left corner
+   of the viewport proper. */
+@media (max-width: 1024px) {
+    elevenlabs-convai,
+    body.company-portal elevenlabs-convai,
+    body.consultant-portal elevenlabs-convai {
+        left: 12px !important;
+        bottom: 1rem !important;
+    }
+}
+
+/* With the bubble out of the bottom-right, page content no longer needs to
+   reserve a corner for it. The remaining padding is ordinary breathing room at
+   the end of a scroll. */
 .content-area {
-    padding-bottom: 6.5rem;
+    padding-bottom: 2.5rem;
 }
 
 @media (max-width: 640px) {
     .content-area {
-        padding-bottom: 7.5rem;
+        padding-bottom: 3rem;
     }
 }
 

@@ -710,14 +710,30 @@ table.mnz-table td{padding:11px 16px;border-bottom:1px solid var(--line-2);font-
 
 
 /* ---------------------------------------------------------------------------
-   Site footer + voice-widget clearance (new theme).
+   Site footer + voice-widget placement (new theme).
 
-   The ElevenLabs embed fixes ITSELF to the viewport from inside its own
-   shadow DOM. Overriding that positioning collapses its call panel, so -- as
-   in the old theme -- we leave the widget alone and simply reserve space at
-   the end of the page so the bubble never covers content or the footer.
+   The bubble now lives at the bottom-LEFT, over the sidebar, parked just above
+   the plan card in .mnz-side__foot -- see the placement block in app-shell.css,
+   which both themes load. The corner it used to occupy is where page content
+   ends, so it kept landing on real controls (the upgrade page's checkout bar
+   was the last straw).
+
+   The widget's shadow-DOM internals are still left alone; only the host element
+   moves, and the call panel travels with it because it is positioned relative
+   to that host.
+
+   .mnz-side__foot is taller here than the old shell's footer -- it carries a
+   30px button plus company name and meta lines -- so this theme parks the
+   bubble higher than the shared default.
    --------------------------------------------------------------------------- */
-.mnz-main{padding-bottom:6.5rem}
+body.mnz-theme elevenlabs-convai{bottom:7.5rem !important}
+
+@media (max-width:1024px){
+  body.mnz-theme elevenlabs-convai{bottom:1rem !important}
+}
+
+/* No corner to reserve any more; this is ordinary end-of-scroll breathing room. */
+.mnz-main{padding-bottom:2.5rem}
 
 .mnz-main > .site-footer{margin-top:32px;padding-top:16px;
   border-top:1px solid var(--line)}
@@ -726,7 +742,7 @@ table.mnz-table td{padding:11px 16px;border-bottom:1px solid var(--line-2);font-
 .mnz-main > .site-footer .site-copyright a:hover{color:var(--ink)}
 
 @media (max-width:640px){
-  .mnz-main{padding-bottom:7.5rem}
+  .mnz-main{padding-bottom:3rem}
 }
 
 /* Print: this file's print block sits ABOVE these rules, so its
