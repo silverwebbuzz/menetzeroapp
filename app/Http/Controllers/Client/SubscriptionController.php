@@ -86,7 +86,7 @@ class SubscriptionController extends Controller
         $comparisonLabels = CommercialPlanComparison::planLabels();
         $operationsRows = CommercialPlanComparison::operationsRows();
         $downloadRows = CommercialPlanComparison::downloadRows();
-        $consultantAddOns = CommercialPlanComparison::consultantAddOns();
+        $cardHighlights = CommercialPlanComparison::cardHighlights();
         $enabledGateways = PaymentGateway::enabled();
         $displayCurrency = \App\Services\CurrencyService::displayCurrency();
 
@@ -116,7 +116,7 @@ class SubscriptionController extends Controller
             'comparisonLabels',
             'operationsRows',
             'downloadRows',
-            'consultantAddOns',
+            'cardHighlights',
             'enabledGateways',
             'planChanges',
             'downgradeWarnings',

@@ -233,6 +233,47 @@ class CommercialPlanComparison
     }
 
     /**
+     * The three or four lines that go on a plan card.
+     *
+     * The full comparison tables answer "how does X differ from Y"; a card has
+     * to answer "is this the one for me" in a glance, so this is deliberately
+     * a short hand-picked list rather than a slice of operationsRows(). Keep it
+     * in step with those tables -- a card that promises more than the table
+     * shows is the version of this page people complain about.
+     *
+     * @return array<string, array<int, string>>
+     */
+    public static function cardHighlights(): array
+    {
+        return [
+            'client_free' => [
+                '1 location, 2 users',
+                'Scope 1 & 2 Quick Input',
+                'Scope 3: 1 entry per category',
+                'Watermarked trial downloads',
+            ],
+            'client_carbon' => [
+                '5 locations, 10 users',
+                'Scope 3: 12 entries per category',
+                'Clean MOCCAE, IEQT & GHG PDFs',
+                'Bulk CSV / XLS import and export',
+            ],
+            'client_esg' => [
+                'Everything in Carbon',
+                'IFRS S1 & S2, GRI and SASB exports',
+                'UAE ESG Report PDF',
+                'ESG Scorecard Excel',
+            ],
+            'client_enterprise' => [
+                'Unlimited locations and users',
+                'Unlimited Scope 3',
+                'White-label ESG PDF and assurance upload',
+                'HRIS KPI import and priority consultants',
+            ],
+        ];
+    }
+
+    /**
      * Consultant review packs (checkout in Phase B).
      *
      * @return array<int, array<string, mixed>>

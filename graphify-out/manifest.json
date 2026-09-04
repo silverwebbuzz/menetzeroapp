@@ -20,13 +20,13 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Data/CommercialPlanComparison.php": {
-    "mtime": 1785753486.7210562,
-    "ast_hash": "1c5b59025dce8427aa61c8ec48a41bb9",
+    "mtime": 1788518523.5687208,
+    "ast_hash": "e8c23e87e48ab21c6e8ed5fac58f1f8f",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Data/ConsultantAgencyPlanMatrix.php": {
-    "mtime": 1785849135.6451237,
-    "ast_hash": "f48a3681d8357624bbbffbe93e6b6fa7",
+    "mtime": 1788245200.1163495,
+    "ast_hash": "143409ab54e376f4645fa12051f69753",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Data/ConsultantOptions.php": {
@@ -35,8 +35,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Data/PlanEntitlementDefaults.php": {
-    "mtime": 1786432216.9722242,
-    "ast_hash": "da5c57d9bab64abf545cbcaf3199787a",
+    "mtime": 1788435013.9313955,
+    "ast_hash": "af4e66f64a320a1d8180ac6fdceb2368",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Data/Scope12HelpGuide.php": {
@@ -45,8 +45,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Data/SubscriptionPlanMatrix.php": {
-    "mtime": 1783322351.5516894,
-    "ast_hash": "083c9fd0179b0d81b3ced1cd41197025",
+    "mtime": 1788243669.6707706,
+    "ast_hash": "7536c64a62b4ed997892a97f434744f1",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Exports/ResultsBreakdownExport.php": {
@@ -105,13 +105,13 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Admin/CompanySubscriptionController.php": {
-    "mtime": 1781089286.4135363,
-    "ast_hash": "f06d142d4abc8940c5c312edad0e55f1",
+    "mtime": 1788330701.3523376,
+    "ast_hash": "0de191fc05325951dd7ae146fd75fddb",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Admin/ConsultantController.php": {
-    "mtime": 1785308607.2361772,
-    "ast_hash": "c956a263149139081fbff7ba1b437ff7",
+    "mtime": 1788330946.4849324,
+    "ast_hash": "81f044b9a3c2038b5749c4c3a00059e7",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Admin/ConsultantIntroRequestController.php": {
@@ -150,13 +150,13 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Admin/SiteContentController.php": {
-    "mtime": 1781089286.634111,
-    "ast_hash": "b29f4615234de25454fd19aa051fc0d5",
+    "mtime": 1788247297.5170279,
+    "ast_hash": "d24dfa90147c37a14389f65f31ae9294",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Admin/SuperAdminController.php": {
-    "mtime": 1785308602.806095,
-    "ast_hash": "ff956c1641e93209aaf3a43f1a9a62c4",
+    "mtime": 1788433604.2290523,
+    "ast_hash": "3342e7f2099693f9b3046219fc70fc10",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Auth/ForgotPasswordController.php": {
@@ -180,18 +180,18 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Client/ConsultantMarketplaceController.php": {
-    "mtime": 1781604678.8336942,
-    "ast_hash": "5fd1fec5adeceef681f7f20fd81c1dea",
+    "mtime": 1788435005.506756,
+    "ast_hash": "45c516063756a422f87e5aa1dd75383a",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Client/SubscriptionController.php": {
-    "mtime": 1785763660.1148846,
-    "ast_hash": "3b98a3c00eb20bb21435872e51a9a8c7",
+    "mtime": 1788518530.9387236,
+    "ast_hash": "f3bf6c8f8a437a12aa238e183619a3e3",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/CompanyReportingSettingsController.php": {
-    "mtime": 1781089286.0291395,
-    "ast_hash": "9468f7c22e130f6a5f166b471bf7d063",
+    "mtime": 1788433604.2337682,
+    "ast_hash": "7769461cc37d6fb8295a249be1bf0d78",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/CompanySetupController.php": {
@@ -210,8 +210,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Consultant/Agency/PackCheckoutController.php": {
-    "mtime": 1785770062.1423934,
-    "ast_hash": "e750aefc57c2755e6deca5bdab6080da",
+    "mtime": 1788517852.7919617,
+    "ast_hash": "72882c4496c49d9aa10d5abfe095cb14",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Consultant/Agency/RenewalController.php": {
@@ -260,8 +260,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/DashboardController.php": {
-    "mtime": 1781245646.4277368,
-    "ast_hash": "d531d8a57b74d4de5e6c3d4bb29a6bae",
+    "mtime": 1788433604.2376497,
+    "ast_hash": "fafcae60e1c31438105f8efe1e004972",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Disclosure/ClimateOpportunityController.php": {
@@ -275,7 +275,7 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Disclosure/DisclosureBaseController.php": {
-    "mtime": 1781089285.9030547,
+    "mtime": 1787584007.5376897,
     "ast_hash": "abfe9cfc3aea198556900e8ba0294243",
     "semantic_hash": ""
   },
@@ -310,8 +310,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Disclosure/ReductionTargetController.php": {
-    "mtime": 1785517901.8316958,
-    "ast_hash": "15acf7b1f932ef6d0ba215e3fb021e13",
+    "mtime": 1787585956.5110765,
+    "ast_hash": "c90ba8813f907f66f475390122604d8e",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Disclosure/SectionController.php": {
@@ -325,8 +325,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/EmissionBoundaryController.php": {
-    "mtime": 1781089286.708074,
-    "ast_hash": "e0a8d0e75630b760102baa11a90a8822",
+    "mtime": 1788352980.6032248,
+    "ast_hash": "c784223b434e819acb74242091d0e916",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/HomeController.php": {
@@ -345,8 +345,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/LocationController.php": {
-    "mtime": 1781089286.0736892,
-    "ast_hash": "d4c47c5de88b5fa963d0684e856b4ba8",
+    "mtime": 1788352167.6111124,
+    "ast_hash": "0c88e288208d1703d3d92d6bae050082",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/PageController.php": {
@@ -355,8 +355,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/PaymentWebhookController.php": {
-    "mtime": 1781604485.6186144,
-    "ast_hash": "e208422900795baab89e8f6fed36c01c",
+    "mtime": 1788434885.3124313,
+    "ast_hash": "2ae5b4fa5b71a0ae38adc99d13ff6171",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/ProfileController.php": {
@@ -370,8 +370,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/QuickInputController.php": {
-    "mtime": 1786511099.1993215,
-    "ast_hash": "df2060b7309d89294f67189ae263c9ba",
+    "mtime": 1787811748.6514387,
+    "ast_hash": "8252aa7227b8cfdab1a2294a1df37f3e",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/ReportController.php": {
@@ -385,8 +385,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Scope12BulkImportController.php": {
-    "mtime": 1781089286.0439992,
-    "ast_hash": "6b049aee47ac0dbd55a5d2196b63a599",
+    "mtime": 1787583078.5995376,
+    "ast_hash": "7049d78243fde1fbc3363c9eb1e38be9",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/StaffManagementController.php": {
@@ -425,8 +425,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Middleware/EnsureOnboardingComplete.php": {
-    "mtime": 1781089285.7781985,
-    "ast_hash": "ac90bcf364057c11ff77df828a7446d9",
+    "mtime": 1788351885.8442407,
+    "ast_hash": "96f1c58caeec6aeaf1cb8c7c45f61c78",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Middleware/EnsureSuperAdmin.php": {
@@ -479,11 +479,6 @@
     "ast_hash": "79405bc4fd95bd68377b9f8526fabedc",
     "semantic_hash": ""
   },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/AgricultureData.php": {
-    "mtime": 1781089284.8799222,
-    "ast_hash": "b9551dbef42192c9d87ae7cc9d9023f7",
-    "semantic_hash": ""
-  },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/CarbonCalculation.php": {
     "mtime": 1781089285.5030487,
     "ast_hash": "4ae9952903a58ef3cc61d585f0d36646",
@@ -515,8 +510,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/Company.php": {
-    "mtime": 1781089285.0408547,
-    "ast_hash": "98cc1694b471acc315cf4eb7dec1887e",
+    "mtime": 1788433604.2648454,
+    "ast_hash": "0a64d8ce290fa23662263528f0d1a33e",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/CompanyCustomRole.php": {
@@ -540,13 +535,13 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/CompanyReportingSetting.php": {
-    "mtime": 1783317827.4238603,
-    "ast_hash": "feba3845a1eab5aa2c66412b089490a5",
+    "mtime": 1787584830.9559371,
+    "ast_hash": "0119bcb4092e450cae576687f57eadae",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/Consultant.php": {
-    "mtime": 1781096660.4863,
-    "ast_hash": "efe72a92d9931dfd8d7112b80e7ee1cc",
+    "mtime": 1787574198.08844,
+    "ast_hash": "d66e135d2e9ff565de80596f44abc5b1",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/ConsultantClientEngagement.php": {
@@ -619,24 +614,9 @@
     "ast_hash": "601bfab1d481257710871493d521af19",
     "semantic_hash": ""
   },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/EnergyData.php": {
-    "mtime": 1781089284.9806921,
-    "ast_hash": "ce4b5dc7dd24f56340d3c11fe6748e9e",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/Facility.php": {
-    "mtime": 1781089285.4930077,
-    "ast_hash": "a9ea15101fc6acc1942e29a3bfef16e7",
-    "semantic_hash": ""
-  },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/FeatureFlag.php": {
     "mtime": 1781089285.2846782,
     "ast_hash": "cf7b6e6f5f90e093d10f23866f20c00c",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/IndustrialData.php": {
-    "mtime": 1781089284.80789,
-    "ast_hash": "64a6677c6c9347184c41935e38fcde53",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/Location.php": {
@@ -675,13 +655,13 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/PaymentGateway.php": {
-    "mtime": 1781604745.443955,
-    "ast_hash": "241748676fa9bbe91af50da4adf0ea0c",
+    "mtime": 1788435013.9284656,
+    "ast_hash": "509758757267eee77167e6d52401b617",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/PaymentTransaction.php": {
-    "mtime": 1781089284.9604802,
-    "ast_hash": "91502809e0f8155bd559d49af00b62e6",
+    "mtime": 1788247249.5396032,
+    "ast_hash": "ef348533c5fdec6935f062657dcaa781",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/Permission.php": {
@@ -754,11 +734,6 @@
     "ast_hash": "2e4c2caeb177859afa562a02d81491ae",
     "semantic_hash": ""
   },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/TransportData.php": {
-    "mtime": 1781089285.2302976,
-    "ast_hash": "d8a127e28a1e09f03e60004255697915",
-    "semantic_hash": ""
-  },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/UsageTracking.php": {
     "mtime": 1781089285.3490384,
     "ast_hash": "53f56b1b69f92d3d236730b8b5808f35",
@@ -774,24 +749,14 @@
     "ast_hash": "acfc9691120dbde3360f63ead46c10d7",
     "semantic_hash": ""
   },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/UserCompanyAccess.php": {
-    "mtime": 1781089285.414349,
-    "ast_hash": "a7c2634ed4320f4e7babff6d235c2504",
-    "semantic_hash": ""
-  },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/UserCompanyRole.php": {
     "mtime": 1781089284.7980025,
     "ast_hash": "40345844df6eff1ffa55d63fa9cc3ed7",
     "semantic_hash": ""
   },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/WasteData.php": {
-    "mtime": 1781089285.00135,
-    "ast_hash": "1fab6e573435440db8035d80c375e031",
-    "semantic_hash": ""
-  },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Providers/AppServiceProvider.php": {
-    "mtime": 1781089284.688208,
-    "ast_hash": "fe65aa1ac857bbc094a27860e2d29dae",
+    "mtime": 1788441601.0297017,
+    "ast_hash": "abf164dfd199a2f7a1b378c7a67a2464",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/CompanyInvitationService.php": {
@@ -800,8 +765,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/ConsultantAccountService.php": {
-    "mtime": 1781089287.344934,
-    "ast_hash": "eb70769419308235d897cc0b4ce21eff",
+    "mtime": 1787573818.236187,
+    "ast_hash": "79a3d22d95d788b59d17df69442fa05c",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/ConsultantAgencyClientService.php": {
@@ -810,13 +775,13 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/ConsultantAgencyEntitlementService.php": {
-    "mtime": 1785851679.7243986,
-    "ast_hash": "281b7f21488f195e038084c9f1d08522",
+    "mtime": 1788192509.6870267,
+    "ast_hash": "230ab4304e4012692dfd694490a8765d",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/ConsultantAgencyPaymentService.php": {
-    "mtime": 1781604455.136078,
-    "ast_hash": "f44e2ae8f76f8b9ff7ead303c56cc74f",
+    "mtime": 1788517827.6624537,
+    "ast_hash": "93e050a439f20c6c9d84427a65819c46",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/ConsultantAgencyRenewalService.php": {
@@ -825,8 +790,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/ConsultantAgencySubscriptionService.php": {
-    "mtime": 1785848236.10832,
-    "ast_hash": "1fa899a39eeab7ebed0fa113103755a8",
+    "mtime": 1788441441.9463682,
+    "ast_hash": "92d4dbccdde5a998d896536d2310ebd0",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/ConsultantAgencyWorkspaceService.php": {
@@ -845,8 +810,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/ConsultantMarketplaceService.php": {
-    "mtime": 1781604735.3652956,
-    "ast_hash": "cc016997b92f26f2ee839eda350e9a19",
+    "mtime": 1788517958.4629333,
+    "ast_hash": "d5146e400edd1589439d861087fed6f2",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/CouponService.php": {
@@ -855,13 +820,13 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/CurrencyService.php": {
-    "mtime": 1781089287.395022,
-    "ast_hash": "fc73f10439fb7ed2b57a7cb711ba9838",
+    "mtime": 1788517919.7271197,
+    "ast_hash": "ef2cf29602eddc494d81f895090ed682",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/DisclosureService.php": {
-    "mtime": 1783320882.9296625,
-    "ast_hash": "f10b7220e3aef41bbc430f1e1fe61521",
+    "mtime": 1788187413.515493,
+    "ast_hash": "0e56c53043a315b058a75822d2732842",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/EmissionCalculationService.php": {
@@ -870,8 +835,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/EsgDashboardService.php": {
-    "mtime": 1783317538.247514,
-    "ast_hash": "44dce3c3f9b82ec0deffd48f55d990d3",
+    "mtime": 1787580456.6489823,
+    "ast_hash": "770b7a7f398b414d5aaf1682af9f8c91",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/FeatureFlagService.php": {
@@ -925,13 +890,13 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/PaymentCompletionService.php": {
-    "mtime": 1781260286.7711318,
-    "ast_hash": "a4196899b77cf23a017e99fdd36cb2b2",
+    "mtime": 1788247144.0482333,
+    "ast_hash": "7753116459cc99eed7976b0e68747f30",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/PaymentService.php": {
-    "mtime": 1781604425.7934892,
-    "ast_hash": "9aa80f34f02913e96f1088f60d9d0c28",
+    "mtime": 1788434914.1946142,
+    "ast_hash": "c0114b5ed9109dde7b05af70d9eba572",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/PlanEntitlementAdminService.php": {
@@ -940,8 +905,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/PlanEntitlementService.php": {
-    "mtime": 1785851586.3724275,
-    "ast_hash": "03037e4268999a4304a85347551e5b55",
+    "mtime": 1788353242.4071214,
+    "ast_hash": "14a1fe41c650b2fabbcfc555463cd19b",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/QuickInputFormBuilder.php": {
@@ -960,8 +925,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/SubscriptionService.php": {
-    "mtime": 1785752773.934323,
-    "ast_hash": "d32c92d6840d1b3efd3c132aae57f37d",
+    "mtime": 1788517958.4640586,
+    "ast_hash": "5331066cb420ca35b3d2830ba613fb10",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/UsageTrackingService.php": {
@@ -970,8 +935,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Support/PlanGate.php": {
-    "mtime": 1785851683.2049515,
-    "ast_hash": "78eaf8ce4229b2fba530716a2534976c",
+    "mtime": 1788441419.0393486,
+    "ast_hash": "b4986e770049a0de628a6e8c24a38eef",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/helpers.php": {
@@ -985,13 +950,13 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/bootstrap/app.php": {
-    "mtime": 1781089237.976832,
-    "ast_hash": "7b0cc34fcc32b37434316bf5ccb36f16",
+    "mtime": 1787723513.6364198,
+    "ast_hash": "8a73ef77135728072a158b891674ad9f",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/bootstrap/providers.php": {
-    "mtime": 1776855083.1762574,
-    "ast_hash": "d18593472c5e35d8ab5add4240fc95f6",
+    "mtime": 1787671676.54348,
+    "ast_hash": "f0673d9c4067150f00748ff424fb7fe0",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/composer.json": {
@@ -1005,8 +970,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/config/auth.php": {
-    "mtime": 1781015781.9081984,
-    "ast_hash": "84ae5c404444edf35e2bd9edf03e8b34",
+    "mtime": 1787574160.512646,
+    "ast_hash": "9f6ffeaa1be1effbcef3e30bf863dbfa",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/config/cache.php": {
@@ -1020,8 +985,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/config/disclosure.php": {
-    "mtime": 1783317387.5667107,
-    "ast_hash": "1f53dfcb398cad45f27d4bed719d6460",
+    "mtime": 1788181198.0247447,
+    "ast_hash": "1c079ff98cd46672abac58169858a7c8",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/config/filesystems.php": {
@@ -1045,8 +1010,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/config/services.php": {
-    "mtime": 1781530464.2256675,
-    "ast_hash": "6e58aa2f4e6778105729c075df59cfd9",
+    "mtime": 1787137535.870774,
+    "ast_hash": "26ba539a647fcc9cdbbb5f0556e798cf",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/config/session.php": {
@@ -1099,268 +1064,8 @@
     "ast_hash": "90390db311185bbc3a651574e775470b",
     "semantic_hash": ""
   },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/0001_01_01_000000_create_users_table.php": {
-    "mtime": 1776855083.1826222,
-    "ast_hash": "a4fed09b5046676ce211484841eef589",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/0001_01_01_000001_create_cache_table.php": {
-    "mtime": 1776855083.182795,
-    "ast_hash": "6803c10a1aa695d40633ec8bea5576d5",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/0001_01_01_000002_create_jobs_table.php": {
-    "mtime": 1776855083.1829445,
-    "ast_hash": "ead9cce2650b36345454f85e8c0214a0",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2024_01_01_000001_create_admins_table.php": {
-    "mtime": 1776859559.1259224,
-    "ast_hash": "545909c035ea071b5dc077c0757a5847",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2025_01_15_000001_create_emission_sources_master_table.php": {
-    "mtime": 1776855083.1833146,
-    "ast_hash": "6c2ed4b1d082b4e939bab46ec765111a",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2025_01_15_000002_create_location_emission_boundaries_table.php": {
-    "mtime": 1776855083.1834931,
-    "ast_hash": "07472c906a966cacc6b8b1069992d640",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2025_01_15_000003_optimize_location_emission_boundaries.php": {
-    "mtime": 1776855083.1837118,
-    "ast_hash": "407b15b1fea2a2084766c70245201097",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2025_01_15_000004_create_measurements_table.php": {
-    "mtime": 1776855083.1839218,
-    "ast_hash": "1f330d882e7dba71bc3e83d602ec732f",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2025_01_15_000007_create_measurement_audit_trail_table.php": {
-    "mtime": 1776855083.1841106,
-    "ast_hash": "c1f5809f011acc49c8c98edb6d850663",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2025_09_27_134025_create_companies_table.php": {
-    "mtime": 1776855083.1843064,
-    "ast_hash": "499f7751d444188b6f96b5f52e701fc3",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2025_09_27_134032_create_carbon_emissions_table.php": {
-    "mtime": 1776855083.1845164,
-    "ast_hash": "5cec64eae298b545de2d24b22dba3c3d",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2025_09_27_134035_create_carbon_calculations_table.php": {
-    "mtime": 1776855083.1847517,
-    "ast_hash": "3328a1e619091a1152c4f1dd5b397a16",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2025_09_27_134045_add_users_company_fk.php": {
-    "mtime": 1776855083.1851206,
-    "ast_hash": "3299c804368773330d364f4c94564ffe",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2025_10_02_000100_alter_companies_add_uae_fields.php": {
-    "mtime": 1776855083.185465,
-    "ast_hash": "e02aa6270d494a7259d0657d19d12ad4",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2025_10_02_000110_create_facilities_table.php": {
-    "mtime": 1776855083.1857758,
-    "ast_hash": "f46cf6c0449bc19246a856cf87c876e4",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2025_10_02_000130_create_energy_data_table.php": {
-    "mtime": 1776855083.1859992,
-    "ast_hash": "f5fc0836b43684ad3619f33e919d8ae3",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2025_10_02_000140_create_transport_data_table.php": {
-    "mtime": 1776855083.1861734,
-    "ast_hash": "a9d31aa9aacd08df5387a74a240fac9b",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2025_10_02_000150_create_industrial_data_table.php": {
-    "mtime": 1776855083.1863377,
-    "ast_hash": "054cef678fc4e9f0049cc53def78f5bd",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2025_10_02_000160_create_waste_data_table.php": {
-    "mtime": 1776855083.1864982,
-    "ast_hash": "fde1da0be8d686fb50f0a36d73c98a6a",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2025_10_02_000170_create_agriculture_data_table.php": {
-    "mtime": 1776855083.1866488,
-    "ast_hash": "f2b75e0cc846ff14c7b64404c9e8b84e",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2025_10_02_000180_create_reports_table.php": {
-    "mtime": 1776855083.1868105,
-    "ast_hash": "0dd4d8a263d8c788ea8aa41b06055620",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2025_10_03_120000_add_user_profile_fields.php": {
-    "mtime": 1776855083.1871307,
-    "ast_hash": "0af4ff6b9592b3ba3c2c4687eeec55ac",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2025_10_03_130000_add_business_subcategory_to_companies.php": {
-    "mtime": 1776855083.1872854,
-    "ast_hash": "c5576aea3e1d53f93223e9c3ddea6803",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2025_10_03_140000_create_locations_table.php": {
-    "mtime": 1776855083.1874406,
-    "ast_hash": "143560787b900f48b0d70497f830af39",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_04_22_000100_add_company_type_to_companies.php": {
-    "mtime": 1781089171.2694385,
-    "ast_hash": "380861c205a9a5af064575e86cd4b3fd",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_03_000100_add_logo_path_to_companies.php": {
-    "mtime": 1780555560.7965062,
-    "ast_hash": "4fa8e77b8c87224fd981487157fdb2f6",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_08_000100_add_scope3_records_per_form_to_subscription_plans.php": {
-    "mtime": 1780914609.6573324,
-    "ast_hash": "d00c4fcbf3cc8ce3d49a1ef5d995219d",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_08_000200_restructure_client_subscription_plans.php": {
-    "mtime": 1780915357.2296162,
-    "ast_hash": "a336dc1443a24328a682a6b57cf5ff70",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_08_000300_create_plan_feature_rows_table.php": {
-    "mtime": 1780916962.584049,
-    "ast_hash": "bdd5e1d241e8d42c4ffd9fb106293e76",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_08_000400_create_scope3_addons_table.php": {
-    "mtime": 1780916968.5818808,
-    "ast_hash": "d0af9c7971b810644335ad48bc1c52cd",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_08_000500_seed_pricing_content.php": {
-    "mtime": 1780917006.3997455,
-    "ast_hash": "8c652083753ed3a35e583449b4344887",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_08_000600_create_payment_gateways_table.php": {
-    "mtime": 1780918592.1595173,
-    "ast_hash": "05e12dd188cc3230fd3ab71dfab240f0",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_08_000700_add_price_inr_to_subscription_plans.php": {
-    "mtime": 1780922587.586791,
-    "ast_hash": "14200d2d2ba6614c9cc5f5ce9a298c40",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_08_000800_create_site_settings_table.php": {
-    "mtime": 1781270639.1444619,
-    "ast_hash": "1b204a11b2ccecb9f13055b677ec4c28",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_08_000900_create_site_pages_table.php": {
-    "mtime": 1780923506.3791285,
-    "ast_hash": "b10106ecf267a30b26cf0c4ec73b500e",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_08_001000_update_site_branding.php": {
-    "mtime": 1780923543.078268,
-    "ast_hash": "342825c98a06ae9fba9c386f4a1494d2",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_08_001100_fix_client_subscriptions_unique_index.php": {
-    "mtime": 1780926887.0474632,
-    "ast_hash": "2988dddd91dd9b30d6f57a5c34d96017",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_08_001200_create_subscription_coupons_table.php": {
-    "mtime": 1780928178.2683814,
-    "ast_hash": "a60171d0529a159ee45ebfc0bcacadc2",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_08_001300_fix_scope12_emission_sources.php": {
-    "mtime": 1780983501.9947004,
-    "ast_hash": "ee74b9483bb6db1be5f72803c8203393",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_09_000100_phase0_reporting_foundation.php": {
-    "mtime": 1780988379.622217,
-    "ast_hash": "f03afb7086a214a5b5bdc0e835f9ea3b",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_09_100000_create_ifrs_s2_disclosure_tables.php": {
-    "mtime": 1780989068.8797133,
-    "ast_hash": "5721231529ad72f94a7d96b2c22d6085",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_09_160000_add_consultant_pack_transaction_type.php": {
-    "mtime": 1781017390.6613643,
-    "ast_hash": "ea38fc15e381739a78e727a976d23b15",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_09_200000_phase2_ifrs_s1_disclosure_tables.php": {
-    "mtime": 1780989159.3079956,
-    "ast_hash": "0e935f5a30be18ce9d58f61c8d15481d",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_09_300000_phase3_gri_disclosure.php": {
-    "mtime": 1780989514.759861,
-    "ast_hash": "cf0eb4ccd833f01d9ab90931349c9443",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_10_100000_commercial_plan_v1_entitlements.php": {
-    "mtime": 1781013062.5071616,
-    "ast_hash": "fc9c288740572f8d21fbeec7405b59da",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_10_200000_consultant_directory_phase_a.php": {
-    "mtime": 1781015763.9146442,
-    "ast_hash": "1c871439031e9dcae9e592054f9782b4",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_10_210000_consultant_marketplace_c10.php": {
-    "mtime": 1781017126.20521,
-    "ast_hash": "4507f7ba10cacbd148a7b8bdb9e097d2",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_11_100000_consultant_agency_plans.php": {
-    "mtime": 1781090604.4915383,
-    "ast_hash": "d10eba43b0c76582f040d8bf58069ca9",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_11_110000_consultant_agency_schema.php": {
-    "mtime": 1781090610.2796037,
-    "ast_hash": "152ef3a0d3a8e54b579d9d0dafb6e690",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_12_100000_consultant_trial_plan.php": {
-    "mtime": 1781091312.3778293,
-    "ast_hash": "62948abeeaa60e610416a1009805a2e6",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_13_100000_consultant_public_inquiries.php": {
-    "mtime": 1781092308.925212,
-    "ast_hash": "d481aea9bbe70bcf23df307d9d80a357",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_14_100000_consultant_google_oauth.php": {
-    "mtime": 1781096636.874473,
-    "ast_hash": "b085156782956e6d3cb3bae3aa848ab9",
-    "semantic_hash": ""
-  },
   "/Users/apple/Silverwebbuzz/menetzeroapp/database/seeders/AdminSeeder.php": {
-    "mtime": 1776855083.1876903,
+    "mtime": 1788328454.0801425,
     "ast_hash": "1a7c1d78bb75dc311fcf4510e1d7c2b0",
     "semantic_hash": ""
   },
@@ -1375,8 +1080,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/database/seeders/ConsultantFullDemoSeeder.php": {
-    "mtime": 1786001931.0596972,
-    "ast_hash": "0d204237372b618993e52ff0db193c07",
+    "mtime": 1788188160.319199,
+    "ast_hash": "2f17349ffa2e3bc4331b82f0ab990d8d",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/database/seeders/DatabaseSeeder.php": {
@@ -1430,18 +1135,18 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/companies/index.blade.php": {
-    "mtime": 1781089322.8425026,
-    "ast_hash": "afbcbb488e38889b7438a02c25a096bd",
+    "mtime": 1788331871.596035,
+    "ast_hash": "4afd1956aea5993f0e1984075623cd29",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/companies/show.blade.php": {
-    "mtime": 1785307567.3402195,
-    "ast_hash": "4d64227d3f172ae6dffc88cf3d635013",
+    "mtime": 1788433604.2752013,
+    "ast_hash": "d7e2b88aa10835fb00291e9a599fcea1",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/consultants/index.blade.php": {
-    "mtime": 1781090254.7257457,
-    "ast_hash": "fbc9a380d02c3f44237ec193af70923a",
+    "mtime": 1788331871.5965738,
+    "ast_hash": "4f87342bea21905f2d6610c65d47f91f",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/consultants/intro-requests.blade.php": {
@@ -1455,8 +1160,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/consultants/show.blade.php": {
-    "mtime": 1785307594.1931808,
-    "ast_hash": "931a7fe0bf20c255e45ec0adbd9a90b2",
+    "mtime": 1788328148.28215,
+    "ast_hash": "6d761ada5c2fa2ab0670cb30f36fa1ee",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/coupons/form.blade.php": {
@@ -1570,18 +1275,18 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/layouts/app.blade.php": {
-    "mtime": 1781241624.9025981,
-    "ast_hash": "0026503e0eebff607782ee6988116bd7",
+    "mtime": 1788332355.0292523,
+    "ast_hash": "0d62b02fee794008cdcb9a8b47c920b1",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/partials/nav.blade.php": {
-    "mtime": 1785767888.51601,
-    "ast_hash": "24136813075c5bdf1d50c9b6cc064bdc",
+    "mtime": 1788434774.0162313,
+    "ast_hash": "ed16a92e1b21aa4576f6f08730af04a1",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/payment-gateways/index.blade.php": {
-    "mtime": 1781604615.9052844,
-    "ast_hash": "0c09159696d45ff68c92b29876b97c81",
+    "mtime": 1788434967.8677602,
+    "ast_hash": "a13ebae981fe450ed4f4e63fc4772659",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/pricing/addon.blade.php": {
@@ -1590,13 +1295,13 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/pricing/feature-row.blade.php": {
-    "mtime": 1780917183.054604,
-    "ast_hash": "97278cccb82bac10f0d1441d000fd139",
+    "mtime": 1788192733.9304492,
+    "ast_hash": "5284be4f9d3861c48b1c23617ae93ddd",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/pricing/index.blade.php": {
-    "mtime": 1781015047.103306,
-    "ast_hash": "24b1a9a0a1e80e2f8682045ce6eeb021",
+    "mtime": 1788192718.5413709,
+    "ast_hash": "a1b5ab1c12a754a661c71739845b4715",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/role-templates/create.blade.php": {
@@ -1615,8 +1320,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/site-content/index.blade.php": {
-    "mtime": 1781270643.5102296,
-    "ast_hash": "d9655be1e6bea6f7bbb801cb50e37f69",
+    "mtime": 1788247321.4808698,
+    "ast_hash": "3c6050ab6093eea41a7c74c9614fcae3",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/site-content/page.blade.php": {
@@ -1630,13 +1335,13 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/subscription-plans/create.blade.php": {
-    "mtime": 1780922942.3010404,
-    "ast_hash": "c2c29a2c9c0580440933b387d6babb93",
+    "mtime": 1788435013.9370475,
+    "ast_hash": "5ab0526ab36b30aaeb93bb516f033205",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/subscription-plans/edit.blade.php": {
-    "mtime": 1781015034.388615,
-    "ast_hash": "cb6c4191d31a083e1c8d36122efdfa23",
+    "mtime": 1788435013.9344425,
+    "ast_hash": "e46e77a5a9c7b443404276591ebbaa86",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/subscription-plans/entitlements.blade.php": {
@@ -1660,18 +1365,18 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/auth/login.blade.php": {
-    "mtime": 1785996935.5629182,
+    "mtime": 1787723539.6060727,
     "ast_hash": "1ddc26e4ba943ac1d828278f2eb71e46",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/auth/register.blade.php": {
-    "mtime": 1785996948.4992836,
+    "mtime": 1787723539.614346,
     "ast_hash": "b6f6430a03da77e26c94004009c03f94",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/client/consultants/checkout.blade.php": {
-    "mtime": 1781246229.3002212,
-    "ast_hash": "d0e4e34b9d0d569f69b9a92b25b217cb",
+    "mtime": 1788243935.9868302,
+    "ast_hash": "1f850cc1bdbbd6ac3ecd95b190606b70",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/client/consultants/index.blade.php": {
@@ -1685,8 +1390,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/client/consultants/payment-checkout.blade.php": {
-    "mtime": 1781604696.575214,
-    "ast_hash": "365873f99baf7bda0870fb5ffec60c93",
+    "mtime": 1788434953.3274064,
+    "ast_hash": "6ca03040e0f977651826c5ab14f2d465",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/client/consultants/show.blade.php": {
@@ -1695,13 +1400,13 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/client/subscriptions/billing.blade.php": {
-    "mtime": 1785771126.6844442,
-    "ast_hash": "f5e8ff0eee4580ae8144053794cd75d5",
+    "mtime": 1788434793.943552,
+    "ast_hash": "8783c101428f87347236aa912842f729",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/client/subscriptions/checkout.blade.php": {
-    "mtime": 1781604538.6588,
-    "ast_hash": "4de90f243e8fa97f5c0381c7ca240f1a",
+    "mtime": 1788517870.644337,
+    "ast_hash": "4cafb1bc4adce44c9a6d5fcbd3a1a8e5",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/client/subscriptions/current-plan.blade.php": {
@@ -1712,11 +1417,6 @@
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/client/subscriptions/index.blade.php": {
     "mtime": 1781246219.6826544,
     "ast_hash": "024eb6dca502831d9153428bc080aacc",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/client/subscriptions/partials/billing-method-modal.blade.php": {
-    "mtime": 1781014589.6796494,
-    "ast_hash": "63ae96b29d4b4a96bf27b2363bb52823",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/client/subscriptions/partials/comparison-table.blade.php": {
@@ -1730,8 +1430,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/client/subscriptions/upgrade.blade.php": {
-    "mtime": 1781270643.4894767,
-    "ast_hash": "dbe87d002cf493b03b903a5c7659edc7",
+    "mtime": 1788518618.2972214,
+    "ast_hash": "203bac301fe39c80d710b6ce024af890",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/components/alert.blade.php": {
@@ -1770,8 +1470,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/components/payments-notice.blade.php": {
-    "mtime": 1785771134.3267796,
-    "ast_hash": "82851b070e960267fb47e272015a8f50",
+    "mtime": 1788441441.9413722,
+    "ast_hash": "9e3b3ee02f40a610fc5a49a1dcd05842",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/components/plan-gated-link.blade.php": {
@@ -1790,8 +1490,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/consultant/agency/clients/create.blade.php": {
-    "mtime": 1785839812.4738286,
-    "ast_hash": "9612d5834e7c5a78626d81a7b915010b",
+    "mtime": 1788441450.574401,
+    "ast_hash": "95518e7c1c3d453480cdf39080ba0b36",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/consultant/agency/clients/edit.blade.php": {
@@ -1805,43 +1505,43 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/consultant/agency/clients/show.blade.php": {
-    "mtime": 1785849212.5983207,
-    "ast_hash": "538455389dfb990b76dff4e588df8f24",
+    "mtime": 1788243977.1002336,
+    "ast_hash": "1dbc36e085323db35522d9d0c10f2ac0",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/consultant/agency/packs/checkout.blade.php": {
-    "mtime": 1785767986.2252548,
-    "ast_hash": "6df5dc6a116834788fcace50250b17aa",
+    "mtime": 1788434934.5520937,
+    "ast_hash": "8b1a26f4964678004fea6732f13b5f06",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/consultant/agency/packs/index.blade.php": {
-    "mtime": 1785839491.5076807,
-    "ast_hash": "482d2947d53b75e58396787124e490f7",
+    "mtime": 1788434832.1500094,
+    "ast_hash": "0122c1a9d46ef8877667f04afe41c212",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/consultant/agency/renewal/index.blade.php": {
-    "mtime": 1785849828.7220542,
-    "ast_hash": "e2023c2d36ab036a1fc750be87f2a659",
+    "mtime": 1788441450.5738661,
+    "ast_hash": "4d6116821d108d0329076a2c3c69108b",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/consultant/agency/workspace/switcher.blade.php": {
-    "mtime": 1785847813.0252569,
-    "ast_hash": "de72c380bb62a751fad38d0660607d57",
+    "mtime": 1788441450.5753632,
+    "ast_hash": "0db6f2404653f71119203c9b61509380",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/consultant/auth/login.blade.php": {
-    "mtime": 1785996960.9797578,
-    "ast_hash": "04bfeb960bf6a61af42a2d682ede4ace",
+    "mtime": 1788517359.3258097,
+    "ast_hash": "4783c68cecef7acc2f75f60f4ac6412e",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/consultant/auth/register.blade.php": {
-    "mtime": 1785996973.1310005,
+    "mtime": 1787723539.638763,
     "ast_hash": "a0942704c776bd5ceb2f790e7f78744a",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/consultant/dashboard.blade.php": {
-    "mtime": 1785770670.4353476,
-    "ast_hash": "c40ca3d0d3273459efb1ed93f4d7e9a1",
+    "mtime": 1788441441.9442332,
+    "ast_hash": "988d280caab987be7d858403bbdfef63",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/consultant/documents.blade.php": {
@@ -1855,13 +1555,13 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/consultant/landing.blade.php": {
-    "mtime": 1785771111.7441623,
-    "ast_hash": "562812775e0872c3db508a6042217218",
+    "mtime": 1788441497.8851476,
+    "ast_hash": "c0c7c0055a4a0f42d7f16136302d3735",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/consultant/layouts/app.blade.php": {
-    "mtime": 1781530577.7030122,
-    "ast_hash": "ecf0ce79020ade7ff13d81054f69cc38",
+    "mtime": 1787725423.871981,
+    "ast_hash": "80151ac3e0348fae20f7716e4645a648",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/consultant/orders.blade.php": {
@@ -1875,8 +1575,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/dashboard/index.blade.php": {
-    "mtime": 1781246219.8013108,
-    "ast_hash": "d73abdd0ab0a7f599517f5d2b7f8b045",
+    "mtime": 1788345993.0748682,
+    "ast_hash": "1e1c80dfd27b1d24db61165cd943ba3e",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/dashboard/no-company-access.blade.php": {
@@ -1885,18 +1585,18 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/disclosures/climate-opportunities/index.blade.php": {
-    "mtime": 1781246219.2498763,
-    "ast_hash": "23b4aaed82d3b4b1c8fd0df124d4561f",
+    "mtime": 1787814724.4946415,
+    "ast_hash": "8778e50b01618a859e90692e74445862",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/disclosures/climate-risks/index.blade.php": {
-    "mtime": 1781246219.2636704,
-    "ast_hash": "516c4a1e6a6ddff5e823295c9ea63287",
+    "mtime": 1788184087.1109483,
+    "ast_hash": "0f7e3141cfaee83e24ad2ae7e9f02f7f",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/disclosures/esg-dashboard.blade.php": {
-    "mtime": 1783317243.0290096,
-    "ast_hash": "2d06f0060ae9552b93c4f9219bbf2eb5",
+    "mtime": 1788184918.9470177,
+    "ast_hash": "1df611597ac890d170927b4a07187f2e",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/disclosures/gri-overview.blade.php": {
@@ -1910,8 +1610,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/disclosures/hub.blade.php": {
-    "mtime": 1783317495.3368697,
-    "ast_hash": "610eeffe68cbee73a74cf7d42814de4e",
+    "mtime": 1788184918.9452155,
+    "ast_hash": "6da1235d76bb7160ff93807d56c594d4",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/disclosures/material-topics.blade.php": {
@@ -1925,8 +1625,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/disclosures/partials/header.blade.php": {
-    "mtime": 1783315919.802942,
-    "ast_hash": "28bb128431348902731b079fa7ddbc4e",
+    "mtime": 1788184844.3843079,
+    "ast_hash": "4a9a9141773ce95d172bde41eb58e748",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/disclosures/report-preview.blade.php": {
@@ -1945,13 +1645,13 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/disclosures/section.blade.php": {
-    "mtime": 1783403269.6377387,
-    "ast_hash": "3763f68673000cd425582e49df2f2ca9",
+    "mtime": 1788186984.118036,
+    "ast_hash": "a83e6c92293b490222d8f6ffa386f813",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/disclosures/sustainability-risks/index.blade.php": {
-    "mtime": 1781246219.4252267,
-    "ast_hash": "5f57ed86e7fa225ed696fccf3244e535",
+    "mtime": 1788184041.1696,
+    "ast_hash": "8bc6f0cba321e173de931e78de9d19b5",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/disclosures/targets/_form.blade.php": {
@@ -1960,8 +1660,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/disclosures/targets/index.blade.php": {
-    "mtime": 1785518132.8000112,
-    "ast_hash": "e80c7a82c83cdf33e937387763f91d23",
+    "mtime": 1787814724.4955745,
+    "ast_hash": "6c09f52df742d166d5cf3574ccee4623",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/emails/welcome.blade.php": {
@@ -1970,8 +1670,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/emission-boundaries/index.blade.php": {
-    "mtime": 1781246219.6247303,
-    "ast_hash": "3ce692cf5e033e372a435eb2e519cd32",
+    "mtime": 1788352966.6334212,
+    "ast_hash": "71c53d33475430ddc1e2255e36909a01",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/emission-form/sections/company.blade.php": {
@@ -2050,8 +1750,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/layouts/app.blade.php": {
-    "mtime": 1785770664.673076,
-    "ast_hash": "5fb70e8e192dabc1a27953b47c8bf985",
+    "mtime": 1788517369.1994014,
+    "ast_hash": "f55a280c7df026076fa4ae542dd4b92c",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/layouts/partials/marketing-footer.blade.php": {
@@ -2065,28 +1765,28 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/layouts/partials/nav-client.blade.php": {
-    "mtime": 1785820928.5143406,
-    "ast_hash": "e53b4527c6b64d8256109d5d6d27f2f4",
+    "mtime": 1788441425.9967108,
+    "ast_hash": "73628b4cf7a2f83b2c0a69ae41ade4bf",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/layouts/partials/nav-consultant.blade.php": {
-    "mtime": 1785767854.1231585,
-    "ast_hash": "769875b7cd3c6d2e82827eba89de4f9e",
+    "mtime": 1788271022.233733,
+    "ast_hash": "2b8c6c2125df36bc15a57924965a9be1",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/layouts/partials/nav-disclosures-gri.blade.php": {
-    "mtime": 1783317499.265693,
-    "ast_hash": "3b3d504e3ccc65fd7dfbf8d681755735",
+    "mtime": 1788185553.5598693,
+    "ast_hash": "ad5580516a0e20e797047966317d869d",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/layouts/partials/nav-disclosures-s1.blade.php": {
-    "mtime": 1780989227.5232322,
-    "ast_hash": "70102c23153f0d35b91b57fac5be000f",
+    "mtime": 1788185537.4367812,
+    "ast_hash": "ff560371df2e5151300f639c52b493ab",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/layouts/partials/nav-disclosures-s2.blade.php": {
-    "mtime": 1780989225.6644738,
-    "ast_hash": "a06eda6c408fa8cef8d262d81af70659",
+    "mtime": 1788185553.5595548,
+    "ast_hash": "489c80adaff152d55303cc4670a0fc61",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/layouts/partials/nav-disclosures.blade.php": {
@@ -2100,13 +1800,13 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/locations/create.blade.php": {
-    "mtime": 1781246219.5085275,
-    "ast_hash": "28ec9b71494e2ed6760c16303acf03b1",
+    "mtime": 1788351841.5044174,
+    "ast_hash": "65ed0dbf01b9ee1a1389e4f0e3f21345",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/locations/edit.blade.php": {
-    "mtime": 1781246219.5256371,
-    "ast_hash": "2b0373f86470a6c3b22fbd30b7fb3277",
+    "mtime": 1788352235.7876163,
+    "ast_hash": "56eba155afae0825c06503cbc93d8e1d",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/locations/index.blade.php": {
@@ -2120,8 +1820,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/profile/index.blade.php": {
-    "mtime": 1780555560.806667,
-    "ast_hash": "0d064d6d5e8c42e2e6a92dd1f8d6307a",
+    "mtime": 1787744544.2091057,
+    "ast_hash": "8775a6e1bf2d8eb4e1369685cd73bd5b",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/public/consultant-list/index.blade.php": {
@@ -2145,8 +1845,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/public/pricing.blade.php": {
-    "mtime": 1785762617.0939758,
-    "ast_hash": "34e1f5feb313b4b66adb9b22bc31cb6c",
+    "mtime": 1788517359.3237164,
+    "ast_hash": "7bfadfe36da940dd0e565652cb075d62",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/quick-input/help-guide.blade.php": {
@@ -2155,13 +1855,13 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/quick-input/index.blade.php": {
-    "mtime": 1786511161.4029746,
-    "ast_hash": "4a09bbea3415bedfee305b7cadc1b603",
+    "mtime": 1787734514.240455,
+    "ast_hash": "2120033ab60da2ced5033deb45591072",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/quick-input/show.blade.php": {
-    "mtime": 1785752825.4692242,
-    "ast_hash": "79d5aa4f5664b6b7d4fe904e42727542",
+    "mtime": 1787735922.6373727,
+    "ast_hash": "0292b1ae4790214fa7dc76b8a52165a5",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/quick-input/view.blade.php": {
@@ -2185,8 +1885,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/reports/index.blade.php": {
-    "mtime": 1785753481.1859894,
-    "ast_hash": "46c5a2106f1c4b3e6b3c991b6435d050",
+    "mtime": 1788353242.3984191,
+    "ast_hash": "61119ce979dce603d0a457a4064558ca",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/reports/pdf.blade.php": {
@@ -2205,13 +1905,13 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/roles/index.blade.php": {
-    "mtime": 1781246219.6101005,
-    "ast_hash": "845f9396c72858eb315895d2e3bdf871",
+    "mtime": 1787760328.590748,
+    "ast_hash": "29bda65fe0934178abedc51a8a105d66",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/settings/reporting.blade.php": {
-    "mtime": 1781246219.5641725,
-    "ast_hash": "36a7c7a2694a957ed946af3afa30e941",
+    "mtime": 1788345285.5435927,
+    "ast_hash": "dc922409c16ca99f9d2d481db6989c47",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/staff/invitation-success.blade.php": {
@@ -2220,18 +1920,18 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/welcome.blade.php": {
-    "mtime": 1785771126.2295136,
-    "ast_hash": "d98b7fb8268df0e625fbc55184050911",
+    "mtime": 1788517359.3250203,
+    "ast_hash": "ff8240758945b41c886cb50b755fda98",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/routes/console.php": {
-    "mtime": 1785770636.7715456,
-    "ast_hash": "16bd8b38871275b8f7185489577235c7",
+    "mtime": 1788272944.935432,
+    "ast_hash": "ea4690add8ff6592efc9c894fcd53ab1",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/routes/web.php": {
-    "mtime": 1786511105.568207,
-    "ast_hash": "730c37b58e57abe962993df9cb1d5980",
+    "mtime": 1788434749.64014,
+    "ast_hash": "3b1640a64f8e9866b1a51788641e4423",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/public/robots.txt": {
@@ -2280,8 +1980,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Disclosure/EsgScorecardController.php": {
-    "mtime": 1783321784.7296684,
-    "ast_hash": "99b6063110469838139ebcb01f01f073",
+    "mtime": 1788179194.5707574,
+    "ast_hash": "83577e51b1659d7e6f693f6fe50f33d1",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Disclosure/EsgSustainabilityTargetController.php": {
@@ -2290,8 +1990,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Disclosure/MaterialityMatrixController.php": {
-    "mtime": 1783317413.9710274,
-    "ast_hash": "16b8f42104218e486de57b281c810654",
+    "mtime": 1788182611.2383008,
+    "ast_hash": "e465970dc6490f40269a26dcfccabe73",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Disclosure/SasbIndexController.php": {
@@ -2335,8 +2035,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Mail/TemplateMail.php": {
-    "mtime": 1781269801.9936416,
-    "ast_hash": "5dd1b1adfa22c0ab73fd404769aade4b",
+    "mtime": 1788262714.927581,
+    "ast_hash": "7f98067f60452077ad6e9ccca99f92dd",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/EmailTemplate.php": {
@@ -2380,8 +2080,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/DashboardInsightsService.php": {
-    "mtime": 1781245630.1420853,
-    "ast_hash": "33719c9a1d2e5148dead78dc4b8704a5",
+    "mtime": 1787584196.7723064,
+    "ast_hash": "ea80558c03fbba6737a33050331d0296",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/EmailDiagnosticService.php": {
@@ -2390,8 +2090,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/EmailTemplateService.php": {
-    "mtime": 1781271775.0207818,
-    "ast_hash": "a22615df7c4667e3db3a7edaf6d4ded6",
+    "mtime": 1788247129.4260917,
+    "ast_hash": "aa0db9066f0a11bfeaf4f4add4182531",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/EnergyFromActivityService.php": {
@@ -2460,13 +2160,13 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/config/email-triggers.php": {
-    "mtime": 1785770708.9411159,
-    "ast_hash": "207e9fb60afbc835222d5f6e0d97de1d",
+    "mtime": 1788435161.4740162,
+    "ast_hash": "dea5a33cc6286e1354054e4451dd537f",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/config/emails.php": {
-    "mtime": 1785770700.3006163,
-    "ast_hash": "edb778a813de36f13f8ff88f4784d834",
+    "mtime": 1788435161.3823056,
+    "ast_hash": "e36abf00772f8a4cfd6c53fa5ea328ab",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/config/energy_from_activity.php": {
@@ -2515,73 +2215,28 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/config/plans-company.php": {
-    "mtime": 1785771048.0973668,
-    "ast_hash": "4bfdf50eafb5b98fb6df5e9c2a6fa90d",
+    "mtime": 1788353629.2204177,
+    "ast_hash": "b6b6f00320644bdcc8949e6e7ac48708",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/config/plans-consultant.php": {
-    "mtime": 1785845428.6250186,
-    "ast_hash": "217c1f53a8d03a8a2364b8e46e13fdd5",
+    "mtime": 1788435191.3796144,
+    "ast_hash": "289ad3f8cd8ee5b746f53d7f5dda9978",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/config/portal-guide-company.php": {
-    "mtime": 1785768691.7301283,
-    "ast_hash": "2985a51d647305faf7bd9a9711f16f64",
+    "mtime": 1788435133.258727,
+    "ast_hash": "bdfc5ad61eb73e765bb0ceddd76593c9",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/config/portal-guide-consultant.php": {
-    "mtime": 1785845428.0329301,
-    "ast_hash": "6961cd9cd2887efcbd6efa3f8c0f5c3d",
+    "mtime": 1788435230.7573807,
+    "ast_hash": "2d4dc5458729e4658729fb196f823fed",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/config/sasb.php": {
     "mtime": 1783317792.0080602,
     "ast_hash": "135116f1b0e05aa8fc8d04b97318ff63",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_14_120000_create_email_templates_table.php": {
-    "mtime": 1781260218.032965,
-    "ast_hash": "21daf56e32649ae307371dc2ae2aeff7",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_15_100000_measurement_data_supporting_docs.php": {
-    "mtime": 1781162711.7065895,
-    "ast_hash": "ed9a44f60b5b9cac2a2a818f91c8e8f4",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_15_120000_update_site_contact_details.php": {
-    "mtime": 1781270639.2121649,
-    "ast_hash": "317d9326e74dc04be7f574d228e166ff",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_06_16_120000_add_stripe_payment_gateway.php": {
-    "mtime": 1781604627.084084,
-    "ast_hash": "f28599b27369e35acb1458ff0c844542",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_07_01_100000_fix_diesel_factor_scope2_precision_and_heat_methodology.php": {
-    "mtime": 1782883297.719781,
-    "ast_hash": "9d1275d06c92dbe5ba5f8cc08c79a9bc",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_07_06_100000_phase_b_esg_kpi_snapshots.php": {
-    "mtime": 1783317161.0382853,
-    "ast_hash": "3ce506ced98896549396a62df1cc5295",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_07_06_200000_phase_c_esg_depth.php": {
-    "mtime": 1783317357.531741,
-    "ast_hash": "ff5374fb250c939b5eceeaad2dd1d8ff",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_07_06_300000_phase_d_sasb_sector.php": {
-    "mtime": 1783317782.3951333,
-    "ast_hash": "eff4a306d149543ef02016dbb205542d",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_07_06_400000_hris_kpi_import_logs.php": {
-    "mtime": 1783321735.1344583,
-    "ast_hash": "f1be9cabf5fefc11ada9ca6cddfa2107",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/database/seeders/EmailTemplateSeeder.php": {
@@ -2650,43 +2305,43 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/dashboard/partials/enterprise.blade.php": {
-    "mtime": 1781245693.2911177,
-    "ast_hash": "abed082fb5be8217a7f808312f1835f8",
+    "mtime": 1788180452.405479,
+    "ast_hash": "5c606ad137d0d024a52a7ecaa0e5ebad",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/disclosures/esg-depth/overview.blade.php": {
-    "mtime": 1783317893.6757812,
-    "ast_hash": "e5005b8ef3ea4f627f5a9b75e09d58a0",
+    "mtime": 1788184918.9479523,
+    "ast_hash": "a3812fdd5a577f8ab04b8972d50e0eff",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/disclosures/esg-scorecard.blade.php": {
-    "mtime": 1783422266.6175578,
-    "ast_hash": "97a33cd80f0e70d90e8cd2c4f9feb475",
+    "mtime": 1788184918.9461548,
+    "ast_hash": "708c18ee63eacdb6403b5bf8a4f8b1e8",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/disclosures/esg-targets/index.blade.php": {
-    "mtime": 1783422254.1032324,
-    "ast_hash": "c7bfeda2574e7cd140324af57262d8dd",
+    "mtime": 1787814734.9669812,
+    "ast_hash": "92c40609b9dcde8b165c93b974efd6b0",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/disclosures/materiality-matrix/index.blade.php": {
-    "mtime": 1783422260.9344885,
-    "ast_hash": "3a6ef0de0990fbea5a5765042f1b6c59",
+    "mtime": 1788182695.766674,
+    "ast_hash": "a488a068ca46589703cd259123a3e2bd",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/disclosures/sasb/index.blade.php": {
-    "mtime": 1783317880.2015417,
-    "ast_hash": "5b934380f58e9017c49ff8495f56e7f6",
+    "mtime": 1787814734.9698095,
+    "ast_hash": "de873758d3352fa34d4aaa707ba6b9ad",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/disclosures/stakeholders/index.blade.php": {
-    "mtime": 1783422200.718088,
-    "ast_hash": "1b568defee170035dab5e590d6d5fd5b",
+    "mtime": 1787814734.9719105,
+    "ast_hash": "2ecaeafbc8dbe6f1df0afe8d5ec47ac0",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/disclosures/supply-chain/index.blade.php": {
-    "mtime": 1783422224.0245965,
-    "ast_hash": "3bbcfbfa5bc861b26fa268aeb4761472",
+    "mtime": 1787814734.9684494,
+    "ast_hash": "a8a0fbf2c7a45efec663bc79eceb26f0",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/disclosures/uae-esg-overview.blade.php": {
@@ -2705,8 +2360,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/emails/template.blade.php": {
-    "mtime": 1781260319.7572663,
-    "ast_hash": "2c35ce4c4281500d32f88d2b0c7b1b3b",
+    "mtime": 1787733736.3924546,
+    "ast_hash": "3f8371184cc8d22d5ad9a6780de69080",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/help/company.blade.php": {
@@ -2755,8 +2410,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/layouts/partials/nav-disclosures-uae-esg.blade.php": {
-    "mtime": 1783315918.6894422,
-    "ast_hash": "21e640af68a4f008174a19cafbd672ab",
+    "mtime": 1788185553.5601866,
+    "ast_hash": "0e8191419d4e77be9bce6a81060b623f",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/layouts/partials/site-copyright.blade.php": {
@@ -2770,7 +2425,7 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/layouts/portal-auth.blade.php": {
-    "mtime": 1785997083.4913812,
+    "mtime": 1787672146.0530357,
     "ast_hash": "61cb7d03f5800f9f0d039f5fda2d742b",
     "semantic_hash": ""
   },
@@ -2790,8 +2445,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/CONSULTANT_AGENCY_PLAN_V1.md": {
-    "mtime": 1785762036.0095441,
-    "ast_hash": "83c95f887680f5e32e87e65b72064b61",
+    "mtime": 1788435532.7654266,
+    "ast_hash": "39d8cf3499a04c7b175afbc0d51064d3",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/DESIGN_DEPLOY_NOTES.md": {
@@ -2805,13 +2460,13 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/PAYMENT_GATEWAYS.md": {
-    "mtime": 1783314865.5069568,
-    "ast_hash": "ef26f02123680c788ed0b62c4c005914",
+    "mtime": 1788435516.3339977,
+    "ast_hash": "c01498e3401a1e8d59c2a31b86816299",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/PROJECT_OVERVIEW.md": {
-    "mtime": 1783314865.5074956,
-    "ast_hash": "b8a725f6e2f95a0f1f2da1c7042f23b8",
+    "mtime": 1788435532.76316,
+    "ast_hash": "601ec1baf573ab5e1825798a14d68379",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/QUICK_INPUT_AUDIT.md": {
@@ -2834,11 +2489,6 @@
     "ast_hash": "7f1be66632f3fe01a5118a63303d9fe9",
     "semantic_hash": ""
   },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_07_06_500000_update_plan_descriptions_for_uae_esg.php": {
-    "mtime": 1783329259.1455698,
-    "ast_hash": "a9127555f240946fbcc7654c27b760cc",
-    "semantic_hash": ""
-  },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Support/FieldHelp.php": {
     "mtime": 1783430258.2618215,
     "ast_hash": "6d3efe54d84a348ffde7456cbc116c77",
@@ -2857,11 +2507,6 @@
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/components/field-help.blade.php": {
     "mtime": 1783422141.084778,
     "ast_hash": "3951f0b9fcacecdc8d2deb4f559b242a",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_07_18_000100_fix_quick_input_cascade_options.php": {
-    "mtime": 1785306697.7527962,
-    "ast_hash": "47d6fe6af1ac6465e2bd4e21c0a536c3",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/quick-input/partials/resolved-field-help.blade.php": {
@@ -2884,34 +2529,24 @@
     "ast_hash": "9c746548a23a0f3562c72e4e95b28a2f",
     "semantic_hash": ""
   },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_07_29_100000_create_admin_package_assignments_table.php": {
-    "mtime": 1785307462.207851,
-    "ast_hash": "98abdd90501fb22d7b2b407dca9dca33",
-    "semantic_hash": ""
-  },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/package-assignments/index.blade.php": {
     "mtime": 1785307611.1294904,
     "ast_hash": "01dd43fe66139104892e2138e4895fa5",
     "semantic_hash": ""
   },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_07_29_110000_consultant_demo_pack.php": {
-    "mtime": 1785308616.772749,
-    "ast_hash": "19056dc63065548f6832e6831819ebf9",
-    "semantic_hash": ""
-  },
   "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/elevenlabs-voice-agent/COMPANY_PORTAL_KNOWLEDGE.md": {
-    "mtime": 1787116461.492971,
-    "ast_hash": "987179fb16df9e8d1534967363df42ca",
+    "mtime": 1787138475.2805893,
+    "ast_hash": "068d09c62c7464850e0c0fdd8417e494",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/elevenlabs-voice-agent/COMPANY_PRE_QUESTIONS.md": {
-    "mtime": 1787116461.4950047,
-    "ast_hash": "60f196f698fb4bb5c3e8acbba6c2b047",
+    "mtime": 1787144982.6754034,
+    "ast_hash": "9838272d7d5baa6dce3d05713b37fbc9",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/elevenlabs-voice-agent/CONSULTANT_PORTAL_KNOWLEDGE.md": {
-    "mtime": 1787116461.4983969,
-    "ast_hash": "0ad9756235cbdbe4c4ff113c3ae59562",
+    "mtime": 1787138513.3166437,
+    "ast_hash": "a962b16b8c3def2a5b505b3e2ac865a1",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/elevenlabs-voice-agent/CONSULTANT_PRE_QUESTIONS.md": {
@@ -2920,8 +2555,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/elevenlabs-voice-agent/README.md": {
-    "mtime": 1787116475.6159332,
-    "ast_hash": "f3eac42aa4cf1757cb2cc0d3eb3f157d",
+    "mtime": 1787145063.401381,
+    "ast_hash": "a386c18dd1808f1298e197f1f08740ef",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/PRICING_AND_PLAN_MAJOR_CHANGES.md": {
@@ -2929,134 +2564,14 @@
     "ast_hash": "af5a7bc72df7624fa06743fbf5f2e87c",
     "semantic_hash": ""
   },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_08_03_100000_phase1_free_plan_scope3_preview.php": {
-    "mtime": 1785752809.4182353,
-    "ast_hash": "b1057047876484803473efffd26705d0",
-    "semantic_hash": ""
-  },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Exports/TrialWatermarkNoticeSheet.php": {
-    "mtime": 1785753395.668213,
-    "ast_hash": "54dc92c9682475dfef45174f03fb6207",
+    "mtime": 1788353242.3994308,
+    "ast_hash": "bd14e98029ffb3353cbe2388e1ad3a36",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Support/ExportWatermark.php": {
     "mtime": 1785820928.5038006,
     "ast_hash": "b1398be1f807f3b85389835a9dfb5bc0",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_08_03_110000_phase2_free_watermarked_exports.php": {
-    "mtime": 1785753487.102757,
-    "ast_hash": "813a989cb83c80e6ca599b8d6f7f2e0c",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Data/CompanyPackageOptions.php": {
-    "mtime": 1785769997.4536173,
-    "ast_hash": "687569f6b04744d2598dfa2d9abbc557",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Admin/CompanyPackageRequestController.php": {
-    "mtime": 1786101106.0952,
-    "ast_hash": "e925c259312ec9a89be355871bc0fa98",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Client/PackageRequestController.php": {
-    "mtime": 1785770048.5588002,
-    "ast_hash": "3df2e478a8b8c653a7135937d2652016",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/CompanyPackageRequest.php": {
-    "mtime": 1785767328.0668795,
-    "ast_hash": "2a695be2751d6d770bb2b9e42edae704",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_08_03_120000_create_company_package_requests_table.php": {
-    "mtime": 1785763565.5932992,
-    "ast_hash": "23685b2a10ecb01a4137ae2feae35036",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/package-requests/index.blade.php": {
-    "mtime": 1785767406.0512419,
-    "ast_hash": "bb3ca1ba7ae06ffebe1cced34e7bba63",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/client/subscriptions/request-package.blade.php": {
-    "mtime": 1785770080.191462,
-    "ast_hash": "d0b8b6b069d1c6e204f5675f573f4faa",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Data/CommercialPriceBook.php": {
-    "mtime": 1785839529.603663,
-    "ast_hash": "11cc3e86701743ddc4ea3d11b782658e",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Admin/ConsultantEntityRequestController.php": {
-    "mtime": 1786101099.4325604,
-    "ast_hash": "b2816708033006a45fbd2e7da719c74b",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Consultant/Agency/EntityRequestController.php": {
-    "mtime": 1785839476.0384264,
-    "ast_hash": "dbbe2608ec71980e2b300920e336997d",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/ConsultantEntityRequest.php": {
-    "mtime": 1785839319.9961598,
-    "ast_hash": "5352c5c12673c3c213e70575a6a48c23",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/AdminRequestActivationService.php": {
-    "mtime": 1785839518.7061267,
-    "ast_hash": "b77195410c4194136b23d77e5e72c7ba",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_08_03_130000_create_consultant_entity_requests_table.php": {
-    "mtime": 1785764197.266184,
-    "ast_hash": "a38a399d832eff23a850e2d682c07029",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_08_03_140000_phase6_request_quote_fields.php": {
-    "mtime": 1785767324.6275568,
-    "ast_hash": "b3a786c47dde8ea5b9051617cb38ec52",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/entity-requests/index.blade.php": {
-    "mtime": 1785839513.4221492,
-    "ast_hash": "ea65cb079feae5844979b8b501ece33c",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Admin/PriceBookController.php": {
-    "mtime": 1785767644.0087059,
-    "ast_hash": "f3e3ebd191ff9bd79192931e659bc172",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/CommercialPriceBookEntry.php": {
-    "mtime": 1785767627.431304,
-    "ast_hash": "a6e93401e7b2e655891c1f307bcf04c6",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_08_03_150000_phase7_commercial_price_book.php": {
-    "mtime": 1785767611.579382,
-    "ast_hash": "8e85825c6f6d6d8021c92310f36b947b",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/admin/price-book/index.blade.php": {
-    "mtime": 1785767644.4113529,
-    "ast_hash": "8127254e93d3ffd6bffa228b8c5c632f",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_08_03_160000_phase8_seed_scope_and_consultant_entity.php": {
-    "mtime": 1785768455.6516874,
-    "ast_hash": "7f7013a5b92378cdf8457e650e2d8d1b",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_08_03_210000_consultant_entity_request_package_code.php": {
-    "mtime": 1785769363.686078,
-    "ast_hash": "d2b40e89618adf3d4e75e05353a15060",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/partials/package-request-matrix.blade.php": {
-    "mtime": 1785839491.8057463,
-    "ast_hash": "3fd4b17af12da22decacf70cb96c2c89",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Console/Commands/SendRenewalRemindersCommand.php": {
@@ -3065,38 +2580,13 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/SubscriptionRenewalNudgeService.php": {
-    "mtime": 1785770699.6341462,
-    "ast_hash": "35dd5cadf177d209ed0dbbee4bcb2c8c",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_08_04_150000_phase1_consultant_multi_package_catalog.php": {
-    "mtime": 1785837900.7188246,
-    "ast_hash": "0306747195953018eb44d0e6a4ed4700",
+    "mtime": 1788441441.9450989,
+    "ast_hash": "a996d511a5fefef795b462bfd9a1a838",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/CONSULTANT_MULTI_PACKAGE_PLAN.md": {
     "mtime": 1785851698.4725535,
     "ast_hash": "98f9dfdb654707d285afb0fc60d14401",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_08_04_160000_phase2_consultant_multi_package_migrate.php": {
-    "mtime": 1785838625.1254888,
-    "ast_hash": "5cf7bf9d3f9dbd35bcf4c4755bbe1f75",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_08_04_170000_phase3_consultant_entity_request_lines.php": {
-    "mtime": 1785839320.0455248,
-    "ast_hash": "c100c1736d8f37076966765a1799320a",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_08_04_180000_drop_consultant_extra_slots_purchased.php": {
-    "mtime": 1785848142.5097735,
-    "ast_hash": "61e3bc623156ce23f8e0632c9146bff5",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_08_04_181000_phase7_engagement_metadata_for_seat_moves.php": {
-    "mtime": 1785849135.735114,
-    "ast_hash": "2d4e46d19e0fea26346fcd74a71db415",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/consultant/agency/clients/move.blade.php": {
@@ -3145,28 +2635,13 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Scope3BulkImportController.php": {
-    "mtime": 1786449559.7786634,
-    "ast_hash": "1c351050af67ebe22f3d779c0fd27da2",
+    "mtime": 1787583089.706156,
+    "ast_hash": "dcf60ac56b717b426c656a2086a9d6ed",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/Scope3BulkImportService.php": {
     "mtime": 1787116300.8852081,
     "ast_hash": "1a84cc10c0f3b720e29d55737b71e9a2",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_08_06_120000_cleanup_orphan_scope3_measurement_data.php": {
-    "mtime": 1786002259.6422129,
-    "ast_hash": "49b49d17d896e5d9b5f3838d35aab6cf",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_08_11_100000_raise_scope3_records_per_form_for_paid_plans.php": {
-    "mtime": 1786432247.3789165,
-    "ast_hash": "76e722fd24f648c13e6572bd88777a07",
-    "semantic_hash": ""
-  },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/silverwebbuzz_in_menetzero(10).sql": {
-    "mtime": 1785998395.9057412,
-    "ast_hash": "06911e31fba32f2e2aa3595863c2f1bd",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/quick-input/scope3-help-guide.blade.php": {
@@ -3177,6 +2652,686 @@
   "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/SCOPE3_BULK_IMPORT_PLAN.md": {
     "mtime": 1787116521.5658293,
     "ast_hash": "7e03cc5f671469150eb7e13cba0a97a3",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/.claude/scripts/check-theme-views.py": {
+    "mtime": 1788331942.1552336,
+    "ast_hash": "952158334d2cd5d7df0e381ab4c87415",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/Menetzero-Redesign/assets/mnz-ui.js": {
+    "mtime": 1787665163.0,
+    "ast_hash": "819aefc43a427db0224c90d758b66f93",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/Menetzero-Redesign/support.js": {
+    "mtime": 1787665163.0,
+    "ast_hash": "951ae391b8ae72ef12e671c2fad23353",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Console/Commands/ApplyScheduledDowngradesCommand.php": {
+    "mtime": 1788272944.8861885,
+    "ast_hash": "8a30979dad7f59fb75d49cca8ca20307",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Console/Commands/CleanupOrphanedOrganisationData.php": {
+    "mtime": 1788430220.4731517,
+    "ast_hash": "b362cd0f003c9e90634c0a48767d1ac6",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Admin/CompanyThemeController.php": {
+    "mtime": 1787734288.6900156,
+    "ast_hash": "a57a9c596af0ecb6e5b1832b4485432a",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Consultant/ForgotPasswordController.php": {
+    "mtime": 1787574180.8441162,
+    "ast_hash": "c35d2f315ac78b58ba1351a6806db9a6",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Disclosure/EnvironmentalDashboardController.php": {
+    "mtime": 1788174249.2546737,
+    "ast_hash": "982f0a17ec3c67ea7bd8e0949e941b8b",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Disclosure/GovernanceDashboardController.php": {
+    "mtime": 1788179671.9396017,
+    "ast_hash": "e3227e6f6c11a71c936b2aada21067ad",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/Disclosure/SocialDashboardController.php": {
+    "mtime": 1788179002.746912,
+    "ast_hash": "52318e35427ba123ce269b15f9e63942",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/InvoiceController.php": {
+    "mtime": 1788247193.2559931,
+    "ast_hash": "d0073203b336050d8c54e16a74e6632b",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/ReportingYearController.php": {
+    "mtime": 1787814066.3494241,
+    "ast_hash": "fa8aba54567e910398827d99c4fdd673",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Controllers/ZeroAiController.php": {
+    "mtime": 1787144092.1286483,
+    "ast_hash": "2870df51e816b76b11cf1c4ac2e9b6c7",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/Middleware/ResolveTheme.php": {
+    "mtime": 1787723455.6419017,
+    "ast_hash": "1ffd07ecd37853a5fa639778d06fee9a",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Http/View/Composers/ReportingYearsComposer.php": {
+    "mtime": 1787583992.5748844,
+    "ast_hash": "5767fc96d5803f739e8ea210604013ba",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Listeners/RecordSuccessfulLogin.php": {
+    "mtime": 1788329011.764186,
+    "ast_hash": "dec35275a17aa62a44937e971242887d",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/BaseYearRestatement.php": {
+    "mtime": 1787584848.1876683,
+    "ast_hash": "d3bf7cd3cc0c77705b97cf6ff24158b8",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/Invoice.php": {
+    "mtime": 1788247002.244209,
+    "ast_hash": "bac85853fb058ad893210a354a67cb0a",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Models/StructuralChange.php": {
+    "mtime": 1787584848.1808307,
+    "ast_hash": "b0337d250892c4214b5c54fd3416292e",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Providers/ThemeServiceProvider.php": {
+    "mtime": 1787723550.5866427,
+    "ast_hash": "dba9039e5c83d892cb5743daf2833e69",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/EmissionsIntensityService.php": {
+    "mtime": 1787584885.2620187,
+    "ast_hash": "6d2a4c17cce84476454537a8ae14a7d5",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/EnvironmentalDashboardService.php": {
+    "mtime": 1788174431.049956,
+    "ast_hash": "8f14cfa34bbe88ac079712423aa2d251",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/EsgPerformanceCardService.php": {
+    "mtime": 1788182354.5859556,
+    "ast_hash": "c11cd8d12b5a6c8579f4c527cf5fac97",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/GovernanceDashboardService.php": {
+    "mtime": 1788179647.082178,
+    "ast_hash": "fdcf972bcc407074bd67095f54fac70a",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/InvoiceService.php": {
+    "mtime": 1788247395.9940524,
+    "ast_hash": "0ef85accdf917f1ba2422df7e1c8dbc3",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/OrganisationDeletionService.php": {
+    "mtime": 1788430164.03471,
+    "ast_hash": "9c3b4b70d6601f7ddc6c589ba4bf2a85",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/ReductionTargetProgressService.php": {
+    "mtime": 1787580591.3860488,
+    "ast_hash": "8f72f6bb36214e532a1cc67575ec9e41",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/ScheduledDowngradeService.php": {
+    "mtime": 1788272965.6386454,
+    "ast_hash": "228c4266851e9afcd4baf665e8f6a268",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/SocialDashboardService.php": {
+    "mtime": 1788178982.080817,
+    "ast_hash": "a5dc8c6ed9ff838d25d7a68ecc432455",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/ThemeResolver.php": {
+    "mtime": 1787734267.4046233,
+    "ast_hash": "20a86bc153fcf62ae9d9f2b325c438fd",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Services/ZeroAiKnowledgeBase.php": {
+    "mtime": 1787144894.663883,
+    "ast_hash": "1efea84584f9b3298d62d5f0632100b2",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Support/NavigationGates.php": {
+    "mtime": 1787814004.8475137,
+    "ast_hash": "d8c049ca16b72efcf8f52694d02748b1",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/app/Support/NavigationMap.php": {
+    "mtime": 1788180693.3991137,
+    "ast_hash": "f9ff413712457631c98ed17f485ce110",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/config/navigation.php": {
+    "mtime": 1788271004.568849,
+    "ast_hash": "520e743fd3992ac48865cebb433f23c7",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/config/themes.php": {
+    "mtime": 1787671616.4636073,
+    "ast_hash": "42c7657b46bbeda4547811560bcde0f4",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_09_03_000000_baseline_schema.php": {
+    "mtime": 1788433604.2677462,
+    "ast_hash": "81125638c6d1fe2184c0a01765b00876",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/database/schema/mysql-schema.sql": {
+    "mtime": 1788435410.5530763,
+    "ast_hash": "cdd19d15b38f152183d4a2f5524199e0",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/database/seeders/FalconHistoricalDataSeeder.php": {
+    "mtime": 1787583658.36471,
+    "ast_hash": "cd1d201a0b644c8ab77f6b897e9805bb",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/database/seeders/FalconSustainabilityRiskSeeder.php": {
+    "mtime": 1788184479.9822955,
+    "ast_hash": "e0967c5749a70c0f760c63b708190d31",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/database/seeders/SitePageSeeder.php": {
+    "mtime": 1788247966.9827054,
+    "ast_hash": "bda45b43449a4f54d63036708bbcff64",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/database/seeders/SubscriptionPlanSeeder.php": {
+    "mtime": 1788192051.6240351,
+    "ast_hash": "81459f295d74042207e64f70720994d1",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/database/sql/2026_09_03_cleanup_offline_requests_and_retired_gateways.sql": {
+    "mtime": 1788517931.6399384,
+    "ast_hash": "5cd413000ab1b07cb6af264cedb28919",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/nav-blade-balance-check.py": {
+    "mtime": 1787814805.9788108,
+    "ast_hash": "d72d031847715049679ea64df3256810",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/nav-gate-parity-check.py": {
+    "mtime": 1787814031.2721353,
+    "ast_hash": "cbcaa27f1ed3a92c14d03b800c9f2333",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/nav-route-name-check.py": {
+    "mtime": 1787813840.0910203,
+    "ast_hash": "97a2a9f9559ba18e7b0450bbb7a72ec2",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/nav-undefined-var-check.py": {
+    "mtime": 1787814192.1829228,
+    "ast_hash": "3508b76011f07789f2bdd47953cbc925",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/silverwebbuzz_in_menetzero(12).sql": {
+    "mtime": 1788432332.4843006,
+    "ast_hash": "d3644010f65e699a9826153882f0a9b0",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/public/js/mnz-ui.js": {
+    "mtime": 1787671682.1217065,
+    "ast_hash": "819aefc43a427db0224c90d758b66f93",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/dashboard/partials/enterprise-scripts.blade.php": {
+    "mtime": 1787727774.6615417,
+    "ast_hash": "bd984d93b45721b4bf27287329f5a577",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/dashboard/partials/esg-performance.blade.php": {
+    "mtime": 1788182327.763613,
+    "ast_hash": "dd783e49465a908190e00f9a7ebe2af0",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/disclosures/materiality-matrix/snapshot.blade.php": {
+    "mtime": 1788182643.316618,
+    "ast_hash": "fdaf6178347bdba5d8d17812412002bf",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/environmental/index.blade.php": {
+    "mtime": 1788174808.4164224,
+    "ast_hash": "e966fb3f39b01315e2e84cf2ba49bec9",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/errors/403.blade.php": {
+    "mtime": 1787731398.0096326,
+    "ast_hash": "cca44aa7dac1eea32e0b84789a2ac1d6",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/errors/404.blade.php": {
+    "mtime": 1787731397.9943972,
+    "ast_hash": "fe7765197d23480b7c3cd11b948d6602",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/errors/419.blade.php": {
+    "mtime": 1787731362.3504813,
+    "ast_hash": "2b8f9144973fc6652e827b2616f0314f",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/errors/500.blade.php": {
+    "mtime": 1787731362.36103,
+    "ast_hash": "942d3cc1f9ce9b3c3b4e50f80330c7c1",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/errors/503.blade.php": {
+    "mtime": 1787731362.371408,
+    "ast_hash": "aff2c8ea9d55578caf0b2250138db808",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/errors/layout.blade.php": {
+    "mtime": 1787731345.89684,
+    "ast_hash": "03d239fa25acb5c8b7c80eec2a143649",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/errors/partials/home-action.blade.php": {
+    "mtime": 1787737088.4276118,
+    "ast_hash": "ca7e12ce56403c051ea54f3541ba14a2",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/governance/index.blade.php": {
+    "mtime": 1788179704.8885632,
+    "ast_hash": "2d60448b9e49e550be2df4e66a8fcb67",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/invoices/pdf.blade.php": {
+    "mtime": 1788247092.658068,
+    "ast_hash": "fc6fdb82293abc5ea6248399584663fb",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/layouts/partials/nav-tabs.blade.php": {
+    "mtime": 1788171341.653024,
+    "ast_hash": "ce1e815f0650be771fbbf441d1f0b8ba",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/layouts/partials/plan-card.blade.php": {
+    "mtime": 1788441574.4133847,
+    "ast_hash": "1d9aff7ffd78c1d7ba575f7eaf4ea06b",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/layouts/partials/register-lineage.blade.php": {
+    "mtime": 1787814660.2575781,
+    "ast_hash": "9dd7b7f833bcde3e8f197eae38e966d4",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/layouts/partials/reporting-year-switcher.blade.php": {
+    "mtime": 1787814178.1704588,
+    "ast_hash": "ea5b091716d08595576d3d865b1bf0b3",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/partials/onboarding-stepper.blade.php": {
+    "mtime": 1788345162.2587004,
+    "ast_hash": "3693a954e7bc6c18c30bd71a224974fb",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/profile/partials/index-scripts.blade.php": {
+    "mtime": 1787744533.456969,
+    "ast_hash": "2a1f4999d3c712f9e5b16744be9d303a",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/quick-input/bulk-import.blade.php": {
+    "mtime": 1788353242.3895144,
+    "ast_hash": "34863c6cfb35c8575b31e8a3b76b8c97",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/quick-input/partials/entry-form.blade.php": {
+    "mtime": 1788353242.3910182,
+    "ast_hash": "3a23cf2720419c88b455059b23ce2da2",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/quick-input/partials/source-icon.blade.php": {
+    "mtime": 1787734504.5138407,
+    "ast_hash": "1c237e001da2ce61fd106af3426b6878",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/reports/partials/index-scripts.blade.php": {
+    "mtime": 1787729434.7600484,
+    "ast_hash": "86cfc03266dd89dc9968bd2f5b895e9b",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/roles/partials/index-scripts.blade.php": {
+    "mtime": 1787760319.3799574,
+    "ast_hash": "921fa8d805b4221e295edb59831421b2",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/social/index.blade.php": {
+    "mtime": 1788179062.5131118,
+    "ast_hash": "dc3cab68cc3b45a25bdebb67adf65e48",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/admin/auth/login.blade.php": {
+    "mtime": 1787723594.023206,
+    "ast_hash": "6a3b573e3ee7374a9028f1bc3ae362ce",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/admin/layouts/app.blade.php": {
+    "mtime": 1788332363.7742624,
+    "ast_hash": "29f3defe3f2aae7f1e18cb9391fed73f",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/admin/partials/nav.blade.php": {
+    "mtime": 1788434784.700912,
+    "ast_hash": "a9dcc3ad4d65cb215fe9248e82201a79",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/auth/login.blade.php": {
+    "mtime": 1787723539.7052155,
+    "ast_hash": "b4e241c2f97db65288faef70c1328757",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/auth/register.blade.php": {
+    "mtime": 1787723539.6913683,
+    "ast_hash": "e3449fc07ff86ccb1ce1432e8a5e1d97",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/client/consultants/checkout.blade.php": {
+    "mtime": 1788243952.932917,
+    "ast_hash": "d348296e094cd383c780b3894a7c665c",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/client/consultants/index.blade.php": {
+    "mtime": 1787808216.1427724,
+    "ast_hash": "63d112cfaaef5a78a18734271846368d",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/client/consultants/orders.blade.php": {
+    "mtime": 1787808129.9359202,
+    "ast_hash": "c25db614147c62304b74a6797cebc91f",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/client/consultants/payment-checkout.blade.php": {
+    "mtime": 1788434953.3294108,
+    "ast_hash": "2e6e219b2ae0fdd3d083b293b6b3b0bf",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/client/consultants/show.blade.php": {
+    "mtime": 1787808216.143836,
+    "ast_hash": "6c0230f612b858cc01b31090535e2ebc",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/client/subscriptions/billing.blade.php": {
+    "mtime": 1788434808.6910093,
+    "ast_hash": "c578dc58d7095995df1e58c23f7005e5",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/consultant/auth/login.blade.php": {
+    "mtime": 1787723539.6806998,
+    "ast_hash": "af5cf1eeb1203ba6435a4a9172172e82",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/consultant/auth/register.blade.php": {
+    "mtime": 1787723539.6646097,
+    "ast_hash": "dd2ed341a13a8586c64e2ca36a557804",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/consultant/layouts/app.blade.php": {
+    "mtime": 1788246140.5764887,
+    "ast_hash": "5b23aaccc274d63ad5aa3032e27ae2ff",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/dashboard/partials/enterprise.blade.php": {
+    "mtime": 1788180466.67477,
+    "ast_hash": "4c5082b5e4897157cfa8580f604dd991",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/disclosures/climate-risks/index.blade.php": {
+    "mtime": 1788184189.5602899,
+    "ast_hash": "8688c71f0cafa3499502c2d05b28a00a",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/disclosures/esg-dashboard.blade.php": {
+    "mtime": 1788184943.2069929,
+    "ast_hash": "f38ed4cb9098326d84b58bbf2ac2cbe1",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/disclosures/esg-scorecard.blade.php": {
+    "mtime": 1788184943.2073996,
+    "ast_hash": "60ceca87d7b0eb34d10a9b77f223caa7",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/disclosures/gri-overview.blade.php": {
+    "mtime": 1787807527.2282307,
+    "ast_hash": "f65ef6bc2faf529f17baef5dbbfa9da5",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/disclosures/hub.blade.php": {
+    "mtime": 1788184943.2065063,
+    "ast_hash": "ab6cd75b5754561adfc732d68ef62306",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/disclosures/materiality-matrix/index.blade.php": {
+    "mtime": 1788182739.8810287,
+    "ast_hash": "b0ca1bcf6dbdeeb0d5e2ecb253d88285",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/disclosures/overview.blade.php": {
+    "mtime": 1787806839.3531075,
+    "ast_hash": "6fb2df8be5919bf8adf5e4ffd7ada8ad",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/disclosures/s1-overview.blade.php": {
+    "mtime": 1787806839.3536074,
+    "ast_hash": "70688d432d1c65db9dc58ce441b48ba5",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/disclosures/sasb/index.blade.php": {
+    "mtime": 1787814734.9731667,
+    "ast_hash": "5a1a66d3edf78795e9037b19fcbb2b1a",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/disclosures/stakeholders/index.blade.php": {
+    "mtime": 1787814734.9745512,
+    "ast_hash": "77c956ef5532d4abb17197b320e82342",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/disclosures/supply-chain/index.blade.php": {
+    "mtime": 1787814734.975903,
+    "ast_hash": "b8b1159d29c7d7323e0e4a0be5814956",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/disclosures/sustainability-risks/index.blade.php": {
+    "mtime": 1788184189.559783,
+    "ast_hash": "ca24c6211653291e6b2ea598b896905d",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/disclosures/uae-esg-overview.blade.php": {
+    "mtime": 1787807588.9139109,
+    "ast_hash": "9d7b976439f10c3ce4133b0fb78cce74",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/help/company.blade.php": {
+    "mtime": 1787808667.1308062,
+    "ast_hash": "65283ca5b8689802f08eb1f5487b0d8f",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/help/consultant-company-guide.blade.php": {
+    "mtime": 1787808667.141902,
+    "ast_hash": "c11d101bcbd336fbdfe364cfcba1d4eb",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/help/consultant.blade.php": {
+    "mtime": 1787808667.1366305,
+    "ast_hash": "3172c7be47b92727bdcc69c3f803826b",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/help/partials/guide-body.blade.php": {
+    "mtime": 1787808892.664115,
+    "ast_hash": "4ad691bf159dac7649ed0d2d8fe78f3c",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/help/partials/guide-highlight.blade.php": {
+    "mtime": 1787808795.248422,
+    "ast_hash": "f5b96d254d05400d05292fac3b499027",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/layouts/app.blade.php": {
+    "mtime": 1788517345.4620748,
+    "ast_hash": "18b9f4ce84da0f4c26acf1100bc4750b",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/layouts/partials/nav-client.blade.php": {
+    "mtime": 1788441516.7522764,
+    "ast_hash": "aeb8fe7b37b0cf757aafbecb5934fba3",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/layouts/partials/nav-consultant.blade.php": {
+    "mtime": 1788271004.620684,
+    "ast_hash": "89822d130c2f5275f00509f7e8cafc27",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/layouts/partials/nav-disclosures-esg-depth.blade.php": {
+    "mtime": 1787728362.3997853,
+    "ast_hash": "cc03eace4e926e9e1044d30a91aa551e",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/layouts/partials/nav-tabs.blade.php": {
+    "mtime": 1788171730.5000575,
+    "ast_hash": "d0424b4f597eacfb5f27c8d01ccd66f5",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/layouts/portal-auth.blade.php": {
+    "mtime": 1787725022.6535113,
+    "ast_hash": "f673e7e2ae227cde43d85955e47570c9",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/locations/index.blade.php": {
+    "mtime": 1787742493.9753854,
+    "ast_hash": "2c7c8984f2b09b8dda32a21be302325d",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/profile/index.blade.php": {
+    "mtime": 1787744636.655288,
+    "ast_hash": "041a5b56c64431d40c576c0437694925",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/quick-input/index.blade.php": {
+    "mtime": 1787742389.8327413,
+    "ast_hash": "f9b0f20889b31490b1f867a025652dce",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/quick-input/show.blade.php": {
+    "mtime": 1787735244.7518008,
+    "ast_hash": "9b949c23dda69b5c28871d14a1e752e9",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/reports/index.blade.php": {
+    "mtime": 1788353242.396377,
+    "ast_hash": "29e0d5efdcff34df55ee1a179ee50513",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/roles/create.blade.php": {
+    "mtime": 1787760567.5860283,
+    "ast_hash": "6062bac6ae6f5da7f329b5f890f53dda",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/roles/edit.blade.php": {
+    "mtime": 1787760590.0865154,
+    "ast_hash": "45ae02755650478089d7edfe8fc05a24",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/roles/index.blade.php": {
+    "mtime": 1787760658.6785796,
+    "ast_hash": "35f7a277823f027eccf8f2a1e0d0c40f",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/settings/reporting.blade.php": {
+    "mtime": 1788345302.720907,
+    "ast_hash": "62b694d3e3fe2b1c05f50fed34fe6e58",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/zero-ai/index.blade.php": {
+    "mtime": 1787145049.334825,
+    "ast_hash": "8df960c3445c728353f7b6d02a0ca6bb",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/CLAUDE.md": {
+    "mtime": 1788435467.50903,
+    "ast_hash": "912efa7ba41dbeb7adaf5c8880f45cb2",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/Menetzero-Redesign/Auth.dc.html": {
+    "mtime": 1787665163.0,
+    "ast_hash": "c2077e4cf07a4280d557291b5db46500",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/Menetzero-Redesign/Current Dashboard (recreation).dc.html": {
+    "mtime": 1787665163.0,
+    "ast_hash": "956d2968fb9e55365d471c9b3227ab69",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/Menetzero-Redesign/Emails.dc.html": {
+    "mtime": 1787665163.0,
+    "ast_hash": "d71e2285abaf3310d8813f16fe787d62",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/Menetzero-Redesign/Internal.dc.html": {
+    "mtime": 1787665163.0,
+    "ast_hash": "9f0a3f6d7cd1f5fb99fcd327f95a479c",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/Menetzero-Redesign/MeNetZero Redesign.dc.html": {
+    "mtime": 1787665163.0,
+    "ast_hash": "075f310e679ea236c387a37aabe868e2",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/Menetzero-Redesign/Portals.dc.html": {
+    "mtime": 1787665163.0,
+    "ast_hash": "6e69961ff034ae1fd4579159f5a97e24",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/CRON_AND_SCHEDULED_JOBS.md": {
+    "mtime": 1788326624.4211686,
+    "ast_hash": "df3be3004b9f07b6e278cba0ea85dac4",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/DATABASE_SCHEMA.md": {
+    "mtime": 1788435467.5080483,
+    "ast_hash": "50368868376167a6aa96069c07606475",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/elevenlabs-voice-agent/ESG_KNOWLEDGE.md": {
+    "mtime": 1787144878.7333364,
+    "ast_hash": "4e7a10ce5fdd9e54b623676aa45f6ed8",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/documentation/redesign.md": {
+    "mtime": 1788435556.6383278,
+    "ast_hash": "9fac18e4540b59731db506eff158e90e",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/Menetzero-Redesign/assets/menetzero.svg": {
+    "mtime": 1787665163.0,
+    "ast_hash": "e71bacacad97893c873330a4755a6607",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/Menetzero-Redesign/screenshots/auth-settled.png": {
+    "mtime": 1787665163.0,
+    "ast_hash": "863fa94bfc1ae470fba38f331482ea64",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/public/images/menetzero-2.svg": {
+    "mtime": 1787671682.1276038,
+    "ast_hash": "e71bacacad97893c873330a4755a6607",
     "semantic_hash": ""
   }
 }
