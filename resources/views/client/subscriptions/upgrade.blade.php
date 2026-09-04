@@ -89,7 +89,7 @@
         @csrf
 
         <!-- Step 1: plan selection -->
-        <section class="mb-12">
+        <section id="plan-selection" class="mb-12 scroll-mt-24">
             <div class="flex items-baseline gap-3 mb-4">
                 <span class="flex-none w-7 h-7 rounded-full bg-gray-900 text-white text-xs font-bold flex items-center justify-center">1</span>
                 <div>
@@ -97,6 +97,34 @@
                     <p class="text-sm text-gray-500">Billed annually. You can change plan later — upgrades apply immediately, downgrades at renewal.</p>
                 </div>
             </div>
+
+            {{-- Decision helper, above the cards rather than below the form.
+                 These worked examples ("a one-location cafe...", "a logistics
+                 SME...") are what most people actually choose on, so they have
+                 to be readable BEFORE the prices, not three sections after the
+                 pay button. Collapsed by default so it costs one line of height
+                 to anyone who already knows what they want. --}}
+            @php $chooserExamples = $planGuide['examples'] ?? []; @endphp
+            @if(!empty($chooserExamples))
+                <details class="mb-5 bg-white rounded-xl border border-gray-200 group">
+                    <summary class="flex items-center justify-between gap-3 px-5 py-3.5 cursor-pointer select-none">
+                        <span class="flex items-center gap-2 text-sm font-semibold text-gray-900">
+                            <svg class="w-4 h-4 flex-none text-orange-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Not sure which one? Find the story closest to yours
+                        </span>
+                        <svg class="w-5 h-5 flex-none text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                    </summary>
+                    <div class="border-t border-gray-100 p-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                        @foreach($chooserExamples as $example)
+                            <div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                                <span class="inline-block text-[11px] font-semibold uppercase tracking-wide text-orange-700 bg-orange-50 border border-orange-200 px-2 py-0.5 rounded mb-2">{{ $example['plan'] ?? 'Plan' }}</span>
+                                <p class="text-sm text-gray-800 mb-2">{{ $example['scenario'] ?? '' }}</p>
+                                <p class="text-xs text-gray-600 mb-0"><strong class="text-gray-800">You get:</strong> {{ $example['you_get'] ?? '' }}</p>
+                            </div>
+                        @endforeach
+                    </div>
+                </details>
+            @endif
 
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 items-stretch">
                 @foreach($planOrder as $code)
@@ -265,7 +293,7 @@
         </section>
 
         <!-- Step 2: checkout -->
-        <section class="mb-12">
+        <section id="checkout-section" class="mb-12 scroll-mt-24">
             <div class="flex items-baseline gap-3 mb-4">
                 <span class="flex-none w-7 h-7 rounded-full bg-gray-900 text-white text-xs font-bold flex items-center justify-center">2</span>
                 <div>
@@ -338,11 +366,17 @@
                 {{-- Order summary. Values are mirrored from the selected plan card by
                      the script below; the server re-resolves everything from plan_id
                      on submit, so nothing here can change what is actually charged. --}}
-                <aside class="lg:col-span-1 lg:sticky lg:top-6 bg-white rounded-xl border border-gray-200 p-6">
+                {{-- Not sticky any more: the sticky element on this page is the
+                     bar at the bottom of the viewport, which carries the same
+                     selection and the same submit button and follows the reader
+                     everywhere, including back up over the cards. --}}
+                <aside class="lg:col-span-1 bg-white rounded-xl border border-gray-200 p-6">
                     <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-4">Order summary</h3>
 
                     <div id="summary-empty" class="text-sm text-gray-500">
-                        Select a package above to see what you will pay.
+                        No plan selected yet.
+                        <a href="#plan-selection" class="text-orange-700 font-medium hover:underline">Choose a plan</a>
+                        to see what you will pay.
                     </div>
 
                     <div id="summary-filled" class="hidden">
@@ -360,6 +394,10 @@
                         </div>
 
                         <p class="text-xs text-gray-500 mt-1" id="summary-note"></p>
+
+                        <a href="#plan-selection" class="inline-block mt-3 text-xs font-medium text-orange-700 hover:underline">
+                            Change plan
+                        </a>
                     </div>
 
                     <div class="mt-5 space-y-2">
@@ -378,15 +416,62 @@
                 </aside>
             </div>
         </section>
+
+        {{-- Sticky selection bar.
+
+             The complaint this answers: with the cards at the top and the pay
+             button far below, choosing meant scrolling down to check a price
+             and back up to pick, with nothing on screen saying what was
+             currently selected. This bar is fixed to the bottom of the
+             viewport for the whole page, so the current selection, the amount
+             due and the submit button are always visible -- and "Change plan"
+             jumps back to the cards instead of asking the reader to hunt for
+             them. It hides itself when the real checkout box is on screen, so
+             the two submit buttons are never both visible at once.
+
+             It sits inside the form on purpose: its button is a real submit
+             for the same form, not a script that clicks the other one. --}}
+        <div id="sticky-bar"
+             class="hidden fixed bottom-0 inset-x-0 z-20 border-t border-gray-200 bg-white/95 backdrop-blur shadow-[0_-2px_12px_rgba(0,0,0,0.06)] print:hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+                <div class="min-w-0 flex-1">
+                    <div id="sticky-empty" class="text-sm text-gray-600">
+                        <span class="font-medium text-gray-900">No plan selected.</span>
+                        <span class="hidden sm:inline">Pick one above to continue.</span>
+                    </div>
+                    <div id="sticky-filled" class="hidden items-baseline gap-2 flex-wrap">
+                        <span class="text-sm font-semibold text-gray-900" id="sticky-plan"></span>
+                        <span class="text-xs text-gray-500" id="sticky-note"></span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 flex-none">
+                    <div id="sticky-total-wrap" class="hidden text-right">
+                        <div class="text-[11px] uppercase tracking-wide text-gray-500 leading-none">Due today</div>
+                        <div class="text-lg font-extrabold text-gray-900 leading-tight" id="sticky-total"></div>
+                    </div>
+                    <a href="#plan-selection" id="sticky-change"
+                       class="hidden text-sm font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap">
+                        Change plan
+                    </a>
+                    <button type="submit"
+                            class="px-5 py-2.5 {{ $checkoutAvailable ? 'bg-orange-600 hover:bg-orange-700 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }} rounded-lg text-sm font-medium whitespace-nowrap">
+                        {{ $checkoutAvailable ? 'Continue to payment' : 'Apply change' }}
+                    </button>
+                </div>
+            </div>
+        </div>
     </form>
 
-    {{-- Everything below the form is help, not input: the worked examples, the
-         caveats and the FAQ now sit together instead of being split around a
-         card block in the middle. --}}
-    <section class="border-t border-gray-200 pt-10">
+    {{-- Reference material only. The worked examples moved up next to the
+         cards -- they are how people choose, so they belong with the choosing.
+         What is left here is what you read after deciding, or not at all.
+
+         pb-28 keeps the last FAQ answer clear of the fixed bar. --}}
+    <section class="border-t border-gray-200 pt-10 pb-28">
         @include('plans.partials.human-guide', [
             'guide' => $planGuide,
-            'show' => ['intro', 'examples', 'clarifications', 'faq'],
+            'show' => ['intro', 'clarifications', 'faq'],
         ])
     </section>
 
@@ -394,53 +479,105 @@
 
 <script>
 (function () {
-    // Mirrors the selected plan card into the order summary. Display only --
-    // processUpgrade() re-resolves the plan and its price from plan_id, so a
-    // stale or tampered value here cannot affect what is charged.
+    // Mirrors the selected plan card into the order summary and the sticky
+    // bar. Display only -- processUpgrade() re-resolves the plan and its price
+    // from plan_id, so a stale or tampered value here cannot affect what is
+    // charged.
     var radios = document.querySelectorAll('.plan-radio');
     if (!radios.length) { return; }
 
     var empty  = document.getElementById('summary-empty');
     var filled = document.getElementById('summary-filled');
 
+    var bar          = document.getElementById('sticky-bar');
+    var barEmpty     = document.getElementById('sticky-empty');
+    var barFilled    = document.getElementById('sticky-filled');
+    var barTotalWrap = document.getElementById('sticky-total-wrap');
+    var barChange    = document.getElementById('sticky-change');
+
+    // `hidden` and `flex` are both display utilities, so toggling `hidden` on a
+    // flex row depends on stylesheet order. Setting display directly avoids the
+    // question entirely.
+    function show(el, on, display) {
+        if (!el) { return; }
+        el.classList.toggle('hidden', !on);
+        el.style.display = on ? (display || '') : '';
+    }
+
     function render() {
         var picked = document.querySelector('.plan-radio:checked');
 
         if (!picked) {
-            empty.classList.remove('hidden');
-            filled.classList.add('hidden');
+            show(empty, true);
+            show(filled, false);
+            show(barEmpty, true);
+            show(barFilled, false);
+            show(barTotalWrap, false);
+            show(barChange, false);
             return;
         }
 
-        empty.classList.add('hidden');
-        filled.classList.remove('hidden');
+        show(empty, false);
+        show(filled, true);
+        show(barEmpty, false);
+        show(barFilled, true, 'flex');
+        show(barChange, true);
 
+        var name   = picked.getAttribute('data-plan-name') || '';
         var price  = picked.getAttribute('data-price-text') || '';
         var sub    = picked.getAttribute('data-price-sub') || '';
         var charge = picked.getAttribute('data-charge');
         var type   = picked.getAttribute('data-change-type') || '';
 
-        document.getElementById('summary-plan').textContent = picked.getAttribute('data-plan-name') || '';
+        // charge_amount already accounts for credit from the current plan, so
+        // it is the figure to show as due today whenever one was supplied.
+        var total = charge || price;
+
+        document.getElementById('summary-plan').textContent = name;
         document.getElementById('summary-price').textContent = price;
         document.getElementById('summary-billing').textContent =
             sub === 'per year' ? 'Billed annually' : sub;
+        document.getElementById('summary-total').textContent = total;
 
-        // charge_amount already accounts for credit from the current plan, so
-        // it is the figure to show as due today whenever one was supplied.
-        document.getElementById('summary-total').textContent = charge || price;
-
-        var note = document.getElementById('summary-note');
+        var noteText;
         if (charge && charge !== price) {
-            note.textContent = 'Includes credit from your current package.';
+            noteText = 'Includes credit from your current package.';
         } else if (type === 'downgrade' || type === 'downgrade_to_free') {
-            note.textContent = 'Takes effect at the end of your current paid period.';
+            noteText = 'Takes effect at the end of your current paid period.';
         } else {
-            note.textContent = '';
+            noteText = '';
         }
+        document.getElementById('summary-note').textContent = noteText;
+
+        document.getElementById('sticky-plan').textContent = name;
+        document.getElementById('sticky-note').textContent =
+            (type === 'downgrade' || type === 'downgrade_to_free')
+                ? 'Applies at renewal — no charge now'
+                : (sub === 'per year' ? 'Billed annually' : sub);
+
+        // A downgrade charges nothing today, so a "Due today" figure next to it
+        // would be actively misleading.
+        var isDowngrade = (type === 'downgrade' || type === 'downgrade_to_free');
+        show(barTotalWrap, !isDowngrade);
+        document.getElementById('sticky-total').textContent = total;
     }
 
     radios.forEach(function (r) { r.addEventListener('change', render); });
     render();
+
+    // The bar duplicates the checkout box's submit button, so it should not be
+    // on screen at the same time as the real one -- two identical buttons in
+    // view is its own kind of confusing. IntersectionObserver keeps it hidden
+    // while the checkout box is visible; without support, the bar simply stays
+    // on, which is the safe fallback.
+    var checkout = document.getElementById('checkout-section');
+    if (bar && checkout && 'IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+            show(bar, !entries[0].isIntersecting);
+        }, { threshold: 0.2 }).observe(checkout);
+    } else {
+        show(bar, true);
+    }
 })();
 </script>
 
