@@ -68,6 +68,6 @@
 <ul class="space-y-2.5 text-white/90 text-base font-medium">
     <li class="flex gap-3"><span>✓</span> Verified public directory profile</li>
     <li class="flex gap-3"><span>✓</span> Inbound leads from companies who find you</li>
-    <li class="flex gap-3"><span>✓</span> Request client capacity — pricing confirmed offline</li>
+    <li class="flex gap-3"><span>✓</span> Buy client capacity — AED pricing at checkout</li>
 </ul>
 @endsection

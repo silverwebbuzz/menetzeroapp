@@ -10,7 +10,7 @@
         <p class="mkt-lead">
             Start with MENetZero Free — measure Scope 1 &amp; 2, try Scope 3 (one entry per category),
             and download watermarked trial reports. When you need official clean exports or more capacity,
-            request a package from inside your account. Pricing is confirmed offline by our team.
+            upgrade from inside your account and pay online in AED.
         </p>
         <div class="flex flex-wrap justify-center gap-3 mt-8">
             <a href="{{ route('register') }}" class="mkt-btn mkt-btn-primary mkt-btn-lg">Company — Explore Free</a>
@@ -44,7 +44,7 @@
             <li class="flex gap-2"><span class="text-gray-400">—</span> Official clean PDF packs after your package is activated</li>
         </ul>
         <div class="rounded-xl border border-teal-100 bg-teal-50/60 p-5 text-sm text-teal-950">
-            <strong>Consultants:</strong> Free includes one managed client entity. Request more entities from the consultant portal after you sign in — preferential annual rates are confirmed offline.
+            <strong>Consultants:</strong> Free includes one managed client entity. Buy more capacity from the consultant portal after you sign in — preferential annual rates for larger volumes are agreed with sales.
         </div>
     </div>
 </section>

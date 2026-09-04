@@ -325,20 +325,27 @@
                         <span style="font-size:12.5px;color:var(--warn)">
                             <strong>Renewal window</strong> — {{ $companyRenewalNudge['plan_name'] }}
                             expires {{ $companyRenewalNudge['expires_at']->format('d M Y') }}
-                            ({{ $companyRenewalNudge['days_left'] }} days). Pricing is confirmed offline.
+                            ({{ $companyRenewalNudge['days_left'] }} days). Renew online from Plan &amp; billing.
                         </span>
-                        <a href="{{ $companyRenewalNudge['request_url'] }}" class="mnz-btn mnz-btn--primary">Upgrade Package</a>
+                        <a href="{{ $companyRenewalNudge['request_url'] }}" class="mnz-btn mnz-btn--primary">Renew plan</a>
                     </div>
                 </div>
             @endif
 
             @yield('content')
+
+            {{-- Footer lives INSIDE .mnz-main, not after .mnz-body: the sidebar
+                 is now a sticky full-height column, so a footer outside the
+                 content column would sit beside it rather than below the page.
+                 Same partial as the old theme -- one copyright line to change. --}}
+            @include('layouts.partials.site-footer')
         </main>
     </div>
 @else
     {{-- Guest branch: the old shell renders content bare with a footer. --}}
     <main class="mnz-main">
         @yield('content')
+        @include('layouts.partials.site-footer')
     </main>
 @endauth
 
@@ -349,5 +356,16 @@
     <script defer src="{{ $themeJs }}"></script>
 @endforeach
 @stack('scripts')
+
+{{-- ElevenLabs voice help assistant ("Misi"). Mirrors the old theme's block --
+     the new shell was missing it entirely, so users on this theme had no voice
+     support at all. Same gating: signed-in non-admins, never on the Zero AI
+     page (its fixed bottom-right bubble covers that page's composer). --}}
+@auth
+    @if(config('services.elevenlabs.agent_id') && !auth()->user()->isAdmin() && !request()->routeIs('client.zero-ai'))
+        <elevenlabs-convai agent-id="{{ config('services.elevenlabs.agent_id') }}"></elevenlabs-convai>
+        <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
+    @endif
+@endauth
 </body>
 </html>

@@ -10,13 +10,19 @@ use App\Models\SiteSetting;
 
 class ConsultantMarketplaceService
 {
+    /**
+     * Marketplace pack price. Charged in AED, like the rest of billing.
+     *
+     * This used to convert to INR at a stored aed_inr_rate and charge rupees.
+     * That is now wrong twice over: INR is no longer a supported currency, and
+     * charging an Indian-domestic currency would recharacterise an exported
+     * service. The AED figure is the real list price, not a conversion.
+     */
     public function chargeAmount(float $amountAed): array
     {
-        $rate = (float) SiteSetting::get('aed_inr_rate', 22.5);
-
         return [
-            'currency' => 'INR',
-            'amount' => round($amountAed * $rate, 0),
+            'currency' => 'AED',
+            'amount' => round($amountAed, 2),
         ];
     }
 

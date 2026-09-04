@@ -180,3 +180,40 @@ ORDER BY `plan_category`, `sort_order`, `plan_code`;
 SELECT `gateway`, `label`, `is_enabled`, `mode`
 FROM `payment_gateways`
 ORDER BY `sort_order`;
+
+
+-- ===========================================================================
+-- 7. AED-ONLY CURRENCY  (added 2026-09-04, after Razorpay International
+--    Payments + AED settlement were activated)
+--
+--    The application no longer offers INR: CurrencyService::SUPPORTED is
+--    ['AED'] and the AED -> INR checkout fallbacks were removed, so a rejected
+--    AED order now fails visibly instead of silently charging rupees. These
+--    settings are the DB half of that.
+--
+--    Why it matters beyond display: the seller is an Indian entity exporting
+--    services to UAE buyers. Receiving convertible foreign exchange is what
+--    keeps the supply a zero-rated export; an INR charge would make it look
+--    like a domestic supply.
+--
+--    VAT stays at 0%. billing_trn is deliberately left EMPTY -- InvoiceService
+--    applies VAT only once a TRN is present, because charging 5% while not
+--    registered with the UAE FTA is a penalisable offence, and the customer
+--    could not reclaim it without a TRN on the invoice. Do not set billing_trn
+--    or billing_vat_rate unless MENetZero actually registers for UAE VAT.
+-- ===========================================================================
+
+INSERT INTO `site_settings` (`key`, `value`, `created_at`, `updated_at`)
+VALUES ('default_currency', 'AED', NOW(), NOW())
+ON DUPLICATE KEY UPDATE `value` = 'AED', `updated_at` = NOW();
+
+-- Geo-detection served the INR/AED split and has nothing left to choose.
+INSERT INTO `site_settings` (`key`, `value`, `created_at`, `updated_at`)
+VALUES ('currency_auto_detect', '0', NOW(), NOW())
+ON DUPLICATE KEY UPDATE `value` = '0', `updated_at` = NOW();
+
+-- Confirm VAT is off and no TRN is set.
+SELECT `key`, `value`
+FROM `site_settings`
+WHERE `key` IN ('default_currency', 'currency_auto_detect', 'billing_trn', 'billing_vat_rate')
+ORDER BY `key`;

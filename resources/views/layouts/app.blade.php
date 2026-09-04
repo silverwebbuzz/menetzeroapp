@@ -294,10 +294,10 @@
                                 {{ $companyRenewalNudge['plan_name'] }}
                                 expires {{ $companyRenewalNudge['expires_at']->format('d M Y') }}
                                 ({{ $companyRenewalNudge['days_left'] }} days).
-                                Pricing is confirmed offline.
+                                Renew online from Plan &amp; billing.
                             </span>
                             <a href="{{ $companyRenewalNudge['request_url'] }}" class="inline-flex justify-center px-3 py-1.5 rounded-md bg-orange-600 text-white text-xs font-semibold hover:bg-orange-700 whitespace-nowrap">
-                                Upgrade Package
+                                Renew plan
                             </a>
                         </div>
                     @endif

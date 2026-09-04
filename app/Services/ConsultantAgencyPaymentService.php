@@ -16,9 +16,6 @@ class ConsultantAgencyPaymentService
     ) {
     }
 
-    /**
-     * @param  callable(): array{charge_amount: float, charge_currency?: string}  $inrFallbackQuote
-     */
     public function start(
         Company $consultantOrg,
         string $transactionType,
@@ -27,7 +24,6 @@ class ConsultantAgencyPaymentService
         string $currency,
         string $description,
         array $metadata,
-        callable $inrFallbackQuote,
     ): RedirectResponse {
         $gateway = PaymentGateway::forGateway($gatewayCode);
 
@@ -55,60 +51,23 @@ class ConsultantAgencyPaymentService
             $user = Auth::user();
             $meta = $transaction->metadata;
 
-            // Razorpay only. Stripe and Cashfree were removed with their
-            // routes -- their branches called route() on names that no longer
-            // exist, which would have thrown after the transaction row was
-            // already written.
+            // Razorpay only, AED only. Stripe and Cashfree were removed with
+            // their routes.
             //
-            // The AED -> INR fallback is kept, now on Razorpay: a standard
-            // Indian account accepts INR only, and AED needs International
-            // Payments activated. $inrFallbackQuote() re-prices rather than
-            // converting, so the INR amount is the real INR list price.
-            try {
-                $rzOrder = $this->paymentService->createRazorpayOrder(
-                    $gateway,
-                    $transaction->amount,
-                    $transaction->currency,
-                    'consultant_' . $transaction->id,
-                    ['type' => $transactionType, 'consultant_id' => (string) $consultantOrg->id]
-                );
-            } catch (\RuntimeException $e) {
-                if ($transaction->currency === 'INR'
-                    || !$this->paymentService->isRazorpayCurrencyDisabledError($e->getMessage())) {
-                    throw $e;
-                }
-
-                $inrQuote = $inrFallbackQuote();
-
-                // Preserve the price that was quoted BEFORE overwriting amount
-                // and currency. The invoice is denominated in the currency the
-                // customer agreed to; without this the AED figure is lost and
-                // only the INR settlement survives.
-                $meta['quoted_amount'] = (float) $transaction->amount;
-                $meta['quoted_currency'] = strtoupper((string) $transaction->currency);
-
-                $transaction->update([
-                    'amount' => $inrQuote['charge_amount'],
-                    'currency' => 'INR',
-                ]);
-                $meta['charged_in_inr_fallback'] = true;
-
-                // metadata is persisted at the end of the try block, but an
-                // exception between here and there would lose the quote, so
-                // write it now -- the invoice depends on it.
-                $transaction->metadata = $meta;
-                $transaction->save();
-
-                $rzOrder = $this->paymentService->createRazorpayOrder(
-                    $gateway,
-                    $inrQuote['charge_amount'],
-                    'INR',
-                    'consultant_' . $transaction->id,
-                    ['type' => $transactionType, 'consultant_id' => (string) $consultantOrg->id]
-                );
-
-                session()->flash('info', 'Charged in the INR equivalent while AED activation is pending with our payment provider.');
-            }
+            // The AED -> INR fallback that used to live here is gone on
+            // purpose: the seller is an Indian entity exporting services to
+            // UAE buyers, and charging INR would recharacterise a zero-rated
+            // export as a domestic supply. AED needs International Payments
+            // active on the Razorpay account; if it is not, this throws and
+            // the sale fails visibly, which is recoverable. A silent INR
+            // charge is not.
+            $rzOrder = $this->paymentService->createRazorpayOrder(
+                $gateway,
+                $transaction->amount,
+                $transaction->currency,
+                'consultant_' . $transaction->id,
+                ['type' => $transactionType, 'consultant_id' => (string) $consultantOrg->id]
+            );
 
             $meta['razorpay_order_id'] = $rzOrder['id'] ?? null;
 

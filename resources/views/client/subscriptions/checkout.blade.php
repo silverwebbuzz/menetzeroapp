@@ -12,12 +12,9 @@
     @if(session('info'))
         <div class="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">{{ session('info') }}</div>
     @endif
-    @if(!empty($meta['charged_in_inr_fallback']))
-        <div class="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            Prices on our site are shown in {{ $meta['display_currency'] ?? 'AED' }}, but that currency is still being activated with our payment provider.
-            You will pay the INR equivalent shown below.
-        </div>
-    @endif
+    {{-- No INR-fallback banner: AED is the only currency a new order can be
+         raised in. Transactions predating that change still carry the flag in
+         metadata, but they are historical and already paid. --}}
     <div class="bg-white rounded-xl border border-gray-200 p-8 text-center">
         <h1 class="text-2xl font-bold text-gray-900 mb-1">Complete your payment</h1>
         <p class="text-gray-600 text-sm mb-6">You're subscribing to the <strong>{{ $plan->plan_name ?? 'selected' }}</strong> plan (annual).</p>

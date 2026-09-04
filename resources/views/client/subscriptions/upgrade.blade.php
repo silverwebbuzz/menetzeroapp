@@ -48,12 +48,8 @@
                 Simple annual pricing in {{ $displayCurrency }}. Pick based on what you need to download and share — not every feature name on the list below.
             </p>
         </div>
-        <div class="inline-flex items-center rounded-lg border border-gray-200 overflow-hidden text-sm self-start">
-            <a href="{{ route('currency.switch', 'AED') }}"
-               class="px-3 py-1.5 {{ $displayCurrency === 'AED' ? 'bg-brand text-white' : 'text-gray-600 hover:bg-gray-50' }}">AED</a>
-            <a href="{{ route('currency.switch', 'INR') }}"
-               class="px-3 py-1.5 {{ $displayCurrency === 'INR' ? 'bg-brand text-white' : 'text-gray-600 hover:bg-gray-50' }}">INR (₹)</a>
-        </div>
+        {{-- Currency toggle removed: AED is the only supported currency, so a
+             switch with one option is a control that cannot do anything. --}}
     </div>
 
     <!-- Current Plan Info -->
@@ -250,18 +246,13 @@
                                 Online payment isn't configured yet. You can switch to the Free plan, or contact sales for paid plans.
                             </p>
                         @else
-                            {{-- This warns that you may be charged in a different currency
-                                 than the one displayed, so it must be readable. It was
-                                 text-gray-400: the lightest text on the page. --}}
+                            {{-- AED is the only currency now, so this no longer warns
+                                 about a possible switch -- it just confirms what will
+                                 be charged. The old INR-fallback wording was removed
+                                 with the fallback itself. --}}
                             <div class="text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
-                                @if($displayCurrency === 'AED')
-                                    Checkout opens in <strong>AED</strong>. If AED is still being activated with our
-                                    payment provider you will be charged the <strong>INR (&#8377;) equivalent</strong>
-                                    automatically, and told the exact amount before you pay.
-                                @else
-                                    Checkout opens in <strong>INR (&#8377;)</strong>. The exact amount is shown on the
-                                    payment screen before you pay.
-                                @endif
+                                Checkout opens in <strong>AED</strong>. The exact amount is shown on the
+                                payment screen before you pay.
                             </div>
                         @endif
                     </div>

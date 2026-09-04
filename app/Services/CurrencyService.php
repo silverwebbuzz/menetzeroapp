@@ -2,47 +2,41 @@
 
 namespace App\Services;
 
-use App\Models\SiteSetting;
 use App\Models\SubscriptionPlan;
 
 /**
- * Resolves the display currency for the visitor and exposes the amount that
- * must be charged through the payment gateways (always INR).
+ * Currency for display and for charging. AED only.
+ *
+ * MENetZero sells to UAE companies for UAE compliance, and the seller is an
+ * Indian entity exporting services. Taking INR would make the sale look like a
+ * domestic Indian supply rather than a zero-rated export, so INR was removed
+ * from checkout entirely -- not merely hidden. The methods below are kept
+ * (rather than deleted) because call sites across billing still ask for a
+ * currency; they now always answer AED.
  */
 class CurrencyService
 {
-    public const SUPPORTED = ['AED', 'INR'];
+    public const SUPPORTED = ['AED'];
+
+    public const DEFAULT = 'AED';
 
     /**
-     * The currency to show prices in: explicit user choice, then geo-detection
-     * (Cloudflare country header), then the configured default.
+     * Always AED. Geo-detection and the visitor's session choice were dropped
+     * with INR: with a single supported currency there is nothing to detect
+     * and nothing to switch to.
      */
     public static function displayCurrency(): string
     {
-        $session = session('display_currency');
-        if (in_array($session, self::SUPPORTED, true)) {
-            return $session;
-        }
-
-        if (SiteSetting::get('currency_auto_detect', '1') === '1') {
-            $country = strtoupper((string) request()->header('CF-IPCountry'));
-            if ($country === 'IN') {
-                return 'INR';
-            }
-            if ($country === 'AE') {
-                return 'AED';
-            }
-        }
-
-        return strtoupper(SiteSetting::get('default_currency', 'AED'));
+        return self::DEFAULT;
     }
 
+    /**
+     * No-op. Kept so the currency-switch route and any bookmarked link do not
+     * fatal; an unsupported code was already ignored before.
+     */
     public static function setDisplayCurrency(string $code): void
     {
-        $code = strtoupper($code);
-        if (in_array($code, self::SUPPORTED, true)) {
-            session(['display_currency' => $code]);
-        }
+        // Intentionally empty: AED is the only supported currency.
     }
 
     /**
@@ -52,38 +46,25 @@ class CurrencyService
      */
     public static function displayPrice(SubscriptionPlan $plan, ?string $currency = null): array
     {
-        $currency = $currency ?: self::displayCurrency();
-        $amount = $currency === 'INR'
-            ? (float) $plan->price_inr
-            : (float) $plan->price_annual;
-
-        return ['currency' => $currency, 'amount' => $amount];
+        return ['currency' => self::DEFAULT, 'amount' => (float) $plan->price_annual];
     }
 
     /**
-     * Amount sent to the payment gateway. Matches the visitor's display currency
-     * so Razorpay checkout shows the same currency they picked on our site
-     * (AED or INR). Settlement to your bank is still in INR per gateway rules;
-     * AED orders need International Payments activated on the account.
+     * Amount sent to the payment gateway. Always AED, which requires
+     * International Payments to be active on the Razorpay account. If that is
+     * ever switched off the order now FAILS rather than silently re-pricing
+     * into INR -- see the removed fallbacks in SubscriptionController and
+     * ConsultantAgencyPaymentService. A visible error is recoverable; an
+     * unintended INR charge changes the tax character of the sale.
      *
      * @return array{currency:string, amount:float, display_currency:string}
      */
     public static function chargeAmount(SubscriptionPlan $plan, ?string $displayCurrency = null): array
     {
-        $displayCurrency = strtoupper($displayCurrency ?: self::displayCurrency());
-
-        if ($displayCurrency === 'AED') {
-            return [
-                'currency' => 'AED',
-                'amount' => (float) $plan->price_annual,
-                'display_currency' => 'AED',
-            ];
-        }
-
         return [
-            'currency' => 'INR',
-            'amount' => (float) $plan->price_inr,
-            'display_currency' => 'INR',
+            'currency' => self::DEFAULT,
+            'amount' => (float) $plan->price_annual,
+            'display_currency' => self::DEFAULT,
         ];
     }
 
@@ -92,6 +73,8 @@ class CurrencyService
      */
     public static function symbol(string $code): string
     {
+        // Historical transactions and invoices may still carry INR, so this
+        // formats whatever it is given rather than assuming AED.
         return strtoupper($code) === 'INR' ? '₹' : 'AED';
     }
 

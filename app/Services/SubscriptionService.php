@@ -77,7 +77,7 @@ class SubscriptionService
      *   credit_amount: float
      * }
      */
-    public function resolvePlanChange(?ClientSubscription $current, SubscriptionPlan $target, string $chargeCurrency = 'INR'): array
+    public function resolvePlanChange(?ClientSubscription $current, SubscriptionPlan $target, string $chargeCurrency = 'AED'): array
     {
         $chargeCurrency = strtoupper($chargeCurrency);
 

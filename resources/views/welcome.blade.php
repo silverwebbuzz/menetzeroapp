@@ -16,7 +16,7 @@
         </p>
         <p class="text-sm text-gray-500 mt-4 max-w-2xl mx-auto">
             Start free with Scope 1 &amp; 2, try Scope 3 (one entry per category), and download watermarked trial reports.
-            When you need clean exports or more capacity, request a package from inside your account — pricing is confirmed offline.
+            When you need clean exports or more capacity, upgrade from inside your account and pay online in AED.
         </p>
         <x-payments-notice class="mt-6" />
         <div class="flex flex-wrap justify-center gap-3 mt-6">
@@ -103,7 +103,7 @@
     <div class="mkt-container">
         <div class="mkt-section-head">
             <h2>Packages matched to your reporting needs</h2>
-            <p>Explore Free publicly — package details and pricing confirmed offline after you request from your account</p>
+            <p>Explore Free publicly — AED pricing is shown when you upgrade from your account</p>
         </div>
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             @foreach([

@@ -94,10 +94,9 @@ class PackCheckoutController extends Controller
     /**
      * Buy an agency pack (slots at Carbon or ESG depth).
      *
-     * Razorpay only, charged in the display currency. If AED is not yet
-     * activated on the Razorpay account, ConsultantAgencyPaymentService
-     * re-prices through the closure passed as the last argument and charges
-     * the INR equivalent, telling the buyer before they pay.
+     * Razorpay only, charged in AED. Requires International Payments on the
+     * Razorpay account; if AED is rejected the order fails rather than
+     * re-pricing into INR -- see ConsultantAgencyPaymentService::start().
      */
     public function processCheckout(Request $request)
     {
@@ -157,7 +156,6 @@ class PackCheckoutController extends Controller
                 // Read at activation to set slot_limit on the subscription row.
                 'slot_limit' => $quote['slots'],
             ],
-            fn () => $this->consultantSubscriptions->resolvePackPurchase($consultantOrg, $plan, $quote['contract_year'], 'INR', $slots),
         );
     }
 
@@ -210,18 +208,13 @@ class PackCheckoutController extends Controller
                 'contract_year' => $quote['contract_year'],
                 'pro_rata' => $quote['pro_rata'],
             ],
-            fn () => $this->consultantSubscriptions->resolveExtraSlotPurchase(
-                $subscription,
-                (int) $data['quantity'],
-                'INR',
-            ),
         );
     }
 
     public function processYearUnlock(Request $request)
     {
         return redirect()->route('consultant.packs.index')
-            ->with('info', 'Self-serve year unlock checkout is unavailable. Contact MENetZero to unlock a reporting year after offline payment.');
+            ->with('info', 'Self-serve year unlock checkout is unavailable. Contact MENetZero to unlock a reporting year.');
     }
 
     public function paymentCheckout(int $transaction)

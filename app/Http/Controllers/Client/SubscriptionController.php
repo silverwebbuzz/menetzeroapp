@@ -125,16 +125,11 @@ class SubscriptionController extends Controller
     }
 
     /**
-     * Self-serve checkout disabled (Phase 3). Free/downgrade paths retained for admin ops only via direct service.
-     */
-    /**
      * Plan change: schedule a downgrade, apply a free upgrade, or start payment.
      *
-     * Razorpay is the only gateway. Charges are attempted in AED and fall back
-     * to INR only if Razorpay rejects the currency -- a standard Indian
-     * account accepts INR alone, and International Payments has to be
-     * activated for AED. The previous version forced INR unconditionally,
-     * which billed UAE customers in rupees even once AED was available.
+     * Razorpay is the only gateway and AED is the only currency. This needs
+     * International Payments active on the Razorpay account; if it is not, the
+     * order fails rather than falling back to INR (see the note at the call).
      */
     public function processUpgrade(Request $request)
     {
@@ -304,56 +299,20 @@ class SubscriptionController extends Controller
         try {
             $metadata = $transaction->metadata;
 
-            try {
-                $order = $this->paymentService->createRazorpayOrder(
-                    $gateway,
-                    $transaction->amount,
-                    $transaction->currency,
-                    'txn_' . $transaction->id,
-                    ['plan' => $plan->plan_code, 'company_id' => (string) $company->id]
-                );
-            } catch (\RuntimeException $e) {
-                // AED not activated on the Razorpay account. Re-price in INR
-                // and retry rather than failing the sale. Anything else is
-                // rethrown — charging the wrong currency is worse than an
-                // error the customer can retry.
-                if ($transaction->currency === 'INR'
-                    || !$this->paymentService->isRazorpayCurrencyDisabledError($e->getMessage())) {
-                    throw $e;
-                }
-
-                $inrChange = $this->subscriptionService->resolvePlanChange($currentSubscription, $plan, 'INR');
-                $inrAmount = (float) $inrChange['charge_amount'];
-
-                // A coupon was priced against the AED amount; re-apply the same
-                // proportion so the customer keeps the discount they were shown.
-                if (!empty($couponMeta) && $charge['amount'] > 0) {
-                    $inrAmount = round($inrAmount * ($charge['amount'] / ($couponMeta['original_amount'] ?? $charge['amount'])), 2);
-                }
-
-                if ($inrAmount <= 0) {
-                    throw $e;
-                }
-
-                $transaction->update(['amount' => $inrAmount, 'currency' => 'INR']);
-                $metadata['charged_in_inr_fallback'] = true;
-                $metadata['original_currency'] = $charge['currency'];
-                $metadata['original_amount'] = $charge['amount'];
-
-                $order = $this->paymentService->createRazorpayOrder(
-                    $gateway,
-                    $inrAmount,
-                    'INR',
-                    'txn_' . $transaction->id,
-                    ['plan' => $plan->plan_code, 'company_id' => (string) $company->id]
-                );
-
-                session()->flash(
-                    'info',
-                    'AED checkout is still being activated on our payment provider. '
-                    . 'You will be charged the INR equivalent (₹' . number_format($inrAmount, 0) . ') for now.'
-                );
-            }
+            // AED only. The former INR fallback (re-price and retry when AED
+            // was rejected) is deliberately gone: the seller is an Indian
+            // entity exporting services to UAE buyers, and an INR charge would
+            // recharacterise a zero-rated export as a domestic supply. If AED
+            // is rejected the sale now fails visibly and is retried after the
+            // gateway is fixed, which is recoverable; a silent INR charge is
+            // not.
+            $order = $this->paymentService->createRazorpayOrder(
+                $gateway,
+                $transaction->amount,
+                $transaction->currency,
+                'txn_' . $transaction->id,
+                ['plan' => $plan->plan_code, 'company_id' => (string) $company->id]
+            );
 
             $metadata['razorpay_order_id'] = $order['id'] ?? null;
             $transaction->metadata = $metadata;
