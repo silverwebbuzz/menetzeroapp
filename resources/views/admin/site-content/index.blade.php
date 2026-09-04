@@ -100,6 +100,60 @@
                     <p class="mt-1 text-xs text-gray-500">UAE standard rate is 5. Ignored while the TRN is blank.</p>
                     @error('billing_vat_rate')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                 </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Brand name on invoice</label>
+                    <input type="text" name="billing_brand_name"
+                           value="{{ old('billing_brand_name', $settings['billing_brand_name'] ?? '') }}"
+                           placeholder="MENetZero"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+                    <p class="mt-1 text-xs text-gray-500">Trading name shown above the legal entity. Blank falls back to the legal name.</p>
+                    @error('billing_brand_name')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Company registration no.</label>
+                    <input type="text" name="billing_registration_no"
+                           value="{{ old('billing_registration_no', $settings['billing_registration_no'] ?? '') }}"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+                    <p class="mt-1 text-xs text-gray-500">Trade licence / CIN. Printed under the seller address.</p>
+                    @error('billing_registration_no')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Billing contact email</label>
+                    <input type="email" name="billing_email"
+                           value="{{ old('billing_email', $settings['billing_email'] ?? '') }}"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+                    <p class="mt-1 text-xs text-gray-500">Where billing queries go. Blank falls back to the support email.</p>
+                    @error('billing_email')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Billing contact phone</label>
+                    <input type="text" name="billing_phone"
+                           value="{{ old('billing_phone', $settings['billing_phone'] ?? '') }}"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+                    @error('billing_phone')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Default HSN / SAC code</label>
+                    <input type="text" name="billing_hsn_sac"
+                           value="{{ old('billing_hsn_sac', $settings['billing_hsn_sac'] ?? '') }}"
+                           placeholder="998314"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+                    <p class="mt-1 text-xs text-gray-500">Service classification code. Leave blank to hide the column.</p>
+                    @error('billing_hsn_sac')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Invoice terms &amp; notes</label>
+                    <textarea name="billing_terms" rows="3"
+                              placeholder="Printed at the foot of every invoice."
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">{{ old('billing_terms', $settings['billing_terms'] ?? '') }}</textarea>
+                    @error('billing_terms')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                </div>
             </div>
             <div class="mt-5 flex justify-end">
                 <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">Save Details</button>

@@ -70,4 +70,44 @@ class Invoice extends Model
     {
         return (float) $this->tax_amount > 0;
     }
+
+    /**
+     * The total spelled out, as a tax invoice is conventionally required to
+     * show it ("UAE Dirham Six Thousand Five Hundred Only").
+     *
+     * NumberFormatter comes from ext-intl, which is not guaranteed to be
+     * installed; without it this returns null and the template simply omits the
+     * line rather than printing a broken total.
+     */
+    public function totalInWords(): ?string
+    {
+        if (!class_exists(\NumberFormatter::class)) {
+            return null;
+        }
+
+        $currencyNames = [
+            'AED' => ['UAE Dirham', 'Fils'],
+            'INR' => ['Indian Rupee', 'Paise'],
+            'USD' => ['US Dollar', 'Cents'],
+        ];
+
+        $code = strtoupper((string) $this->currency);
+        [$major, $minor] = $currencyNames[$code] ?? [$code, 'Cents'];
+
+        $formatter = new \NumberFormatter('en', \NumberFormatter::SPELLOUT);
+
+        $total = round((float) $this->total, 2);
+        $whole = (int) floor($total);
+        // Rounded before casting: 0.29 * 100 is 28.999... in binary floating
+        // point, which truncates to 28 fils instead of 29.
+        $fraction = (int) round(($total - $whole) * 100);
+
+        $words = $major . ' ' . ucwords((string) $formatter->format($whole));
+
+        if ($fraction > 0) {
+            $words .= ' and ' . ucwords((string) $formatter->format($fraction)) . ' ' . $minor;
+        }
+
+        return $words . ' Only';
+    }
 }

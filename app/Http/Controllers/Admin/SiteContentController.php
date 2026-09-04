@@ -22,6 +22,12 @@ class SiteContentController extends Controller
         // charges 0% until a TRN is present, because applying VAT without being
         // registered to collect it is a compliance problem, not a display one.
         'billing_legal_name', 'billing_address', 'billing_trn', 'billing_vat_rate',
+        // Rest of the invoice document: the trading brand shown above the legal
+        // entity, the registration line a UAE/India invoice needs, and the
+        // footer terms. Kept as settings rather than hard-coded so the finance
+        // team can correct them without a deploy.
+        'billing_brand_name', 'billing_registration_no', 'billing_email',
+        'billing_phone', 'billing_terms', 'billing_hsn_sac',
     ];
 
     public function index()
@@ -49,6 +55,12 @@ class SiteContentController extends Controller
             'billing_address' => 'nullable|string|max:500',
             'billing_trn' => 'nullable|string|max:40',
             'billing_vat_rate' => 'nullable|numeric|min:0|max:100',
+            'billing_brand_name' => 'nullable|string|max:120',
+            'billing_registration_no' => 'nullable|string|max:60',
+            'billing_email' => 'nullable|email|max:150',
+            'billing_phone' => 'nullable|string|max:40',
+            'billing_terms' => 'nullable|string|max:1000',
+            'billing_hsn_sac' => 'nullable|string|max:20',
         ]);
 
         foreach ($this->settingKeys as $key) {
