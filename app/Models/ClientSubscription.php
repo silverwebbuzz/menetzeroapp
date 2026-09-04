@@ -16,6 +16,7 @@ class ClientSubscription extends Model
         'billing_cycle',
         'started_at',
         'expires_at',
+        'reporting_year',
         'auto_renew',
         'payment_method',
         'stripe_subscription_id',
@@ -27,6 +28,7 @@ class ClientSubscription extends Model
         'auto_renew' => 'boolean',
         'started_at' => 'datetime',
         'expires_at' => 'datetime',
+        'reporting_year' => 'integer',
         'metadata' => 'array',
     ];
 

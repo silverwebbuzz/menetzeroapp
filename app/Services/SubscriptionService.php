@@ -423,12 +423,34 @@ class SubscriptionService
             $metadata['upgraded_from_plan_id'] = $existing->subscription_plan_id;
         }
 
+        // The reporting year this term covers. One term entitles ONE year --
+        // see PlanEntitlementService::fiscalYearWithinSubscription().
+        //
+        // Inherited ONLY while the existing term is still running, which is
+        // what an upgrade or a mid-term plan change looks like: the customer is
+        // buying a better plan for the year they are working on, not a
+        // different year. Without this an upgrade would silently move their
+        // coverage forward and lock the data they had been entering.
+        //
+        // A RENEWAL is the opposite case -- the old term has ended, and the new
+        // one is for the year the customer is starting -- so an expired row
+        // must not drag its year forward. Callers that mean a specific year
+        // (an explicit "ESG for next year" purchase) pass reporting_year.
+        $inheritsYear = $existing && $existing->expires_at->isFuture();
+
+        $reportingYear = (int) (
+            $data['reporting_year']
+                ?? ($inheritsYear ? $existing->reporting_year : null)
+                ?? Carbon::parse($startedAt)->year
+        );
+
         $payload = [
             'subscription_plan_id' => $planId,
             'status' => 'active',
             'billing_cycle' => $billingCycle,
             'started_at' => $startedAt,
             'expires_at' => $expiresAt,
+            'reporting_year' => $reportingYear,
             'auto_renew' => $data['auto_renew'] ?? true,
             'payment_method' => $data['payment_method'] ?? null,
             'stripe_subscription_id' => $data['stripe_subscription_id'] ?? null,

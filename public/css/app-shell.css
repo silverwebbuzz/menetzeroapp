@@ -1702,38 +1702,40 @@ table.min-w-full tbody tr:hover { background-color: var(--canvas); }
    than overlap: the bubble sits directly above it.
    ========================================================================== */
 
+/* Move the bubble by TRANSLATING the host, rather than by setting left/bottom
+   on it.
+
+   Setting left/right/bottom here only works if the thing you actually see is
+   the host box itself. It is not: the vendor renders the bubble into its own
+   shadow root and anchors it there, so overriding the host's offsets moved a
+   box the bubble was not attached to and the widget disappeared from the
+   corner entirely. A transform has no such problem -- it moves the host and
+   everything drawn inside it, shadow DOM included, without touching a single
+   vendor-owned property.
+
+   `right: 0` is the vendor's own anchor, so the translate is measured from the
+   bottom-right corner: negative X walks it left across the viewport, negative Y
+   lifts it above the sidebar's plan card.
+
+   Width is what varies between screens, so the X shift is computed from the
+   viewport rather than hard-coded: 100vw takes it to the left edge, then the
+   sidebar width and a gutter bring it back into the sidebar column. */
 elevenlabs-convai {
-    position: fixed !important;
-    /* Tucked into the left gutter, inside the sidebar column. */
-    left: 12px !important;
-    right: auto !important;
-    /* Above .sidebar-footer (approx 3rem tall) with a gap. */
-    bottom: 4.25rem !important;
     /* Under the sidebar (40) and the mobile overlay (35) so an open mobile menu
        covers it, but above ordinary page content. */
     z-index: 34 !important;
-}
-
-/* The old shell's sidebar is a fixed 280px column; keep the bubble inside it
-   rather than straddling the content edge.
-
-   Scoped on the BODY class, not .app-shell: the widget is emitted at the end of
-   <body>, outside the .app-shell wrapper div, so a descendant selector on the
-   wrapper would never match it. */
-body.company-portal elevenlabs-convai,
-body.consultant-portal elevenlabs-convai {
-    left: 16px !important;
+    transform: translate(
+        calc(-100vw + var(--sidebar-width, 280px) - 1rem),
+        -3.5rem
+    ) !important;
 }
 
 /* On mobile both shells collapse the sidebar, so there is no left column to sit
-   in and no footer box to clear — return the bubble to the bottom-left corner
-   of the viewport proper. */
+   in and no plan card to clear. Sit in the bottom-left corner of the viewport
+   proper: the full width across, minus the bubble's own size and a margin. */
 @media (max-width: 1024px) {
-    elevenlabs-convai,
-    body.company-portal elevenlabs-convai,
-    body.consultant-portal elevenlabs-convai {
-        left: 12px !important;
-        bottom: 1rem !important;
+    elevenlabs-convai {
+        transform: translate(calc(-100vw + 5.5rem), 0) !important;
     }
 }
 

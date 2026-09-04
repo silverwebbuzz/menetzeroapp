@@ -304,13 +304,12 @@ class PlanEntitlementService
             return ['allowed' => true, 'message' => null];
         }
 
-        $startYear = (int) $subscription->started_at->year;
-        $endYear = (int) $subscription->expires_at->year;
+        $covered = $this->subscriptionReportingYear($subscription);
 
         return [
             'allowed' => false,
-            'message' => "Fiscal year {$reportingYear} is outside your package term ({$startYear}–{$endYear}). "
-                . 'Renew or extend your package to edit this year and issue certificates.',
+            'message' => "Your package covers fiscal year {$covered}. "
+                . "To work on FY{$reportingYear}, add a package for that year.",
         ];
     }
 
@@ -369,19 +368,41 @@ class PlanEntitlementService
             return ['allowed' => true, 'message' => null];
         }
 
+        $covered = $this->subscriptionReportingYear($subscription);
+
         return [
             'allowed' => false,
-            'message' => "Downloads for fiscal year {$fiscalYear} are included for your active subscription term only. "
-                . 'Renew or upgrade to export this year.',
+            'message' => "Your package covers downloads for fiscal year {$covered}. "
+                . "To download FY{$fiscalYear} reports, add a package for that year.",
         ];
     }
 
+    /**
+     * One term entitles ONE reporting year -- the year stored on the row.
+     *
+     * This used to read `fy >= started_at->year && fy <= expires_at->year`.
+     * Every 12-month term that does not begin on 1 January spans two calendar
+     * years, so that test handed out two reporting years for one year's money:
+     * ESG bought on 1 March 2026 unlocked FY2026 AND FY2027. It also paid for
+     * a late upgrade -- fill a year on Carbon, upgrade in the closing days,
+     * and the new term back-dated ESG across data already entered while
+     * opening the following year too.
+     *
+     * reporting_year is nullable for rows written before it existed; those
+     * fall back to started_at's year, which is the same narrow single year the
+     * migration backfilled.
+     */
     protected function fiscalYearWithinSubscription(ClientSubscription $subscription, int $fiscalYear): bool
     {
-        $startYear = (int) $subscription->started_at->year;
-        $endYear = (int) $subscription->expires_at->year;
+        return $fiscalYear === $this->subscriptionReportingYear($subscription);
+    }
 
-        return $fiscalYear >= $startYear && $fiscalYear <= $endYear;
+    /**
+     * The reporting year a term covers.
+     */
+    protected function subscriptionReportingYear(ClientSubscription $subscription): int
+    {
+        return (int) ($subscription->reporting_year ?? $subscription->started_at->year);
     }
 
     protected function exportDeniedMessage(string $exportCode): string

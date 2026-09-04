@@ -726,10 +726,16 @@ table.mnz-table td{padding:11px 16px;border-bottom:1px solid var(--line-2);font-
    30px button plus company name and meta lines -- so this theme parks the
    bubble higher than the shared default.
    --------------------------------------------------------------------------- */
-body.mnz-theme elevenlabs-convai{bottom:7.5rem !important}
+/* This theme's sidebar is --side-w (236px), not the old shell's 280px, and its
+   .mnz-side__foot is taller -- company name, meta line and a 30px button -- so
+   it needs a bigger lift than the shared default. Same translate technique; see
+   the placement block in app-shell.css for why offsets are not used. */
+body.mnz-theme elevenlabs-convai{
+  transform:translate(calc(-100vw + var(--side-w) - 1rem), -6.5rem) !important}
 
 @media (max-width:1024px){
-  body.mnz-theme elevenlabs-convai{bottom:1rem !important}
+  body.mnz-theme elevenlabs-convai{
+    transform:translate(calc(-100vw + 5.5rem), 0) !important}
 }
 
 /* No corner to reserve any more; this is ordinary end-of-scroll breathing room. */
