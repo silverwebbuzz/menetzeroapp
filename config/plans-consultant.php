@@ -78,5 +78,16 @@ return [
             'q' => 'Is directory listing the same as paid capacity?',
             'a' => 'No. Directory profile and leads are separate from managed-client capacity.',
         ],
+        [
+            'q' => 'How many reporting years does one client slot cover?',
+            'a' => 'One. Each client has a Primary Reporting Year (PRY) — the year you can enter data for and '
+                 . 'issue certificates for. Earlier years stay visible read-only for comparison, and later years '
+                 . 'are locked until you unlock that year or renew the client onto a new PRY.',
+        ],
+        [
+            'q' => 'A client needs two years done. What do I do?',
+            'a' => 'Each year needs its own capacity: unlock the additional year on that client, or renew them '
+                 . 'onto the next PRY when the first year is filed. One slot does not cover two filings.',
+        ],
     ],
 ];

@@ -135,7 +135,7 @@ class SubscriptionService
         $targetPrice = $this->planPriceInCurrency($target, $chargeCurrency);
 
         if ($currentPrice <= 0) {
-            // Free → paid: full annual price, new 1-year term.
+            // Free → paid: full annual price for the reporting year in progress.
             return [
                 'type' => 'upgrade',
                 'requires_payment' => $targetPrice > 0,
@@ -165,10 +165,15 @@ class SubscriptionService
             'charge_currency' => $chargeCurrency,
             'preserve_expiry' => false,
             'credit_amount' => $unusedCredit,
+            // Wording deliberately does NOT promise "a full year" or "a new
+            // 1-year term": an upgrade keeps the reporting year the customer is
+            // already working on (SubscriptionService::subscribeClient inherits
+            // reporting_year while the term is live), so it upgrades a year
+            // rather than adding one.
             'message' => $upgradeCharge > 0
                 ? "Your unused {$currentPlan->plan_name} time ({$daysRemaining} days, credit {$creditLabel}) "
-                    . "is applied toward a full year of {$target->plan_name}. "
-                    . "You pay {$chargeLabel} today and your new 1-year term starts now."
+                    . "is applied toward {$target->plan_name}. You pay {$chargeLabel} today, and "
+                    . "{$target->plan_name} covers the reporting year you are working on."
                 : 'Your plan will be upgraded immediately at no extra charge.',
             'days_remaining' => $daysRemaining,
         ];

@@ -73,7 +73,8 @@
             @endforeach
         @endif
         <p class="text-xs text-gray-500">
-            <strong>Upgrades:</strong> unused time on your current plan is credited toward a full year on the new plan.
+            <strong>Upgrades:</strong> apply immediately and cover the same reporting year you are working on —
+            they do not add a second year.
             <strong>Downgrades:</strong> take effect at renewal — no refund for unused time.
         </p>
     </div>
@@ -94,7 +95,7 @@
                 <span class="flex-none w-7 h-7 rounded-full bg-gray-900 text-white text-xs font-bold flex items-center justify-center">1</span>
                 <div>
                     <h2 class="section-heading mb-0">Select a plan</h2>
-                    <p class="text-sm text-gray-500">Billed annually. You can change plan later — upgrades apply immediately, downgrades at renewal.</p>
+                    <p class="text-sm text-gray-500">One package covers one reporting year. You can change plan later — upgrades apply immediately, downgrades at renewal.</p>
                 </div>
             </div>
 
@@ -182,7 +183,7 @@
                                         <span class="text-gray-500">(credit {{ \App\Services\CurrencyService::format($change['credit_amount'], $change['charge_currency']) }} applied)</span>
                                     @endif
                                 </div>
-                                <div class="text-[11px] text-gray-400 mt-0.5">Full 1-year term from upgrade date</div>
+                                <div class="text-[11px] text-gray-400 mt-0.5">Covers your current reporting year</div>
                             @elseif($change && !$isCurrent && in_array($change['type'], ['downgrade', 'downgrade_to_free']))
                                 <div class="text-xs text-amber-700 mt-2">At renewal — no charge now</div>
                             @endif

@@ -68,6 +68,12 @@ return [
                     . 'only the download and capacity limits change.',
         ],
         [
+            'title' => 'A package covers one reporting year',
+            'body' => 'Each package covers a single fiscal year — the compliance year you are filing for. '
+                    . 'Upgrading mid-year improves the reports for that same year rather than adding another one, '
+                    . 'and each additional year needs its own package.',
+        ],
+        [
             'title' => 'Scope 3 depth varies',
             'body' => 'Free allows one Scope 3 entry per category, which is enough to see how it works. '
                     . 'Carbon and ESG open up full value-chain capacity.',
@@ -109,8 +115,27 @@ return [
         ],
         [
             'q' => 'Can I change package or go back to Free?',
-            'a' => 'Yes. Upgrades apply immediately. Downgrades and a return to Free take effect at the end of your '
-                 . 'current paid period, so you keep what you paid for. Your data is kept either way.',
+            'a' => 'Yes. Upgrades apply immediately and cover the same reporting year you are already working on. '
+                 . 'Downgrades and a return to Free take effect at the end of your current paid period, so you '
+                 . 'keep what you paid for. Your data is kept either way.',
+        ],
+        [
+            'q' => 'Which reporting year does my package cover?',
+            'a' => 'One. A package covers a single fiscal year — the year you were working on when you bought it — '
+                 . 'and that is the year you can enter data for and download reports for. Each further year needs '
+                 . 'its own package, because each year is its own compliance filing.',
+        ],
+        [
+            'q' => 'If I upgrade mid-year, do I get an extra year?',
+            'a' => 'No. Upgrading from Carbon to ESG mid-year gives you the ESG reports for the year you are '
+                 . 'already working on — it does not add a second year. You pay the difference between the two '
+                 . 'packages, and your renewal date does not move.',
+        ],
+        [
+            'q' => 'I need reports for last year as well. What do I do?',
+            'a' => 'Add a package for that year. Your data stays in the system whatever your current package is, '
+                 . 'so nothing is lost — but entering data and downloading submittable reports for another '
+                 . 'fiscal year needs a package covering that year. Contact us and we will set it up.',
         ],
     ],
 
