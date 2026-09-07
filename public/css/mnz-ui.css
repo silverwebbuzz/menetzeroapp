@@ -718,6 +718,10 @@ table.mnz-table td{padding:11px 16px;border-bottom:1px solid var(--line-2);font-
    --------------------------------------------------------------------------- */
 .mnz-main{padding-bottom:2.5rem}
 
+/* Same as the old shell: a page with a fixed bottom bar needs room below the
+   footer, which renders after the page's own content. */
+.mnz-main:has(.has-sticky-bar){padding-bottom:7.5rem}
+
 .mnz-main > .site-footer{margin-top:32px;padding-top:16px;
   border-top:1px solid var(--line)}
 .mnz-main > .site-footer .site-copyright{margin:0;font-size:11.5px;color:var(--ink-3);text-align:center}

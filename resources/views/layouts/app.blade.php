@@ -51,7 +51,7 @@
     </script>
 
     <!-- App shell styles (portal-design-system loads last so typography always wins) -->
-    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260907b">
+    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260907c">
     @stack('styles')
     <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260630">
     <link rel="stylesheet" href="{{ asset('css/portal-enterprise.css') }}?v=20260630">

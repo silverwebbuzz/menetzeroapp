@@ -33,7 +33,9 @@
     $displayCurrency = \App\Services\CurrencyService::displayCurrency();
     $checkoutAvailable = \App\Models\PaymentGateway::checkoutAvailable();
 @endphp
-<div class="w-full max-w-7xl mx-auto">
+{{-- has-sticky-bar tells the shell to reserve bottom space for the fixed
+     checkout bar, so the site footer's policy links are not hidden behind it. --}}
+<div class="w-full max-w-7xl mx-auto has-sticky-bar">
     @if(!$checkoutAvailable)
         <div class="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
             <strong>Paid upgrades coming soon.</strong> Review plans and features below. Stay on Free to explore Scope 1 &amp; 2, or schedule a downgrade at renewal. Paid checkout will open here when online payments go live.
@@ -474,8 +476,10 @@
          cards -- they are how people choose, so they belong with the choosing.
          What is left here is what you read after deciding, or not at all.
 
-         pb-28 keeps the last FAQ answer clear of the fixed bar. --}}
-    <section class="border-t border-gray-200 pt-10 pb-28">
+         The clearance for the fixed bar is on .content-area (app-shell.css),
+         not here: the site footer renders AFTER this page's content, so padding
+         inside a section still left the footer underneath the bar. --}}
+    <section class="border-t border-gray-200 pt-10">
         @include('plans.partials.human-guide', [
             'guide' => $planGuide,
             'show' => ['intro', 'clarifications', 'faq'],
