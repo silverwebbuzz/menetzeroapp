@@ -37,7 +37,7 @@
             </div>
         </div>
         <div class="border-t border-gray-800 pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-gray-500">
-            @include('layouts.partials.site-copyright', ['variant' => 'dark'])
+            @include('layouts.partials.site-copyright', ['variant' => 'dark', 'policyLinks' => false])
             <div class="flex flex-wrap gap-x-4 gap-y-1">
                 <a href="{{ route('login') }}" class="hover:text-white">Company sign in</a>
                 <a href="{{ route('consultant.login') }}" class="hover:text-white">Consultant sign in</a>

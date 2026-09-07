@@ -710,45 +710,27 @@ table.mnz-table td{padding:11px 16px;border-bottom:1px solid var(--line-2);font-
 
 
 /* ---------------------------------------------------------------------------
-   Site footer + voice-widget placement (new theme).
+   Site footer + voice-widget clearance (new theme).
 
-   The bubble now lives at the bottom-LEFT, over the sidebar, parked just above
-   the plan card in .mnz-side__foot -- see the placement block in app-shell.css,
-   which both themes load. The corner it used to occupy is where page content
-   ends, so it kept landing on real controls (the upgrade page's checkout bar
-   was the last straw).
-
-   The widget's shadow-DOM internals are still left alone; only the host element
-   moves, and the call panel travels with it because it is positioned relative
-   to that host.
-
-   .mnz-side__foot is taller here than the old shell's footer -- it carries a
-   30px button plus company name and meta lines -- so this theme parks the
-   bubble higher than the shared default.
+   The ElevenLabs embed fixes ITSELF to the viewport from inside its own shadow
+   DOM and is deliberately left alone -- see the placement note in
+   app-shell.css for why moving it does not work. We only reserve space at the
+   end of the page so the bubble never covers content or the footer.
    --------------------------------------------------------------------------- */
-/* This theme's sidebar is --side-w (236px), not the old shell's 280px, and its
-   .mnz-side__foot is taller -- company name, meta line and a 30px button -- so
-   it needs a bigger lift than the shared default. Same translate technique; see
-   the placement block in app-shell.css for why offsets are not used. */
-body.mnz-theme elevenlabs-convai{
-  transform:translate(calc(-100vw + var(--side-w) - 1rem), -6.5rem) !important}
-
-@media (max-width:1024px){
-  body.mnz-theme elevenlabs-convai{
-    transform:translate(calc(-100vw + 5.5rem), 0) !important}
-}
-
-/* No corner to reserve any more; this is ordinary end-of-scroll breathing room. */
-.mnz-main{padding-bottom:2.5rem}
+.mnz-main{padding-bottom:6.5rem}
 
 .mnz-main > .site-footer{margin-top:32px;padding-top:16px;
   border-top:1px solid var(--line)}
 .mnz-main > .site-footer .site-copyright{margin:0;font-size:11.5px;color:var(--ink-3);text-align:center}
 .mnz-main > .site-footer .site-copyright a{color:var(--ink-2);text-decoration:underline}
 .mnz-main > .site-footer .site-copyright a:hover{color:var(--ink)}
+.mnz-main > .site-footer .site-policy-links{margin:6px 0 0;font-size:11.5px;color:var(--ink-3);text-align:center}
+.mnz-main > .site-footer .site-policy-links a{color:var(--ink-2);text-decoration:underline}
+.mnz-main > .site-footer .site-policy-links a:hover{color:var(--ink)}
+.mnz-main > .site-footer .site-policy-links span{margin:0 6px;opacity:.5}
 
 @media (max-width:640px){
-  .mnz-main{padding-bottom:3rem}
+  .mnz-main{padding-bottom:7.5rem}
 }
 
 /* Print: this file's print block sits ABOVE these rules, so its

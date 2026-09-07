@@ -433,8 +433,13 @@
 
              It sits inside the form on purpose: its button is a real submit
              for the same form, not a script that clicks the other one. --}}
+        {{-- `left` is set in CSS, not with inset-x-0: the shell's sidebar is a
+             fixed column, so a full-viewport bar runs underneath it and shoves
+             its own centred content left, behind the sidebar -- which is what
+             clipped "Pick one above to continue". See .upgrade-sticky-bar in
+             app-shell.css, which offsets it by each theme's sidebar width. --}}
         <div id="sticky-bar"
-             class="hidden fixed bottom-0 inset-x-0 z-20 border-t border-gray-200 bg-white/95 backdrop-blur shadow-[0_-2px_12px_rgba(0,0,0,0.06)] print:hidden">
+             class="upgrade-sticky-bar hidden fixed bottom-0 right-0 z-20 border-t border-gray-200 bg-white/95 backdrop-blur shadow-[0_-2px_12px_rgba(0,0,0,0.06)] print:hidden">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center gap-x-4 gap-y-2">
                 <div class="min-w-0 flex-1">
                     <div id="sticky-empty" class="text-sm text-gray-600">
