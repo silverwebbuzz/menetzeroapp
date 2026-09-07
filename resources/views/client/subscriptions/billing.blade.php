@@ -124,7 +124,7 @@
                             <div class="h-full rounded-full {{ $pct >= 90 ? 'bg-red-500' : 'bg-emerald-500' }}" style="width: {{ $pct }}%"></div>
                         </div>
                     @elseif($limit === 0)
-                        <p class="text-xs text-purple-700">Available on Starter+</p>
+                        <p class="text-xs text-purple-700">Available on Carbon and above</p>
                     @else
                         <p class="text-xs text-gray-500">Unlimited on your plan</p>
                     @endif
@@ -188,7 +188,7 @@
                     </li>
                 @endforeach
             </ul>
-            <p class="mt-4 text-xs text-gray-500">Disclosure PDF export typically needs Scope Pro or an ESG package. Clean GHG / IEQT exports need Scope Basic or higher.</p>
+            <p class="mt-4 text-xs text-gray-500">Disclosure PDF exports need the ESG package or above. Clean GHG / MOCCAE / IEQT exports need Carbon or above.</p>
         </div>
     </div>
 

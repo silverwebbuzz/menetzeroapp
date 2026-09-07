@@ -23,7 +23,7 @@
         <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 mb-6">
             <p class="text-gray-700">
                 <strong>{{ max($consultantCount, 1) }}+ verified consultants</strong> in the UAE directory.
-                Upgrade to <a href="{{ route('subscriptions.upgrade') }}" class="text-teal-600 hover:underline">Starter</a>
+                Upgrade to <a href="{{ route('subscriptions.upgrade') }}" class="text-teal-600 hover:underline">Carbon</a>
                 to see consultant names and request introductions.
             </p>
         </div>

@@ -75,7 +75,7 @@
                         <h3 class="scope-block__title">{{ $meta['title'] }}</h3>
                         <span class="scope-block__subtitle">{{ $meta['subtitle'] }}</span>
                         @if($scopeKey === 'Scope 3' && $gate->isScope3Locked())
-                            <span class="badge-plan">Starter+</span>
+                            <span class="badge-plan">Carbon+</span>
                         @endif
                     </div>
                     @if($scopeKey === 'Scope 3' && $gate->isScope3Locked())
@@ -83,7 +83,7 @@
                             @if($gate->isAgencyWorkspace())
                                 <p class="callout-panel__body">Scope 3 covers your value chain — purchased goods, travel, commuting, and more. {{ $gate->agencyLockedMessage('Scope 3') }}</p>
                             @else
-                                <p class="callout-panel__body">Scope 3 covers your value chain — purchased goods, travel, commuting, and more. Unlock preview mode on <strong>Starter</strong>.</p>
+                                <p class="callout-panel__body">Scope 3 covers your value chain — purchased goods, travel, commuting, and more. Unlock preview mode on <strong>Carbon</strong>.</p>
                             @endif
                             <div class="callout-panel__actions">
                                 <a href="{{ $gate->upgradeRoute() }}" class="btn btn-primary btn-sm">{{ $gate->upgradeButtonLabel('View agency packs') }}</a>

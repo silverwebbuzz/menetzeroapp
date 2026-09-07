@@ -56,7 +56,7 @@
                     @if($gate->isAgencyWorkspace())
                         <p class="callout-panel__body">Upload DEWA bills, fuel receipts, and fleet data in one Excel or CSV file. {{ $gate->agencyLockedMessage('Bulk import') }}</p>
                     @else
-                        <p class="callout-panel__body">Upload DEWA bills, fuel receipts, and fleet data in one Excel or CSV file. Available on <strong>Starter</strong> (AED 1,499/year) and above.</p>
+                        <p class="callout-panel__body">Upload DEWA bills, fuel receipts, and fleet data in one Excel or CSV file. Available on <strong>Carbon</strong> and above.</p>
                     @endif
                 </div>
                 <div class="callout-panel__actions">

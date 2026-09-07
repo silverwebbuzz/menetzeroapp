@@ -142,7 +142,7 @@
                         <h3 class="qi-scope__title">{{ $meta['title'] }}</h3>
                         <span class="qi-scope__sub">{{ $meta['subtitle'] }}</span>
                         @if($scopeKey === 'Scope 3' && $gate->isScope3Locked())
-                            <span class="mnz-chip mnz-chip--warn">Starter+</span>
+                            <span class="mnz-chip mnz-chip--warn">Carbon+</span>
                         @endif
                     </div>
 
@@ -153,7 +153,7 @@
                                     @if($gate->isAgencyWorkspace())
                                         Scope 3 covers your value chain — purchased goods, travel, commuting, and more. {{ $gate->agencyLockedMessage('Scope 3') }}
                                     @else
-                                        Scope 3 covers your value chain — purchased goods, travel, commuting, and more. Unlock preview mode on <strong>Starter</strong>.
+                                        Scope 3 covers your value chain — purchased goods, travel, commuting, and more. Unlock preview mode on <strong>Carbon</strong>.
                                     @endif
                                 </p>
                                 <a href="{{ $gate->upgradeRoute() }}" class="mnz-btn mnz-btn--accent">

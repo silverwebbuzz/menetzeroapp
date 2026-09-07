@@ -106,7 +106,7 @@
                 <p style="margin:0;font-size:13px;color:var(--ink-2);line-height:1.6">
                     <strong style="color:var(--ink)">{{ max($consultantCount, 1) }}+ verified consultants</strong>
                     in the UAE directory.
-                    Upgrade to <a href="{{ route('subscriptions.upgrade') }}" class="cd-link">Starter</a>
+                    Upgrade to <a href="{{ route('subscriptions.upgrade') }}" class="cd-link">Carbon</a>
                     to see consultant names and request introductions.
                 </p>
             </div>

@@ -193,7 +193,7 @@
     @elseif($level === 'teaser')
         <div class="mnz-panel mnz-seam">
             <div class="mnz-panel__body" style="font-size:12.5px;color:var(--ink-2)">
-                <a href="{{ route('subscriptions.upgrade') }}" class="cs-link" style="font-weight:600">Upgrade to Starter</a>
+                <a href="{{ route('subscriptions.upgrade') }}" class="cs-link" style="font-weight:600">Upgrade to Carbon</a>
                 to request introductions.
             </div>
         </div>

@@ -124,7 +124,7 @@
             <p style="font-size:12.5px;color:var(--ink-3);margin:0 0 16px">
                 Upload the verifier’s signed assurance PDF (e.g. LRQA). Narrative assurance status remains in
                 <a href="{{ route('disclosures.uae-esg.sections.edit', ['fiscal_year' => $fiscalYear, 'section' => 'about_report']) }}">About This Report</a>.
-                Growth plans use text fields only.
+                Packages below Enterprise use text fields only.
             </p>
 
             @if(!empty($assuranceDocument))

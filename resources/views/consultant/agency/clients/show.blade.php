@@ -92,7 +92,7 @@
         <div class="cd-notice cd-notice--warning p-4 mb-4">
             <h3 class="font-semibold text-sm mb-1">Unlock {{ $yearUnlockTarget }} exports</h3>
             <p class="text-sm mb-3">
-                {{ $yearUnlockTarget }} is preview-only today. Purchase a reporting year unlock for full Growth exports
+                {{ $yearUnlockTarget }} is preview-only today. Purchase a reporting year unlock for full exports
                 (AED {{ number_format($yearUnlockQuote['charge_amount'], 0) }} pro-rata) without using another managed client place.
             </p>
             <form action="{{ route('consultant.packs.year-unlock') }}" method="POST" class="flex flex-col sm:flex-row sm:items-end gap-3">

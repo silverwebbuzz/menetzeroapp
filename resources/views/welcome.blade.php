@@ -91,7 +91,7 @@
                 <ul class="space-y-3 text-sm text-gray-600">
                     <li class="flex items-start"><span class="mkt-checkmark">✓</span> Business travel, commuting, and logistics</li>
                     <li class="flex items-start"><span class="mkt-checkmark">✓</span> Purchased goods, waste, and supply chain</li>
-                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> One entry per category on Free; more on Scope Pro / ESG packages</li>
+                    <li class="flex items-start"><span class="mkt-checkmark">✓</span> One entry per category on Free; full value-chain capacity on Carbon and above</li>
                     <li class="flex items-start"><span class="mkt-checkmark">✓</span> Higher Scope 3 intensity available on request</li>
                 </ul>
             </div>
@@ -103,49 +103,41 @@
     <div class="mkt-container">
         <div class="mkt-section-head">
             <h2>Packages matched to your reporting needs</h2>
-            <p>Explore Free publicly — AED pricing is shown when you upgrade from your account</p>
+            <p>Annual pricing in AED. Start on Free with no card, and upgrade from your account when you are ready</p>
         </div>
+        {{-- Cards are built from CommercialPlanComparison::cardHighlights() and
+             the plan taglines, the same sources the in-app upgrade page uses,
+             so the marketing site cannot drift away from the live catalogue
+             again. It previously advertised Scope Basic and Scope Pro / ESG,
+             both retired -- visitors were reading names nobody could buy. --}}
+        @php
+            $mktHighlights = \App\Data\CommercialPlanComparison::cardHighlights();
+            $mktLabels = \App\Data\CommercialPlanComparison::planLabels();
+            $mktTaglines = config('plans-company.plan_taglines', []);
+        @endphp
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            @foreach([
-                ['Free', 'Try the workflow', [
-                    'Scope 1 & 2 full entry',
-                    'Scope 3 — one entry per category',
-                    'Watermarked trial downloads',
-                    'Disclosure form previews',
-                ]],
-                ['Scope Basic', 'MOCCAE-ready inventory', [
-                    'Clean GHG, MOCCAE & IEQT exports',
-                    'Bulk CSV / Excel import',
-                    'Up to 3 sites',
-                    'Request from Plan & billing',
-                ]],
-                ['Scope Pro / ESG', 'Broader scopes & disclosures', [
-                    'Everything in Scope Basic, expanded',
-                    'UAE ESG Report PDF + scorecard options',
-                    'IFRS / GRI export packages',
-                    'Request from Plan & billing',
-                ]],
-                ['Enterprise', 'Custom & white-label', [
-                    'Custom implementation',
-                    'White-label report covers',
-                    'Extended KPI / assurance workflows',
-                    'Talk to MENetZero',
-                ]],
-            ] as $plan)
+            @foreach(\App\Data\CommercialPlanComparison::PLAN_COLUMNS as $code)
+                @php
+                    $name = $mktLabels[$code]['name'] ?? $code;
+                    $tagline = $mktTaglines[$code] ?? ($mktLabels[$code]['tagline'] ?? '');
+                    $feats = $mktHighlights[$code] ?? [];
+                @endphp
                 <div class="mkt-feature-card flex flex-col h-full">
-                    <h3 class="text-lg font-bold mkt-text-brand mb-1">{{ $plan[0] }}</h3>
-                    <p class="text-xs text-gray-500 mb-4">{{ $plan[1] }}</p>
+                    <h3 class="text-lg font-bold mkt-text-brand mb-1">{{ $name }}</h3>
+                    <p class="text-xs text-gray-500 mb-4">{{ $tagline }}</p>
                     <ul class="space-y-2 text-sm text-gray-600 flex-1 mb-5">
-                        @foreach($plan[2] as $feat)
+                        @foreach($feats as $feat)
                             <li class="flex items-start"><span class="mkt-checkmark">✓</span> {{ $feat }}</li>
                         @endforeach
                     </ul>
-                    @if($plan[0] === 'Free')
-                        <a href="{{ route('register') }}" class="mkt-btn mkt-btn-primary mkt-btn-sm">Explore Free</a>
-                    @elseif($plan[0] === 'Enterprise')
-                        <a href="{{ route('contact') }}" class="mkt-btn mkt-btn-outline mkt-btn-sm">Contact us</a>
+                    @if($code === 'client_free')
+                        <a href="{{ route('register') }}" class="mkt-btn mkt-btn-primary mkt-btn-sm">Start free</a>
+                    @elseif($code === 'client_enterprise')
+                        <a href="{{ route('contact') }}" class="mkt-btn mkt-btn-outline mkt-btn-sm">Contact sales</a>
                     @else
-                        <a href="{{ route('register') }}" class="mkt-btn mkt-btn-outline mkt-btn-sm">Sign up to request</a>
+                        {{-- Checkout is self-serve, so the old "Sign up to request"
+                             described a process that no longer exists. --}}
+                        <a href="{{ route('register') }}" class="mkt-btn mkt-btn-outline mkt-btn-sm">Sign up to buy</a>
                     @endif
                 </div>
             @endforeach
@@ -166,8 +158,8 @@
             @foreach([
                 ['Emission calculations', ['Automated Scope 1 & 2 from activity data', 'Built-in emission factor library for MENA', 'Dashboard with totals, trends, and hotspots', 'Historical data retention by package']],
                 ['UAE & regional compliance', ['GHG Protocol-aligned inventory methodology', 'MOCCAE Scope 1 & 2 report PDFs', 'IEQT export for mrv.ae submission', 'Working papers for your audit trail']],
-                ['ESG disclosures', ['Integrated UAE ESG Report PDF (Scope Pro / ESG packages)', 'ESG Scorecard with multi-year KPI tables', 'IFRS S1 / S2 and GRI + content index', 'SASB sector index (optional)', 'Preview on Free & Scope Basic — export on Scope Pro+']],
-                ['Data management', ['Manual quick-input for every emission source', 'Bulk CSV / Excel import (Scope Basic+)', 'Bulk data export for analysis', 'Document storage per organisation']],
+                ['ESG disclosures', ['Integrated UAE ESG Report PDF (ESG package and above)', 'ESG Scorecard with multi-year KPI tables', 'IFRS S1 / S2 and GRI + content index', 'SASB sector index (optional)', 'Preview on Free and Carbon — export on ESG and Enterprise']],
+                ['Data management', ['Manual quick-input for every emission source', 'Bulk CSV / Excel import (Carbon and above)', 'Bulk data export for analysis', 'Document storage per organisation']],
                 ['Multi-location & team access', ['Track emissions per branch or site', 'Invite colleagues with role-based access', 'Site and seat limits by package', 'Custom scale on Enterprise']],
                 ['Consultant marketplace', ['Browse verified UAE consultants publicly', 'Request introductions from your account', 'Optional review support for professional sign-off', 'Paid packages unlock fuller directory connect']],
             ] as $block)
@@ -188,41 +180,48 @@
     <div class="mkt-container">
         <div class="mkt-section-head">
             <h2>Reports &amp; exports by package</h2>
-            <p>Capabilities only — no public prices. Upgrade your package from your account when ready.</p>
+            <p>What each package includes. Upgrade from your account whenever you need more.</p>
         </div>
+        {{-- Rows come from CommercialPlanComparison, the same tables the upgrade
+             page renders. The hand-written version here had SIX columns -- Scope
+             Basic, Scope Pro, ESG Starter, ESG Complete -- none of which are
+             sellable any more, and its figures had drifted from the real limits. --}}
+        @php
+            // Re-read rather than relying on the cards section above: the two
+            // blocks are far apart and one must not break by moving the other.
+            $mktLabels = \App\Data\CommercialPlanComparison::planLabels();
+            $mktColumns = \App\Data\CommercialPlanComparison::PLAN_COLUMNS;
+            $mktRows = array_merge(
+                \App\Data\CommercialPlanComparison::operationsRows(),
+                \App\Data\CommercialPlanComparison::downloadRows()
+            );
+        @endphp
         <div class="mkt-table-wrap">
             <table class="mkt-table">
                 <thead>
                     <tr>
                         <th>Deliverable</th>
-                        <th>Free</th>
-                        <th>Scope Basic</th>
-                        <th>Scope Pro</th>
-                        <th>ESG Starter</th>
-                        <th>ESG Complete</th>
+                        @foreach($mktColumns as $code)
+                            <th>{{ $mktLabels[$code]['name'] ?? $code }}</th>
+                        @endforeach
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach([
-                        ['Sites / branches', '1', 'Up to 3', 'Up to 10', 'Up to 5', 'Up to 10'],
-                        ['Scope 1 & 2 calculations', 'In-app', '✓', '✓', '✓', '✓'],
-                        ['Clean GHG / MOCCAE / IEQT / Excel', 'Watermarked', '✓', '✓', '✓', '✓'],
-                        ['Bulk CSV / Excel import', '—', '✓', '✓', '✓', '✓'],
-                        ['Scope 3 categories', '1 entry each', 'Limited', 'Broader', 'Broad', 'Broad'],
-                        ['Disclosure forms (IFRS / GRI)', 'Preview', 'Preview', 'Export', 'Export', 'Export'],
-                        ['UAE ESG Report PDF', '—', '—', '✓', '✓', '✓'],
-                        ['ESG Scorecard', '—', '—', '✓', '✓', '✓'],
-                        ['IFRS S1 / S2 & GRI exports', '—', '—', '✓', '✓', '✓'],
-                        ['White-label / assurance options', '—', '—', '—', '✓', '✓'],
-                        ['Multi-entity consolidation', '—', '—', '—', '✓', '✓'],
-                    ] as $row)
+                    @foreach($mktRows as $row)
                         <tr>
-                            <td>{{ $row[0] }}</td>
-                            <td>{{ $row[1] }}</td>
-                            <td>{{ $row[2] }}</td>
-                            <td>{{ $row[3] }}</td>
-                            <td>{{ $row[4] }}</td>
-                            <td>{{ $row[5] }}</td>
+                            <td>{{ $row['label'] }}</td>
+                            @foreach($mktColumns as $code)
+                                @php $cell = $row['cells'][$code] ?? false; @endphp
+                                <td>
+                                    @if($cell === true)
+                                        ✓
+                                    @elseif($cell === false)
+                                        —
+                                    @else
+                                        {{ $cell }}
+                                    @endif
+                                </td>
+                            @endforeach
                         </tr>
                     @endforeach
                 </tbody>
@@ -326,7 +325,7 @@
             @foreach([
                 ['Can I really start for free?', 'Yes. Free includes Scope 1 & 2, Scope 3 (one entry per category), and watermarked trial downloads. Official clean exports unlock after your package is activated.'],
                 ['How do I get a paid package?', 'Sign in, open Plan & billing, and request a package. MENetZero confirms features and pricing offline, then activates after payment.'],
-                ['Which package do I need for MOCCAE?', 'A Scope Basic–style package typically covers clean GHG inventory PDF, MOCCAE Scope 1 & 2 PDF, and IEQT — confirm when you request.'],
+                ['Which package do I need for MOCCAE?', 'Carbon or above. It produces clean GHG inventory, MOCCAE Scope 1 & 2 and IEQT files you can submit. Free downloads are watermarked trial files, fine for checking numbers but not for submission.'],
                 ['What about full UAE ESG / IFRS / GRI?', 'Those sit on ESG packages (and Enterprise for white-label / custom). Request the package that matches your disclosure needs.'],
                 ['Do I need a consultant to use MenetZero?', 'No. The platform is self-serve for companies. Consultants are optional — for review, sign-off, or if you prefer expert guidance alongside the software.'],
                 ['I manage emissions for clients, not my own company', 'Use the consultant portal instead. Explore Free here is for organisations tracking their own footprint. Visit /consultant for agency features.'],

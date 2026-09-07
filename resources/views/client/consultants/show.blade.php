@@ -94,7 +94,7 @@
         </div>
     @elseif($level === 'teaser')
         <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mt-6 text-sm">
-            <a href="{{ route('subscriptions.upgrade') }}" class="text-teal-700 font-medium hover:underline">Upgrade to Starter</a> to request introductions.
+            <a href="{{ route('subscriptions.upgrade') }}" class="text-teal-700 font-medium hover:underline">Upgrade to Carbon</a> to request introductions.
         </div>
     @endif
 </div>

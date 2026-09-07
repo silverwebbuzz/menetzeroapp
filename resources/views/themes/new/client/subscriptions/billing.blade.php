@@ -195,7 +195,7 @@
                         @if($pct !== null && $limit > 0)
                             <div class="bl-bar"><span class="{{ $pct >= 90 ? 'is-high' : '' }}" style="width: {{ $pct }}%"></span></div>
                         @elseif($limit === 0)
-                            <p style="font-size:11px;color:var(--accent);margin:8px 0 0">Available on Starter+</p>
+                            <p style="font-size:11px;color:var(--accent);margin:8px 0 0">Available on Carbon and above</p>
                         @else
                             <p style="font-size:11px;color:var(--ink-3);margin:8px 0 0">Unlimited on your plan</p>
                         @endif
@@ -263,8 +263,8 @@
                     </div>
                 @endforeach
                 <p style="font-size:11px;color:var(--ink-3);margin:14px 0 0">
-                    Disclosure PDF export typically needs Scope Pro or an ESG package.
-                    Clean GHG / IEQT exports need Scope Basic or higher.
+                    Disclosure PDF exports need the ESG package or above.
+                    Clean GHG / MOCCAE / IEQT exports need Carbon or above.
                 </p>
             </div>
         </div>
