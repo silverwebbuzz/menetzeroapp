@@ -6,11 +6,14 @@
 
 [x-cloak] { display: none !important; }
 
-/* The ElevenLabs voice bubble is fixed bottom-right and sits on top of the
-   composer. On this page the user already has a text assistant, so the floating
-   widget is both redundant and in the way — hide it here only. It stays on every
-   other page. The host element is targeted rather than its internals, which live
-   in shadow DOM and are not a stable styling surface. */
+/* On this page the user already has a text assistant, so the floating voice
+   widget is redundant — hide it here only. It stays on every other page.
+
+   The DOCK is hidden rather than the widget inside it: hiding only the widget
+   would leave the empty fixed wrapper behind. Both selectors are kept so this
+   still works if the dock is ever removed; neither touches the widget's shadow
+   DOM, which is not a stable styling surface. */
+body:has(.zai) .voice-widget-dock,
 body:has(.zai) elevenlabs-convai {
     display: none !important;
 }

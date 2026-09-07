@@ -82,7 +82,7 @@
             },
         };
     </script>
-    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260907">
+    <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260907b">
     @stack('styles')
     <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260630">
     <link rel="stylesheet" href="{{ asset('css/portal-enterprise.css') }}?v=20260630">
@@ -363,7 +363,11 @@
      page (its fixed bottom-right bubble covers that page's composer). --}}
 @auth
     @if(config('services.elevenlabs.agent_id') && !auth()->user()->isAdmin() && !request()->routeIs('client.zero-ai'))
-        <elevenlabs-convai agent-id="{{ config('services.elevenlabs.agent_id') }}"></elevenlabs-convai>
+        {{-- Docked in our own fixed wrapper -- see the note in the old theme's
+             layout and .voice-widget-dock in app-shell.css. --}}
+        <div class="voice-widget-dock">
+            <elevenlabs-convai agent-id="{{ config('services.elevenlabs.agent_id') }}"></elevenlabs-convai>
+        </div>
         <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
     @endif
 @endauth

@@ -3,7 +3,7 @@
 @section('title', 'Zero AI')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/zero-ai.css') }}?v=20260819">
+<link rel="stylesheet" href="{{ asset('css/zero-ai.css') }}?v=20260907">
 @endpush
 
 @section('content')

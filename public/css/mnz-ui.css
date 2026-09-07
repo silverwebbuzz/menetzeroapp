@@ -712,12 +712,11 @@ table.mnz-table td{padding:11px 16px;border-bottom:1px solid var(--line-2);font-
 /* ---------------------------------------------------------------------------
    Site footer + voice-widget clearance (new theme).
 
-   The ElevenLabs embed fixes ITSELF to the viewport from inside its own shadow
-   DOM and is deliberately left alone -- see the placement note in
-   app-shell.css for why moving it does not work. We only reserve space at the
-   end of the page so the bubble never covers content or the footer.
+   The voice widget is docked bottom-left by .voice-widget-dock (app-shell.css),
+   so this theme no longer reserves a bottom-right corner for it. The padding
+   here is ordinary end-of-scroll breathing room above the footer.
    --------------------------------------------------------------------------- */
-.mnz-main{padding-bottom:6.5rem}
+.mnz-main{padding-bottom:2.5rem}
 
 .mnz-main > .site-footer{margin-top:32px;padding-top:16px;
   border-top:1px solid var(--line)}
@@ -730,7 +729,7 @@ table.mnz-table td{padding:11px 16px;border-bottom:1px solid var(--line-2);font-
 .mnz-main > .site-footer .site-policy-links span{margin:0 6px;opacity:.5}
 
 @media (max-width:640px){
-  .mnz-main{padding-bottom:7.5rem}
+  .mnz-main{padding-bottom:5rem}
 }
 
 /* Print: this file's print block sits ABOVE these rules, so its

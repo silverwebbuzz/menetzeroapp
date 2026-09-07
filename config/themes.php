@@ -76,7 +76,7 @@ return [
             'assets' => [
                 'css' => ['css/mnz-ui.css'],
                 'js' => ['js/mnz-ui.js'],
-                'version' => '20260907',
+                'version' => '20260907b',
             ],
         ],
     ],

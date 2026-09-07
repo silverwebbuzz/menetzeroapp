@@ -1726,10 +1726,6 @@ table.min-w-full tbody tr:hover { background-color: var(--canvas); }
 
 .upgrade-sticky-bar {
     left: var(--sidebar-width, 280px);
-    /* Room at the right for the voice bubble, which owns that corner and is
-       not moved (see the placement note below). Without this the bar's own
-       button sits underneath it. */
-    padding-right: 5.5rem;
 }
 
 /* New theme's rail is --side-w (236px). */
@@ -1747,35 +1743,71 @@ body.mnz-theme .upgrade-sticky-bar {
 }
 
 /* ==========================================================================
-   Voice help assistant — placement
+   Voice help assistant — dock
 
-   The ElevenLabs embed fixes ITSELF to the viewport bottom-right from inside
-   its own shadow DOM. We do NOT reposition it.
+   The widget is wrapped in our own .voice-widget-dock (see the portal layouts)
+   instead of being restyled. Restyling it does not work: the vendor fixes the
+   bubble to the bottom-right from inside its shadow DOM, and overriding the
+   host's offsets -- or transforming the host -- made it vanish.
 
-   Two attempts were made to move it to the bottom-left over the sidebar: first
-   by overriding left/bottom on the host, then by translating the host. Both
-   made the widget vanish. The vendor anchors the visible bubble inside the
-   shadow root, so neither the host's offsets nor a transform on it move the
-   thing the user actually sees in a way that survives the widget's own layout
-   work. Without a way to inspect that shadow DOM, further attempts are
-   guesswork, and a support widget that disappears is worse than one in an
-   inconvenient corner.
+   The trick that makes a wrapper work is `transform` on the dock. A transformed
+   element becomes the containing block for `position: fixed` descendants, so
+   the widget's own fixed positioning resolves against THIS box rather than the
+   viewport. It therefore lands wherever we put the dock, with its internals
+   untouched. `translateZ(0)` is a no-op visually and exists only to establish
+   that containing block.
 
-   So the widget keeps its own corner, and the PAGE stays out of its way: the
-   rule below reserves bottom padding, and the upgrade page's sticky bar leaves
-   right-hand room for it (see .upgrade-sticky-bar above).
+   Bottom-LEFT, above the sidebar's plan card: that corner is dead space in
+   every shell, while the bottom-right is where page content and action buttons
+   end up.
    ========================================================================== */
 
-/* Keep the end of the page clear of the floating bubble so buttons and text at
-   the bottom of a long page stay reachable. Overrides the bottom half of the
-   `padding` shorthand set on .content-area above. */
+.voice-widget-dock {
+    position: fixed;
+    left: 16px;
+    bottom: 4.5rem;
+    /* Establishes the containing block for the widget's own fixed positioning
+       -- this is what actually anchors it here. */
+    transform: translateZ(0);
+    /* Below the sidebar (40) and the mobile overlay (35) so an open mobile menu
+       covers it, above ordinary page content. */
+    z-index: 34;
+    /* The dock is only an anchor; the widget draws its own surfaces. Without
+       this the empty box would swallow clicks meant for the sidebar. */
+    pointer-events: none;
+}
+
+.voice-widget-dock > * {
+    pointer-events: auto;
+}
+
+/* New theme's rail is narrower and its .mnz-side__foot is taller -- company
+   name, meta line and a 30px button -- so the dock sits higher there. */
+body.mnz-theme .voice-widget-dock {
+    bottom: 7.5rem;
+}
+
+/* Both shells collapse the sidebar below this width, so there is no rail to sit
+   in and no plan card to clear. */
+@media (max-width: 1024px) {
+    .voice-widget-dock,
+    body.mnz-theme .voice-widget-dock {
+        left: 12px;
+        bottom: 1rem;
+    }
+}
+
+/* The bubble is docked bottom-left now, so the bottom-right corner no longer
+   needs reserving. What is left is ordinary end-of-scroll breathing room. */
 .content-area {
-    padding-bottom: 6.5rem;
+    padding-bottom: 2.5rem;
 }
 
 @media (max-width: 640px) {
+    /* Mobile drops the dock to the bottom-left corner of the viewport proper,
+       so a little more clearance keeps the last row of content clear of it. */
     .content-area {
-        padding-bottom: 7.5rem;
+        padding-bottom: 5rem;
     }
 }
 
