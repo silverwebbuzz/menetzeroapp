@@ -88,7 +88,10 @@ class ForgotPasswordController extends Controller
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function (User $user, string $password) {
                 $user->forceFill([
-                    'password' => Hash::make($password)
+                    'password' => Hash::make($password),
+                    // A completed reset means the user now knows their password,
+                    // even if the account originated from Google signup.
+                    'password_set_at' => now()
                 ])->setRememberToken(Str::random(60));
 
                 $user->save();

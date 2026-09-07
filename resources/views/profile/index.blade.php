@@ -146,6 +146,11 @@
                 @csrf
                 
                 <div class="max-w-2xl">
+                    {{-- Accounts created through Google have a random password
+                         nobody has seen, so asking for it would make this form
+                         impossible to complete. They set a first password here
+                         instead; being signed in is the assurance. --}}
+                    @if(auth()->user()->hasUsablePassword())
                     <div class="mb-6">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Current Password *</label>
                         <input type="password" name="current_password" 
@@ -155,6 +160,12 @@
                             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
+                    @else
+                    <div class="mb-6 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+                        You signed up with Google, so this account has no password yet. Set one below and you
+                        will be able to sign in either way.
+                    </div>
+                    @endif
                     
                     <div class="mb-6">
                         <label class="block text-sm font-medium text-gray-700 mb-2">New Password *</label>

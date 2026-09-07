@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'password_set_at',
         'phone',
         'designation',
         'company_id', // Kept for backward compatibility, but not used in new logic
@@ -55,6 +56,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'password_set_at' => 'datetime',
             'is_active' => 'boolean',
         ];
     }
@@ -760,5 +762,24 @@ class User extends Authenticatable
         app(\App\Services\EmailTemplateService::class)->sendToUser('email_verification', $this, [
             'verify_url' => $verifyUrl,
         ]);
+    }
+
+    /**
+     * Did this account ever set a password the person actually knows?
+     *
+     * Signing up through Google stores Hash::make(Str::random(24)) so the row
+     * satisfies the not-null column -- the user has never seen that value and
+     * cannot type it. Asking such an account for its "current password" before
+     * letting it set a new one locks the person out of their own credentials,
+     * so the change-password flow branches on this.
+     *
+     * `provider` cannot answer this on its own: OAuthController sets
+     * provider='google' both for a fresh Google signup AND when linking Google
+     * to an existing email/password account, and the second kind of user does
+     * know their password. password_set_at records the fact directly.
+     */
+    public function hasUsablePassword(): bool
+    {
+        return $this->password_set_at !== null;
     }
 }

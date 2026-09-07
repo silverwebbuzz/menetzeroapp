@@ -37,6 +37,8 @@ class RegisterController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            // Marks this as a password the user knows -- see User::hasUsablePassword().
+            'password_set_at' => now(),
             'role' => 'company_admin', // Client registration = company_admin
             'is_active' => true,
         ]);

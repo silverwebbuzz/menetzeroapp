@@ -73,13 +73,19 @@ class ProfileController extends Controller
         // Get user from web guard
         $user = Auth::guard('web')->user();
         
+        // An account created through Google signup has a random password nobody
+        // has ever seen, so demanding the "current" one locked those users out
+        // of ever setting a real password. They are already authenticated in
+        // this session, which is the same assurance the current-password check
+        // provides, so it is only required where a known password exists.
+        $needsCurrent = $user->hasUsablePassword();
+
         $request->validate([
-            'current_password' => 'required|string',
+            'current_password' => $needsCurrent ? 'required|string' : 'nullable|string',
             'new_password' => 'required|string|min:8|confirmed',
         ]);
 
-        // Verify current password
-        if (!Hash::check($request->current_password, $user->password)) {
+        if ($needsCurrent && !Hash::check($request->current_password, $user->password)) {
             return back()->withErrors(['current_password' => 'Current password is incorrect.'])->withInput();
         }
 
@@ -91,6 +97,7 @@ class ProfileController extends Controller
         // Update password
         $user->update([
             'password' => Hash::make($request->new_password),
+            'password_set_at' => now(),
         ]);
 
         // Send password changed email notification

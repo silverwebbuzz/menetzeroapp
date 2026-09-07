@@ -19,6 +19,7 @@ class Consultant extends Authenticatable
         'avatar',
         'provider',
         'password',
+        'password_set_at',
         'phone',
         'company_name',
         'trade_license_number',
@@ -58,6 +59,7 @@ class Consultant extends Authenticatable
             'submitted_at' => 'datetime',
             'reviewed_at' => 'datetime',
             'password' => 'hashed',
+            'password_set_at' => 'datetime',
         ];
     }
 

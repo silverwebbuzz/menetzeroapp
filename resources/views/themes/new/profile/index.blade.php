@@ -164,11 +164,21 @@
                 <form method="POST" action="{{ route('profile.update.password') }}">
                     @csrf
                     <div style="max-width:34rem;display:flex;flex-direction:column;gap:16px">
+                        {{-- See the old theme's profile form: a Google-created
+                             account has no password its owner knows, so this
+                             field is replaced by a first-password notice. --}}
+                        @if(auth()->user()->hasUsablePassword())
                         <div class="mnz-field">
                             <label class="mnz-label" for="current_password">Current Password *</label>
                             <input type="password" name="current_password" id="current_password" class="mnz-input" required autocomplete="current-password">
                             @error('current_password')<p class="pf-err">{{ $message }}</p>@enderror
                         </div>
+                        @else
+                        <div style="border:1px solid #bfdbfe;background:#eff6ff;color:#1e3a8a;border-radius:8px;padding:12px 14px;font-size:13px">
+                            You signed up with Google, so this account has no password yet. Set one below and you
+                            will be able to sign in either way.
+                        </div>
+                        @endif
                         <div class="mnz-field">
                             <label class="mnz-label" for="new_password">New Password *</label>
                             <input type="password" name="new_password" id="new_password" class="mnz-input" required autocomplete="new-password" minlength="8">
