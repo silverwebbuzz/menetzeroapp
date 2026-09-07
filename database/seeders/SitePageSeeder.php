@@ -159,48 +159,61 @@ HTML;
     protected function refunds(): string
     {
         return <<<'HTML'
-<p><em>Last updated: 1 September 2026</em></p>
+<p><em>Last updated: 7 September 2026</em></p>
 
 <p>This policy explains how cancellations and refunds work for
 {{brand_name}} subscriptions, operated by {{company_legal_name}}.</p>
 
 <h2>Try before you pay</h2>
-<p>{{brand_name}} has a free plan. We encourage you to use it to confirm the
-platform fits your needs before purchasing, as paid plans are billed annually
-in advance.</p>
+<p>{{brand_name}} has a free plan with no time limit and no card required.
+Paid packages are billed annually in advance and are
+<strong>non-refundable</strong>, so please use the free plan to confirm the
+platform fits your needs before you purchase.</p>
 
 <h2>Cancelling a subscription</h2>
 <p>You can cancel at any time from <strong>Plan &amp; billing</strong> in your
 account, or by emailing {{support_email}}.</p>
 <p>Cancellation takes effect <strong>at the end of your current paid
 term</strong>. Your plan stays fully active until that date, and it will not
-renew afterwards. Cancelling does not, by itself, trigger a refund of the
-current term.</p>
+renew afterwards. Cancelling does not refund the current term — you keep the
+access you have paid for until it expires.</p>
 
 <h2>Refunds</h2>
-<p><strong>Within 14 days of a first purchase.</strong> If you have just bought
-a paid plan for the first time and it is not right for you, contact
-{{support_email}} within 14 days of payment and we will refund it in full.</p>
-<p><strong>Renewals.</strong> If an annual renewal was charged and you had
-intended to cancel, contact us within 14 days of the charge and we will refund
-it, provided the renewed term has not been substantially used.</p>
-<p><strong>Service failure.</strong> If the platform is materially unavailable
-or does not work as described and we cannot resolve it in reasonable time, we
-will refund the affected portion of your term.</p>
-<p><strong>Duplicate or incorrect charges.</strong> Refunded in full, always.
-Tell us and we will correct it.</p>
+<p><strong>Paid subscriptions are non-refundable.</strong> Packages are sold as
+an annual licence for a single reporting year, and they are billed in advance.
+Once a package is active we do not refund it, whether or not it has been used,
+and whether or not the reporting year has been filed.</p>
+<p>This is why the free plan exists. Please use it to confirm the platform
+fits your needs before you buy — it has no time limit and no card is required.</p>
 
-<h2>What is not normally refunded</h2>
+<h2>The two exceptions</h2>
+<p><strong>Service failure, within 7 days.</strong> If the platform is
+materially unavailable or does not work as described, and we cannot put it
+right within a reasonable time, contact {{support_email}} within
+<strong>7 days of payment</strong> and we will refund that purchase in full.
+Beyond 7 days we will work to fix the problem, but the payment stands.</p>
+<p><strong>Duplicate or incorrect charges.</strong> Refunded in full, always,
+with no time limit. If you were billed twice, billed the wrong amount, or
+billed for something you did not buy, tell us and we will correct it. This is
+a billing error on our side, not a refund request.</p>
+
+<h2>What is not refunded</h2>
 <ul>
-<li>Part-used annual terms outside the periods above — access continues to the
-end of the term instead.</li>
-<li>Consultancy client slots that have been assigned to a client workspace and
-used to produce reports.</li>
+<li>Part-used annual terms. Access continues to the end of the term instead —
+downgrading or cancelling never shortens what you have already paid for.</li>
+<li>Packages where the reporting year has been worked on, reports generated or
+exports downloaded.</li>
+<li>Upgrades. Moving from one package to a higher one is a purchase for the
+same reporting year and is not reversible.</li>
+<li>Consultancy client slots that have been assigned to a client workspace.</li>
 <li>Fees for bespoke onboarding, data migration or advisory work already
 delivered.</li>
+<li>Change of mind, a change in your own circumstances, or a reporting
+obligation that no longer applies to you.</li>
 </ul>
-<p>If your circumstances are not covered here, contact us. We would rather
-discuss it than have you feel unfairly treated.</p>
+<p>If something has gone genuinely wrong, contact us. We would rather hear
+about it than have you feel unfairly treated — but please read the above
+before purchasing, because outside the two exceptions the answer will be no.</p>
 
 <h2>How refunds are paid</h2>
 <p>Approved refunds are returned to the original payment method, normally
@@ -213,9 +226,10 @@ movement between the two dates; that difference is set by your bank, not by
 us.</p>
 
 <h2>Requesting a refund</h2>
-<p>Email {{support_email}} with your account name, the invoice number, and the
-reason. We aim to acknowledge within 2 business days and to decide within 5.
-If we decline, we will explain why.</p>
+<p>If you believe your situation falls under one of the two exceptions above,
+email {{support_email}} with your account name, the invoice number, and what
+went wrong. We aim to acknowledge within 2 business days and to decide within
+5. If we decline, we will explain why.</p>
 
 <h2>Contact</h2>
 <p>{{company_legal_name}}<br>

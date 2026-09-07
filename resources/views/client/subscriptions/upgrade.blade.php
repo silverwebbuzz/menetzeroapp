@@ -75,7 +75,8 @@
         <p class="text-xs text-gray-500">
             <strong>Upgrades:</strong> apply immediately and cover the same reporting year you are working on —
             they do not add a second year.
-            <strong>Downgrades:</strong> take effect at renewal — no refund for unused time.
+            <strong>Downgrades:</strong> take effect at renewal — packages are non-refundable, and you keep
+            full access until your current term ends.
         </p>
     </div>
     @endif

@@ -39,6 +39,15 @@
         <p class="mt-4 text-xs text-gray-400">
             Payment is processed securely by {{ $gateway->label }}. Don't close this window.
         </p>
+        {{-- Stated at the point of payment, not only in the policy page: this is
+             the last moment the customer can change their mind, and gateways
+             expect the refund position to be visible before the charge. --}}
+        <p class="mt-2 text-xs text-gray-500">
+            This is an annual package for one reporting year, billed in advance and
+            <strong>non-refundable</strong> except for a service failure reported within 7 days,
+            or a duplicate charge. See our
+            <a href="{{ route('refunds') }}" target="_blank" class="underline hover:text-gray-700">Refunds &amp; Cancellations</a> policy.
+        </p>
         <a href="{{ route('subscriptions.upgrade') }}" class="mt-4 inline-block text-sm text-gray-500 hover:text-gray-700">Cancel and go back</a>
     </div>
 

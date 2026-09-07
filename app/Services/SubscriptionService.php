@@ -124,7 +124,8 @@ class SubscriptionService
                 'preserve_expiry' => true,
                 'message' => "Your {$currentPlan->plan_name} plan stays active until "
                     . $current->expires_at->format('F d, Y')
-                    . ". {$target->plan_name} will apply when you renew — no refund for unused time.",
+                    . ". {$target->plan_name} will apply when you renew. Packages are non-refundable, so you "
+                    . 'keep full access until then.',
                 'days_remaining' => $daysRemaining,
                 'credit_amount' => 0,
             ];

@@ -32,6 +32,14 @@
             <button id="payBtn" class="btn btn-primary w-full">
                 Pay {{ $chargeLabel }}
             </button>
+            {{-- Same notice as the company checkout: the refund position has to
+                 be visible before the charge, not only on the policy page. --}}
+            <p class="mt-3 text-xs text-gray-500">
+                Capacity is billed in advance for the contract year and is
+                <strong>non-refundable</strong> except for a service failure reported within 7 days,
+                or a duplicate charge. See our
+                <a href="{{ route('refunds') }}" target="_blank" class="underline">Refunds &amp; Cancellations</a> policy.
+            </p>
             <form id="razorpayForm" method="POST" action="{{ route('consultant.packs.payment.razorpay') }}" class="hidden">
                 @csrf
                 <input type="hidden" name="transaction_id" value="{{ $transaction->id }}">

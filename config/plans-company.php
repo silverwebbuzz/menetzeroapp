@@ -63,6 +63,12 @@ return [
                     . 'Paid packages unlock clean exports, deeper Scope 3, more sites and team seats.',
         ],
         [
+            'title' => 'Paid packages are non-refundable',
+            'body' => 'Packages are billed annually in advance for one reporting year and are not refunded once active — '
+                    . 'which is exactly why Free has no time limit. Try it first. The only exceptions are a genuine '
+                    . 'service failure reported within 7 days of payment, and any duplicate or incorrect charge.',
+        ],
+        [
             'title' => 'Your data is yours',
             'body' => 'Moving between packages never deletes what you have entered. If you return to Free, your data stays — '
                     . 'only the download and capacity limits change.',
@@ -118,6 +124,15 @@ return [
             'a' => 'Yes. Upgrades apply immediately and cover the same reporting year you are already working on. '
                  . 'Downgrades and a return to Free take effect at the end of your current paid period, so you '
                  . 'keep what you paid for. Your data is kept either way.',
+        ],
+        [
+            'q' => 'Can I get a refund?',
+            'a' => 'Paid packages are non-refundable. They are sold as an annual licence for one reporting year and '
+                 . 'billed in advance, so once a package is active it is not refunded — cancelling stops the renewal '
+                 . 'but leaves your access running to the end of the term you paid for. Two exceptions: if the '
+                 . 'platform genuinely does not work as described, tell us within 7 days of payment and we will '
+                 . 'refund in full; and any duplicate or incorrect charge is always corrected, with no time limit. '
+                 . 'Use the free plan first — it has no time limit and needs no card.',
         ],
         [
             'q' => 'Which reporting year does my package cover?',
