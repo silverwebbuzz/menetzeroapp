@@ -24,28 +24,46 @@ class PaymentGatewayController extends Controller
 
         $validated = $request->validate([
             'mode' => 'required|in:test,live',
-            'key_id' => 'nullable|string|max:255',
-            'key_secret' => 'nullable|string|max:500',
-            'webhook_secret' => 'nullable|string|max:500',
+            'test_key_id' => 'nullable|string|max:255',
+            'test_key_secret' => 'nullable|string|max:500',
+            'test_webhook_secret' => 'nullable|string|max:500',
+            'live_key_id' => 'nullable|string|max:255',
+            'live_key_secret' => 'nullable|string|max:500',
+            'live_webhook_secret' => 'nullable|string|max:500',
         ]);
 
         $gateway->mode = $validated['mode'];
-        $gateway->key_id = $validated['key_id'] ?? null;
 
-        // Only overwrite secrets when a new value is supplied (the form shows
-        // them masked, so an empty field means "keep existing").
-        if ($request->filled('key_secret')) {
-            $gateway->key_secret = $validated['key_secret'];
-        }
-        if ($request->filled('webhook_secret')) {
-            $gateway->webhook_secret = $validated['webhook_secret'];
+        // Both credential sets are saved on every submit, independently of the
+        // selected mode: the whole point is that switching mode no longer means
+        // retyping keys, so editing the live pair while running in test must
+        // keep working.
+        foreach (['test', 'live'] as $prefix) {
+            $gateway->{$prefix . '_key_id'} = $validated[$prefix . '_key_id'] ?? null;
+
+            // Only overwrite secrets when a new value is supplied (the form
+            // shows them masked, so an empty field means "keep existing").
+            foreach (['key_secret', 'webhook_secret'] as $secret) {
+                $field = $prefix . '_' . $secret;
+                if ($request->filled($field)) {
+                    $gateway->{$field} = $validated[$field];
+                }
+            }
         }
 
         $gateway->is_enabled = $request->boolean('is_enabled');
 
-        // Cannot enable a gateway without credentials.
+        // Cannot enable a gateway whose ACTIVE mode has no credentials. The
+        // other mode's keys are irrelevant here -- they are not what checkout
+        // would use.
         if ($gateway->is_enabled && !$gateway->isConfigured()) {
-            return back()->with('error', $gateway->label . ' needs a Key ID and Secret before it can be enabled.');
+            $modeLabel = $gateway->isLive() ? 'Live' : 'Test';
+
+            return back()->with(
+                'error',
+                $gateway->label . ' needs a ' . $modeLabel . ' Key ID and Secret before it can be enabled in '
+                    . $modeLabel . ' mode.'
+            );
         }
 
         $gateway->save();
