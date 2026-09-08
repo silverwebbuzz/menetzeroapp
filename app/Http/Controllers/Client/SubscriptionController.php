@@ -131,6 +131,72 @@ class SubscriptionController extends Controller
      * International Payments active on the Razorpay account; if it is not, the
      * order fails rather than falling back to INR (see the note at the call).
      */
+    /**
+     * Validate a coupon against a selected plan and return what it would cost.
+     *
+     * Preview only -- nothing is redeemed and no counter moves. It resolves the
+     * plan change and calls the same CouponService::validateForCheckout() that
+     * processUpgrade() uses, so the figure quoted here is the figure charged;
+     * anything the service would reject at checkout is rejected here, with the
+     * service's own message.
+     */
+    public function previewCoupon(Request $request)
+    {
+        $company = Auth::user()->getActiveCompany();
+        if (!$company || !$company->isClient()) {
+            return response()->json(['ok' => false, 'message' => 'Access denied.'], 403);
+        }
+
+        $request->validate([
+            'plan_id' => 'required|exists:subscription_plans,id',
+            'coupon_code' => 'required|string|max:64',
+        ]);
+
+        $plan = SubscriptionPlan::findOrFail($request->plan_id);
+
+        if ($plan->plan_category !== 'client' || !$plan->is_active) {
+            return response()->json(['ok' => false, 'message' => 'Invalid plan selected.'], 422);
+        }
+
+        $currentSubscription = $this->subscriptionService->getActiveSubscription($company->id, 'client');
+        $displayCurrency = \App\Services\CurrencyService::displayCurrency();
+        $change = $this->subscriptionService->resolvePlanChange($currentSubscription, $plan, $displayCurrency);
+
+        // Only a payable upgrade has something to discount. Downgrades and free
+        // moves charge nothing today, so a coupon cannot apply to them.
+        if (!in_array($change['type'], ['upgrade', 'new'], true) || empty($change['requires_payment'])) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'This plan change has nothing to pay today, so a coupon cannot be applied.',
+            ], 422);
+        }
+
+        $amount = (float) $change['charge_amount'];
+        $currency = $change['charge_currency'];
+
+        try {
+            $applied = $this->couponService->validateForCheckout(
+                $request->input('coupon_code'),
+                $company->id,
+                $plan,
+                $amount,
+                $currency
+            );
+        } catch (\RuntimeException $e) {
+            return response()->json(['ok' => false, 'message' => $e->getMessage()], 422);
+        }
+
+        return response()->json([
+            'ok' => true,
+            'code' => $applied['coupon']->code,
+            'label' => $applied['coupon']->typeLabel(),
+            'is_free' => $applied['is_free'],
+            'subtotal' => \App\Services\CurrencyService::format($amount, $currency),
+            'discount' => \App\Services\CurrencyService::format($applied['discount'], $currency),
+            'total' => \App\Services\CurrencyService::format($applied['final_amount'], $currency),
+        ]);
+    }
+
     public function processUpgrade(Request $request)
     {
         $company = Auth::user()->getActiveCompany();

@@ -615,6 +615,11 @@ Route::middleware([
         Route::get('/upgrade', [\App\Http\Controllers\Client\SubscriptionController::class, 'upgrade'])->name('upgrade');
         Route::post('/upgrade', [\App\Http\Controllers\Client\SubscriptionController::class, 'processUpgrade'])->name('process-upgrade');
 
+        // Coupon preview for the upgrade screen. Read-only: it prices the code
+        // against the selected plan so the order summary can show the discount
+        // before anyone commits, and redeems nothing.
+        Route::post('/coupon/preview', [\App\Http\Controllers\Client\SubscriptionController::class, 'previewCoupon'])->name('coupon.preview');
+
         // Payment checkout + gateway callbacks
         Route::get('/checkout/{id}', [\App\Http\Controllers\Client\SubscriptionController::class, 'checkout'])->name('checkout');
         Route::post('/payment/razorpay/callback', [\App\Http\Controllers\Client\SubscriptionController::class, 'razorpayCallback'])->name('payment.razorpay');

@@ -337,10 +337,26 @@
                             <label for="coupon_code" class="block text-sm font-medium text-gray-700 mb-1">
                                 Coupon code <span class="text-gray-400 font-normal">(optional)</span>
                             </label>
-                            <input type="text" id="coupon_code" name="coupon_code" value="{{ old('coupon_code') }}"
-                                   placeholder="e.g. LAUNCH50"
-                                   class="w-full max-w-xs border border-gray-300 rounded-lg px-3 py-2 text-sm uppercase">
-                            <p class="text-xs text-gray-500 mt-1">Applied at checkout — the discount is shown before you pay.</p>
+                            <div class="flex flex-wrap items-start gap-2">
+                                <input type="text" id="coupon_code" name="coupon_code" value="{{ old('coupon_code') }}"
+                                       placeholder="e.g. LAUNCH50"
+                                       class="flex-1 min-w-0 max-w-xs border border-gray-300 rounded-lg px-3 py-2 text-sm uppercase">
+                                {{-- type="button": this posts to the preview endpoint,
+                                     it must never submit the checkout form. --}}
+                                <button type="button" id="coupon-apply"
+                                        class="flex-none px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    Apply
+                                </button>
+                                <button type="button" id="coupon-remove"
+                                        class="hidden flex-none px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-900">
+                                    Remove
+                                </button>
+                            </div>
+
+                            {{-- One line for both outcomes; the script sets the colour. --}}
+                            <p id="coupon-status" class="hidden text-xs mt-1.5" role="status" aria-live="polite"></p>
+
+                            <p id="coupon-hint" class="text-xs text-gray-500 mt-1">Applied at checkout — the discount is shown before you pay.</p>
                             @error('coupon_code')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
                         </div>
 
@@ -390,6 +406,17 @@
                         <div class="border-t border-gray-100 mt-4 pt-4 flex items-baseline justify-between">
                             <span class="text-sm text-gray-600">Package price</span>
                             <span class="text-sm font-medium text-gray-900" id="summary-price"></span>
+                        </div>
+
+                        {{-- Discount row. Hidden until a coupon is successfully
+                             previewed, so the summary reads the same as before
+                             for everyone without a code. --}}
+                        <div id="summary-discount-row" class="hidden border-t border-gray-100 mt-3 pt-3 items-baseline justify-between">
+                            <span class="text-sm text-emerald-700">
+                                Coupon <span class="font-semibold" id="summary-coupon-code"></span>
+                                <span class="text-xs text-emerald-600" id="summary-coupon-label"></span>
+                            </span>
+                            <span class="text-sm font-medium text-emerald-700" id="summary-discount"></span>
                         </div>
 
                         <div class="border-t border-gray-200 mt-3 pt-3 flex items-baseline justify-between">
@@ -515,6 +542,116 @@
         el.style.display = on ? (display || '') : '';
     }
 
+    /* ── Coupon preview ──────────────────────────────────────────────────
+     *
+     * The quote comes from the server, which runs the same validation that
+     * checkout runs. Nothing here changes what is charged: processUpgrade()
+     * re-validates the code and re-resolves the price on submit.
+     */
+
+    var appliedCoupon = null;
+
+    var couponInput  = document.getElementById('coupon_code');
+    var couponApply  = document.getElementById('coupon-apply');
+    var couponRemove = document.getElementById('coupon-remove');
+    var couponStatus = document.getElementById('coupon-status');
+    var couponHint   = document.getElementById('coupon-hint');
+
+    var discountRow  = document.getElementById('summary-discount-row');
+
+    function setStatus(message, kind) {
+        if (!couponStatus) { return; }
+        couponStatus.textContent = message || '';
+        couponStatus.className = 'text-xs mt-1.5 ' +
+            (kind === 'error' ? 'text-red-600' : 'text-emerald-700');
+        show(couponStatus, !!message);
+        show(couponHint, !message);
+    }
+
+    function clearCoupon(message) {
+        appliedCoupon = null;
+        show(discountRow, false);
+        show(couponRemove, false);
+        if (couponInput) { couponInput.readOnly = false; }
+        if (couponApply) { couponApply.disabled = false; }
+        setStatus(message || '', 'error');
+    }
+
+    function applyCoupon() {
+        var picked = document.querySelector('.plan-radio:checked');
+        var code = (couponInput.value || '').trim();
+
+        if (!code) { setStatus('Enter a coupon code first.', 'error'); return; }
+        if (!picked) { setStatus('Choose a plan before applying a coupon.', 'error'); return; }
+
+        couponApply.disabled = true;
+        setStatus('Checking…', 'ok');
+
+        var body = new FormData();
+        body.append('plan_id', picked.value);
+        body.append('coupon_code', code);
+
+        fetch('{{ route('subscriptions.coupon.preview') }}', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            },
+            body: body
+        })
+        .then(function (res) { return res.json().then(function (d) { return { ok: res.ok, data: d }; }); })
+        .then(function (r) {
+            couponApply.disabled = false;
+
+            if (!r.ok || !r.data.ok) {
+                clearCoupon(r.data.message || 'That coupon could not be applied.');
+                render();
+                return;
+            }
+
+            appliedCoupon = r.data;
+
+            document.getElementById('summary-coupon-code').textContent = r.data.code;
+            document.getElementById('summary-coupon-label').textContent =
+                r.data.label ? '(' + r.data.label + ')' : '';
+            document.getElementById('summary-discount').textContent = '− ' + r.data.discount;
+
+            show(discountRow, true, 'flex');
+            show(couponRemove, true);
+            couponInput.readOnly = true;
+
+            setStatus(r.data.is_free
+                ? 'Coupon applied — nothing to pay today.'
+                : 'Coupon applied — ' + r.data.discount + ' off.', 'ok');
+
+            render();
+        })
+        .catch(function () {
+            couponApply.disabled = false;
+            clearCoupon('Could not check that coupon. Please try again.');
+            render();
+        });
+    }
+
+    if (couponApply) { couponApply.addEventListener('click', applyCoupon); }
+
+    if (couponRemove) {
+        couponRemove.addEventListener('click', function () {
+            couponInput.value = '';
+            clearCoupon('');
+            render();
+        });
+    }
+
+    // Enter in the coupon box applies the code; without this it submits the
+    // whole form and starts checkout.
+    if (couponInput) {
+        couponInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); applyCoupon(); }
+        });
+    }
+
     function render() {
         var picked = document.querySelector('.plan-radio:checked');
 
@@ -548,7 +685,10 @@
         document.getElementById('summary-price').textContent = price;
         document.getElementById('summary-billing').textContent =
             sub === 'per year' ? 'Billed annually' : sub;
-        document.getElementById('summary-total').textContent = total;
+        // An applied coupon owns the total; render() must not overwrite the
+        // discounted figure when it re-runs for another reason.
+        document.getElementById('summary-total').textContent =
+            appliedCoupon ? appliedCoupon.total : total;
 
         var noteText;
         if (charge && charge !== price) {
@@ -570,10 +710,21 @@
         // would be actively misleading.
         var isDowngrade = (type === 'downgrade' || type === 'downgrade_to_free');
         show(barTotalWrap, !isDowngrade);
-        document.getElementById('sticky-total').textContent = total;
+        document.getElementById('sticky-total').textContent =
+            appliedCoupon ? appliedCoupon.total : total;
     }
 
-    radios.forEach(function (r) { r.addEventListener('change', render); });
+    // Changing plan invalidates a quote priced against the old plan, so the
+    // discount is dropped rather than shown against a figure it was not
+    // calculated from. The code is left in the box to be re-applied.
+    radios.forEach(function (r) {
+        r.addEventListener('change', function () {
+            if (appliedCoupon) {
+                clearCoupon('Plan changed — apply your coupon again to see the new total.');
+            }
+            render();
+        });
+    });
     render();
 
     // The bar duplicates the checkout box's submit button, so it should not be
