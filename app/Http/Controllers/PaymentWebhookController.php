@@ -52,7 +52,6 @@ class PaymentWebhookController extends Controller
         $payload = $request->json()->all();
         $event = $payload['event'] ?? null;
 
-        // We only act on successful payment/order events.
         $orderId = $payload['payload']['payment']['entity']['order_id']
             ?? $payload['payload']['order']['entity']['id']
             ?? null;
@@ -69,8 +68,57 @@ class PaymentWebhookController extends Controller
             }
         }
 
+        // A declined card is the only signal we get that an attempt ended:
+        // the payer never returns through razorpayCallback(), so without this
+        // the row sits at 'pending' forever while Razorpay emails the merchant
+        // that it failed. Recording it keeps the billing history honest and
+        // stops abandoned attempts from being mistaken for pending ones.
+        if ($event === 'payment.failed' && $orderId) {
+            $this->recordFailure($orderId, $paymentId, $payload);
+        }
+
         // Always 200 on a verified request so the gateway stops retrying.
         return response()->json(['status' => 'ok']);
+    }
+
+    /**
+     * Mark a transaction failed after a declined payment.
+     *
+     * Deliberately narrow: only a row still awaiting its outcome is touched.
+     * A payment can fail and then succeed on retry against the same order, and
+     * webhooks can arrive out of order, so a transaction that already reached
+     * 'completed' must never be walked back to 'failed' by a late notification.
+     */
+    private function recordFailure(string $orderId, ?string $paymentId, array $payload): void
+    {
+        $transaction = PaymentTransaction::where('metadata->razorpay_order_id', $orderId)->first();
+
+        if (!$transaction || $transaction->status !== 'pending') {
+            return;
+        }
+
+        $entity = $payload['payload']['payment']['entity'] ?? [];
+
+        $metadata = $transaction->metadata ?? [];
+        $metadata['failure'] = array_filter([
+            'razorpay_payment_id' => $paymentId,
+            'code' => $entity['error_code'] ?? null,
+            'description' => $entity['error_description'] ?? null,
+            'reason' => $entity['error_reason'] ?? null,
+            'source' => 'webhook',
+            'at' => now()->toIso8601String(),
+        ]);
+
+        $transaction->status = 'failed';
+        $transaction->metadata = $metadata;
+        $transaction->save();
+
+        Log::info('Razorpay payment failed', [
+            'transaction_id' => $transaction->id,
+            'order_id' => $orderId,
+            'payment_id' => $paymentId,
+            'code' => $entity['error_code'] ?? null,
+        ]);
     }
 
     private function activate(PaymentTransaction $transaction, array $refs): void

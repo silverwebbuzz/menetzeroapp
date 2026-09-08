@@ -241,7 +241,22 @@
                                         <td class="px-4 py-3 whitespace-nowrap">{{ $transaction->created_at->format('M d, Y') }}</td>
                                         <td class="px-4 py-3">{{ $transaction->description ?? 'Package payment' }}</td>
                                         <td class="px-4 py-3">
-                                            <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100">{{ ucfirst($transaction->status ?? 'pending') }}</span>
+                                            {{-- Colour by outcome. Every status used to render in the
+                                                 same grey, which made a failed charge look like one
+                                                 still in progress. --}}
+                                            @php
+                                                $txStatus = $transaction->status ?? 'pending';
+                                                $txTone = match ($txStatus) {
+                                                    'completed' => 'bg-green-100 text-green-800',
+                                                    'failed' => 'bg-red-100 text-red-800',
+                                                    'refunded' => 'bg-amber-100 text-amber-800',
+                                                    default => 'bg-gray-100 text-gray-700',
+                                                };
+                                            @endphp
+                                            <span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ $txTone }}">{{ ucfirst($txStatus) }}</span>
+                                            @if($txStatus === 'failed' && ($reason = $transaction->metadata['failure']['description'] ?? null))
+                                                <span class="block text-xs text-gray-500 mt-0.5">{{ $reason }}</span>
+                                            @endif
                                         </td>
                                         <td class="px-4 py-3">
                                             {{-- Prefer the issued invoice; invoice_url is the
