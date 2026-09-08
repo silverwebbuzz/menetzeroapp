@@ -1757,28 +1757,29 @@ body.mnz-theme .upgrade-sticky-bar {
    untouched. `translateZ(0)` is a no-op visually and exists only to establish
    that containing block.
 
-   Bottom-LEFT, above the sidebar's plan card: that corner is dead space in
-   every shell, while the bottom-right is where page content and action buttons
-   end up.
+   The dock sets no `left`/`right`: the widget anchors itself horizontally
+   inside the box, and pinning an edge is what broke earlier attempts. Only the
+   box's size and vertical offset are ours, lifting the bubble clear of the
+   sidebar's plan card and of any fixed bottom bar on the page.
    ========================================================================== */
 
 .voice-widget-dock {
     position: fixed;
-    left: 16px;
     bottom: 4.5rem;
     /* The widget inside is itself position:fixed, so it contributes NO size to
        this wrapper. A zero-size box gives it nothing to resolve against and the
        bubble never appears, so the dock is given explicit room to lay out in.
-       Wide enough for the expanded "Need help? / Start a call" panel. */
-    width: 22rem;
+       These dimensions were confirmed against the rendered widget in the
+       browser -- they fit the expanded "Need help? / Start a call" panel. */
+    width: 19rem;
     max-width: calc(100vw - 32px);
-    height: 8rem;
+    height: 11rem;
     /* Establishes the containing block for the widget's own fixed positioning
        -- this is what actually anchors it here. */
     transform: translateZ(0);
-    /* Below the sidebar (40) and the mobile overlay (35) so an open mobile menu
-       covers it, above ordinary page content. */
-    z-index: 34;
+    /* Above the sidebar so the bubble is not clipped by it. Safe because the
+       dock takes no pointer events, so it cannot block the nav beneath it. */
+    z-index: 40;
     /* The dock is only an anchor; the widget draws its own surfaces. Without
        this the sized box would swallow clicks meant for the page beneath it. */
     pointer-events: none;
@@ -1795,12 +1796,15 @@ body.mnz-theme .voice-widget-dock {
     bottom: 7.5rem;
 }
 
-/* Both shells collapse the sidebar below this width, so there is no rail to sit
-   in and no plan card to clear. */
+/* Both shells collapse the sidebar below this width, so there is no plan card
+   to clear and the dock can sit lower.
+
+   `left` is deliberately NOT set here, matching the base rule: the widget does
+   its own horizontal anchoring inside the dock, and forcing a left edge is what
+   broke it in earlier attempts. Only the vertical offset changes. */
 @media (max-width: 1024px) {
     .voice-widget-dock,
     body.mnz-theme .voice-widget-dock {
-        left: 12px;
         bottom: 1rem;
     }
 }
