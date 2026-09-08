@@ -119,8 +119,14 @@
 
                 {{-- The legal entity behind the brand. Both are needed: the
                      customer knows the product by its brand, but the contract
-                     and the tax point belong to the company. --}}
-                <div class="seller-legal">{{ $invoice->seller_name }}</div>
+                     and the tax point belong to the company.
+
+                     Only printed when it differs from the brand -- if the two
+                     settings hold the same value there is nothing to add, and
+                     repeating the name under the logo just looks like a bug. --}}
+                @if ($invoice->seller_name && $invoice->seller_name !== $brand)
+                    <div class="seller-legal">{{ $invoice->seller_name }}</div>
+                @endif
                 @if ($invoice->seller_address)
                     <div class="muted">{!! nl2br(e($invoice->seller_address)) !!}</div>
                 @endif
