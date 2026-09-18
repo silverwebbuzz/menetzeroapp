@@ -6,8 +6,9 @@
 @section('content')
 @php
     // Render order for the selectable plan cards: the live four-tier
-    // catalogue, Free through Enterprise.
-    $planOrder = ['client_free', 'client_carbon', 'client_esg', 'client_enterprise'];
+    // catalogue, Essential through Enterprise. Free is retired from checkout
+    // and is appended below only for companies still sitting on it.
+    $planOrder = ['client_essential', 'client_carbon', 'client_esg', 'client_enterprise'];
 
     // A subscriber grandfathered on a retired plan must still see the card for
     // the plan they are actually paying for -- otherwise the page shows no
@@ -19,13 +20,17 @@
     }
     $planGuide = config('plans-company');
     $planTaglines = $planGuide['plan_taglines'] ?? [];
+    // Free is no longer sellable, so this card is display-only: it appears for
+    // a company already on Free (appended above as their current plan) to show
+    // what they are on and what Essential adds. selectable = false keeps it out
+    // of checkout -- nobody can pick Free again once they leave it.
     $freeMeta = [
         'name' => 'Free',
-        'tagline' => $planTaglines['client_free'] ?? 'Try S1&2 + disclosure forms (preview only)',
+        'tagline' => $planTaglines['client_free'] ?? 'Evaluation only — watermarked downloads',
         'price_display' => 'AED 0',
-        'price_sub' => 'Free forever',
+        'price_sub' => 'Evaluation only',
         'is_custom' => false,
-        'selectable' => true,
+        'selectable' => false,
         'highlight' => false,
     ];
 @endphp
@@ -162,7 +167,7 @@
                                 $priceSub = 'Contact sales for pricing';
                             } elseif ((float) $plan->price_annual <= 0) {
                                 $priceText = \App\Services\CurrencyService::format(0, $cur);
-                                $priceSub = 'Free forever';
+                                $priceSub = 'Evaluation only';
                             } else {
                                 $disp = \App\Services\CurrencyService::displayPrice($plan, $cur);
                                 $priceText = \App\Services\CurrencyService::format($disp['amount'], $cur);
@@ -367,7 +372,7 @@
                         <div id="payment-method-section" class="border-t border-gray-100 pt-5">
                             @if($enabledGateways->isEmpty())
                                 <p class="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-                                    Online payment isn't configured yet. You can switch to the Free plan, or contact sales for paid plans.
+                                    Online payment isn't configured yet — please contact sales to arrange a plan.
                                 </p>
                             @else
                                 {{-- AED is the only currency now, so this no longer warns

@@ -15,8 +15,8 @@
             and publish an integrated UAE ESG Report with IFRS / GRI disclosures — without hiring a consultant to do the data entry.
         </p>
         <p class="text-sm text-gray-500 mt-4 max-w-2xl mx-auto">
-            Start free with Scope 1 &amp; 2, try Scope 3 (one entry per category), and download watermarked trial reports.
-            When you need clean exports or more capacity, upgrade from inside your account and pay online in AED.
+            Scope 1 &amp; 2 with submission-ready MOCCAE and GHG exports from AED 499 a year.
+            Add Scope 3, more sites or the ESG frameworks whenever you need them — pay online in AED.
         </p>
         <x-payments-notice class="mt-6" />
         <div class="flex flex-wrap justify-center gap-3 mt-6">
@@ -36,7 +36,7 @@
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             @foreach([
                 ['MOCCAE-ready from day one', 'Generate GHG inventories, MOCCAE Scope 1 & 2 PDFs, and IEQT exports aligned with UAE reporting workflows.'],
-                ['Start free, request when ready', 'Try Scope 1 & 2 and watermarked trial downloads at no cost. Upgrade your package for official clean exports and higher limits.'],
+                ['Priced for small UAE businesses', 'Essential covers one site\'s Scope 1 & 2 with clean MOCCAE and GHG exports for AED 499 a year. Upgrade when you need Scope 3 or more capacity.'],
                 ['UAE ESG on higher packages', 'Build narrative chapters, auto-pull GHG totals, and download the integrated UAE ESG Report PDF plus ESG Scorecard on ESG packages.'],
                 ['Human review when you need it', 'Connect with verified UAE consultants from the directory — optional review packs for professional sign-off.'],
             ] as $item)
@@ -130,8 +130,8 @@
                             <li class="flex items-start"><span class="mkt-checkmark">✓</span> {{ $feat }}</li>
                         @endforeach
                     </ul>
-                    @if($code === 'client_free')
-                        <a href="{{ route('register') }}" class="mkt-btn mkt-btn-primary mkt-btn-sm">Start free</a>
+                    @if($code === 'client_essential')
+                        <a href="{{ route('register') }}" class="mkt-btn mkt-btn-primary mkt-btn-sm">Get started</a>
                     @elseif($code === 'client_enterprise')
                         <a href="{{ route('contact') }}" class="mkt-btn mkt-btn-outline mkt-btn-sm">Contact sales</a>
                     @else
@@ -143,7 +143,7 @@
             @endforeach
         </div>
         <p class="text-center text-sm text-gray-500 mt-8">
-            <a href="{{ route('pricing') }}" class="mkt-text-brand hover:underline">Learn what’s included on Free →</a>
+            <a href="{{ route('pricing') }}" class="mkt-text-brand hover:underline">Compare what’s included in each plan →</a>
         </p>
     </div>
 </section>
@@ -302,8 +302,8 @@
                 <div class="space-y-4 text-sm text-slate-300">
                     <div class="pb-4 border-b border-white/10">
                         <p class="font-semibold text-white mb-1">Company portal — you are here</p>
-                        <p>Your organisation tracks its own emissions. Start Free, then request a package when ready.</p>
-                        <a href="{{ route('pricing') }}" class="text-teal-300 hover:underline text-xs mt-2 inline-block">Explore Free →</a>
+                        <p>Your organisation tracks its own emissions. Start on Essential, then upgrade as your reporting grows.</p>
+                        <a href="{{ route('pricing') }}" class="text-teal-300 hover:underline text-xs mt-2 inline-block">See pricing →</a>
                     </div>
                     <div>
                         <p class="font-semibold text-white mb-1">Consultant portal</p>
@@ -346,7 +346,7 @@
     <div class="mkt-container max-w-3xl text-center">
         <h2 class="text-3xl font-bold text-gray-900 mb-4">Ready to measure your organisation's footprint?</h2>
         <p class="text-gray-500 mb-8">
-            Create your company account in minutes. Start Free, then request a package when you need clean exports.
+            Create your company account in minutes and start reporting from AED 499 a year.
         </p>
         <div class="flex flex-wrap justify-center gap-3">
             <a href="{{ route('register') }}" class="mkt-btn mkt-btn-primary mkt-btn-lg">Company sign up</a>

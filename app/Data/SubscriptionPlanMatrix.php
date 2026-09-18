@@ -26,6 +26,15 @@ class SubscriptionPlanMatrix
     public static function plans(): array
     {
         return [
+            'client_essential' => [
+                'name' => 'Essential',
+                'tagline' => 'Scope 1 & 2 with clean MOCCAE and GHG exports',
+                'price_display' => 'AED 499',
+                'price_sub' => '/ year',
+                'is_custom' => false,
+                'selectable' => true,
+                'highlight' => false,
+            ],
             'client_carbon' => [
                 'name' => 'Carbon',
                 'tagline' => 'Full Scope 1-3 inventory, MOCCAE & IEQT',

@@ -4,7 +4,7 @@
  * Human-friendly copy for the company package guidance on the upgrade page.
  *
  * KEEP THIS IN STEP WITH THE CATALOGUE. The live self-serve tiers are
- * client_free · client_carbon · client_esg · client_enterprise
+ * client_essential · client_carbon · client_esg · client_enterprise
  * (SubscriptionPlanSeeder::ACTIVE_CODES). Everything else is retired: those
  * rows still exist so grandfathered subscribers keep their entitlements, but
  * nobody can buy them, so they must not appear in `examples` or the FAQ.
@@ -21,8 +21,8 @@ return [
         'body' => 'Every package includes your full Scope 1 and 2 inventory. What changes is Scope 3 depth, '
                 . 'which reports you can download without a watermark, and how many sites and teammates you get.',
         'tips' => [
-            'Not sure yet? Stay on Free — Scope 1 & 2 for one site, plus one Scope 3 entry per category. Downloads are watermarked trial files.',
-            'Need clean MOCCAE, IEQT or GHG reports you can actually submit? That is Carbon.',
+            'One site, and all you need is the MOCCAE filing? That is Essential — clean MOCCAE, GHG and Excel exports.',
+            'Need Scope 3, the IEQT export or more than one site? That is Carbon.',
             'Need IFRS S1 & S2, GRI, SASB or the UAE ESG Report? That is ESG.',
         ],
     ],
@@ -31,10 +31,10 @@ return [
     // to plan_taglines below so the two cannot tell a user different stories.
     'examples' => [
         [
-            'plan' => 'Free',
-            'code' => 'client_free',
-            'scenario' => 'A one-location café wants to understand its electricity and LPG use before committing any budget.',
-            'you_get' => 'Enter data, view dashboards and preview disclosures — watermarked trial downloads only.',
+            'plan' => 'Essential',
+            'code' => 'client_essential',
+            'scenario' => 'A one-location café has to file its Scope 1 & 2 numbers and needs a report it can actually submit.',
+            'you_get' => 'Scope 1 & 2 for one site with clean MOCCAE, GHG and Excel exports — no watermark.',
         ],
         [
             'plan' => 'Carbon',
@@ -158,11 +158,12 @@ return [
         // Live four-tier catalogue. Carbon and ESG name what the buyer gets:
         // Carbon is the inventory and its UAE filings, ESG adds the framework
         // reports on top.
-        'client_free' => 'Scope 1 & 2 for one site — preview only',
+        'client_essential' => 'Scope 1 & 2 for one site with clean MOCCAE and GHG exports',
         'client_carbon' => 'Full Scope 1–3 inventory with MOCCAE, IEQT and GHG reports',
         'client_esg' => 'Everything in Carbon plus IFRS S1 & S2, GRI, SASB and UAE ESG',
         'client_enterprise' => 'Multi-entity consolidation, assurance support and SSO',
         // Superseded codes — still shown to whoever is grandfathered on them.
+        'client_free' => 'Evaluation only — watermarked downloads (retired)',
         'client_scope_basic' => 'Clean GHG / MOCCAE / Excel / IEQT (retired)',
         'client_scope_pro' => 'Broader scopes + ESG disclosure exports (retired)',
         'client_esg_starter' => 'Full ESG pack for mid-size orgs (retired)',

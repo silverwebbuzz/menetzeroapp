@@ -22,6 +22,7 @@ class PlanEntitlementDefaults
      */
     public const CURRENT_PLAN_CODES = [
         'client_free',
+        'client_essential',
         'client_carbon',
         'client_esg',
         'client_enterprise',
@@ -46,6 +47,7 @@ class PlanEntitlementDefaults
     /** Every code that must still resolve, live or grandfathered. */
     public const PLAN_CODES = [
         'client_free',
+        'client_essential',
         'client_carbon',
         'client_esg',
         'client_enterprise',
@@ -66,6 +68,7 @@ class PlanEntitlementDefaults
     {
         return [
             'client_free' => self::free(),
+            'client_essential' => self::essential(),
             'client_carbon' => self::carbon(),
             'client_esg' => self::esg(),
             'client_starter' => self::starter(),
@@ -106,36 +109,97 @@ class PlanEntitlementDefaults
     }
 
     /**
+     * Free — the floor state, not a sellable plan.
+     *
+     * Retired from checkout (is_active = false in SubscriptionPlanSeeder) once
+     * Essential took over the entry price. It stays defined, and stays at
+     * price_annual = 0, because zero price is a sentinel across the billing
+     * code, not merely a price: SubscriptionService reads it to classify a
+     * downgrade_to_free and to decide whether a subscription counts as paid,
+     * ScheduledDowngradeService lands expired subscriptions here, and
+     * PlanEntitlementService falls back to this code for any company with no
+     * subscription row at all. Give it a price and every one of those paths
+     * starts treating unpaid companies as paying customers.
+     *
+     * Scoped to a demo: data entry works so an evaluator can see their own
+     * numbers, but nothing leaves the product unstamped and Scope 3 is shut.
+     *
      * @return array<string, mixed>
      */
     private static function free(): array
     {
         return [
             'plan_name' => 'Free',
-            'description' => 'Scope 1 & 2 full, Scope 3 (1 entry per category), disclosure previews, watermarked GHG/Excel/IEQT trial downloads. Upgrade your package for clean exports.',
+            'description' => 'Evaluation only: Scope 1 & 2 entry and dashboard, watermarked trial downloads. Subscribe to Essential for clean MOCCAE and GHG reports.',
             'price_annual' => 0,
             'currency' => 'AED',
             'sort_order' => 1,
             'limits' => [
                 'locations' => 1,
                 'users' => 2,
-                'documents' => 10,
-                'scope3_records_per_form' => 1,
+                'documents' => 5,
+                'scope3_records_per_form' => 0,
                 'annual_report_pdf' => 0,
                 'historical_years' => 1,
             ],
             'entitlements' => [
-                // All Scope 3 categories open; capped at 1 entry per category (preview_per_category).
-                'scope3_mode' => 'preview_per_category',
+                // Scope 3 is the Carbon tier's headline — closed here so the
+                // ladder has somewhere to climb.
+                'scope3_mode' => 'locked',
                 'bulk_import' => false,
                 'bulk_export' => false,
                 'help_level' => 'basic',
+                // Disclosure screens stay reachable: seeing what ESG contains
+                // is the point of an evaluation account.
                 'disclosures' => ['access' => true, 'export' => false],
                 // Trial downloads — always stamped (see export_watermark).
                 'exports' => ['ghg_pdf', 'moccae_pdf', 'excel', 'ieqt'],
                 'export_watermark' => true,
                 'export_regen' => 'watermarked_trial',
                 'consultant_directory' => 'teaser',
+            ],
+            'features' => ['disclosures_access'],
+        ];
+    }
+
+    /**
+     * Essential — the entry price, and the first tier that exports cleanly.
+     *
+     * Aimed at the small UAE company with one site that needs a MOCCAE filing
+     * and nothing else. The upgrade lever out of Free is the watermark: the
+     * exports list is identical, the stamp is what AED 499 removes. The lever
+     * on to Carbon is Scope 3, which stays locked here.
+     *
+     * @return array<string, mixed>
+     */
+    private static function essential(): array
+    {
+        return [
+            'plan_name' => 'Essential',
+            'description' => 'Scope 1 & 2 with clean MOCCAE, GHG and Excel exports. 1 site, 3 users.',
+            'price_annual' => 499,
+            'currency' => 'AED',
+            'sort_order' => 2,
+            'limits' => [
+                'locations' => 1,
+                'users' => 3,
+                'documents' => 25,
+                'scope3_records_per_form' => 0,
+                'annual_report_pdf' => -1,
+                'historical_years' => 2,
+            ],
+            'entitlements' => [
+                'scope3_mode' => 'locked',
+                // Bulk import is a Scope 3 convenience at this size — a single
+                // site's Scope 1 & 2 is a short manual entry.
+                'bulk_import' => false,
+                'bulk_export' => false,
+                'help_level' => 'full',
+                'disclosures' => ['access' => true, 'export' => false],
+                // IEQT stays a Carbon feature; this tier covers the MOCCAE filing.
+                'exports' => ['ghg_pdf', 'moccae_pdf', 'excel'],
+                'consultant_directory' => 'teaser',
+                'export_regen' => 'subscription_year_unlimited',
             ],
             'features' => ['disclosures_access'],
         ];
@@ -159,7 +223,7 @@ class PlanEntitlementDefaults
             'description' => 'Full Scope 1-3 inventory with MOCCAE, IEQT and GHG reports. 5 sites.',
             'price_annual' => 3000,
             'currency' => 'AED',
-            'sort_order' => 2,
+            'sort_order' => 3,
             'limits' => [
                 'locations' => 5,
                 'users' => 10,
@@ -203,7 +267,7 @@ class PlanEntitlementDefaults
         $plan['plan_name'] = 'ESG';
         $plan['description'] = 'Everything in Carbon plus IFRS S1 & S2, GRI, SASB and the UAE ESG report. 5 sites.';
         $plan['price_annual'] = 6500;
-        $plan['sort_order'] = 3;
+        $plan['sort_order'] = 4;
 
         $plan['limits']['documents'] = 200;
         $plan['limits']['historical_years'] = 5;
@@ -322,7 +386,7 @@ class PlanEntitlementDefaults
             'description' => 'Unlimited Scope 3, multi-site, API — custom pricing (AED 20,000+).',
             'price_annual' => 20000,
             'currency' => 'AED',
-            'sort_order' => 4,
+            'sort_order' => 5,
             'limits' => [
                 'locations' => -1,
                 'users' => -1,

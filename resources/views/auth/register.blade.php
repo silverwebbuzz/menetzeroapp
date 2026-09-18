@@ -51,7 +51,7 @@
 @endsection
 
 @section('sidebar')
-<span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-sm font-semibold">Start free — no card required</span>
+<span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-sm font-semibold">Explore free — subscribe when you export</span>
 
 <p class="mt-5 mb-1 text-xs font-bold uppercase tracking-wider text-white/60">Set up in four steps</p>
 <ul class="space-y-2.5 text-white/90 text-base font-medium">

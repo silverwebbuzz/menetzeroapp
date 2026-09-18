@@ -16,8 +16,8 @@ use Illuminate\Support\Facades\Schema;
  * iterates them rather than restating prices and entitlements a second time.
  * A hardcoded copy here would be one more place for the catalogue to drift.
  *
- * ACTIVE (self-serve): the four-tier catalogue on each side.
- *   client_free · client_carbon · client_esg · client_enterprise
+ * ACTIVE (self-serve): the client catalogue now opens at Essential.
+ *   client_essential · client_carbon · client_esg · client_enterprise
  *   consultant_free · consultant_carbon · consultant_esg · consultant_enterprise
  *
  * INACTIVE but seeded: every retired code, plus the admin-only demo pack and
@@ -26,6 +26,11 @@ use Illuminate\Support\Facades\Schema;
  * PlanEntitlementService resolves entitlements through that row. A missing row
  * strips a paying subscriber's access at the next lookup. is_active = false is
  * what removes them from checkout.
+ *
+ * client_free is inactive for a second reason on top of being retired: it is
+ * the entitlement floor. Companies mid-signup, companies whose subscription
+ * lapsed and anything else without a subscription row resolve to it, so the
+ * row must stay seeded and stay at price 0 even though it is unbuyable.
  *
  * Idempotent: updateOrCreate keyed on plan_code, so it is safe to re-run and
  * safe to run after truncating the table.
@@ -36,7 +41,7 @@ class SubscriptionPlanSeeder extends Seeder
 {
     /** Codes that remain purchasable. Everything else is seeded inactive. */
     private const ACTIVE_CODES = [
-        'client_free',
+        'client_essential',
         'client_carbon',
         'client_esg',
         'client_enterprise',
