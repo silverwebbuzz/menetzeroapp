@@ -36,4 +36,25 @@ return [
     */
     'consultant_public' => env('PORTAL_CONSULTANT_PUBLIC', false),
 
+    /*
+    |---------------------------------------------------------------------------
+    | Require a paid subscription before the company workspace opens
+    |---------------------------------------------------------------------------
+    |
+    | true:  after saving their business profile, a company is held at plan
+    |        selection until a subscription is active (EnsureSubscribed).
+    | false: the workspace opens unpaid on the free entitlement floor -- data
+    |        entry works, Scope 3 is locked and downloads are watermarked.
+    |
+    | The paywall deliberately sits after business setup rather than at
+    | registration: subscriptions key off company_id, and no company exists
+    | until that profile is saved.
+    |
+    | Set PORTAL_REQUIRE_SUBSCRIPTION=false in .env to reopen the workspace
+    | immediately -- no deploy, and nothing about existing subscriptions
+    | changes, since access is always read from the subscription itself.
+    |
+    */
+    'require_subscription' => env('PORTAL_REQUIRE_SUBSCRIPTION', true),
+
 ];

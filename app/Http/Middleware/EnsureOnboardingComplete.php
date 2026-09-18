@@ -31,6 +31,19 @@ class EnsureOnboardingComplete
             'company.setup.store',
             'locations.create',
             'locations.store',
+            // Billing must stay reachable before the location step. The paywall
+            // (EnsureSubscribed) sits between the business profile and the first
+            // location, so without these a company with no location yet would be
+            // sent here to pay and immediately bounced back to add a location.
+            'subscriptions.index',
+            'subscriptions.upgrade',
+            'subscriptions.process-upgrade',
+            'subscriptions.checkout',
+            'subscriptions.payment.razorpay',
+            'subscriptions.billing',
+            'subscriptions.coupon.preview',
+            'subscriptions.current-plan',
+            'subscriptions.payment-history',
             'logout',
             'account.selector',
             'account.switch',

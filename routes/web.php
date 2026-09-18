@@ -253,6 +253,8 @@ Route::middleware([
     'checkCompanyType:client',
     'restrictManagedClientWorkspace',
     'ensureOnboardingComplete',
+    // Runs after onboarding so the company exists before we ask it to pay.
+    'ensureSubscribed',
 ])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('client.dashboard');
     Route::get('/help', [\App\Http\Controllers\PortalGuideController::class, 'company'])->name('client.help');

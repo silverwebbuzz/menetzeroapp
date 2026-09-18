@@ -5,13 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Company;
 use App\Models\User;
-use App\Models\ClientSubscription;
-use App\Models\SubscriptionPlan;
 use App\Models\RoleTemplate;
 use App\Models\CompanyCustomRole;
 use App\Models\MasterIndustryCategory;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 
 class CompanySetupController extends Controller
 {
@@ -190,49 +187,24 @@ class CompanySetupController extends Controller
                 'user_id' => $user->id
             ]);
             
-            // Create free subscription for the company
-            $freePlan = SubscriptionPlan::where('plan_category', 'client')
-                ->where(function($query) {
-                    $query->where('plan_code', 'free')
-                          ->orWhere('plan_code', 'FREE')
-                          ->orWhere('price_annual', 0);
-                })
-                ->where('is_active', true)
-                ->first();
-
-            if ($freePlan) {
-                try {
-                    $startedAt = now();
-                    $expiresAt = Carbon::parse($startedAt)->addYear();
-
-                    $subscription = ClientSubscription::create([
-                        'company_id' => $company->id,
-                        'subscription_plan_id' => $freePlan->id,
-                        'status' => 'active',
-                        'billing_cycle' => 'annual',
-                        'started_at' => $startedAt,
-                        'expires_at' => $expiresAt,
-                        'auto_renew' => true,
-                    ]);
-                    
-                    \Log::info('Created free subscription for company', [
-                        'company_id' => $company->id,
-                        'subscription_id' => $subscription->id,
-                        'plan_id' => $freePlan->id
-                    ]);
-                } catch (\Exception $e) {
-                    \Log::error('Failed to create subscription', [
-                        'company_id' => $company->id,
-                        'plan_id' => $freePlan->id,
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString()
-                    ]);
-                }
-            } else {
-                \Log::warning('No free plan found to create subscription', [
-                    'company_id' => $company->id
-                ]);
-            }
+            // No subscription row is created here, and that is deliberate.
+            //
+            // A new company starts unsubscribed: PlanEntitlementService falls
+            // back to client_free for any company without a subscription, which
+            // is the evaluation floor -- Scope 1 & 2 entry and dashboards work,
+            // Scope 3 is locked and every download is watermarked. The first
+            // ClientSubscription row is written by checkout when they pay.
+            //
+            // This previously auto-created a subscription on the first active
+            // plan priced at 0. That query matched on price rather than on a
+            // plan code, so it would silently enrol every new company in any
+            // zero-priced plan that happened to be active -- and once Free was
+            // retired it matched nothing and logged a warning on every signup.
+            // Leaving the company unsubscribed says the same thing without a
+            // row that has to be reconciled at checkout.
+            \Log::info('New company starts unsubscribed on the free entitlement floor', [
+                'company_id' => $company->id,
+            ]);
 
             // Create default custom roles from role templates
             try {

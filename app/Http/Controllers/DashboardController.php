@@ -187,6 +187,18 @@ class DashboardController extends Controller
                 ]);
             }
 
+            // Payment comes between the business profile and the first location:
+            // adding locations is real work, and the point of the paywall is to
+            // settle billing before the company invests any of it. Managed
+            // clients are billed through their agency, so they skip this.
+            if (config('portals.require_subscription')
+                && ! $company->isManagedClient()
+                && ! app(\App\Services\SubscriptionService::class)->getActiveSubscription($company->id, 'client')
+            ) {
+                return redirect()->route('subscriptions.upgrade')
+                    ->with('info', 'Choose a package to activate your workspace. Your business details are saved.');
+            }
+
             if ($onboardingStep === 'location') {
                 return redirect()->route('locations.create', ['onboarding' => 1])
                     ->with('info', 'Add at least one business location before entering emission data.');

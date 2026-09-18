@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'ensureSuperAdmin' => \App\Http\Middleware\EnsureSuperAdmin::class,
             'permission' => \App\Http\Middleware\CheckPermission::class,
             'ensureOnboardingComplete' => \App\Http\Middleware\EnsureOnboardingComplete::class,
+            'ensureSubscribed' => \App\Http\Middleware\EnsureSubscribed::class,
             'disclosureAccess' => \App\Http\Middleware\CheckDisclosureAccess::class,
             'ensureConsultant' => \App\Http\Middleware\EnsureConsultant::class,
             'syncConsultantAgencySession' => \App\Http\Middleware\SyncConsultantAgencySession::class,
