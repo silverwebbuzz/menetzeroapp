@@ -20,17 +20,23 @@ use Illuminate\Support\Facades\Schema;
  *   client_essential · client_carbon · client_esg · client_enterprise
  *   consultant_free · consultant_carbon · consultant_esg · consultant_enterprise
  *
- * INACTIVE but seeded: every retired code, plus the admin-only demo pack and
- * the managed-client limit template. These rows must EXIST even though nobody
- * can buy them -- an existing subscription points at one by id, and
- * PlanEntitlementService resolves entitlements through that row. A missing row
- * strips a paying subscriber's access at the next lookup. is_active = false is
- * what removes them from checkout.
+ * INACTIVE but seeded: client_free and the admin-only demo pack (consultant_1).
+ * Both must EXIST while being unbuyable. client_free is the entitlement floor --
+ * companies mid-signup, companies whose subscription lapsed and anything else
+ * without a subscription row resolve to it, so it stays seeded at price 0.
+ * consultant_1 is looked up by plan_code on the admin screens.
  *
- * client_free is inactive for a second reason on top of being retired: it is
- * the entitlement floor. Companies mid-signup, companies whose subscription
- * lapsed and anything else without a subscription row resolve to it, so the
- * row must stay seeded and stay at price 0 even though it is unbuyable.
+ * NOT SEEDED: every retired plan. They were deleted from the table on purpose,
+ * so SEEDED_CODES is an allowlist and this seeder skips everything outside it --
+ * re-running it will not resurrect them. Their definitions remain in PHP because
+ * forPlanCode() still resolves them for historical lookups and for the
+ * consultant-managed entitlement templates.
+ *
+ * Because of that, this seeder assumes nobody is subscribed to a retired plan.
+ * That held when they were removed (all six had zero subscribers). Before
+ * reviving one, add its code to SEEDED_CODES so the row exists again -- an
+ * active subscription pointing at a missing plan row resolves to no
+ * entitlements at the next lookup.
  *
  * Idempotent: updateOrCreate keyed on plan_code, so it is safe to re-run and
  * safe to run after truncating the table.
@@ -39,6 +45,34 @@ use Illuminate\Support\Facades\Schema;
  */
 class SubscriptionPlanSeeder extends Seeder
 {
+    /**
+     * The only rows this seeder creates. Anything not listed here is skipped,
+     * even though the data classes still define it.
+     *
+     * Retired plans were deleted from the table deliberately, and an earlier
+     * version of this seeder iterated every definition -- so each run brought
+     * all of them back. The definitions stay in PHP because forPlanCode() must
+     * still resolve them for historical lookups and for the consultant-managed
+     * entitlement templates; they simply no longer earn a database row.
+     *
+     * Adding a plan back to the catalogue means adding its code here, and to
+     * ACTIVE_CODES if it should also be purchasable.
+     */
+    private const SEEDED_CODES = [
+        // Client — the floor, then the live ladder.
+        'client_free',
+        'client_essential',
+        'client_carbon',
+        'client_esg',
+        'client_enterprise',
+        // Consultant — live packs, plus the admin-only demo pack.
+        'consultant_free',
+        'consultant_1',
+        'consultant_carbon',
+        'consultant_esg',
+        'consultant_enterprise',
+    ];
+
     /** Codes that remain purchasable. Everything else is seeded inactive. */
     private const ACTIVE_CODES = [
         'client_essential',
@@ -74,6 +108,10 @@ class SubscriptionPlanSeeder extends Seeder
         $count = 0;
 
         foreach (PlanEntitlementDefaults::definitions() as $code => $definition) {
+            if (! in_array($code, self::SEEDED_CODES, true)) {
+                continue;
+            }
+
             $priceAnnual = (float) ($definition['price_annual'] ?? 0);
 
             // consultant_managed_standard is a limit template, not a sellable
@@ -113,6 +151,10 @@ class SubscriptionPlanSeeder extends Seeder
         $count = 0;
 
         foreach (ConsultantAgencyPlanMatrix::packDefinitions() as $code => $pack) {
+            if (! in_array($code, self::SEEDED_CODES, true)) {
+                continue;
+            }
+
             $priceAnnual = (float) ($pack['price_annual'] ?? 0);
 
             SubscriptionPlan::updateOrCreate(
