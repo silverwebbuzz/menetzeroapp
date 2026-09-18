@@ -97,6 +97,12 @@ class NavigationGates
             'team'        => (bool) ($canViewStaff || $canViewRoles),
             'billing'     => $isAdmin && ! $isManagedClientWorkspace,
             'admin'       => $isAdmin,
+            // Marketplace is hidden while the consultant side is unlisted, so a
+            // company is not offered consultants it cannot browse. Same billing
+            // permission as before, plus the site-wide switch in config/portals.
+            'consultants' => $isAdmin
+                && ! $isManagedClientWorkspace
+                && (bool) config('portals.consultant_public'),
         ];
     }
 }

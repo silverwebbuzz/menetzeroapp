@@ -3,6 +3,11 @@
 @section('title', 'MIDDLE EAST NET Zero - Carbon Emissions Tracking')
 
 @section('content')
+@php
+    // Consultant sections are hidden while the company packages are the pitch.
+    // Routes stay live — the portal is handed out by direct URL. config/portals.php.
+    $showConsultant = config('portals.consultant_public');
+@endphp
 <section class="mkt-hero mkt-hero-xl">
     <div class="mkt-container max-w-4xl">
         <div class="mkt-tagline">For companies · self-serve</div>
@@ -229,12 +234,18 @@
         </div>
         <p class="text-center text-xs text-gray-400 mt-4 max-w-2xl mx-auto">
             Enterprise is custom (white-label, extended KPIs, implementation) — talk to MENetZero.
-            Reports are draft working papers for your compliance workflow. Third-party verification is available through our
-            <a href="{{ route('consultant-list.index') }}" class="mkt-text-brand hover:underline">consultant directory</a>.
+            Reports are draft working papers for your compliance workflow.
+            @if($showConsultant)
+                Third-party verification is available through our
+                <a href="{{ route('consultant-list.index') }}" class="mkt-text-brand hover:underline">consultant directory</a>.
+            @else
+                Third-party verification is available on request — <a href="{{ route('contact') }}" class="mkt-text-brand hover:underline">contact us</a>.
+            @endif
         </p>
     </div>
 </section>
 
+@if($showConsultant)
 <section class="mkt-section">
     <div class="mkt-container">
         <div class="mkt-section-head">
@@ -249,6 +260,7 @@
         </div>
     </div>
 </section>
+@endif
 
 <section class="mkt-section mkt-section-bg">
     <div class="mkt-container">
@@ -275,6 +287,7 @@
     </div>
 </section>
 
+@if($showConsultant)
 <section class="mkt-section mkt-section-dark">
     <div class="mkt-container">
         <div class="grid md:grid-cols-2 gap-12 items-center">
@@ -315,6 +328,7 @@
         </div>
     </div>
 </section>
+@endif
 
 <section class="mkt-section mkt-section-bg">
     <div class="mkt-container max-w-3xl">

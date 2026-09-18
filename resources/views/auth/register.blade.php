@@ -42,12 +42,14 @@
 
 <p class="auth-footer">
     Already have an account?
-    <a href="{{ route('login') }}" class="text-brand font-semibold hover:underline">Company sign in</a>
+    <a href="{{ route('login') }}" class="text-brand font-semibold hover:underline">{{ config('portals.consultant_public') ? 'Company sign in' : 'Sign in' }}</a>
 </p>
-<p class="auth-footer-sub">
-    Sustainability consultant?
-    <a href="{{ route('consultant.register') }}" class="text-brand font-semibold hover:underline">Consultant sign up</a>
-</p>
+@if(config('portals.consultant_public'))
+    <p class="auth-footer-sub">
+        Sustainability consultant?
+        <a href="{{ route('consultant.register') }}" class="text-brand font-semibold hover:underline">Consultant sign up</a>
+    </p>
+@endif
 @endsection
 
 @section('sidebar')

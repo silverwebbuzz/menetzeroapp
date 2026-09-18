@@ -460,7 +460,7 @@ return [
                 'label' => 'Find a consultant',
                 'icon' => 'users',
                 'route' => 'client.consultants.index',
-                'gate' => 'billing',
+                'gate' => 'consultants',
                 'active' => ['client.consultants.'],
                 'year' => false,
             ],

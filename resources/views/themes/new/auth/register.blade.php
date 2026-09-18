@@ -55,9 +55,11 @@
     <p class="auth-footer">
         Already have an account? <a href="{{ route('login') }}">Sign in</a>
     </p>
-    <p class="auth-footer-sub">
-        Sustainability consultant? <a href="{{ route('consultant.register') }}">Consultant sign up</a>
-    </p>
+    @if(config('portals.consultant_public'))
+        <p class="auth-footer-sub">
+            Sustainability consultant? <a href="{{ route('consultant.register') }}">Consultant sign up</a>
+        </p>
+    @endif
 @endsection
 
 @section('sidebar')

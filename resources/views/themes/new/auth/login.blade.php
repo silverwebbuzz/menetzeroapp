@@ -50,12 +50,14 @@
 
     <p class="auth-footer">
         Don't have an account?
-        <a href="{{ route('register') }}">Company sign up</a>
+        <a href="{{ route('register') }}">{{ config('portals.consultant_public') ? 'Company sign up' : 'Sign up' }}</a>
     </p>
-    <p class="auth-footer-sub">
-        Sustainability consultant?
-        <a href="{{ route('consultant.login') }}">Consultant sign in</a>
-    </p>
+    @if(config('portals.consultant_public'))
+        <p class="auth-footer-sub">
+            Sustainability consultant?
+            <a href="{{ route('consultant.login') }}">Consultant sign in</a>
+        </p>
+    @endif
 @endsection
 
 @section('sidebar')
