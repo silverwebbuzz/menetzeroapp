@@ -154,7 +154,7 @@ class CommercialPlanComparison
             [
                 'label' => 'IEQT export (mrv.ae)',
                 'cells' => [
-                    'client_free' => 'Watermarked',
+                    'client_free' => false,
                     'client_essential' => false,
                     'client_carbon' => true,
                     'client_esg' => true,

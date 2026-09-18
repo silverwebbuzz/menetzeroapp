@@ -584,8 +584,15 @@ class SubscriptionService
 
         $subscription = $this->getActiveSubscription($companyId, 'client');
 
+        // No subscription, or one that lapsed, falls to the Free floor -- the
+        // same code PlanEntitlementService resolves entitlements through, so
+        // limits and entitlements cannot disagree about what an unsubscribed
+        // company gets. Returning [] here would read as "no limits defined" in
+        // canPerformAction() and hand out unlimited locations and users.
         if (!$subscription || !$subscription->plan) {
-            return [];
+            $free = \App\Data\PlanEntitlementDefaults::forPlanCode('client_free');
+
+            return is_array($free['limits'] ?? null) ? $free['limits'] : [];
         }
 
         return $subscription->plan->limits ?? [];
@@ -688,8 +695,9 @@ class SubscriptionService
                 'allowed' => false,
                 'limit' => $limit,
                 'used' => $used,
-                'message' => "Your Free access allows {$limit} entry per Scope 3 category. "
-                    . 'Upgrade your package for higher Scope 3 limits.',
+                'message' => "Your package allows {$limit} "
+                    . ($limit === 1 ? 'entry' : 'entries')
+                    . ' per Scope 3 category. Upgrade your package for higher Scope 3 limits.',
             ];
         }
 

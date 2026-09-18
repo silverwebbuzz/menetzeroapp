@@ -209,7 +209,7 @@ class PlanEntitlementService
 
         return [
             'allowed' => false,
-            'message' => 'Bulk CSV/XLS import is not included on Free. Upgrade your package to unlock bulk import.',
+            'message' => 'Bulk CSV/XLS import is included from the Carbon package upwards. Upgrade your package to unlock bulk import.',
         ];
     }
 
@@ -224,7 +224,7 @@ class PlanEntitlementService
 
         return [
             'allowed' => false,
-            'message' => 'Bulk data export is not included on Free. Upgrade your package to unlock bulk export.',
+            'message' => 'Bulk data export is included from the Carbon package upwards. Upgrade your package to unlock bulk export.',
         ];
     }
 
@@ -336,7 +336,7 @@ class PlanEntitlementService
         if ($regen === 'none') {
             return [
                 'allowed' => false,
-                'message' => 'Official report downloads require an activated package. Upgrade your package after exploring Free.',
+                'message' => 'Clean report downloads require an active package. Subscribe to remove the watermark.',
             ];
         }
 
@@ -348,7 +348,7 @@ class PlanEntitlementService
 
             return [
                 'allowed' => false,
-                'message' => 'Official report downloads require an activated package. Upgrade your package after exploring Free.',
+                'message' => 'Clean report downloads require an active package. Subscribe to remove the watermark.',
             ];
         }
 

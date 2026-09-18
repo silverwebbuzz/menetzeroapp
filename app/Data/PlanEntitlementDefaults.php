@@ -152,8 +152,11 @@ class PlanEntitlementDefaults
                 // Disclosure screens stay reachable: seeing what ESG contains
                 // is the point of an evaluation account.
                 'disclosures' => ['access' => true, 'export' => false],
-                // Trial downloads — always stamped (see export_watermark).
-                'exports' => ['ghg_pdf', 'moccae_pdf', 'excel', 'ieqt'],
+                // Trial downloads — always stamped (see export_watermark). IEQT
+                // is not here: it is a Carbon feature, and an evaluation account
+                // must never expose a file that a paying Essential subscriber
+                // cannot get.
+                'exports' => ['ghg_pdf', 'moccae_pdf', 'excel'],
                 'export_watermark' => true,
                 'export_regen' => 'watermarked_trial',
                 'consultant_directory' => 'teaser',
