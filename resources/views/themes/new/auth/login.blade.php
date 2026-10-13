@@ -60,6 +60,8 @@
     @endif
 @endsection
 
+@section('sidebar-image', 'images/help/company/login-sustainability-team-wind-turbine')
+
 @section('sidebar')
     <span>Your carbon accounting workspace</span>
 

@@ -675,6 +675,12 @@ body.portal-auth {
    /* background: rgba(5, 46, 22, 0.45);*/
 }
 
+/* Consultant photos are bright offices; without a darker card the white
+   copy disappears over white shirts and paper. */
+.portal-auth--consultant .brand-gradient.has-sidebar-image .glass {
+    background: rgba(2, 29, 113, 0.55);
+}
+
 .portal-auth--consultant {
     --brand: #1563eb;
     --brand-dark: #1254c9;

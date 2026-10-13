@@ -41,7 +41,7 @@
         <link rel="stylesheet" href="{{ asset('css/consultant-shell.css') }}?v=20260621">
     @endif
     @stack('head')
-    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20261013c">
+    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20261013d">
     @include('layouts.partials.google-analytics')
 </head>
 <body class="portal-auth portal-auth--{{ $portalVariant }}">

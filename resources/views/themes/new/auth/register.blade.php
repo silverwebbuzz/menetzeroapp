@@ -62,6 +62,8 @@
     @endif
 @endsection
 
+@section('sidebar-image', 'images/help/company/register-forest-co2-leaf')
+
 @section('sidebar')
     <span>What you get on day one</span>
     <p>Included</p>

@@ -55,6 +55,8 @@
     </p>
 @endsection
 
+@section('sidebar-image', 'images/help/consultant/login-consultants-reviewing-report')
+
 @section('sidebar')
     <span>Your agency hub</span>
 

@@ -72,6 +72,8 @@
     </p>
 @endsection
 
+@section('sidebar-image', 'images/help/consultant/register-consultant-outside-office')
+
 @section('sidebar')
     <span>After you register</span>
     <p>Review</p>
