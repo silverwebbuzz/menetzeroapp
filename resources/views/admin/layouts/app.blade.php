@@ -26,6 +26,11 @@
                         orange: BRAND,
                         // Admin pages hardcode gray-* utilities; point them at
                         // the admin skin's cooler neutrals (admin-paygate.css).
+                        // Status tints used by hand-rolled pills and alerts.
+                        green:  { 100: '#ecfdf5', 700: '#047857', 800: '#047857' },
+                        red:    { 100: '#fef2f2', 800: '#b91c1c' },
+                        yellow: { 100: '#fffbeb', 800: '#b45309' },
+                        blue:   { 100: '#eff6ff', 800: '#1d4ed8' },
                         gray: {
                             50: '#f8fafc', 100: '#f1f5f9', 200: '#e4e7ec', 300: '#d5dae1',
                             400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155',
@@ -33,6 +38,9 @@
                         },
                     },
                     fontFamily: { sans: ['Poppins', 'Inter', 'system-ui', 'sans-serif'] },
+                    // The admin skin's base is 13px; without this every
+                    // text-sm label, cell and button renders a step larger.
+                    fontSize: { sm: ['13px', '1.5'], lg: ['15px', '1.45'] },
                 },
             },
         };
@@ -43,7 +51,7 @@
     <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260902">
     {{-- Admin-only skin. Must load after app-shell.css: it re-points that
          file's tokens for this portal alone (scoped to body.admin-pg). --}}
-    <link rel="stylesheet" href="{{ asset('css/admin-paygate.css') }}?v=20261013">
+    <link rel="stylesheet" href="{{ asset('css/admin-paygate.css') }}?v=20261013b">
     @stack('head')
 </head>
 <body class="admin-pg">
@@ -103,7 +111,7 @@
                 </button>
                 <span class="pg-crumb">Admin</span>
                 <span class="pg-crumb-sep" aria-hidden="true">/</span>
-                <h1 class="page-title truncate">@yield('page-title', 'Admin Dashboard')</h1>
+                <span class="page-title truncate">@yield('page-title', 'Admin Dashboard')</span>
                 <span class="pg-topbar-chip">Super Admin</span>
             </header>
 
@@ -118,6 +126,13 @@
                         @endif
                     </div>
                 @endif
+
+                {{-- Most admin pages have no heading of their own and relied
+                     on the topbar for it. admin-paygate.css hides this one on
+                     the pages that do render a .page-header or an <h1>. --}}
+                <div class="pg-page-head">
+                    <h1 class="pg-page-title">@yield('page-title', 'Admin Dashboard')</h1>
+                </div>
 
                 @yield('content')
             </main>

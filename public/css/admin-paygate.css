@@ -437,3 +437,163 @@ body.admin-pg .alert-info    { color: var(--info); }
     body.admin-pg .pg-crumb-sep,
     body.admin-pg .pg-topbar-chip { display: none; }
 }
+
+/* ===================================================================== */
+/* Page heading supplied by the layout                                    */
+/* ===================================================================== */
+
+body.admin-pg .pg-page-head { margin-bottom: 16px; }
+
+body.admin-pg .content-area:has(.page-header) > .pg-page-head,
+body.admin-pg .content-area:has(h1:not(.pg-page-title)) > .pg-page-head { display: none; }
+
+/* ===================================================================== */
+/* Hand-rolled Tailwind pages                                             */
+/*                                                                        */
+/* Most admin views predate the design system and are written in raw      */
+/* utilities (bg-white shadow rounded-lg, min-w-full tables, text links   */
+/* as row actions). These rules give those recurring patterns the same    */
+/* treatment as .card / .table / .btn / .badge, so the views themselves   */
+/* stay untouched.                                                        */
+/* ===================================================================== */
+
+/* Cards */
+body.admin-pg .content-area div.bg-white.shadow,
+body.admin-pg .content-area div.bg-white.rounded-lg,
+body.admin-pg .content-area div.bg-white.rounded-xl,
+body.admin-pg .content-area a.bg-white.shadow,
+body.admin-pg .content-area a.bg-white.rounded-lg {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg) !important;
+    box-shadow: none !important;
+}
+
+/* A card that is itself a link (the emission hub tiles). */
+body.admin-pg .content-area a.bg-white.shadow,
+body.admin-pg .content-area a.bg-white.rounded-lg {
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 0.15s, background-color 0.15s;
+}
+body.admin-pg .content-area a.bg-white.shadow:hover,
+body.admin-pg .content-area a.bg-white.rounded-lg:hover {
+    border-color: var(--brand);
+    background-color: var(--pg-sf2);
+}
+
+/* Section headings and big figures */
+body.admin-pg .content-area h2,
+body.admin-pg .content-area h3 {
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+body.admin-pg .content-area h2.text-lg,
+body.admin-pg .content-area h2.text-xl,
+body.admin-pg .content-area h3.text-lg { font-size: 15px !important; }
+
+body.admin-pg .content-area .text-3xl,
+body.admin-pg .content-area .text-2xl:not(h1) {
+    font-size: 22px;
+    line-height: 1.2;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+/* Tables */
+body.admin-pg .content-area table.min-w-full { font-size: 13px; }
+
+body.admin-pg .content-area table.min-w-full thead th { padding: 9px 14px; }
+
+body.admin-pg .content-area table.min-w-full tbody td:not([colspan]) { padding: 9px 14px; }
+
+body.admin-pg .content-area table.min-w-full tbody > tr,
+body.admin-pg .content-area table.min-w-full tbody.divide-y > tr { border-color: var(--pg-ln2); }
+
+/* Row actions: text links become quiet 26px buttons. Only direct children
+   of the action wrapper, so a linked company name in a cell is left alone. */
+body.admin-pg .content-area td div.flex > a[class*="text-"]:not([class*="px-"]):not([class*="bg-"]),
+body.admin-pg .content-area td div.flex > form > button[class*="text-"]:not([class*="px-"]):not([class*="bg-"]),
+body.admin-pg .content-area td > form > button[class*="text-"]:not([class*="px-"]):not([class*="bg-"]) {
+    display: inline-flex;
+    align-items: center;
+    height: 26px;
+    padding: 0 8px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color 0.15s;
+}
+body.admin-pg .content-area td div.flex > a[class*="text-"]:not([class*="px-"]):not([class*="bg-"]):hover,
+body.admin-pg .content-area td div.flex > form > button[class*="text-"]:not([class*="px-"]):not([class*="bg-"]):hover,
+body.admin-pg .content-area td > form > button[class*="text-"]:not([class*="px-"]):not([class*="bg-"]):hover {
+    background-color: var(--canvas-deep);
+}
+body.admin-pg .content-area td div.flex > form > button.text-red-600:hover,
+body.admin-pg .content-area td > form > button.text-red-600:hover { background-color: var(--danger-soft); }
+body.admin-pg .content-area td div.flex.space-x-2 > * { margin-left: 2px !important; }
+
+/* Status pills */
+body.admin-pg .content-area span.rounded-full[class*="px-"],
+body.admin-pg .content-area span.rounded[class*="px-"][class*="text-xs"] {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 8px !important;
+    border-radius: 6px !important;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* Buttons written as px-* py-* rounded-* utilities. Anything block-level or
+   deliberately tall is a card or a list row, not a button. */
+body.admin-pg .content-area a[class*="px-"][class*="py-"][class*="rounded"]:not(.block):not(.w-full):not([class*="py-3"]):not([class*="py-4"]),
+body.admin-pg .content-area button[class*="px-"][class*="py-"][class*="rounded"]:not(.block):not(.w-full):not([class*="py-3"]):not([class*="py-4"]):not(.mobile-menu-btn):not([role="tab"]):not(.tab-button) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 32px;
+    padding: 0 12px !important;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+body.admin-pg .content-area a[class*="bg-purple-6"]:not(.block),
+body.admin-pg .content-area button[class*="bg-purple-6"]:not(.block) {
+    background-image: linear-gradient(90deg, var(--brand), var(--brand-darker));
+    border-color: transparent !important;
+    box-shadow: 0 8px 18px -10px rgb(5 150 105 / 0.9);
+}
+body.admin-pg .content-area a[class*="bg-purple-6"]:not(.block):hover,
+body.admin-pg .content-area button[class*="bg-purple-6"]:not(.block):hover { filter: brightness(1.08); }
+
+/* Form fields */
+body.admin-pg .content-area label.block[class*="font-medium"],
+body.admin-pg .content-area label[class*="text-sm"][class*="font-medium"] {
+    margin-bottom: 6px;
+    font-size: 12.5px;
+    color: var(--ink-muted);
+}
+
+body.admin-pg .content-area select:not([multiple]):not([size]),
+body.admin-pg .content-area input[type="text"]:not(.btn):not([type="hidden"]),
+body.admin-pg .content-area input[type="email"]:not(.btn),
+body.admin-pg .content-area input[type="password"]:not(.btn),
+body.admin-pg .content-area input[type="number"]:not(.btn),
+body.admin-pg .content-area input[type="date"]:not(.btn),
+body.admin-pg .content-area input[type="url"]:not(.btn),
+body.admin-pg .content-area input[type="search"]:not(.btn) { min-height: 36px; }
+
+body.admin-pg .content-area input[type="checkbox"],
+body.admin-pg .content-area input[type="radio"] { accent-color: var(--brand); }
+
+/* Inline flash banners (bg-green-100 border border-green-400 …) */
+body.admin-pg .content-area div[role="alert"] {
+    padding: 9px 14px;
+    border-color: transparent;
+    border-radius: var(--radius);
+    font-size: 13px;
+}
