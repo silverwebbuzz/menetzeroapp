@@ -118,6 +118,11 @@
         .mnz-auth__panel { background: #14161a; color: #fff; padding: 44px 56px;
             display: flex; flex-direction: column; min-width: 0;
             position: relative; overflow: hidden; }
+        /* Pages opt in with @section('sidebar-image'); the dark wash keeps
+           the muted panel copy readable over the photo. */
+        .mnz-auth__panel--image { background:
+            linear-gradient(#14161ac7, #14161ad9),
+            var(--mnz-auth-image) center / cover no-repeat; }
         .mnz-auth__grid { position: absolute; inset: 0;
             background-image: linear-gradient(#ffffff0d 1px, transparent 1px),
                               linear-gradient(90deg, #ffffff0d 1px, transparent 1px);
@@ -178,7 +183,8 @@
         </div>
     </div>
 
-    <div class="mnz-auth__panel">
+    <div class="mnz-auth__panel @hasSection('sidebar-image') mnz-auth__panel--image @endif"
+         @hasSection('sidebar-image') style="--mnz-auth-image: url('@yield('sidebar-image')')" @endif>
         <div class="mnz-auth__grid"></div>
         <div class="mnz-auth__kicker">{{ $portalBadge ?? 'Carbon accounting' }}</div>
         <div class="mnz-auth__panel-body">

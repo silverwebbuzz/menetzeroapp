@@ -656,6 +656,18 @@ body.portal-auth {
     background: linear-gradient(135deg, #021d71 0%, #1563eb 55%, #4d8ef7 100%);
 }
 
+/* Pages opt in with @section('sidebar-image'). The tint keeps white copy
+   readable over the photo's bright patches. */
+.portal-auth .brand-gradient.has-sidebar-image {
+    background:
+        linear-gradient(135deg, rgba(5, 46, 22, 0.72) 0%, rgba(5, 46, 22, 0.5) 100%),
+        var(--auth-sidebar-image) center / cover no-repeat;
+}
+
+.portal-auth .brand-gradient.has-sidebar-image .glass {
+    background: rgba(5, 46, 22, 0.45);
+}
+
 .portal-auth--consultant {
     --brand: #1563eb;
     --brand-dark: #1254c9;

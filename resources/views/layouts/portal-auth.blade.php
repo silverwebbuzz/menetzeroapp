@@ -38,7 +38,7 @@
         <link rel="stylesheet" href="{{ asset('css/consultant-shell.css') }}?v=20260621">
     @endif
     @stack('head')
-    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20260806">
+    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20261013">
     @include('layouts.partials.google-analytics')
 </head>
 <body class="portal-auth portal-auth--{{ $portalVariant }}">
@@ -55,7 +55,8 @@
             </div>
         </div>
 
-        <div class="relative brand-gradient text-white hidden lg:block">
+        <div class="relative brand-gradient text-white hidden lg:block @hasSection('sidebar-image') has-sidebar-image @endif"
+             @hasSection('sidebar-image') style="--auth-sidebar-image: url('@yield('sidebar-image')')" @endif>
             <div class="relative h-full w-full flex items-center justify-center p-10">
                 <div class="glass auth-sidebar-panel p-8 w-full max-w-xl">
                     @hasSection('sidebar')

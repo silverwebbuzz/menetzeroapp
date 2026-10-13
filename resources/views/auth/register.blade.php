@@ -52,6 +52,8 @@
 @endif
 @endsection
 
+@section('sidebar-image', asset('images/help/company/view-green-forest-trees-with-co2.webp'))
+
 @section('sidebar')
 <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-sm font-semibold">Explore free — subscribe when you export</span>
 

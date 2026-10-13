@@ -1370,8 +1370,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/auth/register.blade.php": {
-    "mtime": 1789727653.9071896,
-    "ast_hash": "fceaf87c39bda7bca1fd9a39688d61ae",
+    "mtime": 1791888241.65804,
+    "ast_hash": "10fd8d596dfe9b52200595326c8747f0",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/client/consultants/checkout.blade.php": {
@@ -2425,8 +2425,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/layouts/portal-auth.blade.php": {
-    "mtime": 1787672146.0530357,
-    "ast_hash": "61cb7d03f5800f9f0d039f5fda2d742b",
+    "mtime": 1791888243.7204573,
+    "ast_hash": "a4a85883ead4e29afd2442858b9a548b",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/plans/partials/human-guide.blade.php": {
@@ -3210,8 +3210,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/layouts/portal-auth.blade.php": {
-    "mtime": 1787725022.6535113,
-    "ast_hash": "f673e7e2ae227cde43d85955e47570c9",
+    "mtime": 1791888246.9082355,
+    "ast_hash": "de69731af72f2daa5cfe67bd32fd3aa4",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/locations/index.blade.php": {
@@ -3377,6 +3377,16 @@
   "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_10_13_000000_correct_emission_factors_to_2026.php": {
     "mtime": 1791876366.9533885,
     "ast_hash": "0c0a53268603baf228ffe5032038598a",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/public/images/help/company/view-green-forest-trees-with-co2.jpg": {
+    "mtime": 1791888139.0759144,
+    "ast_hash": "707a4246f4cdd55044d165f7df7d7183",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/public/images/help/company/view-green-forest-trees-with-co2.webp": {
+    "mtime": 1791888228.7443802,
+    "ast_hash": "a1614d1c15d54a96d625b76dcda7d3f7",
     "semantic_hash": ""
   }
 }
