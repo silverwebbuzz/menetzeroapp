@@ -1365,13 +1365,13 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/auth/login.blade.php": {
-    "mtime": 1789727648.7360206,
-    "ast_hash": "a18facf725c84c042dba33e794af6045",
+    "mtime": 1791888588.496105,
+    "ast_hash": "e21c4aea32d0a6cfb3f84f318d2cbc82",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/auth/register.blade.php": {
-    "mtime": 1791888241.65804,
-    "ast_hash": "10fd8d596dfe9b52200595326c8747f0",
+    "mtime": 1791888588.4935727,
+    "ast_hash": "4b3eebea0ad5e4cfac6d15549d43e60b",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/client/consultants/checkout.blade.php": {
@@ -2425,8 +2425,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/layouts/portal-auth.blade.php": {
-    "mtime": 1791888243.7204573,
-    "ast_hash": "a4a85883ead4e29afd2442858b9a548b",
+    "mtime": 1791888624.6479974,
+    "ast_hash": "2eec33571625aa9aafc01d42eb0b5c18",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/plans/partials/human-guide.blade.php": {
@@ -3210,8 +3210,8 @@
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/layouts/portal-auth.blade.php": {
-    "mtime": 1791888246.9082355,
-    "ast_hash": "de69731af72f2daa5cfe67bd32fd3aa4",
+    "mtime": 1791888588.5012207,
+    "ast_hash": "fd89dc1df4ae462dd4d9cc4cfa014af0",
     "semantic_hash": ""
   },
   "/Users/apple/Silverwebbuzz/menetzeroapp/resources/views/themes/new/locations/index.blade.php": {
@@ -3379,14 +3379,24 @@
     "ast_hash": "0c0a53268603baf228ffe5032038598a",
     "semantic_hash": ""
   },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/public/images/help/company/view-green-forest-trees-with-co2.jpg": {
-    "mtime": 1791888139.0759144,
-    "ast_hash": "707a4246f4cdd55044d165f7df7d7183",
+  "/Users/apple/Silverwebbuzz/menetzeroapp/public/images/help/company/login-sustainability-team-wind-turbine-1600.webp": {
+    "mtime": 1791888562.7658644,
+    "ast_hash": "0274ab84668b6ded01c02dfc6f01da06",
     "semantic_hash": ""
   },
-  "/Users/apple/Silverwebbuzz/menetzeroapp/public/images/help/company/view-green-forest-trees-with-co2.webp": {
-    "mtime": 1791888228.7443802,
-    "ast_hash": "a1614d1c15d54a96d625b76dcda7d3f7",
+  "/Users/apple/Silverwebbuzz/menetzeroapp/public/images/help/company/login-sustainability-team-wind-turbine-960.webp": {
+    "mtime": 1791888559.8063185,
+    "ast_hash": "2308fbb4cccee8aaf318bc3aecec07da",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/public/images/help/company/register-forest-co2-leaf-1600.webp": {
+    "mtime": 1791888572.1555185,
+    "ast_hash": "76d288e7b255f190aa13689342fcc4d1",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/public/images/help/company/register-forest-co2-leaf-960.webp": {
+    "mtime": 1791888573.0846205,
+    "ast_hash": "295de8c5ceeb9ecdb18f9a45e49a02f3",
     "semantic_hash": ""
   }
 }

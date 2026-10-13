@@ -12,6 +12,9 @@
     @php
         $portalVariant = $portalVariant ?? 'company';
         $isConsultant = $portalVariant === 'consultant';
+        // Pages pass a path without size or extension; -960 and -1600 WebP
+        // variants sit side by side and CSS picks one per screen.
+        $sidebarImage = trim($__env->yieldContent('sidebar-image'));
         $brandPalette = $isConsultant
             ? ['50'=>'#eff6ff','100'=>'#dbeafe','200'=>'#bfdbfe','300'=>'#93c5fd','400'=>'#60a5fa','500'=>'#2563eb','600'=>'#1d4ed8','700'=>'#1e40af','800'=>'#1e3a8a','900'=>'#0f2b6b']
             : ['50'=>'#f0fdf4','100'=>'#dcfce7','200'=>'#bbf7d0','300'=>'#86efac','400'=>'#4ade80','500'=>'#16a34a','600'=>'#15803d','700'=>'#166534','800'=>'#14532d','900'=>'#052e16'];
@@ -38,7 +41,7 @@
         <link rel="stylesheet" href="{{ asset('css/consultant-shell.css') }}?v=20260621">
     @endif
     @stack('head')
-    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20261013">
+    <link rel="stylesheet" href="{{ asset('css/portal-design-system.css') }}?v=20261013b">
     @include('layouts.partials.google-analytics')
 </head>
 <body class="portal-auth portal-auth--{{ $portalVariant }}">
@@ -55,8 +58,8 @@
             </div>
         </div>
 
-        <div class="relative brand-gradient text-white hidden lg:block @hasSection('sidebar-image') has-sidebar-image @endif"
-             @hasSection('sidebar-image') style="--auth-sidebar-image: url('@yield('sidebar-image')')" @endif>
+        <div class="relative brand-gradient text-white hidden lg:block {{ $sidebarImage ? 'has-sidebar-image' : '' }}"
+             @if($sidebarImage) style="--auth-sidebar-image: url('{{ asset($sidebarImage.'-960.webp') }}'); --auth-sidebar-image-lg: url('{{ asset($sidebarImage.'-1600.webp') }}')" @endif>
             <div class="relative h-full w-full flex items-center justify-center p-10">
                 <div class="glass auth-sidebar-panel p-8 w-full max-w-xl">
                     @hasSection('sidebar')

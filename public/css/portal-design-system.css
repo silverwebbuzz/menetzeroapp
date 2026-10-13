@@ -659,9 +659,18 @@ body.portal-auth {
 /* Pages opt in with @section('sidebar-image'). The tint keeps white copy
    readable over the photo's bright patches. */
 .portal-auth .brand-gradient.has-sidebar-image {
+    --auth-sidebar-bg: var(--auth-sidebar-image);
     background:
         linear-gradient(135deg, rgba(5, 46, 22, 0.72) 0%, rgba(5, 46, 22, 0.5) 100%),
-        var(--auth-sidebar-image) center / cover no-repeat;
+        var(--auth-sidebar-bg) center / cover no-repeat;
+}
+
+/* The panel is half the viewport, so the 960px file covers 1x screens up to
+   1920 wide; only retina and larger displays fetch the 1600px one. */
+@media (min-width: 1921px), (min-resolution: 1.5dppx) {
+    .portal-auth .brand-gradient.has-sidebar-image {
+        --auth-sidebar-bg: var(--auth-sidebar-image-lg);
+    }
 }
 
 .portal-auth .brand-gradient.has-sidebar-image .glass {

@@ -23,6 +23,9 @@
         'admin' => 'Platform administration',
         default => null,
     };
+    // Pages pass a path without size or extension; -960 and -1600 WebP
+    // variants sit side by side and CSS picks one per screen.
+    $sidebarImage = trim($__env->yieldContent('sidebar-image'));
 @endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
@@ -120,9 +123,12 @@
             position: relative; overflow: hidden; }
         /* Pages opt in with @section('sidebar-image'); the dark wash keeps
            the muted panel copy readable over the photo. */
-        .mnz-auth__panel--image { background:
+        .mnz-auth__panel--image { --mnz-auth-bg: var(--mnz-auth-image); background:
             linear-gradient(#14161ac7, #14161ad9),
-            var(--mnz-auth-image) center / cover no-repeat; }
+            var(--mnz-auth-bg) center / cover no-repeat; }
+        @media (min-width: 1921px), (min-resolution: 1.5dppx) {
+            .mnz-auth__panel--image { --mnz-auth-bg: var(--mnz-auth-image-lg); }
+        }
         .mnz-auth__grid { position: absolute; inset: 0;
             background-image: linear-gradient(#ffffff0d 1px, transparent 1px),
                               linear-gradient(90deg, #ffffff0d 1px, transparent 1px);
@@ -183,8 +189,8 @@
         </div>
     </div>
 
-    <div class="mnz-auth__panel @hasSection('sidebar-image') mnz-auth__panel--image @endif"
-         @hasSection('sidebar-image') style="--mnz-auth-image: url('@yield('sidebar-image')')" @endif>
+    <div class="mnz-auth__panel {{ $sidebarImage ? 'mnz-auth__panel--image' : '' }}"
+         @if($sidebarImage) style="--mnz-auth-image: url('{{ asset($sidebarImage.'-960.webp') }}'); --mnz-auth-image-lg: url('{{ asset($sidebarImage.'-1600.webp') }}')" @endif>
         <div class="mnz-auth__grid"></div>
         <div class="mnz-auth__kicker">{{ $portalBadge ?? 'Carbon accounting' }}</div>
         <div class="mnz-auth__panel-body">
