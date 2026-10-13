@@ -33,7 +33,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     {{-- FALLBACK CSS — risk R-3. Company page bodies still render existing
          markup (ent-*, btn, alert, card, Tailwind utilities). These stay
@@ -48,36 +48,47 @@
            rule at all -- on subscriptions/upgrade the selected currency pill
            is `bg-brand text-white`, i.e. white on white.
 
-           These are the CLIENT values (green #16a34a) and differ from the
-           consultant shell's (blue #1563eb) -- the two portals have different
-           brands, so this block is deliberately not shared. `orange` is
-           remapped here but not there, matching each old shell.
+           These are the CLIENT values and differ from the consultant
+           shell's (blue #1563eb) -- the two portals have different brands, so
+           this block is deliberately not shared. `orange` is remapped here but
+           not there, matching each old shell.
 
-           Keep in step with layouts/app.blade.php until the page bodies are
-           themed; delete it when none remain. fontFamily is deliberately NOT
-           overridden -- the 2.0 shell sets its own typography below. */
+           The scale is emerald, matching company-paygate.css (the skin loaded
+           below) and the super-admin panel, NOT the old client shell's
+           #16a34a green: a `bg-brand` button has to sit beside the skin's own
+           buttons without reading as a second green. DEFAULT is the 600 step
+           so white text on it clears AA. The gray remap and the 13px text-sm
+           are the skin's neutrals and base size, for the same reason.
+           fontFamily is deliberately NOT overridden -- the skin sets its own
+           typography. */
         const BRAND = {
-            50:  '#f0fdf4',
-            100: '#dcfce7',
-            200: '#bbf7d0',
-            300: '#86efac',
-            400: '#4ade80',
-            500: '#16a34a',
-            600: '#15803d',
-            700: '#166534',
-            800: '#14532d',
-            900: '#052e16',
+            50:  '#ecfdf5',
+            100: '#d1fae5',
+            200: '#a7f3d0',
+            300: '#6ee7b7',
+            400: '#34d399',
+            500: '#10b981',
+            600: '#059669',
+            700: '#047857',
+            800: '#065f46',
+            900: '#064e3b',
         };
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        brand: { DEFAULT: BRAND[500], dark: BRAND[600], soft: BRAND[50], ...BRAND },
+                        brand: { DEFAULT: BRAND[600], dark: BRAND[700], soft: BRAND[50], ...BRAND },
                         purple: BRAND,
                         violet: BRAND,
                         indigo: BRAND,
                         orange: BRAND,
+                        gray: {
+                            50: '#f8fafc', 100: '#f1f5f9', 200: '#e4e7ec', 300: '#d5dae1',
+                            400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155',
+                            800: '#1e293b', 900: '#0f172a',
+                        },
                     },
+                    fontSize: { sm: ['13px', '1.5'] },
                 },
             },
         };
@@ -172,6 +183,13 @@
         @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
     </style>
 
+    {{-- Company-portal skin: dark rail, flat bordered surfaces, emerald
+         accent -- the same look as the super-admin panel. Loaded after the
+         <style> block above so it has the last word, and scoped to
+         body.pg-skin: mnz-ui.css is shared with the consultant and admin 2.0
+         shells, which must not pick this up. --}}
+    <link rel="stylesheet" href="{{ asset('css/company-paygate.css') }}?v=20261013">
+
     {{-- Chart.js loads in <head>, matching the shell this replaces.
          Company pages call `new Chart(...)` from body-level scripts, so a
          bottom-of-body load would be too late. --}}
@@ -180,7 +198,7 @@
     @stack('head')
     @include('layouts.partials.google-analytics')
 </head>
-<body class="mnz-theme" data-pillar="e">
+<body class="mnz-theme pg-skin" data-pillar="e">
 <div class="mnz-app" x-data="{ sidebarOpen: false }">
 
 @auth('web')
@@ -246,7 +264,9 @@
                 </svg>
             </button>
 
-            <a href="{{ route('client.dashboard') }}">
+            {{-- The skin moves the logo to the head of the sidebar (below);
+                 this copy shows only once the sidebar collapses off-canvas. --}}
+            <a href="{{ route('client.dashboard') }}" class="pg-topbar-logo">
                 <img src="{{ asset('images/menetzero.svg') }}" alt="MENetZero" class="mnz-topbar__logo">
             </a>
             <span class="mnz-topbar__rule"></span>
@@ -304,6 +324,12 @@
     <div class="mnz-body">
         <aside class="mnz-side" :class="{ 'is-open': sidebarOpen }"
                @keydown.escape.window="sidebarOpen = false">
+            <div class="pg-brand">
+                <a href="{{ route('client.dashboard') }}">
+                    <img src="{{ asset('images/menetzero.svg') }}" alt="MENetZero">
+                </a>
+                <span class="pg-brand__label">ESG workspace</span>
+            </div>
             @include('layouts.partials.nav-client')
         </aside>
 

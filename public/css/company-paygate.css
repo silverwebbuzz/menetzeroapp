@@ -1,0 +1,760 @@
+/*
+ * MENetZero — company portal skin (new theme only)
+ *
+ * The same look as the super-admin panel (admin-paygate.css): dark rail,
+ * 56px topbar, 13px Poppins, flat bordered surfaces with a 10px radius,
+ * 32px buttons, tinted status pills, emerald accent.
+ *
+ * Loaded ONLY by themes/new/layouts/app.blade.php, last, and every rule is
+ * scoped to body.pg-skin. mnz-ui.css and app-shell.css are shared with the
+ * consultant and admin shells, so nothing here may leak out of that scope.
+ *
+ * Navigation is untouched: the six pillar tabs and the filtered sidebar are
+ * the information architecture (config/navigation.php). This file only moves
+ * the sidebar to a full-height rail and restyles what is already rendered.
+ */
+
+body.pg-skin {
+    /* mnz-ui.css tokens */
+    --ink: #0f172a;
+    --ink-2: #475569;
+    --ink-3: #64748b;
+    --ink-4: #94a3b8;
+    --line: #e4e7ec;
+    --line-2: #eef0f3;
+    --line-3: #d5dae1;
+    --surface: #ffffff;
+    --canvas: #f5f6f8;
+    --canvas-2: #f1f5f9;
+
+    --e: #047857;
+    --e-tint: #ecfdf5;
+    --e-line: #d1fae5;
+    --ok: #047857;
+    --ok-tint: #ecfdf5;
+    --ok-line: #d1fae5;
+    --warn: #b45309;
+    --warn-tint: #fffbeb;
+    --warn-line: #fde68a;
+    --bad: #b91c1c;
+    --bad-tint: #fef2f2;
+    --bad-line: #fecaca;
+
+    --r: 7px;
+    --r-lg: 10px;
+    --side-w: 260px;
+    --sans: 'Poppins', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+    /* app-shell.css / portal-enterprise.css tokens, for the page bodies that
+       are still written against the old shell's classes. */
+    --brand: #059669;
+    --brand-dark: #047857;
+    --brand-darker: #065f46;
+    --brand-soft: #ecfdf5;
+    --brand-softer: #d1fae5;
+    --brand-accent: #10b981;
+    --ink-muted: #475569;
+    --ink-secondary: #64748b;
+    --ink-subtle: #64748b;
+    --ink-hint: #94a3b8;
+    --line-strong: #d5dae1;
+    --canvas-deep: #eef0f3;
+    --danger: #b91c1c;
+    --danger-soft: #fef2f2;
+    --warning: #b45309;
+    --warning-soft: #fffbeb;
+    --info: #1d4ed8;
+    --info-soft: #eff6ff;
+    --success: #047857;
+    --success-soft: #ecfdf5;
+    --radius-sm: 5px;
+    --radius: 7px;
+    --radius-md: 7px;
+    --radius-lg: 10px;
+    --radius-xl: 12px;
+    --radius-card: 10px;
+    --radius-input: 7px;
+    --radius-btn: 7px;
+    --shadow-xs: none;
+    --shadow-sm: 0 1px 2px 0 rgb(15 23 42 / 0.04);
+    --shadow-card: none;
+    --shadow-card-hover: 0 1px 2px 0 rgb(15 23 42 / 0.06);
+    --shadow-ring: 0 0 0 3px rgb(5 150 105 / 0.16);
+
+    /* Skin-only tokens */
+    --pg-nav: #062a21;
+    --pg-nav-line: rgb(255 255 255 / 0.08);
+    --pg-sf2: #f8fafc;
+    --pg-fill: linear-gradient(90deg, #059669, #065f46);
+    --pg-glow: 0 8px 18px -10px rgb(5 150 105 / 0.9);
+
+    font-family: var(--sans);
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink);
+    background: var(--canvas);
+    font-feature-settings: 'tnum' 1, 'cv11' 1;
+}
+
+/* ===================================================================== */
+/* Shell: full-height rail on the left, topbar + tabs over the content    */
+/* ===================================================================== */
+
+/* :has() keeps the guest branch (a bare <main>, no sidebar) single-column. */
+body.pg-skin .mnz-app:has(> .mnz-body) {
+    display: grid;
+    grid-template-columns: var(--side-w) minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+        "acting acting"
+        "side   top"
+        "side   main";
+}
+
+body.pg-skin .mnz-acting { grid-area: acting; }
+
+/* The wrapper dissolves so the sidebar and the content become cells of the
+   grid above; the sidebar can then span the topbar's row as well. */
+body.pg-skin .mnz-body { display: contents; }
+
+body.pg-skin .mnz-topbar {
+    grid-area: top;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+}
+
+body.pg-skin .mnz-main {
+    grid-area: main;
+    padding: 22px 24px 40px;
+}
+
+body.pg-skin .mnz-side {
+    grid-area: side;
+    width: auto;
+    height: 100vh;
+    padding: 0 0 14px;
+    background: var(--pg-nav);
+    border-right: 0;
+    color: #ffffff;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(255 255 255 / 0.18) transparent;
+}
+
+/* A consultant's acting-as bar sits above the grid and takes its own height
+   out of the first screen. */
+body.pg-skin .mnz-app:has(> .mnz-acting) .mnz-side { height: calc(100vh - 38px); }
+
+/* ===================================================================== */
+/* Sidebar                                                                */
+/* ===================================================================== */
+
+body.pg-skin .pg-brand {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1px;
+    height: var(--topbar-h);
+    padding: 0 17px;
+    background: var(--pg-nav);
+    border-bottom: 1px solid var(--pg-nav-line);
+}
+
+/* The logo's wordmark is black, which disappears on the dark rail. */
+body.pg-skin .pg-brand img {
+    height: 22px;
+    width: auto;
+    filter: brightness(0) invert(1);
+}
+
+body.pg-skin .pg-brand__label {
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1.2;
+    color: rgb(255 255 255 / 0.55);
+}
+
+body.pg-skin .mnz-side__head { padding: 18px 24px 8px; }
+
+body.pg-skin .mnz-side__eyebrow,
+body.pg-skin .mnz-side__title {
+    font: 600 10.5px var(--sans);
+    letter-spacing: 0.08em;
+    color: rgb(255 255 255 / 0.45);
+}
+
+body.pg-skin .mnz-side__heading {
+    font: 600 15px var(--sans);
+    letter-spacing: -0.01em;
+    color: #ffffff;
+}
+
+body.pg-skin .mnz-side__group { padding: 6px 12px 0; }
+body.pg-skin .mnz-side__group + .mnz-side__group { margin-top: 12px; }
+
+body.pg-skin .mnz-nav {
+    height: 38px;
+    padding: 0 12px;
+    gap: 12px;
+    margin: 2px 0;
+    border-radius: 9px;
+    font: 500 13.5px var(--sans);
+    color: rgb(255 255 255 / 0.9);
+    text-decoration: none;
+}
+
+body.pg-skin .mnz-nav:hover {
+    background: rgb(255 255 255 / 0.06);
+    color: #ffffff;
+}
+
+body.pg-skin .mnz-nav.is-active {
+    background: var(--pg-fill);
+    box-shadow: var(--pg-glow);
+    color: #ffffff;
+    font-weight: 500;
+}
+
+body.pg-skin .mnz-nav__dot {
+    width: 6px;
+    height: 6px;
+    background: rgb(255 255 255 / 0.3);
+}
+body.pg-skin .mnz-nav:hover .mnz-nav__dot { background: rgb(255 255 255 / 0.6); }
+body.pg-skin .mnz-nav.is-active .mnz-nav__dot { background: #ffffff; }
+
+body.pg-skin .mnz-nav__chev { color: rgb(255 255 255 / 0.5); }
+
+body.pg-skin .mnz-subnav {
+    margin: 2px 0 6px 26px;
+    border-left-color: rgb(255 255 255 / 0.12);
+}
+
+body.pg-skin .mnz-subnav__link {
+    padding: 6px 10px;
+    font-size: 12.5px;
+    color: rgb(255 255 255 / 0.7);
+}
+body.pg-skin .mnz-subnav__link:hover { background: rgb(255 255 255 / 0.06); color: #ffffff; }
+body.pg-skin .mnz-subnav__link.is-active {
+    background: rgb(255 255 255 / 0.1);
+    color: #ffffff;
+    font-weight: 500;
+}
+body.pg-skin .mnz-subnav__link.is-locked { color: #fcd34d; }
+
+/* Plan card */
+body.pg-skin .mnz-side__foot {
+    margin: auto 12px 0;
+    padding: 14px 0 0;
+    border-top: 0;
+}
+
+body.pg-skin .mnz-plan {
+    padding: 12px;
+    border: 1px solid var(--pg-nav-line);
+    border-radius: 10px;
+    background: rgb(255 255 255 / 0.05);
+}
+
+body.pg-skin .mnz-plan__company { font: 600 13px var(--sans); color: #ffffff; }
+body.pg-skin .mnz-plan__meta { font: 400 11.5px var(--sans); color: rgb(255 255 255 / 0.55); }
+body.pg-skin .mnz-plan__tier { color: rgb(255 255 255 / 0.85); }
+body.pg-skin .mnz-plan.is-expiring .mnz-plan__days { color: #fcd34d; }
+body.pg-skin .mnz-plan.is-expired .mnz-plan__days { color: #fca5a5; }
+
+body.pg-skin .mnz-plan__btn,
+body.pg-skin .mnz-plan.is-expiring .mnz-plan__btn,
+body.pg-skin .mnz-plan.is-expired .mnz-plan__btn {
+    height: 32px;
+    border: 0;
+    border-radius: 7px;
+    background: var(--pg-fill);
+    box-shadow: var(--pg-glow);
+    color: #ffffff;
+    font: 500 12.5px var(--sans);
+}
+body.pg-skin .mnz-plan__btn:hover,
+body.pg-skin .mnz-plan.is-expiring .mnz-plan__btn:hover,
+body.pg-skin .mnz-plan.is-expired .mnz-plan__btn:hover {
+    background: var(--pg-fill);
+    color: #ffffff;
+    filter: brightness(1.1);
+}
+
+/* ===================================================================== */
+/* Topbar and pillar tabs                                                 */
+/* ===================================================================== */
+
+body.pg-skin .mnz-topbar__row { gap: 10px; padding: 0 20px; }
+
+body.pg-skin .pg-topbar-logo,
+body.pg-skin .mnz-topbar__rule { display: none; }
+
+body.pg-skin .mnz-topbar__ctx { font: 500 13px var(--sans); color: var(--ink); }
+
+body.pg-skin .mnz-topbar__avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #059669, #065f46);
+    color: #ffffff;
+}
+
+body.pg-skin .mnz-signout {
+    height: 32px;
+    padding: 0 12px;
+    border-radius: 7px;
+    font: 500 12.5px var(--sans);
+}
+
+body.pg-skin .mnz-menu-btn { height: 32px; border-radius: 7px; }
+
+/* Zero AI reads as a feature chip, not one more ghost button. */
+body.pg-skin .mnz-topbar .mnz-btn--ghost {
+    height: 28px;
+    padding: 0 12px;
+    border-radius: 9999px;
+    background: var(--e-tint);
+    color: var(--brand-darker);
+    font-size: 12.5px;
+}
+body.pg-skin .mnz-topbar .mnz-btn--ghost:hover { background: var(--e-line); }
+
+body.pg-skin .mnz-yearpick__label {
+    font: 400 12px var(--sans);
+    letter-spacing: 0;
+    text-transform: none;
+}
+body.pg-skin .mnz-yearpick__select {
+    height: 32px;
+    border-radius: 7px;
+    font: 500 13px var(--sans);
+}
+
+body.pg-skin .mnz-dropdown__menu { border-radius: 10px; box-shadow: 0 12px 28px -8px rgb(15 23 42 / 0.18); }
+body.pg-skin .mnz-dropdown__head { font: 600 10.5px var(--sans); letter-spacing: 0.08em; }
+body.pg-skin .mnz-dropdown__item { font: 400 13px var(--sans); border-radius: 6px; }
+
+body.pg-skin .mnz-tabs { padding: 0 20px; border-top: 1px solid var(--line-2); }
+body.pg-skin .mnz-tab { padding: 0 12px; font: 500 13px var(--sans); text-decoration: none; }
+body.pg-skin .mnz-tab.is-active { font-weight: 600; }
+body.pg-skin .mnz-tab__dot { border-radius: 9999px; }
+body.pg-skin .mnz-tabs__meta { font: 400 12px var(--sans); letter-spacing: 0; }
+
+/* ===================================================================== */
+/* Type                                                                   */
+/* ===================================================================== */
+
+/* :where() keeps the bare-element rules weak, so a titled component
+   (.esg-cards__title on an <h2>, .mnz-doc h1) still sets its own size. */
+body.pg-skin :where(.mnz-main h1),
+body.pg-skin .esg-cards__title,
+body.pg-skin .env-title,
+body.pg-skin .mm-title,
+body.pg-skin .ent-page-title {
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+}
+
+body.pg-skin :where(.mnz-main h2) { font-size: 15px; letter-spacing: -0.01em; }
+body.pg-skin :where(.mnz-main h3) { font-size: 14px; }
+
+body.pg-skin .mnz-lead,
+body.pg-skin .env-lead,
+body.pg-skin .mm-lead,
+body.pg-skin .esg-cards__ctx { font-size: 13px; color: var(--ink-2); }
+
+/* Kickers stay small caps, but in the UI face. */
+body.pg-skin .mnz-kicker,
+body.pg-skin .env-kicker,
+body.pg-skin .mm-kicker,
+body.pg-skin .esg-card__code {
+    font: 600 10.5px var(--sans);
+    letter-spacing: 0.08em;
+}
+
+/* Metric labels: sentence case, 12px. */
+body.pg-skin .mnz-label,
+body.pg-skin .env-kpi__label,
+body.pg-skin .esg-path__stats dt {
+    font: 400 12px var(--sans);
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--ink-2);
+}
+
+/* Remaining mono meta (codes, years, notes) moves to the UI face too. */
+body.pg-skin .mnz-kpi__delta,
+body.pg-skin .mnz-nav__meta,
+body.pg-skin .esg-card__pctlabel,
+body.pg-skin .esg-card__code-tag,
+body.pg-skin .esg-fw__note,
+body.pg-skin .esg-path__scope,
+body.pg-skin .esg-path__note,
+body.pg-skin .esg-path__progress-lbl,
+body.pg-skin .env-card__meta,
+body.pg-skin .env-kpi__code,
+body.pg-skin .env-table__code,
+body.pg-skin .env-trend__year,
+body.pg-skin .gov-fw,
+body.pg-skin .gov-rem__lbl,
+body.pg-skin .mm-axis,
+body.pg-skin .mm-year,
+body.pg-skin .mm-gri {
+    font-family: var(--sans);
+    letter-spacing: 0.02em;
+}
+
+/* Figures */
+body.pg-skin .mnz-kpi__value b,
+body.pg-skin .env-kpi__value,
+body.pg-skin .esg-card__pct,
+body.pg-skin .soc-hs__pct,
+body.pg-skin .ent-kpi-value {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+body.pg-skin .env-kpi__value.env-kpi__value--text { font-size: 15px; letter-spacing: -0.01em; }
+
+/* ===================================================================== */
+/* Page heads — no rule under the title                                   */
+/* ===================================================================== */
+
+body.pg-skin .mnz-pagehead,
+body.pg-skin .esg-cards__head,
+body.pg-skin .env-head,
+body.pg-skin .mm-head {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+/* ===================================================================== */
+/* Surfaces — 1px line, 10px radius, no shadow                            */
+/* ===================================================================== */
+
+body.pg-skin .mnz-panel,
+body.pg-skin .esg-fw,
+body.pg-skin .esg-path,
+body.pg-skin .env-card,
+body.pg-skin .mm-card,
+body.pg-skin .mnz-doc {
+    border-color: var(--line);
+    border-radius: var(--r-lg);
+}
+
+/* Panels are not clipped (a dropdown inside one must be able to escape), so
+   the first and last child carry the corner instead. */
+body.pg-skin .mnz-panel > :first-child,
+body.pg-skin .env-card > :first-child { border-top-left-radius: 9px; border-top-right-radius: 9px; }
+body.pg-skin .mnz-panel > :last-child,
+body.pg-skin .env-card > :last-child { border-bottom-left-radius: 9px; border-bottom-right-radius: 9px; }
+
+/* Seam grids are static tiles, so they can simply be clipped. */
+body.pg-skin .mnz-seam,
+body.pg-skin .esg-cards__grid,
+body.pg-skin .env-kpis {
+    border-color: var(--line);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+}
+body.pg-skin .mnz-seam { background: var(--line); }
+
+body.pg-skin .esg-card,
+body.pg-skin .env-kpi,
+body.pg-skin .esg-path__head,
+body.pg-skin .esg-path__stats,
+body.pg-skin .esg-path__stats > div,
+body.pg-skin .env-card__head,
+body.pg-skin .mnz-panel__head,
+body.pg-skin .mnz-panel__foot { border-color: var(--line); }
+
+body.pg-skin .mnz-panel__head { padding: 13px 16px; }
+body.pg-skin .mnz-panel__body { padding: 16px; }
+body.pg-skin .mnz-panel__foot { padding: 12px 16px; background: var(--pg-sf2); }
+
+body.pg-skin .esg-card__name,
+body.pg-skin .esg-fw__title,
+body.pg-skin .esg-path__title,
+body.pg-skin .env-card__title { font-size: 14px; letter-spacing: -0.01em; }
+
+/* Progress bars */
+body.pg-skin .mnz-meter,
+body.pg-skin .mnz-meter > i,
+body.pg-skin .esg-card__bar,
+body.pg-skin .esg-card__bar span,
+body.pg-skin .esg-fw__bar,
+body.pg-skin .esg-fw__bar span,
+body.pg-skin .soc-hs__bar,
+body.pg-skin .soc-hs__bar span,
+body.pg-skin .gov-progress__bar,
+body.pg-skin .gov-progress__bar span { height: 6px; border-radius: 9999px; }
+
+body.pg-skin .esg-card__bar,
+body.pg-skin .esg-fw__bar,
+body.pg-skin .soc-hs__bar,
+body.pg-skin .gov-progress__bar { background: var(--line-2); }
+
+/* ===================================================================== */
+/* Buttons — 32px                                                         */
+/* ===================================================================== */
+
+body.pg-skin .mnz-btn { font: 500 13px var(--sans); text-decoration: none; }
+body.pg-skin .mnz-btn--lg { height: 40px; font-size: 14px; }
+
+body.pg-skin .mnz-btn--primary,
+body.pg-skin .mnz-btn--primary:hover,
+body.pg-skin .env-page:not(.env-page--social):not(.env-page--gov) .env-btn--primary,
+body.pg-skin .mnz-main .btn-primary {
+    background: var(--pg-fill);
+    border-color: transparent;
+    box-shadow: var(--pg-glow);
+    color: #ffffff;
+}
+body.pg-skin .mnz-btn--primary:hover,
+body.pg-skin .env-page:not(.env-page--social):not(.env-page--gov) .env-btn--primary:hover,
+body.pg-skin .mnz-main .btn-primary:hover:not(:disabled) { filter: brightness(1.08); border-color: transparent; }
+
+/* Outside a pillar, mnz-ui's accent is ink, which makes the main action on
+   Settings and Billing a black button. Give it the brand fill there. */
+body.pg-skin [data-pillar=neutral] .mnz-btn--accent {
+    background: var(--pg-fill);
+    border-color: transparent;
+    box-shadow: var(--pg-glow);
+    color: #ffffff;
+}
+
+body.pg-skin .env-btn {
+    height: 32px;
+    padding: 0 12px;
+    border-radius: 7px;
+    border-color: var(--line);
+    font-size: 13px;
+}
+
+body.pg-skin .mnz-main .btn {
+    min-height: 32px;
+    padding: 0 12px;
+    gap: 6px;
+    font-size: 13px;
+}
+body.pg-skin .mnz-main .btn-secondary { border-color: var(--line); }
+body.pg-skin .mnz-main .btn-sm { min-height: 28px; padding: 0 10px; font-size: 12.5px; }
+body.pg-skin .mnz-main .btn-xs { min-height: 24px; padding: 0 8px; font-size: 12px; }
+body.pg-skin .mnz-main .btn-lg { min-height: 40px; padding: 0 16px; font-size: 14px; }
+
+/* ===================================================================== */
+/* Status pills — 22px, tinted, no outline                                */
+/* ===================================================================== */
+
+body.pg-skin .mnz-chip,
+body.pg-skin .env-badge,
+body.pg-skin .mm-flag,
+body.pg-skin .esg-path__sbti,
+body.pg-skin .ent-status,
+body.pg-skin .mnz-main .badge {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 8px;
+    border: 0;
+    border-radius: 6px;
+    font: 500 12px var(--sans);
+    letter-spacing: 0;
+    text-transform: none;
+    white-space: nowrap;
+}
+body.pg-skin .esg-path__sbti { background: var(--e-tint); color: var(--e); }
+
+/* ===================================================================== */
+/* Tables                                                                 */
+/* ===================================================================== */
+
+body.pg-skin .mnz-table__head,
+body.pg-skin table.mnz-table th,
+body.pg-skin .env-table th,
+body.pg-skin .mm-table__head,
+body.pg-skin .mnz-main .table thead th,
+body.pg-skin .mnz-main table.min-w-full thead th {
+    font: 500 12px var(--sans) !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    color: var(--ink-3) !important;
+    background: var(--pg-sf2) !important;
+    border-color: var(--line);
+}
+
+body.pg-skin .mnz-table__row,
+body.pg-skin table.mnz-table td,
+body.pg-skin .env-table td,
+body.pg-skin .mm-table__row { font-size: 13px; border-color: var(--line-2); }
+
+body.pg-skin .mnz-table__row:hover,
+body.pg-skin .mnz-table__row--edit,
+body.pg-skin .mnz-sec__btn:hover { background: var(--pg-sf2); }
+
+body.pg-skin .mnz-main .table { font-size: 13px; }
+body.pg-skin .mnz-main .table thead th { padding: 9px 14px; }
+body.pg-skin .mnz-main .table tbody td { padding: 9px 14px; border-bottom-color: var(--line-2); }
+body.pg-skin .mnz-main table.min-w-full { font-size: 13px; }
+body.pg-skin .mnz-main table.min-w-full tbody > tr { border-color: var(--line-2); }
+body.pg-skin .mnz-main .table tbody tr:hover,
+body.pg-skin .mnz-main table.min-w-full tbody tr:hover { background-color: var(--pg-sf2); }
+
+/* ===================================================================== */
+/* Forms                                                                  */
+/* ===================================================================== */
+
+body.pg-skin .mnz-input,
+body.pg-skin .mnz-select { height: 36px; font: 400 13px var(--sans); }
+body.pg-skin .mnz-textarea { font: 400 13px var(--sans); }
+
+/* mnz-ui leaves .mnz-select with the browser's own arrow, which sits flush
+   against the border; draw the same chevron the year switcher uses. */
+body.pg-skin .mnz-select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 30px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m5 7.5 5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 9px center;
+    background-size: 16px;
+}
+body.pg-skin .mnz-input--cell { height: 28px; }
+body.pg-skin .mnz-field > label { font-size: 12.5px; color: var(--ink-2); }
+body.pg-skin .mnz-switch[aria-checked=true] { background: var(--brand); }
+
+body.pg-skin .mnz-main .form-label,
+body.pg-skin .mnz-main label.block[class*="font-medium"] {
+    font-size: 12.5px;
+    color: var(--ink-2);
+}
+
+body.pg-skin .mnz-main .form-control,
+body.pg-skin .mnz-main .form-input,
+body.pg-skin .mnz-main .form-select,
+body.pg-skin .mnz-main .form-textarea { font-size: 13px; }
+
+body.pg-skin .mnz-main input[type="checkbox"],
+body.pg-skin .mnz-main input[type="radio"] { accent-color: var(--brand); }
+
+/* ===================================================================== */
+/* Page bodies still written in old-shell classes or raw Tailwind         */
+/* ===================================================================== */
+
+body.pg-skin .mnz-main .card,
+body.pg-skin .mnz-main .stat-card,
+body.pg-skin .mnz-main .ent-card,
+body.pg-skin .mnz-main .ent-kpi-card,
+body.pg-skin .mnz-main div.bg-white.shadow,
+body.pg-skin .mnz-main div.bg-white.shadow-sm,
+body.pg-skin .mnz-main div.bg-white.shadow-lg,
+body.pg-skin .mnz-main div.bg-white.rounded-lg,
+body.pg-skin .mnz-main div.bg-white.rounded-xl {
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg) !important;
+    box-shadow: none !important;
+}
+
+body.pg-skin .mnz-main .card-header { padding: 13px 16px; }
+body.pg-skin .mnz-main .card-body { padding: 16px; }
+body.pg-skin .mnz-main .card-footer { padding: 12px 16px; background-color: var(--pg-sf2); }
+body.pg-skin .mnz-main .card-title,
+body.pg-skin .mnz-main .ent-card-title { font-size: 14px; }
+
+body.pg-skin .mnz-main .stat-card-label {
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--ink-2);
+}
+body.pg-skin .mnz-main .stat-card-value { font-size: 20px; line-height: 1.2; letter-spacing: -0.02em; }
+
+body.pg-skin .mnz-main .page-header h1 { margin-bottom: 4px; }
+body.pg-skin .mnz-main .page-header p { font-size: 13px; color: var(--ink-2); }
+
+/* Hand-rolled primary buttons (bg-brand / remapped purple). */
+body.pg-skin .mnz-main a[class*="bg-purple-6"]:not(.block),
+body.pg-skin .mnz-main button[class*="bg-purple-6"]:not(.block),
+body.pg-skin .mnz-main a.bg-brand:not(.block),
+body.pg-skin .mnz-main button.bg-brand:not(.block),
+body.pg-skin .mnz-main a[class*="bg-emerald-6"]:not(.block),
+body.pg-skin .mnz-main button[class*="bg-emerald-6"]:not(.block) {
+    background-image: var(--pg-fill);
+    box-shadow: var(--pg-glow);
+}
+
+/* Hand-rolled pills. */
+body.pg-skin .mnz-main span.rounded-full[class*="px-"][class*="text-xs"] {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 8px !important;
+    border-radius: 6px !important;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+body.pg-skin .mnz-main .alert { font-size: 13px; border-radius: var(--r); }
+
+body.pg-skin .mnz-main > .site-footer { border-top-color: var(--line); }
+
+/* ===================================================================== */
+/* Small screens — the rail goes off-canvas                               */
+/* ===================================================================== */
+
+@media (max-width: 1024px) {
+    body.pg-skin .mnz-app:has(> .mnz-body) {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
+            "acting"
+            "top"
+            "main";
+    }
+
+    body.pg-skin .mnz-side,
+    body.pg-skin .mnz-app:has(> .mnz-acting) .mnz-side {
+        position: fixed;
+        inset: 0 auto 0 0;
+        z-index: 40;
+        width: min(86vw, var(--side-w));
+        height: auto;
+        transform: translateX(-100%);
+        transition: transform 0.2s ease;
+        box-shadow: none;
+    }
+    body.pg-skin .mnz-side.is-open {
+        transform: none;
+        box-shadow: 0 0 0 100vmax rgb(15 23 42 / 0.45);
+    }
+
+    body.pg-skin .mnz-menu-btn { display: inline-flex; }
+    body.pg-skin .pg-topbar-logo { display: block; }
+    body.pg-skin .pg-topbar-logo img { height: 22px; }
+    body.pg-skin .mnz-topbar__row { padding: 0 14px; }
+    body.pg-skin .mnz-tabs { padding: 0 8px; }
+    body.pg-skin .mnz-main { padding: 18px 16px 32px; }
+}
+
+@media (max-width: 640px) {
+    body.pg-skin .mnz-topbar__ctx { display: none; }
+    body.pg-skin :where(.mnz-main h1),
+    body.pg-skin .esg-cards__title,
+    body.pg-skin .env-title,
+    body.pg-skin .mm-title { font-size: 19px; }
+}
+
+@media print {
+    body.pg-skin .mnz-app:has(> .mnz-body) { display: block; }
+}
