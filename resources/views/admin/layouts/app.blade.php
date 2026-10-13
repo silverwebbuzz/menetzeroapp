@@ -6,7 +6,7 @@
     <title>@yield('title', 'Admin | MENetZero')</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         const BRAND = {
@@ -24,8 +24,15 @@
                         violet: BRAND,
                         indigo: BRAND,
                         orange: BRAND,
+                        // Admin pages hardcode gray-* utilities; point them at
+                        // the admin skin's cooler neutrals (admin-paygate.css).
+                        gray: {
+                            50: '#f8fafc', 100: '#f1f5f9', 200: '#e4e7ec', 300: '#d5dae1',
+                            400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155',
+                            800: '#1e293b', 900: '#0f172a',
+                        },
                     },
-                    fontFamily: { sans: ['Inter', 'Poppins', 'system-ui', 'sans-serif'] },
+                    fontFamily: { sans: ['Poppins', 'Inter', 'system-ui', 'sans-serif'] },
                 },
             },
         };
@@ -34,9 +41,12 @@
     {{-- Cache-busted like the consultant shell: without a version the browser
          serves its cached copy and a CSS change appears to do nothing. --}}
     <link rel="stylesheet" href="{{ asset('css/app-shell.css') }}?v=20260902">
+    {{-- Admin-only skin. Must load after app-shell.css: it re-points that
+         file's tokens for this portal alone (scoped to body.admin-pg). --}}
+    <link rel="stylesheet" href="{{ asset('css/admin-paygate.css') }}?v=20261013">
     @stack('head')
 </head>
-<body class="bg-slate-50">
+<body class="admin-pg">
     <div class="app-shell" x-data="{ sidebarOpen: false }">
         {{-- Mobile overlay --}}
         <div class="mobile-overlay"
@@ -48,11 +58,11 @@
         <aside class="sidebar"
                :class="{ 'is-open': sidebarOpen }"
                @keydown.escape.window="sidebarOpen = false">
-            <div class="sidebar-header" style="flex-direction: column; align-items: flex-start; gap: 0.125rem; padding-top: 0.75rem; padding-bottom: 0.75rem; height: auto; min-height: var(--header-height);">
+            <div class="sidebar-header">
                 <a href="{{ route('admin.dashboard') }}" class="brand-logo">
                     <img src="{{ asset('images/menetzero.svg') }}" alt="MENetZero">
                 </a>
-                <span class="text-[10px] font-semibold text-brand-dark uppercase tracking-widest pl-1">Super Admin</span>
+                <span class="pg-portal-label">Super Admin console</span>
             </div>
 
             <nav class="flex-1 overflow-y-auto py-2">
@@ -61,11 +71,19 @@
 
             <div class="sidebar-footer">
                 @php $admin = auth('admin')->user(); @endphp
-                <span class="truncate">{{ $admin?->name ?? 'Admin' }}</span>
+                <div class="pg-user">
+                    <span class="pg-avatar" aria-hidden="true">{{ strtoupper(mb_substr($admin?->name ?? 'A', 0, 1)) }}</span>
+                    <span class="min-w-0">
+                        <span class="pg-user-name truncate">{{ $admin?->name ?? 'Admin' }}</span>
+                        <span class="pg-user-role">Super Admin</span>
+                    </span>
+                </div>
                 <form method="POST" action="{{ route('admin.logout') }}">
                     @csrf
-                    <button type="submit" class="text-red-600 hover:text-red-700 whitespace-nowrap font-medium">
-                        Logout
+                    <button type="submit" class="pg-icon-btn" title="Logout" aria-label="Logout">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
                     </button>
                 </form>
             </div>
@@ -83,7 +101,10 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
                 </button>
+                <span class="pg-crumb">Admin</span>
+                <span class="pg-crumb-sep" aria-hidden="true">/</span>
                 <h1 class="page-title truncate">@yield('page-title', 'Admin Dashboard')</h1>
+                <span class="pg-topbar-chip">Super Admin</span>
             </header>
 
             <main class="content-area">

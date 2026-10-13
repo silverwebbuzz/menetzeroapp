@@ -1,0 +1,439 @@
+/*
+ * MENetZero — Super Admin skin
+ *
+ * PayGate's look and feel (dark rail, 56px topbar, 13px Poppins, flat bordered
+ * surfaces, 32px buttons, tinted status pills) in MENetZero emerald.
+ *
+ * Loaded ONLY by admin/layouts/app.blade.php, after app-shell.css, and every
+ * rule is scoped to body.admin-pg. app-shell.css is shared with the company
+ * and consultant portals, so nothing here may leak out of that scope.
+ *
+ * Most of the re-skin is the token block below: app-shell.css is written
+ * against these variables, so redefining them on the admin body restyles its
+ * cards, tables, forms and buttons without repeating the rules.
+ */
+
+body.admin-pg {
+    /* Accent — one step darker than app-shell's emerald so white text on a
+       primary button clears AA contrast. */
+    --brand: #059669;
+    --brand-dark: #047857;
+    --brand-darker: #065f46;
+    --brand-soft: #ecfdf5;
+    --brand-softer: #d1fae5;
+
+    /* Neutrals (PayGate: tx / tx2 / tx3 / ln / sf / bg) */
+    --ink: #0f172a;
+    --ink-muted: #475569;
+    --ink-subtle: #64748b;
+    --ink-hint: #94a3b8;
+    --line: #e4e7ec;
+    --line-strong: #d5dae1;
+    --surface: #ffffff;
+    --canvas: #f5f6f8;
+    --canvas-deep: #eef0f3;
+
+    /* State */
+    --danger: #b91c1c;
+    --danger-soft: #fef2f2;
+    --warning: #b45309;
+    --warning-soft: #fffbeb;
+    --info: #1d4ed8;
+    --info-soft: #eff6ff;
+    --success: #047857;
+    --success-soft: #ecfdf5;
+
+    /* Shape */
+    --sidebar-width: 260px;
+    --header-height: 56px;
+    --radius-sm: 5px;
+    --radius: 7px;
+    --radius-md: 7px;
+    --radius-lg: 10px;
+    --radius-xl: 12px;
+
+    /* Surfaces are separated by a 1px line, not a shadow. */
+    --shadow-xs: none;
+    --shadow-sm: 0 1px 2px 0 rgb(15 23 42 / 0.04);
+    --shadow-ring: 0 0 0 3px rgb(5 150 105 / 0.16);
+
+    /* Skin-only tokens */
+    --pg-nav: #062a21;
+    --pg-nav-line: rgb(255 255 255 / 0.08);
+    --pg-sf2: #f8fafc;
+    --pg-ln2: #eef0f3;
+
+    font-family: 'Poppins', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-size: 13px;
+    font-feature-settings: 'tnum' 1, 'cv11' 1;
+}
+
+/* Brand fill for primary buttons and the active menu item. */
+body.admin-pg .btn-primary,
+body.admin-pg .sidebar .nav-link.active {
+    background-image: linear-gradient(90deg, var(--brand), var(--brand-darker));
+    box-shadow: 0 8px 18px -10px rgb(5 150 105 / 0.9);
+}
+
+/* ===================================================================== */
+/* Sidebar                                                                */
+/* ===================================================================== */
+
+body.admin-pg .sidebar {
+    background-color: var(--pg-nav);
+    border-right: 0;
+    color: #ffffff;
+    overflow: hidden;
+}
+
+body.admin-pg .sidebar-header {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 1px;
+    padding: 0 17px;
+    border-bottom: 1px solid var(--pg-nav-line);
+}
+
+/* The logo's wordmark is black, which disappears on the dark rail. */
+body.admin-pg .brand-logo img {
+    height: 22px;
+    filter: brightness(0) invert(1);
+}
+
+body.admin-pg .pg-portal-label {
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.55);
+    line-height: 1.2;
+}
+
+body.admin-pg .sidebar nav {
+    padding: 12px 12px 16px;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(255 255 255 / 0.18) transparent;
+}
+
+body.admin-pg .nav-section { padding: 16px 0 0; }
+body.admin-pg .nav-section:first-child { padding-top: 0; }
+
+body.admin-pg .nav-section-title {
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: rgb(255 255 255 / 0.45);
+    padding: 0 12px 6px;
+}
+
+body.admin-pg .sidebar .nav-link {
+    height: 40px;
+    padding: 0 12px;
+    gap: 12px;
+    margin: 2px 0;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgb(255 255 255 / 0.9);
+}
+
+body.admin-pg .sidebar .nav-link:hover,
+body.admin-pg .sidebar .nav-link:active {
+    background-color: rgb(255 255 255 / 0.06);
+    color: #ffffff;
+}
+
+body.admin-pg .sidebar .nav-link.active {
+    color: #ffffff;
+    font-weight: 500;
+}
+
+/* The gradient fill marks the active item; the edge bar would double it. */
+body.admin-pg .sidebar .nav-link.active::before { display: none; }
+
+/* Three classes deep on purpose: app-shell's
+   .nav-link:hover:not(.active) svg would otherwise repaint the icon grey. */
+body.admin-pg .sidebar .nav-link svg,
+body.admin-pg .sidebar .nav-link:hover svg,
+body.admin-pg .sidebar .nav-link.active svg,
+body.admin-pg .sidebar .nav-link:hover:not(.active) svg {
+    width: 18px;
+    height: 18px;
+    color: currentColor;
+}
+
+body.admin-pg .sidebar-footer {
+    padding: 12px 14px;
+    border-top: 1px solid var(--pg-nav-line);
+    color: #ffffff;
+    gap: 10px;
+}
+
+body.admin-pg .pg-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+body.admin-pg .pg-avatar {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    flex: none;
+    border-radius: 8px;
+    background-image: linear-gradient(135deg, var(--brand), var(--brand-darker));
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+body.admin-pg .pg-user-name {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.25;
+    color: #ffffff;
+}
+
+body.admin-pg .pg-user-role {
+    display: block;
+    font-size: 11.5px;
+    line-height: 1.25;
+    color: rgb(255 255 255 / 0.55);
+}
+
+body.admin-pg .pg-icon-btn {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    flex: none;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: rgb(255 255 255 / 0.6);
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s;
+}
+body.admin-pg .pg-icon-btn:hover { background-color: rgb(255 255 255 / 0.08); color: #ffffff; }
+body.admin-pg .pg-icon-btn svg { width: 16px; height: 16px; }
+
+/* ===================================================================== */
+/* Topbar                                                                 */
+/* ===================================================================== */
+
+body.admin-pg .header {
+    padding: 0 20px;
+    gap: 6px;
+    font-size: 13px;
+}
+
+body.admin-pg .pg-crumb { color: var(--ink-subtle); white-space: nowrap; }
+body.admin-pg .pg-crumb-sep { color: var(--line-strong); }
+
+body.admin-pg .page-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+}
+
+body.admin-pg .pg-topbar-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 26px;
+    margin-left: auto;
+    padding: 0 10px;
+    border-radius: 9999px;
+    background-color: var(--brand-soft);
+    color: var(--brand-darker);
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    flex: none;
+}
+body.admin-pg .pg-topbar-chip::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background-color: var(--brand);
+}
+
+/* ===================================================================== */
+/* Page                                                                   */
+/* ===================================================================== */
+
+body.admin-pg .content-area { padding: 22px 24px; }
+
+/* !important because app-shell locks every content heading to 14px with
+   !important (its "heading scale" block); the admin skin wants PayGate's
+   22px page title. */
+body.admin-pg .content-area h1 {
+    font-size: 22px !important;
+    font-weight: 600 !important;
+    line-height: 1.25 !important;
+    letter-spacing: -0.015em;
+}
+
+body.admin-pg .content-area h1 + p,
+body.admin-pg .page-header p {
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+    color: var(--ink-muted) !important;
+}
+
+body.admin-pg .page-header { align-items: flex-end; gap: 16px; margin-bottom: 18px; }
+
+/* ===================================================================== */
+/* Buttons — 32px                                                         */
+/* ===================================================================== */
+
+body.admin-pg .btn {
+    min-height: 32px;
+    padding: 0 12px;
+    gap: 6px;
+    font-size: 13px;
+}
+
+body.admin-pg .btn-primary { border-color: transparent; }
+body.admin-pg .btn-primary:hover:not(:disabled) {
+    border-color: transparent;
+    filter: brightness(1.08);
+}
+
+body.admin-pg .btn-secondary { border-color: var(--line); }
+body.admin-pg .btn-secondary:hover:not(:disabled) {
+    background-color: var(--pg-sf2);
+    border-color: var(--line);
+}
+
+body.admin-pg .btn-ghost:hover:not(:disabled) { background-color: var(--pg-sf2); }
+
+body.admin-pg .btn-sm { min-height: 28px; padding: 0 10px; font-size: 12.5px; }
+body.admin-pg .btn-xs { min-height: 24px; padding: 0 8px; font-size: 12px; }
+body.admin-pg .btn-lg { min-height: 40px; padding: 0 16px; font-size: 14px; }
+
+/* Legacy inline Tailwind buttons, which app-shell normalises to 14px. */
+body.admin-pg .content-area a[class*="px-"][class*="py-"][class*="rounded"],
+body.admin-pg .content-area button[class*="px-"][class*="py-"][class*="rounded"]:not(.mobile-menu-btn):not([role="tab"]):not(.tab-button) {
+    font-size: 13px !important;
+}
+
+/* ===================================================================== */
+/* Cards, stats                                                           */
+/* ===================================================================== */
+
+body.admin-pg .card-header { padding: 13px 16px; }
+body.admin-pg .card-body { padding: 16px; }
+body.admin-pg .card-footer { padding: 12px 16px; background-color: var(--pg-sf2); }
+body.admin-pg .card-title { font-size: 14px; }
+body.admin-pg .card-subtitle { font-size: 12px; color: var(--ink-subtle); }
+
+body.admin-pg .stat-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 13px 14px;
+}
+
+body.admin-pg .stat-card-label {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--ink-muted);
+}
+
+body.admin-pg .stat-card-value {
+    font-size: 20px;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+/* ===================================================================== */
+/* Tables                                                                 */
+/* ===================================================================== */
+
+body.admin-pg .table { font-size: 13px; }
+
+body.admin-pg .table thead th,
+body.admin-pg table.min-w-full thead th {
+    padding: 9px 14px;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    color: var(--ink-subtle) !important;
+    background: var(--pg-sf2) !important;
+}
+
+body.admin-pg .table tbody td {
+    padding: 9px 14px;
+    border-bottom-color: var(--pg-ln2);
+}
+
+body.admin-pg .table tbody tr:hover,
+body.admin-pg table.min-w-full tbody tr:hover { background-color: var(--pg-sf2); }
+
+/* ===================================================================== */
+/* Badges — 22px tinted pills, no outline                                 */
+/* ===================================================================== */
+
+body.admin-pg .badge {
+    height: 22px;
+    padding: 0 8px;
+    gap: 6px;
+    border: 0;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0;
+}
+
+body.admin-pg .badge-brand   { background: var(--brand-soft);   color: var(--brand-dark); }
+body.admin-pg .badge-success { background: var(--success-soft); color: var(--success); }
+body.admin-pg .badge-danger  { background: var(--danger-soft);  color: var(--danger); }
+body.admin-pg .badge-warning { background: var(--warning-soft); color: var(--warning); }
+body.admin-pg .badge-info    { background: var(--info-soft);    color: var(--info); }
+body.admin-pg .badge-neutral { background: #f1f5f9;             color: var(--ink-muted); }
+
+/* ===================================================================== */
+/* Forms, alerts                                                          */
+/* ===================================================================== */
+
+body.admin-pg .form-label { font-size: 12.5px; color: var(--ink-muted); }
+
+body.admin-pg .form-control,
+body.admin-pg .form-input,
+body.admin-pg .form-select,
+body.admin-pg .form-textarea,
+body.admin-pg .content-area select:not([multiple]):not([size]),
+body.admin-pg .content-area input[type="text"]:not(.btn):not([type="hidden"]),
+body.admin-pg .content-area input[type="email"]:not(.btn),
+body.admin-pg .content-area input[type="password"]:not(.btn),
+body.admin-pg .content-area input[type="number"]:not(.btn),
+body.admin-pg .content-area input[type="date"]:not(.btn),
+body.admin-pg .content-area input[type="url"]:not(.btn),
+body.admin-pg .content-area input[type="search"]:not(.btn),
+body.admin-pg .content-area textarea:not(.btn) {
+    font-size: 13px;
+}
+
+body.admin-pg .alert { font-size: 13px; border-color: transparent; }
+body.admin-pg .alert-success { color: var(--success); }
+body.admin-pg .alert-danger  { color: var(--danger); }
+body.admin-pg .alert-warning { color: var(--warning); }
+body.admin-pg .alert-info    { color: var(--info); }
+
+@media (max-width: 768px) {
+    body.admin-pg .content-area h1 { font-size: 19px !important; }
+    body.admin-pg .pg-crumb,
+    body.admin-pg .pg-crumb-sep,
+    body.admin-pg .pg-topbar-chip { display: none; }
+}
