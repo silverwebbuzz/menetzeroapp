@@ -3368,5 +3368,15 @@
     "mtime": 1789733611.2364502,
     "ast_hash": "9959b647fa8d1d25fa90c68cb19f6046",
     "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/database/data/emission_factors_2026.php": {
+    "mtime": 1791876174.7192261,
+    "ast_hash": "417350b8d0dee8494ade057201cbcf55",
+    "semantic_hash": ""
+  },
+  "/Users/apple/Silverwebbuzz/menetzeroapp/database/migrations/2026_10_13_000000_correct_emission_factors_to_2026.php": {
+    "mtime": 1791876366.9533885,
+    "ast_hash": "0c0a53268603baf228ffe5032038598a",
+    "semantic_hash": ""
   }
 }
